@@ -131,6 +131,7 @@ La división debe mejorar claridad y pruebas. No crear clases base universales, 
 - Flutter contiene solo URL y clave publicable con sesión de usuario. Los valores de compilación no son secretos. Credenciales SQL, `service_role` y claves secretas permanecen en servidor.
 - Configuración local ignorada por Git; ejemplos versionados sin credenciales. Nunca registrar códigos/tokens del deep link ni datos privados en logs.
 - Versionar migraciones, grants, RLS, restricciones y funciones. Comprobar permisos entre usuarios y roles; no mantener esquema solamente en Dashboard.
+- Las fuentes SQL pertenecen a `database`, por tipo de objeto y con numeración global. Los cambios de cada incremento generan su migración de Supabase; conservar el SQL aplicado y añadir nuevos scripts para evolucionarlo. Seguir [database/README.md](../database/README.md) y [ADR-002](decisiones/002-organizacion-database.md). Seeds y tests se ejecutan aparte; no hay dos fuentes editables para el mismo cambio.
 - Separar contratos públicos del QR de coordenadas/documentos privados. RLS controla filas y debe acompañarse de control de columnas y bytes expuestos.
 - Validar invariantes y operaciones atómicas en servidor. Reintentos incompatibles deben producir conflicto, no publicaciones duplicadas.
 - Persistir notificaciones y trabajo de entrega antes de intentar push; registrar fallos y permitir reintento.

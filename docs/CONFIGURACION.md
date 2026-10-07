@@ -42,7 +42,7 @@ Al implementar HU-01, usar `AppConfig.authRedirectUri` como `redirectTo` en OAut
 
 Android registra esquema `entrehuellas`, host `login-callback` y ruta `/`, permiso INTERNET y actividad `singleTop`. iOS registra el esquema y desactiva también el manejador de enlaces de Flutter; no se compiló iOS en Windows. Supabase Flutter procesa los enlaces mediante app_links y PKCE; go_router conserva las rutas de la UI. [SDK de Supabase Flutter](https://pub.dev/packages/supabase_flutter), [deep links de Flutter y plugins](https://docs.flutter.dev/ui/navigation/deep-linking).
 
-No se han creado tablas, grants, RLS ni funciones. Versionarlos en S1 y comprobar permisos con dos usuarios antes de declarar HU-01 completa.
+No se han creado tablas, grants, RLS ni funciones. Las fuentes se incorporarán en `database`, siguiendo [su estructura y numeración](../database/README.md), y generarán migraciones en S1. Comprobar permisos con dos usuarios antes de declarar HU-01 completa. El JSON de Flutter contiene configuración pública; no es una conexión SQL para ejecutar esos scripts.
 
 ## Prueba Android pendiente
 

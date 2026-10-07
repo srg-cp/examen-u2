@@ -28,6 +28,7 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 - La configuración de acceso, permisos y reglas críticas se valida en Supabase: grants, RLS, restricciones y funciones autorizadas.
 - Separar datos públicos del QR de coordenadas y documentos privados. La RLS controla filas; no sustituye el control de columnas expuestas.
 - Versionar migraciones, políticas y funciones. No mantener cambios de esquema solamente en el Dashboard.
+- Organizar fuentes SQL en `database` según `database/README.md` y ADR-002: directorios por tipo de objeto y numeración global `001_...sql`. Los scripts del incremento generan una migración en `supabase/migrations`; no mantener copias editables independientes ni reescribir SQL aplicado. Preparar y validar esa generación en S1 antes del primer despliegue. `database/functions` es SQL; `supabase/functions` contiene Edge Functions.
 - La app usa clave publicable y sesión de usuario. Credenciales SQL, claves secretas y service_role permanecen en servidor.
 - Guardar envíos offline con identificador estable; el servidor deduplica y valida reintentos. Diferenciar borrador, pendiente y publicado.
 - Guardar la notificación antes de intentar push. Registrar fallo y permitir reintento.

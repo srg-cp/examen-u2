@@ -5,7 +5,7 @@
 ## Hechos comprobados
 
 - Carpeta actual: `C:\Users\Administrator\Documents\projects\entreHuellas`.
-- Rama comprobada: `main`, commit de partida `8c5fdee` (`init`). Árbol limpio antes de editar. El proyecto ya tenía commits y una app Flutter multiplataforma con una pantalla `Hello World!`; el estado previo del 4 de octubre quedó desactualizado.
+- Comprobación inicial del chat 00: `main`, commit de partida `8c5fdee` (`init`), árbol limpio. El proyecto ya tenía commits y una app Flutter multiplataforma con una pantalla `Hello World!`; el estado previo del 4 de octubre quedó desactualizado.
 - La app se conserva en `flutter_application_entrehuellas`, según la decisión de ubicación del 6 de octubre de 2026. No se creó `apps/mobile` ni se regeneraron las plataformas.
 - Flutter 3.35.3 stable / Dart 3.9.2. No se actualizó el SDK.
 - `flutter doctor`: Android SDK 36.1.0-rc1, Command-line Tools ausentes y licencias de estado desconocido. `flutter devices`: Windows, Chrome y Edge; ningún Android conectado.
@@ -77,12 +77,22 @@ Las pruebas de sesión usan un repositorio sustituido; no equivalen a acceso con
 - La documentación distingue la base de sesión implementada de los flujos previstos de mascotas, recuperación y almacenamiento local. El registro de decisión incluye los costos de los contratos/mapeos y los límites de una futura sustitución del backend.
 - Validación: enlaces locales y coherencia de referencias revisados, `git diff --check` sin errores. Cambios solo documentales; no se repitieron pruebas Flutter. Se conservó el trabajo local en `main` sin acciones GitHub ni configuración remota.
 
+## Organización de la base de datos, 7 de octubre de 2026
+
+- Estado de partida de esta tarea: rama `main`, commit `8503fa3` (`feat: Initialize Supabase and set up authentication structure`), árbol limpio antes de editar. Se conservaron los archivos existentes.
+- Confirmado `config/supabase.local.json`: JSON y formato de URL HTTPS/clave publicable compatibles con AppConfig, sin mostrar ni modificar valores. Archivo ignorado por Git. Esto no verifica credenciales remotas ni autenticación.
+- Creado `database` con 11 directorios versionables: extensions, types, tables, indexes, functions, triggers, views, policies, grants, seeds y tests. Su README define numeración global `001_...sql`, dependencias, separación de datos de prueba y conservación del SQL aplicado. No se crearon objetos de base de datos ni scripts SQL ficticios.
+- ADR-002 registra la organización por objeto y la generación prevista de migraciones de Supabase a partir de las fuentes. Actualizados AGENTS, README, arquitectura, reglas, guía y configuración. El procedimiento de generación se debe implementar y comprobar en S1 antes del primer despliegue.
+- Validación: directorios y enlaces locales comprobados, `git diff --check` correcto y protección Git de la configuración local confirmada. No hay SQL nuevo que ejecutar; no se realizaron pruebas de permisos ni se repitieron pruebas Flutter. Supabase CLI y psql no se encontraron en PATH.
+- No se ejecutó SQL local/remoto ni se modificó el proyecto Supabase. No hubo commit, push o despliegue en esta tarea.
+- Siguiente paso: S1 / HU-01, definir el primer esquema y sus políticas en database, preparar generación/migración y probar permisos con dos usuarios antes de aplicarlo al entorno de desarrollo autorizado.
+
 ## Pendiente
 
 - Completar herramientas Android y revisión de licencias. Build APK y ejecución Android **no verificados**; faltan herramientas y dispositivo. iOS no compilado en Windows.
-- Identificar proyecto Supabase de desarrollo, aportar URL/clave publicable en el archivo local y registrar el retorno exacto en Authentication > URL Configuration > Redirect URLs. No se verificó ni cambió configuración en Dashboard.
+- Verificar el proyecto Supabase de desarrollo configurado en el JSON local y registrar el retorno exacto en Authentication > URL Configuration > Redirect URLs. El archivo local está completado y su formato fue validado; no se verificó ni cambió configuración en Dashboard.
 - Probar retorno con app abierta/cerrada y luego correo/OAuth real en S1. No se verificó autenticación ni restauración remota de sesión.
-- Implementar HU-01 / RF-01,34: registro/correo/Google, perfil, cierre de sesión, gestión de cuenta; migraciones/grants/RLS y permisos entre dos usuarios. No hay esquema ni políticas nuevas en esta entrega.
+- Implementar HU-01 / RF-01,34: registro/correo/Google, perfil, cierre de sesión, gestión de cuenta; fuentes SQL en database, generación de migraciones/grants/RLS y permisos entre dos usuarios. No hay esquema ni políticas nuevas en esta entrega.
 - Revisar identificadores definitivos, firma y requisitos de distribución antes de publicar una app.
 - Publicar cambios y ejecutar CI remoto solo cuando la tarea autorice acciones GitHub.
 

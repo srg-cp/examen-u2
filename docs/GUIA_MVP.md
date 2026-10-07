@@ -106,7 +106,7 @@ Se conserva la numeración original para relacionar implementación, informe aca
 ### S1 - Acceso y cuenta
 
 - **HU-01 / RF-01,34:** acceso por correo/Google, sesión, perfil y gestión de cuenta. Inicio válido crea o recupera un único perfil; otro usuario no puede editarlo. Solicitud de baja trazable y exportación básica de los datos del usuario según el alcance acordado.
-- Crear o identificar el proyecto Supabase de desarrollo, configurar Auth y versionar esquema, permisos y migraciones.
+- Crear o identificar el proyecto Supabase de desarrollo, configurar Auth y versionar esquema, permisos y migraciones. Las fuentes SQL se organizan en `database` según [su convención](../database/README.md); preparar la generación ordenada de migraciones antes del primer despliegue.
 - Comprobar sesión inválida, cierre de sesión y acceso cruzado con dos cuentas. Resolver los enlaces de retorno/confirmación de correo necesarios para Android.
 - **Demo:** entrar, ver perfil, cerrar sesión y verificar permisos.
 
@@ -248,7 +248,7 @@ flutter test
 
 Usar `test` cuando exista; crear pruebas para comportamientos relevantes. El build Android y las pruebas en teléfono/emulador se realizan al cerrar incrementos que los requieran. Las comprobaciones del cliente no sustituyen pruebas de RLS, restricciones y RPC con usuarios distintos.
 
-Las migraciones Supabase se guardan en el repositorio. Elegir en S1 el flujo de CLI/entornos; el stack local completo necesita sus dependencias propias y no es condición para redactar las primeras migraciones. [Migraciones oficiales](https://supabase.com/docs/guides/local-development/database-migrations).
+Las fuentes SQL se guardan en `database` por objeto y con numeración global; las migraciones de despliegue se generan en `supabase/migrations`, según [ADR-002](decisiones/002-organizacion-database.md). Elegir en S1 el flujo de CLI/entornos y validar la generación antes de aplicar SQL. El stack local completo necesita sus dependencias propias y no es condición para redactar las fuentes iniciales. [Migraciones oficiales](https://supabase.com/docs/guides/local-development/database-migrations).
 
 ## 8. Prompt para una historia independiente
 

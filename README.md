@@ -19,6 +19,8 @@ Las reglas de recuperación, la interfaz y el acceso a datos se separan para pod
 - [Reglas de oro de arquitectura — norma del proyecto](docs/REGLAS_ARQUITECTURA.md).
 - [Arquitectura del sistema](docs/ARQUITECTURA.md).
 - [ADR-001: motivos y alternativas de arquitectura](docs/decisiones/001-arquitectura-aplicacion.md).
+- [Organización y numeración del SQL](database/README.md).
+- [ADR-002: fuentes SQL y migraciones](docs/decisiones/002-organizacion-database.md).
 - [Estado actual y siguiente paso](docs/ESTADO.md).
 - [Configuración de Supabase y validación](docs/CONFIGURACION.md).
 - [Instrucciones para agentes](AGENTS.md).

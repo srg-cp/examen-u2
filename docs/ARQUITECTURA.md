@@ -19,13 +19,20 @@ entreHuellas/
   flutter_application_entrehuellas/  # App Flutter existente; Android primero
   apps/
     public-web/             # Web QR ligera, se crea en S4
+  database/                 # Fuentes SQL numeradas por tipo de objeto
+    tables/
+    functions/
+    policies/
+    grants/
+    tests/                  # Pruebas SQL; resto del árbol en database/README.md
   supabase/
-    migrations/             # Esquema, restricciones, RLS y funciones
+    migrations/             # Paquetes de cambios generados desde database
     functions/              # Integraciones y operaciones server-side necesarias
-    tests/                  # Pruebas de permisos y reglas críticas
 ```
 
 La app existente se conserva en `flutter_application_entrehuellas`, según la decisión de ubicación del 6 de octubre de 2026. `apps/public-web` y `supabase` se crearán cuando su sprint los requiera.
+
+`database` guarda las fuentes SQL en carpetas por objeto, con secuencia global `001_...sql`. Las migraciones agrupan cambios en orden de dependencia; sus fuentes y su historial no se modifican después de aplicarlos. La estructura inicial y la separación entre SQL y Edge Functions se describen en [database/README.md](../database/README.md) y [ADR-002](decisiones/002-organizacion-database.md). Todavía no hay esquema funcional ni procedimiento de generación/ejecución de migraciones configurado.
 
 En `flutter_application_entrehuellas/lib`:
 
