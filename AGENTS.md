@@ -2,21 +2,28 @@
 
 ## Contexto
 
-Construimos el MVP de recuperación colaborativa. Android primero. La arquitectura acordada es Flutter + Riverpod + MVVM + repositorios por funcionalidad y Supabase como backend. La web QR forma parte del MVP.
+Construimos el MVP de recuperación colaborativa. Android primero. La arquitectura acordada es Clean Architecture por funcionalidad con Flutter, MVVM, Riverpod, casos de uso, repositorios y Supabase como backend. La web QR forma parte del MVP. Los motivos y las consecuencias se registran en [ADR-001](docs/decisiones/001-arquitectura-aplicacion.md).
 
 Las instrucciones explícitas del usuario prevalecen sobre este documento. El plan maestro PDF es referencia de producto; sus propuestas técnicas se actualizan con las decisiones registradas aquí.
 
 ## Inicio y alcance
 
-- Leer `docs/ESTADO.md`, `docs/ARQUITECTURA.md` y la sección del sprint pertinente en `docs/GUIA_MVP.md`.
+- Leer `docs/REGLAS_ARQUITECTURA.md` (norma obligatoria), `docs/ESTADO.md`, `docs/ARQUITECTURA.md` y la sección del sprint pertinente en `docs/GUIA_MVP.md`.
 - Comprobar rama, cambios locales y estado real antes de editar. Conservar el trabajo existente.
 - Usar las HU y RF originales para trazabilidad; separar el número de historia del número de issue de GitHub.
 - Implementar un incremento completo con criterios de aceptación. No ampliar el MVP por la existencia de funciones futuras en el PDF.
-- La creación de la app se hará en `apps/mobile`. Crear los demás componentes cuando su sprint los necesite.
+- La app existente se conserva en `flutter_application_entrehuellas` (decisión del usuario del 6 de octubre de 2026). No recrearla ni moverla a `apps/mobile`. Crear los demás componentes cuando su sprint los necesite.
 
 ## Implementación
 
-- Presentation contiene pantallas, ViewModels y estado; data contiene repositorios y acceso a datos. Extraer dominio/casos de uso cuando exista lógica compartida o compleja.
+- Cumplir [las reglas de oro de arquitectura](docs/REGLAS_ARQUITECTURA.md). Ningún incremento está completo si rompe sus fronteras. Registrar cambios de reglas como decisiones arquitectónicas versionadas y actualizar documentación/comprobaciones; no introducir excepciones implícitas por alcance MVP o urgencia.
+
+- Presentation contiene pantallas, ViewModels y estado; data contiene implementaciones de repositorios y acceso a datos. Las operaciones del producto se expresan mediante casos de uso de dominio consumidos por ViewModels.
+- Clean Architecture por funcionalidad: `domain/entities`, `domain/repositories` (contratos) y `domain/use_cases` independientes de Flutter, Riverpod y Supabase. Los casos de uso expresan operaciones concretas y reglas; no crear clases base genéricas ni funcionalidades vacías. Bootstrap/main inyectan implementaciones; `app` contiene bootstrap, aplicación y router.
+- El alcance MVP limita las funcionalidades, no la separación de responsabilidades ni su calidad. Mantener el test de dependencias arquitectónicas al añadir funcionalidades.
+- `presentation` organiza `screens`, `view_models`, `state` y `widgets` según componentes reales. La pantalla observa el estado del ViewModel; no obtiene repositorios ni combina directamente providers de infraestructura. Riverpod/AsyncValue pertenece a presentación/inyección, nunca al dominio.
+- `data` organiza `data_sources`, `models` (DTO) y `repositories`. El SDK se encapsula en fuentes de datos; el repositorio mapea DTO a entidades y fallos externos a fallos de dominio. No propagar mensajes/tokens del SDK hacia la UI.
+- Los providers de cada funcionalidad declaran contratos/casos de uso sin importar implementaciones ni pantallas. Bootstrap/main inyectan las implementaciones. Presentation no importa `app`; data no importa presentation/providers/app. Liberar suscripciones de presentación con autoDispose y comprobar recuperación tras error.
 - Los widgets consumen ViewModels. El SDK de Supabase se usa detrás de repositorios o servicios, sin llamadas de negocio desde widgets.
 - La configuración de acceso, permisos y reglas críticas se valida en Supabase: grants, RLS, restricciones y funciones autorizadas.
 - Separar datos públicos del QR de coordenadas y documentos privados. La RLS controla filas; no sustituye el control de columnas expuestas.

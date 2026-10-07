@@ -16,5 +16,6 @@ Migraciones, configuración y limitaciones materiales cuando correspondan.
 
 ## Relevo
 
+- [ ] El cambio cumple `docs/REGLAS_ARQUITECTURA.md`; los cambios de arquitectura tienen una decisión registrada en `docs/decisiones`.
 - [ ] `docs/ESTADO.md` refleja el resultado y el siguiente paso.
 - [ ] Criterios de aceptación verificados o pendientes identificados.

@@ -29,3 +29,5 @@ Datos de prueba, usuarios autorizados/no autorizados y evidencia esperada.
 ## Trabajo técnico
 
 Tareas suficientes para completar la historia; mantener la historia como unidad de resultado.
+
+Respetar `docs/REGLAS_ARQUITECTURA.md`. Identificar las capas afectadas y las comprobaciones de contratos, errores y permisos que corresponden al flujo. Registrar una decisión en `docs/decisiones` si la historia cambia los límites de arquitectura.

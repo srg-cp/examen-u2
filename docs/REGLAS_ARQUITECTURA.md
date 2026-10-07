@@ -1,0 +1,166 @@
+# Entre Huellas: reglas de oro de arquitectura
+
+Estado: norma del proyecto. Fecha: 7 de octubre de 2026, America/Lima.
+
+La decisión que sustenta estas reglas está registrada en [ADR-001: arquitectura de la aplicación](decisiones/001-arquitectura-aplicacion.md). La separación de capas permite mantener y probar las reglas de recuperación mientras evolucionan la interfaz, el acceso remoto y el almacenamiento local.
+
+Este documento define las reglas que deben cumplir las implementaciones, refactorizaciones y revisiones del sistema. Se lee antes de modificar código junto con [AGENTS.md](../AGENTS.md), [ESTADO.md](ESTADO.md) y el sprint correspondiente de [GUIA_MVP.md](GUIA_MVP.md). [ARQUITECTURA.md](ARQUITECTURA.md) describe la organización y las decisiones concretas; este documento establece sus límites obligatorios.
+
+**Regla de oro:** cada componente tiene una responsabilidad clara; las dependencias apuntan hacia contratos y dominio; la infraestructura permanece fuera de las reglas del producto. Ninguna entrega se considera completa si rompe estas fronteras.
+
+Las instrucciones explícitas del usuario prevalecen. Ante discrepancias documentales, esta norma rige los límites arquitectónicos y se actualizan los documentos descriptivos para conservar coherencia. Una modificación de arquitectura debe registrarse como una decisión versionada con motivo, consecuencias y validación. El alcance MVP o la urgencia no crean excepciones implícitas.
+
+## 1. Arquitectura y patrones adoptados
+
+| Decisión | Regla del sistema |
+| --- | --- |
+| Clean Architecture por funcionalidad | Cada funcionalidad organiza presentación, dominio y datos según los componentes que realmente necesita. |
+| MVVM | La pantalla renderiza estado; el ViewModel coordina acciones y estado de UI. |
+| Casos de uso | Las operaciones del producto y sus reglas se expresan en dominio mediante contratos de repositorio. |
+| Repository | Dominio declara el contrato; data implementa acceso, mapeo y coordinación de fuentes. |
+| Adapter / fuentes de datos | Los SDK, APIs y almacenamiento se encapsulan en fuentes de datos sustituibles. |
+| Inyección de dependencias | Los componentes reciben dependencias; bootstrap/main componen implementaciones y Riverpod las entrega. |
+| Estado inmutable y flujo en una dirección | La UI envía acciones al ViewModel y recibe nuevos estados; no modifica entidades o datos compartidos. |
+| SOLID | Las responsabilidades, contratos y sustituciones deben poder explicarse y probarse. |
+
+Stack acordado: Flutter, Riverpod, go_router y Supabase. Android primero; la app existente permanece en `flutter_application_entrehuellas`. La web pública QR forma parte del sistema y conserva sus propios límites de acceso. No se añaden ASP.NET Core, SignalR, Redis o workers de IA sin una nueva decisión arquitectónica registrada.
+
+## 2. Organización por funcionalidad
+
+```text
+lib/
+  main.dart
+  app/                         # Bootstrap, app y router
+  core/                        # Configuración, tema y componentes compartidos
+  features/
+    <funcionalidad>/
+      presentation/
+        screens/
+        widgets/
+        view_models/
+        state/
+      domain/
+        entities/
+        repositories/
+        use_cases/
+        failures/
+      data/
+        data_sources/
+        models/                # DTO de fuentes externas
+        repositories/
+      providers/               # Declaraciones de inyección
+```
+
+Se crean carpetas y clases cuando contienen una responsabilidad real. Una pantalla estática puede existir sin ViewModel, repositorio o caso de uso vacío. `core` recibe componentes compartidos con una razón concreta de reutilización; no concentra las reglas de todas las funcionalidades.
+
+Archivos y carpetas usan `snake_case`; clases usan `UpperCamelCase`. Los nombres expresan responsabilidad: `AccessScreen`, `AuthViewModel`, `AuthViewState`, `AuthRepository`, `AuthRepositoryImpl`, `SupabaseAuthDataSource`, `AuthSessionDto` y `WatchAuthSession`.
+
+## 3. Dependencias permitidas y prohibidas
+
+El recorrido de una operación es:
+
+```text
+Pantalla → ViewModel → Caso de uso → Contrato de repositorio
+                                          ↓ implementación inyectada
+                              Repositorio de data → Fuente de datos → SDK
+
+Respuesta: datos externos → DTO → entidad → estado de UI → pantalla
+```
+
+Este recorrido describe llamadas y resultados. En los imports, la implementación del repositorio depende del contrato de dominio; el contrato no importa la implementación.
+
+| Componente | Puede conocer | No debe conocer |
+| --- | --- | --- |
+| Dominio | Dart independiente de plataforma, entidades, fallos, contratos y casos de uso de dominio | Flutter, Riverpod, Supabase, JSON de infraestructura, data, presentation, providers o app |
+| Pantallas y widgets | Estado de UI, ViewModels, componentes visuales, tema y navegación simple | Repositorios, fuentes, DTO, SDK o composición de app |
+| ViewModels | Casos de uso, entidades, estado de UI y providers declarativos | Implementaciones de repositorio, fuentes de datos, SDK o bootstrap |
+| Repositorios de data | Contratos/entidades/fallos de dominio, DTO y contratos de fuentes | Pantallas, ViewModels, providers de UI o app |
+| Fuentes de datos | SDK, formatos externos y DTO | Pantallas, ViewModels o reglas de presentación |
+| Providers de funcionalidad | Contratos y casos de uso; Riverpod para declararlos | Implementaciones de data, pantallas o bootstrap |
+| Bootstrap/main | Configuración, implementaciones y contratos para componerlos | Reglas del producto o comportamiento visual de una pantalla |
+
+No introducir ciclos entre módulos. Una funcionalidad no importa la presentación o data de otra; la colaboración se expresa mediante contratos/casos de uso de dominio inyectados. Los exports y archivos compartidos tampoco deben servir para eludir estas reglas.
+
+## 4. Reglas de presentation
+
+1. La pantalla obtiene los datos y acciones de su ViewModel. Un estado de pantalla reúne lo necesario para renderizarla; no combina directamente providers de infraestructura o sesión.
+2. Los widgets contienen layout, estilos, animaciones, visibilidad y navegación simple. Validación de negocio, persistencia y procesamiento de respuestas se ejecutan fuera de ellos.
+3. El ViewModel invoca casos de uso y transforma resultados en estado de UI. Las reglas de autorización o transición del producto no se deciden en presentación.
+4. Los estados son inmutables. `AsyncValue` representa carga, dato y error en presentación; no se duplica con otra máquina de estados equivalente sin una necesidad específica.
+5. Textos visibles, mensajes de error y adaptación visual pertenecen a presentación. Los mensajes externos del SDK no se muestran directamente.
+6. Los providers vinculados a pantalla liberan recursos con `autoDispose` cuando corresponde. Un estado global persistente necesita un motivo y un propietario explícitos.
+7. Comprobar carga, errores, recuperación, cambios de sesión y disposición de suscripciones. Una identidad recibida tras un error debe poder recuperar el estado aunque coincida con la anterior.
+8. El diseño debe soportar superficies pequeñas y texto ampliado sin desbordamiento. Extraer widgets cuando tengan una responsabilidad visual reconocible.
+
+## 5. Reglas de domain
+
+1. Las entidades representan conceptos del producto y son independientes del almacenamiento. No contienen tokens, objetos del SDK, widgets ni anotaciones de serialización externa.
+2. Los contratos de repositorio expresan operaciones y semántica: resultado, ausencia de datos, fallos, idempotencia y comportamiento observable cuando aplique.
+3. Los casos de uso reciben contratos por constructor. Expresan operaciones concretas; contienen validación de negocio o coordinación que debe ser independiente de UI/backend.
+4. El dominio no obtiene dependencias desde Riverpod ni desde singletons de SDK. Sus componentes se pueden probar con implementaciones sustitutas en Dart.
+5. Los fallos de dominio tienen significado estable y no contienen mensajes sensibles o excepciones del SDK como contrato público. Un error no equivale a ausencia de sesión, datos vacíos o éxito.
+6. Las reglas críticas de permisos, concurrencia y transiciones también se validan en servidor; una comprobación cliente no autoriza una operación por sí sola.
+
+## 6. Reglas de data
+
+1. El acceso a Supabase y otros SDK se realiza en `data_sources`. La inicialización del SDK en bootstrap es una excepción de composición explícita; no contiene operaciones de negocio.
+2. Las fuentes devuelven DTO/proyecciones de datos externos. El repositorio entrega entidades y fallos del dominio a sus consumidores.
+3. Los repositorios se construyen con contratos de fuentes; no buscan un cliente global por su cuenta. Las fuentes reciben el cliente desde composición.
+4. El mapeo DTO → entidad se realiza en data. No propagar estructuras JSON ni tipos externos para que presentación los interprete.
+5. Normalizar fallos externos y conservar la información técnica necesaria para diagnóstico seguro, sin exponer credenciales, tokens ni datos privados. No ocultar errores como resultados exitosos.
+6. La responsabilidad de caché, fuentes remota/local y sincronización pertenece a data. Las reglas del producto corresponden a dominio y al servidor.
+7. Los reintentos deben tener una política explícita. No reintentar escrituras sin identificador estable y deduplicación/validación del servidor. Diferenciar borrador, pendiente y publicado.
+8. Los streams deben conservar transiciones y recuperación pertinentes; cancelación, pausa y reanudación se transmiten al origen. Cada suscripción conserva su estado propio.
+
+## 7. SOLID y tamaño del código
+
+| Principio | Criterio para revisar un cambio |
+| --- | --- |
+| S: responsabilidad única | Cada clase tiene una responsabilidad y un motivo principal para cambiar. |
+| O: abierto a extensión | Un comportamiento variable se puede incorporar mediante contratos/composición, sin introducir decisiones del backend en los consumidores. |
+| L: sustitución | Una implementación sustituta conserva la semántica, resultados y fallos acordados; no basta con coincidir en firmas. |
+| I: segregación de interfaces | Los contratos ofrecen las operaciones que necesitan sus consumidores; evitar interfaces que agrupan responsabilidades ajenas. |
+| D: inversión de dependencias | Los casos de uso dependen de contratos; las implementaciones se inyectan desde composición. |
+
+**No hay un máximo obligatorio de líneas por archivo o método.** Revisar responsabilidades, dependencias, complejidad y duplicación. Dividir cuando una clase acumula motivos de cambio, un método mezcla etapas distintas o un widget contiene componentes visuales independientes.
+
+La división debe mejorar claridad y pruebas. No crear clases base universales, interfaces para cada clase, contenedores DI adicionales o paquetes/generadores sin una necesidad demostrable. Una clase pequeña también debe cumplir sus contratos y fronteras.
+
+## 8. Seguridad y persistencia del sistema
+
+- Flutter contiene solo URL y clave publicable con sesión de usuario. Los valores de compilación no son secretos. Credenciales SQL, `service_role` y claves secretas permanecen en servidor.
+- Configuración local ignorada por Git; ejemplos versionados sin credenciales. Nunca registrar códigos/tokens del deep link ni datos privados en logs.
+- Versionar migraciones, grants, RLS, restricciones y funciones. Comprobar permisos entre usuarios y roles; no mantener esquema solamente en Dashboard.
+- Separar contratos públicos del QR de coordenadas/documentos privados. RLS controla filas y debe acompañarse de control de columnas y bytes expuestos.
+- Validar invariantes y operaciones atómicas en servidor. Reintentos incompatibles deben producir conflicto, no publicaciones duplicadas.
+- Persistir notificaciones y trabajo de entrega antes de intentar push; registrar fallos y permitir reintento.
+- Mantener el retorno móvil `entrehuellas://login-callback/` gestionado por Supabase/app_links. Modificar el enlace exige revisar registro nativo, allowlist remota y flujo de autenticación.
+
+Estas reglas describen requisitos de cada incremento; no afirman que todas las funcionalidades o políticas ya estén implementadas. La evidencia actual se registra en [ESTADO.md](ESTADO.md).
+
+## 9. Verificación obligatoria de cambios
+
+Antes de considerar completo un cambio de código, comprobar los puntos que le correspondan:
+
+- Responsabilidades y dependencias respetan esta norma; las operaciones tienen trazabilidad a sus HU/RF.
+- Reglas y contratos relevantes se prueban por separado, y se verifica su integración con estado/navegación cuando corresponda.
+- Las pruebas cubren fallos y límites materiales: recuperación, cancelación, permisos, invariantes y reintentos según el flujo.
+- Se ejecutan formato, análisis y pruebas pertinentes. Un build o demo se declara válido únicamente si se ejecutó.
+- La configuración pública está separada de secretos y las migraciones/políticas necesarias están versionadas.
+- La documentación de estado registra resultados, limitaciones y siguiente paso. No se acepta una excepción arquitectónica silenciosa.
+
+Comandos desde `flutter_application_entrehuellas`:
+
+```powershell
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze --no-pub
+flutter test --no-pub
+```
+
+Resolver dependencias primero si cambiaron. `test/architecture_test.dart` comprueba varias fronteras mediante directivas import/export/part y se ejecuta con `flutter test`. El workflow Flutter ejecuta comprobaciones cuando se publique en GitHub. Esta protección automática complementa la revisión; no cubre todos los símbolos, imports transitivos, reglas de negocio ni permisos remotos. Los cambios solo documentales requieren comprobar coherencia y enlaces; no obligan a repetir builds de aplicación.
+
+## 10. Cómo evolucionar sin perder la arquitectura
+
+Para cambiar una regla, registrar una decisión arquitectónica versionada en `docs` con el problema, alternativas, decisión, impacto, plan de transición y validación. Actualizar esta norma, [ARQUITECTURA.md](ARQUITECTURA.md), [AGENTS.md](../AGENTS.md) y las comprobaciones afectadas en el mismo incremento. Mantener compatible el comportamiento existente o documentar expresamente su migración.
+
+Ningún documento garantiza por sí solo que la arquitectura nunca se rompa. Su cumplimiento se sostiene leyendo estas reglas, revisando cada cambio y manteniendo pruebas y CI que detecten las desviaciones comprobables.

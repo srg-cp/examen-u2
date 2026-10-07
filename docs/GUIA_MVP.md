@@ -2,7 +2,9 @@
 
 Fecha: 4 de octubre de 2026. Repositorio: https://github.com/srg-cp/entrehuellas.
 
-Esta es la guía del MVP acordado: **Flutter + Supabase**, con MVVM, Riverpod y repositorios por funcionalidad. Adapta los sprints S1-S6 y las historias HU-01 a HU-16 del plan maestro v2. La API ASP.NET Core queda como evolución opcional.
+Esta es la guía del MVP acordado: **Flutter + Supabase**, con Clean Architecture por funcionalidad, MVVM, Riverpod, casos de uso y repositorios. Adapta los sprints S1-S6 y las historias HU-01 a HU-16 del plan maestro v2. La API ASP.NET Core queda como evolución opcional. [ADR-001](decisiones/001-arquitectura-aplicacion.md) registra los motivos y las alternativas de esta organización.
+
+Cada sprint debe cumplir [REGLAS_ARQUITECTURA.md](REGLAS_ARQUITECTURA.md), norma compartida de patrones, dependencias y SOLID. El alcance funcional del sprint no modifica esos límites.
 
 ## 1. Cómo dividir el trabajo entre chats
 
@@ -40,7 +42,7 @@ Además: preferencias de zonas, datos públicos separados de privados, gestión 
 
 Los seis sprints son una secuencia de entregas. Si se conserva la duración de dos semanas del plan, representan doce semanas referenciales. La fecha de entrega y la capacidad semanal todavía deben confirmarse; el chat 00 es preparación, no una promesa de plazo adicional fijo.
 
-## 3. Estado de partida comprobado
+## 3. Estado de partida histórico (4 de octubre de 2026)
 
 - Git estaba inicializado. Se configuró `origin` y la rama local `main`.
 - El repositorio remoto respondió sin referencias al consultarlo: vacío en esa comprobación.
@@ -52,24 +54,31 @@ Los seis sprints son una secuencia de entregas. Si se conserva la duración de d
 
 ## 4. Chat 00: proyecto y estructura
 
+La app existente se conserva en `flutter_application_entrehuellas`, según la decisión del 6 de octubre de 2026. Esa carpeta reemplaza la ubicación propuesta `apps/mobile`. La estructura utiliza `presentation`, `domain` y `data` por funcionalidad, con MVVM y Riverpod. La base de navegación y configuración está implementada; consultar [ESTADO.md](ESTADO.md) para validación real y [CONFIGURACION.md](CONFIGURACION.md) para comandos y deep links. La sección anterior conserva el estado histórico de la preparación.
+
 Orden de trabajo:
+
+Decisión del 7 de octubre de 2026: mantener una base de arquitectura sólida independientemente del alcance MVP. Dominio organiza `entities`, `repositories` y `use_cases`; los ViewModels consumen casos de uso y data implementa los contratos. Se prepara ejecución F5 con configuración local para no repetir argumentos durante el desarrollo. No se amplía el alcance funcional de HU-01 ni se añaden servicios al backend.
+
+Revisión de presentation/data del mismo día: presentación organiza screens/view_models/state/widgets y observa un estado único; data separa data_sources/models/repositories, encapsula el SDK y transforma fallos en errores de dominio. Providers declaran contratos y bootstrap inyecta implementaciones. Añadir pruebas de recuperación tras error y liberación de suscripciones a los criterios técnicos de cada flujo observable. Detalles en [ARQUITECTURA.md](ARQUITECTURA.md).
 
 1. Leer `AGENTS.md` y los documentos; comprobar Git y conservar los archivos existentes.
 2. Completar el entorno Android. En Android Studio, abrir SDK Manager y revisar SDK Tools: instalar **Android SDK Command-line Tools**, comprobar Platform-Tools, Build-Tools y una plataforma compatible. El usuario revisa los términos con `flutter doctor --android-licenses`. Volver a ejecutar `flutter doctor` y detectar un teléfono o emulador. [Configuración Android oficial](https://docs.flutter.dev/platform-integration/android/setup).
 3. Elegir una versión de Flutter y dependencias compatibles. La instalada es un punto de partida; cualquier actualización se evalúa y documenta.
-4. Crear Android en `apps/mobile` y organizar `lib/app`, `lib/core` y funcionalidades. Elegir el identificador Android antes de distribuir.
+4. Conservar la app existente en `flutter_application_entrehuellas` y organizar `lib/app`, `lib/core` y funcionalidades con `presentation`, `domain` y `data`. Revisar el identificador Android provisional antes de distribuir.
 5. Incorporar inicialmente Riverpod, go_router y supabase_flutter. Añadir Drift/SQLite cuando se implemente el almacenamiento local. Cada paquete debe resolver una necesidad concreta.
 6. Preparar configuración con ejemplos sin credenciales. Verificar la app con una pantalla inicial y estado explícito de configuración si Supabase aún no existe.
 7. Crear CI con formato, análisis y pruebas pertinentes. Documentar los comandos y fijar la versión de Flutter usada por CI.
 8. Revisar los archivos, realizar el primer commit y publicar la base cuando la solicitud de ejecución incluya esas acciones.
 
-Ejemplo de comando de creación, a ejecutar en la raíz del repositorio durante este chat. `app.entrehuellas` es un prefijo provisional que debe revisarse antes de distribuir:
+La app ya existe: no ejecutar `flutter create` sobre ella. Para trabajar desde la raíz:
 
 ```powershell
-flutter create --empty --platforms=android --project-name entre_huellas --org app.entrehuellas apps/mobile
+Set-Location flutter_application_entrehuellas
+flutter pub get --enforce-lockfile
 ```
 
-Los flags fueron comprobados con el Flutter instalado. [Creación de una app Flutter](https://docs.flutter.dev/reference/create-new-app).
+El identificador conservado es `com.example.flutter_application_entrehuellas`; sigue pendiente elegir el definitivo antes de distribuir.
 
 **Criterio de salida:** app inicial ejecutada en Android, estructura comprensible, versión registrada, comprobaciones pertinentes pasando y procedimiento para configurar Supabase documentado. Si Android sigue bloqueado, registrar lo que se verificó por otra vía y mantener el build Android pendiente.
 
@@ -81,7 +90,7 @@ Lee AGENTS.md, docs/ARQUITECTURA.md, docs/ESTADO.md y la sección 4 de docs/GUIA
 
 El repositorio es https://github.com/srg-cp/entrehuellas. Origin y la rama main ya fueron configurados; compruébalos sin volver a clonar encima de la carpeta.
 
-Crea la app Flutter Android en apps/mobile con MVVM, Riverpod, repositorios por funcionalidad, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos y CI para formato, análisis y pruebas pertinentes.
+Continúa sobre la app Flutter existente en flutter_application_entrehuellas. Lee docs/REGLAS_ARQUITECTURA.md y conserva las capas presentation, domain y data por funcionalidad, MVVM, Riverpod, casos de uso, repositorios, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos, el deep link entrehuellas://login-callback/ y CI para formato, análisis y pruebas pertinentes.
 
 Revisa Flutter y Android. Ya se detectaron Command-line Tools y licencias pendientes. Ayúdame a resolver los pasos que requieran mi intervención mientras avanzas con lo independiente. Registra la versión de SDK y el identificador Android elegidos.
 
@@ -181,7 +190,7 @@ La seguridad, pruebas y documentación acompañan cada sprint; S6 reúne la vali
 
 ## 6. GitHub con un flujo sencillo
 
-Usar `main` como base integrada y una rama por historia o conjunto coherente de cambios. Inicialmente no hace falta mantener una rama `develop` adicional. El primer commit puede publicar la base en el repositorio vacío; los cambios posteriores siguen ramas y pull requests.
+Usar `main` como base integrada y una rama por historia o conjunto coherente de cambios. Inicialmente no hace falta mantener una rama `develop` adicional. El repositorio local ya tiene commits; comprobar las referencias y la autenticación del remoto antes de publicar cambios. Los incrementos siguen ramas y pull requests según la autorización de cada tarea.
 
 Crear un issue por HU y milestones S1-S6. La plantilla de historia está en `.github/ISSUE_TEMPLATE/historia.md`. No hace falta un tablero adicional para empezar; se puede añadir si mejora la coordinación.
 
@@ -229,7 +238,7 @@ Siguiente paso concreto:
 
 Una historia está terminada cuando sus criterios están verificados, los permisos y errores pertinentes están cubiertos, los cambios de datos están versionados y se puede demostrar el resultado. Una interfaz con datos simulados se identifica como tal; no equivale al flujo integrado.
 
-Para trabajos de implementación con Flutter, ejecutar según corresponda desde `apps/mobile`:
+Para trabajos de implementación con Flutter, ejecutar según corresponda desde `flutter_application_entrehuellas`:
 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test
@@ -245,7 +254,7 @@ Las migraciones Supabase se guardan en el repositorio. Elegir en S1 el flujo de 
 
 ```text
 Trabaja en la historia HU-XX del sprint Sx de Entre Huellas.
-Lee AGENTS.md, docs/ESTADO.md, docs/ARQUITECTURA.md y los criterios de docs/GUIA_MVP.md.
+Lee AGENTS.md, docs/REGLAS_ARQUITECTURA.md, docs/ESTADO.md, docs/ARQUITECTURA.md y los criterios de docs/GUIA_MVP.md.
 Issue de GitHub: [enlace si existe]. Rama: [rama, si ya está creada].
 Implementa el comportamiento completo con Supabase y validación pertinente.
 Conserva el trabajo existente y registra pruebas y pendientes.
@@ -257,4 +266,4 @@ Si la tarea implica varios chats activos, acordar quién integra y usar worktree
 
 ## 9. Próximo paso inmediato
 
-Abrir **00 - Proyecto y estructura** en este proyecto y pegar su prompt. Su objetivo es dejar una base Android ejecutable y conectada a GitHub, antes de iniciar HU-01.
+Completar herramientas Android, conectar un teléfono/emulador y validar apertura del deep link sobre la base del chat 00. Identificar el proyecto Supabase de desarrollo e iniciar **01 - Acceso y cuenta**, HU-01 / RF-01,34. El login completo, perfil y políticas no forman parte de la preparación de arquitectura. Las acciones GitHub requieren autorización en la tarea actual.

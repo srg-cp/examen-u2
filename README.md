@@ -2,25 +2,33 @@
 
 MVP para publicar mascotas perdidas o encontradas, compartir una ficha mediante QR, recibir avistamientos y gestionar la recuperación.
 
-## Decisiones iniciales
+## Base técnica
 
 - Android con Flutter.
-- MVVM y Riverpod, organización por funcionalidades y repositorios.
+- Clean Architecture por funcionalidad, MVVM y Riverpod.
+- Casos de uso y contratos en dominio; repositorios y fuentes de datos en data.
 - Supabase Auth, PostgreSQL/PostGIS, Storage y funciones cuando sean necesarias.
 - SQLite para borradores y caché.
 - Web pública ligera para abrir el QR sin instalar la app.
 
+Las reglas de recuperación, la interfaz y el acceso a datos se separan para poder evolucionar y probar cada parte. Esta organización contempla la incorporación de almacenamiento local y el control de los datos públicos del QR. Los motivos y las alternativas están en [la decisión de arquitectura](docs/decisiones/001-arquitectura-aplicacion.md).
+
 ## Documentación
 
 - [Guía de trabajo, chats, sprints y GitHub](docs/GUIA_MVP.md).
-- [Arquitectura del MVP](docs/ARQUITECTURA.md).
+- [Reglas de oro de arquitectura — norma del proyecto](docs/REGLAS_ARQUITECTURA.md).
+- [Arquitectura del sistema](docs/ARQUITECTURA.md).
+- [ADR-001: motivos y alternativas de arquitectura](docs/decisiones/001-arquitectura-aplicacion.md).
 - [Estado actual y siguiente paso](docs/ESTADO.md).
+- [Configuración de Supabase y validación](docs/CONFIGURACION.md).
 - [Instrucciones para agentes](AGENTS.md).
 
 ## Estado
 
-Se ha preparado la documentación inicial. La aplicación Flutter y el proyecto Supabase todavía no están creados ni verificados en este repositorio.
+La app existente se conserva en `flutter_application_entrehuellas`. Incluye Clean Architecture por funcionalidad (`presentation`, `domain`, `data`), Riverpod, go_router y arranque configurable de Supabase. Sin configuración se puede explorar la pantalla inicial y el acceso. El login completo pertenece a HU-01.
 
-Repositorio previsto: https://github.com/srg-cp/entrehuellas.
+El dominio organiza entidades, contratos de repositorios y casos de uso; el ViewModel consume `WatchAuthSession`. En VS Code, los perfiles **Entre Huellas - desarrollo local** y **Entre Huellas - sin Supabase** permiten iniciar con F5. El perfil local requiere crear/completar el archivo de configuración una sola vez.
 
-El siguiente paso es el chat **00 - Proyecto y estructura** descrito en la guía.
+Repositorio: [srg-cp/entrehuellas](https://github.com/srg-cp/entrehuellas).
+
+Desde la carpeta de la app: `flutter pub get --enforce-lockfile` y `flutter run -d chrome`. Para Supabase y el deep link `entrehuellas://login-callback/`, seguir [la configuración](docs/CONFIGURACION.md). El estado registra la validación y los requisitos Android pendientes.
