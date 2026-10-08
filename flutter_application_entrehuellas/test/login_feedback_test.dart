@@ -74,7 +74,7 @@ void main() {
                     onSubmit: ref
                         .read(loginViewModelProvider.notifier)
                         .password,
-                    onRecover: () {},
+                    onRecover: (_) {},
                   ),
                 ),
               ),

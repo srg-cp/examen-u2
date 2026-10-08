@@ -8,6 +8,7 @@ import 'core/config/app_config.dart';
 import 'core/config/startup_state_provider.dart';
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/providers/registration_providers.dart';
+import 'features/auth/providers/password_recovery_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,9 @@ Future<void> main() async {
       overrides: [
         startupStateProvider.overrideWithValue(bootstrap.state),
         authRepositoryProvider.overrideWithValue(bootstrap.authRepository),
+        passwordRecoveryRepositoryProvider.overrideWithValue(
+          bootstrap.passwordRecoveryRepository,
+        ),
         accessRepositoryProvider.overrideWithValue(bootstrap.accessRepository),
         registrationRepositoryProvider.overrideWithValue(
           bootstrap.registrationRepository,

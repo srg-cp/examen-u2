@@ -6,6 +6,7 @@ enum RegistrationSourceFailureKind {
   alreadyRegistered,
   rateLimited,
   unavailable,
+  invalidCode,
 }
 
 final class RegistrationSourceFailure implements Exception {
@@ -20,4 +21,5 @@ abstract interface class RegistrationDataSource {
     required String password,
   });
   Future<void> resendConfirmation(String email);
+  Future<void> verifyCode(String email, String code);
 }

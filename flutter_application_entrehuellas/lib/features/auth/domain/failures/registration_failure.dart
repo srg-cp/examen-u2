@@ -7,6 +7,7 @@ enum RegistrationFailureKind {
   rateLimited,
   unavailable,
   notConfigured,
+  invalidCode,
 }
 
 final class RegistrationFailure implements Exception {

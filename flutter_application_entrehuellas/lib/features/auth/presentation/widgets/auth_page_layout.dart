@@ -12,6 +12,9 @@ class AuthPageLayout extends StatelessWidget {
     this.onClose,
     this.showClose = false,
     this.reveal = false,
+    this.revealBrand = true,
+    this.revealClose = true,
+    this.contentBuilder,
     super.key,
   });
 
@@ -20,9 +23,13 @@ class AuthPageLayout extends StatelessWidget {
   final VoidCallback? onClose;
   final bool showClose;
   final bool reveal;
+  final bool revealBrand;
+  final bool revealClose;
+  final Widget Function(Widget)? contentBuilder;
 
-  Widget _item(int order, Widget child) =>
-      reveal ? StaggerRevealItem(order: order, child: child) : child;
+  Widget _item(int order, Widget child, {bool enabled = true}) =>
+      reveal && enabled ? StaggerRevealItem(order: order, child: child) : child;
+  Widget _content(Widget content) => contentBuilder?.call(content) ?? content;
 
   @override
   Widget build(BuildContext context) => SafeArea(
@@ -51,25 +58,35 @@ class AuthPageLayout extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: BrandWordmark(iconSize: 80, textSize: 32),
                         ),
+                        enabled: revealBrand,
                       ),
                       const SizedBox(height: 14),
-                      if (title != null) ...[
-                        _item(
-                          2,
-                          Text(
-                            title!,
-                            key: const ValueKey('auth-title'),
-                            textAlign: TextAlign.left,
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(
-                                  fontSize: 48,
-                                  color: const Color(0xFF111111),
+                      _content(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (title != null) ...[
+                              _item(
+                                2,
+                                Text(
+                                  title!,
+                                  key: const ValueKey('auth-title'),
+                                  textAlign: TextAlign.left,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(
+                                        fontSize: 48,
+                                        color: const Color(0xFF111111),
+                                      ),
                                 ),
-                          ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                            child,
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                      ],
-                      child,
+                      ),
                     ],
                   ),
                 ),
@@ -85,6 +102,7 @@ class AuthPageLayout extends StatelessWidget {
                       tooltip: 'Cerrar registro',
                       icon: const Icon(Icons.close_rounded, size: 30),
                     ),
+                    enabled: revealClose,
                   ),
                 ),
             ],

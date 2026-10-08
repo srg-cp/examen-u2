@@ -146,6 +146,8 @@ Estas reglas describen requisitos de cada incremento; no afirman que todas las f
 
 ## 9. Verificación obligatoria de cambios
 
+La UX reutiliza cover reveal seguido de stagger reveal en entradas de pantalla y cambios discretos de etapa, con cabeceras estables; no repite efectos por edición/contadores/reenvío ni por cada frame de gestos. La carga de botones conserva su etiqueta y usa LoadingShimmer: no etiquetas de progreso con puntos suspensivos ASCII/Unicode ni spinners de botón. Solo durante trabajo real, con bloqueo de duplicados, semántica accesible y movimiento reducido. La regla, alcance y comprobación se registran en [ADR-006](decisiones/006-transiciones-y-carga-con-shimmer.md). Todo pertenece a presentación; los ViewModels/casos de uso siguen gobernando operaciones y resultados.
+
 Antes de considerar completo un cambio de código, comprobar los puntos que le correspondan:
 
 - Responsabilidades y dependencias respetan esta norma; las operaciones tienen trazabilidad a sus HU/RF.

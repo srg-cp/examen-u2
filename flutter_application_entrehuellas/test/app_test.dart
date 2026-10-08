@@ -1,3 +1,5 @@
+import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
+import 'support/fake_password_recovery.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,6 +65,9 @@ void main() {
           startupStateProvider.overrideWithValue(
             const StartupState(StartupStatus.ready),
           ),
+          passwordRecoveryRepositoryProvider.overrideWithValue(
+            FakePasswordRecovery(),
+          ),
           authRepositoryProvider.overrideWithValue(localAuth),
           accessRepositoryProvider.overrideWithValue(FakeAccess()),
         ],
@@ -105,6 +110,9 @@ void main() {
       overrides: [
         startupStateProvider.overrideWithValue(
           const StartupState(StartupStatus.ready),
+        ),
+        passwordRecoveryRepositoryProvider.overrideWithValue(
+          FakePasswordRecovery(),
         ),
         authRepositoryProvider.overrideWithValue(auth),
         onboardingRepositoryProvider.overrideWithValue(onboarding),

@@ -1,3 +1,5 @@
+import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
+import 'support/fake_password_recovery.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -23,6 +25,17 @@ import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
 import 'access_test.dart' show FakeAccess;
 
 class FakeRegistration implements RegistrationRepository {
+  int verifications = 0;
+  String? verifiedCode;
+  void Function()? onVerified;
+  @override
+  Future<void> verifyCode(String email, String code) async {
+    verifications++;
+    verifiedCode = code;
+    if (failure != null) throw failure!;
+    onVerified?.call();
+  }
+
   int calls = 0;
   int resends = 0;
   String? name;
@@ -63,6 +76,9 @@ void main() {
         overrides: [
           startupStateProvider.overrideWithValue(
             const StartupState(StartupStatus.ready),
+          ),
+          passwordRecoveryRepositoryProvider.overrideWithValue(
+            FakePasswordRecovery(),
           ),
           authRepositoryProvider.overrideWithValue(auth),
           accessRepositoryProvider.overrideWithValue(FakeAccess()),
@@ -291,6 +307,9 @@ void main() {
           startupStateProvider.overrideWithValue(
             const StartupState(StartupStatus.ready),
           ),
+          passwordRecoveryRepositoryProvider.overrideWithValue(
+            FakePasswordRecovery(),
+          ),
           authRepositoryProvider.overrideWithValue(auth),
           accessRepositoryProvider.overrideWithValue(FakeAccess()),
           registrationRepositoryProvider.overrideWithValue(repo),
@@ -406,13 +425,14 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Crear cuenta'));
       await tester.pumpAndSettle();
       expect(find.text('Revisa tu correo'), findsOneWidget);
-      expect(find.byType(TextField), findsNothing);
+      expect(find.byKey(const ValueKey('email-code')), findsOneWidget);
       final vm = container.read(registrationViewModelProvider.notifier);
       await vm.resend();
       expect(repo.resends, 0);
       await tester.pump(const Duration(seconds: 60));
       await tester.pump();
-      await tester.tap(find.text('Reenviar enlace'));
+      await tester.ensureVisible(find.text('Reenviar código'));
+      await tester.tap(find.text('Reenviar código'));
       await tester.pumpAndSettle();
       expect(repo.resends, 1);
       auth.emit(const AuthSession(userId: 'registered'));
@@ -437,6 +457,9 @@ void main() {
       overrides: [
         startupStateProvider.overrideWithValue(
           const StartupState(StartupStatus.ready),
+        ),
+        passwordRecoveryRepositoryProvider.overrideWithValue(
+          FakePasswordRecovery(),
         ),
         authRepositoryProvider.overrideWithValue(auth),
         accessRepositoryProvider.overrideWithValue(FakeAccess()),

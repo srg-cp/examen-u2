@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/presentation/widgets/loading_shimmer.dart';
 
 class OnboardingActions extends StatelessWidget {
   const OnboardingActions({
@@ -31,40 +32,40 @@ class OnboardingActions extends StatelessWidget {
         ),
       ),
     );
-    final button = FilledButton(
-      onPressed: isBusy ? null : onNext,
-      style: FilledButton.styleFrom(
-        backgroundColor: const Color(0xFF24282A),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-        minimumSize: const Size(180, 68),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-        textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontSize: 22,
-          height: 1.15,
-          fontWeight: FontWeight.w600,
+    final button = LoadingShimmer(
+      isLoading: isBusy,
+      loadingLabel: 'Guardando finalización del onboarding',
+      radius: 26,
+      child: FilledButton(
+        onPressed: isBusy ? null : onNext,
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFF24282A),
+          disabledBackgroundColor: isBusy ? const Color(0xFF24282A) : null,
+          disabledForegroundColor: isBusy ? Colors.white : null,
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+          minimumSize: const Size(180, 68),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontSize: 22,
+            height: 1.15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 26),
+            Expanded(
+              child: Text(
+                page == 2 ? 'Comenzar' : 'Continuar',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const Icon(Icons.arrow_forward_rounded, size: 26),
+          ],
         ),
       ),
-      child: isBusy
-          ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Row(
-              children: [
-                const SizedBox(width: 26),
-                Expanded(
-                  child: Text(
-                    page == 2 ? 'Comenzar' : 'Continuar',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_rounded, size: 26),
-              ],
-            ),
     );
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),

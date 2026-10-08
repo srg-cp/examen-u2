@@ -18,6 +18,10 @@ import '../features/auth/domain/repositories/registration_repository.dart';
 import '../features/auth/data/data_sources/supabase_registration_data_source.dart';
 import '../features/auth/data/repositories/registration_repository_impl.dart';
 import '../features/auth/data/repositories/unavailable_registration_repository.dart';
+import '../features/auth/domain/repositories/password_recovery_repository.dart';
+import '../features/auth/data/data_sources/supabase_password_recovery_data_source.dart';
+import '../features/auth/data/repositories/password_recovery_repository_impl.dart';
+import '../features/auth/data/repositories/unavailable_password_recovery_repository.dart';
 
 class AppBootstrap {
   const AppBootstrap({
@@ -26,6 +30,7 @@ class AppBootstrap {
     required this.accessRepository,
     required this.onboardingRepository,
     required this.registrationRepository,
+    required this.passwordRecoveryRepository,
   });
 
   final StartupState state;
@@ -33,6 +38,7 @@ class AppBootstrap {
   final AccessRepository accessRepository;
   final OnboardingRepository onboardingRepository;
   final RegistrationRepository registrationRepository;
+  final PasswordRecoveryRepository passwordRecoveryRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -60,6 +66,12 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           state: const StartupState(StartupStatus.ready),
           authRepository: AuthRepositoryImpl(source),
           accessRepository: AccessRepositoryImpl(source),
+          passwordRecoveryRepository: PasswordRecoveryRepositoryImpl(
+            SupabasePasswordRecoveryDataSource(
+              supabase.client,
+              redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
+            ),
+          ),
           registrationRepository: RegistrationRepositoryImpl(
             SupabaseRegistrationDataSource(
               supabase.client,
@@ -82,5 +94,6 @@ AppBootstrap _unavailable(StartupStatus status) => AppBootstrap(
   authRepository: const UnavailableAuthRepository(),
   accessRepository: const UnavailableAccessRepository(),
   registrationRepository: const UnavailableRegistrationRepository(),
+  passwordRecoveryRepository: const UnavailablePasswordRecoveryRepository(),
   onboardingRepository: const UnavailableOnboardingRepository(),
 );

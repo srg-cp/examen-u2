@@ -383,12 +383,108 @@ Las pruebas de sesión usan un repositorio sustituido; no equivalen a acceso con
 - Indicadores reducidos de 16 a 12 (margen 5); radio explícito 26 en Continuar/Comenzar para reducir forma de píldora. Conservados ancho completo, alto, flecha y flujo.
 - Formato/análisis correctos y 65 pruebas aprobadas, incluido viewport pequeño/texto ampliado. Render QA aprobado e inspeccionadas primera/tercera etapa. Actualizado DISENO_UI; sin backend ni actualización del emulador, revisar tras recarga.
 
+## Mascota de Revisa tu correo, 8 de octubre de 2026 — S1 / HU-01 / RF-01,34
+
+- Rama `main`, sin cambios locales al iniciar. Generado con image_gen integrado el perrito con sobre/corazón del mockup, usando además la mascota del onboarding como referencia de identidad. PNG RGBA 1254 × 1254 con transparencia, guardado sin recomprimir en `assets/illustrations/dog_with_envelope.png`; prompt exacto y origen documentados junto al asset.
+- Sustituido el icono de RegistrationConfirmation por la ilustración de 240 × 240, completa con contain y decorativa para accesibilidad. Asset registrado en pubspec; captura precarga la imagen y verifica confirmación en viewport 320 × 350/texto escala 2.
+- Formato correcto, análisis sin incidencias y 65 pruebas aprobadas. Render QA aprobado y capturas de confirmación normal/pequeña inspeccionadas; reenvío y entrada tras sesión cubiertos por pruebas existentes.
+- Pendiente revisar en Android tras reiniciar Run/Debug para incluir el asset nuevo. Capturas con repositorios sustituidos; no verifican entrega de correo real. Siguiente paso: revisión en dispositivo y validación remota de HU-01. Sin acciones GitHub, despliegue ni cambios de backend.
+
+## Recuperar contraseña, 8 de octubre de 2026 — S1 / HU-01 / RF-01,34
+
+- Rama `main`, sin commit/acciones GitHub en esta tarea; conservados cambios locales de la mascota de correo. Sustituido el aviso pendiente de ¿Olvidaste tu contraseña? por solicitud real de enlace, confirmación con mascota y reenvío tras 60 segundos. Misma confirmación para correo existente/desconocido; errores de campo, límites y conexión contextuales.
+- Módulo con contratos/casos de uso, fuente Supabase, DTO, repositorio, providers, ViewModels autoDispose e inyección bootstrap/main. SDK encapsulado; sin cambios SQL/migraciones ni credenciales adicionales. El callback PKCE passwordRecovery abre Nueva contraseña antes del onboarding/Inicio; actualización validada, éxito visible y cierre local al volver/cancelar. Sin OTP simulado.
+- Reutilizados AuthPageLayout, decoración/dimensiones de inputs, authPrimaryButtonStyle, ShakeField, OriginPageTransition y StaggerReveal. Extraído EmailLinkConfirmation compartido con registro; preservada ilustración creada anteriormente. Expansión 320 ms/reversa 260 ms desde enlace; siete elementos de solicitud y nueve de reset. Scroll/texto ampliado/movimiento reducido comprobados.
+- Formato correcto, análisis sin incidencias y **84 pruebas aprobadas**. Pruebas nuevas cubren validación sin red, duplicados/desmontaje, cooldown/límites, respuesta tardía frente al callback, dimensiones, reenvío y reversa, prioridad del reset con callback previo/posterior al montaje, bloqueo de navegación, contraseña distinta/confirmación, cierre de sistema, error/recuperación y 320 × 350 a escala 2 con movimiento reducido. SDK real con HTTP/storage PKCE sustituidos verifica recover/callback/update/logout, tokenRefreshed/userUpdated, sesión normal rechazada, enlace vencido, cuenta desconocida y fallos de contraseña/límites tipados.
+- Render QA aprobado; inspeccionados solicitud, confirmación, reset, éxito y variantes pequeñas, con fuentes reales. Capturas en build/ui-preview; no acreditan correo entregado ni deep link ejecutado en Android. Actualizados arquitectura, diseño, guía, configuración y README de app.
+- Pendiente: SMTP/plantilla Recovery, límites/política del servidor, enlace real en la misma instalación PKCE con app abierta/cerrada, enlace usado/vencido y reingreso con contraseña nueva. No se contactó Auth real, cambió contraseña real, instaló build ni desplegó. Si se reinicia después de consumir el enlace y antes de actualizar contraseña, el propósito adicional no persiste y se requiere nueva solicitud. Siguiente paso: reiniciar Run/Debug y seguir CONFIGURACION para validación Android con cuenta de desarrollo; HU-01 sigue abierta (issue #1).
+
+## Registro y recuperación por OTP, 8 de octubre de 2026 — S1 / HU-01 / RF-01,34
+
+- Rama `main`, conservados cambios de las tareas anteriores; sin commit/acciones GitHub. Por instrucción del usuario, sustituido el flujo principal de enlaces por códigos de seis dígitos en registro y recuperación. Puede leerse el correo en una PC e introducirse el código en la app. Misma mascota/componentes/animaciones, seis casillas, teclado numérico, pegado/autofill, ceros iniciales y retroceso; verificación automática al sexto dígito con acción de reintento.
+- VerifyRegistrationCode y VerifyRecoveryCode validan formato antes de red; contratos/fuentes/repositorios/providers incorporan verifyCode. SDK verifyOTP con tipo email para registro y recovery para restablecimiento. Solo respuesta con sesión válida habilita acceso/reset; OTP incorrecto/vencido mantiene formulario, correo y error contextual. Reenvío de código tras 60 segundos, contador mm:ss y limpieza de casillas; verificación/reenvío bloquean operaciones simultáneas. No se generan ni guardan códigos localmente. Se conservan callbacks existentes.
+- Fuentes de correo preparadas en supabase/auth/templates/confirm_signup.html y recovery.html con Token, sin enlaces. Procedimiento versionado para Auth autohospedado y longitud seis; no se aplicaron cambios remotos. El usuario informa que el correo actual ya incluye código alternativo de seis dígitos, que la nueva pantalla puede utilizar.
+- Formato/análisis correctos y **94 pruebas aprobadas**. Nuevas pruebas: formato sin red; SDK con dos clientes independientes que solicitan/verifican sin compartir almacenamiento PKCE; tipos correctos; códigos incorrectos/vencidos y respuesta sin sesión; entrada/pegado, ceros iniciales, retroceso y reintento; bloqueo de duplicados, permanencia tras fallo y rutas de onboarding/reset solo tras verificación. Suite previa actualizada para OTP y aprobada. Render QA aprobado; revisadas confirmaciones de registro/recuperación y casillas en 320 × 350 con texto escala 2. Captura de reset entra ahora mediante el caso de uso de verificación con repositorio sustituido.
+- Actualizados arquitectura, guía, diseño, configuración y README de app/ilustraciones. Sin SQL/migraciones, cuentas/contraseñas reales, envío de correo, instalación Android ni despliegue. Pendiente: aplicar/revisar plantillas cuando proceda y validar lectura en PC → código en teléfono, OTP vencido/usado, reenvío, contraseña nueva y límites reales de Auth. Reiniciar Run/Debug para revisar; seguir CONFIGURACION con cuenta de desarrollo. HU-01 sigue abierta (issue #1).
+
+## Texto breve de confirmación y consulta de caducidad, 8 de octubre de 2026
+
+- Registro/recuperación muestran «Ingresa el código que llegó a {correo}.» con el correo real, sin repetir el email como bloque ni el párrafo largo anterior. Se conserva tipografía de 18 y el flujo OTP/reenvío. Define público opcional EMAIL_OTP_VALIDITY_MINUTES permite añadir duración confirmada; sin él no se imprime una cifra.
+- El usuario desconoce la caducidad actual. Consulta pública solo de lectura: health indica Auth v2.189.0 y settings no devuelve el plazo. Código oficial de esa versión: valor por defecto 86400 segundos/24 horas; la duración efectiva puede estar sustituida en Dokploy. No se asumió ese defecto como configuración efectiva ni se modificó el servidor. Comprobación/documentación en CONFIGURACION.
+- Formato correcto, análisis sin incidencias y 26 pruebas pertinentes aprobadas (registro, recuperación y OTP), más render QA aprobado. Pendiente confirmar GOTRUE_MAILER_OTP_EXP efectivo y entonces configurar la cifra en minutos. Sin GitHub, despliegue ni envíos reales.
+
+## CoverReveal y stagger al enviar/verificar código, 8 de octubre de 2026
+
+- Rama main; conservados cambios locales, incluida configuración de ejemplo modificada por el usuario. Usuario informa haber aplicado caducidad de 15 minutos; no se consultó ni modificó nuevamente el servidor en esta tarea.
+- Añadidos CoverReveal/AuthStageTransition sobre OriginPageTransition compartido. Registro y recuperación expanden la confirmación desde el botón real de envío en 320 ms; envío programático usa cover desde abajo. Formulario anterior conservado durante la expansión, sin interacción/semántica. Nueva contraseña usa cover desde abajo al verificar OTP.
+- Línea de tiempo independiente por etapa de confirmación, nueve componentes/1570 ms: cierre, marca, mascota, título, texto, casillas, ayuda, reenvío y retorno. Contador/edición/error/reenvío no repiten efectos; movimiento reducido presenta el destino directamente. Geometría final, OTP y backend sin cambios.
+- Formato correcto, análisis sin incidencias y **96 pruebas aprobadas**. Dos regresiones nuevas verifican origen del botón, conservación del correo durante cover, descarte del formulario al finalizar, nueva cascada y ausencia de reinicio con contador/reenvío/error, incluyendo movimiento reducido. Regresiones existentes mantienen registro/navegación/viewport pequeño y flujos OTP. Corregida inicialización del controlador para garantizar desmontaje seguro antes de cualquier transición.
+- Render QA aprobado; inspeccionadas capturas intermedias de registro/recuperación/reset y confirmación final. Sin despliegue, SQL, GitHub ni instalación Android. Siguiente paso: Hot Restart y revisión perceptiva/rendimiento en dispositivo; entrega/caducidad real de OTP siguen pendientes de prueba de desarrollo.
+
+## Cover plano, logo persistente y stagger posterior, 8 de octubre de 2026
+
+- Por instrucción del usuario, eliminada la expansión desde el botón en formulario → Revisa tu correo y código → Nueva contraseña. Cover blanco plano de 320 ms limitado al contenido bajo la marca; después comienza el stagger. Sin escala/radios animados ni captura de rectángulos de botones en estas etapas. Apertura original de Crear cuenta conserva su transición independiente.
+- AuthPageLayout separa cabecera y contenido animado; AuthStageTransition conserva el anterior durante la cortina y activa el play del nuevo timeline solo al terminar. Recuperación/OTP/reset comparten PasswordRecoveryScreen y cabecera; ResetPasswordScreen delega callbacks externos. Router conserva la página visible durante refresh de push y mantiene bloqueo hacia destinos autenticados antes de terminar recuperación. Logo conserva render/posición entre etapas; contador/error/reenvío no repiten efectos.
+- Formato correcto, análisis sin incidencias y **96 pruebas aprobadas**. Regresiones ampliadas: cortina antes de stagger, marca persistente entre solicitud/código/reset, contenido anterior y edición preservados durante cover, navegación y movimiento reducido. Se mantienen fronteras, cierre/sesión, OTP y pantallas pequeñas. Render QA aprobado; capturas intermedias y finales revisadas.
+- Actualizados arquitectura y diseño. Conservados cambios locales/configuración del usuario; sin backend/SQL, GitHub ni instalación Android. Siguiente paso: Hot Restart y revisión perceptiva de la secuencia en dispositivo; las pruebas usan repositorios sustituidos, no acreditan OTP/SMTP real.
+
+## Transiciones por etapa y carga con shimmer, 8 de octubre de 2026
+
+- Contraseña actualizada tiene etapa propia: cover plano y luego stagger de título, descripción y retorno, conservando la marca. Login e Inicio incorporan entrada con cover/stagger; registro, recuperación y OTP reutilizan los componentes. La cortina conserva la altura del contenido anterior hasta terminar. Edición, errores, contador y reenvío no repiten la entrada; el gesto continuo del onboarding mantiene su animación existente.
+- LoadingShimmer compartido mantiene etiqueta y dimensiones de los botones durante operaciones reales. Aplicado a ingreso, Google, registro, envío/reenvío/verificación de códigos, guardado de contraseña, finalización del onboarding y salida. Sin etiquetas de carga con puntos suspensivos ni spinner en botones; verificación y reenvío identifican su operación por separado. Controles bloqueados durante carga, anuncio semántico y brillo estático con movimiento reducido.
+- Regla versionada en ADR-006, AGENTS, arquitectura y diseño. Comprobación automática rechaza etiquetas de presentación que terminan en puntos suspensivos. Formato correcto, análisis sin incidencias y **99 pruebas aprobadas**, incluidas carga/accesibilidad/movimiento reducido y transición de éxito con marca persistente. Render QA aprobado; revisadas pantallas finales y capturas de carga/cortina.
+- Conservados cambios locales y configuración del usuario. Sin backend, SQL, GitHub ni instalación Android. Siguiente paso: Hot Restart y revisión perceptiva de animaciones/shimmer en dispositivo. Las capturas y pruebas usan repositorios sustituidos; OTP/SMTP real sigue pendiente de validación.
+
+## Ajuste de Revisa tu correo, 8 de octubre de 2026
+
+- S1 / HU-01 / RF-01,34: mascota ampliada de 240 a 300 px en el componente compartido de registro/recuperación, conservando imagen completa y scroll. Eliminado Volver a iniciar sesión solo de esta etapa; la X mantiene el cierre. Indicación del código y duración en negro #111111, fuente reducida de 18 a 16 e interlineado 1.4. Cover/stagger y operaciones OTP se conservan.
+- Formato correcto, análisis sin incidencias y 99 pruebas aprobadas. Actualizada regresión de cierre para usar la X y comprobada ausencia del retorno; render QA aprobado, revisadas confirmaciones normales y reenvío en 320 × 350 con texto escala 2. Diseño actualizado. Sin backend ni instalación Android; siguiente paso: revisar con Hot Restart en dispositivo.
+
+## Barrido desde el inicio y botones atenuados, 8 de octubre de 2026
+
+- Mascota de Revisa tu correo ampliada de 300 a 320 px en registro/recuperación. LoadingShimmer dejaba el controlador en 0.5 estando inactivo, por lo que los botones ya montados empezaban a mitad del barrido; ahora reposo usa 0 y cada carga nueva arranca desde el borde. Reconstrucciones durante la misma carga conservan su progreso; movimiento reducido mantiene brillo estático.
+- El componente compartido atenúa el contenido a opacidad 0.72 durante carga, con brillo encima y bloqueo de interacción; al finalizar recupera su apariencia. Aplicado también a Ingresar sin modificar etiquetas ni dimensiones. ADR-006 y diseño actualizados.
+- Formato/análisis correctos y 100 pruebas aprobadas. Nueva regresión compara píxeles al inicio, durante el barrido y al iniciar una segunda operación; las existentes verifican opacidad, bloqueo, dimensiones, semántica y movimiento reducido. Render QA y capturas de confirmación/carga revisados. Sin backend ni instalación Android; siguiente paso: Hot Restart y revisión perceptiva en dispositivo.
+
+## Espacio y tonos de confirmación, 8 de octubre de 2026
+
+- Reducida separación debajo de la mascota de 24 a 8 px en Revisa tu correo de registro/recuperación. Indicación y duración recuperan gris #747781; solo el correo usa negro #111111 mediante Text.rich, manteniendo fuente 16, interlineado, texto ampliable y una lectura continua.
+- Formato/análisis correctos, 28 pruebas pertinentes aprobadas y render QA aprobado; captura de recuperación revisada. Diseño actualizado. Sin backend ni instalación Android; siguiente paso: revisión en dispositivo tras recarga.
+
+## Presentación de marca al arrancar, 8 de octubre de 2026
+
+- S1 / HU-01: splash nativo Android con fondo verde claro #F2F8F5, mismo PNG 3D de marca y recursos explícitos API 31+ claro/oscuro. StartupReveal desde MaterialApp.router presenta primero icono centrado, desplaza icono a izquierda y revela Entre Huellas por detrás hacia derecha, en 1100 ms; movimiento reducido omite secuencia. Pantalla de espera conserva fondo/marca.
+- Destino visual montado al terminar presentación; su cover/stagger empieza entonces. Login usa NoTransitionPage para evitar fundido de plataforma adicional. Capturas verifican título Iniciar sesión durante stagger. Sin cambios de destinos, reglas de sesión ni backend.
+- Formato/análisis correctos y 102 pruebas aprobadas. Dos regresiones nuevas verifican desplazamiento/reveal, montaje posterior, orden cover/stagger, movimiento reducido y superficie pequeña/texto ampliado. Render QA aprobado; capturas startup_icon, startup_brand_reveal, startup_brand y access_startup_reveal inspeccionadas. Recursos Android compilados correctamente con AAPT2.
+- Build APK intentado dos veces (también con preferIPv4Stack): Gradle falla antes de compilar con java.io.IOException: Unable to establish loopback connection. Sin APK nuevo ni reinstalación; no se afirma validación del splash nativo en dispositivo. Siguiente paso: resolver conexión local de Gradle, recompilar/reinstalar y revisar arranque frío. Cambios nativos requieren recompilación, no Hot Restart. Conservados cambios existentes; sin GitHub ni despliegue.
+
+## Fondo blanco de arranque, 8 de octubre de 2026
+
+- Por instrucción del usuario, sustituido fondo verde claro por blanco #FFFFFF en presentación Flutter, espera de cuenta y recurso compartido del splash Android. Animación de marca conservada; diseño actualizado.
+- Formato/análisis correctos y recursos Android compilados con AAPT2. Sin APK/reinstalación; bloqueo de Gradle de la tarea anterior sigue pendiente. Fondo nativo requiere recompilar/reinstalar para verse en dispositivo.
+
+## Icono de splash sin recorte por máscara, 8 de octubre de 2026
+
+- Captura del usuario muestra esquinas recortadas en splash Android. El drawable anterior tenía tamaño intrínseco 96 dp sin margen para la máscara del sistema. Añadida variante drawable-v31 con lienzo transparente de 288 dp e icono 96 dp centrado dentro de círculo seguro 192 dp, según dimensiones oficiales Android. Se conserva PNG, fondo blanco, launcher y animación Flutter.
+- Recursos compilados correctamente con AAPT2. Nuevo intento APK vuelve a fallar en Gradle con Unable to establish loopback connection, antes de compilar app. No se pudo reinstalar/verificar el recorte en dispositivo; siguiente paso: recompilar/reinstalar al resolver Gradle y revisar arranque frío. Hot Restart no actualiza este recurso nativo. Diseño actualizado; sin backend ni GitHub.
+
+## Margen proporcional del splash Android, 8 de octubre de 2026
+
+- Usuario confirma recorte persistente. Inspeccionado APK instalado en emulator-5554 mediante AAPT2: sí contiene la variante drawable-v31 anterior con capas de 288/96 dp; descartado que fuera solo una instalación antigua. Sustituida por InsetDrawable con 33.3333% por lado: el margen escala con los límites de dibujo del sistema, en lugar de depender de tamaños de capa fijos. PNG, fondo y presentación Flutter se conservan.
+- AAPT2 compila todos los recursos correctamente. Build APK vuelve a fallar en conexión loopback de Gradle; no se pudo instalar ni comprobar visualmente la nueva variante. No se considera demostrado el resultado en dispositivo. Siguiente paso: Run completo/recompilación desde el entorno que permite compilar y revisar arranque frío; Hot Restart no cambia recursos Android. Diseño actualizado, sin backend/GitHub.
+
+## Resorte horizontal de marca, 8 de octubre de 2026
+
+- StartupReveal usa easeOutBack para logo y nombre: sobrepasan ligeramente su posición horizontal y regresan, sin desplazamiento vertical. Texto emerge desde detrás del icono mediante máscara móvil; margen de pintura conserva extremos durante rebote. Opacidad usa curva separada limitada a 0–1. Fondo blanco y movimiento reducido se conservan.
+- Secuencia verificada: termina presentación de marca, destino se monta con cover, y solo al finalizar cover empieza stagger de Iniciar sesión. Regresión ampliada compara posiciones en sobrepaso/retorno, verifica Y constante y bloqueo del timeline hasta completar cortina.
+- Formato/análisis correctos, 102 pruebas aprobadas y render QA aprobado; marca final revisada. Sin nuevo APK/instalación; siguiente paso: Hot Restart para animación Flutter y revisión perceptiva en dispositivo. Corrección nativa del recorte sigue requiriendo recompilar/reinstalar desde entorno con Gradle operativo.
+
 ## Pendiente
 
 - Ejecución inicial Android observada en capturas y emulador detectado. Revisar herramientas/licencias si afectan nuevas compilaciones; build APK desde esta sesión, icono instalado y retorno de Auth aún no verificados. iOS no compilado en Windows.
 - Registrar/verificar el retorno exacto en Authentication > URL Configuration > Redirect URLs. La configuración pública de Auth fue consultada en solo lectura: Google y correo activos, Apple inactivo. No se modificó el Dashboard ni se verificaron las credenciales OAuth.
 - Probar retorno con app abierta/cerrada y luego correo/OAuth real en S1. No se verificó autenticación ni restauración remota de sesión.
-- Completar HU-01 / RF-01,34: validar registro/confirmación real, recuperación, editor de perfil y gestión de cuenta. Registro, correo/Google/salida están implementados localmente; aplicar las migraciones de perfiles/onboarding ya generadas y ejecutar pruebas de permisos entre usuarios. El esquema no se ha desplegado desde esta sesión.
+- Completar HU-01 / RF-01,34: validar registro/confirmación y recuperación reales, editor de perfil y gestión de cuenta. Registro, recuperación, correo/Google/salida están implementados localmente; aplicar las migraciones de perfiles/onboarding ya generadas y ejecutar pruebas de permisos entre usuarios. El esquema no se ha desplegado desde esta sesión.
 - Revisar identificadores definitivos, firma y requisitos de distribución antes de publicar una app.
 - Publicar cambios y ejecutar CI remoto solo cuando la tarea autorice acciones GitHub.
 

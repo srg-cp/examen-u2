@@ -62,6 +62,7 @@ class RegistrationViewModel extends Notifier<RegistrationViewState> {
       RegistrationFailureKind.weakPassword => RegistrationField.password,
       RegistrationFailureKind.passwordMismatch =>
         RegistrationField.confirmation,
+      RegistrationFailureKind.invalidCode => RegistrationField.code,
       _ => null,
     };
     final hint = switch (kind) {
@@ -75,6 +76,8 @@ class RegistrationViewModel extends Notifier<RegistrationViewState> {
       RegistrationFailureKind.alreadyRegistered => 'Prueba iniciar sesión',
       RegistrationFailureKind.rateLimited =>
         'Espera un momento e inténtalo de nuevo.',
+      RegistrationFailureKind.invalidCode =>
+        'Código incorrecto o vencido. Revisa el correo o solicita otro.',
       _ => 'Registro no disponible. Reintenta.',
     };
     state = RegistrationViewState(
@@ -87,7 +90,10 @@ class RegistrationViewModel extends Notifier<RegistrationViewState> {
       message: field == null ? hint : null,
       errorId: ++_errors,
     );
-    if (state.confirmationEmail != null && state.resendSeconds > 0) {
+    if (state.confirmationEmail != null &&
+        state.resendSeconds > 0 &&
+        (kind == RegistrationFailureKind.rateLimited ||
+            _timer?.isActive != true)) {
       _countdown();
     }
   }
@@ -95,6 +101,22 @@ class RegistrationViewModel extends Notifier<RegistrationViewState> {
   void edited(RegistrationField field) {
     if (!state.isBusy && (state.errorField == field || state.message != null)) {
       state = state.copyWith(clearError: true);
+    }
+  }
+
+  Future<void> verify(String code) async {
+    final email = state.confirmationEmail;
+    if (email == null || state.isBusy || state.authenticated) return;
+    state = state.copyWith(isBusy: true, isVerifying: true, clearError: true);
+    try {
+      await ref.read(verifyRegistrationCodeProvider)(email, code);
+      if (!ref.mounted) return;
+      _timer?.cancel();
+      state = const RegistrationViewState(authenticated: true);
+    } on RegistrationFailure catch (failure) {
+      if (ref.mounted) _failure(failure.kind);
+    } catch (_) {
+      if (ref.mounted) _failure(RegistrationFailureKind.unavailable);
     }
   }
 
