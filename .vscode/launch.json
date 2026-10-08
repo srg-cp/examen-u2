@@ -3,6 +3,7 @@
   "configurations": [
     {
       "name": "Entre Huellas - desarrollo local",
+      "templateFor": "flutter_application_entrehuellas/lib",
       "type": "dart",
       "request": "launch",
       "cwd": "${workspaceFolder}/flutter_application_entrehuellas",

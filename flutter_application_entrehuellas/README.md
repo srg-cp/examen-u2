@@ -19,6 +19,8 @@ flutter run -d chrome
 
 Para conectar Supabase, completar `config/supabase.local.json` con URL y clave publicable siguiendo [CONFIGURACION.md](../docs/CONFIGURACION.md). Ese archivo está ignorado por Git. En VS Code, seleccionar **Entre Huellas - desarrollo local** y ejecutar con F5; el perfil **Entre Huellas - sin Supabase** permite explorar la app sin configuración.
 
+En VS Code, Run/Debug de `main.dart` utiliza el perfil local mediante `templateFor`. Se puede seguir usando el botón de ejecución de Dart/Flutter y elegir el emulador; para cargar cambios del JSON hay que detener e iniciar la app de nuevo.
+
 Por terminal, el arranque configurado es:
 
 ```powershell
@@ -27,10 +29,14 @@ flutter run --dart-define-from-file=config/supabase.local.json
 
 ## Comprobaciones
 
+El icono del launcher Android utiliza los originales de `logo`. Regeneración e instrucciones de instalación en [logo/README.md](../logo/README.md).
+
 ```powershell
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze --no-pub
 flutter test --no-pub
 ```
 
-La base implementa navegación, arranque y observación de sesión. Registro, login completo y perfil pertenecen a HU-01. Consultar [ESTADO.md](../docs/ESTADO.md) para resultados de pruebas y pendientes de Android/Supabase.
+La base implementa navegación, arranque, sesión, ingreso y registro por correo. Perfil y recuperación siguen dentro de HU-01. Consultar [ESTADO.md](../docs/ESTADO.md) para resultados de pruebas y pendientes de Android/Supabase.
+
+El formulario de acceso sigue el mockup de login y conecta correo/contraseña y Google mediante casos de uso y repositorios. El SQL de perfiles se prepara desde [database](../database/README.md); aplicar y validar en desarrollo siguiendo [CONFIGURACION.md](../docs/CONFIGURACION.md). Crear cuenta y confirmación por enlace están implementados. Recuperación y editor de perfil aún están pendientes.

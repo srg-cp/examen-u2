@@ -1,42 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/view_models/login_view_model.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Entre Huellas')),
-    body: Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.pets, size: 72),
-              const SizedBox(height: 24),
-              Text(
-                'Cada huella cuenta',
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Una comunidad para ayudar a las mascotas a volver a casa.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => context.push('/access'),
-                icon: const Icon(Icons.person_outline),
-                label: const Text('Acceso y cuenta'),
-              ),
-            ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final login = ref.watch(loginViewModelProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Entre Huellas'),
+        actions: [
+          IconButton(
+            tooltip: 'Cerrar sesión',
+            onPressed: login.isBusy
+                ? null
+                : () => ref.read(loginViewModelProvider.notifier).signOut(),
+            icon: const Icon(Icons.logout_rounded),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Tu comunidad',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Aquí encontrarás las mascotas y búsquedas de tu comunidad cuando estén disponibles.',
+                  textAlign: TextAlign.center,
+                ),
+                if (login.isError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text(login.message!, textAlign: TextAlign.center),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

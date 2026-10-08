@@ -62,6 +62,8 @@ Decisión del 7 de octubre de 2026: mantener una base de arquitectura sólida in
 
 Revisión de presentation/data del mismo día: presentación organiza screens/view_models/state/widgets y observa un estado único; data separa data_sources/models/repositories, encapsula el SDK y transforma fallos en errores de dominio. Providers declaran contratos y bootstrap inyecta implementaciones. Añadir pruebas de recuperación tras error y liberación de suscripciones a los criterios técnicos de cada flujo observable. Detalles en [ARQUITECTURA.md](ARQUITECTURA.md).
 
+La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISENO_UI.md): tarjetas redondeadas, marca, ilustración y acciones principales. El acceso se ajustó después al mockup de login e incorporó correo/contraseña y Google, con SQL de perfiles preparado. Registro, recuperación, edición de perfil y validación remota siguen pendientes en HU-01; los demás recorridos se incorporan en sus sprints.
+
 1. Leer `AGENTS.md` y los documentos; comprobar Git y conservar los archivos existentes.
 2. Completar el entorno Android. En Android Studio, abrir SDK Manager y revisar SDK Tools: instalar **Android SDK Command-line Tools**, comprobar Platform-Tools, Build-Tools y una plataforma compatible. El usuario revisa los términos con `flutter doctor --android-licenses`. Volver a ejecutar `flutter doctor` y detectar un teléfono o emulador. [Configuración Android oficial](https://docs.flutter.dev/platform-integration/android/setup).
 3. Elegir una versión de Flutter y dependencias compatibles. La instalada es un punto de partida; cualquier actualización se evalúa y documenta.
@@ -109,6 +111,8 @@ Se conserva la numeración original para relacionar implementación, informe aca
 - Crear o identificar el proyecto Supabase de desarrollo, configurar Auth y versionar esquema, permisos y migraciones. Las fuentes SQL se organizan en `database` según [su convención](../database/README.md); preparar la generación ordenada de migraciones antes del primer despliegue.
 - Comprobar sesión inválida, cierre de sesión y acceso cruzado con dos cuentas. Resolver los enlaces de retorno/confirmación de correo necesarios para Android.
 - **Demo:** entrar, ver perfil, cerrar sesión y verificar permisos.
+- Onboarding actualizado el 8 de octubre: sin Omitir, tres indicadores de progreso y botón de ancho completo con flecha. La cuenta pendiente entra a la app tras Comenzar en la tercera etapa; un fallo de guardado permite reintentar. Se conservan finalizaciones anteriores.
+- Incremento de registro: Crear cuenta desde login, validar cuatro campos, registrar con Supabase Auth, confirmar por enlace o recibir sesión si Auth autoconfirma, reenviar con espera de 60 segundos y entrar al onboarding solo con sesión. Sin casilla de Términos/Privacidad hasta contar con documentos, por decisión del usuario. Implementación local preparada; validar entrega SMTP y callback real en Android antes de dar por cerrado HU-01.
 
 Prompt:
 
@@ -248,7 +252,7 @@ flutter test
 
 Usar `test` cuando exista; crear pruebas para comportamientos relevantes. El build Android y las pruebas en teléfono/emulador se realizan al cerrar incrementos que los requieran. Las comprobaciones del cliente no sustituyen pruebas de RLS, restricciones y RPC con usuarios distintos.
 
-Las fuentes SQL se guardan en `database` por objeto y con numeración global; las migraciones de despliegue se generan en `supabase/migrations`, según [ADR-002](decisiones/002-organizacion-database.md). Elegir en S1 el flujo de CLI/entornos y validar la generación antes de aplicar SQL. El stack local completo necesita sus dependencias propias y no es condición para redactar las fuentes iniciales. [Migraciones oficiales](https://supabase.com/docs/guides/local-development/database-migrations).
+Las fuentes SQL se guardan en `database` por objeto y con numeración global; las migraciones de despliegue se generan en `supabase/migrations`, según [ADR-002](decisiones/002-organizacion-database.md). La generación está preparada mediante `database/scripts/Build-Migration.ps1`; validar migración y permisos en desarrollo antes de desplegar. Elegir en S1 el flujo posterior de CLI/entornos. El stack local completo necesita sus dependencias propias y no es condición para redactar las fuentes iniciales. [Migraciones oficiales](https://supabase.com/docs/guides/local-development/database-migrations).
 
 ## 8. Prompt para una historia independiente
 
@@ -266,4 +270,14 @@ Si la tarea implica varios chats activos, acordar quién integra y usar worktree
 
 ## 9. Próximo paso inmediato
 
-Completar herramientas Android, conectar un teléfono/emulador y validar apertura del deep link sobre la base del chat 00. Identificar el proyecto Supabase de desarrollo e iniciar **01 - Acceso y cuenta**, HU-01 / RF-01,34. El login completo, perfil y políticas no forman parte de la preparación de arquitectura. Las acciones GitHub requieren autorización en la tarea actual.
+Completar herramientas Android, conectar un teléfono/emulador y validar apertura del deep link sobre la base del chat 00. Identificar el proyecto Supabase de desarrollo e iniciar **01 - Acceso y cuenta**, HU-01 / RF-01,34. El ingreso por correo/Google ya está implementado y el SQL de perfiles preparado; aplicar y validar en desarrollo, y completar registro, recuperación y perfil en HU-01. Las acciones GitHub requieren autorización en la tarea actual.
+
+### Incremento de HU-01, 7 de octubre de 2026
+
+Ingreso por correo/contraseña y Google implementado con casos de uso, repositorios y ViewModel. Fuentes de perfil 001–007, plan y generador de migración preparados. Se conserva HU-01 / RF-01,34 (issue GitHub #1) abierta: falta aplicar y comprobar SQL/RLS, ejecutar el retorno OAuth real y completar registro, recuperación y perfil. Apple está retirado de la interfaz por instrucción del usuario; no amplía los criterios de este incremento. Procedimiento: [CONFIGURACION.md](CONFIGURACION.md) y [database/README.md](../database/README.md).
+
+La entrada manual del esquema de perfiles es ahora `database/run_all.sql`, generada y repetible. Seguir [ADR-003](decisiones/003-ejecucion-sql-idempotente.md); no reemplaza migraciones ni amplía las funcionalidades de HU-01. Al añadir otro incremento, revisar su ejecución repetida y sus permisos antes de ampliar el generador.
+
+### Corrección del recorrido de acceso
+
+Por instrucción del usuario, el orden es login → onboarding de tres pasos → app. No hay bienvenida pública anterior al login ni pantalla intermedia de sesión activa. El onboarding se muestra hasta completarlo u omitirlo y su finalización pertenece a la cuenta, no a la instalación. El retorno de una sesión existente que ya lo completó abre la app directamente. Este incremento de HU-01 incorpora la persistencia y RPC de finalización; no agrega funcionalidades de mascotas, registro o perfil fuera del alcance actual.

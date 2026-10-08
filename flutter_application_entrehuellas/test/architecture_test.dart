@@ -3,6 +3,25 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('Project UI never uses SnackBar or its display APIs', () {
+    final forbidden = RegExp(
+      r'\b(?:SnackBar|SnackBarAction|SnackBarBehavior|showSnackBar|hideCurrentSnackBar|removeCurrentSnackBar|snackbar)\b',
+    );
+    final violations = <String>[];
+    for (final file in Directory(
+      'lib',
+    ).listSync(recursive: true).whereType<File>()) {
+      if (file.path.endsWith('.dart') &&
+          forbidden.hasMatch(file.readAsStringSync())) {
+        violations.add(file.path);
+      }
+    }
+    expect(
+      violations,
+      isEmpty,
+      reason: 'Forbidden notification component: ${violations.join(', ')}',
+    );
+  });
   test('Layers respect dependency direction and SDKs stay in data sources', () {
     final violations = <String>[];
     final directives = RegExp(r'''(?:import|export|part)\s+(?!of\b)([^;]+);''');

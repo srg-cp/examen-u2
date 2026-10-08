@@ -3,6 +3,7 @@
   "configurations": [
     {
       "name": "Entre Huellas - desarrollo local",
+      "templateFor": "lib",
       "type": "dart",
       "request": "launch",
       "cwd": "${workspaceFolder}",

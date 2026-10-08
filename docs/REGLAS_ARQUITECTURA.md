@@ -132,12 +132,17 @@ La división debe mejorar claridad y pruebas. No crear clases base universales, 
 - Configuración local ignorada por Git; ejemplos versionados sin credenciales. Nunca registrar códigos/tokens del deep link ni datos privados en logs.
 - Versionar migraciones, grants, RLS, restricciones y funciones. Comprobar permisos entre usuarios y roles; no mantener esquema solamente en Dashboard.
 - Las fuentes SQL pertenecen a `database`, por tipo de objeto y con numeración global. Los cambios de cada incremento generan su migración de Supabase; conservar el SQL aplicado y añadir nuevos scripts para evolucionarlo. Seguir [database/README.md](../database/README.md) y [ADR-002](decisiones/002-organizacion-database.md). Seeds y tests se ejecutan aparte; no hay dos fuentes editables para el mismo cambio.
+- SQL usa inglés y `snake_case` en minúsculas para identificadores; los DTO mapean a `camelCase` en Dart. `database/run_all.sql` es generado y repetible; no editarlo manualmente ni reescribir migraciones aplicadas. Al ampliar su alcance, revisar repetición y permisos según [ADR-003](decisiones/003-ejecucion-sql-idempotente.md).
 - Separar contratos públicos del QR de coordenadas/documentos privados. RLS controla filas y debe acompañarse de control de columnas y bytes expuestos.
 - Validar invariantes y operaciones atómicas en servidor. Reintentos incompatibles deben producir conflicto, no publicaciones duplicadas.
 - Persistir notificaciones y trabajo de entrega antes de intentar push; registrar fallos y permitir reintento.
 - Mantener el retorno móvil `entrehuellas://login-callback/` gestionado por Supabase/app_links. Modificar el enlace exige revisar registro nativo, allowlist remota y flujo de autenticación.
 
 Estas reglas describen requisitos de cada incremento; no afirman que todas las funcionalidades o políticas ya estén implementadas. La evidencia actual se registra en [ESTADO.md](ESTADO.md).
+
+## Regla de feedback visual
+
+**No utilizar SnackBar en ninguna funcionalidad de la app**, ni directamente ni mediante wrappers/paquetes. No eludir la regla con una notificación inferior equivalente. Usar feedback junto al campo o acción, accesible y breve. En el login, el error modifica el borde y el icono; conserva el fondo. La decisión y las comprobaciones se registran en [ADR-005](decisiones/005-feedback-sin-snackbar.md).
 
 ## 9. Verificación obligatoria de cambios
 

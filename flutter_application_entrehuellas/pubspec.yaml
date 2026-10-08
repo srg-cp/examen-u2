@@ -17,6 +17,15 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: 0.14.4
+  http: ^1.6.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/app_icon.png
+    - assets/branding/google_g.png
+    - assets/onboarding/dog_waving.png
+    - assets/onboarding/dog_with_map.png
+    - assets/onboarding/dog_and_cat.png
+    - assets/illustrations/community_pets.png
