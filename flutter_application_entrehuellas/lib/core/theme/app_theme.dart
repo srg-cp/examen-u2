@@ -71,14 +71,16 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.ink,
+          backgroundColor: const Color(0xFF24282A),
           foregroundColor: Colors.white,
-          minimumSize: const Size(0, 58),
+          minimumSize: const Size(0, 60),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-          shape: const StadiumBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           textStyle: const TextStyle(
             fontFamily: AppTheme.fontFamily,
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -88,9 +90,9 @@ abstract final class AppTheme {
 }
 
 abstract final class AppColors {
-  static const background = Color(0xFFF6F7F4);
-  static const ink = Color(0xFF17231C);
-  static const secondary = Color(0xFF626E65);
+  static const background = Colors.white;
+  static const ink = Color(0xFF111111);
+  static const secondary = Color(0xFF747781);
   static const green = Color(0xFF137B50);
   static const mint = Color(0xFFE0F2E5);
   static const peach = Color(0xFFF5E9E0);

@@ -83,6 +83,8 @@ No introducir ciclos entre módulos. Una funcionalidad no importa la presentaci�
 
 ## 4. Reglas de presentation
 
+La UI y UX cumplen [REGLAS_UI_UX.md](REGLAS_UI_UX.md). La referencia visual es el flujo de acceso aprobado; los componentes comunes se extraen a core respetando estas fronteras.
+
 1. La pantalla obtiene los datos y acciones de su ViewModel. Un estado de pantalla reúne lo necesario para renderizarla; no combina directamente providers de infraestructura o sesión.
 2. Los widgets contienen layout, estilos, animaciones, visibilidad y navegación simple. Validación de negocio, persistencia y procesamiento de respuestas se ejecutan fuera de ellos.
 3. El ViewModel invoca casos de uso y transforma resultados en estado de UI. Las reglas de autorización o transición del producto no se deciden en presentación.

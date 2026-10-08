@@ -329,6 +329,15 @@ void main() {
     await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
     await capture('onboarding_3');
+    await tester.tap(find.text('Comenzar'));
+    await tester.pumpAndSettle();
+    await capture('home');
+    tester.view.physicalSize = const Size(320, 350);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Cerrar sesión'));
+    await tester.pumpAndSettle();
+    await capture('home_small');
     expect(tester.takeException(), isNull);
   });
 }

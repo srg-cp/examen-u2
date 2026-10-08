@@ -479,6 +479,13 @@ Las pruebas de sesión usan un repositorio sustituido; no equivalen a acceso con
 - Secuencia verificada: termina presentación de marca, destino se monta con cover, y solo al finalizar cover empieza stagger de Iniciar sesión. Regresión ampliada compara posiciones en sobrepaso/retorno, verifica Y constante y bloqueo del timeline hasta completar cortina.
 - Formato/análisis correctos, 102 pruebas aprobadas y render QA aprobado; marca final revisada. Sin nuevo APK/instalación; siguiente paso: Hot Restart para animación Flutter y revisión perceptiva en dispositivo. Corrección nativa del recorte sigue requiriendo recompilar/reinstalar desde entorno con Gradle operativo.
 
+## Regla de oro de UI y UX, 8 de octubre de 2026
+
+- Creada norma obligatoria docs/REGLAS_UI_UX.md por instrucción del usuario. Referencia: Login, Crear cuenta, Recuperar contraseña, Revisa tu correo, Nueva contraseña y Contraseña actualizada aprobados. Incluye identidad, tokens/dimensiones, componentes, orden cover/stagger, resorte horizontal, shimmer/atenuación, feedback, OTP, accesibilidad, criterios verificables y evolución. Revocada dirección antigua de fondo crema/menta/tarjetas como estilo general. DISENO_UI queda como índice de implementación y revisión, sin valores contradictorios; AGENTS, arquitectura, reglas y guía enlazan la norma.
+- Retirada UI anterior de Inicio (AppBar/Tu comunidad/aviso futuro). Destino provisional reutiliza layout/marca/título/acción/cover/stagger de referencia y mantiene bienvenida, cierre de sesión real y error contextual. No es diseño definitivo ni añade funcionalidades. Layout y estilo de botón extraídos a core con aliases/wrapper de Auth; ninguna importación de presentación Auth desde Home. Tema base alineado a blanco, negro/gris y botón radio 24/alto mínimo 60/texto 18. Conservados sesión/onboarding/OTP y cambios existentes.
+- Formato/análisis correctos, 102 pruebas aprobadas y enlaces de norma comprobados. Render QA aprobado; login y nuevo Inicio normal/320 × 350 con escala 2 revisados, cierre alcanzable por scroll. Suite conserva pruebas de fronteras, acceso, navegación y recuperación. Sin APK/instalación, backend ni GitHub.
+- Siguiente paso: usar la norma en todo incremento visual y diseñar Inicio definitivo alrededor de funcionalidades/HU reales. Revisión perceptiva en Android pendiente; corrección de máscara splash sigue requiriendo build/reinstalación desde entorno con Gradle operativo. Validación Auth/SMTP real no se acredita con estos renders.
+
 ## Pendiente
 
 - Ejecución inicial Android observada en capturas y emulador detectado. Revisar herramientas/licencias si afectan nuevas compilaciones; build APK desde esta sesión, icono instalado y retorno de Auth aún no verificados. iOS no compilado en Windows.
