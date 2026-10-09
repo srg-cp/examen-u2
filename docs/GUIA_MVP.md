@@ -197,9 +197,15 @@ La seguridad, pruebas y documentación acompañan cada sprint; S6 reúne la vali
 
 ## 6. GitHub con un flujo sencillo
 
+Cada issue #1–#51 tiene su archivo en [backlog](backlog/README.md), con snapshot de criterios, estado y motivo. La clasificación está sincronizada entre etiquetas status y el campo Status nativo del [tablero EntreHuellas](https://github.com/users/srg-cp/projects/3/views/1). Distinguir Backlog de Ready, implementación de revisión y evidencia local de Done; actualizar tarjeta, etiqueta y documentación juntas. La sincronización inicial está comprobada y no es automática.
+
 Usar `main` como base integrada y una rama por historia o conjunto coherente de cambios. Inicialmente no hace falta mantener una rama `develop` adicional. El repositorio local ya tiene commits; comprobar las referencias y la autenticación del remoto antes de publicar cambios. Los incrementos siguen ramas y pull requests según la autorización de cada tarea.
 
 Crear un issue por HU y milestones S1-S6. La plantilla de historia está en `.github/ISSUE_TEMPLATE/historia.md`. No hace falta un tablero adicional para empezar; se puede añadir si mejora la coordinación.
+
+Actualización del 8 de octubre de 2026: conservar las 16 HU originales y sus issues #1–#16. Doce pasan a historias agrupadoras; 35 derivadas HU-XX.n (#17–#51) y cuatro originales sin dividir forman 39 entregas ejecutables. Todas mantienen formato de historia de usuario y están asignadas a `srg-cp`. El [desglose versionado](BACKLOG_MVP.md) conserva RF, criterios, dependencias y validación. No sumar esfuerzo de agrupadoras y derivadas, ni reutilizar estimaciones originales como estimaciones nuevas. Cerrar una agrupadora solo después de sus derivadas y su validación integrada; los sprints siguen siendo objetivos. La reorganización no añade alcance funcional ni acredita criterios pendientes.
+
+Precisión académica del mismo día: las 12 agrupadoras se identifican como **épicas** en GitHub; las otras 39 son **historias de usuario ejecutables** con escenarios específicos de validación. HU-XX.n es una convención documentada para conservar trazabilidad, no una exigencia universal. #44 (interacciones afectadas por bloqueo) y #51 (funciones controlables/interfaz administrativa) requieren refinamiento antes de comprometer implementación. #25 concreta la exportación básica como JSON UTF-8 de perfil y solicitudes/estados de baja propios. La prioridad se conserva como referencia de la HU original y las estimaciones deben acordarse por entrega; no se afirma adecuación a una rúbrica docente no recibida.
 
 Ejemplos de ramas: `chore/project-setup`, `feat/hu-01-auth`, `feat/hu-05-lost-cases`, `fix/qr-revoked-token`. El número HU no es el número del issue.
 
