@@ -242,3 +242,7 @@ La dependencia de mapa incorpora caché nativa/path_provider: reconstruir e inst
 Con A: crear dos zonas, editar radio, cancelar otra edición, reiniciar y comprobar persistencia; provocar fallo de red y reintentar con el mismo borrador; eliminar y repetir después de pérdida de respuesta. Con B/anónimo: lectura/escritura de A deben rechazarse. Ejecutar `database/tests/009_interest_zone_permissions.sql` en desarrollo para RLS/grants y guardias del servidor; sus pruebas de fixture no sustituyen las cuentas reales en la app.
 
 Mapa de desarrollo: OSM estándar, atribución y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL`, `MAP_ATTRIBUTION`, `MAP_ATTRIBUTION_URL` al compilar; comprobar condiciones/capacidad antes de distribuir, según ADR-018. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
+
+## Preferencias de alertas
+
+Antes de abrir Perfil → Preferencias de alertas, aplicar completo `database/patchs/011_patch_alert_preferences.sql` en Supabase de desarrollo. No requiere claves adicionales ni permisos GPS/push. Guardado con sesión y clave publicable; errores de esquema no se confunden con cuenta sin preferencias. Esta entrega guarda elecciones y no envía notificaciones. Tras actualizar app, verificar guardar/reabrir/reiniciar y aislamiento entre cuentas. Ver ADR-019 y ESTADO para evidencia y pendientes.

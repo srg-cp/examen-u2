@@ -15,3 +15,7 @@ Es una salida generada, no otra fuente editable: `./database/scripts/Build-Avata
 ## 010 — Zonas de interés privadas
 
 Generar con `../scripts/Build-InterestZonesPatch.ps1`. Aplicar completo [010_patch_interest_zones.sql](010_patch_interest_zones.sql) en Supabase de desarrollo con Auth/roles existentes. Crea tabla privada, RPC y permisos; no modifica mascotas ni requiere PostGIS. La salida deriva del plan010 y migración20261009001000; no editarla manualmente. Probado localmente, sin despliegue remoto en esta entrega.
+
+## 011 — Preferencias de alertas
+
+`011_patch_alert_preferences.sql` es generado por `../scripts/Build-AlertPreferencesPatch.ps1` desde plan011/SQL040–043 y migración20261010001100. Ejecutar **todo su contenido** en Supabase de desarrollo. Permite preferencias por cuenta con versión y RLS, sin activar entregas. Repetible sin borrar elecciones. Probar por separado `../tests/010_alert_preferences_permissions.sql`; la prueba usa usuarios ficticios y rollback. No editar el artefacto ni fuentes tras aplicarlo; cambios posteriores requieren otra migración.

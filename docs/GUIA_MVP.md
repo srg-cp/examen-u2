@@ -333,4 +333,8 @@ HU-03 / RF-03 (issues #28/#29): Mis mascotas incorpora Activas/Archivadas y la f
 
 ### Zonas de interés implementadas localmente — HU-02.1 / RF-02,16
 
-Primer incremento de la rama `feature/interest-zones`: selección manual en mapa, radio0.1–50km, listado/edición/eliminación privados por cuenta y alternativa de coordenadas. Contrato versionado e idempotente en SQL036–039/plan010, según ADR-018. Sin GPS ni push; HU-02.2 sigue como segundo incremento. Las pruebas locales no cierran issue#26 ni S2; faltan migración y demo integrada con dos cuentas en Supabase/Android.
+Primer incremento de la rama `feature/interest-zones`: selección manual en mapa, radio0.1–50km, listado/edición/eliminación privados por cuenta y alternativa de coordenadas. Contrato versionado e idempotente en SQL036–039/plan010, según ADR-018. Sin GPS ni push; HU-02.2 se desarrolla como segundo incremento separado. Las pruebas locales no cierran issue#26 ni S2; patch010 aplicado según usuario del 10 de octubre y demo integrada con dos cuentas en Supabase/Android pendiente.
+
+### Preferencias de alertas — HU-02.2 / issue #27
+
+Rama `feature/alert-preferences`, segundo incremento de HU-02: recepción general, tipos perdidas/encontradas/novedades de casos y canales bandeja/push, conservados por cuenta. Recepción inicialmente pausada; pausar conserva elecciones y activar requiere tipo/canal. Contrato SQL040–043/plan011 privado/versionado según ADR-019. UI guarda selección y explica que recepción se habilitará con HU-12; sin GPS, permisos/tokens ni envío. No ampliar a email/SMS ni afirmar entrega push. Requiere patch011 y demo Android/Supabase antes de cerrar criterios. Patch010 de zonas ya aplicado según usuario del 10 de octubre.

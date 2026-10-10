@@ -1332,3 +1332,7 @@ Cumplir docs/REGLAS_ARQUITECTURA.md y docs/REGLAS_UI_UX.md, Flutter/Clean Archit
 
 Una historia termina con criterios demostrados, código integrado, datos versionados y validados, errores/permisos comprobados, demo reproducible y docs/ESTADO.md actualizado. Pruebas locales con sustitutos no acreditan Auth/RLS/Storage/FCM reales. Cerrar una derivada no cierra su épica.
 
+
+## Avance local HU-02.2 — 10 de octubre de 2026
+
+Preferencias de alertas / issue #27 implementadas localmente en `feature/alert-preferences`. Recepción general, tres tipos perdidas/encontradas/novedades de casos y canales bandeja/push, sin envío ni permisos; SQL040–043/plan011 privado/versionado según ADR-019. Patch011 y demo Android/Supabase pendientes antes de cerrar aceptación. El estado operativo de GitHub no se modifica por esta nota de desarrollo; la ficha individual distingue snapshot y avance local.

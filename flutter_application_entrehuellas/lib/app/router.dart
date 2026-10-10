@@ -12,6 +12,7 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/widgets/profile_avatar.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/interest_zones/presentation/screens/interest_zones_screen.dart';
+import '../features/alert_preferences/presentation/screens/alert_preferences_screen.dart';
 import '../features/pets/presentation/widgets/pets_section.dart';
 import '../features/pets/presentation/screens/pet_editor_screen.dart';
 import '../features/pets/presentation/screens/pet_detail_screen.dart';
@@ -70,6 +71,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
       if (path == '/home' && state.uri.path == '/home/profile') return null;
       if (path == '/home' && state.uri.path == '/home/interest-zones') {
+        return null;
+      }
+      if (path == '/home' && state.uri.path == '/home/alert-preferences') {
         return null;
       }
       if (path == '/home' && state.uri.path.startsWith('/home/pets/')) {
@@ -151,6 +155,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           petsContent: PetsSection(),
         ),
         routes: [
+          GoRoute(
+            path: 'alert-preferences',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const AlertPreferencesScreen(),
+            ),
+          ),
           GoRoute(
             path: 'pets/new',
             pageBuilder: (context, state) => CustomTransitionPage<void>(

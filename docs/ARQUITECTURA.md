@@ -243,4 +243,10 @@ Incremento en `features/interest_zones`, según [ADR-018](decisiones/018-zonas-m
 
 RLS/proyección propia, RPC autorizadas con UUID estable/versión/bloqueos y marca de eliminación evitan duplicados y resurrecciones por reintento. Fuentes036–039/plan010 generan migración y patch. Refresco conserva contenido/borrador; cambio/error de cuenta desmonta contenido anterior y descarta respuestas tardías. AutoDispose libera observación y keepAlive se limita a escritura.
 
-flutter_map es el adaptador visual de teselas en presentación: conserva su fuente por instancia, atribución y caché; emite punto al ViewModel. No accede a repositorios ni Supabase. No hay GPS, PostGIS, preferencias/push ni publicación de casos en este incremento. La migración remota y demo Android permanecen pendientes.
+flutter_map es el adaptador visual de teselas en presentación: conserva su fuente por instancia, atribución y caché; emite punto al ViewModel. No accede a repositorios ni Supabase. No hay GPS, PostGIS, preferencias/push ni publicación de casos en este incremento. Patch010 aplicado según confirmación del usuario del 10 de octubre; demo Android pendiente.
+
+## Preferencias privadas de alertas — HU-02.2
+
+[ADR-019](decisiones/019-preferencias-alertas-por-cuenta.md): AlertPreferencesScreen/PreferenceOptions consumen AlertPreferencesViewModel/PreferenceViewState. Dominio contiene AlertPreferences, ReadAlertPreferences, SaveAlertPreferences y contrato AlertPreferenceRepository; data aporta DTO, fuente SDK y repositorio. Providers declaran sesión/casos/contrato; bootstrap inyecta implementaciones y main sus overrides. Ruta privada desde Perfil, sin comunicación por infraestructura entre funcionalidades.
+
+SQL040–043/plan011: agregado por owner_id, RLS/grants por cuenta y guardado RPC versionado con reintento idéntico/no-op. Recepción general prevalece y conserva tres tipos y canales bandeja/push. Defaults pausados solo tras ausencia confirmada; sin envío, permisos ni token. Generación/identidad protege respuestas tardías; autoDispose y keepAlive limitado a guardado. Refresh conserva contenido con progreso fino y error contextual; descartar/salir reemplaza borrador con confirmación. Modal compartido de descarte en core, reutilizado por zonas. HU-12 consumirá preferencias y validará entrega; S2 no acredita push.

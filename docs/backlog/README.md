@@ -38,6 +38,8 @@ Actualización autorizada el 9 de octubre: Perfil #23 y mascotas #3/#28/#29 en I
 
 Actualización autorizada el 10 de octubre: Zonas #26 y su épica #2 pasan de Ready a In progress. Implementación local verificada; patch010 aplicado en Supabase según el usuario. Falta demostrar el recorrido real Android/Supabase e integrar el código. Preferencias #27 permanece en Backlog.
 
+Avance local posterior del 10 de octubre: preferencias #27 implementadas en `feature/alert-preferences` según ADR-019, con SQL040–043/patch011 preparado y pruebas locales. Este incremento de desarrollo no modificó el snapshot de GitHub; patch011 y validación integrada siguen pendientes. Consultar ficha #27 y ESTADO.
+
 ## In Progress
 
 | Issue local | Tipo | Resultado |

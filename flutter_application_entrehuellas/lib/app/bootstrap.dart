@@ -23,6 +23,10 @@ import '../features/pets/data/data_sources/supabase_pet_photo_source.dart';
 import '../features/pets/data/repositories/pet_photo_repository_impl.dart';
 import '../features/pets/data/repositories/unavailable_pet_photo_repository.dart';
 import '../features/interest_zones/domain/repositories/interest_zone_repository.dart';
+import '../features/alert_preferences/domain/repositories/alert_preference_repository.dart';
+import '../features/alert_preferences/data/data_sources/supabase_alert_preference_data_source.dart';
+import '../features/alert_preferences/data/repositories/alert_preference_repository_impl.dart';
+import '../features/alert_preferences/data/repositories/unavailable_alert_preference_repository.dart';
 import '../features/interest_zones/data/data_sources/supabase_interest_zone_data_source.dart';
 import '../features/interest_zones/data/repositories/interest_zone_repository_impl.dart';
 import '../features/interest_zones/data/repositories/unavailable_interest_zone_repository.dart';
@@ -58,6 +62,7 @@ class AppBootstrap {
     required this.petRepository,
     required this.petPhotoRepository,
     required this.interestZoneRepository,
+    required this.alertPreferenceRepository,
   });
 
   final StartupState state;
@@ -71,6 +76,7 @@ class AppBootstrap {
   final PetRepository petRepository;
   final PetPhotoRepository petPhotoRepository;
   final InterestZoneRepository interestZoneRepository;
+  final AlertPreferenceRepository alertPreferenceRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -95,6 +101,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          alertPreferenceRepository: AlertPreferenceRepositoryImpl(
+            SupabaseAlertPreferenceDataSource(supabase.client),
+          ),
           interestZoneRepository: InterestZoneRepositoryImpl(
             SupabaseInterestZoneDataSource(supabase.client),
           ),
@@ -139,6 +148,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
 }
 
 AppBootstrap _unavailable(StartupStatus status) => AppBootstrap(
+  alertPreferenceRepository: const UnavailableAlertPreferenceRepository(),
   interestZoneRepository: const UnavailableInterestZoneRepository(),
   petPhotoRepository: const UnavailablePetPhotoRepository(),
   petRepository: const UnavailablePetRepository(),

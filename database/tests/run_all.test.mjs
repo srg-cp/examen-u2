@@ -4,6 +4,26 @@ import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+test('Alert preferences isolate accounts, pause choices, validate channels/types and deduplicate versioned retries', async (t) => {
+  const db = await database(t);
+  const patch = await readFile(new URL('../patchs/011_patch_alert_preferences.sql', import.meta.url), 'utf8');
+  const permissions = await readFile(new URL('./010_alert_preferences_permissions.sql', import.meta.url), 'utf8');
+  // Incremental upgrade from the zones schema, then repeat the new patch.
+  await db.exec(bundle.split('-- Source: database/tables/040_create_alert_preferences.sql')[0] + '\ncommit;');
+  await db.exec(patch);
+  await db.exec(patch);
+  await db.exec(permissions);
+  await db.exec(`
+    insert into auth.users(id) values ('33333333-3333-4333-8333-333333333327');
+    select set_config('request.jwt.claims', '{"sub":"33333333-3333-4333-8333-333333333327"}', false);
+    select public.save_alert_preferences(0, true, false, true, false, false, true);
+    select public.save_alert_preferences(1, false, false, true, false, false, true);
+  `);
+  const before = await db.query('select * from public.alert_preferences');
+  await db.exec(bundle);
+  await db.exec(patch);
+  assert.deepEqual(await db.query('select * from public.alert_preferences'), before);
+});
 test('Interest zones isolate owners, guard manual bounds, stale writes and late retries after deletion', async (t) => {
   const db = await database(t);
   const patch = await readFile(new URL('../patchs/010_patch_interest_zones.sql', import.meta.url), 'utf8');

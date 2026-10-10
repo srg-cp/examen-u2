@@ -56,6 +56,13 @@ class ProfileScreen extends ConsumerWidget {
                       TextButton.icon(
                         onPressed: exit.isLoading
                             ? null
+                            : () => context.push('/home/alert-preferences'),
+                        icon: const Icon(Icons.notifications_outlined),
+                        label: const Text('Preferencias de alertas'),
+                      ),
+                      TextButton.icon(
+                        onPressed: exit.isLoading
+                            ? null
                             : () => context.push('/home/interest-zones'),
                         icon: const Icon(Icons.location_on_outlined),
                         label: const Text('Zonas de interés'),
