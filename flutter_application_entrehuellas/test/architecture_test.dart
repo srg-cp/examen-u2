@@ -3,6 +3,28 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('Content loading never renders a loading text or circular indicator', () {
+    final visibleLoading = RegExp(
+      r'''\bText\s*\(\s*(?:\w+\s*\?\s*)?['"](?:Cargando|Preparando)\b''',
+    );
+    final circular = RegExp(r'\bCircularProgressIndicator\b');
+    final violations = <String>[];
+    for (final file in Directory(
+      'lib',
+    ).listSync(recursive: true).whereType<File>()) {
+      if (!file.path.endsWith('.dart')) continue;
+      final code = file.readAsStringSync();
+      if (visibleLoading.hasMatch(code) || circular.hasMatch(code)) {
+        violations.add(file.path);
+      }
+    }
+    expect(
+      violations,
+      isEmpty,
+      reason:
+          'Use content skeletons or retained content with top progress; accessible labels remain allowed.',
+    );
+  });
   test('UI loading labels never end in suspension dots', () {
     final literals = RegExp(r''''(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"''');
     final dots = RegExp(r'(?:…|\.\.\.)\s*$');
@@ -78,7 +100,7 @@ void main() {
               '$appRoot/${imported.substring('package:flutter_application_entrehuellas/'.length)}';
         } else if (imported.startsWith('package:')) {
           final isDataSdk = RegExp(
-            r'^package:(supabase|gotrue|postgrest|storage_client|realtime_client|http|drift|sqflite)',
+            r'^package:(supabase|gotrue|postgrest|storage_client|realtime_client|http|drift|sqflite|image_picker|image/|shared_preferences|cross_file)',
           ).hasMatch(imported);
           if (isDomain ||
               (isDataSdk && !path.contains('/data/data_sources/')) ||

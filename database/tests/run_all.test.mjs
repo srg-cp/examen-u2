@@ -4,11 +4,76 @@ import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+const archivingPatch = await readFile(new URL('../patchs/008_patch_pet_archiving.sql', import.meta.url), 'utf8');
+const archivingPermissions = await readFile(new URL('./008_pet_archiving_permissions.sql', import.meta.url), 'utf8');
+test('Archiving restores private pets, preserves history and guards irreversible deletion with retries', async (t) => {
+  const db = await database(t);
+  await db.exec(bundle);
+  await db.exec(archivingPatch);
+  await db.exec(archivingPatch);
+  await db.exec(archivingPermissions);
+});
 const migration = await readFile(new URL('../../supabase/migrations/20261007000100_auth_profiles.sql', import.meta.url), 'utf8');
 const permissions = await readFile(new URL('./001_profiles_permissions.sql', import.meta.url), 'utf8');
 const onboardingPermissions = await readFile(new URL('./002_onboarding_permissions.sql', import.meta.url), 'utf8');
+const profileEdits = await readFile(new URL('./003_profile_edit_permissions.sql', import.meta.url), 'utf8');
+const avatarPermissions = await readFile(new URL('./004_profile_avatar_permissions.sql', import.meta.url), 'utf8');
+const avatarPatch = await readFile(new URL('../patchs/004_patch_profile_avatars.sql', import.meta.url), 'utf8');
+const petsPatch = await readFile(new URL('../patchs/005_patch_pets.sql', import.meta.url), 'utf8');
+const galleryPatch = await readFile(new URL('../patchs/006_patch_pet_gallery.sql', import.meta.url), 'utf8');
+const galleryPermissions = await readFile(new URL('./006_pet_gallery_permissions.sql', import.meta.url), 'utf8');
+const deletionPatch = await readFile(new URL('../patchs/007_patch_pet_deletion.sql', import.meta.url), 'utf8');
+const deletionPermissions = await readFile(new URL('./007_pet_deletion_permissions.sql', import.meta.url), 'utf8');
+test('Deletion isolates owners, rejects stale versions and retires files before metadata with safe retries', async (t) => {
+  const db = await database(t);
+  await db.exec(bundle);
+  await db.exec(deletionPatch);
+  await db.exec(deletionPatch);
+  await db.exec(deletionPermissions);
+});
+test('Pet gallery is private, limited, retryable and cannot bypass ownership or metadata validation', async (t) => {
+  const db = await database(t);
+  assert.doesNotMatch(galleryPatch, /alter\s+table\s+storage\.objects/i);
+  await db.exec(bundle);
+  await db.exec(galleryPatch);
+  await db.exec(galleryPatch);
+  await db.exec(galleryPermissions);
+});
+const petsPermissions = await readFile(new URL('./005_pets_permissions.sql', import.meta.url), 'utf8');
+test('Pets RPCs isolate accounts, validate fields, deduplicate retries and reject stale updates', async (t) => {
+  const db = await database(t);
+  await db.exec(bundle);
+  await db.exec(petsPatch);
+  await db.exec(petsPatch);
+  await db.exec(galleryPatch);
+  await db.exec(galleryPatch);
+  await db.exec(petsPermissions);
+});
 
 // Local PostgreSQL engine with a minimal Auth fixture. This is not Supabase GoTrue.
+test('Avatar bucket is private and repeated policies isolate stable paths by account', async (t) => {
+  const db = await database(t);
+  await db.exec(bundle);
+  await db.exec(bundle);
+  await db.exec(avatarPermissions);
+});
+test('Manual avatar patch is repeatable without altering managed storage and rejects disabled RLS', async (t) => {
+  const db = await database(t);
+  assert.doesNotMatch(avatarPatch, /alter\s+table\s+storage\.objects/i);
+  await db.exec(avatarPatch);
+  await db.exec(avatarPatch);
+  await db.exec(avatarPermissions);
+  await db.exec('alter table storage.objects disable row level security');
+  await assert.rejects(db.exec(avatarPatch), /Storage RLS is disabled/);
+  await db.exec('rollback');
+});
+test('Profile editing enforces server column grants, optional values, Unicode and retry invariants', async (t) => {
+  const db = await database(t);
+  await db.exec(bundle);
+  await db.exec(profileEdits);
+  await db.exec(permissions);
+});
+
 async function database(t) {
   const db = await PGlite.create();
   t.after(() => db.close());
@@ -16,6 +81,13 @@ async function database(t) {
     create role anon;
     create role authenticated;
     create schema auth;
+    create schema storage;
+    create table storage.buckets(id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
+    create table storage.objects(id uuid primary key, bucket_id text references storage.buckets(id), name text, metadata jsonb, unique(bucket_id, name));
+    alter table storage.objects enable row level security;
+    grant usage on schema storage to authenticated, anon;
+    grant select, insert, update, delete on storage.objects to authenticated;
+    grant select on storage.objects to anon;
     create table auth.users (
       id uuid primary key, aud text, role text, email text, raw_user_meta_data jsonb
     );

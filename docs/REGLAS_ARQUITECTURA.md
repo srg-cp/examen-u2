@@ -174,3 +174,9 @@ Resolver dependencias primero si cambiaron. `test/architecture_test.dart` compru
 Para cambiar una regla, registrar una decisión arquitectónica versionada en `docs` con el problema, alternativas, decisión, impacto, plan de transición y validación. Actualizar esta norma, [ARQUITECTURA.md](ARQUITECTURA.md), [AGENTS.md](../AGENTS.md) y las comprobaciones afectadas en el mismo incremento. Mantener compatible el comportamiento existente o documentar expresamente su migración.
 
 Ningún documento garantiza por sí solo que la arquitectura nunca se rompa. Su cumplimiento se sostiene leyendo estas reglas, revisando cada cambio y manteniendo pruebas y CI que detecten las desviaciones comprobables.
+
+## Evolución explícita del feedback de éxito
+
+[ADR-007](decisiones/007-confirmacion-toast-superior.md) permite un toast superior propio para éxitos confirmados, por nueva instrucción del usuario. Es presentación: widget de core con overlay/timer ligados al ciclo de vida de la pantalla, disparado por nueva confirmación de estado. No introduce SDK, persistencia ni decisiones de negocio en UI. Errores siguen contextuales y el componente inferior prohibido no se incorpora. Mantener pruebas de limpieza, no duplicación y accesibilidad, además del escaneo existente.
+
+ADR-009 permite errores de foto en el componente toast superior existente por instrucción expresa. Sigue siendo feedback de presentación con ciclo de vida local; los demás errores conservan feedback contextual y no se incorpora el componente inferior prohibido.

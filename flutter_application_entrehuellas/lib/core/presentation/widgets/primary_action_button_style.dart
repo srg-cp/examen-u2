@@ -5,8 +5,8 @@ ButtonStyle primaryActionButtonStyle(
   BuildContext context, {
   bool isLoading = false,
 }) => FilledButton.styleFrom(
-  backgroundColor: const Color(0xFF24282A),
-  disabledBackgroundColor: isLoading ? const Color(0xFF24282A) : null,
+  backgroundColor: const Color(0xFF111111),
+  disabledBackgroundColor: isLoading ? const Color(0xFF111111) : null,
   disabledForegroundColor: isLoading ? Colors.white : null,
   minimumSize: const Size(double.infinity, 60),
   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),

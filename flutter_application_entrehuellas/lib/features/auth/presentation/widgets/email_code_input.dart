@@ -91,7 +91,7 @@ class _EmailCodeInputState extends State<EmailCodeInput> {
                                     ? const Color(0xFFB53F48)
                                     : _focus.hasFocus &&
                                           i == _controller.text.length
-                                    ? const Color(0xFF818792)
+                                    ? const Color(0xFF6E6E73)
                                     : const Color(0xFFD2D4DA),
                                 width: widget.errorHint == null ? 1 : 3.5,
                               ),
@@ -105,7 +105,7 @@ class _EmailCodeInputState extends State<EmailCodeInput> {
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
                                   color: widget.errorHint == null
-                                      ? const Color(0xFF24282A)
+                                      ? const Color(0xFF111111)
                                       : const Color(0xFFB53F48),
                                 ),
                               ),

@@ -1,0 +1,121 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/failures/profile_failure.dart';
+import '../../providers/profile_providers.dart';
+import '../state/profile_edit_state.dart';
+import '../../domain/entities/account_profile.dart';
+
+final profileViewModelProvider =
+    AsyncNotifierProvider.autoDispose<ProfileViewModel, ProfileEditState>(
+      ProfileViewModel.new,
+      retry: (_, _) => null,
+    );
+
+class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
+  int _generation = 0;
+  int _errorId = 0;
+  @override
+  Future<ProfileEditState> build() async {
+    _generation++;
+    final read = ref.watch(readProfileProvider);
+    final session = await ref.watch(profileSessionProvider.future);
+    if (session == null) {
+      throw const ProfileFailure(ProfileFailureKind.signedOut);
+    }
+    return ProfileEditState.fromProfile(await read(session.userId));
+  }
+
+  void retry() => ref.invalidateSelf();
+  void applyAvatar(AccountProfile remote) {
+    final current = state.asData?.value;
+    if (current == null || current.profile.userId != remote.userId) return;
+    state = AsyncData(
+      ProfileEditState(
+        profile: AccountProfile(
+          userId: current.profile.userId,
+          displayName: current.profile.displayName,
+          city: current.profile.city,
+          email: remote.email,
+          avatarUri: remote.avatarUri,
+        ),
+        displayName: current.displayName,
+        city: current.city,
+        saving: current.saving,
+        issue: current.issue,
+        errorId: current.errorId,
+      ),
+    );
+  }
+
+  void edit({String? displayName, String? city}) {
+    final current = state.asData?.value;
+    if (current == null || current.isBusy) return;
+    final keepIssue =
+        (current.issue == ProfileFailureKind.invalidName &&
+            displayName == null) ||
+        (current.issue == ProfileFailureKind.invalidCity && city == null);
+    state = AsyncData(
+      ProfileEditState(
+        profile: current.profile,
+        displayName: displayName ?? current.displayName,
+        city: city ?? current.city,
+        errorId: current.errorId,
+        issue: keepIssue ? current.issue : null,
+      ),
+    );
+  }
+
+  void discard() {
+    final current = state.asData?.value;
+    if (current != null && !current.isBusy) {
+      state = AsyncData(ProfileEditState.fromProfile(current.profile));
+    }
+  }
+
+  Future<void> save() async {
+    final current = state.asData?.value;
+    if (current == null || current.isBusy || !current.isDirty) return;
+    final generation = _generation;
+    final update = ref.read(updateProfileProvider);
+    state = AsyncData(
+      ProfileEditState(
+        profile: current.profile,
+        displayName: current.displayName,
+        city: current.city,
+        saving: const AsyncLoading(),
+      ),
+    );
+    try {
+      final saved = await update(
+        current.profile.userId,
+        displayName: current.displayName,
+        city: current.city,
+      );
+      if (ref.mounted && generation == _generation) {
+        state = AsyncData(
+          ProfileEditState(
+            profile: saved,
+            displayName: saved.displayName ?? '',
+            city: saved.city ?? '',
+            saved: true,
+          ),
+        );
+      }
+    } catch (error, stack) {
+      if (ref.mounted && generation == _generation) {
+        final failure = error is ProfileFailure
+            ? error
+            : const ProfileFailure(ProfileFailureKind.unavailable);
+        state = AsyncData(
+          ProfileEditState(
+            profile: current.profile,
+            displayName: current.displayName,
+            city: current.city,
+            saving: AsyncError(failure, stack),
+            issue: failure.kind,
+            errorId: ++_errorId,
+          ),
+        );
+      }
+    }
+  }
+}

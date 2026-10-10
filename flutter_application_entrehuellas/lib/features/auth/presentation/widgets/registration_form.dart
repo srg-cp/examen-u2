@@ -165,7 +165,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           order: 7,
           child: Text(
             'Usa al menos 8 caracteres.',
-            style: TextStyle(fontSize: 14, color: Color(0xFF747781)),
+            style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
           ),
         ),
         if (widget.state.message != null)

@@ -32,11 +32,13 @@ void main() {
       controller.value = .5;
       await tester.pump();
       final middle = tester.getRect(surface);
+      expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 0);
       expect(middle.width, greaterThan(origin.width));
       expect(middle.width, lessThan(400));
       controller.value = 1;
       await tester.pump();
       expect(tester.getRect(surface), const Rect.fromLTWH(0, 0, 400, 800));
+      expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 1);
       controller.reverse();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 240));

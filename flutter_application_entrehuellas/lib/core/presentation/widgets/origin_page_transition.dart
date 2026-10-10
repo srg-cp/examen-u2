@@ -34,7 +34,7 @@ class OriginPageTransition extends StatelessWidget {
               : visibleOrigin;
           final surface = Rect.lerp(start, bounds, progress)!;
           final radius = ui.lerpDouble(24, 0, progress)!;
-          final contentOpacity = ((progress - .08) / .72).clamp(0.0, 1.0);
+          final contentOpacity = originContentOpacity(animation.value);
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -78,3 +78,7 @@ class OriginPageTransition extends StatelessWidget {
     );
   }
 }
+
+/// Let the source surface change shape before revealing destination content.
+double originContentOpacity(double value) =>
+    const Interval(.65, 1, curve: Curves.easeOutCubic).transform(value);

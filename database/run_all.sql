@@ -219,4 +219,574 @@ $$;
 revoke all on function public.complete_onboarding() from public, anon, authenticated;
 grant execute on function public.complete_onboarding() to authenticated;
 
+-- Source: database/tables/010_create_profile_avatar_bucket.sql | normalized SHA256: 1da2939180f965d9817e35639d2ff0685e6cf5d11d81f738f51d3cb1ae72b1d1
+-- HU-01.7 expanded by the user: private account avatar, stable retry path.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('profile-avatars', 'profile-avatars', false, 2097152, array['image/jpeg'])
+on conflict (id) do update set
+    public = false, file_size_limit = 2097152, allowed_mime_types = array['image/jpeg'];
+
+-- Source: database/policies/012_profile_avatar_managed_storage.sql | normalized SHA256: 16ccf2e948cf04e510e5650e2e73b49bb5799af394cee3fc5a98168b17a18eda
+-- Supabase manages storage.objects; validate RLS without ALTER TABLE.
+do $storage_rls$
+begin
+    if not exists (select 1 from pg_catalog.pg_class where oid = 'storage.objects'::regclass and relrowsecurity) then
+        raise exception 'Storage RLS is disabled. Restore managed Storage configuration before applying this patch.';
+    end if;
+end;
+$storage_rls$;
+
+do $avatar_policies$
+begin
+    if not exists (select 1 from pg_catalog.pg_policy where polrelid = 'storage.objects'::regclass and polname = 'profile_avatars_account_guard') then
+        create policy profile_avatars_account_guard on storage.objects as restrictive for all to authenticated
+        using (bucket_id <> 'profile-avatars' or name = (select auth.uid())::text || '/avatar.jpg')
+        with check (bucket_id <> 'profile-avatars' or name = (select auth.uid())::text || '/avatar.jpg');
+    end if;
+    if not exists (select 1 from pg_catalog.pg_policy where polrelid = 'storage.objects'::regclass and polname = 'profile_avatars_anon_guard') then
+        create policy profile_avatars_anon_guard on storage.objects as restrictive for all to anon
+        using (bucket_id <> 'profile-avatars') with check (bucket_id <> 'profile-avatars');
+    end if;
+    if not exists (select 1 from pg_catalog.pg_policy where polrelid = 'storage.objects'::regclass and polname = 'profile_avatars_select_own') then
+        create policy profile_avatars_select_own on storage.objects for select to authenticated
+        using (bucket_id = 'profile-avatars' and name = (select auth.uid())::text || '/avatar.jpg');
+    end if;
+    if not exists (select 1 from pg_catalog.pg_policy where polrelid = 'storage.objects'::regclass and polname = 'profile_avatars_insert_own') then
+        create policy profile_avatars_insert_own on storage.objects for insert to authenticated
+        with check (bucket_id = 'profile-avatars' and name = (select auth.uid())::text || '/avatar.jpg');
+    end if;
+    if not exists (select 1 from pg_catalog.pg_policy where polrelid = 'storage.objects'::regclass and polname = 'profile_avatars_update_own') then
+        create policy profile_avatars_update_own on storage.objects for update to authenticated
+        using (bucket_id = 'profile-avatars' and name = (select auth.uid())::text || '/avatar.jpg')
+        with check (bucket_id = 'profile-avatars' and name = (select auth.uid())::text || '/avatar.jpg');
+    end if;
+end;
+$avatar_policies$;
+
+-- Source: database/functions/013_pet_text_rules.sql | normalized SHA256: 637b9b2c7152cf5f92697504c8c53fe42ec0b354ff862150b9d8ee013832388e
+-- Match Dart trim for ordinary and Unicode space characters.
+create or replace function public.pet_trim(p_value text) returns text
+language sql immutable strict set search_path = '' as $$
+  select btrim(p_value, E' \t\n\r\f\v' || U&'\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000\FEFF');
+$$;
+create or replace function public.validate_pet_fields(p_name text, p_species text, p_sex text, p_age_months integer, p_traits text)
+returns void language plpgsql set search_path = '' as $$
+begin
+  if p_name is null or char_length(p_name) not between 1 and 80 then raise exception using errcode = '23514', message = 'pet_invalid_name'; end if;
+  if p_species is null or p_species not in ('dog', 'cat', 'other') then raise exception using errcode = '23514', message = 'pet_invalid_species'; end if;
+  if p_sex is not null and p_sex not in ('male', 'female') then raise exception using errcode = '23514', message = 'pet_invalid_species'; end if;
+  if p_age_months is not null and p_age_months not between 0 and 600 then raise exception using errcode = '23514', message = 'pet_invalid_age'; end if;
+  if p_traits is not null and char_length(p_traits) > 500 then raise exception using errcode = '23514', message = 'pet_invalid_traits'; end if;
+end;
+$$;
+
+-- Source: database/tables/014_create_pets.sql | normalized SHA256: 00533ee48fd6d3dad55d08a20d1807c3571367319146789b420a3d62fd3b603c
+create table if not exists public.pets (
+  id uuid primary key,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 80 and name = public.pet_trim(name)),
+  species text not null check (species in ('dog','cat','other')),
+  sex text check (sex in ('male','female')),
+  age_months integer check (age_months between 0 and 600),
+  traits text check (traits is null or (char_length(traits) between 1 and 500 and traits = public.pet_trim(traits))),
+  version integer not null default 1 check (version > 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Source: database/indexes/015_pets_owner_created.sql | normalized SHA256: 9e0b23dbb75b191e1348d8c0e0c6d090d4e604a23191c0e306b8a150b0016a57
+create index if not exists pets_owner_created_idx on public.pets (owner_id, created_at desc, id);
+
+-- Source: database/functions/016_pet_commands.sql | normalized SHA256: eba6d3083ede7823ed10e521d6047140267fbe0f7998b8100621446d56b33328
+-- Only RPCs write pets; client never supplies owner, version or timestamps.
+create or replace function public.create_pet(p_id uuid, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if p_id is null then raise exception using errcode = '23514', message = 'pet_invalid_id'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  insert into public.pets(id,owner_id,name,species,sex,age_months,traits)
+  values(p_id,v_owner,v_name,p_species,p_sex,p_age_months,v_traits)
+  on conflict(id) do nothing;
+  select * into v_pet from public.pets where id = p_id;
+  if v_pet.owner_id is distinct from v_owner then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if v_pet.name is distinct from v_name or v_pet.species is distinct from p_species or v_pet.sex is distinct from p_sex or v_pet.age_months is distinct from p_age_months or v_pet.traits is distinct from v_traits then
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  return next v_pet;
+end;
+$$;
+create or replace function public.update_pet(p_id uuid, p_expected_version integer, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  select * into v_pet from public.pets where id = p_id and owner_id = v_owner for update;
+  if not found then raise exception using errcode = 'P0002', message = 'pet_missing'; end if;
+  if p_expected_version is null or p_expected_version < 1 then raise exception using errcode = '40001', message = 'pet_conflict'; end if;
+  if v_pet.version <> p_expected_version then
+    -- Lost acknowledgement: return the exact acknowledged version without writing again.
+    if v_pet.version = p_expected_version + 1 and v_pet.name is not distinct from v_name and v_pet.species is not distinct from p_species and v_pet.sex is not distinct from p_sex and v_pet.age_months is not distinct from p_age_months and v_pet.traits is not distinct from v_traits then
+      return next v_pet; return;
+    end if;
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  update public.pets set name=v_name,species=p_species,sex=p_sex,age_months=p_age_months,traits=v_traits,version=version+1,updated_at=clock_timestamp()
+  where id=p_id and owner_id=v_owner returning * into v_pet;
+  return next v_pet;
+end;
+$$;
+
+-- Source: database/policies/017_pets_owner_policies.sql | normalized SHA256: 030bf78c232b250ebe8e545fbc7a4ffb3c297b9a7f2eb30963793e0bb7a5c1b8
+alter table public.pets enable row level security;
+do $pets_rls$
+begin
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='public.pets'::regclass and polname='pets_select_own') then
+    create policy pets_select_own on public.pets for select to authenticated using(owner_id=(select auth.uid()));
+  end if;
+end;
+$pets_rls$;
+
+-- Source: database/grants/018_pets_permissions.sql | normalized SHA256: 9c19c6c3d065fe3d5e320e9fdbc99990e5f04cda232f9733ff16803a1d45721a
+revoke all on public.pets from public, anon, authenticated;
+grant select on public.pets to authenticated;
+revoke all on function public.pet_trim(text) from public, anon, authenticated;
+revoke all on function public.validate_pet_fields(text,text,text,integer,text) from public, anon, authenticated;
+revoke all on function public.create_pet(uuid,text,text,text,integer,text) from public, anon, authenticated;
+revoke all on function public.update_pet(uuid,integer,text,text,text,integer,text) from public, anon, authenticated;
+grant execute on function public.create_pet(uuid,text,text,text,integer,text) to authenticated;
+grant execute on function public.update_pet(uuid,integer,text,text,text,integer,text) to authenticated;
+
+-- Source: database/tables/019_pet_species_size.sql | normalized SHA256: 370e9ecfbeba334c79f173ef5db02cf44134a71e49c80a3d6c6cac0d268ebff6
+alter table public.pets add column if not exists species_detail text;
+alter table public.pets add column if not exists size text;
+do $$ begin
+  if not exists(select 1 from pg_catalog.pg_constraint where conrelid='public.pets'::regclass and conname='pets_species_detail_check') then
+    alter table public.pets add constraint pets_species_detail_check check(species_detail is null or (species='other' and char_length(species_detail) between 1 and 60 and species_detail=public.pet_trim(species_detail)));
+  end if;
+  if not exists(select 1 from pg_catalog.pg_constraint where conrelid='public.pets'::regclass and conname='pets_size_check') then
+    alter table public.pets add constraint pets_size_check check(size is null or size in ('small','medium','large'));
+  end if;
+end; $$;
+-- Legacy other-species rows may remain unspecified; all new v2 writes validate detail.
+
+-- Source: database/functions/020_pet_commands_v2.sql | normalized SHA256: 79b0c7c64ad0055e7c3179116f6dd97bafe4c35e69d08773fbcb356f494f293e
+-- Only RPCs write pets; client never supplies owner, version or timestamps.
+create or replace function public.create_pet_v2(p_id uuid, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text, p_species_detail text, p_size text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+  v_detail text := case when p_species='other' then nullif(public.pet_trim(p_species_detail),'') else null end;
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if p_id is null then raise exception using errcode = '23514', message = 'pet_invalid_id'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  if p_species='other' and (v_detail is null or char_length(v_detail)>60) then raise exception using errcode='23514',message='pet_invalid_species_detail'; end if;
+  if p_size is not null and p_size not in ('small','medium','large') then raise exception using errcode='23514',message='pet_invalid_size'; end if;
+  insert into public.pets(id,owner_id,name,species,sex,age_months,traits,species_detail,size)
+  values(p_id,v_owner,v_name,p_species,p_sex,p_age_months,v_traits,v_detail,p_size)
+  on conflict(id) do nothing;
+  select * into v_pet from public.pets where id = p_id;
+  if v_pet.owner_id is distinct from v_owner then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if v_pet.name is distinct from v_name or v_pet.species is distinct from p_species or v_pet.sex is distinct from p_sex or v_pet.age_months is distinct from p_age_months or v_pet.traits is distinct from v_traits or v_pet.species_detail is distinct from v_detail or v_pet.size is distinct from p_size then
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  return next v_pet;
+end;
+$$;
+create or replace function public.update_pet_v2(p_id uuid, p_expected_version integer, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text, p_species_detail text, p_size text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+  v_detail text := case when p_species='other' then nullif(public.pet_trim(p_species_detail),'') else null end;
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  if p_species='other' and (v_detail is null or char_length(v_detail)>60) then raise exception using errcode='23514',message='pet_invalid_species_detail'; end if;
+  if p_size is not null and p_size not in ('small','medium','large') then raise exception using errcode='23514',message='pet_invalid_size'; end if;
+  select * into v_pet from public.pets where id = p_id and owner_id = v_owner for update;
+  if not found then raise exception using errcode = 'P0002', message = 'pet_missing'; end if;
+  if p_expected_version is null or p_expected_version < 1 then raise exception using errcode = '40001', message = 'pet_conflict'; end if;
+  if v_pet.version <> p_expected_version then
+    -- Lost acknowledgement: return the exact acknowledged version without writing again.
+    if v_pet.version = p_expected_version + 1 and v_pet.name is not distinct from v_name and v_pet.species is not distinct from p_species and v_pet.sex is not distinct from p_sex and v_pet.age_months is not distinct from p_age_months and v_pet.traits is not distinct from v_traits and v_pet.species_detail is not distinct from v_detail and v_pet.size is not distinct from p_size then
+      return next v_pet; return;
+    end if;
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  update public.pets set name=v_name,species=p_species,sex=p_sex,age_months=p_age_months,traits=v_traits,species_detail=v_detail,size=p_size,version=version+1,updated_at=clock_timestamp()
+  where id=p_id and owner_id=v_owner returning * into v_pet;
+  return next v_pet;
+end;
+$$;
+
+-- Source: database/tables/021_pet_photos.sql | normalized SHA256: 2b75111595b826ca30c3e99745a3fdce9cba3ec93b527a04e68222b802856b78
+create table if not exists public.pet_photos (
+  id uuid primary key,
+  pet_id uuid not null references public.pets(id) on delete cascade,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending' check(status in ('pending','published')),
+  created_at timestamptz not null default now()
+);
+create index if not exists pet_photos_pet_created_idx on public.pet_photos(pet_id,created_at,id);
+
+-- Source: database/functions/022_pet_photo_commands.sql | normalized SHA256: eed63038d536ca8ea4f452664213ef65857ed49422b40d37c0e4c1dd4c81776f
+create or replace function public.reserve_pet_photo(p_id uuid,p_pet_id uuid)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_photo public.pet_photos;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  perform 1 from public.pets where id=p_pet_id and owner_id=v_owner for update;
+  if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  select * into v_photo from public.pet_photos where id=p_id;
+  if found then
+    if v_photo.owner_id<>v_owner or v_photo.pet_id<>p_pet_id then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    return next v_photo; return;
+  end if;
+  if (select count(*) from public.pet_photos where pet_id=p_pet_id)>=3 then raise exception using errcode='23514',message='photo_limit'; end if;
+  insert into public.pet_photos(id,pet_id,owner_id) values(p_id,p_pet_id,v_owner) returning * into v_photo;
+  return next v_photo;
+end; $$;
+create or replace function public.publish_pet_photo(p_id uuid)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_photo public.pet_photos;
+begin
+  select * into v_photo from public.pet_photos where id=p_id and owner_id=v_owner for update;
+  if not found or v_owner is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  if not exists(select 1 from storage.objects where bucket_id='pet-photos' and name=v_owner::text||'/'||v_photo.pet_id::text||'/'||p_id::text||'.jpg' and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 4 and 2097152) then
+    raise exception using errcode='P0002',message='photo_incomplete';
+  end if;
+  update public.pet_photos set status='published' where id=p_id returning * into v_photo;
+  return next v_photo;
+end; $$;
+create or replace function public.remove_pet_photo(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_photo public.pet_photos;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  select * into v_photo from public.pet_photos where id=p_id and owner_id=v_owner for update;
+  if not found then return; end if;
+  if exists(select 1 from storage.objects where bucket_id='pet-photos' and name=v_owner::text||'/'||v_photo.pet_id::text||'/'||p_id::text||'.jpg') then raise exception using errcode='P0002',message='photo_file_remaining'; end if;
+  delete from public.pet_photos where id=p_id and owner_id=v_owner;
+end; $$;
+
+-- Source: database/tables/023_pet_photo_bucket.sql | normalized SHA256: 698710fe4f217bc2f39c9bf3fa523ed4ee8e109acc1c52b88f09a3cd917bbb4c
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+values('pet-photos','pet-photos',false,2097152,array['image/jpeg'])
+on conflict(id) do update set public=false,file_size_limit=2097152,allowed_mime_types=array['image/jpeg'];
+
+-- Source: database/policies/024_pet_photo_owner_policies.sql | normalized SHA256: a548951b2dc33180e9ee60325ba788d8aa46a3d5948d8c71d4573525bd5a681e
+alter table public.pet_photos enable row level security;
+create or replace function public.owns_pet_photo_path(p_name text) returns boolean language sql stable security definer set search_path='' as $$
+  select exists(select 1 from public.pet_photos ph join public.pets p on p.id=ph.pet_id where p.owner_id=auth.uid() and ph.owner_id=auth.uid() and p_name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg');
+$$;
+do $$ begin
+  if not exists(select 1 from pg_catalog.pg_class where oid='storage.objects'::regclass and relrowsecurity) then raise exception 'Storage RLS must already be enabled'; end if;
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='public.pet_photos'::regclass and polname='pet_photos_select_own') then
+    create policy pet_photos_select_own on public.pet_photos for select to authenticated using(owner_id=(select auth.uid()));
+  end if;
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_photos_account_guard') then
+    create policy pet_photos_account_guard on storage.objects as restrictive for all to authenticated using(bucket_id<>'pet-photos' or public.owns_pet_photo_path(name)) with check(bucket_id<>'pet-photos' or public.owns_pet_photo_path(name));
+  end if;
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_photos_anon_guard') then
+    create policy pet_photos_anon_guard on storage.objects as restrictive for all to anon using(bucket_id<>'pet-photos') with check(bucket_id<>'pet-photos');
+  end if;
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_photos_objects_own') then
+    create policy pet_photos_objects_own on storage.objects for all to authenticated using(bucket_id='pet-photos' and public.owns_pet_photo_path(name)) with check(bucket_id='pet-photos' and public.owns_pet_photo_path(name));
+  end if;
+end; $$;
+
+-- Source: database/grants/025_pet_gallery_permissions.sql | normalized SHA256: 6073e5481e6de1fa6af20e15c3f8880244d3762ff03f6a786f44d9433ec78f3b
+revoke all on public.pet_photos from public,anon,authenticated;
+grant select on public.pet_photos to authenticated;
+revoke all on function public.create_pet(uuid,text,text,text,integer,text) from public,anon,authenticated;
+revoke all on function public.update_pet(uuid,integer,text,text,text,integer,text) from public,anon,authenticated;
+revoke all on function public.create_pet_v2(uuid,text,text,text,integer,text,text,text) from public,anon,authenticated;
+revoke all on function public.update_pet_v2(uuid,integer,text,text,text,integer,text,text,text) from public,anon,authenticated;
+grant execute on function public.create_pet_v2(uuid,text,text,text,integer,text,text,text) to authenticated;
+grant execute on function public.update_pet_v2(uuid,integer,text,text,text,integer,text,text,text) to authenticated;
+revoke all on function public.reserve_pet_photo(uuid,uuid), public.publish_pet_photo(uuid), public.remove_pet_photo(uuid), public.owns_pet_photo_path(text) from public,anon,authenticated;
+grant execute on function public.reserve_pet_photo(uuid,uuid), public.publish_pet_photo(uuid), public.remove_pet_photo(uuid), public.owns_pet_photo_path(text) to authenticated;
+
+-- Source: database/tables/026_pet_deletion_marker.sql | normalized SHA256: 92e2ba208b998dca36ac29e1b8b28a07c9fbd05e443db15304951447a17f3ec5
+alter table public.pets add column if not exists deletion_requested_at timestamptz;
+create table if not exists public.pet_deletions (
+  id uuid primary key,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  deleted_at timestamptz not null default now()
+);
+alter table public.pet_deletions enable row level security;
+revoke all on public.pet_deletions from public,anon,authenticated;
+
+-- Source: database/functions/027_pet_deletion_commands.sql | normalized SHA256: 2ca535395f97f6d9c7888748e6adcffdbceb448f5123b8cdbce27ef76335932e
+-- Only RPCs write pets; client never supplies owner, version or timestamps.
+create or replace function public.create_pet_v2(p_id uuid, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text, p_species_detail text, p_size text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+  v_detail text := case when p_species='other' then nullif(public.pet_trim(p_species_detail),'') else null end;
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if p_id is null then raise exception using errcode = '23514', message = 'pet_invalid_id'; end if;
+  if exists(select 1 from public.pet_deletions where id=p_id) then raise exception using errcode='40001',message='pet_deleted'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  if p_species='other' and (v_detail is null or char_length(v_detail)>60) then raise exception using errcode='23514',message='pet_invalid_species_detail'; end if;
+  if p_size is not null and p_size not in ('small','medium','large') then raise exception using errcode='23514',message='pet_invalid_size'; end if;
+  insert into public.pets(id,owner_id,name,species,sex,age_months,traits,species_detail,size)
+  values(p_id,v_owner,v_name,p_species,p_sex,p_age_months,v_traits,v_detail,p_size)
+  on conflict(id) do nothing;
+  select * into v_pet from public.pets where id = p_id;
+  if v_pet.owner_id is distinct from v_owner then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  if v_pet.deletion_requested_at is not null then raise exception using errcode='42501',message='pet_deleting'; end if;
+  if v_pet.name is distinct from v_name or v_pet.species is distinct from p_species or v_pet.sex is distinct from p_sex or v_pet.age_months is distinct from p_age_months or v_pet.traits is distinct from v_traits or v_pet.species_detail is distinct from v_detail or v_pet.size is distinct from p_size then
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  return next v_pet;
+end;
+$$;
+create or replace function public.update_pet_v2(p_id uuid, p_expected_version integer, p_name text, p_species text, p_sex text, p_age_months integer, p_traits text, p_species_detail text, p_size text)
+returns setof public.pets language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner uuid := auth.uid();
+  v_pet public.pets;
+  v_name text := public.pet_trim(p_name);
+  v_traits text := nullif(public.pet_trim(p_traits), '');
+  v_detail text := case when p_species='other' then nullif(public.pet_trim(p_species_detail),'') else null end;
+begin
+  if v_owner is null then raise exception using errcode = '42501', message = 'pet_unauthorized'; end if;
+  perform public.validate_pet_fields(v_name, p_species, p_sex, p_age_months, v_traits);
+  if p_species='other' and (v_detail is null or char_length(v_detail)>60) then raise exception using errcode='23514',message='pet_invalid_species_detail'; end if;
+  if p_size is not null and p_size not in ('small','medium','large') then raise exception using errcode='23514',message='pet_invalid_size'; end if;
+  select * into v_pet from public.pets where id = p_id and owner_id = v_owner for update;
+  if not found then raise exception using errcode = 'P0002', message = 'pet_missing'; end if;
+  if v_pet.deletion_requested_at is not null then raise exception using errcode='42501',message='pet_deleting'; end if;
+  if p_expected_version is null or p_expected_version < 1 then raise exception using errcode = '40001', message = 'pet_conflict'; end if;
+  if v_pet.version <> p_expected_version then
+    -- Lost acknowledgement: return the exact acknowledged version without writing again.
+    if v_pet.version = p_expected_version + 1 and v_pet.name is not distinct from v_name and v_pet.species is not distinct from p_species and v_pet.sex is not distinct from p_sex and v_pet.age_months is not distinct from p_age_months and v_pet.traits is not distinct from v_traits and v_pet.species_detail is not distinct from v_detail and v_pet.size is not distinct from p_size then
+      return next v_pet; return;
+    end if;
+    raise exception using errcode = '40001', message = 'pet_conflict';
+  end if;
+  update public.pets set name=v_name,species=p_species,sex=p_sex,age_months=p_age_months,traits=v_traits,species_detail=v_detail,size=p_size,version=version+1,updated_at=clock_timestamp()
+  where id=p_id and owner_id=v_owner returning * into v_pet;
+  return next v_pet;
+end;
+$$;
+
+create or replace function public.reserve_pet_photo(p_id uuid,p_pet_id uuid)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_photo public.pet_photos;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  perform 1 from public.pets where id=p_pet_id and owner_id=v_owner and deletion_requested_at is null for update;
+  if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  select * into v_photo from public.pet_photos where id=p_id;
+  if found then
+    if v_photo.owner_id<>v_owner or v_photo.pet_id<>p_pet_id then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    return next v_photo; return;
+  end if;
+  if (select count(*) from public.pet_photos where pet_id=p_pet_id)>=3 then raise exception using errcode='23514',message='photo_limit'; end if;
+  insert into public.pet_photos(id,pet_id,owner_id) values(p_id,p_pet_id,v_owner) returning * into v_photo;
+  return next v_photo;
+end; $$;
+create or replace function public.publish_pet_photo(p_id uuid)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_photo public.pet_photos;
+begin
+  perform 1 from public.pets p join public.pet_photos ph on ph.pet_id=p.id where ph.id=p_id and p.owner_id=v_owner and p.deletion_requested_at is null for update of p;
+  if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  select * into v_photo from public.pet_photos where id=p_id and owner_id=v_owner for update;
+  if not found or v_owner is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+  if not exists(select 1 from storage.objects where bucket_id='pet-photos' and name=v_owner::text||'/'||v_photo.pet_id::text||'/'||p_id::text||'.jpg' and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 4 and 2097152) then
+    raise exception using errcode='P0002',message='photo_incomplete';
+  end if;
+  update public.pet_photos set status='published' where id=p_id returning * into v_photo;
+  return next v_photo;
+end; $$;
+
+create or replace function public.begin_pet_deletion(p_id uuid,p_expected_version integer)
+returns boolean language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then return false; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if p_expected_version is null or p_expected_version<>v_pet.version then raise exception using errcode='40001',message='pet_conflict'; end if;
+  update public.pets set deletion_requested_at=coalesce(deletion_requested_at,clock_timestamp()) where id=p_id;
+  return true;
+end; $$;
+create or replace function public.finish_pet_deletion(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then return; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if v_pet.deletion_requested_at is null then raise exception using errcode='42501',message='pet_delete_not_started'; end if;
+  if exists(select 1 from storage.objects where bucket_id='pet-photos' and name like v_owner::text||'/'||p_id::text||'/%') then raise exception using errcode='P0002',message='pet_files_remaining'; end if;
+  insert into public.pet_deletions(id,owner_id) values(p_id,v_owner) on conflict(id) do nothing;
+  delete from public.pets where id=p_id and owner_id=v_owner;
+end; $$;
+
+-- Source: database/policies/028_pet_deletion_storage_guard.sql | normalized SHA256: be4db864d96a296c03ce1892d87720096e9f3d1d0396368c3fe77b4e782e924c
+
+create or replace function public.can_write_pet_photo_path(p_name text) returns boolean language plpgsql security definer set search_path='' as $$
+begin
+  -- The parent lock makes Storage metadata writes serialize with begin/finish.
+  perform 1 from public.pet_photos ph join public.pets p on p.id=ph.pet_id where ph.owner_id=auth.uid() and p.owner_id=auth.uid() and p.deletion_requested_at is null and p_name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg' for share of p;
+  return found;
+end;
+$$;
+do $$ begin
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_photos_write_guard') then
+    create policy pet_photos_write_guard on storage.objects as restrictive for insert to authenticated with check(bucket_id<>'pet-photos' or public.can_write_pet_photo_path(name));
+  end if;
+  if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_photos_update_guard') then
+    create policy pet_photos_update_guard on storage.objects as restrictive for update to authenticated using(bucket_id<>'pet-photos' or public.can_write_pet_photo_path(name)) with check(bucket_id<>'pet-photos' or public.can_write_pet_photo_path(name));
+  end if;
+end; $$;
+
+-- Source: database/grants/029_pet_deletion_permissions.sql | normalized SHA256: 6463995ee4c0add1e1c5e5354c6eb32fce1eab95d2918e87f50de59f29136333
+revoke all on function public.begin_pet_deletion(uuid,integer),public.finish_pet_deletion(uuid),public.can_write_pet_photo_path(text) from public,anon,authenticated;
+grant execute on function public.begin_pet_deletion(uuid,integer),public.finish_pet_deletion(uuid),public.can_write_pet_photo_path(text) to authenticated;
+
+-- Source: database/tables/030_pet_archiving.sql | normalized SHA256: 1185804f2d09cc1b3c6d238a7e1626377469d9f9559aa845bd6b3d233066edd4
+alter table public.pets add column if not exists archived_at timestamptz;
+-- Server-owned case guards. Case publication/closure must maintain them under
+-- the same parent-row lock, in the transaction that creates/closes the case.
+alter table public.pets add column if not exists case_history_at timestamptz;
+alter table public.pets add column if not exists active_case_count integer not null default 0;
+do $$ begin
+  if not exists(select 1 from pg_catalog.pg_constraint where conrelid='public.pets'::regclass and conname='pets_case_lifecycle') then
+    alter table public.pets add constraint pets_case_lifecycle check (
+      active_case_count >= 0
+      and (active_case_count = 0 or case_history_at is not null)
+      and (archived_at is null or active_case_count = 0)
+    );
+  end if;
+end; $$;
+comment on column public.pets.archived_at is 'Archived pets remain private and recoverable; active lists filter this column to NULL.';
+comment on column public.pets.case_history_at is 'Irreversible server-owned first case timestamp. Case publication must set this atomically; never supplied by client.';
+comment on column public.pets.active_case_count is 'Server-owned number of active cases; case commands must maintain this atomically under the pet row lock.';
+
+-- Source: database/functions/031_pet_lifecycle_commands.sql | normalized SHA256: 8e1e14c6ea3fa78988b0c838e68984ca2c611b8340814e2e93678819e9e0bb50
+create or replace function public.archive_pet(p_id uuid, p_expected_version integer)
+returns setof public.pets language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then raise exception using errcode='P0002',message='pet_missing'; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if v_pet.deletion_requested_at is not null then raise exception using errcode='42501',message='pet_deleting'; end if;
+  if v_pet.active_case_count>0 then raise exception using errcode='23514',message='pet_active_case'; end if;
+  if p_expected_version is null or p_expected_version<1 then raise exception using errcode='40001',message='pet_conflict'; end if;
+  if v_pet.archived_at is not null then
+    if p_expected_version=v_pet.version or p_expected_version+1=v_pet.version then return next v_pet; return; end if;
+    raise exception using errcode='40001',message='pet_conflict';
+  end if;
+  if p_expected_version<>v_pet.version then raise exception using errcode='40001',message='pet_conflict'; end if;
+  update public.pets set archived_at=clock_timestamp(),version=version+1,updated_at=clock_timestamp()
+    where id=p_id returning * into v_pet;
+  return next v_pet;
+end; $$;
+
+create or replace function public.restore_pet(p_id uuid, p_expected_version integer)
+returns setof public.pets language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then raise exception using errcode='P0002',message='pet_missing'; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if v_pet.deletion_requested_at is not null then raise exception using errcode='42501',message='pet_deleting'; end if;
+  if p_expected_version is null or p_expected_version<1 then raise exception using errcode='40001',message='pet_conflict'; end if;
+  if v_pet.archived_at is null then
+    if p_expected_version=v_pet.version or p_expected_version+1=v_pet.version then return next v_pet; return; end if;
+    raise exception using errcode='40001',message='pet_conflict';
+  end if;
+  if p_expected_version<>v_pet.version then raise exception using errcode='40001',message='pet_conflict'; end if;
+  update public.pets set archived_at=null,version=version+1,updated_at=clock_timestamp()
+    where id=p_id returning * into v_pet;
+  return next v_pet;
+end; $$;
+
+-- Replace the 007 commands in this new increment; never rewrite applied SQL.
+-- Validate BEFORE Storage cleanup, so a case-backed pet never loses its photos.
+create or replace function public.begin_pet_deletion(p_id uuid,p_expected_version integer)
+returns boolean language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then return false; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if v_pet.case_history_at is not null or v_pet.active_case_count>0 then raise exception using errcode='23514',message='pet_has_case_history'; end if;
+  if p_expected_version is null or p_expected_version<>v_pet.version then raise exception using errcode='40001',message='pet_conflict'; end if;
+  update public.pets set deletion_requested_at=coalesce(deletion_requested_at,clock_timestamp()) where id=p_id;
+  return true;
+end; $$;
+
+create or replace function public.finish_pet_deletion(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+  if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  select * into v_pet from public.pets where id=p_id for update;
+  if not found then return; end if;
+  if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+  if v_pet.case_history_at is not null or v_pet.active_case_count>0 then raise exception using errcode='23514',message='pet_has_case_history'; end if;
+  if v_pet.deletion_requested_at is null then raise exception using errcode='42501',message='pet_delete_not_started'; end if;
+  if exists(select 1 from storage.objects where bucket_id='pet-photos' and name like v_owner::text||'/'||p_id::text||'/%') then raise exception using errcode='P0002',message='pet_files_remaining'; end if;
+  insert into public.pet_deletions(id,owner_id) values(p_id,v_owner) on conflict(id) do nothing;
+  delete from public.pets where id=p_id and owner_id=v_owner;
+end; $$;
+
+create or replace function public.protect_pet_case_history()
+returns trigger language plpgsql set search_path='' as $$
+begin
+  if tg_op='DELETE' then
+    if old.case_history_at is not null or old.active_case_count>0 then raise exception using errcode='23514',message='pet_has_case_history'; end if;
+    return old;
+  end if;
+  if old.case_history_at is not null and new.case_history_at is distinct from old.case_history_at then raise exception using errcode='23514',message='pet_history_immutable'; end if;
+  if old.deletion_requested_at is not null and (new.case_history_at is distinct from old.case_history_at or new.active_case_count<>old.active_case_count or new.archived_at is distinct from old.archived_at) then raise exception using errcode='42501',message='pet_deleting'; end if;
+  return new;
+end; $$;
+
+-- Source: database/triggers/032_pet_case_history_guard.sql | normalized SHA256: c1ff8719be659ed14d5481681e54d2cb94f9fccde8cbd7464a856c8ea9de4ab4
+do $$ begin
+  if not exists(select 1 from pg_catalog.pg_trigger where tgrelid='public.pets'::regclass and tgname='pet_case_history_guard' and not tgisinternal) then
+    create trigger pet_case_history_guard before update or delete on public.pets for each row execute function public.protect_pet_case_history();
+  end if;
+end; $$;
+
+-- Source: database/grants/033_pet_lifecycle_permissions.sql | normalized SHA256: 9b965c07526abde7236223b52aea9f061e256dd87fa4fc1aadba03cc2f4d7114
+revoke all on function public.archive_pet(uuid,integer),public.restore_pet(uuid,integer),public.begin_pet_deletion(uuid,integer),public.finish_pet_deletion(uuid),public.protect_pet_case_history() from public,anon,authenticated;
+grant execute on function public.archive_pet(uuid,integer),public.restore_pet(uuid,integer),public.begin_pet_deletion(uuid,integer),public.finish_pet_deletion(uuid) to authenticated;
+-- Preserve SELECT + owner RLS. No direct writes to lifecycle/case guards.
+revoke insert,update,delete on public.pets from anon,authenticated;
+
 commit;

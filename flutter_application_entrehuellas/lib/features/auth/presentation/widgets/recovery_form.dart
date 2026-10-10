@@ -127,7 +127,7 @@ class _RecoveryFormState extends State<RecoveryForm> {
             style: const TextStyle(
               fontSize: 18,
               height: 1.4,
-              color: Color(0xFF747781),
+              color: Color(0xFF6E6E73),
             ),
           ),
         ),
@@ -157,7 +157,7 @@ class _RecoveryFormState extends State<RecoveryForm> {
             order: 6,
             child: Text(
               'Usa al menos 8 caracteres.',
-              style: TextStyle(fontSize: 14, color: Color(0xFF747781)),
+              style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
             ),
           ),
         ],

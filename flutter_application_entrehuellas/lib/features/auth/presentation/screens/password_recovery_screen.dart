@@ -110,7 +110,7 @@ class PasswordRecoveryScreen extends ConsumerWidget {
                                 style: const TextStyle(
                                   fontSize: 18,
                                   height: 1.4,
-                                  color: Color(0xFF747781),
+                                  color: Color(0xFF6E6E73),
                                 ),
                               ),
                             ),
