@@ -219,3 +219,11 @@ PetsSection ofrece PetListFilter para Activas/Archivadas: cápsula gris #E5E5EA,
 ## Continuidad visual del botón al registrar
 
 PetRegistrationButton comparte _content entre botón y copia visual, conserva tipografía/padding/iconos y entrega OriginPageSource al router. OriginPageTransition recibe la identidad solo para pets/new y transforma carbón/radio/Rect; contenido de origen fijo y centrado, sin estiramiento, desaparece hasta45% y reaparece al contraer; destino desde65%. Otras rutas conservan parámetros anteriores. Capturas register_origin_start/middle/close/return y compact_origin_start/morph cubren las dos variantes normal y320×350 texto2; prueba compartida verifica identidad inicial/final, reversa, bloqueo y movimiento reducido.
+
+## Zonas de interés — HU-02.1
+
+Perfil abre `/home/interest-zones`, protegida por login/onboarding. Título32 carbón, margen24/max440, retorno GlassNavigationButton flotante con chevrón. Listado privado muestra vacío confirmado, radio, Editar/Eliminar con confirmación y Añadir zona; conserva datos con progreso fino al actualizar. Error inicial tiene Reintentar y nunca se representa como vacío.
+
+Editor usa campo de nombre, mapa280 con selección manual/círculo métrico, radio0.1–50km y alternativa expandible Indicar coordenadas. Atribución OSM visible fuera del mapa para texto ampliado; fallo permite reintentar mapa y conserva formulario. Guardar mantiene etiqueta/shimmer y éxito confirmado en toast superior; errores contextuales, shake de nombre y consulta de versión actual con confirmación de descarte. Atrás/retorno bloqueados durante escritura; cancelar no persiste.
+
+Cabecera queda fuera de cover/stagger; pasos listado/editor los usan sin reinicios por edición/slider/teclado. Inicio del scroll restaurado al cambiar etapa. Renders con fuentes reales se generan con `flutter test --no-pub --dart-define=CAPTURE_ZONES=true test/interest_zones_test.dart` en `build/ui-preview/zones`; tamaños390×844 y320×350 texto2, incluido modal completo. Las fixtures no son datos de producto ni cartografía remota validada. Véase ADR-018.

@@ -1,6 +1,6 @@
 # Backlog de Entre Huellas
 
-Sincronización: 9 de octubre de 2026, America/Lima. Repositorio: [srg-cp/entrehuellas](https://github.com/srg-cp/entrehuellas/issues).
+Sincronización: 10 de octubre de 2026, America/Lima. Repositorio: [srg-cp/entrehuellas](https://github.com/srg-cp/entrehuellas/issues).
 
 Hay **51 archivos de issue**, uno por cada #1–#51, además de este índice. El nombre combina número GitHub e identificador HU, por ejemplo `017-HU-01.1.md`. Se conservan descripción, aceptación, dependencias, validación y definición de terminado del issue, junto a metadatos, estado y motivo de clasificación.
 
@@ -11,8 +11,8 @@ Son **12 épicas** y **39 historias ejecutables**. No contar ambas como el mismo
 | Estado | Total de issues | Historias ejecutables | Épicas |
 | --- | ---: | ---: | ---: |
 | Backlog | 36 | 28 | 8 |
-| Ready | 4 | 2 | 2 |
-| In Progress | 11 | 9 | 2 |
+| Ready | 2 | 1 | 1 |
+| In Progress | 13 | 10 | 3 |
 | In Review | 0 | 0 | 0 |
 | Done | 0 | 0 | 0 |
 
@@ -28,7 +28,7 @@ Las épicas agregan el estado de sus historias: trabajo iniciado → In Progress
 
 Los estados están aplicados a los issues mediante etiquetas `status:backlog`, `status:ready`, `status:in-progress`, `status:in-review` y `status:done`. Se distingue `type:epic` de `type:story`. #44 y #51 llevan `needs:refinement`. Los 51 issues permanecen abiertos y asignados a srg-cp.
 
-**Tablero sincronizado:** [EntreHuellas — Backlog](https://github.com/users/srg-cp/projects/3/views/1). Tras autorizar GitHub CLI con el permiso project, se verificaron los 51 items del repositorio y se actualizó su campo nativo Status: 36 Backlog, 4 Ready y 11 In progress, sin items en In review o Done. El estado de cada tarjeta coincide con su etiqueta; todos siguen abiertos y asignados a srg-cp. No se guardaron tokens en el repositorio.
+**Tablero sincronizado:** [EntreHuellas — Backlog](https://github.com/users/srg-cp/projects/3/views/1). Se verificaron los 51 items del repositorio: 36 Backlog, 2 Ready y 13 In progress, sin items en In review o Done. El 10 de octubre se actualizaron #2 y #26 en etiquetas y Status nativo; ambos siguen abiertos. No se guardaron tokens en el repositorio.
 
 Referencia del mecanismo y permisos de Projects: [documentación oficial de GitHub](https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects).
 
@@ -36,11 +36,14 @@ Estos archivos son una instantánea del issue y su estado a esta fecha, no una s
 
 Actualización autorizada el 9 de octubre: Perfil #23 y mascotas #3/#28/#29 en In progress; fotos #4/#30 en Ready. No se marca Done ni se cierra ningún issue sin evidencia integrada. Status y etiquetas verificados después del cambio.
 
+Actualización autorizada el 10 de octubre: Zonas #26 y su épica #2 pasan de Ready a In progress. Implementación local verificada; patch010 aplicado en Supabase según el usuario. Falta demostrar el recorrido real Android/Supabase e integrar el código. Preferencias #27 permanece en Backlog.
+
 ## In Progress
 
 | Issue local | Tipo | Resultado |
 | --- | --- | --- |
 | [#1](001-HU-01.md) | Épica | Épica — HU-01 — Entrar y gestionar mi cuenta |
+| [#2](002-HU-02.md) | Épica | Épica — HU-02 — Elegir zonas y preferencias de alertas |
 | [#3](003-HU-03.md) | Épica | Épica — HU-03 — Registrar una mascota |
 | [#17](017-HU-01.1.md) | Historia de usuario | HU-01.1 — Registrarme y confirmar mi correo |
 | [#18](018-HU-01.2.md) | Historia de usuario | HU-01.2 — Acceder con correo y contraseña |
@@ -49,6 +52,7 @@ Actualización autorizada el 9 de octubre: Perfil #23 y mascotas #3/#28/#29 en I
 | [#21](021-HU-01.5.md) | Historia de usuario | HU-01.5 — Completar el onboarding de mi cuenta |
 | [#22](022-HU-01.6.md) | Historia de usuario | HU-01.6 — Recuperar mi contraseña con un código |
 | [#23](023-HU-01.7.md) | Historia de usuario | HU-01.7 — Consultar y editar mi perfil |
+| [#26](026-HU-02.1.md) | Historia de usuario | HU-02.1 — Guardar mis zonas y radios de interés |
 | [#28](028-HU-03.1.md) | Historia de usuario | HU-03.1 — Registrar y consultar mis mascotas |
 | [#29](029-HU-03.2.md) | Historia de usuario | HU-03.2 — Editar la ficha de mi mascota con sus fotos |
 
@@ -56,9 +60,7 @@ Actualización autorizada el 9 de octubre: Perfil #23 y mascotas #3/#28/#29 en I
 
 | Issue local | Tipo | Resultado |
 | --- | --- | --- |
-| [#2](002-HU-02.md) | Épica | Épica — HU-02 — Elegir zonas y preferencias de alertas |
 | [#4](004-HU-04.md) | Épica | Épica — HU-04 — Administrar las fotos de mi mascota |
-| [#26](026-HU-02.1.md) | Historia de usuario | HU-02.1 — Guardar mis zonas y radios de interés |
 | [#30](030-HU-04.1.md) | Historia de usuario | HU-04.1 — Agregar fotografías seguras a mi mascota |
 
 ## Backlog

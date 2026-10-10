@@ -236,3 +236,11 @@ Fuentes034–035/plan009 instalan trigger sobre insert/update de metadatos: mant
 ## Borrador de fotos del editor
 
 [ADR-017](decisiones/017-borrador-fotos-mascotas.md) conserva fotos confirmadas y separa selecciones/retiradas locales. PetPhotosViewModel ejecuta los casos de uso remotos solo después de validación y confirmación de metadatos por PetEditorViewModel. Descartar no escribe; retiradas cuentan para guardado/salida. Reintentos conservan IDs y el servidor mantiene límite/propiedad. Guardar no constituye una transacción distribuida entre metadatos y Storage. Sin nuevo SQL.
+
+## Zonas privadas y selección manual — HU-02.1
+
+Incremento en `features/interest_zones`, según [ADR-018](decisiones/018-zonas-manuales-privadas.md). InterestZonesScreen consume InterestZonesViewModel/ZoneViewState; ListInterestZones, SaveInterestZone y DeleteInterestZone expresan operaciones de dominio. Providers declaran contratos/casos de uso; bootstrap inyecta InterestZoneRepositoryImpl y SupabaseInterestZoneDataSource. Fuente encapsula SDK, repositorio mapea DTO/fallos seguros; dominio no importa plataforma. ZonePoint valida coordenadas textuales y numéricas sin reglas de negocio en widgets.
+
+RLS/proyección propia, RPC autorizadas con UUID estable/versión/bloqueos y marca de eliminación evitan duplicados y resurrecciones por reintento. Fuentes036–039/plan010 generan migración y patch. Refresco conserva contenido/borrador; cambio/error de cuenta desmonta contenido anterior y descarta respuestas tardías. AutoDispose libera observación y keepAlive se limita a escritura.
+
+flutter_map es el adaptador visual de teselas en presentación: conserva su fuente por instancia, atribución y caché; emite punto al ViewModel. No accede a repositorios ni Supabase. No hay GPS, PostGIS, preferencias/push ni publicación de casos en este incremento. La migración remota y demo Android permanecen pendientes.

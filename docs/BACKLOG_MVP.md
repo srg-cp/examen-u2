@@ -4,6 +4,8 @@ Fecha: 8 de octubre de 2026. Responsable: @srg-cp.
 
 Archivos individuales de los 51 issues y clasificación operativa: [docs/backlog/README.md](backlog/README.md). Los estados están aplicados tanto en etiquetas como en el Status nativo del [tablero EntreHuellas](https://github.com/users/srg-cp/projects/3/views/1), verificados para las 51 tarjetas. Las fichas siguientes conservan planificación y trazabilidad; el índice individual incluye estado y motivo.
 
+Actualización operativa del 10 de octubre: HU-02.1 / #26 y su épica HU-02 / #2 pasan a In progress en GitHub y Projects. Zonas implementadas localmente, 212 pruebas Flutter/13 SQL aprobadas y patch010 aplicado en Supabase según el usuario; pendientes demostración Android/Supabase e integración del código. HU-02.2 / #27 sigue en Backlog. Véase [ESTADO](ESTADO.md).
+
 ## Estructura y numeración
 
 Se conservan las 16 HU originales del plan maestro y los issues #1–#16. Doce describen alcance amplio y son **épicas**; cuatro conservan un resultado cohesivo y siguen como historias ejecutables. Hay **39 historias ejecutables** (35 derivadas y cuatro originales) y **12 épicas**: 51 issues abiertos asignados a srg-cp. No contar épicas e historias dos veces como esfuerzo ni presentar 51 entregas independientes.
@@ -463,6 +465,8 @@ Exportación delimitada a datos básicos de cuenta; quedan por implementar la en
 
 ### HU-02.1 — Guardar mis zonas y radios de interés — [#26](https://github.com/srg-cp/entrehuellas/issues/26)
 
+Actualización local, 9 de octubre: implementación de selección manual, radios y operaciones privadas preparada en `feature/interest-zones`; contrato y mapa en [ADR-018](decisiones/018-zonas-manuales-privadas.md). Validación local registrada en ESTADO; migración/demostración Supabase y Android pendientes. Las casillas siguientes permanecen pendientes hasta verificar el recorrido real. No se cambió GitHub ni se completó HU-02.2.
+
 Como usuario, quiero elegir, editar y quitar zonas con su radio para consultar novedades relevantes sin GPS permanente.
 
 - Requisitos: RF-02; RF-16.
@@ -491,7 +495,7 @@ Registrar el escenario, resultado y evidencia en este issue y en docs/ESTADO.md.
 
 **Estado de partida**
 
-Pendiente de implementación. Las casillas permanecen pendientes hasta verificar los criterios completos.
+Implementación local y pruebas registradas; pendiente de activación y demostración con Supabase/Android. Las casillas permanecen pendientes hasta verificar los criterios completos.
 
 ### HU-02.2 — Configurar mis preferencias de alertas — [#27](https://github.com/srg-cp/entrehuellas/issues/27)
 

@@ -330,3 +330,7 @@ Corrección de HU-03.2/#29 y galería privada HU-04.1/#30: selección/retirada s
 ### Integración de archivo/restauración — 9 de octubre de 2026
 
 HU-03 / RF-03 (issues #28/#29): Mis mascotas incorpora Activas/Archivadas y la ficha permite Archivar con confirmación o Restaurar, conservando fotos y metadatos. Eliminar sigue disponible por swipe y rechaza historial/casos activos mediante dominio y servidor. Los casos S3 siguen pendientes y deben mantener indicadores atómicamente según ADR-014. No añade SQL ni cierra automáticamente HU/issues: validación autenticada Android/Supabase y criterios restantes de fotos HU-04 siguen pendientes.
+
+### Zonas de interés implementadas localmente — HU-02.1 / RF-02,16
+
+Primer incremento de la rama `feature/interest-zones`: selección manual en mapa, radio0.1–50km, listado/edición/eliminación privados por cuenta y alternativa de coordenadas. Contrato versionado e idempotente en SQL036–039/plan010, según ADR-018. Sin GPS ni push; HU-02.2 sigue como segundo incremento. Las pruebas locales no cierran issue#26 ni S2; faltan migración y demo integrada con dos cuentas en Supabase/Android.

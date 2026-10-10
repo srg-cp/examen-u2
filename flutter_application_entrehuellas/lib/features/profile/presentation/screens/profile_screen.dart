@@ -53,6 +53,14 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      TextButton.icon(
+                        onPressed: exit.isLoading
+                            ? null
+                            : () => context.push('/home/interest-zones'),
+                        icon: const Icon(Icons.location_on_outlined),
+                        label: const Text('Zonas de interés'),
+                      ),
+                      const SizedBox(height: 16),
                       LoadingShimmer(
                         isLoading: exit.isLoading,
                         loadingLabel: 'Cerrando sesión',

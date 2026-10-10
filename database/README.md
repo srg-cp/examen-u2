@@ -173,3 +173,11 @@ Prueba008 verifica propietarios, anónimo, archivo/restauración/reintentos, fot
 Fuentes034–035, plan009_pet_required_fields.json, migración20261009000900_pet_required_fields.sql y patchs/009_patch_pet_required_fields.sql, generados mediante Build-PetRequiredFieldsPatch.ps1/Build-Migration.ps1. Requiere008; Build-RunAll incorpora el guard al final. Aplicar el patch completo en desarrollo cuando se autorice su despliegue.
 
 Trigger de insert/update sobre metadatos exige tamaño, edad0–600 y rasgos1–200 puntos de código Unicode, además de nombre/especie/tipo y permisos existentes. No reescribe datos antiguos ni concede escrituras cliente. Su lectura y operaciones de ciclo de vida continúan disponibles; cambios de metadatos requieren completarlos. Test vigente en run_all.test.mjs cubre validación, Unicode, cuentas/anónimo, reintentos, registros antiguos y repetición. Tests históricos de mascotas usan el bundle hasta033 para mantener los contratos que verifican. Véase ADR-016. Activación remota pendiente.
+
+## Incremento de zonas privadas — plan010
+
+HU-02.1 / RF-02,16 / issue#26: fuentes036–039 y [plan010](migration_plans/010_interest_zones.json) generan [migración](../supabase/migrations/20261009001000_interest_zones.sql) y [patch010](patchs/010_patch_interest_zones.sql). Regenerar con `./database/scripts/Build-InterestZonesPatch.ps1`; Build-RunAll incorpora el plan y conserva el historial anterior. SQL requiere Auth existente y roles Supabase; no depende de PostGIS ni cambia mascotas.
+
+La cuenta autenticada lee solo sus zonas vigentes y ejecuta save_interest_zone/delete_interest_zone; sin escrituras directas/anónimo. UUID estable, versión y bloqueo transaccional; eliminación conserva tombstone privado para rechazar reintentos antiguos de creación. Nombres1–60 Unicode, latitud−85..85, longitud−180..180 y radio100–50000m. Restrictive RLS protege frente a políticas permisivas ajenas.
+
+`tests/009_interest_zone_permissions.sql` usa dos cuentas de fixture con rollback. `npm test` comprueba además repetir patch/run_all sin alterar datos, fechas, versiones o eliminaciones. PostgreSQL/PGlite local no prueba Supabase remoto; activación/demo real pendientes. Véase ADR-018 y CONFIGURACION.

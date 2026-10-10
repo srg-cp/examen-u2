@@ -11,3 +11,7 @@ Es una salida generada, no otra fuente editable: `./database/scripts/Build-Avata
 ## Patch009: campos obligatorios de mascotas
 
 009_patch_pet_required_fields.sql se genera con database/scripts/Build-PetRequiredFieldsPatch.ps1 y requiere008 aplicado. Ejecutar todo el archivo en Supabase de desarrollo al autorizar despliegue; no editarlo independientemente. Exige edad/tamaño/rasgos al crear o editar metadatos, con rasgos hasta200, conservando filas antiguas y sus operaciones de ciclo de vida. Fuentes034–035/ADR-016; tests locales no acreditan activación remota.
+
+## 010 — Zonas de interés privadas
+
+Generar con `../scripts/Build-InterestZonesPatch.ps1`. Aplicar completo [010_patch_interest_zones.sql](010_patch_interest_zones.sql) en Supabase de desarrollo con Auth/roles existentes. Crea tabla privada, RPC y permisos; no modifica mascotas ni requiere PostGIS. La salida deriva del plan010 y migración20261009001000; no editarla manualmente. Probado localmente, sin despliegue remoto en esta entrega.

@@ -22,6 +22,10 @@ import '../features/pets/data/data_sources/pet_gallery_source.dart';
 import '../features/pets/data/data_sources/supabase_pet_photo_source.dart';
 import '../features/pets/data/repositories/pet_photo_repository_impl.dart';
 import '../features/pets/data/repositories/unavailable_pet_photo_repository.dart';
+import '../features/interest_zones/domain/repositories/interest_zone_repository.dart';
+import '../features/interest_zones/data/data_sources/supabase_interest_zone_data_source.dart';
+import '../features/interest_zones/data/repositories/interest_zone_repository_impl.dart';
+import '../features/interest_zones/data/repositories/unavailable_interest_zone_repository.dart';
 
 import '../core/config/app_config.dart';
 import '../core/config/startup_state.dart';
@@ -53,6 +57,7 @@ class AppBootstrap {
     required this.profilePhotoRepository,
     required this.petRepository,
     required this.petPhotoRepository,
+    required this.interestZoneRepository,
   });
 
   final StartupState state;
@@ -65,6 +70,7 @@ class AppBootstrap {
   final ProfilePhotoRepository profilePhotoRepository;
   final PetRepository petRepository;
   final PetPhotoRepository petPhotoRepository;
+  final InterestZoneRepository interestZoneRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -89,6 +95,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          interestZoneRepository: InterestZoneRepositoryImpl(
+            SupabaseInterestZoneDataSource(supabase.client),
+          ),
           petPhotoRepository: PetPhotoRepositoryImpl(
             NativePetGallerySource(ImagePicker()),
             SupabasePetPhotoSource(supabase.client),
@@ -130,6 +139,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
 }
 
 AppBootstrap _unavailable(StartupStatus status) => AppBootstrap(
+  interestZoneRepository: const UnavailableInterestZoneRepository(),
   petPhotoRepository: const UnavailablePetPhotoRepository(),
   petRepository: const UnavailablePetRepository(),
   state: StartupState(status),

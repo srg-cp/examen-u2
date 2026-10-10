@@ -232,3 +232,13 @@ RPC para cliente autenticado:
 Consulta activa: filtrar archived_at IS NULL; archivadas: IS NOT NULL, siempre por propietario/RLS. El parche NO cambia el listado/botones de la app actual; esa integración Flutter está pendiente. No se desplegó remotamente desde este chat.
 
 S3 debe actualizar case_history_at y active_case_count dentro de las operaciones de casos, bajo bloqueo de mascota. No existen todavía casos de producto; la pruebaSQL usa indicadores controlados por servidor. No aplicar a un esquema externo con casos existentes sin integrar/backfill de esos indicadores. Véase ADR-014, incluyendo la transición de baja de cuenta con historial.
+
+## Activar zonas de interés — HU-02.1 / parche010
+
+Cuando se autorice su aplicación en desarrollo, ejecutar TODO `database/patchs/010_patch_interest_zones.sql` en el mismo proyecto Supabase configurado para la app, con rol postgres/SQL Editor. Requiere Auth y roles Supabase; no necesita volver a aplicar patches de mascotas. Regenerar con `database/scripts/Build-InterestZonesPatch.ps1`; migración versionada `20261009001000_interest_zones.sql`. La aplicación remota no se ejecutó en esta tarea.
+
+La dependencia de mapa incorpora caché nativa/path_provider: reconstruir e instalar la app para registrar plugins; Hot Restart de un binario previo no sustituye este paso. Perfil → Zonas de interés → Añadir zona. Nombrar, mover/ampliar mapa y tocar un centro o Indicar coordenadas; definir radio y Guardar zona. Lima es encuadre inicial, no ubicación detectada. No solicita GPS.
+
+Con A: crear dos zonas, editar radio, cancelar otra edición, reiniciar y comprobar persistencia; provocar fallo de red y reintentar con el mismo borrador; eliminar y repetir después de pérdida de respuesta. Con B/anónimo: lectura/escritura de A deben rechazarse. Ejecutar `database/tests/009_interest_zone_permissions.sql` en desarrollo para RLS/grants y guardias del servidor; sus pruebas de fixture no sustituyen las cuentas reales en la app.
+
+Mapa de desarrollo: OSM estándar, atribución y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL`, `MAP_ATTRIBUTION`, `MAP_ATTRIBUTION_URL` al compilar; comprobar condiciones/capacidad antes de distribuir, según ADR-018. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.

@@ -4,6 +4,25 @@ import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+test('Interest zones isolate owners, guard manual bounds, stale writes and late retries after deletion', async (t) => {
+  const db = await database(t);
+  const patch = await readFile(new URL('../patchs/010_patch_interest_zones.sql', import.meta.url), 'utf8');
+  const permissions = await readFile(new URL('./009_interest_zone_permissions.sql', import.meta.url), 'utf8');
+  await db.exec(bundle);
+  await db.exec(patch);
+  await db.exec(patch);
+  await db.exec(permissions);
+  await db.exec(`
+    insert into auth.users(id) values ('33333333-3333-4333-8333-333333333326');
+    select set_config('request.jwt.claims', '{"sub":"33333333-3333-4333-8333-333333333326"}', false);
+    select public.save_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb26', 0, 'Persistente', -12, -77, 1500);
+    select public.save_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb27', 0, 'Retirada', -12, -77, 1500);
+    select public.delete_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb27', 1);
+  `);
+  const before = await db.query('select * from public.interest_zones order by id');
+  await db.exec(bundle);
+  assert.deepEqual(await db.query('select * from public.interest_zones order by id'), before);
+});
 const legacyBundle = bundle.split('-- Source: database/functions/034_validate_pet_required_fields.sql')[0] + '\ncommit;';
 const requiredFieldsPatch = await readFile(new URL('../patchs/009_patch_pet_required_fields.sql', import.meta.url), 'utf8');
 const archivingPatch = await readFile(new URL('../patchs/008_patch_pet_archiving.sql', import.meta.url), 'utf8');
