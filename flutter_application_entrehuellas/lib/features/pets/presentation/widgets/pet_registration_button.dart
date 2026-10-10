@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/primary_action_button_style.dart';
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class PetRegistrationButton extends StatelessWidget {
@@ -34,23 +35,54 @@ class PetRegistrationButton extends StatelessWidget {
           final origin = box is RenderBox && box.hasSize
               ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
               : null;
-          buttonContext.push('/home/pets/new', extra: origin);
+          buttonContext.push(
+            '/home/pets/new',
+            extra: origin == null
+                ? null
+                : OriginPageSource(
+                    bounds: origin,
+                    color: AppColors.ink,
+                    radius: compact ? origin.shortestSide / 2 : 24,
+                    child: DefaultTextStyle(
+                      style:
+                          (primaryActionButtonStyle(
+                                    context,
+                                  ).textStyle?.resolve({}) ??
+                                  Theme.of(context).textTheme.labelLarge!)
+                              .copyWith(color: Colors.white),
+                      child: IconTheme(
+                        data: const IconThemeData(color: Colors.white),
+                        child: Padding(
+                          padding: compact
+                              ? EdgeInsets.zero
+                              : const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 18,
+                                ),
+                          child: Center(child: _content()),
+                        ),
+                      ),
+                    ),
+                  ),
+          );
         },
-        child: compact
-            ? const Icon(
-                Icons.add_rounded,
-                size: 26,
-                semanticLabel: 'Registrar mascota',
-              )
-            : const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add_rounded, size: 22),
-                  SizedBox(width: 8),
-                  Flexible(child: Text('Registrar mascota')),
-                ],
-              ),
+        child: _content(),
       ),
     ),
   );
+
+  Widget _content() => compact
+      ? const Icon(
+          Icons.add_rounded,
+          size: 26,
+          semanticLabel: 'Registrar mascota',
+        )
+      : const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add_rounded, size: 22),
+            SizedBox(width: 8),
+            Flexible(child: Text('Registrar mascota')),
+          ],
+        );
 }

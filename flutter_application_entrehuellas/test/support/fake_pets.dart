@@ -35,12 +35,14 @@ class FakePets implements PetRepository {
   }
 
   @override
-  Future<List<Pet>> list(String ownerId) async {
+  Future<List<Pet>> list(String ownerId, {bool archived = false}) async {
     await pendingList?.future;
     if (fail) {
       throw const PetFailure(PetFailureKind.unavailable);
     }
-    return pets.values.where((p) => p.ownerId == ownerId).toList();
+    return pets.values
+        .where((p) => p.ownerId == ownerId && p.isArchived == archived)
+        .toList();
   }
 
   @override
@@ -96,6 +98,63 @@ class FakePets implements PetRepository {
       ownerId: ownerId,
       fields: fields,
       version: old.version + 1,
+      coverUri: old.coverUri,
+      archivedAt: old.archivedAt,
+      caseHistoryAt: old.caseHistoryAt,
+      activeCaseCount: old.activeCaseCount,
     );
+  }
+
+  int archives = 0;
+  int restores = 0;
+  bool ambiguousLifecycle = false;
+  @override
+  Future<Pet> archive(String ownerId, String petId, int expectedVersion) async {
+    archives++;
+    return _lifecycle(ownerId, petId, expectedVersion, true);
+  }
+
+  @override
+  Future<Pet> restore(String ownerId, String petId, int expectedVersion) async {
+    restores++;
+    return _lifecycle(ownerId, petId, expectedVersion, false);
+  }
+
+  Future<Pet> _lifecycle(
+    String ownerId,
+    String id,
+    int version,
+    bool archived,
+  ) async {
+    await pending?.future;
+    if (fail) throw const PetFailure(PetFailureKind.unavailable);
+    final old = pets[id];
+    if (old == null) throw const PetFailure(PetFailureKind.missing);
+    if (old.ownerId != ownerId) {
+      throw const PetFailure(PetFailureKind.forbidden);
+    }
+    if (archived && old.activeCaseCount > 0) {
+      throw const PetFailure(PetFailureKind.activeCase);
+    }
+    if (old.isArchived == archived &&
+        (version == old.version || version + 1 == old.version)) {
+      return old;
+    }
+    if (version != old.version) throw const PetFailure(PetFailureKind.conflict);
+    final saved = pets[id] = Pet(
+      id: id,
+      ownerId: ownerId,
+      fields: old.fields,
+      version: old.version + 1,
+      coverUri: old.coverUri,
+      archivedAt: archived ? DateTime.utc(2026, 10, 9) : null,
+      caseHistoryAt: old.caseHistoryAt,
+      activeCaseCount: old.activeCaseCount,
+    );
+    if (ambiguousLifecycle) {
+      ambiguousLifecycle = false;
+      throw const PetFailure(PetFailureKind.unavailable);
+    }
+    return saved;
   }
 }

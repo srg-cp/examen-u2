@@ -223,6 +223,16 @@ Los ViewModels de ficha/editor coordinan sus casos de uso existentes de metadato
 
 ## Archivo reversible de mascotas — contrato backend
 
-ADR-014 establece archive_pet/restore_pet y borrado definitivo sin historia de casos. SQL030–033 aporta estado de archivo e indicadores protegidos del ciclo de casos; las RPC validan dueño, bloqueo de fila, versión y reintentos. El módulo de casos S3 debe mantener los indicadores de forma atómica. No se añadieron casos/adopciones ni componentes vacíos de Flutter; la integración de entidad/DTO/casos de uso/ViewModels/listados archivados queda pendiente del siguiente incremento solicitado.
+ADR-014 establece archive_pet/restore_pet y borrado definitivo sin historia de casos. SQL030–033 aporta estado de archivo e indicadores protegidos del ciclo de casos; las RPC validan dueño, bloqueo de fila, versión y reintentos. El módulo de casos S3 debe mantener los indicadores de forma atómica. No se añadieron casos/adopciones. La integración Flutter añade campos de ciclo de vida a entidad/DTO, ArchivePet/RestorePet, consultas separadas activas/archivadas y PetLifecycleViewModel autoDispose por mascota. Ficha compone confirmación de archivo/restauración, shimmer de trabajo real, errores contextuales y éxito superior confirmado. Ambas listas se invalidan tras edición, archivo/restauración y eliminación; identidad/generación/keepAlive limitado protegen respuestas tardías. Dominio y servidor bloquean archivo con caso activo y borrado con historial. Véase ADR-014 para límites de validación remota.
 
 ADR-015 establece GlassNavigationButton en core como control visual común de retorno/cierre de pantallas; PetScreenShell, AppPageLayout y ProfileScreen lo componen sin modificar ViewModels, dominio o datos.
+
+## Campos requeridos de mascotas y feedback del editor
+
+ADR-016 actualiza el contrato de guardado: tamaño/edad/rasgos pasan a obligatorios, rasgos máximo200. petValidationIssues en dominio devuelve todos los campos inválidos; CreatePet/UpdatePet comparten validatePet. ViewModel prepara edad textual y guarda invalidFields/errorId para presentación, sin escribir ante error. Campos compartidos admiten invalid sin errorText; editor usa shake danger/toast superior conforme a la nueva autorización.
+
+Fuentes034–035/plan009 instalan trigger sobre insert/update de metadatos: mantiene las RPC/RLS/grants e idempotencia, exige datos nuevos completos y conserva filas anteriores sin inventar valores. Operaciones de archivo/restauración/eliminación no modifican esas columnas y siguen disponibles en datos antiguos. No cambia contratos de lectura ni SDKs en widgets.
+
+## Borrador de fotos del editor
+
+[ADR-017](decisiones/017-borrador-fotos-mascotas.md) conserva fotos confirmadas y separa selecciones/retiradas locales. PetPhotosViewModel ejecuta los casos de uso remotos solo después de validación y confirmación de metadatos por PetEditorViewModel. Descartar no escribe; retiradas cuentan para guardado/salida. Reintentos conservan IDs y el servidor mantiene límite/propiedad. Guardar no constituye una transacción distribuida entre metadatos y Storage. Sin nuevo SQL.

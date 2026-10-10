@@ -3,6 +3,16 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('Pet editor field errors never render inline messages', () {
+    final code = File(
+      'lib/features/pets/presentation/screens/pet_editor_screen.dart',
+    ).readAsStringSync();
+    expect(
+      RegExp(r'\berrorText\s*:').hasMatch(code),
+      false,
+      reason: 'ADR-016: use invalid + ShakeField and a screen-owned top toast.',
+    );
+  });
   test('Content loading never renders a loading text or circular indicator', () {
     final visibleLoading = RegExp(
       r'''\bText\s*\(\s*(?:\w+\s*\?\s*)?['"](?:Cargando|Preparando)\b''',

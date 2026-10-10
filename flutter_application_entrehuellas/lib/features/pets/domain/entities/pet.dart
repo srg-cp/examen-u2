@@ -32,12 +32,19 @@ class Pet {
     required this.fields,
     required this.version,
     this.coverUri,
+    this.archivedAt,
+    this.caseHistoryAt,
+    this.activeCaseCount = 0,
   });
   final String id;
   final String ownerId;
   final PetFields fields;
   final int version;
   final Uri? coverUri;
+  final DateTime? archivedAt;
+  final DateTime? caseHistoryAt;
+  final int activeCaseCount;
+  bool get isArchived => archivedAt != null;
 }
 
 /// One UUID per draft, reused after an ambiguous network response.

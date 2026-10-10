@@ -65,3 +65,11 @@ OriginPageTransition comparte la aparición tardía del contenido desde65% para 
 Corrección visual posterior: swipe intensifica fondo a #C12F3D con easeOutCubic y aumenta el filtro común de22% a32%. Texto/iconos interpolan color original a rojo claro #FFE3E6 desde el inicio del recorrido con easeOutCubic compartido con fondo y filtro, sustituyendo selección binaria negro/blanco según luminancia. Retorno restaura todos los colores, sin cambiar navegación ni operaciones.
 
 Corrección de cierre: Material del modal usa animationDuration cero para no añadir interpolación implícita sobre el morph. Durante contracción no se vuelve a pintar la copia del contenido de origen; superficie se desvanece en el último18% de la animación para revelar la tarjeta real inmóvil. Apertura conserva copia/transición aprobada. Ajuste posterior: texto, iconos y filtro comienzan al iniciar el swipe y comparten easeOutCubic con el fondo, sin intervalo abrupto.
+
+### Abrir detalles desde una mascota existente, 9 de octubre de 2026
+
+Por instrucción explícita del usuario, la ficha abierta desde Mis mascotas amplía el uso aprobado de OriginPageTransition: la tarjeta entrega sus límites reales relativos al Navigator; el router expande en320ms y contrae al volver en260ms. Movimiento reducido omite la animación. Reutiliza el mismo componente que Registrar mascota y conserva la continuidad de carga de ADR-011. Sin origen de tarjeta, guardado confirmado y acceso directo mantienen la navegación anterior. Sin cambios de dominio/datos ni autorización.
+
+### Morph del botón de registro, 9 de octubre de 2026
+
+Por instrucción explícita del usuario, Registrar mascota entrega OriginPageSource con rectángulo, color carbón, radio real y copia visual del icono/etiqueta. OriginPageTransition interpola superficie, posición y radio desde el botón completo o círculo + hasta la pantalla blanca; el contenido original se desvanece durante el primer45% y el destino aparece desde65%. Al cerrar recorre la misma transformación y recupera la identidad del botón. Copia sin interacción/semántica; destino bloqueado durante transición. Conserva320/260ms y movimiento reducido inmediato. Esta actualización sustituye el envío exclusivo del Rect para registro; otros destinos mantienen su comportamiento.

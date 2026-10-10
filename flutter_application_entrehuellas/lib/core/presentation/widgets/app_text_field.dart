@@ -11,6 +11,8 @@ class AppTextField extends StatefulWidget {
     this.icon,
     this.hint,
     this.errorText,
+    this.invalid = false,
+    this.footer,
     this.enabled = true,
     this.minLines = 1,
     this.maxLines = 1,
@@ -30,6 +32,8 @@ class AppTextField extends StatefulWidget {
   final IconData? icon;
   final String? hint;
   final String? errorText;
+  final bool invalid;
+  final Widget? footer;
   final bool enabled;
   final int minLines;
   final int maxLines;
@@ -68,6 +72,8 @@ class _AppTextFieldState extends State<AppTextField> {
     label: widget.label,
     icon: widget.icon,
     errorText: widget.errorText,
+    invalid: widget.invalid,
+    footer: widget.footer,
     enabled: widget.enabled,
     focused: _focus.hasFocus,
     child: Semantics(
@@ -89,7 +95,7 @@ class _AppTextFieldState extends State<AppTextField> {
           fontFamily: AppTheme.fontFamily,
           fontSize: 16,
           height: 27 / 16,
-          color: widget.errorText != null
+          color: widget.invalid || widget.errorText != null
               ? AppColors.error
               : widget.enabled
               ? AppColors.ink

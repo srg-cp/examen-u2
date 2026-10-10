@@ -13,6 +13,9 @@ class PetDto {
     this.speciesDetail,
     this.size,
     this.coverUri,
+    this.archivedAt,
+    this.caseHistoryAt,
+    this.activeCaseCount = 0,
   });
   final String id;
   final String ownerId;
@@ -24,9 +27,19 @@ class PetDto {
   final String? speciesDetail;
   final String? size;
   final Uri? coverUri;
+  final DateTime? archivedAt;
+  final DateTime? caseHistoryAt;
+  final int activeCaseCount;
   final int version;
   factory PetDto.fromMap(Map<String, dynamic> row, {Uri? coverUri}) => PetDto(
     coverUri: coverUri,
+    archivedAt: row['archived_at'] == null
+        ? null
+        : DateTime.parse(row['archived_at'] as String),
+    caseHistoryAt: row['case_history_at'] == null
+        ? null
+        : DateTime.parse(row['case_history_at'] as String),
+    activeCaseCount: row['active_case_count'] as int? ?? 0,
     id: row['id'] as String,
     ownerId: row['owner_id'] as String,
     version: row['version'] as int,
@@ -40,6 +53,9 @@ class PetDto {
   );
   Pet toEntity() => Pet(
     coverUri: coverUri,
+    archivedAt: archivedAt,
+    caseHistoryAt: caseHistoryAt,
+    activeCaseCount: activeCaseCount,
     id: id,
     ownerId: ownerId,
     version: version,

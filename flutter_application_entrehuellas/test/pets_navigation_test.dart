@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/app_select_field.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_skeleton.dart';
+import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_photo_gallery.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_size_selector.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -204,8 +205,13 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byTooltip('Volver a mis mascotas'));
         await tester.pump();
+        // Let the asynchronous exit guard dispatch pop before timing reverse.
+        await tester.pump();
         await tester.pump(const Duration(milliseconds: 130));
         expect(find.byType(OriginPageTransition), findsOneWidget);
+        await capture('register_origin_close');
+        await tester.pump(const Duration(milliseconds: 90));
+        await capture('register_origin_return');
         await tester.pumpAndSettle();
         expect(find.text('Aún no tienes mascotas'), findsOneWidget);
         await tester.ensureVisible(find.text('Registrar mascota'));
@@ -219,6 +225,12 @@ void main() {
         await tester.ensureVisible(
           find.byIcon(Icons.add_photo_alternate_outlined),
         );
+        await Scrollable.ensureVisible(
+          tester.element(find.byType(PetPhotoGallery)),
+          alignment: .65,
+        );
+        await tester.pumpAndSettle();
+        await capture('photo_selector');
         await tester.tap(find.byIcon(Icons.add_photo_alternate_outlined));
         await tester.pumpAndSettle();
         expect(find.byTooltip('Quitar foto'), findsNothing);
@@ -226,6 +238,12 @@ void main() {
         await tester.tap(find.byIcon(Icons.add_photo_alternate_outlined));
         await tester.pumpAndSettle();
         expect(find.byTooltip('Quitar foto'), findsOneWidget);
+        await Scrollable.ensureVisible(
+          tester.element(find.byType(PetPhotoGallery)),
+          alignment: .65,
+        );
+        await tester.pumpAndSettle();
+        await capture('photo_pending');
         await tester.ensureVisible(find.byTooltip('Quitar foto'));
         await tester.tap(find.byTooltip('Quitar foto'));
         await tester.pumpAndSettle();
@@ -233,13 +251,11 @@ void main() {
         await tester.ensureVisible(find.text('Registrar mascota').last);
         await tester.tap(find.text('Registrar mascota').last);
         await tester.pumpAndSettle();
-        expect(
-          find.text('Escribe un nombre de hasta 80 caracteres.'),
-          findsOneWidget,
-        );
+        expect(find.text('Completa los campos obligatorios.'), findsOneWidget);
+        await capture('required_fields_error');
         await tester.ensureVisible(find.byType(TextField).first);
         await tester.enterText(find.byType(TextField).first, 'Luna');
-        await tester.pump();
+        await tester.pumpAndSettle();
         await tester.tap(find.byTooltip('Volver a mis mascotas'));
         await tester.pumpAndSettle();
         expect(find.text('¿Salir sin guardar?'), findsOneWidget);
@@ -272,8 +288,12 @@ void main() {
         );
         await tester.ensureVisible(typeField);
         await tester.enterText(typeField, 'Conejo');
-        await tester.ensureVisible(find.text('Mediano'));
-        await tester.tap(find.text('Mediano'));
+        final mediumChip = find.widgetWithText(ChoiceChip, 'Mediano');
+        await Scrollable.ensureVisible(
+          tester.element(mediumChip),
+          alignment: .5,
+        );
+        await tester.tap(mediumChip);
         await tester.pumpAndSettle();
         final sizeSelector = find.byType(PetSizeSelector);
         await Scrollable.ensureVisible(
@@ -302,6 +322,18 @@ void main() {
           await tester.tap(find.byTooltip('Cerrar opciones'));
           await tester.pumpAndSettle();
         }
+        final ageField = find.descendant(
+          of: find.byWidgetPredicate(
+            (w) => w is AppTextField && w.label == 'Edad aproximada (meses)',
+          ),
+          matching: find.byType(TextField),
+        );
+        await tester.ensureVisible(ageField);
+        await tester.enterText(ageField, '24');
+        await tester.ensureVisible(find.byType(TextField).last);
+        await tester.enterText(find.byType(TextField).last, 'Pelaje blanco');
+        await tester.pumpAndSettle();
+        await capture('traits_counter');
         await tester.ensureVisible(find.text('Registrar mascota').last);
         if (const bool.fromEnvironment('CAPTURE_PETS')) {
           pets.pending = Completer<void>();
@@ -325,13 +357,15 @@ void main() {
         expect(find.text('Ficha de mascota'), findsNothing);
         expect(find.text('Luna'), findsOneWidget);
         expect(pets.pets.length, 1);
-        expect(pets.pets.values.single.fields.sex, isNull);
+        expect(pets.pets.values.single.fields.sex, PetSex.male);
         expect(pets.pets.values.single.fields.speciesDetail, 'Conejo');
         expect(pets.pets.values.single.fields.size, PetSize.medium);
         if (const bool.fromEnvironment('CAPTURE_PETS')) {
           await tester.pump(const Duration(seconds: 4));
         }
         await capture('detail');
+        await tester.pump(const Duration(seconds: 7));
+        await tester.pumpAndSettle();
         await tester.ensureVisible(find.text('Editar mascota'));
         if (const bool.fromEnvironment('CAPTURE_PETS')) {
           pets.pendingRead = Completer<void>();
@@ -379,6 +413,10 @@ void main() {
           findsOneWidget,
         );
         await capture('error');
+        await tester.tap(
+          find.text('No se pudo guardar la mascota. Tus cambios siguen aquí.'),
+        );
+        await tester.pumpAndSettle();
         pets.fail = false;
         await tester.ensureVisible(find.text('Guardar cambios'));
         await tester.tap(find.text('Guardar cambios'));
@@ -418,15 +456,42 @@ void main() {
               .origin,
           compactOrigin,
         );
+        expect(
+          tester
+              .widget<OriginPageTransition>(find.byType(OriginPageTransition))
+              .source
+              ?.radius,
+          28,
+        );
+        await capture('compact_origin_start');
+        await tester.pump(const Duration(milliseconds: 70));
+        await capture('compact_origin_morph');
         await tester.pumpAndSettle();
         await tester.tap(find.byTooltip('Volver a mis mascotas'));
         await tester.pumpAndSettle();
         expect(pets.pets.length, 1);
         await tester.ensureVisible(find.text('Luna'));
+        await tester.pumpAndSettle();
+        final cardOrigin = tester.getRect(find.byType(SwipePetCard));
         await tester.tap(find.text('Luna'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 16));
+        expect(
+          tester
+              .widget<OriginPageTransition>(find.byType(OriginPageTransition))
+              .origin,
+          cardOrigin,
+        );
+        await capture('detail_origin_start');
+        await tester.pump(const Duration(milliseconds: 160));
+        await capture('detail_origin_middle');
         await tester.pumpAndSettle();
         expect(find.text('Mancha blanca en el pecho'), findsOneWidget);
         container.read(routerProvider).pop();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 130));
+        expect(find.byType(OriginPageTransition), findsOneWidget);
+        await capture('detail_origin_close');
         await tester.pumpAndSettle();
         await tester.ensureVisible(find.byType(SwipePetCard));
         final swipe = await tester.startGesture(

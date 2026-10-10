@@ -33,6 +33,7 @@ class PetDeletionViewModel extends Notifier<PetDeletionState> {
       await ref.read(deletePetProvider)(owner, pet);
       if (!ref.mounted || generation != _generation) return;
       ref.invalidate(petListViewModelProvider);
+      ref.invalidate(archivedPetListViewModelProvider);
       ref.invalidate(petDetailViewModelProvider(pet.id));
       ref.invalidate(petEditorViewModelProvider(pet.id));
       ref.invalidate(petPhotosViewModelProvider(pet.id));

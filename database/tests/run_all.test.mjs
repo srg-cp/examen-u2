@@ -4,11 +4,13 @@ import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+const legacyBundle = bundle.split('-- Source: database/functions/034_validate_pet_required_fields.sql')[0] + '\ncommit;';
+const requiredFieldsPatch = await readFile(new URL('../patchs/009_patch_pet_required_fields.sql', import.meta.url), 'utf8');
 const archivingPatch = await readFile(new URL('../patchs/008_patch_pet_archiving.sql', import.meta.url), 'utf8');
 const archivingPermissions = await readFile(new URL('./008_pet_archiving_permissions.sql', import.meta.url), 'utf8');
 test('Archiving restores private pets, preserves history and guards irreversible deletion with retries', async (t) => {
   const db = await database(t);
-  await db.exec(bundle);
+  await db.exec(legacyBundle);
   await db.exec(archivingPatch);
   await db.exec(archivingPatch);
   await db.exec(archivingPermissions);
@@ -26,7 +28,7 @@ const deletionPatch = await readFile(new URL('../patchs/007_patch_pet_deletion.s
 const deletionPermissions = await readFile(new URL('./007_pet_deletion_permissions.sql', import.meta.url), 'utf8');
 test('Deletion isolates owners, rejects stale versions and retires files before metadata with safe retries', async (t) => {
   const db = await database(t);
-  await db.exec(bundle);
+  await db.exec(legacyBundle);
   await db.exec(deletionPatch);
   await db.exec(deletionPatch);
   await db.exec(deletionPermissions);
@@ -34,7 +36,7 @@ test('Deletion isolates owners, rejects stale versions and retires files before 
 test('Pet gallery is private, limited, retryable and cannot bypass ownership or metadata validation', async (t) => {
   const db = await database(t);
   assert.doesNotMatch(galleryPatch, /alter\s+table\s+storage\.objects/i);
-  await db.exec(bundle);
+  await db.exec(legacyBundle);
   await db.exec(galleryPatch);
   await db.exec(galleryPatch);
   await db.exec(galleryPermissions);
@@ -42,7 +44,7 @@ test('Pet gallery is private, limited, retryable and cannot bypass ownership or 
 const petsPermissions = await readFile(new URL('./005_pets_permissions.sql', import.meta.url), 'utf8');
 test('Pets RPCs isolate accounts, validate fields, deduplicate retries and reject stale updates', async (t) => {
   const db = await database(t);
-  await db.exec(bundle);
+  await db.exec(legacyBundle);
   await db.exec(petsPatch);
   await db.exec(petsPatch);
   await db.exec(galleryPatch);
@@ -164,4 +166,65 @@ test('Onboarding completion is per account, repeatable and cannot be reset by cl
   await db.exec(bundle);
   assert.deepEqual((await completion()).rows, saved);
   await db.exec(onboardingPermissions);
+});
+
+
+test('Required pet metadata enforces size, age and 200 Unicode scalars, preserves legacy rows and retries', async (t) => {
+  const db = await database(t);
+  await db.exec(legacyBundle);
+  const owner = '11111111-1111-4111-8111-111111111111';
+  const other = '22222222-2222-4222-8222-222222222222';
+  const legacyId = 'aaaaaaaa-1111-4111-8111-111111111111';
+  const petId = 'bbbbbbbb-1111-4111-8111-111111111111';
+  await db.query('insert into auth.users(id) values ($1), ($2)', [owner, other]);
+  await db.query("insert into public.pets(id, owner_id, name, species) values ($1,$2,'Legacy','dog')", [legacyId, owner]);
+  await db.exec(requiredFieldsPatch);
+  await db.exec(requiredFieldsPatch);
+  let legacy = (await db.query('select age_months, traits, size from public.pets where id=$1', [legacyId])).rows[0];
+  assert.deepEqual(legacy, { age_months: null, traits: null, size: null });
+  await db.exec('set role authenticated');
+  await db.query("select set_config('request.jwt.claims', $1, false)", [JSON.stringify({sub: owner})]);
+  const create = 'select * from public.create_pet_v2($1,$2,$3,$4,$5,$6,$7,$8)';
+  const base = [petId, 'Luna', 'dog', null, 0, '🐾'.repeat(200), null, 'medium'];
+  for (const [index, value, message] of [
+    [1, ' ', 'pet_invalid_name'], [2, null, 'pet_invalid_species'],
+    [4, null, 'pet_invalid_age'], [4, -1, 'pet_invalid_age'], [4, 601, 'pet_invalid_age'],
+    [5, null, 'pet_invalid_traits'], [5, '\u00a0 ', 'pet_invalid_traits'],
+    [5, '🐾'.repeat(201), 'pet_invalid_traits'], [7, null, 'pet_invalid_size'],
+    [7, 'huge', 'pet_invalid_size'],
+  ]) {
+    const args = [...base]; args[index] = value;
+    await assert.rejects(db.query(create, args), new RegExp(message));
+  }
+  const first = (await db.query(create, base)).rows[0];
+  const retry = (await db.query(create, base)).rows[0];
+  assert.equal(first.version, retry.version);
+  assert.equal(first.traits, '🐾'.repeat(200));
+  assert.equal(first.age_months, 0);
+  assert.equal(first.sex, null);
+  const update = 'select * from public.update_pet_v2($1,$2,$3,$4,$5,$6,$7,$8,$9)';
+  await assert.rejects(db.query(update, [petId, 1, 'Luna', 'dog', null, 0, '', null, 'medium']), /pet_invalid_traits/);
+  const edited = [petId, 1, 'Luna', 'dog', 'female', 600, 'Blanca', null, 'large'];
+  assert.equal((await db.query(update, edited)).rows[0].version, 2);
+  assert.equal((await db.query(update, edited)).rows[0].version, 2);
+  await assert.rejects(db.query(update, [petId, 1, 'Otro', 'dog', null, 1, 'Negra', null, 'small']), /pet_conflict/);
+  await assert.rejects(db.query(update, [legacyId, 1, 'Legacy edit', 'dog', null, null, null, null, null]), /pet_invalid_size/);
+  await db.query('select public.archive_pet($1,1)', [legacyId]);
+  await db.query('select public.restore_pet($1,2)', [legacyId]);
+  await db.query("select set_config('request.jwt.claims', $1, false)", [JSON.stringify({sub: other})]);
+  assert.equal((await db.query('select id from public.pets')).rows.length, 0);
+  await assert.rejects(db.query(update, [petId, 2, 'Otro', 'dog', null, 1, 'Negra', null, 'small']), /pet_missing|pet_unauthorized/);
+  await assert.rejects(db.query(create, base), /pet_unauthorized/);
+  await assert.rejects(db.query("update public.pets set traits='Bypass' where id=$1", [petId]), /permission denied/);
+  await db.exec('set role anon');
+  await assert.rejects(db.query(create, base), /permission denied/);
+  await db.exec('reset role');
+  const snapshot = (await db.query('select * from public.pets order by id')).rows;
+  await db.exec(bundle);
+  assert.deepEqual((await db.query('select * from public.pets order by id')).rows, snapshot);
+  await db.exec('set role authenticated');
+  await db.query("select set_config('request.jwt.claims', $1, false)", [JSON.stringify({sub: owner})]);
+  await db.query('select public.begin_pet_deletion($1,3)', [legacyId]);
+  await db.query('select public.finish_pet_deletion($1)', [legacyId]);
+  assert.equal((await db.query('select id from public.pets where id=$1', [legacyId])).rows.length, 0);
 });

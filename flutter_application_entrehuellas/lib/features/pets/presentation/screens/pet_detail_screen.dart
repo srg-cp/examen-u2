@@ -12,6 +12,8 @@ import '../widgets/pet_load_feedback.dart';
 import '../widgets/pet_labels.dart';
 import '../widgets/pet_skeleton.dart';
 import '../widgets/pet_photo_gallery.dart';
+import '../widgets/pet_lifecycle_actions.dart';
+import '../view_models/pet_lifecycle_view_model.dart';
 
 class PetDetailScreen extends ConsumerStatefulWidget {
   const PetDetailScreen({
@@ -41,65 +43,88 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lifecycle = ref.watch(petLifecycleViewModelProvider(widget.petId));
     final value = ref.watch(petDetailViewModelProvider(widget.petId));
     final showData =
         value.hasValue &&
         !value.hasError &&
         (!value.isLoading || value.isRefreshing);
-    return ConfirmationToastHost(
-      confirmed:
-          _confirmed && value.asData?.value.ownerId == _confirmationOwner,
-      message: 'Mascota guardada',
-      child: PetScreenShell(
-        loading: value.isLoading && !showData,
-        count: widget.canEdit ? 3 : 2,
-        child: PetRefreshProgress(
-          refreshing: showData && value.isLoading,
-          child: value.isLoading && !showData
-              ? const PetSkeleton(layout: PetSkeletonLayout.detail)
-              : value.hasError
-              ? PetLoadFeedback(
-                  error: value.error,
-                  onRetry: () => ref
-                      .read(petDetailViewModelProvider(widget.petId).notifier)
-                      .reload(),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    StaggerRevealItem(
-                      order: 0,
-                      child: _PetIdentity(pet: value.requireValue),
-                    ),
-                    const SizedBox(height: 24),
-                    StaggerRevealItem(
-                      order: 1,
-                      child: _PetInformation(pet: value.requireValue),
-                    ),
-                    if (widget.canEdit) ...[
+    return PopScope(
+      canPop: !lifecycle.busy,
+      child: ConfirmationToastHost(
+        confirmed:
+            lifecycle.confirmed ||
+            (_confirmed && value.asData?.value.ownerId == _confirmationOwner),
+        noticeId: lifecycle.confirmed ? lifecycle.noticeId : null,
+        message: lifecycle.confirmed
+            ? (lifecycle.archived ? 'Mascota archivada' : 'Mascota restaurada')
+            : 'Mascota guardada',
+        child: PetScreenShell(
+          navigationEnabled: !lifecycle.busy,
+          loading: value.isLoading && !showData,
+          count: widget.canEdit ? 4 : 2,
+          child: PetRefreshProgress(
+            refreshing: showData && value.isLoading,
+            child: value.isLoading && !showData
+                ? const PetSkeleton(layout: PetSkeletonLayout.detail)
+                : value.hasError
+                ? PetLoadFeedback(
+                    error: value.error,
+                    onRetry: () => ref
+                        .read(petDetailViewModelProvider(widget.petId).notifier)
+                        .reload(),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      StaggerRevealItem(
+                        order: 0,
+                        child: _PetIdentity(pet: value.requireValue),
+                      ),
                       const SizedBox(height: 24),
                       StaggerRevealItem(
-                        order: 2,
-                        child: FilledButton(
-                          style: primaryActionButtonStyle(context),
-                          onPressed: () async {
-                            setState(() => _confirmed = false);
-                            final saved = await context.push<Pet>(
-                              '/home/pets/${widget.petId}/edit',
-                            );
-                            if (mounted && saved != null) {
-                              setState(() {
-                                _confirmationOwner = saved.ownerId;
-                                _confirmed = true;
-                              });
-                            }
-                          },
-                          child: const Text('Editar mascota'),
-                        ),
+                        order: 1,
+                        child: _PetInformation(pet: value.requireValue),
                       ),
+                      if (widget.canEdit) ...[
+                        const SizedBox(height: 24),
+                        StaggerRevealItem(
+                          order: 2,
+                          child: FilledButton(
+                            style: primaryActionButtonStyle(context),
+                            onPressed: lifecycle.busy
+                                ? null
+                                : () async {
+                                    setState(() => _confirmed = false);
+                                    ref
+                                        .read(
+                                          petLifecycleViewModelProvider(
+                                            widget.petId,
+                                          ).notifier,
+                                        )
+                                        .clearFeedback();
+                                    final saved = await context.push<Pet>(
+                                      '/home/pets/${widget.petId}/edit',
+                                    );
+                                    if (mounted && saved != null) {
+                                      setState(() {
+                                        _confirmationOwner = saved.ownerId;
+                                        _confirmed = true;
+                                      });
+                                    }
+                                  },
+                            child: const Text('Editar mascota'),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        StaggerRevealItem(
+                          order: 3,
+                          child: PetLifecycleActions(pet: value.requireValue),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
+          ),
         ),
       ),
     );

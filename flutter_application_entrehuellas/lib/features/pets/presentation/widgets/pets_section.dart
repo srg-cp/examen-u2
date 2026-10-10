@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import 'pet_registration_button.dart';
+import 'pet_list_filter.dart';
 import '../view_models/pet_list_view_model.dart';
 import 'pet_load_feedback.dart';
 import 'pet_card_content.dart';
@@ -21,9 +22,13 @@ class PetsSection extends ConsumerStatefulWidget {
 
 class _PetsSectionState extends ConsumerState<PetsSection> {
   bool _sawSkeleton = false;
+  bool _archived = false;
   @override
   Widget build(BuildContext context) {
-    final pets = ref.watch(petListViewModelProvider);
+    final listProvider = _archived
+        ? archivedPetListViewModelProvider
+        : petListViewModelProvider;
+    final pets = ref.watch(listProvider);
     final deletion = ref.watch(petDeletionViewModelProvider);
     final showData =
         pets.hasValue &&
@@ -39,12 +44,16 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
           ? 'Mascota eliminada'
           : deletion.issue == PetFailureKind.conflict
           ? 'La ficha cambió. Actualiza la lista antes de eliminarla.'
+          : deletion.issue == PetFailureKind.activeCase
+          ? 'Resuelve o cancela el caso activo antes de eliminar.'
+          : deletion.issue == PetFailureKind.caseHistory
+          ? 'Esta mascota tiene historial de casos. Puedes archivarla desde su ficha.'
           : 'No se pudo eliminar la mascota. Desliza para reintentar.',
       actionLabel: deletion.issue == PetFailureKind.conflict
           ? 'Actualizar lista'
           : null,
       onAction: deletion.issue == PetFailureKind.conflict
-          ? () => ref.read(petListViewModelProvider.notifier).reload()
+          ? () => ref.read(listProvider.notifier).reload()
           : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,8 +61,21 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
           StaggerRevealItem(
             order: 0,
             child: _PetsHeader(
-              hasPets: showData && pets.requireValue.isNotEmpty,
+              hasPets: _archived || (showData && pets.requireValue.isNotEmpty),
             ),
+          ),
+          const SizedBox(height: 12),
+          PetListFilter(
+            archived: _archived,
+            onChanged: deletion.busyId != null
+                ? null
+                : (archived) {
+                    if (_archived == archived) return;
+                    setState(() {
+                      _archived = archived;
+                      _sawSkeleton = false;
+                    });
+                  },
           ),
           const SizedBox(height: 24),
           StaggerRevealItem(
@@ -66,11 +88,10 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
                   : pets.hasError
                   ? PetLoadFeedback(
                       error: pets.error,
-                      onRetry: () =>
-                          ref.read(petListViewModelProvider.notifier).reload(),
+                      onRetry: () => ref.read(listProvider.notifier).reload(),
                     )
                   : pets.requireValue.isEmpty
-                  ? const _PetsEmptyState()
+                  ? _PetsEmptyState(archived: _archived)
                   : Column(
                       children: [
                         for (final pet in pets.requireValue)
@@ -79,34 +100,53 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                SwipePetCard(
-                                  key: ValueKey(pet.id),
-                                  busy: deletion.busyId == pet.id,
-                                  disabled: deletion.busyId != null,
-                                  onOpen: () =>
-                                      context.push('/home/pets/${pet.id}'),
-                                  onDelete: (origin) async {
-                                    if (await confirmPetDeletion(
-                                          context,
-                                          pet.fields.name,
-                                          origin: origin,
-                                          source: PetCardContent(pet: pet),
-                                        ) &&
-                                        context.mounted) {
-                                      await ref
-                                          .read(
-                                            petDeletionViewModelProvider
-                                                .notifier,
-                                          )
-                                          .delete(pet);
-                                    }
-                                  },
-                                  contentBuilder: (foreground, secondary) =>
-                                      PetCardContent(
-                                        pet: pet,
-                                        foreground: foreground,
-                                        secondary: secondary,
-                                      ),
+                                Builder(
+                                  builder: (cardContext) => SwipePetCard(
+                                    key: ValueKey(pet.id),
+                                    busy: deletion.busyId == pet.id,
+                                    disabled: deletion.busyId != null,
+                                    onOpen: () {
+                                      final box = cardContext
+                                          .findRenderObject();
+                                      final navigator = Navigator.of(
+                                        cardContext,
+                                      ).context.findRenderObject();
+                                      final origin =
+                                          box is RenderBox && box.hasSize
+                                          ? box.localToGlobal(
+                                                  Offset.zero,
+                                                  ancestor: navigator,
+                                                ) &
+                                                box.size
+                                          : null;
+                                      cardContext.push(
+                                        '/home/pets/${pet.id}',
+                                        extra: origin,
+                                      );
+                                    },
+                                    onDelete: (origin) async {
+                                      if (await confirmPetDeletion(
+                                            context,
+                                            pet.fields.name,
+                                            origin: origin,
+                                            source: PetCardContent(pet: pet),
+                                          ) &&
+                                          context.mounted) {
+                                        await ref
+                                            .read(
+                                              petDeletionViewModelProvider
+                                                  .notifier,
+                                            )
+                                            .delete(pet);
+                                      }
+                                    },
+                                    contentBuilder: (foreground, secondary) =>
+                                        PetCardContent(
+                                          pet: pet,
+                                          foreground: foreground,
+                                          secondary: secondary,
+                                        ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -162,7 +202,8 @@ class _PetsHeader extends StatelessWidget {
 }
 
 class _PetsEmptyState extends StatelessWidget {
-  const _PetsEmptyState();
+  const _PetsEmptyState({this.archived = false});
+  final bool archived;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -173,8 +214,8 @@ class _PetsEmptyState extends StatelessWidget {
           child: Icon(Icons.pets_outlined, size: 88, color: Color(0xFF6E6E73)),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Aún no tienes mascotas',
+        Text(
+          archived ? 'No tienes mascotas archivadas' : 'Aún no tienes mascotas',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20,
@@ -183,16 +224,20 @@ class _PetsEmptyState extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Registra a tu mascota para tener su información a mano.',
+        Text(
+          archived
+              ? 'Las mascotas que archives aparecerán aquí. Podrás consultar su ficha y restaurarlas.'
+              : 'Registra a tu mascota para tener su información a mano.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, color: Color(0xFF6E6E73)),
         ),
-        const SizedBox(height: 24),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 280),
-          child: const PetRegistrationButton(),
-        ),
+        if (!archived) ...[
+          const SizedBox(height: 24),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 280),
+            child: const PetRegistrationButton(),
+          ),
+        ],
       ],
     ),
   );

@@ -45,6 +45,16 @@ class _ConfirmationToastHostState extends State<ConfirmationToastHost> {
         (!widget.confirmed || oldWidget.noticeId == widget.noticeId)) {
       return;
     }
+    _showNotice();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.confirmed) _showNotice();
+  }
+
+  void _showNotice() {
     final generation = ++_generation;
     _clear();
     if (!widget.confirmed) return;

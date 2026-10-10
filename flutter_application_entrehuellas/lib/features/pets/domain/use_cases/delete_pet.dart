@@ -9,6 +9,12 @@ class DeletePet {
     if (ownerId.isEmpty || pet.ownerId != ownerId) {
       throw const PetFailure(PetFailureKind.forbidden);
     }
+    if (pet.activeCaseCount > 0) {
+      throw const PetFailure(PetFailureKind.activeCase);
+    }
+    if (pet.caseHistoryAt != null) {
+      throw const PetFailure(PetFailureKind.caseHistory);
+    }
     return _repository.delete(ownerId, pet.id, pet.version);
   }
 }

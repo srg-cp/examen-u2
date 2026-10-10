@@ -180,3 +180,7 @@ Ningún documento garantiza por sí solo que la arquitectura nunca se rompa. Su 
 [ADR-007](decisiones/007-confirmacion-toast-superior.md) permite un toast superior propio para éxitos confirmados, por nueva instrucción del usuario. Es presentación: widget de core con overlay/timer ligados al ciclo de vida de la pantalla, disparado por nueva confirmación de estado. No introduce SDK, persistencia ni decisiones de negocio en UI. Errores siguen contextuales y el componente inferior prohibido no se incorpora. Mantener pruebas de limpieza, no duplicación y accesibilidad, además del escaneo existente.
 
 ADR-009 permite errores de foto en el componente toast superior existente por instrucción expresa. Sigue siendo feedback de presentación con ciclo de vida local; los demás errores conservan feedback contextual y no se incorpora el componente inferior prohibido.
+
+## Validación y feedback del editor de mascotas — ADR-016
+
+Por instrucción explícita del usuario, Registrar/Editar valida nombre, especie, tamaño, edad y rasgos obligatorios (máximo200); sexo opcional. Dominio expresa validación, ViewModel reúne errores y bloquea escritura inválida, UI aplica shake/borde danger y toast superior sin errorText bajo campos. Incluye fallos de guardado/fotos del editor; no generaliza a otras pantallas. Fuente SQL034/trigger035 valida metadatos en servidor sin modificar datos antiguos ni impedir archivo/restauración/eliminación. Véase [ADR-016](decisiones/016-validacion-formulario-mascotas.md).

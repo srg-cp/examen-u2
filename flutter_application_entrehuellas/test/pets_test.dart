@@ -15,7 +15,7 @@ import 'support/fake_pets.dart';
 
 void main() {
   test(
-    'Pet field rules trim Unicode, permit unknown values and reject incomplete/overlong data before storage',
+    'Pet field rules trim Unicode, require age, size and traits while permitting unknown sex and reject incomplete/overlong data before storage',
     () async {
       final repo = FakePets();
       final create = CreatePet(repo);
@@ -25,15 +25,16 @@ void main() {
           species: PetSpecies.other,
           speciesDetail: ' Conejo ',
           size: PetSize.medium,
-          traits: '  ',
+          traits: ' Blanca ',
+          ageMonths: 0,
         ),
       );
       expect(fields.name.runes.length, 80);
-      expect(fields.traits, isNull);
+      expect(fields.traits, 'Blanca');
       expect(fields.speciesDetail, 'Conejo');
       expect(fields.size, PetSize.medium);
       expect(fields.sex, isNull);
-      expect(fields.ageMonths, isNull);
+      expect(fields.ageMonths, 0);
       for (final f in [
         const PetFields(name: 'Luna', species: PetSpecies.other),
         const PetFields(name: ' ', species: PetSpecies.dog),
@@ -47,6 +48,53 @@ void main() {
         );
       }
       expect(repo.creates, 0);
+    },
+  );
+  test(
+    'Each required field rejects missing/invalid data; Unicode boundary and optional sex remain valid',
+    () {
+      PetFields fields({
+        String name = 'Luna',
+        PetSpecies? species = PetSpecies.dog,
+        PetSize? size = PetSize.medium,
+        int? age = 24,
+        String? traits = 'Blanca',
+        String? detail,
+      }) => PetFields(
+        name: name,
+        species: species,
+        size: size,
+        ageMonths: age,
+        traits: traits,
+        speciesDetail: detail,
+      );
+      for (final pair in [
+        (fields(name: ' '), PetFailureKind.invalidName),
+        (fields(name: '🐾' * 81), PetFailureKind.invalidName),
+        (fields(species: null), PetFailureKind.invalidSpecies),
+        (
+          fields(species: PetSpecies.other),
+          PetFailureKind.invalidSpeciesDetail,
+        ),
+        (fields(size: null), PetFailureKind.invalidSize),
+        (fields(age: null), PetFailureKind.invalidAge),
+        (fields(age: -1), PetFailureKind.invalidAge),
+        (fields(age: 601), PetFailureKind.invalidAge),
+        (fields(traits: null), PetFailureKind.invalidTraits),
+        (fields(traits: '\u00a0 '), PetFailureKind.invalidTraits),
+        (fields(traits: '🐾' * 201), PetFailureKind.invalidTraits),
+      ]) {
+        expect(
+          () => validatePet(pair.$1),
+          throwsA(isA<PetFailure>().having((e) => e.kind, 'kind', pair.$2)),
+        );
+      }
+      expect(
+        validatePet(fields(age: 0, traits: '🐾' * 200)).traits!.runes.length,
+        200,
+      );
+      expect(validatePet(fields(age: 600)).ageMonths, 600);
+      expect(validatePet(fields()).sex, isNull);
     },
   );
   late FakeAuthRepository auth;
@@ -67,6 +115,58 @@ void main() {
     await auth.controller.close();
   });
   test(
+    'Validation collects all missing fields without writing, repeats and clears only the edited field',
+    () async {
+      final provider = petEditorViewModelProvider('new');
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
+      final initial = await container.read(provider.future);
+      expect(initial.sex, PetSex.male);
+      expect(initial.hasUnsavedChanges, false);
+      final model = container.read(provider.notifier);
+      await model.save();
+      final failed = container.read(provider).requireValue;
+      expect(failed.invalidFields, {
+        PetFailureKind.invalidName,
+        PetFailureKind.invalidSpecies,
+        PetFailureKind.invalidSize,
+        PetFailureKind.invalidAge,
+        PetFailureKind.invalidTraits,
+      });
+      expect(failed.busy, false);
+      expect(repo.creates, 0);
+      await model.save();
+      expect(
+        container.read(provider).requireValue.errorId,
+        greaterThan(failed.errorId),
+      );
+      model.edit(name: 'Luna');
+      expect(
+        container.read(provider).requireValue.invalidFields,
+        isNot(contains(PetFailureKind.invalidName)),
+      );
+      expect(
+        container.read(provider).requireValue.invalidFields,
+        contains(PetFailureKind.invalidSize),
+      );
+      model.edit(
+        species: PetSpecies.dog,
+        size: PetSize.small,
+        age: '1.5',
+        traits: 'Blanca',
+        clearSex: true,
+      );
+      await model.save();
+      expect(container.read(provider).requireValue.invalidFields, {
+        PetFailureKind.invalidAge,
+      });
+      model.edit(age: '0');
+      await model.save();
+      expect(container.read(provider).requireValue.saved!.fields.sex, isNull);
+      expect(repo.creates, 1);
+    },
+  );
+  test(
     'Create retains the UUID/draft, blocks duplicates and recovers a lost acknowledgement without a duplicate',
     () async {
       final provider = petEditorViewModelProvider('new');
@@ -76,7 +176,13 @@ void main() {
       addTearDown(list.close);
       final initial = await container.read(provider.future);
       final model = container.read(provider.notifier);
-      model.edit(name: ' Luna ', species: PetSpecies.dog);
+      model.edit(
+        name: ' Luna ',
+        species: PetSpecies.dog,
+        size: PetSize.medium,
+        age: '24',
+        traits: 'Blanca',
+      );
       repo.pending = Completer<void>();
       repo.ambiguousCreate = true;
       final saving = model.save();
@@ -112,7 +218,13 @@ void main() {
       const p = Pet(
         id: 'pet-one',
         ownerId: 'one',
-        fields: PetFields(name: 'Luna', species: PetSpecies.cat),
+        fields: PetFields(
+          name: 'Luna',
+          species: PetSpecies.cat,
+          ageMonths: 24,
+          size: PetSize.medium,
+          traits: 'Gris',
+        ),
         version: 1,
       );
       repo.pets[p.id] = p;
@@ -139,6 +251,8 @@ void main() {
           name: 'Luna',
           species: PetSpecies.cat,
           traits: 'Negra',
+          ageMonths: 24,
+          size: PetSize.medium,
         ),
         version: 2,
       );
@@ -154,7 +268,7 @@ void main() {
             .requireValue
             .fields
             .traits,
-        isNull,
+        'Gris',
       );
       model.refreshDetail();
       expect(
@@ -174,7 +288,13 @@ void main() {
       addTearDown(sub.close);
       await container.read(provider.future);
       final model = container.read(provider.notifier);
-      model.edit(name: 'Luna', species: PetSpecies.dog);
+      model.edit(
+        name: 'Luna',
+        species: PetSpecies.dog,
+        size: PetSize.medium,
+        age: '24',
+        traits: 'Blanca',
+      );
       repo.pending = Completer<void>();
       final saving = model.save();
       auth.emit(const AuthSession(userId: 'two'));

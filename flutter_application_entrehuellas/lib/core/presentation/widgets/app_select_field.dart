@@ -24,6 +24,7 @@ class AppSelectField<T> extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.errorText,
+    this.invalid = false,
     super.key,
   }) : assert(options.length > 0);
   final String label;
@@ -33,6 +34,7 @@ class AppSelectField<T> extends StatefulWidget {
   final T? value;
   final ValueChanged<T>? onChanged;
   final String? errorText;
+  final bool invalid;
   @override
   State<AppSelectField<T>> createState() => _AppSelectFieldState<T>();
 }
@@ -95,7 +97,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
     final selected = widget.options
         .where((option) => option.value == widget.value)
         .firstOrNull;
-    final invalid = widget.errorText != null;
+    final invalid = widget.invalid || widget.errorText != null;
     final enabled = widget.onChanged != null;
     return Semantics(
       label: widget.label,
@@ -124,6 +126,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
             focused: _focused || _open,
             enabled: enabled,
             errorText: widget.errorText,
+            invalid: invalid,
             suffix: AnimatedRotation(
               turns: _open ? .5 : 0,
               duration: MediaQuery.disableAnimationsOf(context)
@@ -137,7 +140,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
               ),
             ),
             child: Text(
-              selected?.label ?? '',
+              selected?.label ?? widget.hint ?? 'Seleccionar',
               style: TextStyle(
                 fontFamily: 'sans-serif',
                 fontSize: 16,

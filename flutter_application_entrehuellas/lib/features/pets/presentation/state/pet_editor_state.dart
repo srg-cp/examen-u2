@@ -8,7 +8,7 @@ class PetEditorState {
     this.original,
     this.name = '',
     this.species,
-    this.sex,
+    this.sex = PetSex.male,
     this.age = '',
     this.traits = '',
     this.speciesDetail = '',
@@ -17,6 +17,7 @@ class PetEditorState {
     this.saved,
     this.issue,
     this.errorId = 0,
+    this.invalidFields = const {},
   });
   final String id;
   final String ownerId;
@@ -32,11 +33,12 @@ class PetEditorState {
   final Pet? saved;
   final PetFailureKind? issue;
   final int errorId;
+  final Set<PetFailureKind> invalidFields;
   bool get hasUnsavedChanges => original != null
       ? dirty
       : name.isNotEmpty ||
             species != null ||
-            sex != null ||
+            sex != PetSex.male ||
             age.isNotEmpty ||
             traits.isNotEmpty ||
             speciesDetail.isNotEmpty ||
@@ -65,6 +67,7 @@ class PetEditorState {
     Pet? saved,
     PetFailureKind? issue,
     int? errorId,
+    Set<PetFailureKind>? invalidFields,
   }) => PetEditorState(
     id: id,
     ownerId: ownerId,
@@ -80,6 +83,7 @@ class PetEditorState {
     saved: saved,
     issue: issue,
     errorId: errorId ?? this.errorId,
+    invalidFields: invalidFields ?? this.invalidFields,
   );
   factory PetEditorState.fromPet(Pet pet) => PetEditorState(
     speciesDetail: pet.fields.speciesDetail ?? '',

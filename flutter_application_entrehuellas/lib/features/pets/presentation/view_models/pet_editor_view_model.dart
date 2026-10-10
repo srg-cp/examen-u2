@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/pet.dart';
 import '../../domain/failures/pet_failure.dart';
+import '../../domain/use_cases/validate_pet.dart';
 import '../../providers/pet_providers.dart';
 import '../state/pet_editor_state.dart';
 import 'pet_list_view_model.dart';
@@ -66,6 +67,20 @@ class PetEditorViewModel extends AsyncNotifier<PetEditorState> {
         speciesDetail: speciesDetail,
         size: size,
         clearSize: clearSize,
+        invalidFields: Set.unmodifiable(
+          current.invalidFields.where(
+            (field) => switch (field) {
+              PetFailureKind.invalidName => name == null,
+              PetFailureKind.invalidSpecies => species == null,
+              PetFailureKind.invalidSpeciesDetail =>
+                speciesDetail == null && species == null,
+              PetFailureKind.invalidSize => size == null && !clearSize,
+              PetFailureKind.invalidAge => age == null,
+              PetFailureKind.invalidTraits => traits == null,
+              _ => false,
+            },
+          ),
+        ),
       ),
     );
   }
@@ -76,29 +91,37 @@ class PetEditorViewModel extends AsyncNotifier<PetEditorState> {
     final photos = ref.read(petPhotosViewModelProvider(current.id));
     if (photos.busy ||
         photos.loading ||
-        (!current.dirty && photos.pending.isEmpty)) {
+        (!current.dirty && !photos.hasPendingChanges)) {
+      return;
+    }
+    final age = current.age.trim();
+    final ageValid = RegExp(r'^\d{1,3}$').hasMatch(age);
+    final fields = PetFields(
+      speciesDetail: current.speciesDetail,
+      size: current.size,
+      name: current.name,
+      species: current.species,
+      sex: current.sex,
+      ageMonths: ageValid ? int.tryParse(age) : null,
+      traits: current.traits,
+    );
+    final invalid = petValidationIssues(fields);
+    if (invalid.isNotEmpty) {
+      state = AsyncData(
+        current.copy(
+          issue: invalid.first,
+          invalidFields: invalid,
+          errorId: ++_errorId,
+        ),
+      );
       return;
     }
     final generation = _generation;
     final lifetime = ref.keepAlive();
     final create = ref.read(createPetProvider);
     final update = ref.read(updatePetProvider);
-    state = AsyncData(current.copy(busy: true));
+    state = AsyncData(current.copy(busy: true, invalidFields: const {}));
     try {
-      final age = current.age.trim();
-      if (age.isNotEmpty &&
-          (!RegExp(r'^\d{1,3}$').hasMatch(age) || int.tryParse(age) == null)) {
-        throw const PetFailure(PetFailureKind.invalidAge);
-      }
-      final fields = PetFields(
-        speciesDetail: current.speciesDetail,
-        size: current.size,
-        name: current.name,
-        species: current.species,
-        sex: current.sex,
-        ageMonths: age.isEmpty ? null : int.parse(age),
-        traits: current.traits,
-      );
       final saved = current.original == null
           ? await create(current.ownerId, current.id, fields)
           : !current.dirty
@@ -113,11 +136,12 @@ class PetEditorViewModel extends AsyncNotifier<PetEditorState> {
       final session = ref.read(petSessionProvider).asData?.value;
       if (session?.userId != current.ownerId) return;
       ref.invalidate(petListViewModelProvider);
+      ref.invalidate(archivedPetListViewModelProvider);
       ref.invalidate(petDetailViewModelProvider(saved.id));
       state = AsyncData(PetEditorState.fromPet(saved).copy(busy: true));
       if (!await ref
           .read(petPhotosViewModelProvider(saved.id).notifier)
-          .uploadPending()) {
+          .savePendingChanges()) {
         if (ref.mounted && generation == _generation) {
           state = AsyncData(PetEditorState.fromPet(saved));
         }
@@ -125,6 +149,7 @@ class PetEditorViewModel extends AsyncNotifier<PetEditorState> {
       }
       if (!ref.mounted || generation != _generation) return;
       ref.invalidate(petListViewModelProvider);
+      ref.invalidate(archivedPetListViewModelProvider);
       ref.invalidate(petDetailViewModelProvider(saved.id));
       state = AsyncData(current.copy(saved: saved));
     } catch (error) {
@@ -132,7 +157,23 @@ class PetEditorViewModel extends AsyncNotifier<PetEditorState> {
         final kind = error is PetFailure
             ? error.kind
             : PetFailureKind.unavailable;
-        state = AsyncData(current.copy(issue: kind, errorId: ++_errorId));
+        state = AsyncData(
+          current.copy(
+            issue: kind,
+            errorId: ++_errorId,
+            invalidFields:
+                const {
+                  PetFailureKind.invalidName,
+                  PetFailureKind.invalidSpecies,
+                  PetFailureKind.invalidSpeciesDetail,
+                  PetFailureKind.invalidSize,
+                  PetFailureKind.invalidAge,
+                  PetFailureKind.invalidTraits,
+                }.contains(kind)
+                ? {kind}
+                : const {},
+          ),
+        );
       }
     } finally {
       lifetime.close();

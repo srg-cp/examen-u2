@@ -6,8 +6,11 @@ enum PetSourceFailureKind {
   missing,
   forbidden,
   conflict,
+  activeCase,
+  caseHistory,
   invalidName,
   invalidSpecies,
+  invalidSize,
   invalidAge,
   invalidTraits,
   invalidSpeciesDetail,
@@ -19,8 +22,10 @@ class PetSourceFailure implements Exception {
 }
 
 abstract interface class PetDataSource {
+  Future<PetDto> archive(String ownerId, String petId, int expectedVersion);
+  Future<PetDto> restore(String ownerId, String petId, int expectedVersion);
   Future<void> delete(String ownerId, String petId, int expectedVersion);
-  Future<List<PetDto>> list(String ownerId);
+  Future<List<PetDto>> list(String ownerId, {bool archived = false});
   Future<PetDto> read(String ownerId, String petId);
   Future<PetDto> create(
     String ownerId,

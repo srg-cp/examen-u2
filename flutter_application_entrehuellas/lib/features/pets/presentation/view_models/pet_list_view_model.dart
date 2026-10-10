@@ -11,12 +11,14 @@ final petListViewModelProvider =
     );
 
 class PetListViewModel extends AsyncNotifier<List<Pet>> {
+  PetListViewModel({this.archived = false});
+  final bool archived;
   @override
   Future<List<Pet>> build() async {
     final useCase = ref.watch(listMyPetsProvider);
     final session = await ref.watch(petSessionProvider.future);
     if (session == null) throw const PetFailure(PetFailureKind.signedOut);
-    return useCase(session.userId);
+    return useCase(session.userId, archived: archived);
   }
 
   void reload() => ref.invalidateSelf();
@@ -46,3 +48,9 @@ class PetDetailViewModel extends AsyncNotifier<Pet> {
 
   void reload() => ref.invalidateSelf();
 }
+
+final archivedPetListViewModelProvider =
+    AsyncNotifierProvider.autoDispose<PetListViewModel, List<Pet>>(
+      () => PetListViewModel(archived: true),
+      retry: (_, _) => null,
+    );

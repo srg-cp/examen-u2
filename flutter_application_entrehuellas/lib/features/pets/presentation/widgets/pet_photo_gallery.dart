@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/shake_field.dart';
 import '../../domain/entities/pet_photo.dart';
 import '../view_models/pet_photos_view_model.dart';
 
@@ -43,161 +45,206 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
     if (!widget.editable &&
         !state.loading &&
         state.photos.isEmpty &&
-        state.pending.isEmpty &&
         state.issue == null) {
       return const SizedBox.shrink();
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (widget.editable) ...[
-          const Text(
-            'Fotos',
-            style: TextStyle(fontSize: 16, color: Color(0xFF111111)),
-          ),
-          const SizedBox(height: 8),
-        ],
-        LoadingShimmer(
-          isLoading: state.busy || state.loading,
-          loadingLabel: state.loading
-              ? 'Consultando fotos'
-              : 'Preparando fotos',
-          radius: 22,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                if (state.loading)
-                  for (var i = 0; i < 2; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Container(
-                        width: widget.tileSize,
-                        height: widget.tileSize,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE5E5EA),
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                      ),
-                    ),
-                for (final photo in state.photos)
-                  _tile(
-                    id: photo.id,
-                    child: photo.uri == null
-                        ? const Center(
-                            child: Icon(
-                              Icons.image_not_supported_outlined,
-                              color: Color(0xFF6E6E73),
-                            ),
-                          )
-                        : Image.network(
-                            photo.uri.toString(),
+    final invalid = widget.editable && state.issue != null;
+    return ConfirmationToastHost(
+      confirmed: invalid,
+      isError: true,
+      noticeId: state.errorId,
+      message: switch (state.issue) {
+        PetPhotoFailureKind.invalidPhoto => 'Elige una imagen válida.',
+        PetPhotoFailureKind.galleryUnavailable =>
+          'No se pudo abrir la galería. Inténtalo de nuevo.',
+        PetPhotoFailureKind.limit => 'Puedes añadir hasta tres fotos.',
+        _ =>
+          !state.hasPendingChanges
+              ? 'No se pudieron consultar las fotos.'
+              : 'No se pudieron guardar las fotos. Reintenta al guardar.',
+      },
+      actionLabel:
+          invalid &&
+              !state.hasPendingChanges &&
+              state.issue == PetPhotoFailureKind.unavailable
+          ? 'Reintentar'
+          : null,
+      onAction:
+          invalid &&
+              !state.hasPendingChanges &&
+              state.issue == PetPhotoFailureKind.unavailable &&
+              !disabled
+          ? () => model.initialize(widget.existing)
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.editable) ...[
+            const Text(
+              'Fotos',
+              style: TextStyle(fontSize: 16, color: Color(0xFF111111)),
+            ),
+            const SizedBox(height: 8),
+          ],
+          ShakeField(
+            errorId: state.errorId,
+            hasError: invalid,
+            child: LoadingShimmer(
+              isLoading: state.busy || state.loading,
+              loadingLabel: state.loading
+                  ? 'Consultando fotos'
+                  : 'Preparando fotos',
+              radius: 22,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    if (state.loading)
+                      for (var i = 0; i < 2; i++)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Container(
                             width: widget.tileSize,
                             height: widget.tileSize,
-                            fit: BoxFit.cover,
-                            cacheWidth:
-                                (widget.tileSize *
-                                        MediaQuery.devicePixelRatioOf(context))
-                                    .ceil(),
-                            errorBuilder: (_, __, ___) => const Center(
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: Color(0xFF6E6E73),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE5E5EA),
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                          ),
+                        ),
+                    for (final photo
+                        in widget.editable ? state.visiblePhotos : state.photos)
+                      _tile(
+                        id: photo.id,
+                        invalid: invalid,
+                        child: photo.uri == null
+                            ? const Center(
+                                child: Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: Color(0xFF6E6E73),
+                                ),
+                              )
+                            : Image.network(
+                                photo.uri.toString(),
+                                width: widget.tileSize,
+                                height: widget.tileSize,
+                                fit: BoxFit.cover,
+                                cacheWidth:
+                                    (widget.tileSize *
+                                            MediaQuery.devicePixelRatioOf(
+                                              context,
+                                            ))
+                                        .ceil(),
+                                errorBuilder: (_, __, ___) => const Center(
+                                  child: Icon(
+                                    Icons.broken_image_outlined,
+                                    color: Color(0xFF6E6E73),
+                                  ),
+                                ),
+                              ),
+                        remove: widget.editable && !disabled
+                            ? () => model.stageRemoval(photo.id)
+                            : null,
+                        pending: !photo.ready,
+                      ),
+                    for (final draft
+                        in widget.editable ? state.pending : <PetPhotoDraft>[])
+                      _tile(
+                        id: draft.id,
+                        invalid: invalid,
+                        child: Image.memory(
+                          draft.bytes,
+                          width: widget.tileSize,
+                          height: widget.tileSize,
+                          fit: BoxFit.cover,
+                          cacheWidth:
+                              (widget.tileSize *
+                                      MediaQuery.devicePixelRatioOf(context))
+                                  .ceil(),
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(Icons.image_not_supported_outlined),
+                          ),
+                        ),
+                        remove: widget.editable && !disabled
+                            ? () => model.stageRemoval(draft.id)
+                            : null,
+                      ),
+                    if (widget.editable &&
+                        state.visiblePhotos.length + state.pending.length < 3)
+                      Material(
+                        color: const Color(0xFFF5F5F7),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          side: BorderSide(
+                            color: invalid
+                                ? const Color(0xFFB53F48)
+                                : const Color(0xFFE5E5EA),
+                            width: invalid ? 3.5 : 1,
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: disabled
+                              ? null
+                              : () => model.choose(widget.existing),
+                          child: SizedBox(
+                            width: widget.tileSize,
+                            height: widget.tileSize,
+                            child: Semantics(
+                              label: 'Añadir foto de mascota',
+                              button: true,
+                              child: Center(
+                                child: Icon(
+                                  Icons.add_photo_alternate_outlined,
+                                  size: 40,
+                                  color: invalid
+                                      ? const Color(0xFFB53F48)
+                                      : const Color(0xFF6E6E73),
+                                ),
                               ),
                             ),
                           ),
-                    remove: widget.editable && !disabled
-                        ? () => model.remove(photo.id, true)
-                        : null,
-                    pending: !photo.ready,
-                  ),
-                for (final draft in state.pending)
-                  _tile(
-                    id: draft.id,
-                    child: Image.memory(
-                      draft.bytes,
-                      width: widget.tileSize,
-                      height: widget.tileSize,
-                      fit: BoxFit.cover,
-                      cacheWidth:
-                          (widget.tileSize *
-                                  MediaQuery.devicePixelRatioOf(context))
-                              .ceil(),
-                      errorBuilder: (_, __, ___) => const Center(
-                        child: Icon(Icons.image_not_supported_outlined),
-                      ),
-                    ),
-                    remove: widget.editable && !disabled
-                        ? () => model.remove(draft.id, widget.existing)
-                        : null,
-                  ),
-                if (widget.editable &&
-                    state.photos.length + state.pending.length < 3)
-                  Material(
-                    color: const Color(0xFFF5F5F7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                      side: const BorderSide(color: Color(0xFFE5E5EA)),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: disabled
-                          ? null
-                          : () => model.choose(widget.existing),
-                      child: SizedBox(
-                        width: widget.tileSize,
-                        height: widget.tileSize,
-                        child: Semantics(
-                          label: 'Añadir foto de mascota',
-                          button: true,
-                          child: Center(
-                            child: Icon(
-                              Icons.add_photo_alternate_outlined,
-                              size: 30,
-                              color: Color(0xFF6E6E73),
-                            ),
-                          ),
                         ),
                       ),
-                    ),
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-        if (state.recovered)
-          const Padding(
-            padding: EdgeInsets.only(top: 8),
-            child: Text(
-              'Foto recuperada. Guarda para añadirla.',
-              style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
+          if (widget.editable && state.recovered)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                'Foto recuperada. Guarda para añadirla.',
+                style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
+              ),
             ),
-          ),
-        if (state.issue != null) ...[
-          const SizedBox(height: 8),
-          Semantics(
-            liveRegion: true,
-            child: Text(switch (state.issue!) {
-              PetPhotoFailureKind.invalidPhoto => 'Elige una imagen válida.',
-              PetPhotoFailureKind.galleryUnavailable =>
-                'No se pudo abrir la galería. Inténtalo de nuevo.',
-              PetPhotoFailureKind.limit => 'Puedes añadir hasta tres fotos.',
-              _ =>
-                state.pending.isEmpty
-                    ? 'No se pudieron consultar las fotos.'
-                    : 'No se pudieron guardar las fotos. Reintenta al guardar.',
-            }, style: const TextStyle(fontSize: 14, color: Color(0xFFB53F48))),
-          ),
-          if (state.pending.isEmpty &&
-              state.issue == PetPhotoFailureKind.unavailable)
-            TextButton(
-              onPressed: disabled
-                  ? null
-                  : () => model.initialize(widget.existing),
-              child: const Text('Reintentar consulta'),
+          if (state.issue != null && !widget.editable) ...[
+            const SizedBox(height: 8),
+            Semantics(
+              liveRegion: true,
+              child: Text(switch (state.issue!) {
+                PetPhotoFailureKind.invalidPhoto => 'Elige una imagen válida.',
+                PetPhotoFailureKind.galleryUnavailable =>
+                  'No se pudo abrir la galería. Inténtalo de nuevo.',
+                PetPhotoFailureKind.limit => 'Puedes añadir hasta tres fotos.',
+                _ =>
+                  !state.hasPendingChanges
+                      ? 'No se pudieron consultar las fotos.'
+                      : 'No se pudieron guardar las fotos. Reintenta al guardar.',
+              }, style: const TextStyle(fontSize: 14, color: Color(0xFFB53F48))),
             ),
+            if (!state.hasPendingChanges &&
+                state.issue == PetPhotoFailureKind.unavailable)
+              TextButton(
+                onPressed: disabled
+                    ? null
+                    : () => model.initialize(widget.existing),
+                child: const Text('Reintentar consulta'),
+              ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -206,6 +253,7 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
     required Widget child,
     VoidCallback? remove,
     bool pending = false,
+    bool invalid = false,
   }) => Padding(
     padding: const EdgeInsets.only(right: 10),
     child: ClipRRect(
@@ -227,6 +275,18 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
                     child: Text(
                       'Pendiente',
                       style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            if (invalid)
+              IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: const Color(0xFFB53F48),
+                      width: 3.5,
                     ),
                   ),
                 ),

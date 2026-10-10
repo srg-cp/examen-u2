@@ -66,7 +66,7 @@ class PetSkeleton extends StatelessWidget {
           const SizedBox(height: 8),
           const Align(
             alignment: Alignment.centerLeft,
-            child: SizedBox(width: 112, child: _Shape(height: 112, radius: 22)),
+            child: SizedBox(width: 160, child: _Shape(height: 160, radius: 22)),
           ),
           const SizedBox(height: 20),
           const SkeletonFormFields(fieldCount: 6, multilineLast: true),

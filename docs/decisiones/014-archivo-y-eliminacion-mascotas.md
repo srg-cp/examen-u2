@@ -1,6 +1,6 @@
 # ADR-014: archivo reversible y eliminación definitiva de mascotas
 
-Fecha: 9 de octubre de 2026. Estado: aceptada por instrucción explícita del usuario. Trazabilidad: HU-03 / RF-03; incremento backend solicitado, sin añadir adopciones ni casos a este sprint.
+Fecha: 9 de octubre de 2026. Estado: aceptada por instrucción explícita del usuario. Trazabilidad: HU-03 / RF-03; contrato backend e integración Flutter autorizados, sin añadir adopciones ni casos a este sprint.
 
 ## Decisión
 
@@ -22,7 +22,11 @@ Si hubiera tablas de casos externas no versionadas, integrar y rellenar indicado
 
 ## Transición de aplicación
 
-Primero aplicar 007 completo y después 008 completo. La app actual sigue mostrando Eliminar y no interpreta archived_at: este parche entrega solo el backend solicitado. La próxima integración debe añadir entidades/DTO/casos de uso/ViewModels de archivar/restaurar, listado activo con archived_at IS NULL y consulta de archivadas con IS NOT NULL, acciones y feedback reales; los widgets no deciden permisos. Mantener RLS por propietario en ambas consultas.
+Primero aplicar 007 completo y después 008 completo. Flutter integra archived_at/case_history_at/active_case_count en entidad/DTO, ArchivePet/RestorePet y PetLifecycleViewModel autoDispose por mascota. Mis mascotas permite consultar Activas (archived_at IS NULL) y Archivadas (IS NOT NULL), siempre filtradas por dueño bajo RLS. La ficha permite Archivar con confirmación y Restaurar; conserva edición y galería privada. Errores de archivo/restauración permanecen contextuales y el éxito confirmado usa el toast superior compartido. La eliminación continúa solo por swipe, con guards de dominio y servidor para historia/casos activos; no se amplía la autorización de toast de errores de eliminación a otras operaciones. Los widgets no deciden permisos.
+
+La operación bloquea envíos repetidos, edición y retorno mientras espera. Un keepAlive limitado a la escritura y generaciones de sesión descartan respuestas de cuentas anteriores. Al confirmar se invalidan ambos listados, ficha y editor, conservando las fotos. Guardar metadatos/fotos o eliminar invalida también Archivadas. Errores de versión permiten actualizar ficha/listado y reintentar; un reintento ambiguo conserva ID y versión originales hasta recibir confirmación.
+
+Comprobación remota del 9 de octubre: archive_pet y restore_pet disponibles, HTTP401/42501 para actor anónimo y UUID nulo. No acredita operación autenticada ni todas las políticas; no se desplegó SQL ni se alteraron datos reales.
 
 ## Validación
 

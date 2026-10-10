@@ -167,3 +167,9 @@ Fuentes030–033 y plan008 generan supabase/migrations/20261009000800_pet_archiv
 archive_pet/restore_pet conservan ficha/fotos y controlan dueño, versión, reintento y caso activo. begin_pet_deletion/finish_pet_deletion evolucionan en la nueva fuente031 para rechazar historial antes de limpiar archivos. case_history_at/active_case_count son indicadores de servidor: S3 debe mantenerlos en las transacciones de casos; no exponer comandos cliente para modificarlos. RLS/grants previos conservados. Trigger impide borrar historia y constraints impiden archivar con casos activos. Véase ADR-014 para alcance, baja de cuenta y contrato de integración pendiente.
 
 Prueba008 verifica propietarios, anónimo, archivo/restauración/reintentos, fotos, historial inmutable, contador activo y borrado definitivo sin historia. node --test run_all.test.mjs valida también reejecución completa; los fixtures no prueban servicios remotos.
+
+## Campos obligatorios de mascota — plan009
+
+Fuentes034–035, plan009_pet_required_fields.json, migración20261009000900_pet_required_fields.sql y patchs/009_patch_pet_required_fields.sql, generados mediante Build-PetRequiredFieldsPatch.ps1/Build-Migration.ps1. Requiere008; Build-RunAll incorpora el guard al final. Aplicar el patch completo en desarrollo cuando se autorice su despliegue.
+
+Trigger de insert/update sobre metadatos exige tamaño, edad0–600 y rasgos1–200 puntos de código Unicode, además de nombre/especie/tipo y permisos existentes. No reescribe datos antiguos ni concede escrituras cliente. Su lectura y operaciones de ciclo de vida continúan disponibles; cambios de metadatos requieren completarlos. Test vigente en run_all.test.mjs cubre validación, Unicode, cuentas/anónimo, reintentos, registros antiguos y repetición. Tests históricos de mascotas usan el bundle hasta033 para mantener los contratos que verifican. Véase ADR-016. Activación remota pendiente.

@@ -239,3 +239,21 @@ Tamaño de mascota usa tres opciones de igual ancho que, junto con dos separacio
 ## Salida de Registrar/Editar mascota
 
 Al volver mediante retorno glass o Atrás del sistema, pedir confirmación solo si hay cambios sin guardar: campos o fotos pendientes. Registro vacío y edición intacta/restaurada salen directamente. Modal «¿Salir sin guardar?» ofrece «Seguir editando» (conserva el borrador) y «Salir sin guardar» (descarta campos/fotos pendientes); tocar fuera o Atrás del modal equivale a seguir. Impedir confirmaciones duplicadas y salida mientras se guarda/procesa foto. Guardado confirmado sale sin preguntar. Reutilizar el patrón de modal neutro y transición compartida, con scroll/texto ampliado/movimiento reducido.
+
+## Apertura de ficha desde la tarjeta, 9 de octubre de 2026
+
+Por instrucción explícita del usuario, abrir los detalles de una mascota existente desde Mis mascotas reutiliza OriginPageTransition de Registrar mascota: expansión desde los límites reales de la tarjeta en coordenadas del Navigator, apertura320ms y contracción260ms al volver. Movimiento reducido muestra el destino directamente. Mantener continuidad de skeleton y resolución sin repetir cover/stagger según ADR-011. Entradas sin tarjeta de origen, incluido guardado confirmado, conservan su navegación previa.
+
+## Editor de mascotas: validación y fotos — ADR-016
+
+Por instrucción explícita del usuario, Registrar/Editar amplía fotos a cuadrados de hasta160, igual que ficha, con radio22/scroll horizontal. Fotos opcionales. Nombre/especie/tamaño/edad/rasgos obligatorios; tipo obligatorio si Otra. Sexo opcional, Macho inicial y No lo sé disponible. Especie muestra Seleccionar hasta elegir; placeholder fuera de opciones. Rasgos o descripción incluye0/200 dentro del campo y límite200.
+
+Los campos inválidos muestran únicamente borde/texto/icono danger y ShakeField compartido con login; no usar textos de error debajo ni indicadores adicionales. El toast superior compartido explica campos incompletos, valores inválidos y errores de guardado/fotos del editor; conflicto ofrece Ver ficha actual. Intento nuevo repite feedback, edición limpia la marca del campo editado y conserva los demás. Movimiento reducido mantiene contenido accesible sin shake. Otras funcionalidades y errores de fotos de la ficha conservan feedback anterior. [ADR-016](decisiones/016-validacion-formulario-mascotas.md) sustituye las reglas previas solo para este editor.
+
+## Selector Activas/Archivadas — 9 de octubre de 2026
+
+Por referencia explícita del usuario, este selector usa una sola cápsula gris con dos segmentos y selección carbón/texto blanco, sin check ni bordes separados. El indicador y el color de ambas etiquetas transicionan juntos con el mismo progreso320ms/easeInOutCubic de selección local, respetando movimiento reducido; no vuelve a revelar la pantalla al seleccionar. Mantener tipografía/áreas táctiles y ambos textos completos; al ampliar texto, permitir disposición vertical dentro de la misma cápsula si la fila no cabe. Detalles en DISENO_UI.
+
+## Morph de Registrar mascota — 9 de octubre de 2026
+
+La expansión de registro conserva inicialmente la identidad del botón: carbón, radio24 en vacío o círculo56/radio28 con mascotas, icono y etiqueta reales. La superficie se transforma progresivamente en pantalla blanca; la copia del origen se desvanece antes de mostrar el formulario. El cierre invierte el morph y recupera el botón. Reutilizar OriginPageTransition/OriginPageSource, sin controles activos ni anuncios duplicados en la copia, con movimiento reducido inmediato. Véase ADR-006.

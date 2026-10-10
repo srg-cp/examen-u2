@@ -161,7 +161,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                   (context, animation, secondaryAnimation, child) =>
                       OriginPageTransition(
                         animation: animation,
-                        origin: state.extra is Rect
+                        source: state.extra is OriginPageSource
+                            ? state.extra as OriginPageSource
+                            : null,
+                        origin: state.extra is OriginPageSource
+                            ? (state.extra as OriginPageSource).bounds
+                            : state.extra is Rect
                             ? state.extra as Rect
                             : null,
                         child: child,
@@ -171,14 +176,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'pets/:id',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: PetDetailScreen(
+            pageBuilder: (context, state) {
+              final child = PetDetailScreen(
                 petId: state.pathParameters['id']!,
                 savedPet: state.extra is Pet ? state.extra as Pet : null,
                 canEdit: state.extra != 'inspect',
-              ),
-            ),
+              );
+              if (state.extra is! Rect) {
+                return NoTransitionPage(key: state.pageKey, child: child);
+              }
+              return CustomTransitionPage<void>(
+                key: state.pageKey,
+                transitionDuration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 320),
+                reverseTransitionDuration:
+                    MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 260),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) =>
+                        OriginPageTransition(
+                          animation: animation,
+                          origin: state.extra as Rect,
+                          child: child,
+                        ),
+                child: child,
+              );
+            },
             routes: [
               GoRoute(
                 path: 'edit',

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/unicode_length_limiting_formatter.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/primary_action_button_style.dart';
@@ -43,7 +45,7 @@ class _PetEditorScreenState extends ConsumerState<PetEditorScreen> {
     final editor = ref.read(petEditorViewModelProvider(petId)).asData?.value;
     return editor != null &&
         (editor.hasUnsavedChanges ||
-            ref.read(petPhotosViewModelProvider(editor.id)).pending.isNotEmpty);
+            ref.read(petPhotosViewModelProvider(editor.id)).hasPendingChanges);
   }
 
   Future<void> _requestExit() async {
@@ -95,7 +97,7 @@ class _PetEditorScreenState extends ConsumerState<PetEditorScreen> {
         : ref.watch(petPhotosViewModelProvider(editor.id));
     final busy = editor?.busy == true || photos?.busy == true;
     final changed =
-        editor?.hasUnsavedChanges == true || photos?.pending.isNotEmpty == true;
+        editor?.hasUnsavedChanges == true || photos?.hasPendingChanges == true;
     return PopScope(
       canPop: _allowExit || (!busy && !changed),
       onPopInvokedWithResult: (didPop, result) {
@@ -171,232 +173,273 @@ class _PetFormState extends ConsumerState<_PetForm> {
     final value = widget.value;
     final model = widget.model;
     final issue = value.issue;
-    final nameError = issue == PetFailureKind.invalidName;
-    final speciesError = issue == PetFailureKind.invalidSpecies;
-    final ageError = issue == PetFailureKind.invalidAge;
-    final traitsError = issue == PetFailureKind.invalidTraits;
-    final detailError = issue == PetFailureKind.invalidSpeciesDetail;
+    final nameError = value.invalidFields.contains(PetFailureKind.invalidName);
+    final speciesError = value.invalidFields.contains(
+      PetFailureKind.invalidSpecies,
+    );
+    final ageError = value.invalidFields.contains(PetFailureKind.invalidAge);
+    final traitsError = value.invalidFields.contains(
+      PetFailureKind.invalidTraits,
+    );
+    final detailError = value.invalidFields.contains(
+      PetFailureKind.invalidSpeciesDetail,
+    );
+    final sizeError = value.invalidFields.contains(PetFailureKind.invalidSize);
     final photos = ref.watch(petPhotosViewModelProvider(value.id));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        StaggerRevealItem(
-          order: 0,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: PetPhotoGallery(
-              petId: value.id,
-              existing: value.original != null,
-              editable: true,
-              locked: value.busy,
+    return ConfirmationToastHost(
+      confirmed: issue != null,
+      isError: true,
+      noticeId: value.errorId,
+      message: switch (issue) {
+        PetFailureKind.invalidName =>
+          value.name.trim().isEmpty
+              ? 'Completa los campos obligatorios.'
+              : 'El nombre admite hasta 80 caracteres.',
+        PetFailureKind.invalidSpecies ||
+        PetFailureKind.invalidSize => 'Completa los campos obligatorios.',
+        PetFailureKind.invalidSpeciesDetail =>
+          value.speciesDetail.trim().isEmpty
+              ? 'Completa los campos obligatorios.'
+              : 'El tipo admite hasta 60 caracteres.',
+        PetFailureKind.invalidAge =>
+          value.age.trim().isEmpty
+              ? 'Completa los campos obligatorios.'
+              : 'Introduce una edad de 0 a 600 meses.',
+        PetFailureKind.invalidTraits =>
+          value.traits.trim().isEmpty
+              ? 'Completa los campos obligatorios.'
+              : 'Los rasgos admiten hasta 200 caracteres.',
+        PetFailureKind.conflict =>
+          'La ficha cambió. Revisa la versión actual antes de guardar.',
+        _ => 'No se pudo guardar la mascota. Tus cambios siguen aquí.',
+      },
+      actionLabel: issue == PetFailureKind.conflict ? 'Ver ficha actual' : null,
+      onAction: issue == PetFailureKind.conflict
+          ? () {
+              model.refreshDetail();
+              context.push('/home/pets/${value.id}', extra: 'inspect');
+            }
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          StaggerRevealItem(
+            order: 0,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: LayoutBuilder(
+                builder: (context, constraints) => PetPhotoGallery(
+                  petId: value.id,
+                  existing: value.original != null,
+                  editable: true,
+                  locked: value.busy,
+                  tileSize: constraints.maxWidth.clamp(0, 160).toDouble(),
+                ),
+              ),
             ),
           ),
-        ),
-        _field(
-          1,
-          ShakeField(
-            errorId: value.errorId,
-            hasError: nameError,
-            child: AppTextField(
-              label: 'Nombre',
-              controller: _name,
-              enabled: !value.busy,
-              textCapitalization: TextCapitalization.words,
-              onChanged: (text) => model.edit(name: text),
-              hint: 'Nombre de tu mascota',
-              icon: Icons.pets_outlined,
-              errorText: nameError
-                  ? 'Escribe un nombre de hasta 80 caracteres.'
-                  : null,
+          _field(
+            1,
+            ShakeField(
+              errorId: value.errorId,
+              hasError: nameError,
+              child: AppTextField(
+                label: 'Nombre',
+                controller: _name,
+                enabled: !value.busy,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (text) => model.edit(name: text),
+                hint: 'Nombre de tu mascota',
+                icon: Icons.pets_outlined,
+                invalid: nameError,
+              ),
             ),
           ),
-        ),
-        _field(
-          2,
-          ShakeField(
-            errorId: value.errorId,
-            hasError: speciesError,
-            child: AppSelectField<PetSpecies>(
-              label: 'Especie',
-              hint: 'Selecciona una especie',
-              icon: Icons.category_outlined,
-              value: value.species,
-              errorText: speciesError ? 'Selecciona la especie.' : null,
+          _field(
+            2,
+            ShakeField(
+              errorId: value.errorId,
+              hasError: speciesError,
+              child: AppSelectField<PetSpecies>(
+                label: 'Especie',
+                hint: 'Seleccionar',
+                icon: Icons.category_outlined,
+                value: value.species,
+                invalid: speciesError,
+                options: [
+                  for (final species in PetSpecies.values)
+                    AppSelectOption(
+                      value: species,
+                      label: speciesLabel(species),
+                      icon: species == PetSpecies.other
+                          ? Icons.category_outlined
+                          : Icons.pets_outlined,
+                    ),
+                ],
+                onChanged: value.busy
+                    ? null
+                    : (species) => model.edit(species: species),
+              ),
+            ),
+          ),
+          if (value.species == PetSpecies.other)
+            _field(
+              3,
+              ShakeField(
+                errorId: value.errorId,
+                hasError: detailError,
+                child: AppTextField(
+                  label: 'Tipo de mascota',
+                  controller: _speciesDetail,
+                  enabled: !value.busy,
+                  onChanged: (text) => model.edit(speciesDetail: text),
+                  hint: 'Por ejemplo, conejo o loro',
+                  icon: Icons.pets_outlined,
+                  invalid: detailError,
+                ),
+              ),
+            ),
+          _field(
+            4,
+            AppSelectField<PetSex?>(
+              label: 'Sexo (opcional)',
+              hint: 'No lo sé',
+              icon: Icons.info_outline_rounded,
+              value: value.sex,
               options: [
-                for (final species in PetSpecies.values)
-                  AppSelectOption(
-                    value: species,
-                    label: speciesLabel(species),
-                    icon: species == PetSpecies.other
-                        ? Icons.category_outlined
-                        : Icons.pets_outlined,
+                const AppSelectOption<PetSex?>(
+                  value: null,
+                  label: 'No lo sé',
+                  icon: Icons.help_outline_rounded,
+                ),
+                for (final sex in PetSex.values)
+                  AppSelectOption<PetSex?>(
+                    value: sex,
+                    label: sexLabel(sex),
+                    icon: sex == PetSex.male
+                        ? Icons.male_rounded
+                        : Icons.female_rounded,
                   ),
               ],
               onChanged: value.busy
                   ? null
-                  : (species) => model.edit(species: species),
+                  : (sex) => model.edit(sex: sex, clearSex: sex == null),
             ),
           ),
-        ),
-        if (value.species == PetSpecies.other)
           _field(
-            3,
+            5,
             ShakeField(
               errorId: value.errorId,
-              hasError: detailError,
+              hasError: sizeError,
+              child: PetSizeSelector(
+                value: value.size,
+                invalid: sizeError,
+                onChanged: value.busy
+                    ? null
+                    : (size) => model.edit(size: size, clearSize: size == null),
+              ),
+            ),
+            label: 'Tamaño',
+          ),
+          _field(
+            6,
+            ShakeField(
+              errorId: value.errorId,
+              hasError: ageError,
               child: AppTextField(
-                label: 'Tipo de mascota',
-                controller: _speciesDetail,
+                label: 'Edad aproximada (meses)',
+                controller: _age,
                 enabled: !value.busy,
-                onChanged: (text) => model.edit(speciesDetail: text),
-                hint: 'Por ejemplo, conejo o loro',
-                icon: Icons.pets_outlined,
-                errorText: detailError
-                    ? 'Especifica el tipo (hasta 60 caracteres).'
-                    : null,
+                keyboardType: TextInputType.number,
+                onChanged: (text) => model.edit(age: text),
+                hint: 'Edad en meses',
+                icon: Icons.cake_outlined,
+                invalid: ageError,
               ),
             ),
           ),
-        _field(
-          4,
-          AppSelectField<PetSex?>(
-            label: 'Sexo',
-            hint: 'No lo sé',
-            icon: Icons.info_outline_rounded,
-            value: value.sex,
-            options: [
-              const AppSelectOption<PetSex?>(
-                value: null,
-                label: 'No lo sé',
-                icon: Icons.help_outline_rounded,
-              ),
-              for (final sex in PetSex.values)
-                AppSelectOption<PetSex?>(
-                  value: sex,
-                  label: sexLabel(sex),
-                  icon: sex == PetSex.male
-                      ? Icons.male_rounded
-                      : Icons.female_rounded,
-                ),
-            ],
-            onChanged: value.busy
-                ? null
-                : (sex) => model.edit(sex: sex, clearSex: sex == null),
-          ),
-        ),
-        _field(
-          5,
-          PetSizeSelector(
-            value: value.size,
-            onChanged: value.busy
-                ? null
-                : (size) => model.edit(size: size, clearSize: size == null),
-          ),
-          label: 'Tamaño',
-        ),
-        _field(
-          6,
-          ShakeField(
-            errorId: value.errorId,
-            hasError: ageError,
-            child: AppTextField(
-              label: 'Edad aproximada (meses)',
-              controller: _age,
-              enabled: !value.busy,
-              keyboardType: TextInputType.number,
-              onChanged: (text) => model.edit(age: text),
-              hint: 'No lo sé',
-              icon: Icons.cake_outlined,
-              errorText: ageError
-                  ? 'Introduce de 0 a 600 meses o déjalo vacío.'
-                  : null,
-            ),
-          ),
-        ),
-        _field(
-          7,
-          ShakeField(
-            errorId: value.errorId,
-            hasError: traitsError,
-            child: AppTextField(
-              label: 'Rasgos',
-              controller: _traits,
-              enabled: !value.busy,
-              minLines: 2,
-              maxLines: 5,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (text) => model.edit(traits: text),
-              hint: 'Color, marcas u otros detalles',
-              icon: Icons.notes_rounded,
-              errorText: traitsError ? 'Usa hasta 500 caracteres.' : null,
-            ),
-          ),
-        ),
-        StaggerRevealItem(
-          order: 8,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (issue != null &&
-                  !nameError &&
-                  !speciesError &&
-                  !ageError &&
-                  !traitsError &&
-                  !detailError) ...[
-                Semantics(
-                  liveRegion: true,
-                  child: Text(
-                    issue == PetFailureKind.conflict
-                        ? 'La ficha cambió. Revisa la versión actual antes de guardar.'
-                        : 'No se pudo guardar la mascota. Tus cambios siguen aquí.',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFB53F48),
+          _field(
+            7,
+            ShakeField(
+              errorId: value.errorId,
+              hasError: traitsError,
+              child: AppTextField(
+                label: 'Rasgos o descripción',
+                controller: _traits,
+                enabled: !value.busy,
+                minLines: 2,
+                maxLines: 5,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (text) => model.edit(traits: text),
+                hint: 'Color, marcas u otros detalles',
+                icon: Icons.notes_rounded,
+                invalid: traitsError,
+                inputFormatters: const [UnicodeLengthLimitingFormatter(200)],
+                footer: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _traits,
+                  builder: (context, text, _) => Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${text.text.runes.length}/200',
+                      semanticsLabel:
+                          '${text.text.runes.length} de 200 caracteres',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF6E6E73),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (issue == PetFailureKind.conflict)
-                  TextButton(
-                    onPressed: value.busy
-                        ? null
-                        : () {
-                            model.refreshDetail();
-                            context.push(
-                              '/home/pets/${value.id}',
-                              extra: 'inspect',
-                            );
-                          },
-                    child: const Text('Ver ficha actual'),
-                  ),
-              ],
-              LoadingShimmer(
-                isLoading: value.busy,
-                loadingLabel: 'Guardando mascota',
-                radius: 22,
-                child: FilledButton(
-                  style: primaryActionButtonStyle(
-                    context,
+              ),
+            ),
+          ),
+          StaggerRevealItem(
+            order: 8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ShakeField(
+                  errorId: value.errorId,
+                  hasError: issue != null && value.invalidFields.isEmpty,
+                  child: LoadingShimmer(
                     isLoading: value.busy,
-                  ),
-                  onPressed:
-                      value.busy ||
-                          photos.busy ||
-                          photos.loading ||
-                          (!value.dirty && photos.pending.isEmpty)
-                      ? null
-                      : model.save,
-                  child: Text(
-                    value.original == null
-                        ? 'Registrar mascota'
-                        : 'Guardar cambios',
+                    loadingLabel: 'Guardando mascota',
+                    radius: 22,
+                    child: FilledButton(
+                      style:
+                          primaryActionButtonStyle(
+                            context,
+                            isLoading: value.busy,
+                          ).copyWith(
+                            side: issue != null && value.invalidFields.isEmpty
+                                ? const WidgetStatePropertyAll(
+                                    BorderSide(
+                                      color: Color(0xFFB53F48),
+                                      width: 3.5,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                      onPressed:
+                          value.busy ||
+                              photos.busy ||
+                              photos.loading ||
+                              (!value.dirty && !photos.hasPendingChanges)
+                          ? null
+                          : model.save,
+                      child: Text(
+                        value.original == null
+                            ? 'Registrar mascota'
+                            : 'Guardar cambios',
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

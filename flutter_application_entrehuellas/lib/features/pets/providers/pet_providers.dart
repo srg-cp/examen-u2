@@ -1,3 +1,5 @@
+import '../domain/use_cases/archive_pet.dart';
+import '../domain/use_cases/restore_pet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../domain/repositories/pet_repository.dart';
@@ -37,4 +39,11 @@ final createPetProvider = Provider(
 );
 final updatePetProvider = Provider(
   (ref) => UpdatePet(ref.watch(petRepositoryProvider)),
+);
+
+final archivePetProvider = Provider(
+  (ref) => ArchivePet(ref.watch(petRepositoryProvider)),
+);
+final restorePetProvider = Provider(
+  (ref) => RestorePet(ref.watch(petRepositoryProvider)),
 );

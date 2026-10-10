@@ -197,3 +197,25 @@ PetSizeSelector usa Expanded en tres columnas con dos gaps8. ChoiceChip conserva
 ## Confirmación de cambios sin guardar de mascotas
 
 PetEditorState.hasUnsavedChanges distingue registro vacío de formulario modificado y compara edición con original; dirty conserva su semántica para guardado/validación. PetEditorScreen usa PopScope y el callback onBack de PetScreenShell para unificar salida por glass/sistema. Fotos pendientes también activan el guard. PetDiscardDialog reutiliza OriginDialogTransition con acciones reales y scroll. Confirmar salida limpia pending mediante PetPhotosViewModel.discardPending, sin tocar fotografías confirmadas, antes de cerrar. Rechazar salida conserva controladores/selecciones/fotos; guardado confirmado omite el aviso.
+
+## Ficha abierta desde su tarjeta
+
+PetsSection captura el Rect de la tarjeta pulsada mediante Builder/RenderBox y lo entrega como extra a /home/pets/:id. Router compone CustomTransitionPage con OriginPageTransition compartido, apertura320ms/cierre260ms y movimiento reducido. Sin Rect conserva NoTransitionPage y las semánticas previas de Pet guardado e inspect. No modifica consultas ni reinicia entradas al resolver skeleton. Harness de mascotas comprueba origen/retorno y captura detail_origin_start/middle/close normal y320×350 texto2.
+
+## Editor de mascotas pulido — ADR-016
+
+PetPhotoGallery editable usa tileSize calculado hasta160, igual que ficha; skeleton acompaña. Nombre/especie/tamaño/edad/rasgos obligatorios, sexo opcional/Macho inicial, especie sin valor con placeholder Seleccionar. AppFieldSurface/AppTextField/AppSelectField admiten invalid sin errorText; PetSizeSelector adapta borde danger sin overflow con texto ampliado. Rasgos o descripción muestra contador interno0/200 y UnicodeLengthLimitingFormatter coherente con dominio/SQL.
+
+PetEditorState.invalidFields reúne fallos del dominio; ViewModel valida antes de enviar, incrementa errorId por intento y limpia solo el campo editado. Formulario y galería editable usan ConfirmationToastHost/ShakeField para errores, sin bloques de texto inferiores; aviso de conflicto conserva Ver ficha actual. PetPhotosState.errorId permite repetir fallos. ConfirmationToastHost maneja también estado confirmado al montar y limpia overlay/timer. Fotos de ficha mantienen feedback contextual. Nueva norma en ADR-016.
+
+## Fotos pendientes hasta guardar — ADR-017
+
+Quitar foto oculta la miniatura solo en el borrador editable; no borra el archivo al tocar X. Ficha mantiene fotos confirmadas. Añadir prepara vista previa local, y quitar una selección local la descarta sin llamadas remotas. Guardar contempla también retiradas sin cambios de campos; continuar conserva el borrador y Salir sin guardar restaura las fotografías confirmadas. Límite de tres aplicado al resultado previsto permite reemplazar. Feedback de guardado fallido conserva shake danger/toast de ADR-016 y pendientes para reintentar.
+
+## Activas/Archivadas y acciones de ciclo de vida
+
+PetsSection ofrece PetListFilter para Activas/Archivadas: cápsula gris #E5E5EA, dos segmentos iguales y un indicador carbón #111111 deslizante con texto blanco, sin check ni bordes individuales, según referencia explícita del usuario. Tipografía del tema14/600, padding6 y área táctil mínima48; letras ampliadas que no caben en fila se apilan dentro de la misma superficie, sin reducir ni truncar. Indicador y colores de ambas etiquetas comparten un único progreso TweenAnimationBuilder320ms/easeInOutCubic: color interpolado carbón/blanco según la posición, con reorientación desde el progreso vigente al cambiar de destino. Inmediato con movimiento reducido y orden RTL respetado. Mantiene consultas independientes y vacío específico de Archivadas. La ficha conserva Editar y añade acción secundaria Archivar/Restaurar con icono, etiqueta estable y LoadingShimmer durante la RPC. Archivo pide confirmación mediante OriginDialogTransition compartida, modal neutro desplazable y acciones que se ajustan al ancho; cancelar no escribe. Estado archivado comunica conservación de ficha/fotos. Errores contextuales bajo la acción, actualización ante conflicto y toast superior de éxito confirmado. Retorno glass y edición se deshabilitan durante la operación; PopScope protege Atrás. Eliminación por swipe conserva su feedback autorizado y explica restricciones por historial. Sin nueva animación de entrada al confirmar o refrescar.
+
+## Continuidad visual del botón al registrar
+
+PetRegistrationButton comparte _content entre botón y copia visual, conserva tipografía/padding/iconos y entrega OriginPageSource al router. OriginPageTransition recibe la identidad solo para pets/new y transforma carbón/radio/Rect; contenido de origen fijo y centrado, sin estiramiento, desaparece hasta45% y reaparece al contraer; destino desde65%. Otras rutas conservan parámetros anteriores. Capturas register_origin_start/middle/close/return y compact_origin_start/morph cubren las dos variantes normal y320×350 texto2; prueba compartida verifica identidad inicial/final, reversa, bloqueo y movimiento reducido.

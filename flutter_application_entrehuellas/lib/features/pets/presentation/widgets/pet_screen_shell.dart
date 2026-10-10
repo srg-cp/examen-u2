@@ -8,6 +8,7 @@ class PetScreenShell extends StatelessWidget {
   const PetScreenShell({
     this.title,
     this.onBack,
+    this.navigationEnabled = true,
     required this.loading,
     required this.child,
     this.count = 9,
@@ -15,6 +16,7 @@ class PetScreenShell extends StatelessWidget {
   });
   final String? title;
   final VoidCallback? onBack;
+  final bool navigationEnabled;
   final bool loading;
   final Widget child;
   final int count;
@@ -36,11 +38,12 @@ class PetScreenShell extends StatelessWidget {
                 left: 24,
                 child: GlassNavigationButton(
                   tooltip: 'Volver a mis mascotas',
-                  onPressed:
-                      onBack ??
-                      () => context.canPop()
-                          ? context.pop()
-                          : context.go('/home'),
+                  onPressed: !navigationEnabled
+                      ? null
+                      : onBack ??
+                            () => context.canPop()
+                                ? context.pop()
+                                : context.go('/home'),
                 ),
               ),
             ],

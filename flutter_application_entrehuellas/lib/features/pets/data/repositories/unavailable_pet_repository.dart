@@ -10,9 +10,22 @@ class UnavailablePetRepository implements PetRepository {
     String petId,
     int expectedVersion,
   ) async => throw const PetFailure(PetFailureKind.unavailable);
+  @override
+  Future<Pet> archive(
+    String ownerId,
+    String petId,
+    int expectedVersion,
+  ) async => _fail();
+  @override
+  Future<Pet> restore(
+    String ownerId,
+    String petId,
+    int expectedVersion,
+  ) async => _fail();
   Never _fail() => throw const PetFailure(PetFailureKind.unavailable);
   @override
-  Future<List<Pet>> list(String ownerId) async => _fail();
+  Future<List<Pet>> list(String ownerId, {bool archived = false}) async =>
+      _fail();
   @override
   Future<Pet> read(String ownerId, String petId) async => _fail();
   @override

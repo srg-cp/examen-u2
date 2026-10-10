@@ -97,7 +97,13 @@ void main() {
       await photoModel.choose(false);
       final id = container.read(gallery).pending.single.id;
       final model = container.read(editor.notifier);
-      model.edit(name: 'Luna', species: PetSpecies.cat);
+      model.edit(
+        name: 'Luna',
+        species: PetSpecies.cat,
+        size: PetSize.medium,
+        age: '24',
+        traits: 'Blanca',
+      );
       photos.loseAcknowledgement = true;
       await model.save();
       expect(pets.pets.length, 1);
@@ -125,6 +131,124 @@ void main() {
       expect(container.read(gallery).photos, isEmpty);
     },
   );
+
+  for (final scenario in [
+    'discard',
+    'replacement',
+    'retry',
+    'invalid',
+    'account',
+    'metadata failure',
+  ]) {
+    test('Photos remain unchanged before confirmation: $scenario', () async {
+      final auth = FakeAuthRepository()
+        ..current = const AuthSession(userId: 'one');
+      final pets = FakePets();
+      pets.pets['pet'] = const Pet(
+        id: 'pet',
+        ownerId: 'one',
+        version: 1,
+        fields: PetFields(
+          name: 'Luna',
+          species: PetSpecies.cat,
+          size: PetSize.medium,
+          ageMonths: 24,
+          traits: 'Blanca',
+        ),
+      );
+      final photos = FakePetPhotos()
+        ..selection = img.encodeJpg(img.Image(width: 10, height: 10));
+      for (final id in ['first', 'second', 'third']) {
+        photos.photos[id] = PetPhoto(
+          id: id,
+          petId: 'pet',
+          ownerId: 'one',
+          ready: true,
+          uri: Uri.parse('https://example.invalid/$id.jpg'),
+        );
+      }
+      final container = ProviderContainer(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(auth),
+          petRepositoryProvider.overrideWithValue(pets),
+          petPhotoRepositoryProvider.overrideWithValue(photos),
+        ],
+      );
+      final editor = petEditorViewModelProvider('pet');
+      final subscription = container.listen(editor, (_, __) {});
+      final gallery = petPhotosViewModelProvider('pet');
+      final photoSubscription = container.listen(gallery, (_, __) {});
+      addTearDown(() async {
+        subscription.close();
+        photoSubscription.close();
+        container.dispose();
+        await auth.controller.close();
+      });
+      await container.read(editor.future);
+      final model = container.read(editor.notifier);
+      final photoModel = container.read(gallery.notifier);
+      photoModel.stageRemoval('first');
+      expect(container.read(gallery).hasPendingChanges, isTrue);
+      expect(container.read(gallery).photos, hasLength(3));
+      expect(container.read(gallery).visiblePhotos, hasLength(2));
+      expect(photos.photos, hasLength(3));
+      expect(photos.removals, isEmpty);
+      if (scenario == 'discard') {
+        await photoModel.choose(true);
+        photoModel.stageRemoval(container.read(gallery).pending.single.id);
+        expect(photos.removals, isEmpty);
+        photoModel.discardPending();
+        expect(container.read(gallery).visiblePhotos, hasLength(3));
+        expect(container.read(gallery).hasPendingChanges, isFalse);
+        expect(photos.attempts, isEmpty);
+      } else if (scenario == 'account') {
+        auth.emit(const AuthSession(userId: 'two'));
+        await Future<void>.delayed(Duration.zero);
+        expect(container.read(gallery).pendingRemovals, isEmpty);
+        expect(container.read(gallery).photos, isEmpty);
+        expect(photos.removals, isEmpty);
+      } else if (scenario == 'invalid') {
+        model.edit(name: '');
+        await model.save();
+        expect(photos.removals, isEmpty);
+        expect(container.read(gallery).pendingRemovals, {'first'});
+        expect(container.read(editor).requireValue.invalidFields, isNotEmpty);
+      } else if (scenario == 'metadata failure') {
+        model.edit(name: 'Luna nueva');
+        pets.fail = true;
+        await model.save();
+        expect(photos.removals, isEmpty);
+        expect(container.read(gallery).pendingRemovals, {'first'});
+        expect(container.read(editor).requireValue.saved, isNull);
+      } else if (scenario == 'replacement') {
+        await photoModel.choose(true);
+        final id = container.read(gallery).pending.single.id;
+        expect(photos.attempts, isEmpty);
+        await model.save();
+        expect(photos.operations, ['remove:first', 'upload:$id']);
+        expect(photos.photos, hasLength(3));
+        expect(container.read(gallery).hasPendingChanges, isFalse);
+        expect(container.read(editor).requireValue.saved, isNotNull);
+        expect(pets.updates, 0);
+      } else {
+        photos.failRemoval = true;
+        await model.save();
+        expect(photos.photos, hasLength(3));
+        expect(container.read(gallery).pendingRemovals, {'first'});
+        expect(container.read(editor).requireValue.saved, isNull);
+        photos.failRemoval = false;
+        photos.loseRemovalAcknowledgement = true;
+        await model.save();
+        expect(photos.photos, hasLength(2));
+        expect(container.read(gallery).pendingRemovals, {'first'});
+        await model.save();
+        expect(photos.removals, ['first', 'first', 'first']);
+        expect(container.read(gallery).hasPendingChanges, isFalse);
+        expect(container.read(editor).requireValue.saved, isNotNull);
+        expect(pets.updates, 0);
+      }
+    });
+  }
 }
 
 class _LostPicker extends ImagePicker {

@@ -9,6 +9,11 @@ class FakePetPhotos implements PetPhotoRepository {
   Uint8List? selection;
   Uint8List? recovered;
   bool loseAcknowledgement = false;
+  bool loseRemovalAcknowledgement = false;
+  bool failRemoval = false;
+  Completer<void>? pendingRemoval;
+  final removals = <String>[];
+  final operations = <String>[];
   final photos = <String, PetPhoto>{};
   final attempts = <String>[];
   @override
@@ -33,6 +38,14 @@ class FakePetPhotos implements PetPhotoRepository {
   @override
   Future<PetPhoto> upload(String owner, String pet, PetPhotoDraft draft) async {
     attempts.add(draft.id);
+    operations.add('upload:${draft.id}');
+    if (!photos.containsKey(draft.id) &&
+        photos.values
+                .where((p) => p.ownerId == owner && p.petId == pet)
+                .length >=
+            3) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.limit);
+    }
     final photo = photos.putIfAbsent(
       draft.id,
       () => PetPhoto(
@@ -52,6 +65,16 @@ class FakePetPhotos implements PetPhotoRepository {
 
   @override
   Future<void> remove(String owner, String pet, String id) async {
+    removals.add(id);
+    operations.add('remove:$id');
+    await pendingRemoval?.future;
+    if (failRemoval) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
+    }
     photos.remove(id);
+    if (loseRemovalAcknowledgement) {
+      loseRemovalAcknowledgement = false;
+      throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
+    }
   }
 }

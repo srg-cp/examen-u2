@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -168,11 +169,53 @@ void main() {
           await choose('Salir sin guardar');
           expect(container.read(photoProvider).pending, isEmpty);
           expect(photos.attempts, isEmpty);
+          if (edit) {
+            photos.photos['confirmed'] = const PetPhoto(
+              id: 'confirmed',
+              petId: 'pet',
+              ownerId: 'one',
+              ready: true,
+            );
+            await container.read(photoProvider.notifier).initialize(true);
+            await open();
+            await tester.ensureVisible(find.byTooltip('Quitar foto'));
+            await tester.tap(find.byTooltip('Quitar foto'));
+            await tester.pumpAndSettle();
+            expect(photos.removals, isEmpty);
+            expect(container.read(photoProvider).pendingRemovals, {
+              'confirmed',
+            });
+            final save = find.widgetWithText(FilledButton, 'Guardar cambios');
+            expect(tester.widget<FilledButton>(save).onPressed, isNotNull);
+            await tester.binding.handlePopRoute();
+            await tester.pumpAndSettle();
+            expect(find.text('¿Salir sin guardar?'), findsOneWidget);
+            await choose('Seguir editando');
+            expect(container.read(photoProvider).pendingRemovals, {
+              'confirmed',
+            });
+            await tester.tap(find.byTooltip('Volver a mis mascotas'));
+            await tester.pumpAndSettle();
+            await choose('Salir sin guardar');
+            expect(container.read(photoProvider).pendingRemovals, isEmpty);
+            expect(
+              container.read(photoProvider).visiblePhotos.single.id,
+              'confirmed',
+            );
+            expect(photos.photos.containsKey('confirmed'), isTrue);
+            expect(photos.removals, isEmpty);
+          }
           await open();
           final savingModel = container.read(
             petEditorViewModelProvider(editorId).notifier,
           );
-          savingModel.edit(name: 'Otra mascota', species: PetSpecies.dog);
+          savingModel.edit(
+            name: 'Otra mascota',
+            species: PetSpecies.dog,
+            size: PetSize.medium,
+            age: '24',
+            traits: 'Blanca',
+          );
           pets.fail = true;
           pets.pending = Completer<void>();
           final saving = savingModel.save();
@@ -185,6 +228,8 @@ void main() {
           pets.pending!.complete();
           await saving;
           pets.pending = null;
+          await tester.pumpAndSettle();
+          await tester.pump(const Duration(seconds: 4));
           await tester.pumpAndSettle();
           await tester.tap(find.byTooltip('Volver a mis mascotas'));
           await tester.pumpAndSettle();

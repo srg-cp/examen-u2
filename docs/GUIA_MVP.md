@@ -318,3 +318,15 @@ Usuario solicita retorno superior, tipo concreto para Otra especie, tamaño hori
 ### Archivo reversible y eliminación definitiva — 9 de octubre de 2026
 
 Por aceptación del usuario, HU-03 / RF-03 añade archivo/restauración como alternativa habitual al borrado. Se entrega ahora el contrato SQL008: conservar ficha/fotos, bloquear archivo con casos activos y borrado con historial. Sin ampliación a adopciones/reportes en este incremento. Integración Flutter y demo remota pendientes; S3 debe mantener indicadores de historia/casos activos bajo bloqueo en la misma transacción. Detalles en ADR-014 y CONFIGURACION.
+
+## Ajuste solicitado de registro/edición de mascotas — 9 de octubre de 2026
+
+HU-03 / RF-03 (issues#28/#29 separados de la numeración HU): nombre/especie/tamaño/edad/rasgos obligatorios al guardar, descripción1–200 con contador, sexo opcional con valor inicial y placeholder de especie no seleccionable. Selector de fotos privado de hasta160, conservando alcance HU-04.1/#30 y sus pendientes. Feedback del editor mediante shake danger y toast superior sin errores debajo, según ADR-016. Plan009 añade validación protegida de metadatos; preserva fichas antiguas y su ciclo de vida. No cierra HU/issues ni activa SQL remoto por pruebas locales.
+
+### Fotos como borrador hasta confirmación — 9 de octubre de 2026
+
+Corrección de HU-03.2/#29 y galería privada HU-04.1/#30: selección/retirada se mantienen locales hasta Registrar mascota/Guardar cambios; cancelar conserva fotos confirmadas. ADR-017 documenta reintento y límites del guardado parcial tras confirmación. No añade sincronización offline persistente, atomicidad de Storage ni migración SQL.
+
+### Integración de archivo/restauración — 9 de octubre de 2026
+
+HU-03 / RF-03 (issues #28/#29): Mis mascotas incorpora Activas/Archivadas y la ficha permite Archivar con confirmación o Restaurar, conservando fotos y metadatos. Eliminar sigue disponible por swipe y rechaza historial/casos activos mediante dominio y servidor. Los casos S3 siguen pendientes y deben mantener indicadores atómicamente según ADR-014. No añade SQL ni cierra automáticamente HU/issues: validación autenticada Android/Supabase y criterios restantes de fotos HU-04 siguen pendientes.

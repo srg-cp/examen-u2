@@ -9,6 +9,18 @@ class PetRepositoryImpl implements PetRepository {
   @override
   Future<void> delete(String ownerId, String petId, int expectedVersion) =>
       _run(() => _source.delete(ownerId, petId, expectedVersion));
+  @override
+  Future<Pet> archive(String ownerId, String petId, int expectedVersion) =>
+      _run(
+        () async =>
+            (await _source.archive(ownerId, petId, expectedVersion)).toEntity(),
+      );
+  @override
+  Future<Pet> restore(String ownerId, String petId, int expectedVersion) =>
+      _run(
+        () async =>
+            (await _source.restore(ownerId, petId, expectedVersion)).toEntity(),
+      );
   Future<T> _run<T>(Future<T> Function() action) async {
     try {
       return await action();
@@ -20,8 +32,11 @@ class PetRepositoryImpl implements PetRepository {
   }
 
   @override
-  Future<List<Pet>> list(String ownerId) => _run(
-    () async => (await _source.list(ownerId)).map((d) => d.toEntity()).toList(),
+  Future<List<Pet>> list(String ownerId, {bool archived = false}) => _run(
+    () async => (await _source.list(
+      ownerId,
+      archived: archived,
+    )).map((d) => d.toEntity()).toList(),
   );
   @override
   Future<Pet> read(String ownerId, String petId) =>

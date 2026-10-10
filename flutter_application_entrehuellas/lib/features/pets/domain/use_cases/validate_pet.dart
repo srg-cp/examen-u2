@@ -1,34 +1,44 @@
 import '../entities/pet.dart';
 import '../failures/pet_failure.dart';
 
-PetFields validatePet(PetFields value) {
+/// All invalid fields, in form reading order; also used before any write.
+Set<PetFailureKind> petValidationIssues(PetFields value) {
+  final issues = <PetFailureKind>{};
   final name = value.name.trim();
   final traits = value.traits?.trim();
   final detail = value.speciesDetail?.trim();
+  if (name.isEmpty || name.runes.length > 80) {
+    issues.add(PetFailureKind.invalidName);
+  }
+  if (value.species == null) issues.add(PetFailureKind.invalidSpecies);
   if (value.species == PetSpecies.other &&
       (detail == null || detail.isEmpty || detail.runes.length > 60)) {
-    throw const PetFailure(PetFailureKind.invalidSpeciesDetail);
+    issues.add(PetFailureKind.invalidSpeciesDetail);
   }
-  if (name.isEmpty || name.runes.length > 80) {
-    throw const PetFailure(PetFailureKind.invalidName);
+  if (value.size == null) issues.add(PetFailureKind.invalidSize);
+  if (value.ageMonths == null ||
+      value.ageMonths! < 0 ||
+      value.ageMonths! > 600) {
+    issues.add(PetFailureKind.invalidAge);
   }
-  if (value.species == null) {
-    throw const PetFailure(PetFailureKind.invalidSpecies);
+  if (traits == null || traits.isEmpty || traits.runes.length > 200) {
+    issues.add(PetFailureKind.invalidTraits);
   }
-  if (value.ageMonths != null &&
-      (value.ageMonths! < 0 || value.ageMonths! > 600)) {
-    throw const PetFailure(PetFailureKind.invalidAge);
-  }
-  if (traits != null && traits.runes.length > 500) {
-    throw const PetFailure(PetFailureKind.invalidTraits);
-  }
+  return Set.unmodifiable(issues);
+}
+
+PetFields validatePet(PetFields value) {
+  final issues = petValidationIssues(value);
+  if (issues.isNotEmpty) throw PetFailure(issues.first);
   return PetFields(
-    speciesDetail: value.species == PetSpecies.other ? detail : null,
+    speciesDetail: value.species == PetSpecies.other
+        ? value.speciesDetail!.trim()
+        : null,
     size: value.size,
-    name: name,
+    name: value.name.trim(),
     species: value.species,
     sex: value.sex,
     ageMonths: value.ageMonths,
-    traits: traits == null || traits.isEmpty ? null : traits,
+    traits: value.traits!.trim(),
   );
 }

@@ -29,7 +29,7 @@ class SupabasePetDataSource implements PetDataSource {
         await _client.rpc('finish_pet_deletion', params: {'p_id': petId});
       });
   static const columns =
-      'id,owner_id,name,species,sex,age_months,traits,species_detail,size,version,pet_photos(id,status,created_at)';
+      'id,owner_id,name,species,sex,age_months,traits,species_detail,size,version,archived_at,case_history_at,active_case_count,pet_photos(id,status,created_at)';
   Future<PetDto> _dto(Map<String, dynamic> row) async {
     Uri? cover;
     final photos =
@@ -82,8 +82,11 @@ class SupabasePetDataSource implements PetDataSource {
         '40001' => PetSourceFailureKind.conflict,
         '42501' => PetSourceFailureKind.forbidden,
         '23514' => switch (error.message) {
+          'pet_active_case' => PetSourceFailureKind.activeCase,
+          'pet_has_case_history' => PetSourceFailureKind.caseHistory,
           'pet_invalid_name' => PetSourceFailureKind.invalidName,
           'pet_invalid_species' => PetSourceFailureKind.invalidSpecies,
+          'pet_invalid_size' => PetSourceFailureKind.invalidSize,
           'pet_invalid_age' => PetSourceFailureKind.invalidAge,
           'pet_invalid_traits' => PetSourceFailureKind.invalidTraits,
           'pet_invalid_species_detail' =>
@@ -99,15 +102,20 @@ class SupabasePetDataSource implements PetDataSource {
   }
 
   @override
-  Future<List<PetDto>> list(String ownerId) => _run(ownerId, () async {
-    final rows = await _client
-        .from('pets')
-        .select(columns)
-        .eq('owner_id', ownerId)
-        .order('created_at', ascending: false)
-        .order('id');
-    return Future.wait(rows.map(_dto));
-  });
+  Future<List<PetDto>> list(String ownerId, {bool archived = false}) =>
+      _run(ownerId, () async {
+        final query = _client
+            .from('pets')
+            .select(columns)
+            .eq('owner_id', ownerId);
+        final filtered = archived
+            ? query.not('archived_at', 'is', null)
+            : query.isFilter('archived_at', null);
+        final rows = await filtered
+            .order('created_at', ascending: false)
+            .order('id');
+        return Future.wait(rows.map(_dto));
+      });
   @override
   Future<PetDto> read(String ownerId, String petId) => _run(ownerId, () async {
     final row = await _client
@@ -118,6 +126,30 @@ class SupabasePetDataSource implements PetDataSource {
         .maybeSingle();
     if (row == null) throw const PetSourceFailure(PetSourceFailureKind.missing);
     return _dto(row);
+  });
+  @override
+  Future<PetDto> archive(String ownerId, String petId, int expectedVersion) =>
+      _lifecycle(ownerId, petId, expectedVersion, 'archive_pet');
+  @override
+  Future<PetDto> restore(String ownerId, String petId, int expectedVersion) =>
+      _lifecycle(ownerId, petId, expectedVersion, 'restore_pet');
+  Future<PetDto> _lifecycle(
+    String owner,
+    String id,
+    int version,
+    String command,
+  ) => _run(owner, () async {
+    final rows = await _client.rpc(
+      command,
+      params: {'p_id': id, 'p_expected_version': version},
+    );
+    final dto = PetDto.fromMap(
+      Map<String, dynamic>.from((rows as List).single as Map),
+    );
+    if (dto.ownerId != owner || dto.id != id) {
+      throw const PetSourceFailure(PetSourceFailureKind.forbidden);
+    }
+    return dto;
   });
   Future<PetDto> _write(
     String owner,

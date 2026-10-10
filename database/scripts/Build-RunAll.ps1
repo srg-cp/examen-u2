@@ -41,6 +41,10 @@ $archivingPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plan
 if(($archivingPlan.sources -join '|') -ne 'tables/030_pet_archiving.sql|functions/031_pet_lifecycle_commands.sql|triggers/032_pet_case_history_guard.sql|grants/033_pet_lifecycle_permissions.sql'){throw 'Revisar repetición de archivado de mascotas.'}
 & (Join-Path $PSScriptRoot 'Build-PetArchivingPatch.ps1')
 
+$requiredFieldsPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/009_pet_required_fields.json') -Raw | ConvertFrom-Json
+if(($requiredFieldsPlan.sources -join '|') -ne 'functions/034_validate_pet_required_fields.sql|triggers/035_pet_required_fields_guard.sql'){throw 'Revisar repetición de validación obligatoria de mascotas.'}
+& (Join-Path $PSScriptRoot 'Build-PetRequiredFieldsPatch.ps1')
+
 function Protect-Creation([string]$Condition, [string]$Sql) {
     return 'do $run_all_object$' + "`n" + 'begin' + "`n" +
         "    if $Condition then`n$Sql`n    end if;`n" +
@@ -146,7 +150,7 @@ foreach ($relativePath in $expectedSources) {
         default { $lines.Add($sql) } # Reviewed repeatable grants and ON CONFLICT DO NOTHING backfill.
     }
 }
-foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources))) {
+foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources))) {
     $sql = [IO.File]::ReadAllText((Join-Path $databaseRoot $relativePath)).Replace("`r`n", "`n").TrimEnd()
     $hashAlgorithm = [Security.Cryptography.SHA256]::Create()
     try { $hash = [BitConverter]::ToString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($sql + "`n"))).Replace('-', '').ToLowerInvariant() }
@@ -158,4 +162,4 @@ $lines.Add("`ncommit;")
 $outputPath = Join-Path $databaseRoot 'run_all.sql'
 $content = ($lines -join "`n") + "`n"
 [IO.File]::WriteAllText($outputPath, $content, (New-Object Text.UTF8Encoding($false)))
-Write-Output 'Generado database/run_all.sql desde perfiles, onboarding, avatar y mascotas con galería/archivo (001-010,012-033; 011 sustituido).'
+Write-Output 'Generado database/run_all.sql desde perfiles, onboarding, avatar y mascotas con galería/archivo (001-010,012-035; 011 sustituido).'
