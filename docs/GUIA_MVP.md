@@ -347,3 +347,7 @@ Rama `feature/alert-preferences`, segundo incremento de HU-02: recepción genera
 ### Continuación de HU-04 — 10 de octubre de 2026
 
 En codex/pet-photos se implementan cámara con alternativa de galería, procesamiento servidor de JPEG/miniaturas sin EXIF y selección explícita de principal, conservando borradores hasta Guardar y reemplazo determinista al retirar. SQL044–047/plan012 y Edge pet-photo-process preparados; activación conjunta y demo hosted/Android pendientes. ADR-020 mantiene originales y derivados privados: publicación en S3 solo mediante proyección autorizada de bytes verificados. No añade reportes ni entrega alertas; el siguiente incremento funcional sigue HU-05 tras activar/verificar fotos. Historias no cerradas por evidencia local.
+
+### Publicación de mascotas perdidas — HU-05 / RF-05, issue #5
+
+Implementación local en feature/lost-pet-cases: formulario por mascota propia, fotos elegidas, fecha/hora y punto manual, vista previa pública y Mis casos. Publicación autorizada/versionada/idempotente en SQL048–051/plan013 con caso activo único e historial/contador atómicos. Punto/referencia privados y derivados seleccionados verificados con lectura pública limitada; ADR-021 detalla la proyección. La ficha móvil es protegida; web QR, encontrados, exploración/cercanía PostGIS y cierre siguen sus historias posteriores. Activación patch013 y demo real pendientes; no se cierra HU-05 por evidencia local. [Ficha](funcionalidades/casos-perdidos.md).

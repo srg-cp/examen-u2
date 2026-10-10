@@ -49,3 +49,7 @@ CreatePet, UpdatePet, ListMyPets, ReadPet, ArchivePet, RestorePet y DeletePet.
 RPC versionadas, RLS y Storage; [configuración](../CONFIGURACION.md).
 Verificar creación/edición, cancelación, reintento, conflictos, archivo/restauración,
 eliminación fallida y aislamiento A/B. Evidencia y pendientes en [ESTADO](../ESTADO.md).
+
+## Integración con HU-05
+
+La publicación local de un caso perdido actualiza historial permanente, contador activo y versión de mascota en la misma transacción. Con caso activo no puede archivarse; con historial no puede eliminarse definitivamente. Patch013/activación y demo real pendientes. El reporte vuelve a consultar ficha/fotos para usar la versión vigente; ver [Casos perdidos](casos-perdidos.md).

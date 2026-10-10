@@ -23,3 +23,7 @@ Generar con `../scripts/Build-InterestZonesPatch.ps1`. Aplicar completo [010_pat
 ## 012 — Procesamiento y principal de fotos
 
 Generar mediante `database/scripts/Build-PetPhotoProcessingPatch.ps1`. Aplicar todo `012_patch_pet_photo_processing.sql` después de011 y coordinar activación con Edge pet-photo-process. No ejecutado remotamente por esta tarea. Añade derivados privados y principal; bloquea el circuito antiguo de cargas/publicación del cliente. Preparar WASM/desplegar según `supabase/functions/pet-photo-process/README.md` antes de actualizar la app. Mantiene fotos históricas privadas y sin processed_at inventado. No editar la salida: fuentes044–047/plan012.
+
+## Patch013: casos perdidos
+
+`013_patch_lost_cases.sql`, generado con `database/scripts/Build-LostCasesPatch.ps1`, se ejecuta completo después de012. Añade publicación autorizada/idempotente, historial/contador atómicos y proyección pública con derivados elegidos/verificados. Mantener buckets privados; sin DML cliente. Preparado y probado localmente; ejecución confirmada por el usuario el 10 de octubre de 2026, sin verificación remota por el agente. Ver CONFIGURACION y ADR-021.

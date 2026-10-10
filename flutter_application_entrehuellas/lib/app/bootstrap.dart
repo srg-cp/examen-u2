@@ -1,3 +1,7 @@
+import '../features/lost_cases/domain/repositories/lost_case_repository.dart';
+import '../features/lost_cases/data/data_sources/supabase_lost_case_data_source.dart';
+import '../features/lost_cases/data/repositories/lost_case_repository_impl.dart';
+import '../features/lost_cases/data/repositories/unavailable_lost_case_repository.dart';
 import '../features/onboarding/domain/repositories/onboarding_repository.dart';
 import '../features/onboarding/data/data_sources/supabase_onboarding_data_source.dart';
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -63,6 +67,7 @@ class AppBootstrap {
     required this.petPhotoRepository,
     required this.interestZoneRepository,
     required this.alertPreferenceRepository,
+    required this.lostCaseRepository,
   });
 
   final StartupState state;
@@ -77,6 +82,7 @@ class AppBootstrap {
   final PetPhotoRepository petPhotoRepository;
   final InterestZoneRepository interestZoneRepository;
   final AlertPreferenceRepository alertPreferenceRepository;
+  final LostCaseRepository lostCaseRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -101,6 +107,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          lostCaseRepository: LostCaseRepositoryImpl(
+            SupabaseLostCaseDataSource(supabase.client),
+          ),
           alertPreferenceRepository: AlertPreferenceRepositoryImpl(
             SupabaseAlertPreferenceDataSource(supabase.client),
           ),
@@ -148,6 +157,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
 }
 
 AppBootstrap _unavailable(StartupStatus status) => AppBootstrap(
+  lostCaseRepository: const UnavailableLostCaseRepository(),
   alertPreferenceRepository: const UnavailableAlertPreferenceRepository(),
   interestZoneRepository: const UnavailableInterestZoneRepository(),
   petPhotoRepository: const UnavailablePetPhotoRepository(),

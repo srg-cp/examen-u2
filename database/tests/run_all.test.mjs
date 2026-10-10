@@ -365,3 +365,91 @@ test('Required pet metadata enforces size, age and 200 Unicode scalars, preserve
   await db.query('select public.finish_pet_deletion($1)', [legacyId]);
   assert.equal((await db.query('select id from public.pets where id=$1', [legacyId])).rows.length, 0);
 });
+
+
+test('Lost publication authorizes, deduplicates, protects history and exposes only approximate metadata and verified selected bytes', async (t) => {
+  const db=await database(t);
+  await db.exec(bundle);
+  const owner='11111111-1111-4111-8111-111111111105', other='22222222-2222-4222-8222-222222222205';
+  const pet='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa05', alien='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb05';
+  const photo='cccccccc-cccc-4ccc-8ccc-cccccccccc05', unselected='cccccccc-cccc-4ccc-8ccc-cccccccccc06';
+  const id='dddddddd-dddd-4ddd-8ddd-dddddddddd05';
+  const actor=async (who,role='authenticated')=>{
+    await db.exec('reset role');
+    await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify(who?{sub:who}:{})]);
+    await db.exec(`set role ${role}`);
+  };
+  await db.exec(`insert into auth.users(id) values('${owner}'),('${other}');
+    insert into public.pets(id,owner_id,name,species,size,age_months,traits) values
+    ('${pet}','${owner}','Luna','dog','small',12,'Blanca'),('${alien}','${other}','Sol','cat','medium',24,'Negra');`);
+  const path=`${owner}/${pet}/${photo}.jpg`;
+  for(const [ph,i] of [[photo,1],[unselected,2]]) {
+    await db.exec(`insert into public.pet_photos(id,pet_id,owner_id,status,is_primary,processed_at,content_hash)
+      values('${ph}','${pet}','${owner}','published',${i===1},now(),'${'a'.repeat(64)}');`);
+    for(const [bucket,j] of [['pet-photos',1],['pet-photo-renditions',2],['pet-photo-thumbnails',3]]) {
+      await db.query('insert into storage.objects(id,bucket_id,name,metadata) values($1,$2,$3,$4)',[
+        `eeeeeeee-eeee-4eee-8eee-eeeeeeeeee${i}${j}`,bucket,`${owner}/${pet}/${ph}.jpg`,{mimetype:'image/jpeg',size:1000}]);
+    }
+  }
+  const params=[id,pet,1,'2026-10-09T14:30:00Z',-12.04641,-77.04281,'Referencia privada',[photo]];
+  const publish=(p=params)=>db.query('select * from public.publish_lost_case($1,$2,$3,$4,$5,$6,$7,$8)',p);
+  await actor(other);
+  await assert.rejects(publish(),/case_unauthorized/);
+  await actor(null,'anon');
+  await assert.rejects(publish(),/permission denied/);
+  assert.equal((await db.query('select * from public.read_public_lost_case($1)',[id])).rows.length,0);
+  await actor(owner);
+  await assert.rejects(publish([...params.slice(0,4),'NaN',...params.slice(5)]),/case_invalid/);
+  await assert.rejects(publish([...params.slice(0,7),[]]),/case_invalid/);
+  await assert.rejects(publish([...params.slice(0,7),[photo,photo]]),/case_invalid/);
+  await assert.rejects(publish([...params.slice(0,3),'2099-01-01',...params.slice(4)]),/case_invalid/);
+  await db.exec('reset role');
+  await db.query('update public.pet_photos set processed_at=null where id=$1',[photo]);
+  await actor(owner);
+  await assert.rejects(publish(),/case_photos_unverified/);
+  await db.exec('reset role');
+  await db.query('update public.pet_photos set processed_at=now() where id=$1',[photo]);
+  await actor(owner);
+  const first=(await publish()).rows[0];
+  const repeat=(await publish()).rows[0];
+  assert.deepEqual(repeat,first);
+  await assert.rejects(publish([id,pet,1,params[3],-12,-77,params[6],[photo]]),/case_conflict/);
+  await assert.rejects(publish(['dddddddd-dddd-4ddd-8ddd-dddddddddd06',...params.slice(1)]),/case_already_active/);
+  await assert.rejects(db.query('select public.archive_pet($1,2)',[pet]),/pet_active_case/);
+  await assert.rejects(db.query('select public.begin_pet_deletion($1,2)',[pet]),/pet_has_case_history/);
+  await assert.rejects(db.query('update public.lost_cases set latitude=0'),/permission denied/);
+  assert.equal((await db.query('select active_case_count from public.pets where id=$1',[pet])).rows[0].active_case_count,1);
+  await actor(other);
+  assert.equal((await db.query('select * from public.lost_cases')).rows.length,0);
+  await db.exec('reset role');
+  await db.exec('create policy case_test_broad on public.lost_cases for all to authenticated using(true) with check(true); create policy case_storage_broad on storage.objects for all to anon,authenticated using(true) with check(true)');
+  // Even broad policies cannot expose the private rows, originals or unselected photos.
+  await actor(other);
+  assert.equal((await db.query('select * from public.lost_cases')).rows.length,0);
+  assert.equal((await db.query('select * from storage.objects')).rows.length,2);
+  await actor(null,'anon');
+  await db.exec('reset role');
+  await db.exec("grant insert,update,delete on storage.objects to anon; insert into storage.buckets(id,name,public) values('case-test-other','case-test-other',false)");
+  await actor(null,'anon');
+  assert.equal((await db.query("update storage.objects set bucket_id='case-test-other' returning id")).rows.length,0);
+  assert.equal((await db.query('delete from storage.objects returning id')).rows.length,0);
+  const pub=(await db.query('select * from public.read_public_lost_case($1)',[id])).rows[0];
+  assert.equal(pub.latitude,-12.045); assert.equal(pub.longitude,-77.045);
+  for(const key of ['owner_id','pet_id','place_reference','pet_version','created_at']) assert.equal(key in pub,false);
+  assert.equal(pub.photos.length,1); assert.equal(pub.photos[0].id,photo);
+  assert.equal((await db.query('select * from storage.objects')).rows.length,2);
+  await assert.rejects(db.query('select * from public.lost_cases'),/permission denied/);
+  await db.exec('reset role');
+  const before=(await db.query('select * from public.lost_cases')).rows;
+  const events=(await db.query('select * from public.case_events')).rows;
+  assert.equal(events.length,1);
+  const patch=await readFile(new URL('../patchs/013_patch_lost_cases.sql',import.meta.url),'utf8');
+  await db.exec(bundle); await db.exec(patch);
+  assert.deepEqual((await db.query('select * from public.lost_cases')).rows,before);
+  assert.deepEqual((await db.query('select * from public.case_events')).rows,events);
+  // Future S5 transition must revoke byte access; URLs already signed have bounded lifetime.
+  await db.query("update public.lost_cases set status='resolved' where id=$1",[id]);
+  await actor(null,'anon');
+  assert.equal((await db.query('select * from public.read_public_lost_case($1)',[id])).rows.length,0);
+  assert.equal((await db.query('select * from storage.objects')).rows.length,0);
+});

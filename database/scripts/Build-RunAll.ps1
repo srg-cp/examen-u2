@@ -54,6 +54,10 @@ $photoProcessingPlan = Get-Content -LiteralPath (Join-Path $databaseRoot 'migrat
 if (($photoProcessingPlan.sources -join '|') -ne 'tables/044_pet_photo_processing.sql|functions/045_pet_photo_processing_commands.sql|policies/046_pet_photo_processing_policies.sql|grants/047_pet_photo_processing_permissions.sql') { throw 'Revisar repetición del procesamiento de fotos.' }
 & (Join-Path $PSScriptRoot 'Build-PetPhotoProcessingPatch.ps1')
 
+$lostCasesPlan = Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/013_lost_cases.json') -Raw | ConvertFrom-Json
+if (($lostCasesPlan.sources -join '|') -ne 'tables/048_lost_cases.sql|functions/049_lost_case_commands.sql|policies/050_lost_case_policies.sql|grants/051_lost_case_permissions.sql') { throw 'Revisar repetición de casos perdidos.' }
+& (Join-Path $PSScriptRoot 'Build-LostCasesPatch.ps1')
+
 function Protect-Creation([string]$Condition, [string]$Sql) {
     return 'do $run_all_object$' + "`n" + 'begin' + "`n" +
         "    if $Condition then`n$Sql`n    end if;`n" +
@@ -159,7 +163,7 @@ foreach ($relativePath in $expectedSources) {
         default { $lines.Add($sql) } # Reviewed repeatable grants and ON CONFLICT DO NOTHING backfill.
     }
 }
-foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources))) {
+foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources) + @($lostCasesPlan.sources))) {
     $sql = [IO.File]::ReadAllText((Join-Path $databaseRoot $relativePath)).Replace("`r`n", "`n").TrimEnd()
     $hashAlgorithm = [Security.Cryptography.SHA256]::Create()
     try { $hash = [BitConverter]::ToString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($sql + "`n"))).Replace('-', '').ToLowerInvariant() }
@@ -171,4 +175,4 @@ $lines.Add("`ncommit;")
 $outputPath = Join-Path $databaseRoot 'run_all.sql'
 $content = ($lines -join "`n") + "`n"
 [IO.File]::WriteAllText($outputPath, $content, (New-Object Text.UTF8Encoding($false)))
-Write-Output 'Generado database/run_all.sql desde perfiles, onboarding, avatar, mascotas, zonas, preferencias y procesamiento de fotos (001-010,012-047; fuente011 sustituida).'
+Write-Output 'Generado database/run_all.sql desde perfiles, onboarding, avatar, mascotas, zonas, preferencias, procesamiento de fotos y casos perdidos (001-010,012-051; fuente011 sustituida).'

@@ -265,3 +265,13 @@ Hay snippet de servicio, router limitado a pet-photo-process y generador de
 paquete con WASM. El Compose completo preparado se obtiene con el parámetro
 ComposePath del generador. Ubicación real del volumen y ruta de Kong pendientes
 de leer del servidor antes de activar; no se ha desplegado remotamente.
+
+## Activación de HU-05: publicar mascotas perdidas
+
+1. Confirmar que patch012 y pet-photo-process funcionan en el mismo proyecto de desarrollo. Guardar al menos una foto nueva procesada; no marcar fotos históricas como verificadas.
+2. Ejecutar completo [database/patchs/013_patch_lost_cases.sql](../database/patchs/013_patch_lost_cases.sql), generado mediante Build-LostCasesPatch.ps1. Requiere012. El usuario confirmó su ejecución el 10 de octubre de 2026; el agente no verificó la base remota. No cambiar buckets a públicos ni conceder DML cliente sobre lost_cases/case_events.
+3. Actualizar la app y abrir Reportar → Mascota perdida. Elegir una mascota/fotos, fecha/hora, punto o coordenadas y referencia privada. Revisar la vista previa, publicar, abrir ficha pública y reabrir desde Mis casos tras reiniciar.
+4. Probar con cuentas A/B: B no publica ni lee fuente privada de A; read_public_lost_case(id) devuelve solo proyección permitida y derivados elegidos. Anónimo no lee tabla base, originales ni fotos sin seleccionar. Validar Storage real además de filas SQL.
+5. Interrumpir red al publicar: el formulario conserva UUID y solicitud; reintentar confirma una sola fila/evento. Con dos conexiones independientes y UUID distintos, publicar simultáneamente la misma mascota: solo un caso activo. Probar versión desactualizada, fecha futura, foto no procesada, archivo y eliminación con historial.
+
+No solicita GPS; selección manual disponible aunque permisos de ubicación estén denegados. URLs públicas de derivados se firman por300s y pueden sobrevivir ese plazo tras revocar nuevos accesos. La web QR, tokens revocables, exploración/cercanía PostGIS y cierre autorizado se activan en sus historias posteriores. Ver [ADR-021](decisiones/021-publicacion-casos-perdidos.md).

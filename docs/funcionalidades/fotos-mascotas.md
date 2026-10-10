@@ -68,3 +68,7 @@ reales de reapertura, cámara/permisos, principal/retiro, usuarios A/B, EXIF/GPS
 archivos descargados y recursos bajo imágenes de detalle. Las historias no se
 cierran automáticamente. Decisiones: [ADR-017](../decisiones/017-borrador-fotos-mascotas.md)
 y [ADR-020](../decisiones/020-procesamiento-y-principal-fotos.md).
+
+## Publicación seleccionada desde HU-05
+
+El nuevo reporte permite seleccionar de una a tres fotos para publicar. Solo derivados verificados de fotos elegidas en casos activos admiten lectura pública mediante RLS, manteniendo buckets/originales privados. Fotos antiguas sin procesamiento deben volver a guardarse antes de publicar. Retirar una foto revoca nuevas lecturas públicas de esa foto y puede reducir la galería del caso; URLs ya firmadas duran hasta cinco minutos. Patch013/validación remota pendientes; [Casos perdidos](casos-perdidos.md) y ADR-021 precisan el contrato.

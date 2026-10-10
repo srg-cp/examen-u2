@@ -16,6 +16,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Fotos de mascotas](fotos-mascotas.md) | pets y Edge pet-photo-process | HU-04; RF-03; issues #4, #30, #31 |
 | [Zonas de interés](zonas.md) | interest_zones | HU-02.1; RF-02,16; issue #26 |
 | [Preferencias de alertas](preferencias-alertas.md) | alert_preferences | HU-02.2; RF-02,16; issue #27 |
+| [Casos perdidos](casos-perdidos.md) | lost_cases | HU-05; RF-05; issue #5; implementación local |
 
 Las HU son identificadores del producto; los números # son issues de GitHub.
 El detalle de subtareas se conserva en [backlog](../backlog/README.md).
@@ -26,7 +27,7 @@ Las sesiones y permisos se comprueban también en servidor; la UI no sustituye
 RLS, grants ni restricciones. Al cambiar de cuenta se descartan resultados
 tardíos y datos privados de la identidad anterior.
 
-Casos perdidos/encontrados, exploración de casos, cartel/QR, avistamientos,
+Casos encontrados, exploración de casos, cartel/QR, avistamientos,
 bandeja y entrega real de alertas siguen en los sprints posteriores de
 [GUIA_MVP](../GUIA_MVP.md). Las preferencias guardadas no envían avisos.
 

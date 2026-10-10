@@ -1,3 +1,4 @@
+import 'features/lost_cases/providers/lost_case_providers.dart';
 import 'features/onboarding/providers/onboarding_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        lostCaseRepositoryProvider.overrideWithValue(
+          bootstrap.lostCaseRepository,
+        ),
         alertPreferenceRepositoryProvider.overrideWithValue(
           bootstrap.alertPreferenceRepository,
         ),

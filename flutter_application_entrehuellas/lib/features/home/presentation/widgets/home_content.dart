@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../state/home_view_state.dart';
@@ -294,14 +295,24 @@ void showReportOptions(BuildContext context) => showModalBottomSheet<void>(
         ),
         const SizedBox(height: 8),
         const Text(
-          'La publicación de reportes aún no está disponible.',
+          'Publica la búsqueda de una mascota perdida. Los reportes de mascotas encontradas estarán disponibles más adelante.',
           style: TextStyle(fontSize: 16, height: 1.4, color: Color(0xFF6E6E73)),
         ),
         const SizedBox(height: 20),
-        const HomeNotice(
-          icon: Icons.search_rounded,
-          title: 'Mascota perdida',
-          description: 'Publicar una búsqueda con foto, fecha y zona.',
+        FilledButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+            context.push('/home/lost-cases/new');
+          },
+          icon: const Icon(Icons.search_rounded),
+          label: const Text('Mascota perdida'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            context.push('/home/my-cases');
+          },
+          child: const Text('Mis casos'),
         ),
         const SizedBox(height: 12),
         const HomeNotice(

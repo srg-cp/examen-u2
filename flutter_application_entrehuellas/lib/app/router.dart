@@ -1,3 +1,6 @@
+import '../features/lost_cases/presentation/screens/case_editor_screen.dart';
+import '../features/lost_cases/presentation/screens/case_detail_screen.dart';
+import '../features/lost_cases/presentation/screens/my_cases_screen.dart';
 import '../core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,6 +70,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       };
       if (path == '/access' &&
           ['/register', '/recover-password'].contains(state.uri.path)) {
+        return null;
+      }
+      if (path == '/home' &&
+          (state.uri.path == '/home/lost-cases/new' ||
+              state.uri.path == '/home/my-cases' ||
+              state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
       if (path == '/home' && state.uri.path == '/home/profile') return null;
@@ -155,6 +164,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           petsContent: PetsSection(),
         ),
         routes: [
+          GoRoute(
+            path: 'lost-cases/new',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const CaseEditorScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'my-cases',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const MyCasesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'cases/:id',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: CaseDetailScreen(id: state.pathParameters['id']!),
+            ),
+          ),
           GoRoute(
             path: 'alert-preferences',
             pageBuilder: (context, state) => NoTransitionPage<void>(

@@ -257,3 +257,7 @@ Por referencia explícita del usuario, este selector usa una sola cápsula gris 
 ## Morph de Registrar mascota — 9 de octubre de 2026
 
 La expansión de registro conserva inicialmente la identidad del botón: carbón, radio24 en vacío o círculo56/radio28 con mascotas, icono y etiqueta reales. La superficie se transforma progresivamente en pantalla blanca; la copia del origen se desvanece antes de mostrar el formulario. El cierre invierte el morph y recupera el botón. Reutilizar OriginPageTransition/OriginPageSource, sin controles activos ni anuncios duplicados en la copia, con movimiento reducido inmediato. Véase ADR-006.
+
+## Activación local de Reportar mascota perdida — 10 de octubre de 2026
+
+HU-05 implementa la acción Mascota perdida desde Reportar y la consulta Mis casos; Mascota encontrada mantiene disponibilidad posterior de HU-06. El nuevo formulario conserva geometría/componentes aprobados, cabecera persistente fuera del reveal, retorno glass, cover seguido de stagger por etapa y scroll al inicio al cambiarla. Referencia/punto exactos privados; selección explícita de fotos y revisión pública antes de enviar. Validación/errores contextuales (ADR-005), sin extender las excepciones de toast de Registrar/Editar mascota a este flujo. Confirmación persistida como etapa; consultas con skeleton inicial y progreso fino en refresh, conforme ADR-011.
