@@ -7,4 +7,5 @@ abstract interface class RegistrationRepository {
     required String password,
   });
   Future<void> resendConfirmation(String email);
+  Future<void> verifyCode(String email, String code);
 }

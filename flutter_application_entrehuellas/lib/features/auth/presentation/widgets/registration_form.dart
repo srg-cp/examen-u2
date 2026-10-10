@@ -1,4 +1,6 @@
 import 'auth_primary_button_style.dart';
+import '../../../../core/presentation/widgets/loading_shimmer.dart';
+
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/shake_field.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
@@ -25,6 +27,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _password = TextEditingController();
   final _confirmation = TextEditingController();
   bool _hidePassword = true;
+
   bool _hideConfirmation = true;
 
   @override
@@ -36,12 +39,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   bool get _disabled => widget.state.isBusy || widget.state.authenticated;
-  void _submit() => widget.onSubmit(
-    _name.text,
-    _email.text,
-    _password.text,
-    _confirmation.text,
-  );
+  void _submit() {
+    widget.onSubmit(
+      _name.text,
+      _email.text,
+      _password.text,
+      _confirmation.text,
+    );
+  }
 
   Widget _input(
     RegistrationField field,
@@ -177,11 +182,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
         const SizedBox(height: 24),
         StaggerRevealItem(
           order: 8,
-          child: FilledButton(
-            onPressed: _disabled ? null : _submit,
-            style: authPrimaryButtonStyle(context),
-            child: Text(
-              widget.state.isBusy ? 'Creando cuenta…' : 'Crear cuenta',
+          child: LoadingShimmer(
+            isLoading: widget.state.isBusy,
+            loadingLabel: 'Creando cuenta',
+            child: FilledButton(
+              onPressed: _disabled ? null : _submit,
+              style: authPrimaryButtonStyle(
+                context,
+                isLoading: widget.state.isBusy,
+              ),
+              child: const Text('Crear cuenta'),
             ),
           ),
         ),

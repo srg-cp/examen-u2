@@ -1,3 +1,7 @@
+import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
+import '../test/support/fake_password_recovery.dart';
+import 'package:flutter_application_entrehuellas/features/auth/presentation/view_models/password_recovery_view_model.dart';
+
 import '../test/access_test.dart' show FakeAccess;
 import '../test/registration_test.dart' show FakeRegistration;
 import 'package:flutter_application_entrehuellas/app/router.dart';
@@ -70,6 +74,8 @@ void main() {
       }
     });
     final auth = FakeAuthRepository();
+    final recovery = FakePasswordRecovery()..onEnd = () => auth.emit(null);
+    addTearDown(recovery.events.close);
     final onboarding = FakeOnboarding(auth);
     addTearDown(auth.controller.close);
     final container = ProviderContainer(
@@ -77,6 +83,7 @@ void main() {
         startupStateProvider.overrideWithValue(
           const StartupState(StartupStatus.ready),
         ),
+        passwordRecoveryRepositoryProvider.overrideWithValue(recovery),
         authRepositoryProvider.overrideWithValue(auth),
         onboardingRepositoryProvider.overrideWithValue(onboarding),
         accessRepositoryProvider.overrideWithValue(
@@ -101,6 +108,10 @@ void main() {
         context,
       );
       await precacheImage(
+        const AssetImage('assets/illustrations/dog_with_envelope.png'),
+        context,
+      );
+      await precacheImage(
         const AssetImage('assets/branding/app_icon.png'),
         context,
       );
@@ -116,8 +127,6 @@ void main() {
         context,
       );
     });
-    await tester.pumpAndSettle();
-
     Future<void> capture(String name) async {
       await tester.runAsync(() async {
         final boundary =
@@ -139,6 +148,20 @@ void main() {
       });
     }
 
+    await tester.pump();
+    await capture('startup_icon');
+    await tester.pump(const Duration(milliseconds: 550));
+    await capture('startup_brand_reveal');
+    await tester.pump(const Duration(milliseconds: 440));
+    await capture('startup_brand');
+    await tester.pump(const Duration(milliseconds: 111));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pump(const Duration(milliseconds: 350));
+    await capture('access_startup_reveal');
+    await tester.pumpAndSettle();
     await capture('access');
     await container
         .read(loginViewModelProvider.notifier)
@@ -158,8 +181,31 @@ void main() {
     await container
         .read(registrationViewModelProvider.notifier)
         .submit('Ana', 'preview@example.com', 'fake-password', 'fake-password');
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('register_confirmation_cover');
+    await tester.pump(const Duration(milliseconds: 160));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 340));
+    await tester.pump(const Duration(milliseconds: 250));
+    await capture('register_confirmation_reveal');
     await tester.pumpAndSettle();
     await capture('register_confirmation');
+    tester.view.physicalSize = const Size(320, 350);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('email-code')));
+    await tester.pumpAndSettle();
+    await capture('register_confirmation_code_small');
+    await tester.ensureVisible(find.textContaining('Reenviar código'));
+    await tester.pumpAndSettle();
+    await capture('register_confirmation_small');
+    expect(tester.takeException(), isNull);
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pumpAndSettle();
     container.read(routerProvider).pop();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 130));
@@ -170,6 +216,101 @@ void main() {
         .fieldEdited(LoginField.email);
     await tester.pumpAndSettle();
     final pendingCheck = Completer<bool>();
+    await tester.ensureVisible(find.text('¿Olvidaste tu contraseña?'));
+    await tester.tap(find.text('¿Olvidaste tu contraseña?'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await capture('recover_reveal');
+    await tester.pumpAndSettle();
+    await capture('recover_password');
+    tester.view.physicalSize = const Size(320, 350);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Enviar código'));
+    await tester.pumpAndSettle();
+    await capture('recover_password_small');
+    expect(tester.takeException(), isNull);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('recovery-email')),
+      'preview@example.com',
+    );
+    recovery.pending = Completer<void>();
+    final send = container
+        .read(passwordRecoveryViewModelProvider.notifier)
+        .request('preview@example.com');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump(const Duration(milliseconds: 350));
+    await capture('recover_password_loading');
+    recovery.pending!.complete();
+    await send;
+    recovery.pending = null;
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('recover_confirmation_cover');
+    await tester.pump(const Duration(milliseconds: 160));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 340));
+    await tester.pump(const Duration(milliseconds: 250));
+    await capture('recover_confirmation_reveal');
+    await tester.pumpAndSettle();
+    await capture('recover_confirmation');
+    auth.emit(const AuthSession(userId: 'preview-user'));
+    await container
+        .read(passwordRecoveryViewModelProvider.notifier)
+        .verify('012345');
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('reset_password_cover');
+    await tester.pumpAndSettle();
+    await capture('reset_password');
+    tester.view.physicalSize = const Size(320, 350);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Guardar contraseña'));
+    await tester.pumpAndSettle();
+    await capture('reset_password_small');
+    expect(tester.takeException(), isNull);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('recovery-password')),
+      'new-password',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('recovery-confirmation')),
+      'new-password',
+    );
+    recovery.pending = Completer<void>();
+    final save = container
+        .read(passwordRecoveryViewModelProvider.notifier)
+        .reset('new-password', 'new-password');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump(const Duration(milliseconds: 350));
+    await capture('reset_password_loading');
+    recovery.pending!.complete();
+    await save;
+    recovery.pending = null;
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('reset_password_success_cover');
+    await tester.pump(const Duration(milliseconds: 160));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 590));
+    await tester.pump(const Duration(milliseconds: 350));
+    await capture('reset_password_success_reveal');
+    await tester.pumpAndSettle();
+    await capture('reset_password_success');
+    await tester.tap(find.text('Volver a iniciar sesión'));
+    await tester.pumpAndSettle();
     onboarding.pendingRead = pendingCheck;
     auth.emit(const AuthSession(userId: 'preview-user'));
     await tester.pumpAndSettle();
@@ -188,6 +329,15 @@ void main() {
     await tester.tap(find.text('Continuar'));
     await tester.pumpAndSettle();
     await capture('onboarding_3');
+    await tester.tap(find.text('Comenzar'));
+    await tester.pumpAndSettle();
+    await capture('home');
+    tester.view.physicalSize = const Size(320, 350);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Cerrar sesión'));
+    await tester.pumpAndSettle();
+    await capture('home_small');
     expect(tester.takeException(), isNull);
   });
 }

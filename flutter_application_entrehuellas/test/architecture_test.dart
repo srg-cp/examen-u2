@@ -3,6 +3,30 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('UI loading labels never end in suspension dots', () {
+    final literals = RegExp(r''''(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"''');
+    final dots = RegExp(r'(?:…|\.\.\.)\s*$');
+    final violations = <String>[];
+    for (final file in Directory(
+      'lib',
+    ).listSync(recursive: true).whereType<File>()) {
+      if (!file.path.endsWith('.dart') ||
+          !file.path.replaceAll('\\', '/').contains('/presentation/')) {
+        continue;
+      }
+      for (final match in literals.allMatches(file.readAsStringSync())) {
+        final literal = match.group(0)!;
+        if (dots.hasMatch(literal.substring(1, literal.length - 1))) {
+          violations.add(file.path);
+        }
+      }
+    }
+    expect(
+      violations,
+      isEmpty,
+      reason: 'Loading uses LoadingShimmer with stable labels: $violations',
+    );
+  });
   test('Project UI never uses SnackBar or its display APIs', () {
     final forbidden = RegExp(
       r'\b(?:SnackBar|SnackBarAction|SnackBarBehavior|showSnackBar|hideCurrentSnackBar|removeCurrentSnackBar|snackbar)\b',

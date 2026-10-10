@@ -14,6 +14,8 @@ final class SupabaseRegistrationDataSource implements RegistrationDataSource {
     } on AuthException catch (error, stack) {
       final kind = switch (error.code) {
         'email_address_invalid' => RegistrationSourceFailureKind.invalidEmail,
+        'otp_expired' ||
+        'otp_disabled' => RegistrationSourceFailureKind.invalidCode,
         'weak_password' => RegistrationSourceFailureKind.weakPassword,
         'user_already_exists' ||
         'email_exists' => RegistrationSourceFailureKind.alreadyRegistered,
@@ -61,5 +63,19 @@ final class SupabaseRegistrationDataSource implements RegistrationDataSource {
       email: email,
       emailRedirectTo: redirectUri,
     );
+  });
+
+  @override
+  Future<void> verifyCode(String email, String code) => _execute(() async {
+    final response = await _client.auth.verifyOTP(
+      email: email,
+      token: code,
+      type: OtpType.email,
+    );
+    if (response.session == null || response.user == null) {
+      throw const RegistrationSourceFailure(
+        RegistrationSourceFailureKind.invalidCode,
+      );
+    }
   });
 }

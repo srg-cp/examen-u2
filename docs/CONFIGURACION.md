@@ -122,14 +122,35 @@ Reiniciar la app para incorporar el asset. Sin sesión se abre login. Tras entra
 
 Si tras aplicar SQL PostgREST aún no reconoce la columna o RPC nueva, recargar su caché de esquema con `notify pgrst, 'reload schema';` desde SQL Editor y reintentar. No altera el esquema ni reemplaza la migración.
 
-## Probar el registro por correo
+## Probar registro y recuperación por código (actualizado el 8 de octubre)
 
-Desde el login, abrir Crear cuenta y completar nombre, correo, contraseña de al menos ocho caracteres y confirmación. El cliente llama Supabase Auth con metadata `full_name`; el trigger 002 ya versionado crea el perfil. El SQL existente debe estar aplicado: no hay una tabla nueva de contraseñas ni una migración adicional para este formulario.
+Registro y recuperación usan ahora códigos OTP de seis dígitos escritos dentro de la app. El usuario puede leer el correo en una PC y escribirlo en el teléfono. El código se valida directamente contra Auth con correo y token; no requiere el verificador PKCE de la instalación que lo solicitó. Google y los callbacks existentes conservan su configuración de Redirect URLs.
 
-En el Supabase administrado con Dokploy, comprobar que el registro por correo esté habilitado, el servicio SMTP funcione y la plantilla Signup utilice el enlace de confirmación de Auth (`ConfirmationURL`). Mantener `entrehuellas://login-callback/` en la allowlist de Redirect URLs. La app envía ese retorno en signup y reenvío; no cambiarlo en el JSON local. Configurar la longitud mínima de contraseña del servidor a ocho o más; la validación cliente no reemplaza esa configuración.
+Revisar que Confirm signup y Reset password incluyan `{{ .Token }}`. El usuario informa que el correo actual ya muestra un código alternativo de seis dígitos; ese código se puede usar en la nueva pantalla. Para presentar solo código y evitar instrucciones de enlace, se prepararon las fuentes [confirm_signup.html](../supabase/auth/templates/confirm_signup.html) y [recovery.html](../supabase/auth/templates/recovery.html), junto a su [procedimiento de aplicación](../supabase/auth/templates/README.md). No se desplegaron ni se modificó Auth remoto en esta tarea.
 
-Con confirmación de correo activa, el registro sin sesión muestra Revisa tu correo y permite reenviar el enlace tras 60 segundos. No muestra una cuadrícula OTP: la verificación actual es por enlace. Abrir el correo en el mismo dispositivo, confirmar y comprobar retorno a la app/onboarding. Si ya no se conserva el contexto del enlace, volver a iniciar sesión con correo/contraseña después de confirmar. Con confirmación desactivada y sesión devuelta por Auth, el flujo observado dirige al onboarding sin pantalla de correo.
+En el Auth autohospedado con Dokploy, comprobar la configuración efectiva `GOTRUE_MAILER_OTP_LENGTH=6`, caducidad, límites de envío/verificación, SMTP y política de contraseña de al menos ocho caracteres. La espera del cliente es 60 segundos; no sustituye límites del servidor. Las URLs de las plantillas deben estar disponibles desde el contenedor y sus variables transmitidas por Compose antes de redesplegar. No usar una ruta de Windows como URL de plantilla ni guardar secretos en estos HTML.
 
-El resultado sin sesión no se utiliza para afirmar que el correo es nuevo: Auth puede devolver un usuario ofuscado para una cuenta existente según su configuración. Se muestra la misma orientación de confirmación. No se infiere existencia a partir de metadata o identidades.
+### Texto de caducidad
 
-Comprobar con una cuenta de desarrollo: nombre en el perfil propio, primer onboarding, reingreso sin repetirlo, contraseña distinta en confirmación, límite de reenvíos, retorno con app abierta/cerrada y error de conexión. La implementación se probó con SDK real y HTTP sustituido; no acredita entrega SMTP ni retorno real del correo. [Registro en Supabase](https://supabase.com/docs/reference/dart/auth-signup), [reenvío](https://supabase.com/docs/reference/dart/auth-resend).
+Consulta de solo lectura del 8 de octubre: `/auth/v1/health` devuelve Auth `v2.189.0`; `/auth/v1/settings` no expone caducidad del correo. Esa versión [usa 86400 segundos (24 horas) como valor por defecto](https://github.com/supabase/auth/blob/v2.189.0/internal/conf/configuration.go#L1096); no demuestra el valor efectivo del despliegue. Revisar `GOTRUE_MAILER_OTP_EXP` en el servicio Auth de Dokploy y su entorno efectivo: el Compose puede sustituir el valor por defecto.
+
+Cuando se confirme el plazo real, añadir `EMAIL_OTP_VALIDITY_MINUTES` con un entero positivo a la configuración pública de compilación (`config/supabase.local.json` o `--dart-define`) para mostrar «Válido por N minutos.» en ambas confirmaciones. N debe ser `GOTRUE_MAILER_OTP_EXP / 60` si el plazo es un número entero de minutos. Sin valor confirmado, la app muestra solo «Ingresa el código que llegó a {correo}.» y evita afirmar una duración inventada. Este define no cambia la caducidad del servidor ni el contador independiente de 60 segundos para reenviar.
+
+### Registro
+
+1. Desde login, Crear cuenta con nombre, correo, contraseña y confirmación. Con confirmación activa, Revisa tu correo muestra mascota, seis casillas y espera para reenviar. Sin confirmación y con sesión devuelta, entrar al onboarding como antes.
+2. Leer el correo en la PC y escribir/pegar el código en el celular. Se verifica automáticamente al completar seis dígitos; si falla hay reintento explícito. `verifyOTP(type: email)` debe devolver sesión antes del onboarding. Probar un código que comience con cero y pegado completo.
+3. Probar código incorrecto, vencido/usado y reenvío tras 60 segundos. Un error mantiene el correo y permite corregir/reintentar. Reenvío limpia las casillas. Comprobar perfil/nombre y primer onboarding; el trigger de perfiles ya versionado se mantiene, sin tablas nuevas.
+
+### Recuperación
+
+1. Desde ¿Olvidaste tu contraseña?, introducir correo y Enviar código. La orientación es neutral para cuenta existente/desconocida; reenvío usa la misma solicitud de recuperación y espera 60 segundos.
+2. Leer el código en otro equipo y escribirlo en la app. `verifyOTP(type: recovery)` debe establecer sesión de recuperación y abrir Nueva contraseña antes de onboarding/Inicio. No se debe usar signInWithOtp ni un OTP de registro para recuperar contraseña.
+3. Probar contraseña corta, confirmación distinta, contraseña anterior y política del servidor; guardar y revisar éxito. Regresar al login cierra la sesión local de recuperación. Comprobar que la nueva contraseña permite entrar y la anterior falla.
+4. Probar código inválido/vencido/usado, desconexión al verificar/guardar y cancelación mediante X/retorno de sistema. Un código incorrecto se muestra en las casillas; no abandona el formulario ni habilita reset. Un fallo de cierre permite reintentar.
+
+Si se interrumpe/reinicia la app después de verificar el código y antes de cambiar contraseña, solicitar un código nuevo: el propósito adicional de recuperación no se persiste por instalación. Los OTP no se guardan ni se registran en logs locales.
+
+Las pruebas usan SDK real con HTTP y almacenamiento sustituidos, incluidos dos clientes independientes sin compartir almacenamiento PKCE. Cubren la verificación por código, propósito correcto, respuesta sin sesión, vencimiento y recorrido UI/router. No contactan el servidor, envían correo ni cambian contraseñas reales. Sigue pendiente demostrar lectura en PC → entrada en teléfono con el Auth de desarrollo.
+
+Referencias: [verifyOTP](https://supabase.com/docs/reference/dart/auth-verifyotp), [Token en plantillas](https://supabase.com/docs/guides/auth/auth-email-templates), [configuración autohospedada](https://github.com/supabase/supabase/blob/master/docker/CONFIG.md), [updateUser](https://supabase.com/docs/reference/dart/auth-updateuser).

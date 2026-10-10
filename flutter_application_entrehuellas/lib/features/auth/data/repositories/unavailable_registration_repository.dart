@@ -6,6 +6,9 @@ final class UnavailableRegistrationRepository
     implements RegistrationRepository {
   const UnavailableRegistrationRepository();
   @override
+  Future<void> verifyCode(String email, String code) async =>
+      throw const RegistrationFailure(RegistrationFailureKind.notConfigured);
+  @override
   Future<RegistrationOutcome> register({
     required String name,
     required String email,

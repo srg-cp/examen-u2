@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
+import '../../../../core/presentation/widgets/startup_reveal.dart';
+import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../auth/presentation/view_models/login_view_model.dart';
 import '../view_models/entry_view_model.dart';
 
@@ -9,8 +11,9 @@ class EntryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final flow = ref.watch(entryViewModelProvider);
+    final login = ref.watch(loginViewModelProvider);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: StartupReveal.background,
       body: SafeArea(
         child: Center(
           child: flow.hasError
@@ -25,14 +28,25 @@ class EntryScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       FilledButton(
-                        onPressed: () =>
-                            ref.read(entryViewModelProvider.notifier).retry(),
+                        onPressed: login.isBusy
+                            ? null
+                            : () => ref
+                                  .read(entryViewModelProvider.notifier)
+                                  .retry(),
                         child: const Text('Reintentar'),
                       ),
-                      TextButton(
-                        onPressed: () =>
-                            ref.read(loginViewModelProvider.notifier).signOut(),
-                        child: const Text('Cerrar sesión'),
+                      LoadingShimmer(
+                        isLoading: login.isBusy,
+                        loadingLabel: 'Cerrando sesión',
+                        highlight: const Color(0x3324282A),
+                        child: TextButton(
+                          onPressed: login.isBusy
+                              ? null
+                              : () => ref
+                                    .read(loginViewModelProvider.notifier)
+                                    .signOut(),
+                          child: const Text('Cerrar sesión'),
+                        ),
                       ),
                     ],
                   ),

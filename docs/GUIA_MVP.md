@@ -62,7 +62,7 @@ Decisión del 7 de octubre de 2026: mantener una base de arquitectura sólida in
 
 Revisión de presentation/data del mismo día: presentación organiza screens/view_models/state/widgets y observa un estado único; data separa data_sources/models/repositories, encapsula el SDK y transforma fallos en errores de dominio. Providers declaran contratos y bootstrap inyecta implementaciones. Añadir pruebas de recuperación tras error y liberación de suscripciones a los criterios técnicos de cada flujo observable. Detalles en [ARQUITECTURA.md](ARQUITECTURA.md).
 
-La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISENO_UI.md): tarjetas redondeadas, marca, ilustración y acciones principales. El acceso se ajustó después al mockup de login e incorporó correo/contraseña y Google, con SQL de perfiles preparado. Registro, recuperación, edición de perfil y validación remota siguen pendientes en HU-01; los demás recorridos se incorporan en sus sprints.
+La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISENO_UI.md): tarjetas redondeadas, marca, ilustración y acciones principales. El acceso se ajustó después al mockup de login e incorporó correo/contraseña y Google, con SQL de perfiles preparado. Registro y recuperación están implementados localmente; edición de perfil y validación remota siguen pendientes en HU-01; los demás recorridos se incorporan en sus sprints.
 
 1. Leer `AGENTS.md` y los documentos; comprobar Git y conservar los archivos existentes.
 2. Completar el entorno Android. En Android Studio, abrir SDK Manager y revisar SDK Tools: instalar **Android SDK Command-line Tools**, comprobar Platform-Tools, Build-Tools y una plataforma compatible. El usuario revisa los términos con `flutter doctor --android-licenses`. Volver a ejecutar `flutter doctor` y detectar un teléfono o emulador. [Configuración Android oficial](https://docs.flutter.dev/platform-integration/android/setup).
@@ -107,12 +107,15 @@ Se conserva la numeración original para relacionar implementación, informe aca
 
 ### S1 - Acceso y cuenta
 
+- Dirección visual obligatoria: [REGLAS_UI_UX.md](REGLAS_UI_UX.md), basada en acceso/cuenta/OTP/contraseña aprobados. Retirado Inicio anterior; destino provisional conserva bienvenida y cierre real, sin ampliar funcionalidades.
+
 - **HU-01 / RF-01,34:** acceso por correo/Google, sesión, perfil y gestión de cuenta. Inicio válido crea o recupera un único perfil; otro usuario no puede editarlo. Solicitud de baja trazable y exportación básica de los datos del usuario según el alcance acordado.
 - Crear o identificar el proyecto Supabase de desarrollo, configurar Auth y versionar esquema, permisos y migraciones. Las fuentes SQL se organizan en `database` según [su convención](../database/README.md); preparar la generación ordenada de migraciones antes del primer despliegue.
 - Comprobar sesión inválida, cierre de sesión y acceso cruzado con dos cuentas. Resolver los enlaces de retorno/confirmación de correo necesarios para Android.
 - **Demo:** entrar, ver perfil, cerrar sesión y verificar permisos.
 - Onboarding actualizado el 8 de octubre: sin Omitir, tres indicadores de progreso y botón de ancho completo con flecha. La cuenta pendiente entra a la app tras Comenzar en la tercera etapa; un fallo de guardado permite reintentar. Se conservan finalizaciones anteriores.
-- Incremento de registro: Crear cuenta desde login, validar cuatro campos, registrar con Supabase Auth, confirmar por enlace o recibir sesión si Auth autoconfirma, reenviar con espera de 60 segundos y entrar al onboarding solo con sesión. Sin casilla de Términos/Privacidad hasta contar con documentos, por decisión del usuario. Implementación local preparada; validar entrega SMTP y callback real en Android antes de dar por cerrado HU-01.
+- Incremento de registro: Crear cuenta desde login, validar cuatro campos, registrar con Supabase Auth, confirmar por código de seis dígitos o recibir sesión si Auth autoconfirma, reenviar con espera de 60 segundos y entrar al onboarding solo con sesión. Sin casilla de Términos/Privacidad hasta contar con documentos, por decisión del usuario. Implementación local preparada; validar entrega SMTP y callback real en Android antes de dar por cerrado HU-01.
+- Incremento de recuperación, 8 de octubre: desde ¿Olvidaste tu contraseña?, solicitar código por correo, mostrar seis casillas sin revelar existencia de cuenta y reenviar tras 60 segundos. La verificación OTP de recuperación abre Nueva contraseña antes de onboarding/Inicio; valida contraseña/confirmación y política del servidor. Guardar muestra éxito; al regresar o cancelar se cierra la sesión de recuperación. Implementación y pruebas locales; quedan SMTP, verificación real de códigos leídos en PC e introducidos en Android, códigos vencidos y reingreso con contraseña nueva. Sin nuevas tablas.
 
 Prompt:
 
@@ -194,9 +197,15 @@ La seguridad, pruebas y documentación acompañan cada sprint; S6 reúne la vali
 
 ## 6. GitHub con un flujo sencillo
 
+Cada issue #1–#51 tiene su archivo en [backlog](backlog/README.md), con snapshot de criterios, estado y motivo. La clasificación está sincronizada entre etiquetas status y el campo Status nativo del [tablero EntreHuellas](https://github.com/users/srg-cp/projects/3/views/1). Distinguir Backlog de Ready, implementación de revisión y evidencia local de Done; actualizar tarjeta, etiqueta y documentación juntas. La sincronización inicial está comprobada y no es automática.
+
 Usar `main` como base integrada y una rama por historia o conjunto coherente de cambios. Inicialmente no hace falta mantener una rama `develop` adicional. El repositorio local ya tiene commits; comprobar las referencias y la autenticación del remoto antes de publicar cambios. Los incrementos siguen ramas y pull requests según la autorización de cada tarea.
 
 Crear un issue por HU y milestones S1-S6. La plantilla de historia está en `.github/ISSUE_TEMPLATE/historia.md`. No hace falta un tablero adicional para empezar; se puede añadir si mejora la coordinación.
+
+Actualización del 8 de octubre de 2026: conservar las 16 HU originales y sus issues #1–#16. Doce pasan a historias agrupadoras; 35 derivadas HU-XX.n (#17–#51) y cuatro originales sin dividir forman 39 entregas ejecutables. Todas mantienen formato de historia de usuario y están asignadas a `srg-cp`. El [desglose versionado](BACKLOG_MVP.md) conserva RF, criterios, dependencias y validación. No sumar esfuerzo de agrupadoras y derivadas, ni reutilizar estimaciones originales como estimaciones nuevas. Cerrar una agrupadora solo después de sus derivadas y su validación integrada; los sprints siguen siendo objetivos. La reorganización no añade alcance funcional ni acredita criterios pendientes.
+
+Precisión académica del mismo día: las 12 agrupadoras se identifican como **épicas** en GitHub; las otras 39 son **historias de usuario ejecutables** con escenarios específicos de validación. HU-XX.n es una convención documentada para conservar trazabilidad, no una exigencia universal. #44 (interacciones afectadas por bloqueo) y #51 (funciones controlables/interfaz administrativa) requieren refinamiento antes de comprometer implementación. #25 concreta la exportación básica como JSON UTF-8 de perfil y solicitudes/estados de baja propios. La prioridad se conserva como referencia de la HU original y las estimaciones deben acordarse por entrega; no se afirma adecuación a una rúbrica docente no recibida.
 
 Ejemplos de ramas: `chore/project-setup`, `feat/hu-01-auth`, `feat/hu-05-lost-cases`, `fix/qr-revoked-token`. El número HU no es el número del issue.
 

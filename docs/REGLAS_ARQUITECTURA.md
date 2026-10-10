@@ -83,6 +83,8 @@ No introducir ciclos entre módulos. Una funcionalidad no importa la presentaci�
 
 ## 4. Reglas de presentation
 
+La UI y UX cumplen [REGLAS_UI_UX.md](REGLAS_UI_UX.md). La referencia visual es el flujo de acceso aprobado; los componentes comunes se extraen a core respetando estas fronteras.
+
 1. La pantalla obtiene los datos y acciones de su ViewModel. Un estado de pantalla reúne lo necesario para renderizarla; no combina directamente providers de infraestructura o sesión.
 2. Los widgets contienen layout, estilos, animaciones, visibilidad y navegación simple. Validación de negocio, persistencia y procesamiento de respuestas se ejecutan fuera de ellos.
 3. El ViewModel invoca casos de uso y transforma resultados en estado de UI. Las reglas de autorización o transición del producto no se deciden en presentación.
@@ -145,6 +147,8 @@ Estas reglas describen requisitos de cada incremento; no afirman que todas las f
 **No utilizar SnackBar en ninguna funcionalidad de la app**, ni directamente ni mediante wrappers/paquetes. No eludir la regla con una notificación inferior equivalente. Usar feedback junto al campo o acción, accesible y breve. En el login, el error modifica el borde y el icono; conserva el fondo. La decisión y las comprobaciones se registran en [ADR-005](decisiones/005-feedback-sin-snackbar.md).
 
 ## 9. Verificación obligatoria de cambios
+
+La UX reutiliza cover reveal seguido de stagger reveal en entradas de pantalla y cambios discretos de etapa, con cabeceras estables; no repite efectos por edición/contadores/reenvío ni por cada frame de gestos. La carga de botones conserva su etiqueta y usa LoadingShimmer: no etiquetas de progreso con puntos suspensivos ASCII/Unicode ni spinners de botón. Solo durante trabajo real, con bloqueo de duplicados, semántica accesible y movimiento reducido. La regla, alcance y comprobación se registran en [ADR-006](decisiones/006-transiciones-y-carga-con-shimmer.md). Todo pertenece a presentación; los ViewModels/casos de uso siguen gobernando operaciones y resultados.
 
 Antes de considerar completo un cambio de código, comprobar los puntos que le correspondan:
 

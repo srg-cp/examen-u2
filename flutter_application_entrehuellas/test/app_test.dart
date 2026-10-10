@@ -1,3 +1,5 @@
+import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
+import 'support/fake_password_recovery.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,6 +65,9 @@ void main() {
           startupStateProvider.overrideWithValue(
             const StartupState(StartupStatus.ready),
           ),
+          passwordRecoveryRepositoryProvider.overrideWithValue(
+            FakePasswordRecovery(),
+          ),
           authRepositoryProvider.overrideWithValue(localAuth),
           accessRepositoryProvider.overrideWithValue(FakeAccess()),
         ],
@@ -105,6 +110,9 @@ void main() {
       overrides: [
         startupStateProvider.overrideWithValue(
           const StartupState(StartupStatus.ready),
+        ),
+        passwordRecoveryRepositoryProvider.overrideWithValue(
+          FakePasswordRecovery(),
         ),
         authRepositoryProvider.overrideWithValue(auth),
         onboardingRepositoryProvider.overrideWithValue(onboarding),
@@ -156,14 +164,14 @@ void main() {
       expect(find.text('Una nueva'), findsOneWidget);
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Tu comunidad'), findsOneWidget);
+      expect(find.text('Inicio'), findsOneWidget);
       expect(onboarding.completed, {'one'});
       auth.emit(null);
       await tester.pumpAndSettle();
       expect(find.text('Iniciar sesión'), findsOneWidget);
       auth.emit(const AuthSession(userId: 'one'));
       await tester.pumpAndSettle();
-      expect(find.text('Tu comunidad'), findsOneWidget);
+      expect(find.text('Inicio'), findsOneWidget);
       auth.emit(const AuthSession(userId: 'two'));
       await tester.pumpAndSettle();
       expect(find.text('Cada huella'), findsOneWidget);
@@ -190,7 +198,7 @@ void main() {
       onboarding.failSave = false;
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Tu comunidad'), findsOneWidget);
+      expect(find.text('Inicio'), findsOneWidget);
       expect(onboarding.saves, 2);
     },
   );
@@ -255,7 +263,7 @@ void main() {
     expect(find.bySemanticsLabel('Preparando tu cuenta'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('Cada huella'), findsNothing);
-    expect(find.text('Tu comunidad'), findsNothing);
+    expect(find.text('Inicio'), findsNothing);
     pending.complete(false);
     await tester.pumpAndSettle();
     expect(find.text('Cada huella'), findsOneWidget);
@@ -268,7 +276,7 @@ void main() {
       onboarding.failRead = true;
       await mount(tester);
       expect(find.text('Reintentar'), findsOneWidget);
-      expect(find.text('Tu comunidad'), findsNothing);
+      expect(find.text('Inicio'), findsNothing);
       expect(find.textContaining('private'), findsNothing);
       onboarding.failRead = false;
       await tester.tap(find.text('Reintentar'));
@@ -282,7 +290,7 @@ void main() {
     auth.current = const AuthSession(userId: 'returning');
     onboarding.completed.add('returning');
     await mount(tester);
-    expect(find.text('Tu comunidad'), findsOneWidget);
+    expect(find.text('Inicio'), findsOneWidget);
     expect(find.text('Iniciar sesión'), findsNothing);
   });
 
@@ -302,7 +310,7 @@ void main() {
       previousRead.complete(true);
       await tester.pumpAndSettle();
       expect(find.text('Cada huella'), findsOneWidget);
-      expect(find.text('Tu comunidad'), findsNothing);
+      expect(find.text('Inicio'), findsNothing);
       container.read(routerProvider).go('/home');
       await tester.pumpAndSettle();
       expect(find.text('Cada huella'), findsOneWidget);
@@ -332,7 +340,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Tu comunidad'), findsOneWidget);
+      expect(find.text('Inicio'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

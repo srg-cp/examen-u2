@@ -1,4 +1,6 @@
 import 'auth_primary_button_style.dart';
+import '../../../../core/presentation/widgets/loading_shimmer.dart';
+import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import 'auth_input_decoration.dart';
 import '../../../../core/presentation/widgets/shake_field.dart';
 import '../state/login_view_state.dart';
@@ -11,11 +13,13 @@ class LoginCredentialsForm extends StatefulWidget {
     required this.onRecover,
     this.feedback = const LoginViewState(),
     this.onFieldEdited,
+    this.reveal = false,
     super.key,
   });
   final bool isBusy;
+  final bool reveal;
   final void Function(String email, String password) onSubmit;
-  final VoidCallback onRecover;
+  final void Function(Rect?) onRecover;
   final LoginViewState feedback;
   final void Function(LoginField)? onFieldEdited;
   @override
@@ -26,6 +30,8 @@ class _LoginCredentialsFormState extends State<LoginCredentialsForm> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _obscure = true;
+  Widget _reveal(int order, Widget child) =>
+      widget.reveal ? StaggerRevealItem(order: order, child: child) : child;
   @override
   void dispose() {
     _email.dispose();
@@ -37,13 +43,16 @@ class _LoginCredentialsFormState extends State<LoginCredentialsForm> {
     final invalid = field == LoginField.email
         ? widget.feedback.emailInvalid
         : widget.feedback.passwordInvalid;
-    return Semantics(
-      liveRegion: invalid,
-      hint: invalid ? 'Revisa este campo' : null,
-      child: ShakeField(
-        errorId: widget.feedback.errorId,
-        hasError: invalid,
-        child: child,
+    return _reveal(
+      3 + field.index,
+      Semantics(
+        liveRegion: invalid,
+        hint: invalid ? 'Revisa este campo' : null,
+        child: ShakeField(
+          errorId: widget.feedback.errorId,
+          hasError: invalid,
+          child: child,
+        ),
       ),
     );
   }
@@ -120,34 +129,55 @@ class _LoginCredentialsFormState extends State<LoginCredentialsForm> {
             ),
           ),
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: widget.isBusy ? null : widget.onRecover,
-            child: const Text(
-              '¿Olvidaste tu contraseña?',
-              style: TextStyle(fontSize: 16, color: Color(0xFF343942)),
+        _reveal(
+          5,
+          Align(
+            alignment: Alignment.centerRight,
+            child: Builder(
+              builder: (buttonContext) => TextButton(
+                onPressed: widget.isBusy
+                    ? null
+                    : () {
+                        final box = buttonContext.findRenderObject();
+                        final navigator = Navigator.of(
+                          buttonContext,
+                        ).context.findRenderObject();
+                        final origin = box is RenderBox && box.hasSize
+                            ? box.localToGlobal(
+                                    Offset.zero,
+                                    ancestor: navigator,
+                                  ) &
+                                  box.size
+                            : null;
+                        widget.onRecover(origin);
+                      },
+                child: const Text(
+                  '¿Olvidaste tu contraseña?',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF343942)),
+                ),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 4),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: widget.isBusy
-                ? null
-                : () => widget.onSubmit(_email.text, _password.text),
-            style: authPrimaryButtonStyle(context),
-            child: widget.isBusy
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text('Ingresar'),
+        _reveal(
+          6,
+          SizedBox(
+            width: double.infinity,
+            child: LoadingShimmer(
+              isLoading: widget.isBusy,
+              loadingLabel: 'Iniciando sesión',
+              child: FilledButton(
+                onPressed: widget.isBusy
+                    ? null
+                    : () => widget.onSubmit(_email.text, _password.text),
+                style: authPrimaryButtonStyle(
+                  context,
+                  isLoading: widget.isBusy,
+                ),
+                child: const Text('Ingresar'),
+              ),
+            ),
           ),
         ),
       ],

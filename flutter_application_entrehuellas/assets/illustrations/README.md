@@ -11,3 +11,9 @@ Use case: background-extraction. Edit target: the provided Entre Huellas mascot 
 ```
 
 El recurso está incluido explícitamente en pubspec.yaml. Una variante futura se guarda como archivo nuevo y se revisa en la UI antes de sustituir el recurso consumido.
+
+## Confirmación de correo
+
+`dog_with_envelope.png`: PNG RGBA de 1254 × 1254 generado con **image_gen integrado**, con transparencia real, sin redimensionar ni recomprimir. Referencias: la mascota de Revisa tu correo (segunda pantalla de la fila inferior de `mockups/Entre huellas_ bienvenida y cuenta-1.png`) y `assets/onboarding/dog_waving.png` para conservar identidad y estilo. Reconstrucción generada, no recorte determinista del mockup. El prompt exacto se conserva en [email_generation_prompt.txt](email_generation_prompt.txt).
+
+`RegistrationConfirmation` sustituye el icono por esta ilustración decorativa en un área de 240 × 240 con `BoxFit.contain`, excluida de semántica. Los textos y acciones siguen siendo widgets reales; la confirmación usa ahora un código OTP de seis dígitos (actualización del 8 de octubre). Render revisado en `build/ui-preview/register_confirmation.png` y viewport 320 × 350 con escala de texto 2 en `register_confirmation_small.png`.

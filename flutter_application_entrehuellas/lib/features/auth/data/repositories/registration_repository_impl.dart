@@ -22,6 +22,8 @@ final class RegistrationRepositoryImpl implements RegistrationRepository {
           RegistrationFailureKind.rateLimited,
         RegistrationSourceFailureKind.unavailable =>
           RegistrationFailureKind.unavailable,
+        RegistrationSourceFailureKind.invalidCode =>
+          RegistrationFailureKind.invalidCode,
       });
     } catch (_) {
       throw const RegistrationFailure(RegistrationFailureKind.unavailable);
@@ -47,4 +49,7 @@ final class RegistrationRepositoryImpl implements RegistrationRepository {
   @override
   Future<void> resendConfirmation(String email) =>
       _execute(() => _source.resendConfirmation(email));
+  @override
+  Future<void> verifyCode(String email, String code) =>
+      _execute(() => _source.verifyCode(email, code));
 }

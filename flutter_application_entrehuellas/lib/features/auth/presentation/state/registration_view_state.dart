@@ -1,8 +1,9 @@
-enum RegistrationField { name, email, password, confirmation }
+enum RegistrationField { name, email, password, confirmation, code }
 
 class RegistrationViewState {
   const RegistrationViewState({
     this.isBusy = false,
+    this.isVerifying = false,
     this.confirmationEmail,
     this.authenticated = false,
     this.errorField,
@@ -12,6 +13,7 @@ class RegistrationViewState {
     this.resendSeconds = 0,
   });
   final bool isBusy;
+  final bool isVerifying;
   final String? confirmationEmail;
   final bool authenticated;
   final RegistrationField? errorField;
@@ -22,11 +24,13 @@ class RegistrationViewState {
 
   RegistrationViewState copyWith({
     bool? isBusy,
+    bool? isVerifying,
     int? resendSeconds,
     bool clearError = false,
     String? message,
   }) => RegistrationViewState(
     isBusy: isBusy ?? this.isBusy,
+    isVerifying: isVerifying ?? this.isVerifying,
     confirmationEmail: confirmationEmail,
     authenticated: authenticated,
     errorField: clearError ? null : errorField,
