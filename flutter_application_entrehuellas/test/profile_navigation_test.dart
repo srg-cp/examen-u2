@@ -15,6 +15,11 @@ import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
 import 'access_test.dart' show FakeAccess;
 import 'support/fake_password_recovery.dart';
 import 'support/fake_profile.dart';
+import 'package:flutter_application_entrehuellas/features/interest_zones/providers/interest_zone_providers.dart';
+import 'interest_zones_test.dart' show FakeZones;
+import 'package:flutter_application_entrehuellas/features/alert_preferences/providers/alert_preference_providers.dart';
+import 'package:flutter_application_entrehuellas/features/alert_preferences/presentation/view_models/alert_preferences_view_model.dart';
+import 'support/fake_alert_preferences.dart';
 
 void main() {
   for (final small in [false, true]) {
@@ -43,6 +48,10 @@ void main() {
             onboardingRepositoryProvider.overrideWithValue(onboarding),
             passwordRecoveryRepositoryProvider.overrideWithValue(recovery),
             profileRepositoryProvider.overrideWithValue(FakeProfile()),
+            interestZoneRepositoryProvider.overrideWithValue(FakeZones()),
+            alertPreferenceRepositoryProvider.overrideWithValue(
+              FakeAlertPreferences(),
+            ),
           ],
         );
         addTearDown(() async {
@@ -72,6 +81,41 @@ void main() {
         expect(transition.origin, avatarBounds);
         await tester.pumpAndSettle();
         expect(find.text('Perfil'), findsOneWidget);
+        await tester.ensureVisible(find.text('Zonas de interés'));
+        await tester.tap(find.text('Zonas de interés'));
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Todavía no tienes zonas de interés.'),
+          findsOneWidget,
+        );
+        await tester.tap(find.byTooltip('Volver al perfil'));
+        await tester.pumpAndSettle();
+        expect(find.text('Perfil'), findsOneWidget);
+        await tester.ensureVisible(find.text('Cerrar sesión'));
+        await tester.ensureVisible(find.text('Preferencias de alertas'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Preferencias de alertas'));
+        await tester.pumpAndSettle();
+        expect(find.text('Tipos de aviso'), findsOneWidget);
+        container
+            .read(alertPreferencesViewModelProvider.notifier)
+            .edit(enabled: true);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Volver al perfil'));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Cancelar'));
+        await tester.tap(find.text('Cancelar'));
+        await tester.pumpAndSettle();
+        expect(find.text('Tipos de aviso'), findsOneWidget);
+        await tester.tap(find.byTooltip('Volver al perfil'));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.widgetWithText(FilledButton, 'Descartar'),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Descartar'));
+        await tester.pumpAndSettle();
+        expect(find.text('Perfil'), findsOneWidget);
         await tester.ensureVisible(find.text('Cerrar sesión'));
         await tester.pumpAndSettle();
         await tester.ensureVisible(find.byTooltip('Cerrar perfil'));
@@ -97,6 +141,14 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Iniciar sesión'), findsOneWidget);
         expect(find.text('Perfil'), findsNothing);
+        container.read(routerProvider).go('/home/interest-zones');
+        await tester.pumpAndSettle();
+        expect(find.text('Iniciar sesión'), findsOneWidget);
+        expect(find.text('Zonas de interés'), findsNothing);
+        container.read(routerProvider).go('/home/alert-preferences');
+        await tester.pumpAndSettle();
+        expect(find.text('Iniciar sesión'), findsOneWidget);
+        expect(find.text('Tipos de aviso'), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );

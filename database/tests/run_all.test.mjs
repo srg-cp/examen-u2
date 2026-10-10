@@ -4,6 +4,139 @@ import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+test('Processed photos require server attestation, private byte paths, versioned covers and complete removal', async (t) => {
+  const db = await database(t);
+  const patch = await readFile(new URL('../patchs/012_patch_pet_photo_processing.sql', import.meta.url), 'utf8');
+  await db.exec(bundle.split('-- Source: database/tables/044_pet_photo_processing.sql')[0]+'\ncommit;');
+  const owner='11111111-1111-4111-8111-111111111130',other='22222222-2222-4222-8222-222222222230';
+  const pet='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa30',alien='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb30';
+  const photo='cccccccc-cccc-4ccc-8ccc-cccccccccc30',second='cccccccc-cccc-4ccc-8ccc-cccccccccc31';
+  const hash='a'.repeat(64);
+  await db.exec(`insert into auth.users(id) values('${owner}'),('${other}');
+    insert into public.pets(id,owner_id,name,species,size,age_months,traits) values
+    ('${pet}','${owner}','Luna','dog','small',12,'Blanca'),('${alien}','${other}','Sol','cat','small',12,'Negra');`);
+  await db.exec(patch);
+  await db.exec(patch);
+  const actor=async(id)=>{
+    await db.exec('reset role');
+    await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub:id})]);
+    await db.exec('set role authenticated');
+  };
+  await actor(owner);
+  await assert.rejects(db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[owner,pet,photo,hash]),/permission denied/);
+  await assert.rejects(db.query('select public.publish_pet_photo($1)',[photo]),/permission denied/);
+  await assert.rejects(db.query('select public.reserve_pet_photo($1,$2)',[photo,pet]),/permission denied/);
+  await assert.rejects(db.query('select public.list_pet_photos($1)',[alien]),/photo_unauthorized/);
+  await db.exec('reset role; set role service_role');
+  await db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[owner,pet,photo,hash]);
+  await assert.rejects(db.query('select public.complete_pet_photo_processing($1,$2,$3)',[owner,photo,hash]),/photo_incomplete/);
+  await assert.rejects(db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[owner,pet,photo,'b'.repeat(64)]),/photo_conflict/);
+  await assert.rejects(db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[other,alien,photo,hash]),/photo_unauthorized/);
+  await db.exec('reset role');
+  // Simulate Storage metadata only; actual content sanitation is tested in Deno.
+  for (const [id,offset] of [[photo,0],[second,1]]) {
+    await db.exec('set role service_role');
+    await db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[owner,pet,id,hash]);
+    await db.exec('reset role');
+    for (const [bucket,index] of [['pet-photo-renditions',1],['pet-photo-thumbnails',2]]) {
+      await db.query('insert into storage.objects(id,bucket_id,name,metadata) values($1,$2,$3,$4)',[
+        `dddddddd-dddd-4ddd-8ddd-dddddddddd${offset}${index}`,bucket,`${owner}/${pet}/${id}.jpg`,{mimetype:'image/jpeg',size:1000}]);
+    }
+    await db.exec('set role service_role');
+    await db.query('select public.complete_pet_photo_processing($1,$2,$3)',[owner,id,hash]);
+    await db.query('select public.complete_pet_photo_processing($1,$2,$3)',[owner,id,hash]);
+    await db.exec('reset role');
+  }
+  await actor(owner);
+  const list=()=>db.query('select * from public.list_pet_photos($1)',[pet]);
+  let rows=(await list()).rows;
+  assert.equal(rows.filter(row=>row.is_primary).length,1);
+  assert.equal(rows[0].id,photo);
+  const revision=rows[0].selection_version;
+  assert.equal(revision,1);
+  await db.query('select public.set_primary_pet_photo($1,$2,$3)',[pet,second,revision]);
+  await db.query('select public.set_primary_pet_photo($1,$2,$3)',[pet,second,revision]);
+  await assert.rejects(db.query('select public.set_primary_pet_photo($1,$2,$3)',[pet,photo,revision]),/photo_conflict/);
+  await assert.rejects(db.query('select content_hash from public.pet_photos'),/permission denied/);
+  assert.equal((await db.query("select * from storage.objects where bucket_id like 'pet-photo-%'")).rows.length,4);
+  assert.equal((await db.query('delete from storage.objects where name=$1 returning id',[`${owner}/${pet}/${photo}.jpg`])).rows.length,0);
+  // Broad permissive policies must never bypass bucket-specific restrictive guards.
+  await db.exec('reset role');
+  await db.exec('create policy test_broad_storage on storage.objects for all to authenticated using(true) with check(true)');
+  await actor(owner);
+  await assert.rejects(db.query("insert into storage.objects(id,bucket_id,name,metadata) values('eeeeeeee-eeee-4eee-8eee-eeeeeeeeee30','pet-photo-renditions',$1,'{}')",[`${owner}/${pet}/${photo}.jpg`]),/row-level security/);
+  assert.equal((await db.query("update storage.objects set metadata='{}' where bucket_id='pet-photo-renditions' returning id")).rows.length,0);
+  assert.equal((await db.query("select metadata from storage.objects where bucket_id='pet-photo-renditions'")).rows[0].metadata.size,1000);
+  await actor(other);
+  assert.equal((await db.query("select * from storage.objects where bucket_id like 'pet-photo-%'")).rows.length,0);
+  await assert.rejects(db.query('select public.set_primary_pet_photo($1,$2,$3)',[pet,photo,2]),/photo_unauthorized/);
+  await assert.rejects(db.query('select public.begin_pet_photo_removal($1,$2)',[photo,pet]),/photo_unauthorized/);
+  await actor(owner);
+  await db.query('select public.begin_pet_photo_removal($1,$2)',[second,pet]);
+  await assert.rejects(db.query('select public.remove_pet_photo($1)',[second]),/photo_file_remaining/);
+  assert.equal((await list()).rows.find(row=>row.is_primary).id,photo);
+  await db.exec('reset role; set role service_role');
+  await assert.rejects(db.query('select public.complete_pet_photo_processing($1,$2,$3)',[owner,second,hash]),/photo_conflict/);
+  await actor(owner);
+  await db.query('delete from storage.objects where name=$1',[`${owner}/${pet}/${second}.jpg`]);
+  await db.query('select public.remove_pet_photo($1)',[second]);
+  await db.query('select public.remove_pet_photo($1)',[second]);
+  await db.exec('reset role; set role service_role');
+  await assert.rejects(db.query('select public.prepare_pet_photo($1,$2,$3,$4)',[owner,pet,second,hash]),/photo_deleted/);
+  await db.exec('reset role');
+  const before=(await db.query('select * from public.pet_photos order by id')).rows;
+  await db.exec(bundle);
+  await db.exec(patch);
+  assert.deepEqual((await db.query('select * from public.pet_photos order by id')).rows,before);
+  await db.exec('set role anon');
+  assert.equal((await db.query("select * from storage.objects where bucket_id like 'pet-photo-%'")).rows.length,0);
+  await assert.rejects(db.query('select * from public.list_pet_photos($1)',[pet]),/permission denied/);
+  await actor(owner);
+  await db.query('select public.begin_pet_deletion($1,1)',[pet]);
+  await assert.rejects(db.query('select public.finish_pet_deletion($1)',[pet]),/pet_files_remaining/);
+  await db.query('delete from storage.objects where name=$1',[`${owner}/${pet}/${photo}.jpg`]);
+  await db.query('select public.finish_pet_deletion($1)',[pet]);
+  assert.equal((await db.query('select * from public.pets where id=$1',[pet])).rows.length,0);
+});
+test('Alert preferences isolate accounts, pause choices, validate channels/types and deduplicate versioned retries', async (t) => {
+  const db = await database(t);
+  const patch = await readFile(new URL('../patchs/011_patch_alert_preferences.sql', import.meta.url), 'utf8');
+  const permissions = await readFile(new URL('./010_alert_preferences_permissions.sql', import.meta.url), 'utf8');
+  // Incremental upgrade from the zones schema, then repeat the new patch.
+  await db.exec(bundle.split('-- Source: database/tables/040_create_alert_preferences.sql')[0] + '\ncommit;');
+  await db.exec(patch);
+  await db.exec(patch);
+  await db.exec(permissions);
+  await db.exec(`
+    insert into auth.users(id) values ('33333333-3333-4333-8333-333333333327');
+    select set_config('request.jwt.claims', '{"sub":"33333333-3333-4333-8333-333333333327"}', false);
+    select public.save_alert_preferences(0, true, false, true, false, false, true);
+    select public.save_alert_preferences(1, false, false, true, false, false, true);
+  `);
+  const before = await db.query('select * from public.alert_preferences');
+  await db.exec(bundle);
+  await db.exec(patch);
+  assert.deepEqual(await db.query('select * from public.alert_preferences'), before);
+});
+test('Interest zones isolate owners, guard manual bounds, stale writes and late retries after deletion', async (t) => {
+  const db = await database(t);
+  const patch = await readFile(new URL('../patchs/010_patch_interest_zones.sql', import.meta.url), 'utf8');
+  const permissions = await readFile(new URL('./009_interest_zone_permissions.sql', import.meta.url), 'utf8');
+  await db.exec(bundle);
+  await db.exec(patch);
+  await db.exec(patch);
+  await db.exec(permissions);
+  await db.exec(`
+    insert into auth.users(id) values ('33333333-3333-4333-8333-333333333326');
+    select set_config('request.jwt.claims', '{"sub":"33333333-3333-4333-8333-333333333326"}', false);
+    select public.save_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb26', 0, 'Persistente', -12, -77, 1500);
+    select public.save_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb27', 0, 'Retirada', -12, -77, 1500);
+    select public.delete_interest_zone('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb27', 1);
+  `);
+  const before = await db.query('select * from public.interest_zones order by id');
+  await db.exec(bundle);
+  assert.deepEqual(await db.query('select * from public.interest_zones order by id'), before);
+});
 const legacyBundle = bundle.split('-- Source: database/functions/034_validate_pet_required_fields.sql')[0] + '\ncommit;';
 const requiredFieldsPatch = await readFile(new URL('../patchs/009_patch_pet_required_fields.sql', import.meta.url), 'utf8');
 const archivingPatch = await readFile(new URL('../patchs/008_patch_pet_archiving.sql', import.meta.url), 'utf8');
@@ -82,6 +215,7 @@ async function database(t) {
   await db.exec(`
     create role anon;
     create role authenticated;
+    create role service_role bypassrls;
     create schema auth;
     create schema storage;
     create table storage.buckets(id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
@@ -219,9 +353,12 @@ test('Required pet metadata enforces size, age and 200 Unicode scalars, preserve
   await db.exec('set role anon');
   await assert.rejects(db.query(create, base), /permission denied/);
   await db.exec('reset role');
-  const snapshot = (await db.query('select * from public.pets order by id')).rows;
+  // The latest increment adds a server-only photo revision, without changing
+  // the legacy metadata. Compare the same projection across the upgrade.
+  const snapshotQuery = "select to_jsonb(p)-'photo_selection_version' as pet from public.pets p order by id";
+  const snapshot = (await db.query(snapshotQuery)).rows;
   await db.exec(bundle);
-  assert.deepEqual((await db.query('select * from public.pets order by id')).rows, snapshot);
+  assert.deepEqual((await db.query(snapshotQuery)).rows, snapshot);
   await db.exec('set role authenticated');
   await db.query("select set_config('request.jwt.claims', $1, false)", [JSON.stringify({sub: owner})]);
   await db.query('select public.begin_pet_deletion($1,3)', [legacyId]);

@@ -219,3 +219,19 @@ PetsSection ofrece PetListFilter para Activas/Archivadas: cápsula gris #E5E5EA,
 ## Continuidad visual del botón al registrar
 
 PetRegistrationButton comparte _content entre botón y copia visual, conserva tipografía/padding/iconos y entrega OriginPageSource al router. OriginPageTransition recibe la identidad solo para pets/new y transforma carbón/radio/Rect; contenido de origen fijo y centrado, sin estiramiento, desaparece hasta45% y reaparece al contraer; destino desde65%. Otras rutas conservan parámetros anteriores. Capturas register_origin_start/middle/close/return y compact_origin_start/morph cubren las dos variantes normal y320×350 texto2; prueba compartida verifica identidad inicial/final, reversa, bloqueo y movimiento reducido.
+
+## Zonas de interés — HU-02.1
+
+Perfil abre `/home/interest-zones`, protegida por login/onboarding. Título32 carbón, margen24/max440, retorno GlassNavigationButton flotante con chevrón. Listado privado muestra vacío confirmado, radio, Editar/Eliminar con confirmación y Añadir zona; conserva datos con progreso fino al actualizar. Error inicial tiene Reintentar y nunca se representa como vacío.
+
+Editor usa campo de nombre, mapa280 con selección manual/círculo métrico, radio0.1–50km y alternativa expandible Indicar coordenadas. Atribución OSM visible fuera del mapa para texto ampliado; fallo permite reintentar mapa y conserva formulario. Guardar mantiene etiqueta/shimmer y éxito confirmado en toast superior; errores contextuales, shake de nombre y consulta de versión actual con confirmación de descarte. Atrás/retorno bloqueados durante escritura; cancelar no persiste.
+
+Cabecera queda fuera de cover/stagger; pasos listado/editor los usan sin reinicios por edición/slider/teclado. Inicio del scroll restaurado al cambiar etapa. Renders con fuentes reales se generan con `flutter test --no-pub --dart-define=CAPTURE_ZONES=true test/interest_zones_test.dart` en `build/ui-preview/zones`; tamaños390×844 y320×350 texto2, incluido modal completo. Las fixtures no son datos de producto ni cartografía remota validada. Véase ADR-018.
+
+## Preferencias de alertas — HU-02.2
+
+Perfil enlaza a Preferencias de alertas: título32, ancho440/margen24, scroll y GlassNavigationButton flotante con chevrón. Secciones de recepción, tipos y canales usan interruptores neutros con etiquetas ampliables; elecciones editables incluso pausadas. Texto explica recepción futura, sin controles de permisos/envío. Guardar preferencias conserva etiqueta y LoadingShimmer solo durante escritura. Errores junto a guardar; conflictos ofrecen consulta actual confirmando descarte. Éxito en ConfirmationToastHost ligado a cuenta/confirmación. Actualizar conserva contenido con progreso fino; carga inicial skeleton y cambio de cuenta oculta datos previos. Entrada cover/stagger sin repetir al alternar interruptores. Modal compartido en core, con scroll y acciones ampliables. ADR-019 registra alcance y contratos.
+
+## Gestión de fotos — HU-04.1/#30 y HU-04.2/#31
+
+Galería del editor conserva tiles, shake danger y toast superior. Añade Tomar foto con alternativa de galería ante permiso/cámara no disponible; principal mediante estrella de48 de área táctil, tooltip y semántica selected. Imagen, retirada y principal son borrador hasta guardar; descartarlos no escribe. Ficha indica la principal confirmada y listado usa su miniatura limpia. Retirar principal selecciona la publicada más antigua o ninguna si no quedan fotos, según ADR-020. Conflicto de principal ofrece Consultar fotos antes de reintentar; no anuncia éxito por cambiar la estrella local. Renders del componente en build/ui-preview/photos/primary_normal.png y primary_small.png (390×844 y320×350 texto2) con fuentes reales y fotos de prueba, sin incorporar fixtures al producto. Los flujos de editor/navegación existentes siguen cubiertos por la suite Flutter.

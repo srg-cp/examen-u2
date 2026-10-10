@@ -11,6 +11,8 @@ import 'features/auth/providers/registration_providers.dart';
 import 'features/auth/providers/password_recovery_providers.dart';
 import 'features/profile/providers/profile_providers.dart';
 import 'features/pets/providers/pet_providers.dart';
+import 'features/interest_zones/providers/interest_zone_providers.dart';
+import 'features/alert_preferences/providers/alert_preference_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,12 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        alertPreferenceRepositoryProvider.overrideWithValue(
+          bootstrap.alertPreferenceRepository,
+        ),
+        interestZoneRepositoryProvider.overrideWithValue(
+          bootstrap.interestZoneRepository,
+        ),
         petRepositoryProvider.overrideWithValue(bootstrap.petRepository),
         petPhotoRepositoryProvider.overrideWithValue(
           bootstrap.petPhotoRepository,

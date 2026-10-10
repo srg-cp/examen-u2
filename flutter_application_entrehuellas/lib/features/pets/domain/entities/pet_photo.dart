@@ -7,12 +7,18 @@ class PetPhoto {
     required this.ownerId,
     required this.ready,
     this.uri,
+    this.thumbnailUri,
+    this.isPrimary = false,
+    this.selectionVersion = 0,
   });
   final String id;
   final String petId;
   final String ownerId;
   final bool ready;
   final Uri? uri;
+  final Uri? thumbnailUri;
+  final bool isPrimary;
+  final int selectionVersion;
 }
 
 class PetPhotoDraft {
@@ -27,7 +33,11 @@ enum PetPhotoFailureKind {
   invalidPhoto,
   limit,
   forbidden,
+  cameraUnavailable,
+  conflict,
 }
+
+enum PetPhotoOrigin { gallery, camera }
 
 class PetPhotoFailure implements Exception {
   const PetPhotoFailure(this.kind);

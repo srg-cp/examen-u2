@@ -57,23 +57,30 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
         PetPhotoFailureKind.invalidPhoto => 'Elige una imagen válida.',
         PetPhotoFailureKind.galleryUnavailable =>
           'No se pudo abrir la galería. Inténtalo de nuevo.',
+        PetPhotoFailureKind.cameraUnavailable =>
+          'No se pudo abrir la cámara. Puedes usar la galería.',
+        PetPhotoFailureKind.conflict =>
+          'Las fotos cambiaron. Vuelve a consultarlas e intenta guardar.',
         PetPhotoFailureKind.limit => 'Puedes añadir hasta tres fotos.',
         _ =>
           !state.hasPendingChanges
               ? 'No se pudieron consultar las fotos.'
               : 'No se pudieron guardar las fotos. Reintenta al guardar.',
       },
-      actionLabel:
-          invalid &&
-              !state.hasPendingChanges &&
-              state.issue == PetPhotoFailureKind.unavailable
+      actionLabel: invalid && state.issue == PetPhotoFailureKind.conflict
+          ? 'Consultar fotos'
+          : invalid &&
+                !state.hasPendingChanges &&
+                state.issue == PetPhotoFailureKind.unavailable
           ? 'Reintentar'
           : null,
       onAction:
-          invalid &&
-              !state.hasPendingChanges &&
-              state.issue == PetPhotoFailureKind.unavailable &&
-              !disabled
+          invalid && state.issue == PetPhotoFailureKind.conflict && !disabled
+          ? () => model.refreshAfterConflict(widget.existing)
+          : invalid &&
+                !state.hasPendingChanges &&
+                state.issue == PetPhotoFailureKind.unavailable &&
+                !disabled
           ? () => model.initialize(widget.existing)
           : null,
       child: Column(
@@ -146,6 +153,13 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
                             ? () => model.stageRemoval(photo.id)
                             : null,
                         pending: !photo.ready,
+                        primary: widget.editable
+                            ? state.visiblePrimaryId == photo.id
+                            : photo.isPrimary,
+                        selectPrimary:
+                            widget.editable && !disabled && photo.ready
+                            ? () => model.stagePrimary(photo.id)
+                            : null,
                       ),
                     for (final draft
                         in widget.editable ? state.pending : <PetPhotoDraft>[])
@@ -167,6 +181,10 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
                         ),
                         remove: widget.editable && !disabled
                             ? () => model.stageRemoval(draft.id)
+                            : null,
+                        primary: state.visiblePrimaryId == draft.id,
+                        selectPrimary: !disabled
+                            ? () => model.stagePrimary(draft.id)
                             : null,
                       ),
                     if (widget.editable &&
@@ -211,6 +229,22 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
               ),
             ),
           ),
+          if (widget.editable &&
+              state.visiblePhotos.length + state.pending.length < 3)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: disabled
+                    ? null
+                    : () => model.choose(
+                        widget.existing,
+                        origin: PetPhotoOrigin.camera,
+                      ),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: const Text('Tomar foto'),
+                style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+              ),
+            ),
           if (widget.editable && state.recovered)
             const Padding(
               padding: EdgeInsets.only(top: 8),
@@ -227,6 +261,10 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
                 PetPhotoFailureKind.invalidPhoto => 'Elige una imagen válida.',
                 PetPhotoFailureKind.galleryUnavailable =>
                   'No se pudo abrir la galería. Inténtalo de nuevo.',
+                PetPhotoFailureKind.cameraUnavailable =>
+                  'No se pudo abrir la cámara. Puedes usar la galería.',
+                PetPhotoFailureKind.conflict =>
+                  'Las fotos cambiaron. Vuelve a consultarlas.',
                 PetPhotoFailureKind.limit => 'Puedes añadir hasta tres fotos.',
                 _ =>
                   !state.hasPendingChanges
@@ -254,7 +292,10 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
     VoidCallback? remove,
     bool pending = false,
     bool invalid = false,
+    bool primary = false,
+    VoidCallback? selectPrimary,
   }) => Padding(
+    key: ValueKey('pet_photo_$id'),
     padding: const EdgeInsets.only(right: 10),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(22),
@@ -304,6 +345,30 @@ class _PetPhotoGalleryState extends ConsumerState<PetPhotoGallery> {
                     minimumSize: const Size(48, 48),
                   ),
                   icon: const Icon(Icons.close_rounded, size: 18),
+                ),
+              ),
+            if (selectPrimary != null || primary)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                child: Semantics(
+                  selected: primary,
+                  label: primary ? 'Foto principal' : 'Elegir foto principal',
+                  child: IconButton(
+                    tooltip: primary
+                        ? 'Foto principal'
+                        : 'Elegir foto principal',
+                    onPressed: selectPrimary,
+                    style: IconButton.styleFrom(
+                      backgroundColor: const Color(0xD9111111),
+                      foregroundColor: Colors.white,
+                      disabledForegroundColor: Colors.white,
+                      minimumSize: const Size(48, 48),
+                    ),
+                    icon: Icon(
+                      primary ? Icons.star_rounded : Icons.star_outline_rounded,
+                    ),
+                  ),
                 ),
               ),
           ],

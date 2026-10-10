@@ -1,5 +1,9 @@
 # Arquitectura de Entre Huellas
 
+El comportamiento de cada módulo, sus recorridos y límites actuales se documentan
+en [Funcionalidades](funcionalidades/README.md). Esta arquitectura describe su
+organización; ESTADO conserva la evidencia de validación y las decisiones van en ADR.
+
 Norma obligatoria: [REGLAS_ARQUITECTURA.md](REGLAS_ARQUITECTURA.md). Define patrones, responsabilidades, dependencias, SOLID y criterios de revisión. Este documento conserva la descripción y las decisiones concretas de implementación.
 
 Norma visual obligatoria: [REGLAS_UI_UX.md](REGLAS_UI_UX.md), basada en las pantallas de acceso aprobadas. AppPageLayout y primaryActionButtonStyle se comparten en core; los nombres de Auth delegan en ellos y mantienen compatibilidad. Inicio reutiliza core sin importar presentación de Auth. Su UI anterior queda retirada; sesión y casos de uso se conservan.
@@ -236,3 +240,21 @@ Fuentes034–035/plan009 instalan trigger sobre insert/update de metadatos: mant
 ## Borrador de fotos del editor
 
 [ADR-017](decisiones/017-borrador-fotos-mascotas.md) conserva fotos confirmadas y separa selecciones/retiradas locales. PetPhotosViewModel ejecuta los casos de uso remotos solo después de validación y confirmación de metadatos por PetEditorViewModel. Descartar no escribe; retiradas cuentan para guardado/salida. Reintentos conservan IDs y el servidor mantiene límite/propiedad. Guardar no constituye una transacción distribuida entre metadatos y Storage. Sin nuevo SQL.
+
+## Zonas privadas y selección manual — HU-02.1
+
+Incremento en `features/interest_zones`, según [ADR-018](decisiones/018-zonas-manuales-privadas.md). InterestZonesScreen consume InterestZonesViewModel/ZoneViewState; ListInterestZones, SaveInterestZone y DeleteInterestZone expresan operaciones de dominio. Providers declaran contratos/casos de uso; bootstrap inyecta InterestZoneRepositoryImpl y SupabaseInterestZoneDataSource. Fuente encapsula SDK, repositorio mapea DTO/fallos seguros; dominio no importa plataforma. ZonePoint valida coordenadas textuales y numéricas sin reglas de negocio en widgets.
+
+RLS/proyección propia, RPC autorizadas con UUID estable/versión/bloqueos y marca de eliminación evitan duplicados y resurrecciones por reintento. Fuentes036–039/plan010 generan migración y patch. Refresco conserva contenido/borrador; cambio/error de cuenta desmonta contenido anterior y descarta respuestas tardías. AutoDispose libera observación y keepAlive se limita a escritura.
+
+flutter_map es el adaptador visual de teselas en presentación: conserva su fuente por instancia, atribución y caché; emite punto al ViewModel. No accede a repositorios ni Supabase. No hay GPS, PostGIS, preferencias/push ni publicación de casos en este incremento. Patch010 aplicado según confirmación del usuario del 10 de octubre; demo Android pendiente.
+
+## Preferencias privadas de alertas — HU-02.2
+
+[ADR-019](decisiones/019-preferencias-alertas-por-cuenta.md): AlertPreferencesScreen/PreferenceOptions consumen AlertPreferencesViewModel/PreferenceViewState. Dominio contiene AlertPreferences, ReadAlertPreferences, SaveAlertPreferences y contrato AlertPreferenceRepository; data aporta DTO, fuente SDK y repositorio. Providers declaran sesión/casos/contrato; bootstrap inyecta implementaciones y main sus overrides. Ruta privada desde Perfil, sin comunicación por infraestructura entre funcionalidades.
+
+SQL040–043/plan011: agregado por owner_id, RLS/grants por cuenta y guardado RPC versionado con reintento idéntico/no-op. Recepción general prevalece y conserva tres tipos y canales bandeja/push. Defaults pausados solo tras ausencia confirmada; sin envío, permisos ni token. Generación/identidad protege respuestas tardías; autoDispose y keepAlive limitado a guardado. Refresh conserva contenido con progreso fino y error contextual; descartar/salir reemplaza borrador con confirmación. Modal compartido de descarte en core, reutilizado por zonas. HU-12 consumirá preferencias y validará entrega; S2 no acredita push.
+
+## Fotos: cámara, procesamiento y principal — HU-04, 10 de octubre de 2026
+
+ADR-020 amplía el circuito de fotos existente: PetPhotoOrigin independiente de ImagePicker, selección de principal como borrador y contrato con versión de selección. Presentation sigue consumiendo ViewModels/casos de uso; data encapsula selector, SDK y Edge. pet-photo-process autentica, autoriza, decodifica y recodifica bytes en servidor con WASM; SQL044–047 protege confirmación y escritura de derivados. Hash/tombstones quedan fuera de la proyección cliente. Buckets de derivados/miniaturas privados; S3 solo puede publicar derivados verificados, nunca originales antiguos. Lectura no ejecuta procesamiento ni publicación automática. Activación conjunta SQL/Edge y validación hosted pendientes; detalles en [ADR-020](decisiones/020-procesamiento-y-principal-fotos.md).

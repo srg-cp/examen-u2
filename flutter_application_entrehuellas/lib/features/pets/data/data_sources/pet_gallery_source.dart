@@ -4,7 +4,7 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum PetGalleryFailureKind { invalidPhoto, unavailable }
+enum PetGalleryFailureKind { invalidPhoto, unavailable, cameraUnavailable }
 
 class PetGalleryFailure implements Exception {
   const PetGalleryFailure(this.kind);
@@ -48,7 +48,12 @@ Uint8List preparePetPhoto(Uint8List bytes) {
 }
 
 abstract interface class PetGallerySource {
-  Future<Uint8List?> choose(String owner, String pet, bool existing);
+  Future<Uint8List?> choose(
+    String owner,
+    String pet,
+    bool existing, {
+    bool camera = false,
+  });
   Future<Uint8List?> recover(String owner, String pet, bool existing);
 }
 
@@ -66,7 +71,12 @@ class NativePetGallerySource implements PetGallerySource {
   }
 
   @override
-  Future<Uint8List?> choose(String owner, String pet, bool existing) async {
+  Future<Uint8List?> choose(
+    String owner,
+    String pet,
+    bool existing, {
+    bool camera = false,
+  }) async {
     final preferences = await SharedPreferences.getInstance();
     final context = '$owner|$pet|$existing';
     if (!await preferences.setString(marker, context)) {
@@ -75,12 +85,20 @@ class NativePetGallerySource implements PetGallerySource {
     try {
       return await _prepare(
         await _picker.pickImage(
-          source: ImageSource.gallery,
+          source: camera ? ImageSource.camera : ImageSource.gallery,
           maxWidth: 1280,
           maxHeight: 1280,
           imageQuality: 90,
           requestFullMetadata: false,
         ),
+      );
+    } on PetGalleryFailure {
+      rethrow;
+    } catch (_) {
+      throw PetGalleryFailure(
+        camera
+            ? PetGalleryFailureKind.cameraUnavailable
+            : PetGalleryFailureKind.unavailable,
       );
     } finally {
       if (preferences.getString(marker) == context) {

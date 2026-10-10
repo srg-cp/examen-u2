@@ -173,3 +173,23 @@ Prueba008 verifica propietarios, anónimo, archivo/restauración/reintentos, fot
 Fuentes034–035, plan009_pet_required_fields.json, migración20261009000900_pet_required_fields.sql y patchs/009_patch_pet_required_fields.sql, generados mediante Build-PetRequiredFieldsPatch.ps1/Build-Migration.ps1. Requiere008; Build-RunAll incorpora el guard al final. Aplicar el patch completo en desarrollo cuando se autorice su despliegue.
 
 Trigger de insert/update sobre metadatos exige tamaño, edad0–600 y rasgos1–200 puntos de código Unicode, además de nombre/especie/tipo y permisos existentes. No reescribe datos antiguos ni concede escrituras cliente. Su lectura y operaciones de ciclo de vida continúan disponibles; cambios de metadatos requieren completarlos. Test vigente en run_all.test.mjs cubre validación, Unicode, cuentas/anónimo, reintentos, registros antiguos y repetición. Tests históricos de mascotas usan el bundle hasta033 para mantener los contratos que verifican. Véase ADR-016. Activación remota pendiente.
+
+## Incremento de zonas privadas — plan010
+
+HU-02.1 / RF-02,16 / issue#26: fuentes036–039 y [plan010](migration_plans/010_interest_zones.json) generan [migración](../supabase/migrations/20261009001000_interest_zones.sql) y [patch010](patchs/010_patch_interest_zones.sql). Regenerar con `./database/scripts/Build-InterestZonesPatch.ps1`; Build-RunAll incorpora el plan y conserva el historial anterior. SQL requiere Auth existente y roles Supabase; no depende de PostGIS ni cambia mascotas.
+
+La cuenta autenticada lee solo sus zonas vigentes y ejecuta save_interest_zone/delete_interest_zone; sin escrituras directas/anónimo. UUID estable, versión y bloqueo transaccional; eliminación conserva tombstone privado para rechazar reintentos antiguos de creación. Nombres1–60 Unicode, latitud−85..85, longitud−180..180 y radio100–50000m. Restrictive RLS protege frente a políticas permisivas ajenas.
+
+`tests/009_interest_zone_permissions.sql` usa dos cuentas de fixture con rollback. `npm test` comprueba además repetir patch/run_all sin alterar datos, fechas, versiones o eliminaciones. PostgreSQL/PGlite local no prueba Supabase remoto; activación/demo real pendientes. Véase ADR-018 y CONFIGURACION.
+
+## Preferencias privadas de alertas — HU-02.2
+
+Fuentes040–043/plan011: tabla alert_preferences por propietario, RPC save_alert_preferences, RLS restrictiva y grants de lectura/ejecución. Versionado y reintento idéntico preservan datos; recepción general conserva elecciones al pausar. Activar exige tipo/canal. No contiene notificaciones, tokens ni envío. Generar mediante `./database/scripts/Build-AlertPreferencesPatch.ps1`; aplicar completo `patchs/011_patch_alert_preferences.sql` en desarrollo. run_all incluye las fuentes, sin reescribir migraciones anteriores. Prueba `tests/010_alert_preferences_permissions.sql` con cuentas ficticias/ROLLBACK y PGlite; repetición conserva valores, versión y fechas. Patch011 aplicado en Supabase según confirmación del usuario del 10 de octubre; operaciones remotas autenticadas pendientes de verificar. ADR-019 contiene el contrato que consumirá HU-12.
+
+## Procesamiento privado y foto principal — plan012
+
+HU-04.1/#30 y HU-04.2/#31 / RF-03: fuentes044–047, plan012, migración20261010001200_pet_photo_processing.sql y patch012 derivados de Build-PetPhotoProcessingPatch.ps1/Build-RunAll.ps1. Migraciones anteriores conservadas. Activación SQL junto con Edge pet-photo-process, pendiente en desarrollo; instrucciones en supabase/functions/pet-photo-process/README.md y ADR-020.
+
+Solo servicio reserva por UUID/hash y confirma ambos derivados. Revocadas las RPC antiguas de reserva/publicación al cliente y bloqueada escritura autenticada de bytes en los tres buckets. Lectura/retirada limitadas al dueño con políticas restrictivas; SELECT de objetos en retirada/baja permite Storage DELETE. Principal única, selección con versión/CAS, reemplazo determinista, retiradas con tombstone y baja comprobando los tres buckets. Repetición conserva processed_at, hash, principal/versiones y tombstones. Fotos antiguas no se marcan procesadas ni se hacen públicas. S3 necesita proyección pública solo de derivados verificados.
+
+Prueba nueva en run_all.test.mjs ejecuta upgrade desde011, repite patch/run_all y comprueba A/B/anónimo/servicio, RPC/grants/columnas, política amplia, confirmación incompleta, hash conflictivo, principal/reintento/CAS, retirada y baja. 15 pruebas SQL locales aprobadas. La fixture Storage solo representa metadata; pruebas Deno del motor real verifican bytes EXIF/GPS. Cuotas y Storage remoto pendientes.

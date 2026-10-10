@@ -21,15 +21,22 @@ class SupabasePetDataSource implements PetDataSource {
             .eq('pet_id', petId);
         _identity(ownerId);
         if (photos.isNotEmpty) {
-          await _client.storage.from('pet-photos').remove([
-            for (final photo in photos) '$ownerId/$petId/${photo['id']}.jpg',
-          ]);
+          for (final bucket in [
+            'pet-photos',
+            'pet-photo-renditions',
+            'pet-photo-thumbnails',
+          ]) {
+            _identity(ownerId);
+            await _client.storage.from(bucket).remove([
+              for (final photo in photos) '$ownerId/$petId/${photo['id']}.jpg',
+            ]);
+          }
         }
         _identity(ownerId);
         await _client.rpc('finish_pet_deletion', params: {'p_id': petId});
       });
   static const columns =
-      'id,owner_id,name,species,sex,age_months,traits,species_detail,size,version,archived_at,case_history_at,active_case_count,pet_photos(id,status,created_at)';
+      'id,owner_id,name,species,sex,age_months,traits,species_detail,size,version,archived_at,case_history_at,active_case_count,pet_photos(id,status,created_at,is_primary,processed_at)';
   Future<PetDto> _dto(Map<String, dynamic> row) async {
     Uri? cover;
     final photos =
@@ -38,15 +45,21 @@ class SupabasePetDataSource implements PetDataSource {
             .where((photo) => photo['status'] == 'published')
             .toList()
           ..sort(
-            (a, b) => '${a['created_at']}:${a['id']}'.compareTo(
-              '${b['created_at']}:${b['id']}',
-            ),
+            (a, b) => a['is_primary'] != b['is_primary']
+                ? (a['is_primary'] == true ? -1 : 1)
+                : '${a['created_at']}:${a['id']}'.compareTo(
+                    '${b['created_at']}:${b['id']}',
+                  ),
           );
     if (photos.isNotEmpty) {
       try {
         cover = Uri.parse(
           await _client.storage
-              .from('pet-photos')
+              .from(
+                photos.first['processed_at'] != null
+                    ? 'pet-photo-thumbnails'
+                    : 'pet-photos',
+              )
               .createSignedUrl(
                 '${row['owner_id']}/${row['id']}/${photos.first['id']}.jpg',
                 3600,

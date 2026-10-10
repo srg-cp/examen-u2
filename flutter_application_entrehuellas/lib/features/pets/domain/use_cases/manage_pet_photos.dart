@@ -11,9 +11,14 @@ class ManagePetPhotos {
     }
   }
 
-  Future<Uint8List?> choose(String owner, String pet, bool existing) {
+  Future<Uint8List?> choose(
+    String owner,
+    String pet,
+    bool existing, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) {
     _owner(owner);
-    return _repository.choose(owner, pet, existing);
+    return _repository.choose(owner, pet, existing, origin: origin);
   }
 
   Future<Uint8List?> recover(String owner, String pet, bool existing) {
@@ -54,5 +59,24 @@ class ManagePetPhotos {
   Future<void> remove(String owner, String pet, String id) {
     _owner(owner);
     return _repository.remove(owner, pet, id);
+  }
+
+  Future<List<PetPhoto>> setPrimary(
+    String owner,
+    String pet,
+    String id,
+    int version,
+  ) async {
+    _owner(owner);
+    if (id.isEmpty || version < 0) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.invalidPhoto);
+    }
+    final photos = await _repository.setPrimary(owner, pet, id, version);
+    if (photos.any((p) => p.ownerId != owner || p.petId != pet) ||
+        photos.where((p) => p.isPrimary).length != 1 ||
+        !photos.any((p) => p.id == id && p.ready && p.isPrimary)) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
+    }
+    return photos;
   }
 }

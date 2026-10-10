@@ -206,7 +206,12 @@ void main() {
 class _FailingGallery extends FakePetPhotos {
   bool fail = true;
   @override
-  Future<Uint8List?> choose(String owner, String pet, bool existing) async {
+  Future<Uint8List?> choose(
+    String owner,
+    String pet,
+    bool existing, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) async {
     if (fail) {
       throw const PetPhotoFailure(PetPhotoFailureKind.galleryUnavailable);
     }

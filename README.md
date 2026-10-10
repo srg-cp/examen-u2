@@ -18,6 +18,7 @@ Las reglas de recuperación, la interfaz y el acceso a datos se separan para pod
 - [Guía de trabajo, chats, sprints y GitHub](docs/GUIA_MVP.md).
 - [Reglas de oro de arquitectura — norma del proyecto](docs/REGLAS_ARQUITECTURA.md).
 - [Arquitectura del sistema](docs/ARQUITECTURA.md).
+- [Qué hace cada funcionalidad y cómo se usa](docs/funcionalidades/README.md).
 - [Diseño y componentes de interfaz](docs/DISENO_UI.md).
 - [ADR-001: motivos y alternativas de arquitectura](docs/decisiones/001-arquitectura-aplicacion.md).
 - [Organización y numeración del SQL](database/README.md).

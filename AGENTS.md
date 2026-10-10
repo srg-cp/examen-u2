@@ -47,6 +47,7 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 - Ejecutar las comprobaciones pertinentes a lo modificado. Para Flutter: formato, análisis y pruebas significativas; para datos: permisos entre usuarios, invariantes y reintentos.
 - Reportar pruebas ejecutadas y pendientes; no afirmar que un build o una política funciona sin comprobarlo.
 - Al terminar, actualizar `docs/ESTADO.md` con resultados, bloqueos y siguiente paso. Registrar modificaciones de alcance en la guía.
+- Por instrucción del usuario, mantener una ficha por funcionalidad en `docs/funcionalidades`, enlazada desde su índice: qué hace, recorrido, reglas/campos, persistencia/permisos, errores/reintentos, dependencias/activación y validación pendiente. Actualizarla en cada incremento; distinguir funcionalidad implementada de historia cerrada y evidencia local de confirmación remota.
 - Comunicar en español. Incluir resultado, validación y limitaciones materiales.
 - La publicación, despliegue y acciones en GitHub siguen la autorización del usuario en la tarea actual; esta guía no concede por sí sola autorización para ejecutarlas.
 

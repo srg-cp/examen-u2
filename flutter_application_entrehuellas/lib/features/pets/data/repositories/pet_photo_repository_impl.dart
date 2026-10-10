@@ -12,15 +12,19 @@ class PetPhotoRepositoryImpl implements PetPhotoRepository {
     try {
       return await action();
     } on PetGalleryFailure catch (e) {
-      throw PetPhotoFailure(
-        e.kind == PetGalleryFailureKind.invalidPhoto
-            ? PetPhotoFailureKind.invalidPhoto
-            : PetPhotoFailureKind.galleryUnavailable,
-      );
+      throw PetPhotoFailure(switch (e.kind) {
+        PetGalleryFailureKind.invalidPhoto => PetPhotoFailureKind.invalidPhoto,
+        PetGalleryFailureKind.cameraUnavailable =>
+          PetPhotoFailureKind.cameraUnavailable,
+        _ => PetPhotoFailureKind.galleryUnavailable,
+      });
     } on PetPhotoSourceFailure catch (e) {
       throw PetPhotoFailure(switch (e.kind) {
         PetPhotoSourceFailureKind.forbidden => PetPhotoFailureKind.forbidden,
         PetPhotoSourceFailureKind.limit => PetPhotoFailureKind.limit,
+        PetPhotoSourceFailureKind.invalidPhoto =>
+          PetPhotoFailureKind.invalidPhoto,
+        PetPhotoSourceFailureKind.conflict => PetPhotoFailureKind.conflict,
         _ => PetPhotoFailureKind.unavailable,
       });
     } catch (_) {
@@ -33,8 +37,20 @@ class PetPhotoRepositoryImpl implements PetPhotoRepository {
   }
 
   @override
-  Future<Uint8List?> choose(String ownerId, String petId, bool existing) =>
-      _run(() => _gallery.choose(ownerId, petId, existing), gallery: true);
+  Future<Uint8List?> choose(
+    String ownerId,
+    String petId,
+    bool existing, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) => _run(
+    () => _gallery.choose(
+      ownerId,
+      petId,
+      existing,
+      camera: origin == PetPhotoOrigin.camera,
+    ),
+    gallery: true,
+  );
   @override
   Future<Uint8List?> recover(String ownerId, String petId, bool existing) =>
       _run(() => _gallery.recover(ownerId, petId, existing), gallery: true);
@@ -56,4 +72,18 @@ class PetPhotoRepositoryImpl implements PetPhotoRepository {
   @override
   Future<void> remove(String ownerId, String petId, String photoId) =>
       _run(() => _remote.remove(ownerId, petId, photoId));
+  @override
+  Future<List<PetPhoto>> setPrimary(
+    String owner,
+    String pet,
+    String id,
+    int expectedVersion,
+  ) => _run(
+    () async => (await _remote.setPrimary(
+      owner,
+      pet,
+      id,
+      expectedVersion,
+    )).map((dto) => dto.toEntity()).toList(),
+  );
 }

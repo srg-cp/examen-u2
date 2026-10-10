@@ -821,4 +821,402 @@ create trigger pets_required_fields_guard
 before insert or update of name, species, sex, age_months, traits, species_detail, size
 on public.pets for each row execute function public.enforce_pet_required_fields();
 
+-- Source: database/tables/036_create_interest_zones.sql | normalized SHA256: 1e1048a2c98a7303b5ff81f64e86c3d5b072030641059553ae1c85e05ac1dd39
+-- HU-02.1 / RF-02,16. Coordinates are private preferences, never public QR data.
+create table if not exists public.interest_zones (
+    id uuid primary key,
+    owner_id uuid not null references auth.users(id) on delete cascade,
+    name text not null check (
+        name = btrim(name, E' \t\n\r\f\v' || U&'\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000\FEFF')
+        and char_length(name) between 1 and 60
+    ),
+    latitude double precision not null check (latitude between -85 and 85),
+    longitude double precision not null check (longitude between -180 and 180),
+    radius_meters integer not null check (radius_meters between 100 and 50000),
+    version integer not null default 1 check (version > 0),
+    deleted_at timestamptz,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+create index if not exists interest_zones_owner_created_idx
+    on public.interest_zones (owner_id, created_at, id) where deleted_at is null;
+
+-- Source: database/functions/037_interest_zone_commands.sql | normalized SHA256: b763c9a477fe66d00872a5c70268f4f9b3c3b867530f9687875a830e3b659547
+-- UUID remains reserved after deletion so delayed create retries cannot resurrect a zone.
+create or replace function public.save_interest_zone(
+    p_id uuid, p_expected_version integer, p_name text,
+    p_latitude double precision, p_longitude double precision, p_radius_meters integer
+) returns public.interest_zones
+language plpgsql security definer set search_path = '' as $$
+declare
+    actor uuid := auth.uid();
+    current_zone public.interest_zones;
+    -- Match Dart trim, including non-breaking and Unicode whitespace.
+    clean_name text := btrim(p_name, E' \t\n\r\f\v' || U&'\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000\FEFF');
+begin
+    if actor is null then raise exception 'zone_signed_out' using errcode = '42501'; end if;
+    if p_id is null or p_expected_version is null or p_expected_version < 0
+       or clean_name is null or char_length(clean_name) not between 1 and 60
+       or p_latitude is null or p_latitude not between -85 and 85
+       or p_longitude is null or p_longitude not between -180 and 180
+       or p_radius_meters is null or p_radius_meters not between 100 and 50000 then
+        raise exception 'zone_invalid' using errcode = '22023';
+    end if;
+    -- Serialize creation/update/delete on the stable key, including missing rows.
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_id::text, 0));
+    select * into current_zone from public.interest_zones where id = p_id for update;
+    if found then
+        if current_zone.owner_id <> actor or current_zone.deleted_at is not null then
+            raise exception 'zone_unavailable' using errcode = '42501';
+        end if;
+        if current_zone.version = p_expected_version + 1
+           and current_zone.name = clean_name and current_zone.latitude = p_latitude
+           and current_zone.longitude = p_longitude and current_zone.radius_meters = p_radius_meters then
+            return current_zone;
+        end if;
+        if current_zone.version <> p_expected_version then
+            raise exception 'zone_conflict' using errcode = '40001';
+        end if;
+        update public.interest_zones set name = clean_name, latitude = p_latitude,
+            longitude = p_longitude, radius_meters = p_radius_meters,
+            version = version + 1, updated_at = now()
+            where id = p_id returning * into current_zone;
+    else
+        if p_expected_version <> 0 then raise exception 'zone_conflict' using errcode = '40001'; end if;
+        insert into public.interest_zones (id, owner_id, name, latitude, longitude, radius_meters)
+            values (p_id, actor, clean_name, p_latitude, p_longitude, p_radius_meters)
+            returning * into current_zone;
+    end if;
+    return current_zone;
+end;
+$$;
+
+create or replace function public.delete_interest_zone(p_id uuid, p_expected_version integer)
+returns void language plpgsql security definer set search_path = '' as $$
+declare
+    actor uuid := auth.uid();
+    current_zone public.interest_zones;
+begin
+    if actor is null then raise exception 'zone_signed_out' using errcode = '42501'; end if;
+    if p_id is null or p_expected_version is null or p_expected_version < 1 then
+        raise exception 'zone_invalid' using errcode = '22023';
+    end if;
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_id::text, 0));
+    select * into current_zone from public.interest_zones where id = p_id for update;
+    if not found or current_zone.owner_id <> actor then
+        raise exception 'zone_unavailable' using errcode = '42501';
+    end if;
+    if current_zone.deleted_at is not null and current_zone.version = p_expected_version + 1 then return; end if;
+    if current_zone.deleted_at is not null or current_zone.version <> p_expected_version then
+        raise exception 'zone_conflict' using errcode = '40001';
+    end if;
+    update public.interest_zones set deleted_at = now(), updated_at = now(), version = version + 1 where id = p_id;
+end;
+$$;
+
+-- Source: database/policies/038_interest_zone_owner_policies.sql | normalized SHA256: 3f668b335d08154a17b6dd30329351f66a7ab8f844715319c9924f165f59bb09
+alter table public.interest_zones enable row level security;
+drop policy if exists interest_zones_select_own on public.interest_zones;
+create policy interest_zones_select_own on public.interest_zones for select to authenticated
+    using (owner_id = (select auth.uid()) and deleted_at is null);
+-- Restrictive guard preserves privacy even if another permissive policy is added.
+drop policy if exists interest_zones_owner_guard on public.interest_zones;
+create policy interest_zones_owner_guard on public.interest_zones as restrictive for all to authenticated
+    using (owner_id = (select auth.uid()) and deleted_at is null)
+    with check (owner_id = (select auth.uid()) and deleted_at is null);
+
+-- Source: database/grants/039_interest_zone_permissions.sql | normalized SHA256: 7c0b8cc5f9b1d418e3cb5344f633cb4c119f3f505f92d94a901b4693a40f2fa4
+revoke all on public.interest_zones from public, anon, authenticated;
+grant select (id, owner_id, name, latitude, longitude, radius_meters, version, created_at, updated_at)
+    on public.interest_zones to authenticated;
+revoke all on function public.save_interest_zone(uuid, integer, text, double precision, double precision, integer)
+    from public, anon, authenticated;
+revoke all on function public.delete_interest_zone(uuid, integer) from public, anon, authenticated;
+grant execute on function public.save_interest_zone(uuid, integer, text, double precision, double precision, integer)
+    to authenticated;
+grant execute on function public.delete_interest_zone(uuid, integer) to authenticated;
+
+-- Source: database/tables/040_create_alert_preferences.sql | normalized SHA256: e4b4c5edeca377a8e758f1043492529e581f8f5e96f85ace061310f035e418a8
+-- HU-02.2: a private aggregate per account; no device token or delivery state.
+create table if not exists public.alert_preferences (
+    owner_id uuid primary key references auth.users(id) on delete cascade,
+    enabled boolean not null default false,
+    lost_pets boolean not null default true,
+    found_pets boolean not null default true,
+    case_updates boolean not null default true,
+    in_app boolean not null default true,
+    push boolean not null default false,
+    version integer not null default 1 check (version > 0),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    constraint alert_preferences_enabled_types check (not enabled or lost_pets or found_pets or case_updates),
+    constraint alert_preferences_enabled_channels check (not enabled or in_app or push)
+);
+
+-- Source: database/functions/041_save_alert_preferences.sql | normalized SHA256: 2c6a1973319c11049c6e20ed96a61e44fd154f6a8f4af691db19d88a98bcd526
+create or replace function public.save_alert_preferences(
+    p_expected_version integer, p_enabled boolean, p_lost_pets boolean,
+    p_found_pets boolean, p_case_updates boolean, p_in_app boolean, p_push boolean
+) returns public.alert_preferences
+language plpgsql security definer set search_path = '' as $$
+declare
+    actor uuid := auth.uid();
+    current_preferences public.alert_preferences;
+    identical boolean;
+begin
+    if actor is null then raise exception 'preferences_signed_out' using errcode = '42501'; end if;
+    if p_expected_version is null or p_expected_version < 0 or p_expected_version >= 2147483647
+       or p_enabled is null or p_lost_pets is null or p_found_pets is null
+       or p_case_updates is null or p_in_app is null or p_push is null
+       or (p_enabled and not (p_lost_pets or p_found_pets or p_case_updates))
+       or (p_enabled and not (p_in_app or p_push)) then
+        raise exception 'preferences_invalid' using errcode = '22023';
+    end if;
+    -- Account identity and expected version remain stable across a lost response.
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('alert_preferences/' || actor::text, 0));
+    select * into current_preferences from public.alert_preferences where owner_id = actor for update;
+    if found then
+        identical := current_preferences.enabled = p_enabled
+          and current_preferences.lost_pets = p_lost_pets and current_preferences.found_pets = p_found_pets
+          and current_preferences.case_updates = p_case_updates and current_preferences.in_app = p_in_app
+          and current_preferences.push = p_push;
+        if identical and current_preferences.version = p_expected_version + 1 then
+            return current_preferences;
+        end if;
+        if current_preferences.version <> p_expected_version then
+            raise exception 'preferences_conflict' using errcode = '40001';
+        end if;
+        if identical then return current_preferences; end if;
+        update public.alert_preferences set enabled = p_enabled, lost_pets = p_lost_pets,
+            found_pets = p_found_pets, case_updates = p_case_updates, in_app = p_in_app, push = p_push,
+            version = version + 1, updated_at = now()
+            where owner_id = actor returning * into current_preferences;
+    else
+        if p_expected_version <> 0 then raise exception 'preferences_conflict' using errcode = '40001'; end if;
+        insert into public.alert_preferences(owner_id, enabled, lost_pets, found_pets, case_updates, in_app, push)
+            values(actor, p_enabled, p_lost_pets, p_found_pets, p_case_updates, p_in_app, p_push)
+            returning * into current_preferences;
+    end if;
+    return current_preferences;
+end;
+$$;
+
+-- Source: database/policies/042_alert_preferences_owner_policies.sql | normalized SHA256: 4338703864448a5205160ffe9190eac08b09cf6452a74bf28317f641fb1064d4
+alter table public.alert_preferences enable row level security;
+drop policy if exists alert_preferences_owner_read on public.alert_preferences;
+create policy alert_preferences_owner_read on public.alert_preferences for select to authenticated
+    using (owner_id = (select auth.uid()));
+drop policy if exists alert_preferences_owner_guard on public.alert_preferences;
+create policy alert_preferences_owner_guard on public.alert_preferences as restrictive for all to authenticated
+    using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
+
+-- Source: database/grants/043_alert_preferences_permissions.sql | normalized SHA256: 46919dd2514d8c7839ac460f08656d075c941dc6bb8646d14c777b94d298d5be
+revoke all on table public.alert_preferences from public, anon, authenticated;
+grant select (owner_id, version, enabled, lost_pets, found_pets, case_updates, in_app, push)
+    on public.alert_preferences to authenticated;
+revoke all on function public.save_alert_preferences(integer, boolean, boolean, boolean, boolean, boolean, boolean)
+    from public, anon, authenticated;
+grant execute on function public.save_alert_preferences(integer, boolean, boolean, boolean, boolean, boolean, boolean)
+    to authenticated;
+
+-- Source: database/tables/044_pet_photo_processing.sql | normalized SHA256: 0441be5877a53b30d227f6c574d9d10e1592f2db51438344f8733302f2b218c0
+alter table public.pets add column if not exists photo_selection_version integer not null default 0 check(photo_selection_version >= 0);
+alter table public.pet_photos add column if not exists is_primary boolean not null default false;
+alter table public.pet_photos add column if not exists processed_at timestamptz;
+alter table public.pet_photos add column if not exists content_hash text check(content_hash ~ '^[0-9a-f]{64}$');
+alter table public.pet_photos drop constraint if exists pet_photos_status_check;
+alter table public.pet_photos add constraint pet_photos_status_check check(status in ('pending','published','removing'));
+create unique index if not exists pet_photos_one_primary_idx on public.pet_photos(pet_id) where is_primary;
+-- Existing photos remain private and unverified; never invent processed_at.
+update public.pet_photos ph set is_primary=true where ph.id in (
+    select distinct on (pet_id) id from public.pet_photos candidate
+    where status='published' and not exists (
+        select 1 from public.pet_photos selected where selected.pet_id=candidate.pet_id and selected.is_primary
+    ) order by pet_id,created_at,id
+);
+create table if not exists public.pet_photo_deletions (
+    id uuid primary key,
+    pet_id uuid not null references public.pets(id) on delete cascade,
+    owner_id uuid not null references auth.users(id) on delete cascade
+);
+alter table public.pet_photo_deletions enable row level security;
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+values ('pet-photo-renditions','pet-photo-renditions',false,2097152,array['image/jpeg']),
+       ('pet-photo-thumbnails','pet-photo-thumbnails',false,262144,array['image/jpeg'])
+on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
+
+-- Source: database/functions/045_pet_photo_processing_commands.sql | normalized SHA256: 5bd4d92bf3cf9a6be8a27366dab6a2000afa72518be83869b9e686a3269c1d41
+-- Service-only command: identity is validated by Auth in the Edge Function.
+create or replace function public.prepare_pet_photo(p_owner uuid,p_pet_id uuid,p_id uuid,p_hash text)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_photo public.pet_photos;
+begin
+    if p_owner is null or p_id is null or p_hash is null or p_hash !~ '^[0-9a-f]{64}$' then
+        raise exception using errcode='23514',message='photo_invalid';
+    end if;
+    perform 1 from public.pets where id=p_pet_id and owner_id=p_owner and deletion_requested_at is null for update;
+    if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    if exists(select 1 from public.pet_photo_deletions where id=p_id) then
+        raise exception using errcode='40001',message='photo_deleted';
+    end if;
+    select * into v_photo from public.pet_photos where id=p_id for update;
+    if found then
+        if v_photo.owner_id<>p_owner or v_photo.pet_id<>p_pet_id then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+        if v_photo.status='removing' or (v_photo.content_hash is not null and v_photo.content_hash<>p_hash) then raise exception using errcode='40001',message='photo_conflict'; end if;
+        -- Legacy conversion requires explicit resubmission; it never becomes public by migration.
+        if v_photo.content_hash is null then
+            update public.pet_photos set content_hash=p_hash where id=p_id returning * into v_photo;
+        end if;
+        return next v_photo; return;
+    end if;
+    if (select count(*) from public.pet_photos where pet_id=p_pet_id)>=3 then raise exception using errcode='23514',message='photo_limit'; end if;
+    insert into public.pet_photos(id,pet_id,owner_id,content_hash) values(p_id,p_pet_id,p_owner,p_hash) returning * into v_photo;
+    return next v_photo;
+end; $$;
+
+create or replace function public.complete_pet_photo_processing(p_owner uuid,p_id uuid,p_hash text)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+declare v_photo public.pet_photos; v_path text;
+begin
+    perform 1 from public.pets p join public.pet_photos ph on ph.pet_id=p.id
+        where ph.id=p_id and p.owner_id=p_owner and p.deletion_requested_at is null for update of p;
+    if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    select * into v_photo from public.pet_photos where id=p_id and owner_id=p_owner for update;
+    if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    if v_photo.status='removing' or v_photo.content_hash is distinct from p_hash then raise exception using errcode='40001',message='photo_conflict'; end if;
+    v_path:=p_owner::text||'/'||v_photo.pet_id::text||'/'||p_id::text||'.jpg';
+    if (select count(*) from storage.objects where name=v_path and (
+        (bucket_id='pet-photo-renditions' and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 4 and 2097152) or
+        (bucket_id='pet-photo-thumbnails' and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 4 and 262144)
+    ))<>2 then raise exception using errcode='P0002',message='photo_incomplete'; end if;
+    update public.pet_photos set status='published',processed_at=coalesce(processed_at,clock_timestamp()) where id=p_id returning * into v_photo;
+    if not exists(select 1 from public.pet_photos where pet_id=v_photo.pet_id and is_primary) then
+        update public.pet_photos set is_primary=true where id=p_id returning * into v_photo;
+        update public.pets set photo_selection_version=photo_selection_version+1 where id=v_photo.pet_id;
+    end if;
+    return next v_photo;
+end; $$;
+
+create or replace function public.list_pet_photos(p_pet_id uuid)
+returns table(id uuid,pet_id uuid,owner_id uuid,status text,is_primary boolean,processed_at timestamptz,selection_version integer)
+language plpgsql security definer set search_path='' as $$
+begin
+    if auth.uid() is null or not exists(select 1 from public.pets where pets.id=p_pet_id and pets.owner_id=auth.uid()) then
+        raise exception using errcode='42501',message='photo_unauthorized';
+    end if;
+    return query select ph.id,ph.pet_id,ph.owner_id,ph.status,ph.is_primary,ph.processed_at,p.photo_selection_version
+        from public.pet_photos ph join public.pets p on p.id=ph.pet_id
+        where ph.pet_id=p_pet_id and ph.owner_id=auth.uid() order by ph.is_primary desc,ph.created_at,ph.id;
+end; $$;
+
+create or replace function public.set_primary_pet_photo(p_pet_id uuid,p_photo_id uuid,p_expected_version integer)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_pet public.pets;
+begin
+    select * into v_pet from public.pets where id=p_pet_id and owner_id=auth.uid() and deletion_requested_at is null for update;
+    if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    if not exists(select 1 from public.pet_photos where id=p_photo_id and pet_id=p_pet_id and owner_id=auth.uid() and status='published') then
+        raise exception using errcode='42501',message='photo_unauthorized';
+    end if;
+    if p_expected_version is null or p_expected_version<0 then raise exception using errcode='40001',message='photo_conflict'; end if;
+    if v_pet.photo_selection_version<>p_expected_version then
+        if v_pet.photo_selection_version=p_expected_version+1 and exists(select 1 from public.pet_photos where id=p_photo_id and is_primary) then return; end if;
+        raise exception using errcode='40001',message='photo_conflict';
+    end if;
+    if exists(select 1 from public.pet_photos where id=p_photo_id and is_primary) then return; end if;
+    update public.pet_photos set is_primary=false where pet_id=p_pet_id and is_primary;
+    update public.pet_photos set is_primary=true where id=p_photo_id;
+    update public.pets set photo_selection_version=photo_selection_version+1 where id=p_pet_id;
+end; $$;
+
+create or replace function public.begin_pet_photo_removal(p_id uuid,p_pet_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_photo public.pet_photos; v_next uuid;
+begin
+    perform 1 from public.pets where id=p_pet_id and owner_id=auth.uid() for update;
+    if not found then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    select * into v_photo from public.pet_photos where id=p_id for update;
+    if not found then return; end if;
+    if v_photo.pet_id<>p_pet_id or v_photo.owner_id<>auth.uid() then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    update public.pet_photos set status='removing',is_primary=false where id=p_id;
+    if v_photo.is_primary then
+        select id into v_next from public.pet_photos where pet_id=p_pet_id and status='published' order by created_at,id limit 1;
+        update public.pet_photos set is_primary=true where id=v_next;
+        update public.pets set photo_selection_version=photo_selection_version+1 where id=p_pet_id;
+    end if;
+end; $$;
+
+create or replace function public.remove_pet_photo(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_photo public.pet_photos;
+begin
+    if auth.uid() is null then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    perform 1 from public.pets p join public.pet_photos ph on ph.pet_id=p.id where ph.id=p_id and ph.owner_id=auth.uid() for update of p;
+    select * into v_photo from public.pet_photos where id=p_id for update;
+    if not found then return; end if;
+    if v_photo.owner_id<>auth.uid() then raise exception using errcode='42501',message='photo_unauthorized'; end if;
+    if v_photo.status<>'removing' then raise exception using errcode='40001',message='photo_removal_not_started'; end if;
+    if exists(select 1 from storage.objects where bucket_id in ('pet-photos','pet-photo-renditions','pet-photo-thumbnails') and name=v_photo.owner_id::text||'/'||v_photo.pet_id::text||'/'||p_id::text||'.jpg') then
+        raise exception using errcode='P0002',message='photo_file_remaining';
+    end if;
+    insert into public.pet_photo_deletions(id,pet_id,owner_id) values(p_id,v_photo.pet_id,v_photo.owner_id) on conflict(id) do nothing;
+    delete from public.pet_photos where id=p_id;
+end; $$;
+
+-- New uploads cannot use the old client-controlled publish path.
+create or replace function public.publish_pet_photo(p_id uuid)
+returns setof public.pet_photos language plpgsql security definer set search_path='' as $$
+begin
+    raise exception using errcode='42501',message='photo_processing_required';
+end; $$;
+
+create or replace function public.finish_pet_deletion(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets;
+begin
+    if v_owner is null then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+    select * into v_pet from public.pets where id=p_id for update;
+    if not found then return; end if;
+    if v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='pet_unauthorized'; end if;
+    if v_pet.case_history_at is not null or v_pet.active_case_count>0 then raise exception using errcode='23514',message='pet_has_case_history'; end if;
+    if v_pet.deletion_requested_at is null then raise exception using errcode='42501',message='pet_delete_not_started'; end if;
+    if exists(select 1 from storage.objects where bucket_id in ('pet-photos','pet-photo-renditions','pet-photo-thumbnails') and name like v_owner::text||'/'||p_id::text||'/%') then raise exception using errcode='P0002',message='pet_files_remaining'; end if;
+    insert into public.pet_deletions(id,owner_id) values(p_id,v_owner) on conflict(id) do nothing;
+    delete from public.pets where id=p_id;
+end; $$;
+
+-- Source: database/policies/046_pet_photo_processing_policies.sql | normalized SHA256: 1bc8d4f361a478df23933c693c044b09ea6e1825f4b2e656bb896a15d07dfb06
+create or replace function public.owns_pet_photo_rendition(p_name text,p_read boolean)
+returns boolean language sql stable security definer set search_path='' as $$
+    select exists(select 1 from public.pet_photos ph join public.pets p on p.id=ph.pet_id
+        where ph.owner_id=auth.uid() and p.owner_id=auth.uid()
+        and p_name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg'
+        -- Storage DELETE also needs SELECT visibility. A removing/deleting
+        -- owner's metadata remains readable until cleanup finishes.
+        and ((p_read and ph.status='published' and ph.processed_at is not null)
+             or ph.status='removing' or p.deletion_requested_at is not null));
+$$;
+do $$ begin
+    if not exists(select 1 from pg_catalog.pg_policy where polrelid='storage.objects'::regclass and polname='pet_renditions_owner_read') then
+        create policy pet_renditions_owner_read on storage.objects for select to authenticated using(bucket_id in ('pet-photo-renditions','pet-photo-thumbnails') and public.owns_pet_photo_rendition(name,true));
+        create policy pet_renditions_owner_delete on storage.objects for delete to authenticated using(bucket_id in ('pet-photo-renditions','pet-photo-thumbnails') and public.owns_pet_photo_rendition(name,false));
+        create policy pet_renditions_read_guard on storage.objects as restrictive for select to authenticated using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails') or public.owns_pet_photo_rendition(name,true));
+        create policy pet_renditions_delete_guard on storage.objects as restrictive for delete to authenticated using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails') or public.owns_pet_photo_rendition(name,false));
+        create policy pet_legacy_photos_delete_guard on storage.objects as restrictive for delete to authenticated using(bucket_id<>'pet-photos' or public.owns_pet_photo_rendition(name,false));
+        create policy pet_renditions_insert_guard on storage.objects as restrictive for insert to authenticated with check(bucket_id not in ('pet-photos','pet-photo-renditions','pet-photo-thumbnails'));
+        create policy pet_renditions_update_guard on storage.objects as restrictive for update to authenticated using(bucket_id not in ('pet-photos','pet-photo-renditions','pet-photo-thumbnails')) with check(bucket_id not in ('pet-photos','pet-photo-renditions','pet-photo-thumbnails'));
+        create policy pet_renditions_anon_guard on storage.objects as restrictive for all to anon using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails')) with check(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails'));
+    end if;
+end; $$;
+
+-- Source: database/grants/047_pet_photo_processing_permissions.sql | normalized SHA256: 36a31775dba15f5fba12e57b0bb2f60a8185a344400e867b01c49dc29ee026fe
+revoke all on public.pet_photo_deletions from public,anon,authenticated;
+revoke all on public.pet_photos from public,anon,authenticated;
+grant select(id,pet_id,owner_id,status,created_at,is_primary,processed_at) on public.pet_photos to authenticated;
+revoke all on function public.reserve_pet_photo(uuid,uuid),public.publish_pet_photo(uuid) from public,anon,authenticated;
+revoke all on function public.prepare_pet_photo(uuid,uuid,uuid,text),public.complete_pet_photo_processing(uuid,uuid,text) from public,anon,authenticated;
+grant execute on function public.prepare_pet_photo(uuid,uuid,uuid,text),public.complete_pet_photo_processing(uuid,uuid,text) to service_role;
+revoke all on function public.list_pet_photos(uuid),public.set_primary_pet_photo(uuid,uuid,integer),public.begin_pet_photo_removal(uuid,uuid),public.owns_pet_photo_rendition(text,boolean) from public,anon,authenticated;
+grant execute on function public.list_pet_photos(uuid),public.set_primary_pet_photo(uuid,uuid,integer),public.begin_pet_photo_removal(uuid,uuid),public.owns_pet_photo_rendition(text,boolean) to authenticated;
+
 commit;

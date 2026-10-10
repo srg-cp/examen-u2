@@ -6,7 +6,12 @@ class UnavailablePetPhotoRepository implements PetPhotoRepository {
   const UnavailablePetPhotoRepository();
   Never _fail() => throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
   @override
-  Future<Uint8List?> choose(String a, String b, bool c) async => _fail();
+  Future<Uint8List?> choose(
+    String a,
+    String b,
+    bool c, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) async => _fail();
   @override
   Future<Uint8List?> recover(String a, String b, bool c) async => null;
   @override
@@ -15,4 +20,11 @@ class UnavailablePetPhotoRepository implements PetPhotoRepository {
   Future<PetPhoto> upload(String a, String b, PetPhotoDraft c) async => _fail();
   @override
   Future<void> remove(String a, String b, String c) async => _fail();
+  @override
+  Future<List<PetPhoto>> setPrimary(
+    String a,
+    String b,
+    String c,
+    int d,
+  ) async => _fail();
 }
