@@ -2,18 +2,35 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+/// Visual identity of a navigation trigger, captured in Navigator coordinates.
+class OriginPageSource {
+  const OriginPageSource({
+    required this.bounds,
+    required this.color,
+    required this.radius,
+    required this.child,
+  });
+
+  final Rect bounds;
+  final Color color;
+  final double radius;
+  final Widget child;
+}
+
 /// Expands a rounded surface from the triggering control and reverses on pop.
 class OriginPageTransition extends StatelessWidget {
   const OriginPageTransition({
     required this.animation,
     required this.child,
     this.origin,
+    this.source,
     super.key,
   });
 
   final Animation<double> animation;
   final Widget child;
   final Rect? origin;
+  final OriginPageSource? source;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +50,15 @@ class OriginPageTransition extends StatelessWidget {
               ? Rect.fromCenter(center: bounds.center, width: 48, height: 48)
               : visibleOrigin;
           final surface = Rect.lerp(start, bounds, progress)!;
-          final radius = ui.lerpDouble(24, 0, progress)!;
-          final contentOpacity = ((progress - .08) / .72).clamp(0.0, 1.0);
+          final radius = ui.lerpDouble(source?.radius ?? 24, 0, progress)!;
+          final contentOpacity = originContentOpacity(animation.value);
+          final sourceOpacity =
+              1 -
+              const Interval(
+                0,
+                .45,
+                curve: Curves.easeInOutCubic,
+              ).transform(animation.value);
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -42,7 +66,11 @@ class OriginPageTransition extends StatelessWidget {
                 rect: surface,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Color.lerp(
+                      source?.color ?? Colors.white,
+                      Colors.white,
+                      progress,
+                    ),
                     borderRadius: BorderRadius.circular(radius),
                     boxShadow: progress > 0 && progress < 1
                         ? const [
@@ -53,20 +81,53 @@ class OriginPageTransition extends StatelessWidget {
                   child: ClipRRect(
                     key: const ValueKey('origin-surface'),
                     borderRadius: BorderRadius.circular(radius),
-                    child: OverflowBox(
-                      alignment: Alignment.topLeft,
-                      minWidth: bounds.width,
-                      maxWidth: bounds.width,
-                      minHeight: bounds.height,
-                      maxHeight: bounds.height,
-                      child: IgnorePointer(
-                        ignoring: animation.status != AnimationStatus.completed,
-                        child: Transform.scale(
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        OverflowBox(
                           alignment: Alignment.topLeft,
-                          scale: surface.width / bounds.width,
-                          child: Opacity(opacity: contentOpacity, child: child),
+                          minWidth: bounds.width,
+                          maxWidth: bounds.width,
+                          minHeight: bounds.height,
+                          maxHeight: bounds.height,
+                          child: ExcludeSemantics(
+                            excluding:
+                                animation.status != AnimationStatus.completed,
+                            child: IgnorePointer(
+                              ignoring:
+                                  animation.status != AnimationStatus.completed,
+                              child: Transform.scale(
+                                alignment: Alignment.topLeft,
+                                scale: surface.width / bounds.width,
+                                child: Opacity(
+                                  opacity: contentOpacity,
+                                  child: child,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        if (source != null && sourceOpacity > 0)
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: ExcludeSemantics(
+                                child: Opacity(
+                                  key: const ValueKey('origin-page-source'),
+                                  opacity: sourceOpacity,
+                                  child: Center(
+                                    child: OverflowBox(
+                                      minWidth: source!.bounds.width,
+                                      maxWidth: source!.bounds.width,
+                                      minHeight: source!.bounds.height,
+                                      maxHeight: source!.bounds.height,
+                                      child: source!.child,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -78,3 +139,7 @@ class OriginPageTransition extends StatelessWidget {
     );
   }
 }
+
+/// Let the source surface change shape before revealing destination content.
+double originContentOpacity(double value) =>
+    const Interval(.65, 1, curve: Curves.easeOutCubic).transform(value);

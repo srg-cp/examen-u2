@@ -9,6 +9,8 @@ import 'core/config/startup_state_provider.dart';
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/providers/registration_providers.dart';
 import 'features/auth/providers/password_recovery_providers.dart';
+import 'features/profile/providers/profile_providers.dart';
+import 'features/pets/providers/pet_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,16 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        petRepositoryProvider.overrideWithValue(bootstrap.petRepository),
+        petPhotoRepositoryProvider.overrideWithValue(
+          bootstrap.petPhotoRepository,
+        ),
+        profilePhotoRepositoryProvider.overrideWithValue(
+          bootstrap.profilePhotoRepository,
+        ),
+        profileRepositoryProvider.overrideWithValue(
+          bootstrap.profileRepository,
+        ),
         startupStateProvider.overrideWithValue(bootstrap.state),
         authRepositoryProvider.overrideWithValue(bootstrap.authRepository),
         passwordRecoveryRepositoryProvider.overrideWithValue(

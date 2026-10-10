@@ -9,7 +9,7 @@ class CommunityHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SurfaceCard(
-    color: AppColors.mint,
+    color: AppColors.surface,
     padding: const EdgeInsets.all(22),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,11 @@
 import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
 import '../test/support/fake_password_recovery.dart';
+import '../test/support/fake_profile.dart';
+import '../test/support/fake_profile_photo.dart';
+import '../test/support/fake_pets.dart';
+import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
+import 'package:flutter_application_entrehuellas/features/profile/providers/profile_providers.dart';
+import 'package:flutter_application_entrehuellas/features/profile/presentation/view_models/profile_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/auth/presentation/view_models/password_recovery_view_model.dart';
 
 import '../test/access_test.dart' show FakeAccess;
@@ -12,6 +18,7 @@ import 'package:flutter_application_entrehuellas/features/auth/presentation/view
 import 'package:flutter_application_entrehuellas/features/auth/presentation/state/login_view_state.dart';
 // Visual QA harness, invoked explicitly with flutter test. No golden baselines.
 import 'dart:convert';
+import 'package:flutter_application_entrehuellas/features/profile/presentation/view_models/profile_photo_view_model.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -78,8 +85,13 @@ void main() {
     addTearDown(recovery.events.close);
     final onboarding = FakeOnboarding(auth);
     addTearDown(auth.controller.close);
+    final profile = FakeProfile();
+    final profilePhotos = FakeProfilePhoto(profile);
     final container = ProviderContainer(
       overrides: [
+        petRepositoryProvider.overrideWithValue(FakePets()),
+        profileRepositoryProvider.overrideWithValue(profile),
+        profilePhotoRepositoryProvider.overrideWithValue(profilePhotos),
         startupStateProvider.overrideWithValue(
           const StartupState(StartupStatus.ready),
         ),
@@ -332,12 +344,86 @@ void main() {
     await tester.tap(find.text('Comenzar'));
     await tester.pumpAndSettle();
     await capture('home');
+    await tester.tap(find.byTooltip('Explorar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('home_navigation_slide');
+    await tester.pumpAndSettle();
+    await capture('home_explore');
+    await tester.tap(find.byTooltip('Inicio'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Reportar'));
+    await tester.pumpAndSettle();
+    await capture('home_report');
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+    profile.pendingRead = Completer<void>();
+    container.invalidate(profileViewModelProvider);
+    await tester.tap(find.byTooltip('Abrir perfil'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 16));
+    await capture('profile_origin_start');
+    await tester.pump(const Duration(milliseconds: 160));
+    await capture('profile_origin_middle');
+    for (var frame = 0; frame < 30; frame++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await capture('profile_loading');
+    profile.pendingRead!.complete();
+    await tester.pumpAndSettle();
+    await capture('profile');
+    profilePhotos.selection = Uint8List.fromList([255, 216, 255, 0]);
+    profilePhotos.fail = true;
+    await tester.tap(find.bySemanticsLabel('Cambiar foto de perfil'));
+    await tester.pumpAndSettle();
+    await capture('profile_photo_error');
+    container.read(profilePhotoViewModelProvider.notifier).discard();
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Ana María');
+    await tester.pump();
+    profile.pendingUpdate = Completer<void>();
+    await tester.ensureVisible(find.text('Guardar cambios'));
+    await tester.tap(find.text('Guardar cambios'));
+    await tester.pump(const Duration(milliseconds: 280));
+    await capture('profile_saving');
+    profile.failUpdate = true;
+    profile.pendingUpdate!.complete();
+    await tester.pumpAndSettle();
+    await capture('profile_error');
+    profile.failUpdate = false;
+    await tester.tap(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+    await capture('profile_saved');
+    profile.failRead = true;
+    container.read(profileViewModelProvider.notifier).retry();
+    await tester.pumpAndSettle();
+    await capture('profile_load_error');
+    profile.failRead = false;
+    await tester.tap(find.text('Reintentar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Cerrar perfil'));
+    await tester.pumpAndSettle();
     tester.view.physicalSize = const Size(320, 350);
     tester.platformDispatcher.textScaleFactorTestValue = 2;
     await tester.pumpAndSettle();
+    await capture('home_small');
+    await tester.tap(find.byTooltip('Abrir perfil'));
+    await tester.pumpAndSettle();
+    await capture('profile_small');
+    await tester.ensureVisible(find.text('Nombre'));
+    await tester.pumpAndSettle();
+    await capture('profile_fields_small');
+    await tester.ensureVisible(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+    await capture('profile_actions_small');
+    container.read(profileViewModelProvider.notifier).edit(city: 'Cusco');
+    await container.read(profileViewModelProvider.notifier).save();
+    await tester.pumpAndSettle();
+    await capture('profile_toast_small');
+    await tester.pump(const Duration(seconds: 4));
     await tester.ensureVisible(find.text('Cerrar sesión'));
     await tester.pumpAndSettle();
-    await capture('home_small');
+    await capture('home_profile_small');
     expect(tester.takeException(), isNull);
   });
 }

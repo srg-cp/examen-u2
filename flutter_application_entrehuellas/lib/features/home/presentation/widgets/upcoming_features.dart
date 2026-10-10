@@ -21,7 +21,7 @@ class UpcomingFeatures extends StatelessWidget {
             icon: Icons.pets_outlined,
             title: 'Tus mascotas',
             description: 'Su historia, sus fotos y un lugar propio.',
-            color: AppColors.peach,
+            color: AppColors.surface,
           );
           const cases = _UpcomingCard(
             icon: Icons.near_me_outlined,

@@ -1,5 +1,7 @@
 # Base de datos de Entre Huellas
 
+Corrección vigente de avatar: usar [patchs/004_patch_profile_avatars.sql](patchs/004_patch_profile_avatars.sql) completo en SQL Editor. La migración 003 falló por ALTER TABLE sobre Storage administrado; plan 004/fuente 012 validan RLS existente sin alterar su propietario/configuración. Historial previo conservado. Regenerar con `./database/scripts/Build-AvatarPatch.ps1`; run_all también utiliza la corrección. Detalles en [patchs/README.md](patchs/README.md).
+
 Esta carpeta contiene las fuentes SQL de PostgreSQL/Supabase, organizadas por tipo de objeto. El esquema y los permisos se incorporan por funcionalidad. La base de datos se ejecuta en Supabase; este directorio guarda su código versionado.
 
 ## Estructura
@@ -137,3 +139,37 @@ El formulario de Crear cuenta usa Supabase Auth y envía `full_name`; el trigger
 Añade `profiles.onboarding_completed_at` y `complete_onboarding()`. Solo se permite leer la fecha propia. El cliente no puede escribirla ni reiniciarla directamente: la RPC usa `auth.uid()`, fija fecha de servidor solo si estaba vacía y rechaza falta de sesión/perfil. Comenzar finaliza el recorrido con la misma RPC persistente; la interfaz ya no ofrece Omitir. La fecha pertenece a la cuenta y sobrevive a reinstalación/cambio de dispositivo.
 
 El plan `002_onboarding.json` genera una migración nueva; la inicial permanece intacta. `run_all.sql` ahora incluye ambas fuentes nuevas y acepta tablas de perfiles anteriores (cinco columnas) o actualizadas (seis). La RPC 009 usa `CREATE OR REPLACE` de forma explícita y revisada para repetir su definición; las funciones de la base 001–007 siguen protegidas por existencia. `tests/002_onboarding_permissions.sql` comprueba finalización propia, repetición, prohibición de reinicio y aislamiento de otra cuenta.
+
+## Consulta y edición de Perfil
+
+HU-01.7 reutiliza los grants/políticas/restricciones versionados en 001–009: lectura propia y actualización de display_name/city, sin escribir id, fechas ni onboarding. No hay cambios de esquema ni nueva migración. Prueba adicional `tests/003_profile_edit_permissions.sql` valida columnas de servidor, longitudes Unicode, valores opcionales y reintentos; se ejecuta junto con 001 para aislamiento entre cuentas. `npm test` incluye ambos sobre PGlite. La demo autenticada remota se prepara con `tool/check_profile_remote_test.dart` y configuración local ignorada, según CONFIGURACION; no se acredita por pasar PGlite.
+
+## Incremento de foto privada de cuenta — 010–011
+
+Por solicitud del usuario, tabla/configuración de bucket en tables/010_create_profile_avatar_bucket.sql y RLS en policies/011_profile_avatar_owner_policies.sql. Plan 003_profile_avatars.json genera supabase/migrations/20261008000300_profile_avatars.sql. No cambia columnas de profiles ni SQL aplicado de 001–009; el correo sigue en Auth. Bucket privado, JPEG/2 MiB, ruta estable por usuario, upsert y guardas restrictivas contra políticas amplias ajenas.
+
+Build-RunAll revisa el nuevo plan y añade fuentes idempotentes al final; baseline de perfiles permanece compatible (cinco/seis columnas). Tests incluyen una fixture mínima de Storage con UUID/unique(bucket_id,name) y RLS para PGlite; 004 comprueba aislamiento, ruta y privacidad aun con otra política permisiva. No representa todo el servicio Storage ni demuestra subida/descarga real. Procedimiento de activación y bloqueo de APK en CONFIGURACION/ESTADO; migración remota pendiente.
+
+## Incremento privado de mascotas
+
+Fuentes 013–018, plan 005, migración 20261008000500_pets.sql y salida manual patchs/005_patch_pets.sql. Build-PetsPatch genera el artefacto manual; Build-RunAll lo incorpora. Nombre/especie obligatorios, opcionales normalizados, SELECT con RLS por dueño y RPC autorizadas para creación/edición sin escrituras directas cliente. ID estable deduplica creación; versión y bloqueo de fila rechazan edición concurrente y reconocen reintento idéntico. SQL 005 verifica roles, Unicode, campos, privilegios y reintentos con rollback. Sin fotos ni borrado de mascotas en este incremento; ver ADR-010.
+
+## Tipo, tamaño y galería privada de mascotas
+
+Fuentes 019–025, plan 006, migración 20261009000600_pet_gallery.sql y patchs/006_patch_pet_gallery.sql derivados de Build-PetGalleryPatch. Ejecutar archivo completo después de 005. Build-RunAll agrega el incremento y verifica igualdad de fuentes con las migraciones anteriores. El plan nuevo aporta trazabilidad HU-03.1/HU-03.2/HU-04.1 / RF-03; los planes anteriores conservan sus bytes.
+
+RPC v2 añaden species_detail/size y sustituyen los permisos cliente de RPC antiguas. Reservas privadas pet_photos cuentan en el límite de tres; publish exige objeto propio/MIME/tamaño; remove exige ausencia del archivo. Bucket privado pet-photos, 2 MiB/JPEG, rutas owner/pet/photo.jpg, RLS restrictiva contra políticas permisivas. Test 006 prueba límite, cuentas/anónimo, reintentos, retirada y validación, con rollback. Fixture local Storage agrega metadata; no demuestra contenido real del objeto ni sanitización de bytes en servidor. ADR-012 registra límites de publicación/miniaturas y demo Android/Storage pendiente.
+
+## Archivado y eliminación definitiva protegida
+
+Fuentes030–033 y plan008 generan supabase/migrations/20261009000800_pet_archiving.sql y database/patchs/008_patch_pet_archiving.sql mediante Build-PetArchivingPatch.ps1. Requiere007. Build-RunAll incorpora el nuevo incremento después de eliminación, sin reescribir SQL de planes anteriores.
+
+archive_pet/restore_pet conservan ficha/fotos y controlan dueño, versión, reintento y caso activo. begin_pet_deletion/finish_pet_deletion evolucionan en la nueva fuente031 para rechazar historial antes de limpiar archivos. case_history_at/active_case_count son indicadores de servidor: S3 debe mantenerlos en las transacciones de casos; no exponer comandos cliente para modificarlos. RLS/grants previos conservados. Trigger impide borrar historia y constraints impiden archivar con casos activos. Véase ADR-014 para alcance, baja de cuenta y contrato de integración pendiente.
+
+Prueba008 verifica propietarios, anónimo, archivo/restauración/reintentos, fotos, historial inmutable, contador activo y borrado definitivo sin historia. node --test run_all.test.mjs valida también reejecución completa; los fixtures no prueban servicios remotos.
+
+## Campos obligatorios de mascota — plan009
+
+Fuentes034–035, plan009_pet_required_fields.json, migración20261009000900_pet_required_fields.sql y patchs/009_patch_pet_required_fields.sql, generados mediante Build-PetRequiredFieldsPatch.ps1/Build-Migration.ps1. Requiere008; Build-RunAll incorpora el guard al final. Aplicar el patch completo en desarrollo cuando se autorice su despliegue.
+
+Trigger de insert/update sobre metadatos exige tamaño, edad0–600 y rasgos1–200 puntos de código Unicode, además de nombre/especie/tipo y permisos existentes. No reescribe datos antiguos ni concede escrituras cliente. Su lectura y operaciones de ciclo de vida continúan disponibles; cambios de metadatos requieren completarlos. Test vigente en run_all.test.mjs cubre validación, Unicode, cuentas/anónimo, reintentos, registros antiguos y repetición. Tests históricos de mascotas usan el bundle hasta033 para mantener los contratos que verifican. Véase ADR-016. Activación remota pendiente.

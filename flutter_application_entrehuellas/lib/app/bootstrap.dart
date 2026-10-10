@@ -4,6 +4,24 @@ import '../features/onboarding/data/repositories/onboarding_repository_impl.dart
 import '../features/onboarding/data/repositories/unavailable_onboarding_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import '../features/profile/domain/repositories/profile_repository.dart';
+import '../features/profile/data/data_sources/supabase_profile_data_source.dart';
+import '../features/profile/data/repositories/profile_repository_impl.dart';
+import '../features/profile/data/repositories/unavailable_profile_repository.dart';
+import 'package:image_picker/image_picker.dart';
+import '../features/profile/domain/repositories/profile_photo_repository.dart';
+import '../features/profile/data/repositories/profile_photo_repository_impl.dart';
+import '../features/profile/data/repositories/unavailable_profile_photo_repository.dart';
+import '../features/profile/data/data_sources/gallery_profile_photo_source.dart';
+import '../features/pets/domain/repositories/pet_repository.dart';
+import '../features/pets/data/data_sources/supabase_pet_data_source.dart';
+import '../features/pets/data/repositories/pet_repository_impl.dart';
+import '../features/pets/data/repositories/unavailable_pet_repository.dart';
+import '../features/pets/domain/repositories/pet_photo_repository.dart';
+import '../features/pets/data/data_sources/pet_gallery_source.dart';
+import '../features/pets/data/data_sources/supabase_pet_photo_source.dart';
+import '../features/pets/data/repositories/pet_photo_repository_impl.dart';
+import '../features/pets/data/repositories/unavailable_pet_photo_repository.dart';
 
 import '../core/config/app_config.dart';
 import '../core/config/startup_state.dart';
@@ -31,6 +49,10 @@ class AppBootstrap {
     required this.onboardingRepository,
     required this.registrationRepository,
     required this.passwordRecoveryRepository,
+    required this.profileRepository,
+    required this.profilePhotoRepository,
+    required this.petRepository,
+    required this.petPhotoRepository,
   });
 
   final StartupState state;
@@ -39,6 +61,10 @@ class AppBootstrap {
   final OnboardingRepository onboardingRepository;
   final RegistrationRepository registrationRepository;
   final PasswordRecoveryRepository passwordRecoveryRepository;
+  final ProfileRepository profileRepository;
+  final ProfilePhotoRepository profilePhotoRepository;
+  final PetRepository petRepository;
+  final PetPhotoRepository petPhotoRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -63,9 +89,23 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          petPhotoRepository: PetPhotoRepositoryImpl(
+            NativePetGallerySource(ImagePicker()),
+            SupabasePetPhotoSource(supabase.client),
+          ),
+          petRepository: PetRepositoryImpl(
+            SupabasePetDataSource(supabase.client),
+          ),
           state: const StartupState(StartupStatus.ready),
+          profilePhotoRepository: ProfilePhotoRepositoryImpl(
+            GalleryProfilePhotoSource(ImagePicker()),
+            SupabaseProfileDataSource(supabase.client),
+          ),
           authRepository: AuthRepositoryImpl(source),
           accessRepository: AccessRepositoryImpl(source),
+          profileRepository: ProfileRepositoryImpl(
+            SupabaseProfileDataSource(supabase.client),
+          ),
           passwordRecoveryRepository: PasswordRecoveryRepositoryImpl(
             SupabasePasswordRecoveryDataSource(
               supabase.client,
@@ -90,10 +130,14 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
 }
 
 AppBootstrap _unavailable(StartupStatus status) => AppBootstrap(
+  petPhotoRepository: const UnavailablePetPhotoRepository(),
+  petRepository: const UnavailablePetRepository(),
   state: StartupState(status),
   authRepository: const UnavailableAuthRepository(),
   accessRepository: const UnavailableAccessRepository(),
   registrationRepository: const UnavailableRegistrationRepository(),
   passwordRecoveryRepository: const UnavailablePasswordRecoveryRepository(),
   onboardingRepository: const UnavailableOnboardingRepository(),
+  profileRepository: const UnavailableProfileRepository(),
+  profilePhotoRepository: const UnavailableProfilePhotoRepository(),
 );

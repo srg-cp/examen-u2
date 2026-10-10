@@ -6,7 +6,7 @@ class PillLabel extends StatelessWidget {
   const PillLabel({
     required this.label,
     this.icon,
-    this.color = AppColors.green,
+    this.color = AppColors.ink,
     this.background = AppColors.surface,
     super.key,
   });

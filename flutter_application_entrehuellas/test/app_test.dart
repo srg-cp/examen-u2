@@ -164,14 +164,14 @@ void main() {
       expect(find.text('Una nueva'), findsOneWidget);
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Inicio'), findsOneWidget);
+      expect(find.byTooltip('Inicio'), findsOneWidget);
       expect(onboarding.completed, {'one'});
       auth.emit(null);
       await tester.pumpAndSettle();
       expect(find.text('Iniciar sesión'), findsOneWidget);
       auth.emit(const AuthSession(userId: 'one'));
       await tester.pumpAndSettle();
-      expect(find.text('Inicio'), findsOneWidget);
+      expect(find.byTooltip('Inicio'), findsOneWidget);
       auth.emit(const AuthSession(userId: 'two'));
       await tester.pumpAndSettle();
       expect(find.text('Cada huella'), findsOneWidget);
@@ -198,7 +198,7 @@ void main() {
       onboarding.failSave = false;
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Inicio'), findsOneWidget);
+      expect(find.byTooltip('Inicio'), findsOneWidget);
       expect(onboarding.saves, 2);
     },
   );
@@ -290,7 +290,7 @@ void main() {
     auth.current = const AuthSession(userId: 'returning');
     onboarding.completed.add('returning');
     await mount(tester);
-    expect(find.text('Inicio'), findsOneWidget);
+    expect(find.byTooltip('Inicio'), findsOneWidget);
     expect(find.text('Iniciar sesión'), findsNothing);
   });
 
@@ -340,7 +340,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
-      expect(find.text('Inicio'), findsOneWidget);
+      expect(find.byTooltip('Inicio'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

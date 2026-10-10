@@ -32,11 +32,13 @@ class AuthStageTransition extends StatefulWidget {
     required this.stage,
     required this.builder,
     this.startCovered = false,
+    this.enabled = true,
     super.key,
   });
   final Object stage;
   final Widget Function(bool play) builder;
   final bool startCovered;
+  final bool enabled;
   @override
   State<AuthStageTransition> createState() => _AuthStageTransitionState();
 }
@@ -51,7 +53,7 @@ class _AuthStageTransitionState extends State<AuthStageTransition>
   @override
   void initState() {
     super.initState();
-    _covering = widget.startCovered;
+    _covering = widget.startCovered && widget.enabled;
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 320),
@@ -72,7 +74,7 @@ class _AuthStageTransitionState extends State<AuthStageTransition>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    if (!widget.enabled || MediaQuery.disableAnimationsOf(context)) {
       _covering = false;
       _previous = null;
       _previousKey = null;
@@ -85,6 +87,13 @@ class _AuthStageTransitionState extends State<AuthStageTransition>
   @override
   void didUpdateWidget(AuthStageTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!widget.enabled) {
+      _covering = false;
+      _previous = null;
+      _previousKey = null;
+      _controller.value = 1;
+      return;
+    }
     if (oldWidget.stage == widget.stage) return;
     _previous = oldWidget.builder(true);
     _previousKey = _stageKey;

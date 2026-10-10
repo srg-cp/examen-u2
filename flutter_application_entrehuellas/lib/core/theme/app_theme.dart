@@ -3,10 +3,54 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   static const fontFamily = 'sans-serif';
   static ThemeData get light {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.green,
+    const scheme = ColorScheme.light(
+      primary: AppColors.ink,
+      onPrimary: AppColors.background,
+      primaryContainer: AppColors.divider,
+      onPrimaryContainer: AppColors.ink,
+      primaryFixed: AppColors.surface,
+      primaryFixedDim: AppColors.divider,
+      onPrimaryFixed: AppColors.ink,
+      onPrimaryFixedVariant: AppColors.secondary,
+      secondary: AppColors.secondary,
+      onSecondary: AppColors.background,
+      secondaryContainer: AppColors.surface,
+      onSecondaryContainer: AppColors.ink,
+      secondaryFixed: AppColors.surface,
+      secondaryFixedDim: AppColors.divider,
+      onSecondaryFixed: AppColors.ink,
+      onSecondaryFixedVariant: AppColors.secondary,
+      tertiary: AppColors.secondary,
+      onTertiary: AppColors.background,
+      tertiaryContainer: AppColors.surface,
+      onTertiaryContainer: AppColors.ink,
+      tertiaryFixed: AppColors.surface,
+      tertiaryFixedDim: AppColors.divider,
+      onTertiaryFixed: AppColors.ink,
+      onTertiaryFixedVariant: AppColors.secondary,
+      error: AppColors.error,
+      onError: AppColors.background,
+      errorContainer: Color(0xFFF9ECEE),
+      onErrorContainer: AppColors.error,
       surface: AppColors.background,
-    ).copyWith(primary: AppColors.ink, onPrimary: Colors.white);
+      onSurface: AppColors.ink,
+      surfaceDim: AppColors.divider,
+      surfaceBright: AppColors.background,
+      surfaceContainerLowest: AppColors.background,
+      surfaceContainerLow: AppColors.surface,
+      surfaceContainer: AppColors.surface,
+      surfaceContainerHigh: AppColors.surface,
+      surfaceContainerHighest: AppColors.divider,
+      onSurfaceVariant: AppColors.secondary,
+      outline: AppColors.secondary,
+      outlineVariant: AppColors.divider,
+      shadow: AppColors.ink,
+      scrim: AppColors.ink,
+      inverseSurface: AppColors.ink,
+      onInverseSurface: AppColors.background,
+      inversePrimary: AppColors.divider,
+      surfaceTint: Colors.transparent,
+    );
     return ThemeData(
       useMaterial3: true,
       fontFamily: AppTheme.fontFamily,
@@ -71,7 +115,7 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF24282A),
+          backgroundColor: const Color(0xFF111111),
           foregroundColor: Colors.white,
           minimumSize: const Size(0, 60),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
@@ -92,10 +136,8 @@ abstract final class AppTheme {
 abstract final class AppColors {
   static const background = Colors.white;
   static const ink = Color(0xFF111111);
-  static const secondary = Color(0xFF747781);
-  static const green = Color(0xFF137B50);
-  static const mint = Color(0xFFE0F2E5);
-  static const peach = Color(0xFFF5E9E0);
-  static const divider = Color(0xFFE4E9E2);
-  static const surface = Colors.white;
+  static const secondary = Color(0xFF6E6E73);
+  static const divider = Color(0xFFE5E5EA);
+  static const surface = Color(0xFFF5F5F7);
+  static const error = Color(0xFFB53F48);
 }

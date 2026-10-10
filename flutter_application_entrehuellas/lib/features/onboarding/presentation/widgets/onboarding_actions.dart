@@ -39,8 +39,8 @@ class OnboardingActions extends StatelessWidget {
       child: FilledButton(
         onPressed: isBusy ? null : onNext,
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF24282A),
-          disabledBackgroundColor: isBusy ? const Color(0xFF24282A) : null,
+          backgroundColor: const Color(0xFF111111),
+          disabledBackgroundColor: isBusy ? const Color(0xFF111111) : null,
           disabledForegroundColor: isBusy ? Colors.white : null,
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
           minimumSize: const Size(180, 68),

@@ -72,7 +72,7 @@ class AccessScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF747781),
+                          color: Color(0xFF6E6E73),
                         ),
                       ),
                     ),
@@ -107,7 +107,7 @@ class AccessScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     '¿No tienes una cuenta?',
-                    style: TextStyle(fontSize: 15, color: Color(0xFF747781)),
+                    style: TextStyle(fontSize: 15, color: Color(0xFF6E6E73)),
                   ),
                   CreateAccountButton(enabled: !login.isBusy),
                 ],

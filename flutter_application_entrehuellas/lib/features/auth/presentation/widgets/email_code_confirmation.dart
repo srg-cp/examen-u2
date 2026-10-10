@@ -79,7 +79,7 @@ class EmailCodeConfirmation extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             height: 1.4,
-            color: Color(0xFF747781),
+            color: Color(0xFF6E6E73),
           ),
         ),
       ),
@@ -102,7 +102,7 @@ class EmailCodeConfirmation extends StatelessWidget {
         child: Text(
           '¿No recibiste el código?',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: Color(0xFF747781)),
+          style: TextStyle(fontSize: 16, color: Color(0xFF6E6E73)),
         ),
       ),
       StaggerRevealItem(

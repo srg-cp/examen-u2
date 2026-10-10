@@ -290,3 +290,43 @@ La entrada manual del esquema de perfiles es ahora `database/run_all.sql`, gener
 ### Corrección del recorrido de acceso
 
 Por instrucción del usuario, el orden es login → onboarding de tres pasos → app. No hay bienvenida pública anterior al login ni pantalla intermedia de sesión activa. El onboarding se muestra hasta completarlo u omitirlo y su finalización pertenece a la cuenta, no a la instalación. El retorno de una sesión existente que ya lo completó abre la app directamente. Este incremento de HU-01 incorpora la persistencia y RPC de finalización; no agrega funcionalidades de mascotas, registro o perfil fuera del alcance actual.
+
+### Diseño navegable de Inicio, 8 de octubre de 2026
+
+Por aprobación explícita del usuario, Inicio incorpora cápsula liquid glass (Inicio, Explorar, Mis mascotas, Perfil), botón Reportar separado y panel con los dos tipos de reporte. Incremento de presentación sobre el destino autenticado: no altera el alcance ni completa historias de mascotas/casos/alertas. Sus módulos muestran disponibilidad pendiente; no se simulan datos ni publicación. El cierre de sesión real permanece en Perfil; login/onboarding y permisos conservan sus criterios. Composición y verificación en REGLAS_UI_UX, DISENO_UI y ESTADO.
+
+### Incremento de Perfil — HU-01.7 / RF-01, issue #23
+
+Implementación local de consulta/edición de nombre visible y ciudad desde Perfil, con persistencia Supabase, validación de campos opcionales, respuesta confirmada, conservación del formulario ante fallos y recuperación. Usa esquema y permisos 001–009 existentes; no amplía a baja/exportación ni inicia mascotas. Debe demostrarse con dos cuentas autenticadas y Android antes de cerrar los criterios remotos. La prueba anónima remota y pruebas PostgreSQL locales no sustituyen esa demo. Procedimiento actualizado en CONFIGURACION.
+
+### Cambio de acceso a Perfil
+
+Por aprobación del usuario, Perfil pasa de sección inferior a ruta protegida superpuesta abierta desde avatar de cabecera. Conserva editor/persistencia de HU-01.7. Logo y alertas permanecen arriba; barra principal queda Inicio/Explorar/Mis mascotas. Se añade lectura de foto de metadatos propios cuando existe e iniciales de respaldo, sin cambiar esquema ni iniciar un flujo de subida de fotografías desde galería.
+
+### Ampliación autorizada de HU-01.7: foto y correo
+
+Usuario solicita foto propia desde galería y correo visible de solo lectura. ADR-008 registra este alcance de cuenta, separado de HU-04 (fotografías de mascotas). Incluye selección/normalización, bucket privado/políticas, reintento y recuperación de selección por cuenta. No se cierra issue #23 ni se modifica GitHub con esta entrega; falta activación SQL y demo integrada Android/Storage. No iniciar funciones de mascotas por este cambio.
+
+### Incremento autorizado: Mis mascotas y ficha editable
+
+Se implementa HU-03.1 / #28 y edición de metadatos de HU-03.2 / #29: nombre/especie, opcionales desconocidos, listado/detalle/edición privados, persistencia y reintentos con ID estable/versión. Fotografías (#30/#31), zonas y casos mantienen sus incrementos posteriores. #29 no se completa sin fotos ni #28 sin demo remota/Android. No cerrar historias por pruebas con sustitutos. Contratos y límites en ADR-010.
+
+### Ampliación autorizada de ficha y galería — 9 de octubre de 2026
+
+Usuario solicita retorno superior, tipo concreto para Otra especie, tamaño horizontal y fotos. ADR-012 amplía HU-03.1/#28, HU-03.2/#29 y parte de HU-04.1/#30: galería privada del dueño con hasta tres fotos, normalización cliente, persistencia/reintentos/retirada y permisos por mascota. Fotos confirmadas en ficha y portada de listado. No publicar originales ni completar miniaturas/sanitización servidor/cámara por este ajuste: esos criterios de #30 siguen pendientes junto con demo real Android/Supabase. Nuevo plan/patch 006, sin reescribir SQL anterior ni cambiar estados GitHub en esta tarea.
+
+### Archivo reversible y eliminación definitiva — 9 de octubre de 2026
+
+Por aceptación del usuario, HU-03 / RF-03 añade archivo/restauración como alternativa habitual al borrado. Se entrega ahora el contrato SQL008: conservar ficha/fotos, bloquear archivo con casos activos y borrado con historial. Sin ampliación a adopciones/reportes en este incremento. Integración Flutter y demo remota pendientes; S3 debe mantener indicadores de historia/casos activos bajo bloqueo en la misma transacción. Detalles en ADR-014 y CONFIGURACION.
+
+## Ajuste solicitado de registro/edición de mascotas — 9 de octubre de 2026
+
+HU-03 / RF-03 (issues#28/#29 separados de la numeración HU): nombre/especie/tamaño/edad/rasgos obligatorios al guardar, descripción1–200 con contador, sexo opcional con valor inicial y placeholder de especie no seleccionable. Selector de fotos privado de hasta160, conservando alcance HU-04.1/#30 y sus pendientes. Feedback del editor mediante shake danger y toast superior sin errores debajo, según ADR-016. Plan009 añade validación protegida de metadatos; preserva fichas antiguas y su ciclo de vida. No cierra HU/issues ni activa SQL remoto por pruebas locales.
+
+### Fotos como borrador hasta confirmación — 9 de octubre de 2026
+
+Corrección de HU-03.2/#29 y galería privada HU-04.1/#30: selección/retirada se mantienen locales hasta Registrar mascota/Guardar cambios; cancelar conserva fotos confirmadas. ADR-017 documenta reintento y límites del guardado parcial tras confirmación. No añade sincronización offline persistente, atomicidad de Storage ni migración SQL.
+
+### Integración de archivo/restauración — 9 de octubre de 2026
+
+HU-03 / RF-03 (issues #28/#29): Mis mascotas incorpora Activas/Archivadas y la ficha permite Archivar con confirmación o Restaurar, conservando fotos y metadatos. Eliminar sigue disponible por swipe y rechaza historial/casos activos mediante dominio y servidor. Los casos S3 siguen pendientes y deben mantener indicadores atómicamente según ADR-014. No añade SQL ni cierra automáticamente HU/issues: validación autenticada Android/Supabase y criterios restantes de fotos HU-04 siguen pendientes.

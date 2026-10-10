@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'brand_wordmark.dart';
+import 'glass_navigation_button.dart';
 import 'stagger_reveal.dart';
 
 /// Shared header geometry: changing form height must not move the brand/title.
@@ -97,10 +98,10 @@ class AppPageLayout extends StatelessWidget {
                   left: 16,
                   child: _item(
                     0,
-                    IconButton(
+                    GlassNavigationButton(
                       onPressed: onClose,
                       tooltip: 'Cerrar registro',
-                      icon: const Icon(Icons.close_rounded, size: 30),
+                      icon: Icons.close_rounded,
                     ),
                     enabled: revealClose,
                   ),

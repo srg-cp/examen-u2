@@ -186,3 +186,53 @@ La UI utiliza feedback contextual y prohíbe SnackBar por [ADR-005](decisiones/0
 RegisterScreen compone una única StaggerReveal compartida entre cabecera y RegistrationForm. Cada componente usa StaggerRevealItem con su orden de entrada; el timeline se conserva durante reconstrucciones del ViewModel y respeta movimiento reducido. La animación reside en presentación y no altera casos de uso, estado de autenticación ni persistencia.
 
 AccessScreen y RegisterScreen reutilizan AuthPageLayout para conservar dimensiones y anclaje de marca/título, sin centrar cada formulario por su propia altura. La X de cierre del registro no reserva un AppBar. El router compone OriginPageTransition con el rectángulo visual del control de entrada. Registro retorna mediante pop para completar la animación inversa y conservar el login anterior; solo usa go sin historial. La transición se desactiva con movimiento reducido y no participa de autorización ni lógica de cuenta.
+
+## Perfil de cuenta — HU-01.7 / RF-01
+
+Perfil se implementa en `features/profile`: entidades/fallos/repositorio y ReadProfile/UpdateProfile en dominio; DTO, fuente Supabase y repositorio en data; AsyncNotifier autoDispose, estado y formulario en presentación. Providers declaran contratos/casos de uso y observación de identidad mediante WatchAuthSession. Bootstrap inyecta el repositorio; router compone ProfileEditor dentro del shell Home mediante un parámetro Widget, sin importaciones entre las presentaciones de ambas funcionalidades.
+
+La lectura selecciona únicamente id/display_name/city de la cuenta activa. La escritura reemplaza solamente display_name/city y obtiene la fila confirmada; nunca envía identidad, rol, timestamps u onboarding. Campos opcionales, vacíos normalizados a null, longitud máxima 120 puntos de código acorde a PostgreSQL. La fuente comprueba identidad antes/después de cada respuesta; ViewModel descarta resultados tardíos por generación al cambiar de cuenta y no escribe tras desmontaje. Fallos de fuente se normalizan y el editor conserva cambios durante error/reintento. Lectura fallida permite retry explícito, sin reintentos automáticos ocultos.
+
+El esquema 001–009 ya contempla este contrato: no se modifica SQL aplicado ni se genera una migración sin cambio de esquema. Tests 001 y 003 verifican políticas/grants y edición en PostgreSQL local; ejecución con dos cuentas autenticadas en Supabase sigue siendo verificación separada.
+
+## Perfil como ruta desde avatar
+
+ProfileAvatarButton se compone desde app/router en el parámetro profileAvatar de Home, sin imports de presentación entre funcionalidades. HomeViewModel solo controla tres destinos; la salida de cuenta pasa a ProfileExitViewModel autoDispose y mantiene SignOut de dominio. /home/profile está anidada en /home y protegida por EntryDestination; la ruta superpuesta conserva estado de Inicio al regresar.
+
+ProfileAvatar observa ProfileViewModel, también utilizado por editor: la suscripción de cabecera mantiene perfil vigente mientras vive Home; los resultados de identidad/carga/error no muestran datos de otra cuenta. SupabaseProfileDataSource agrega solamente la URL HTTPS de avatar_url/picture de metadatos propios al DTO; repositorio mapea avatarUri a entidad. Los metadatos no autorizan operaciones ni se exponen íntegros. Escritura de nombre/ciudad y grants/RLS conservan su contrato. No se añade esquema/Storage para carga de fotos en este ajuste.
+
+## Foto de cuenta y correo
+
+ProfilePhotoRepository/ChangeProfilePhoto declaran selección, recuperación y subida concreta. GalleryProfilePhotoSource encapsula image_picker, procesamiento image y marcador de propietario shared_preferences; ProfilePhotoRepositoryImpl normaliza fallos. SupabaseProfileDataSource proyecta email desde Auth y usa Storage privado con ruta estable/URL firmada. ProfilePhotoViewModel autoDispose controla carga/reintento y generaciones por identidad; applyAvatar actualiza solo imagen/correo, conservando el borrador del editor.
+
+Sin email editable ni nueva columna de perfil. Selecciones recuperadas se vinculan a la cuenta original y requieren confirmación explícita. Arquitectura/privacidad/límites en ADR-008; inyección en bootstrap/main. Test de capas amplía SDKs protegidos a image_picker/image/shared_preferences/cross_file.
+
+## Mis mascotas: registro y edición de metadatos
+
+HU-03.1 / RF-03, issue #28, y parte de HU-03.2 / #29: Home recibe PetsSection desde app/router. PetListViewModel/PetDetailViewModel/PetEditorViewModel autoDispose consumen ListMyPets/ReadPet/CreatePet/UpdatePet; data encapsula consultas y RPC mediante SupabasePetDataSource y DTO. Bootstrap inyecta PetRepositoryImpl; sin imports de presentación entre funcionalidades.
+
+Tabla privada pets con RLS/consulta por dueño y escrituras únicamente RPC autorizadas; UUID por borrador, deduplicación de creación y versionado para edición/reintento. Generaciones por identidad y keepAlive limitado a escritura protegen cambios de sesión/cierre. No implementar fotos o QR como parte de este incremento. ADR-010 documenta reglas, contratos y límites.
+
+## Ampliación de ficha y galería privada
+
+[ADR-012](decisiones/012-ficha-y-galeria-privada-mascotas.md) añade tipo/tamaño y galería privada. PetPhotoRepository/ManagePetPhotos y PetPhotosViewModel coordinan selección/consulta/subida/retirada mediante fuentes NativePetGallerySource y SupabasePetPhotoSource; bootstrap inyecta implementaciones. DTO separa metadata/URL de entidades. Metadata confirmada antes de fotos, IDs estables y respuesta confirmada para éxito; actor/generación/keepAlive protegen estados tardíos. Fotos públicas del QR y procesamiento servidor continúan fuera de este incremento.
+
+### Coordinación de carga inicial de ficha y fotos
+
+Los ViewModels de ficha/editor coordinan sus casos de uso existentes de metadatos y fotos en paralelo. La pantalla observa una única carga inicial hasta finalizar ambas consultas. La inicialización de PetPhotosViewModel se comparte por Future dentro de su ciclo de cuenta/mascota y se reinicia al reconstruirse por sesión; la galería reutiliza el resultado y conserva reintento explícito de sus errores. No cambia contratos de dominio ni acceso a SDK desde presentación. ADR-011 documenta la continuidad visual y sus pruebas.
+
+## Archivo reversible de mascotas — contrato backend
+
+ADR-014 establece archive_pet/restore_pet y borrado definitivo sin historia de casos. SQL030–033 aporta estado de archivo e indicadores protegidos del ciclo de casos; las RPC validan dueño, bloqueo de fila, versión y reintentos. El módulo de casos S3 debe mantener los indicadores de forma atómica. No se añadieron casos/adopciones. La integración Flutter añade campos de ciclo de vida a entidad/DTO, ArchivePet/RestorePet, consultas separadas activas/archivadas y PetLifecycleViewModel autoDispose por mascota. Ficha compone confirmación de archivo/restauración, shimmer de trabajo real, errores contextuales y éxito superior confirmado. Ambas listas se invalidan tras edición, archivo/restauración y eliminación; identidad/generación/keepAlive limitado protegen respuestas tardías. Dominio y servidor bloquean archivo con caso activo y borrado con historial. Véase ADR-014 para límites de validación remota.
+
+ADR-015 establece GlassNavigationButton en core como control visual común de retorno/cierre de pantallas; PetScreenShell, AppPageLayout y ProfileScreen lo componen sin modificar ViewModels, dominio o datos.
+
+## Campos requeridos de mascotas y feedback del editor
+
+ADR-016 actualiza el contrato de guardado: tamaño/edad/rasgos pasan a obligatorios, rasgos máximo200. petValidationIssues en dominio devuelve todos los campos inválidos; CreatePet/UpdatePet comparten validatePet. ViewModel prepara edad textual y guarda invalidFields/errorId para presentación, sin escribir ante error. Campos compartidos admiten invalid sin errorText; editor usa shake danger/toast superior conforme a la nueva autorización.
+
+Fuentes034–035/plan009 instalan trigger sobre insert/update de metadatos: mantiene las RPC/RLS/grants e idempotencia, exige datos nuevos completos y conserva filas anteriores sin inventar valores. Operaciones de archivo/restauración/eliminación no modifican esas columnas y siguen disponibles en datos antiguos. No cambia contratos de lectura ni SDKs en widgets.
+
+## Borrador de fotos del editor
+
+[ADR-017](decisiones/017-borrador-fotos-mascotas.md) conserva fotos confirmadas y separa selecciones/retiradas locales. PetPhotosViewModel ejecuta los casos de uso remotos solo después de validación y confirmación de metadatos por PetEditorViewModel. Descartar no escribe; retiradas cuentan para guardado/salida. Reintentos conservan IDs y el servidor mantiene límite/propiedad. Guardar no constituye una transacción distribuida entre metadatos y Storage. Sin nuevo SQL.

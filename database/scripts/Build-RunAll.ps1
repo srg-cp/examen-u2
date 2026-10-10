@@ -23,6 +23,27 @@ if (($onboardingPlan.sources -join '|') -ne 'tables/008_add_onboarding_completio
     throw 'Revisar repetición de las nuevas operaciones de onboarding.'
 }
 & (Join-Path $PSScriptRoot 'Build-Migration.ps1') -Plan 'migration_plans/002_onboarding.json'
+$avatarPlan = Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/004_profile_avatars_managed_storage.json') -Raw | ConvertFrom-Json
+if (($avatarPlan.sources -join '|') -ne 'tables/010_create_profile_avatar_bucket.sql|policies/012_profile_avatar_managed_storage.sql') { throw 'Revisar repetición de las operaciones de avatar.' }
+& (Join-Path $PSScriptRoot 'Build-AvatarPatch.ps1')
+$petsPlan = Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/005_pets.json') -Raw | ConvertFrom-Json
+if (($petsPlan.sources -join '|') -ne 'functions/013_pet_text_rules.sql|tables/014_create_pets.sql|indexes/015_pets_owner_created.sql|functions/016_pet_commands.sql|policies/017_pets_owner_policies.sql|grants/018_pets_permissions.sql') { throw 'Revisar repetición de las operaciones de mascotas.' }
+& (Join-Path $PSScriptRoot 'Build-PetsPatch.ps1')
+$galleryPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/006_pet_gallery.json') -Raw | ConvertFrom-Json
+if(($galleryPlan.sources -join '|') -ne 'tables/019_pet_species_size.sql|functions/020_pet_commands_v2.sql|tables/021_pet_photos.sql|functions/022_pet_photo_commands.sql|tables/023_pet_photo_bucket.sql|policies/024_pet_photo_owner_policies.sql|grants/025_pet_gallery_permissions.sql'){throw 'Revisar repetición del incremento de galería.'}
+& (Join-Path $PSScriptRoot 'Build-PetGalleryPatch.ps1')
+
+$deletionPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/007_pet_deletion.json') -Raw | ConvertFrom-Json
+if(($deletionPlan.sources -join '|') -ne 'tables/026_pet_deletion_marker.sql|functions/027_pet_deletion_commands.sql|policies/028_pet_deletion_storage_guard.sql|grants/029_pet_deletion_permissions.sql'){throw 'Revisar repetición de eliminación de mascotas.'}
+& (Join-Path $PSScriptRoot 'Build-PetDeletionPatch.ps1')
+
+$archivingPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/008_pet_archiving.json') -Raw | ConvertFrom-Json
+if(($archivingPlan.sources -join '|') -ne 'tables/030_pet_archiving.sql|functions/031_pet_lifecycle_commands.sql|triggers/032_pet_case_history_guard.sql|grants/033_pet_lifecycle_permissions.sql'){throw 'Revisar repetición de archivado de mascotas.'}
+& (Join-Path $PSScriptRoot 'Build-PetArchivingPatch.ps1')
+
+$requiredFieldsPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/009_pet_required_fields.json') -Raw | ConvertFrom-Json
+if(($requiredFieldsPlan.sources -join '|') -ne 'functions/034_validate_pet_required_fields.sql|triggers/035_pet_required_fields_guard.sql'){throw 'Revisar repetición de validación obligatoria de mascotas.'}
+& (Join-Path $PSScriptRoot 'Build-PetRequiredFieldsPatch.ps1')
 
 function Protect-Creation([string]$Condition, [string]$Sql) {
     return 'do $run_all_object$' + "`n" + 'begin' + "`n" +
@@ -129,7 +150,7 @@ foreach ($relativePath in $expectedSources) {
         default { $lines.Add($sql) } # Reviewed repeatable grants and ON CONFLICT DO NOTHING backfill.
     }
 }
-foreach ($relativePath in $onboardingPlan.sources) {
+foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources))) {
     $sql = [IO.File]::ReadAllText((Join-Path $databaseRoot $relativePath)).Replace("`r`n", "`n").TrimEnd()
     $hashAlgorithm = [Security.Cryptography.SHA256]::Create()
     try { $hash = [BitConverter]::ToString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($sql + "`n"))).Replace('-', '').ToLowerInvariant() }
@@ -141,4 +162,4 @@ $lines.Add("`ncommit;")
 $outputPath = Join-Path $databaseRoot 'run_all.sql'
 $content = ($lines -join "`n") + "`n"
 [IO.File]::WriteAllText($outputPath, $content, (New-Object Text.UTF8Encoding($false)))
-Write-Output 'Generado database/run_all.sql desde perfiles y onboarding (001-009).'
+Write-Output 'Generado database/run_all.sql desde perfiles, onboarding, avatar y mascotas con galería/archivo (001-010,012-035; 011 sustituido).'

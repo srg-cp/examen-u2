@@ -154,3 +154,81 @@ Si se interrumpe/reinicia la app después de verificar el código y antes de cam
 Las pruebas usan SDK real con HTTP y almacenamiento sustituidos, incluidos dos clientes independientes sin compartir almacenamiento PKCE. Cubren la verificación por código, propósito correcto, respuesta sin sesión, vencimiento y recorrido UI/router. No contactan el servidor, envían correo ni cambian contraseñas reales. Sigue pendiente demostrar lectura en PC → entrada en teléfono con el Auth de desarrollo.
 
 Referencias: [verifyOTP](https://supabase.com/docs/reference/dart/auth-verifyotp), [Token en plantillas](https://supabase.com/docs/guides/auth/auth-email-templates), [configuración autohospedada](https://github.com/supabase/supabase/blob/master/docker/CONFIG.md), [updateUser](https://supabase.com/docs/reference/dart/auth-updateuser).
+
+## Perfil: validación con cuentas reales de desarrollo
+
+El formulario Perfil consulta y modifica solamente nombre visible y ciudad. Campos opcionales, hasta 120 caracteres Unicode; blanco/vacío se guarda como null. El esquema 001–009 debe estar aplicado. No se necesita una nueva migración para este incremento. Si falla la consulta, usar Reintentar; si falla el guardado, los campos se conservan y puede repetirse Guardar cambios.
+
+Para verificar permisos/persistencia con dos cuentas dedicadas de desarrollo:
+
+1. Copiar `config/profile_test.local.example.json` a `config/profile_test.local.json` dentro de la app. El destino queda ignorado por Git. Completar URL/clave publicable y los cuatro valores de las dos cuentas confirmadas de prueba; no compartir contraseñas por chat ni versionarlas.
+2. Ejecutar desde `flutter_application_entrehuellas`:
+
+```powershell
+flutter test --no-pub tool/check_profile_remote_test.dart --dart-define-from-file=config/profile_test.local.json
+```
+
+La prueba ingresa con A y B, modifica datos editables de A y repite el guardado, vuelve a ingresar con un cliente nuevo, comprueba lectura/edición cruzadas rechazadas y columnas de servidor protegidas. Restaura nombre/ciudad originales de A en finally; la fecha updated_at cambia legítimamente. Sin los valores, la prueba queda omitida explícitamente y no contacta el servidor.
+
+Para Android, comprobar además desde la app: entrar → Perfil → editar → guardar → cerrar/reabrir app → consultar; provocar fallo de red al guardar y reintentar; verificar salida y restauración de sesión. La prueba con nuevo cliente no acredita almacenamiento de sesión, SMTP/OAuth ni comportamiento Android. No ejecutar contra cuentas de producción.
+
+Comprobación SQL adicional en desarrollo: `database/tests/003_profile_edit_permissions.sql`; crea fixtures temporales dentro de una transacción y termina con ROLLBACK. `npm test` en database/tests ejecuta los permisos/invariantes en PostgreSQL en memoria, distinto del entorno Supabase remoto.
+
+## Activar foto de perfil privada
+
+El correo del Perfil es de solo lectura y viene de la sesión de Auth. La foto se elige desde el avatar/cámara o Añadir/Cambiar foto; se normaliza a JPEG y usa Storage privado.
+
+Con perfiles/onboarding ya aplicados, ejecutar en SQL Editor de **Supabase de desarrollo** el patch generado `database/patchs/004_patch_profile_avatars.sql`, completo y sin selección parcial, con rol postgres. Crea bucket privado profile-avatars y permisos por propietario. Sustituye la migración 003 que falló con «must be owner of table objects»: usa RLS administrado ya activo sin ALTER TABLE storage.objects. La migración 004 conserva esta corrección en el historial; 003 se conserva pero no se vuelve a ejecutar manualmente. No se ha aplicado remotamente desde esta tarea: falta una conexión administrativa al proyecto. Alternativa para bootstrap repetible compatible: `database/run_all.sql`, regenerado con fuentes 001–010 y 012 en lugar de 011. No editar salidas a mano; regenerar con Build-AvatarPatch/Build-RunAll.
+
+Después, detener la app y ejecutarla/compilarla de nuevo desde el entorno Flutter que permita Gradle; el selector nativo nuevo no aparece mediante Hot Restart. El intento de APK de esta tarea falló antes de compilar la app con `Unable to establish loopback connection`. No hay APK ni instalación nuevos acreditados. iOS tiene descripción de acceso a galería, sin build iOS en Windows.
+
+Demo necesaria: A selecciona JPG/PNG y confirma foto/correo; reiniciar y consultar; B no puede leer/firmar/sobrescribir objeto de A; cortar conexión, reintentar sin otro objeto; cancelar selección; comprobar permiso denegado y recuperación de actividad Android con la misma cuenta, sin subir automáticamente la imagen recuperada. Ejecutar `database/tests/004_profile_avatar_permissions.sql` aparte en desarrollo: prueba filas/políticas con rollback; no prueba los bytes del servicio Storage.
+
+### Selector no abre después de Hot Restart
+
+Comprobación del 8 de octubre: el APK instalado en emulator-5554 no contiene ImagePickerPlugin aunque el registrante del proyecto lo declare. Detener la ejecución Flutter anterior y abrir una terminal externa o el IDE en flutter_application_entrehuellas, después ejecutar:
+
+```powershell
+flutter run --dart-define-from-file=config/supabase.local.json -d emulator-5554
+```
+
+Esto recompila e instala la versión con selector nativo; no desinstalar ni borrar datos. Desde esta sesión la compilación vuelve a fallar por conexión loopback de Java/Gradle, antes de compilar Android. Cerrar/reabrir el APK antiguo o hacer Hot Restart no instala el plugin. El selector de galería Android no requiere agregar permisos generales de almacenamiento. Probar galería primero y luego confirmación de subida; el toast genérico no identifica por sí solo cuál de las dos etapas falló.
+
+## Activar Mis mascotas en desarrollo
+
+Con el esquema de acceso existente, ejecutar TODO database/patchs/005_patch_pets.sql en SQL Editor con rol postgres, sin selección parcial. El patch es generado desde plan 005/fuentes 013–018 y no depende del bucket de avatar; NO vuelve a ejecutar la migración 003 de Storage fallida. Regenerar mediante ./database/scripts/Build-PetsPatch.ps1; no editar el patch ni la migración a mano. run_all incorpora este incremento para bootstrap repetible.
+
+No aplicado remotamente desde esta entrega. La app ofrece consulta real de mascotas; antes del patch mostrará error/reintento, nunca un supuesto listado vacío. Una vez aplicado: A registra Luna con opcionales desconocidos, abre ficha, edita y reinicia; B no consulta ni modifica esa mascota por app/REST/RPC. Probar desconexión/reintento sin duplicados y dos ediciones con versión antigua (la segunda debe rechazar conflicto sin sobrescribir). database/tests/005_pets_permissions.sql usa fixtures con rollback y pruebas de roles/normalización/versionado.
+
+La ampliación de fotos privadas y tipo/tamaño requiere el patch 006 descrito abajo. No desinstalar para ver el incremento; reiniciar Flutter con la configuración local. El plugin de galería requiere el APK recompilado descrito antes.
+
+## Activar tipo, tamaño y fotos privadas de mascotas
+
+Después de aplicar 005, ejecutar **TODO** `database/patchs/006_patch_pet_gallery.sql` en Supabase de desarrollo con rol postgres, sin selección parcial. Creará columnas, RPC v2, metadata, bucket privado y políticas; no altera storage.objects ni exige cambiar su propietario. Regeneración: `./database/scripts/Build-PetGalleryPatch.ps1`; bootstrap completo: Build-RunAll. El patch no fue ejecutado remotamente desde este chat.
+
+Esta versión de la app requiere 006: las RPC v2 validan tipo/tamaño; las anteriores se retiran de los permisos cliente para impedir bypass. Mascotas existentes se conservan; si su especie es other y no tiene detalle, al editar deberá completar el tipo. Tamaño desconocido sigue permitido.
+
+Demo: A registra Conejo/Mediano, añade hasta tres JPG/PNG de galería, guarda y reinicia; consulta ficha/listado y retira una foto desde Editar. Cancelar galería no añade nada. Fallo de foto mantiene borrador y permite Guardar sin otra mascota/archivo; confirmar que no aparece toast de éxito antes de terminar. B no consulta/descarga/firma/sube/sobrescribe/retira archivos de A; anon sin acceso. Probar reserva incompleta, límite en RPC y recuperación de actividad Android como selección pendiente. `database/tests/006_pet_gallery_permissions.sql` usa fixtures/rollback y valida RLS/grants, no bytes reales del servicio.
+
+Las imágenes son privadas del dueño; publicación de originales/miniaturas del QR/casos y sanitización en servidor siguen pendientes de HU-04.1. No se afirma build/instalación Android ni demo remota: el bloqueo Java/Gradle y el APK anterior sin plugin permanecen documentados hasta una compilación funcional.
+
+## Activar eliminación de mascotas — parche 007
+
+Después del parche 006, ejecutar TODO database/patchs/007_patch_pet_deletion.sql en SQL Editor de Supabase de desarrollo con rol postgres. Generar/verificar por database/scripts/Build-PetDeletionPatch.ps1; no editar el resultado ni reescribir migraciones aplicadas. El parche conserva las mascotas existentes y añade marcador, RPC begin_pet_deletion/finish_pet_deletion, restricciones Storage y permisos de eliminación por propietario.
+
+Diagnóstico remoto del 9 de octubre: ambas RPC devuelven 404/PGRST202 (no disponibles en caché de esquema). La RPC create_pet_v2 del mismo proyecto sí responde 401/42501 con rol anónimo, como corresponde a una función existente protegida. Comprobación con clave pública y UUID nulo de prueba; no se intentó borrar una mascota real ni iniciar sesión como usuario. No se dispone aquí de conexión SQL administrativa y el parche NO fue aplicado remotamente.
+
+Tras aplicar el parche, comprobar eliminación con cuenta propietaria, retirada de fotos y reintento; otra cuenta/anónimo deben seguir rechazados. Si Supabase sigue devolviendo PGRST202 después de confirmar el SQL completo, ejecutar NOTIFY pgrst, 'reload schema'; y repetir. Hot Restart actualiza los botones, pero no crea funciones del backend. No reejecutar patches 005/006 ni bootstrap entero para activar exclusivamente esta función.
+
+## Activar archivo reversible y borrado protegido — parche008
+
+Después de007, ejecutar TODO database/patchs/008_patch_pet_archiving.sql en el SQL Editor del mismo proyecto de desarrollo con rol postgres. Si007 aún no está aplicado, ejecutar primero su archivo completo;008 no sustituye las políticas/objetos de007. Regenerar con database/scripts/Build-PetArchivingPatch.ps1. No editar artefactos generados ni reescribir migraciones previas.
+
+RPC para cliente autenticado:
+- archive_pet(p_id, p_expected_version): archiva sin borrar fotos; bloqueada si hay casos activos.
+- restore_pet(p_id, p_expected_version): restaura y conserva historial.
+- begin_pet_deletion/finish_pet_deletion: mantienen protocolo de limpieza de Storage de007; ahora rechazan historial/casos activos.
+
+Consulta activa: filtrar archived_at IS NULL; archivadas: IS NOT NULL, siempre por propietario/RLS. El parche NO cambia el listado/botones de la app actual; esa integración Flutter está pendiente. No se desplegó remotamente desde este chat.
+
+S3 debe actualizar case_history_at y active_case_count dentro de las operaciones de casos, bajo bloqueo de mascota. No existen todavía casos de producto; la pruebaSQL usa indicadores controlados por servidor. No aplicar a un esquema externo con casos existentes sin integrar/backfill de esos indicadores. Véase ADR-014, incluyendo la transición de baja de cuenta con historial.

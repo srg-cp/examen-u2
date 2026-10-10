@@ -12,12 +12,14 @@ class StaggerReveal extends StatefulWidget {
     required this.child,
     this.play = true,
     this.count = 2,
+    this.enabled = true,
     super.key,
   }) : assert(count > 0);
 
   final Widget child;
   final bool play;
   final int count;
+  final bool enabled;
 
   @override
   State<StaggerReveal> createState() => _StaggerRevealState();
@@ -48,6 +50,10 @@ class _StaggerRevealState extends State<StaggerReveal>
   }
 
   void _start() {
+    if (!widget.enabled) {
+      _controller.value = 1;
+      return;
+    }
     if (!widget.play) return;
     if (MediaQuery.disableAnimationsOf(context)) {
       _controller.value = 1;
@@ -68,6 +74,40 @@ class _StaggerRevealState extends State<StaggerReveal>
     count: widget.count,
     child: widget.child,
   );
+}
+
+/// Loading is part of the current entrance, rather than a new screen stage.
+/// Once a skeleton resolves, the result is immediately visible and interactive.
+class ContentReveal extends StatefulWidget {
+  const ContentReveal({
+    required this.loading,
+    required this.child,
+    this.play = true,
+    this.count = 2,
+    super.key,
+  });
+  final bool loading;
+  final Widget child;
+  final bool play;
+  final int count;
+
+  @override
+  State<ContentReveal> createState() => _ContentRevealState();
+}
+
+class _ContentRevealState extends State<ContentReveal> {
+  bool _sawSkeleton = false;
+
+  @override
+  Widget build(BuildContext context) {
+    _sawSkeleton |= widget.loading;
+    return StaggerReveal(
+      count: widget.count,
+      play: widget.play,
+      enabled: !_sawSkeleton,
+      child: widget.child,
+    );
+  }
 }
 
 class _RevealTimeline extends InheritedWidget {
