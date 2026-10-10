@@ -246,3 +246,22 @@ Mapa de desarrollo: OSM estándar, atribución y User-Agent de app, caché HTTP 
 ## Preferencias de alertas
 
 Antes de abrir Perfil → Preferencias de alertas, aplicar completo `database/patchs/011_patch_alert_preferences.sql` en Supabase de desarrollo. No requiere claves adicionales ni permisos GPS/push. Guardado con sesión y clave publicable; errores de esquema no se confunden con cuenta sin preferencias. Esta entrega guarda elecciones y no envía notificaciones. Tras actualizar app, verificar guardar/reabrir/reiniciar y aislamiento entre cuentas. Ver ADR-019 y ESTADO para evidencia y pendientes.
+
+## Activación de fotos seguras y principal — patch012 + Edge
+
+El incremento HU-04.1/#30 y HU-04.2/#31 requiere `database/patchs/012_patch_pet_photo_processing.sql` completo tras011 **y** la Edge Function pet-photo-process antes de usar cargas de la nueva app. Procedimiento de empaquetado, despliegue y validación en [README de la función](../supabase/functions/pet-photo-process/README.md). En esta tarea no se aplicó SQL ni se desplegó: ambos artefactos están preparados para revisar.
+
+La migración deshabilita reserva/publicación y escritura antigua de archivos desde el cliente; no aplicarla de forma aislada manteniendo la app antigua como cliente de cargas. Fotos existentes siguen privadas y visibles; processed_at nulo no acredita bytes seguros para exposición de casos. Derivados y miniaturas se mantienen en buckets privados. Antes de cerrar historias probar cámara/denegación, principal tras reinicio/retirada, reintentos, usuarios A/B y cuotas reales del runtime hosted; descargar y verificar los bytes de las dos salidas. Registrar archivos privados incompletos/huérfanos si se corta el worker durante limpieza.
+
+Intento de APK debug del incremento (10 de octubre): `flutter build apk --debug --no-pub --dart-define-from-file=config/supabase.local.json` falla en Gradle por `java.io.IOException: Unable to establish loopback connection`, antes de compilar. No hay instalación nueva acreditada; el flujo Android debe probarse desde un entorno de compilación funcional. Pruebas Flutter/Deno/PGlite no sustituyen esa demostración.
+
+### Fotos en la instalación real de Dokploy
+
+La lista de contenedores y Compose aportados por el usuario confirman que
+Entre Huellas no tiene servicio functions, ni detenido. La indicación previa
+de deploy por project-ref era para Supabase administrado y no aplica aquí.
+Seguir [supabase/self-hosted/README.md](../supabase/self-hosted/README.md).
+Hay snippet de servicio, router limitado a pet-photo-process y generador de
+paquete con WASM. El Compose completo preparado se obtiene con el parámetro
+ComposePath del generador. Ubicación real del volumen y ruta de Kong pendientes
+de leer del servidor antes de activar; no se ha desplegado remotamente.

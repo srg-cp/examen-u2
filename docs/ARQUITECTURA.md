@@ -1,5 +1,9 @@
 # Arquitectura de Entre Huellas
 
+El comportamiento de cada módulo, sus recorridos y límites actuales se documentan
+en [Funcionalidades](funcionalidades/README.md). Esta arquitectura describe su
+organización; ESTADO conserva la evidencia de validación y las decisiones van en ADR.
+
 Norma obligatoria: [REGLAS_ARQUITECTURA.md](REGLAS_ARQUITECTURA.md). Define patrones, responsabilidades, dependencias, SOLID y criterios de revisión. Este documento conserva la descripción y las decisiones concretas de implementación.
 
 Norma visual obligatoria: [REGLAS_UI_UX.md](REGLAS_UI_UX.md), basada en las pantallas de acceso aprobadas. AppPageLayout y primaryActionButtonStyle se comparten en core; los nombres de Auth delegan en ellos y mantienen compatibilidad. Inicio reutiliza core sin importar presentación de Auth. Su UI anterior queda retirada; sesión y casos de uso se conservan.
@@ -250,3 +254,7 @@ flutter_map es el adaptador visual de teselas en presentación: conserva su fuen
 [ADR-019](decisiones/019-preferencias-alertas-por-cuenta.md): AlertPreferencesScreen/PreferenceOptions consumen AlertPreferencesViewModel/PreferenceViewState. Dominio contiene AlertPreferences, ReadAlertPreferences, SaveAlertPreferences y contrato AlertPreferenceRepository; data aporta DTO, fuente SDK y repositorio. Providers declaran sesión/casos/contrato; bootstrap inyecta implementaciones y main sus overrides. Ruta privada desde Perfil, sin comunicación por infraestructura entre funcionalidades.
 
 SQL040–043/plan011: agregado por owner_id, RLS/grants por cuenta y guardado RPC versionado con reintento idéntico/no-op. Recepción general prevalece y conserva tres tipos y canales bandeja/push. Defaults pausados solo tras ausencia confirmada; sin envío, permisos ni token. Generación/identidad protege respuestas tardías; autoDispose y keepAlive limitado a guardado. Refresh conserva contenido con progreso fino y error contextual; descartar/salir reemplaza borrador con confirmación. Modal compartido de descarte en core, reutilizado por zonas. HU-12 consumirá preferencias y validará entrega; S2 no acredita push.
+
+## Fotos: cámara, procesamiento y principal — HU-04, 10 de octubre de 2026
+
+ADR-020 amplía el circuito de fotos existente: PetPhotoOrigin independiente de ImagePicker, selección de principal como borrador y contrato con versión de selección. Presentation sigue consumiendo ViewModels/casos de uso; data encapsula selector, SDK y Edge. pet-photo-process autentica, autoriza, decodifica y recodifica bytes en servidor con WASM; SQL044–047 protege confirmación y escritura de derivados. Hash/tombstones quedan fuera de la proyección cliente. Buckets de derivados/miniaturas privados; S3 solo puede publicar derivados verificados, nunca originales antiguos. Lectura no ejecuta procesamiento ni publicación automática. Activación conjunta SQL/Edge y validación hosted pendientes; detalles en [ADR-020](decisiones/020-procesamiento-y-principal-fotos.md).

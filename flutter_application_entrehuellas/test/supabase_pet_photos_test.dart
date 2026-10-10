@@ -8,9 +8,9 @@ import 'package:flutter_application_entrehuellas/features/pets/data/data_sources
 import 'package:flutter_application_entrehuellas/features/pets/data/data_sources/pet_photo_data_source.dart';
 
 void main() {
-  for (final denied in [false, true]) {
+  for (final status in [200, 403, 422, 409]) {
     test(
-      'Private pet JPEG requires reservation, upload, publish and signed read; denied=$denied',
+      'Photo upload uses authenticated Edge processing and private signed renditions; HTTP=$status',
       () async {
         final bytes = img.encodeJpg(img.Image(width: 10, height: 10));
         final calls = <String>[];
@@ -19,16 +19,18 @@ void main() {
           'pet_id': 'pet',
           'owner_id': 'owner',
           'status': 'published',
+          'processed_at': '2026-10-10T00:00:00Z',
+          'is_primary': true,
         };
         final mock = MockClient((request) async {
-          Object? body;
-          var status = 200;
           final path = request.url.path;
+          Object body;
+          var responseStatus = 200;
           if (path == '/auth/v1/token') {
             body = {
               'access_token':
                   'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvd25lciIsImV4cCI6MjAwMDAwMDAwMH0.fake',
-              'refresh_token': 'fake-refresh',
+              'refresh_token': 'fake',
               'token_type': 'bearer',
               'expires_in': 3600,
               'user': {
@@ -36,55 +38,36 @@ void main() {
                 'aud': 'authenticated',
                 'app_metadata': {},
                 'user_metadata': {},
-                'created_at': '2026-10-09T00:00:00Z',
+                'created_at': '2026-10-10T00:00:00Z',
               },
             };
           } else {
             calls.add(path);
-            if (path == '/rest/v1/rpc/reserve_pet_photo') {
-              expect(jsonDecode(request.body), {
-                'p_id': 'photo',
-                'p_pet_id': 'pet',
-              });
-              body = [
-                {...row, 'status': 'pending'},
-              ];
-            } else if (path ==
-                '/storage/v1/object/pet-photos/owner/pet/photo.jpg') {
-              expect(request.headers['x-upsert'], 'true');
-              expect(
-                latin1.decode(request.bodyBytes).toLowerCase(),
-                contains('content-type: image/jpeg'),
-              );
-              expect(
-                latin1.decode(request.bodyBytes),
-                contains(latin1.decode(bytes)),
-              );
-              body = {'Key': 'pet-photos/owner/pet/photo.jpg'};
-            } else if (path == '/rest/v1/rpc/publish_pet_photo') {
-              expect(jsonDecode(request.body), {'p_id': 'photo'});
-              body = [row];
+            if (path == '/functions/v1/pet-photo-process') {
+              expect(request.headers['authorization'], startsWith('Bearer '));
+              expect(request.headers['x-pet-id'], 'pet');
+              expect(request.headers['x-photo-id'], 'photo');
+              expect(request.headers['content-type'], 'image/jpeg');
+              expect(request.bodyBytes, bytes);
+              responseStatus = status;
+              body = status == 200 ? row : {'error': 'photo_failed'};
             } else {
               expect(
                 path,
-                '/storage/v1/object/sign/pet-photos/owner/pet/photo.jpg',
+                anyOf(
+                  '/storage/v1/object/sign/pet-photo-renditions/owner/pet/photo.jpg',
+                  '/storage/v1/object/sign/pet-photo-thumbnails/owner/pet/photo.jpg',
+                ),
               );
-              status = denied ? 403 : 200;
-              body = denied
-                  ? {
-                      'statusCode': '403',
-                      'error': 'Forbidden',
-                      'message': 'private detail',
-                    }
-                  : {
-                      'signedURL':
-                          '/object/sign/pet-photos/owner/pet/photo.jpg?token=fake',
-                    };
+              body = {
+                'signedURL':
+                    '/object/sign/${path.split('/sign/').last}?token=fake',
+              };
             }
           }
           return http.Response(
             jsonEncode(body),
-            status,
+            responseStatus,
             headers: {'content-type': 'application/json'},
             request: request,
           );
@@ -108,25 +91,30 @@ void main() {
           email: 'test@example.invalid',
           password: 'fake',
         );
-        if (denied) {
+        if (status == 200) {
+          final result = await source.upload('owner', 'pet', 'photo', bytes);
+          expect(result.toEntity().isPrimary, true);
+          expect(result.uri!.path, contains('pet-photo-renditions'));
+          expect(result.thumbnailUri!.path, contains('pet-photo-thumbnails'));
+        } else {
+          final kind = switch (status) {
+            403 => PetPhotoSourceFailureKind.forbidden,
+            422 => PetPhotoSourceFailureKind.invalidPhoto,
+            _ => PetPhotoSourceFailureKind.conflict,
+          };
           await expectLater(
             source.upload('owner', 'pet', 'photo', bytes),
-            throwsA(isA<PetPhotoSourceFailure>()),
-          );
-        } else {
-          final photo = await source.upload('owner', 'pet', 'photo', bytes);
-          expect(photo.toEntity().ready, true);
-          expect(
-            photo.toEntity().uri!.path,
-            contains('/pet-photos/owner/pet/photo.jpg'),
+            throwsA(
+              isA<PetPhotoSourceFailure>().having((e) => e.kind, 'kind', kind),
+            ),
           );
         }
-        expect(calls, [
-          '/rest/v1/rpc/reserve_pet_photo',
-          '/storage/v1/object/pet-photos/owner/pet/photo.jpg',
-          '/rest/v1/rpc/publish_pet_photo',
-          '/storage/v1/object/sign/pet-photos/owner/pet/photo.jpg',
-        ]);
+        expect(calls.first, '/functions/v1/pet-photo-process');
+        expect(calls.length, status == 200 ? 3 : 1);
+        expect(
+          calls.any((path) => path.contains('/rest/v1/rpc/publish_pet_photo')),
+          false,
+        );
       },
     );
   }

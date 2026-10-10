@@ -16,9 +16,20 @@ class FakePetPhotos implements PetPhotoRepository {
   final operations = <String>[];
   final photos = <String, PetPhoto>{};
   final attempts = <String>[];
+  PetPhotoOrigin? lastOrigin;
+  bool failPrimary = false;
+  int primaryWrites = 0;
   @override
-  Future<Uint8List?> choose(String owner, String pet, bool existing) async =>
-      selection;
+  Future<Uint8List?> choose(
+    String owner,
+    String pet,
+    bool existing, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) async {
+    lastOrigin = origin;
+    return selection;
+  }
+
   @override
   Future<Uint8List?> recover(String owner, String pet, bool existing) async {
     final bytes = recovered;
@@ -76,5 +87,31 @@ class FakePetPhotos implements PetPhotoRepository {
       loseRemovalAcknowledgement = false;
       throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
     }
+  }
+
+  @override
+  Future<List<PetPhoto>> setPrimary(
+    String owner,
+    String pet,
+    String id,
+    int expectedVersion,
+  ) async {
+    primaryWrites++;
+    if (failPrimary) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
+    }
+    for (final p in List<PetPhoto>.of(photos.values)) {
+      if (p.petId != pet || p.ownerId != owner) continue;
+      photos[p.id] = PetPhoto(
+        id: p.id,
+        petId: pet,
+        ownerId: owner,
+        ready: p.ready,
+        uri: p.uri,
+        isPrimary: p.id == id,
+        selectionVersion: expectedVersion + 1,
+      );
+    }
+    return list(owner, pet);
   }
 }

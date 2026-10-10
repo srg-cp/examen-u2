@@ -12,6 +12,18 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     }
   }
 
+  PetPhotoSourceFailure _failure(String? code, Object? message) =>
+      PetPhotoSourceFailure(
+        code == '42501' || code == '403' || code == '401'
+            ? PetPhotoSourceFailureKind.forbidden
+            : code == '40001' || code == '409'
+            ? PetPhotoSourceFailureKind.conflict
+            : message == 'photo_limit'
+            ? PetPhotoSourceFailureKind.limit
+            : code == '422' || code == '413'
+            ? PetPhotoSourceFailureKind.invalidPhoto
+            : PetPhotoSourceFailureKind.unavailable,
+      );
   Future<T> _run<T>(String owner, Future<T> Function() action) async {
     _owner(owner);
     try {
@@ -21,19 +33,15 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     } on PetPhotoSourceFailure {
       rethrow;
     } on PostgrestException catch (e) {
-      throw PetPhotoSourceFailure(
-        e.code == '42501'
-            ? PetPhotoSourceFailureKind.forbidden
-            : e.message == 'photo_limit'
-            ? PetPhotoSourceFailureKind.limit
-            : PetPhotoSourceFailureKind.unavailable,
-      );
+      throw _failure(e.code, e.message);
+    } on FunctionException catch (e) {
+      final detail = e.details;
+      throw _failure('${e.status}', detail is Map ? detail['error'] : null);
     } catch (_) {
       throw const PetPhotoSourceFailure(PetPhotoSourceFailureKind.unavailable);
     }
   }
 
-  String _path(String owner, String pet, String id) => '$owner/$pet/$id.jpg';
   Future<PetPhotoDto> _signed(
     Map<String, dynamic> row,
     String owner,
@@ -44,48 +52,38 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
       throw const PetPhotoSourceFailure(PetPhotoSourceFailureKind.forbidden);
     }
     Uri? uri;
+    Uri? thumbnail;
     if (row['status'] == 'published') {
-      final link = await _client.storage
-          .from('pet-photos')
-          .createSignedUrl(_path(owner, pet, row['id'] as String), 3600);
-      final parsed = Uri.parse(link);
-      uri = parsed.replace(
-        queryParameters: {
-          ...parsed.queryParameters,
-          'v': '${DateTime.now().microsecondsSinceEpoch}',
-        },
+      final processed = row['processed_at'] != null;
+      final path = '$owner/$pet/${row['id']}.jpg';
+      uri = Uri.parse(
+        await _client.storage
+            .from(processed ? 'pet-photo-renditions' : 'pet-photos')
+            .createSignedUrl(path, 3600),
       );
+      if (processed) {
+        thumbnail = Uri.parse(
+          await _client.storage
+              .from('pet-photo-thumbnails')
+              .createSignedUrl(path, 3600),
+        );
+      }
     }
-    return PetPhotoDto.fromMap(row, uri: uri);
+    return PetPhotoDto.fromMap(row, uri: uri, thumbnailUri: thumbnail);
   }
 
   @override
   Future<List<PetPhotoDto>> list(String owner, String pet) =>
       _run(owner, () async {
-        final rows = await _client
-            .from('pet_photos')
-            .select('id,pet_id,owner_id,status')
-            .eq('pet_id', pet)
-            .eq('owner_id', owner)
-            .order('created_at')
-            .order('id');
-        final photos = <PetPhotoDto>[];
-        for (var row in rows) {
-          if (row['status'] == 'pending') {
-            _owner(owner);
-            try {
-              final response = await _client.rpc(
-                'publish_pet_photo',
-                params: {'p_id': row['id']},
-              );
-              row = Map<String, dynamic>.from((response as List).single as Map);
-            } on PostgrestException catch (e) {
-              if (e.code != 'P0002') rethrow;
-            }
-          }
-          photos.add(await _signed(row, owner, pet));
-        }
-        return photos;
+        final rows = await _client.rpc(
+          'list_pet_photos',
+          params: {'p_pet_id': pet},
+        );
+        return Future.wait(
+          (rows as List).map(
+            (row) => _signed(Map<String, dynamic>.from(row as Map), owner, pet),
+          ),
+        );
       });
   @override
   Future<PetPhotoDto> upload(
@@ -94,44 +92,57 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     String id,
     Uint8List bytes,
   ) => _run(owner, () async {
-    await _client.rpc(
-      'reserve_pet_photo',
-      params: {'p_id': id, 'p_pet_id': pet},
+    final response = await _client.functions.invoke(
+      'pet-photo-process',
+      body: bytes,
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'x-pet-id': pet,
+        'x-photo-id': id,
+      },
     );
-    _owner(owner);
-    await _client.storage
-        .from('pet-photos')
-        .uploadBinary(
-          _path(owner, pet, id),
-          bytes,
-          fileOptions: const FileOptions(
-            contentType: 'image/jpeg',
-            upsert: true,
-            cacheControl: '0',
-          ),
-        );
-    _owner(owner);
-    final response = await _client.rpc(
-      'publish_pet_photo',
-      params: {'p_id': id},
-    );
-    return _signed(
-      Map<String, dynamic>.from((response as List).single as Map),
-      owner,
-      pet,
-    );
+    if (response.data is! Map) {
+      throw const PetPhotoSourceFailure(PetPhotoSourceFailureKind.unavailable);
+    }
+    return _signed(Map<String, dynamic>.from(response.data as Map), owner, pet);
   });
   @override
   Future<void> remove(String owner, String pet, String id) =>
       _run(owner, () async {
-        try {
-          await _client.storage.from('pet-photos').remove([
-            _path(owner, pet, id),
-          ]);
-        } on StorageException catch (e) {
-          if (e.statusCode != '404') rethrow;
+        await _client.rpc(
+          'begin_pet_photo_removal',
+          params: {'p_id': id, 'p_pet_id': pet},
+        );
+        for (final bucket in [
+          'pet-photos',
+          'pet-photo-renditions',
+          'pet-photo-thumbnails',
+        ]) {
+          _owner(owner);
+          try {
+            await _client.storage.from(bucket).remove(['$owner/$pet/$id.jpg']);
+          } on StorageException catch (e) {
+            if (e.statusCode != '404') rethrow;
+          }
         }
         _owner(owner);
         await _client.rpc('remove_pet_photo', params: {'p_id': id});
       });
+  @override
+  Future<List<PetPhotoDto>> setPrimary(
+    String owner,
+    String pet,
+    String id,
+    int expectedVersion,
+  ) => _run(owner, () async {
+    await _client.rpc(
+      'set_primary_pet_photo',
+      params: {
+        'p_pet_id': pet,
+        'p_photo_id': id,
+        'p_expected_version': expectedVersion,
+      },
+    );
+    return list(owner, pet);
+  });
 }

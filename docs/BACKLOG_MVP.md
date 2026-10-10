@@ -1336,3 +1336,9 @@ Una historia termina con criterios demostrados, código integrado, datos version
 ## Avance local HU-02.2 — 10 de octubre de 2026
 
 Preferencias de alertas / issue #27 implementadas localmente en `feature/alert-preferences`. Recepción general, tres tipos perdidas/encontradas/novedades de casos y canales bandeja/push, sin envío ni permisos; SQL040–043/plan011 privado/versionado según ADR-019. Patch011 y demo Android/Supabase pendientes antes de cerrar aceptación. El estado operativo de GitHub no se modifica por esta nota de desarrollo; la ficha individual distingue snapshot y avance local.
+
+## Sincronización operativa GitHub/Projects — 10 de octubre de 2026
+
+Por autorización del usuario, #27 (preferencias), #30 (carga de fotos), #31 (retirada de fotos) y épica #4 pasan a In progress en etiqueta y Status nativo. #2/#26 siguen In progress con evidencia actualizada: zonas/preferencias ya publicadas en commits5bcb543/006ebc6 y patch010/011 aplicados según usuario. Las fotos son avance parcial; cámara, selección explícita de principal, miniaturas/procesamiento público y validación real siguen pendientes. 51 tarjetas verificadas con etiqueta/Status coincidentes:34 Backlog y17 In progress, sin Ready/In review/Done. PR53 existe para mascotas, con descripción de plantilla; no se infiere aceptación completa ni se modifica ese PR. No se cerraron issues; fichas e índice sincronizados. La aplicación de parches no sustituye demo Android/Supabase autenticada.
+
+Avance posterior de HU-04 del 10 de octubre: en codex/pet-photos están preparados cámara, principal/borrador/reemplazo y servidor de imágenes/miniaturas sin EXIF. ADR-020/plan012 requieren activación conjunta SQL/Edge y demo real antes de Done. Se conserva el snapshot remoto In progress; no se cambia GitHub desde esta implementación.

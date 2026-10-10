@@ -103,6 +103,11 @@ Actualiza docs/ESTADO.md con cambios, pruebas, bloqueos y el siguiente paso. Ind
 
 ## 5. Sprints e historias del MVP
 
+El alcance implementado y el funcionamiento de cada módulo se consultan en
+[Funcionalidades](funcionalidades/README.md). Mantener sus fichas en cada
+incremento, incluyendo reglas, persistencia, errores, activación y validación;
+la existencia de una ficha no implica cierre de la HU ni ampliación del MVP.
+
 Se conserva la numeración original para relacionar implementación, informe académico y pruebas. El chat 00 prepara la base técnica que el plan original situaba dentro de S1.
 
 ### S1 - Acceso y cuenta
@@ -337,4 +342,8 @@ Primer incremento de la rama `feature/interest-zones`: selección manual en mapa
 
 ### Preferencias de alertas — HU-02.2 / issue #27
 
-Rama `feature/alert-preferences`, segundo incremento de HU-02: recepción general, tipos perdidas/encontradas/novedades de casos y canales bandeja/push, conservados por cuenta. Recepción inicialmente pausada; pausar conserva elecciones y activar requiere tipo/canal. Contrato SQL040–043/plan011 privado/versionado según ADR-019. UI guarda selección y explica que recepción se habilitará con HU-12; sin GPS, permisos/tokens ni envío. No ampliar a email/SMS ni afirmar entrega push. Requiere patch011 y demo Android/Supabase antes de cerrar criterios. Patch010 de zonas ya aplicado según usuario del 10 de octubre.
+Rama `feature/alert-preferences`, segundo incremento de HU-02: recepción general, tipos perdidas/encontradas/novedades de casos y canales bandeja/push, conservados por cuenta. Recepción inicialmente pausada; pausar conserva elecciones y activar requiere tipo/canal. Contrato SQL040–043/plan011 privado/versionado según ADR-019. UI guarda selección y explica que recepción se habilitará con HU-12; sin GPS, permisos/tokens ni envío. No ampliar a email/SMS ni afirmar entrega push. Patch011 aplicado según confirmación del usuario; requiere demo Android/Supabase antes de cerrar criterios. Patch010 de zonas ya aplicado según usuario del 10 de octubre.
+
+### Continuación de HU-04 — 10 de octubre de 2026
+
+En codex/pet-photos se implementan cámara con alternativa de galería, procesamiento servidor de JPEG/miniaturas sin EXIF y selección explícita de principal, conservando borradores hasta Guardar y reemplazo determinista al retirar. SQL044–047/plan012 y Edge pet-photo-process preparados; activación conjunta y demo hosted/Android pendientes. ADR-020 mantiene originales y derivados privados: publicación en S3 solo mediante proyección autorizada de bytes verificados. No añade reportes ni entrega alertas; el siguiente incremento funcional sigue HU-05 tras activar/verificar fotos. Historias no cerradas por evidencia local.

@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Seleccionar tu foto de perfil desde la galería.</string>
+	<string>Seleccionar fotos de tu perfil y tus mascotas desde la galería.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Tomar fotografías de tus mascotas.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

@@ -14,14 +14,25 @@ class PetPhotosState {
     this.issue,
     this.errorId = 0,
     this.recovered = false,
+    this.pendingPrimaryId,
+    this.pendingPrimaryVersion,
   });
   final List<PetPhoto> photos;
   final List<PetPhotoDraft> pending;
   final Set<String> pendingRemovals;
+  final String? pendingPrimaryId;
+  final int? pendingPrimaryVersion;
+  String? get visiblePrimaryId =>
+      pendingPrimaryId ??
+      visiblePhotos.where((p) => p.isPrimary && p.ready).firstOrNull?.id ??
+      visiblePhotos.where((p) => p.ready).firstOrNull?.id ??
+      pending.firstOrNull?.id;
   List<PetPhoto> get visiblePhotos =>
       photos.where((photo) => !pendingRemovals.contains(photo.id)).toList();
   bool get hasPendingChanges =>
-      pending.isNotEmpty || pendingRemovals.isNotEmpty;
+      pending.isNotEmpty ||
+      pendingRemovals.isNotEmpty ||
+      pendingPrimaryId != null;
   final bool busy;
   final bool loading;
   final PetPhotoFailureKind? issue;
@@ -36,6 +47,9 @@ class PetPhotosState {
     PetPhotoFailureKind? issue,
     int? errorId,
     bool? recovered,
+    String? pendingPrimaryId,
+    int? pendingPrimaryVersion,
+    bool clearPrimary = false,
   }) => PetPhotosState(
     photos: photos ?? this.photos,
     pending: pending ?? this.pending,
@@ -45,6 +59,12 @@ class PetPhotosState {
     issue: issue,
     errorId: errorId ?? this.errorId,
     recovered: recovered ?? this.recovered,
+    pendingPrimaryId: clearPrimary
+        ? null
+        : pendingPrimaryId ?? this.pendingPrimaryId,
+    pendingPrimaryVersion: clearPrimary
+        ? null
+        : pendingPrimaryVersion ?? this.pendingPrimaryVersion,
   );
 }
 
@@ -103,7 +123,10 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     }
   }
 
-  Future<void> choose(bool existing) async {
+  Future<void> choose(
+    bool existing, {
+    PetPhotoOrigin origin = PetPhotoOrigin.gallery,
+  }) async {
     if (state.busy || state.loading) return;
     final owner = _owner;
     if (owner == null) return;
@@ -117,7 +140,7 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     try {
       final bytes = await ref
           .read(managePetPhotosProvider)
-          .choose(owner, petId, existing);
+          .choose(owner, petId, existing, origin: origin);
       if (!_valid(generation, owner)) return;
       state = state.copy(
         pending: bytes == null
@@ -139,6 +162,7 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
       pending: const [],
       pendingRemovals: const {},
       recovered: false,
+      clearPrimary: true,
     );
   }
 
@@ -148,6 +172,8 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     final owner = _owner;
     if (owner == null) return false;
     final generation = _generation;
+    final galleryChanged =
+        state.pending.isNotEmpty || state.pendingRemovals.isNotEmpty;
     final lifetime = ref.keepAlive();
     state = state.copy(busy: true);
     try {
@@ -175,6 +201,31 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
           pending: state.pending.where((p) => p.id != draft.id).toList(),
         );
       }
+      final desiredPrimary = state.pendingPrimaryId;
+      if (desiredPrimary != null) {
+        // Keep the selection's revision for CAS/retry. Only our confirmed
+        // uploads/removals justify reading a newer baseline automatically.
+        if (galleryChanged) {
+          final current = await useCase.list(owner, petId);
+          if (!_valid(generation, owner)) return false;
+          state = state.copy(
+            photos: current,
+            busy: true,
+            pendingPrimaryVersion: current.firstOrNull?.selectionVersion ?? 0,
+          );
+        }
+        final version = state.pendingPrimaryVersion ?? 0;
+        final selected = await useCase.setPrimary(
+          owner,
+          petId,
+          desiredPrimary,
+          version,
+        );
+        if (!_valid(generation, owner)) return false;
+        state = state.copy(photos: selected, busy: true, clearPrimary: true);
+        ref.invalidate(petListViewModelProvider);
+        ref.invalidate(petDetailViewModelProvider(petId));
+      }
       if (!_valid(generation, owner)) return false;
       state = state.copy(recovered: false);
       return true;
@@ -193,11 +244,33 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     if (state.pending.any((draft) => draft.id == id)) {
       state = state.copy(
         pending: state.pending.where((draft) => draft.id != id).toList(),
+        clearPrimary: state.pendingPrimaryId == id,
       );
     } else if (state.photos.any((photo) => photo.id == id)) {
       state = state.copy(
         pendingRemovals: Set.unmodifiable({...state.pendingRemovals, id}),
+        clearPrimary: state.pendingPrimaryId == id,
       );
     }
+  }
+
+  void stagePrimary(String id) {
+    if (state.busy || state.loading || _owner == null) return;
+    if (!state.visiblePhotos.any((p) => p.id == id && p.ready) &&
+        !state.pending.any((p) => p.id == id)) {
+      return;
+    }
+    state = state.copy(
+      pendingPrimaryId: id,
+      pendingPrimaryVersion: state.photos.firstOrNull?.selectionVersion ?? 0,
+    );
+  }
+
+  Future<void> refreshAfterConflict(bool existing) async {
+    await initialize(existing);
+    if (!ref.mounted || state.issue != null) return;
+    state = state.copy(
+      pendingPrimaryVersion: state.photos.firstOrNull?.selectionVersion ?? 0,
+    );
   }
 }
