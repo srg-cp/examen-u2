@@ -1,5 +1,12 @@
 # Zonas de interés privadas
 
+Cambio visual del 15 de octubre de 2026: por instrucción explícita del usuario,
+ZoneMapPicker deja de mostrar el texto de atribución y su botón/enlace en todas
+sus instancias (zonas, formularios y fichas de reportes). Se eliminan las opciones
+de configuración de ese texto/enlace. El proveedor de teselas sigue siendo el
+existente; sus condiciones de atribución quedan pendientes de resolver antes de
+distribuir, según CONFIGURACION. Selección, círculo y reintento se conservan.
+
 Módulo: `interest_zones`. HU-02.1 / RF-02,16;
 [issue #26](../backlog/026-HU-02.1.md).
 

@@ -241,7 +241,7 @@ La dependencia de mapa incorpora caché nativa/path_provider: reconstruir e inst
 
 Con A: crear dos zonas, editar radio, cancelar otra edición, reiniciar y comprobar persistencia; provocar fallo de red y reintentar con el mismo borrador; eliminar y repetir después de pérdida de respuesta. Con B/anónimo: lectura/escritura de A deben rechazarse. Ejecutar `database/tests/009_interest_zone_permissions.sql` en desarrollo para RLS/grants y guardias del servidor; sus pruebas de fixture no sustituyen las cuentas reales en la app.
 
-Mapa de desarrollo: OSM estándar, atribución y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL`, `MAP_ATTRIBUTION`, `MAP_ATTRIBUTION_URL` al compilar; comprobar condiciones/capacidad antes de distribuir, según ADR-018. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
+Mapa de desarrollo: OSM estándar y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL` al compilar. Por instrucción explícita del usuario del 15 de octubre de 2026 se retiraron el texto y el enlace de atribución de la UI compartida, junto con `MAP_ATTRIBUTION`/`MAP_ATTRIBUTION_URL`. El servicio actual exige atribución visible: queda pendiente resolver proveedor/condiciones antes de distribuir; esta retirada visual no acredita cumplimiento del proveedor. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
 
 ## Preferencias de alertas
 

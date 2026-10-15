@@ -2,7 +2,6 @@ import 'confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../config/map_config.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
@@ -148,14 +147,6 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                     ),
                 ],
               ),
-            ),
-          ),
-          // Outside the map: attribution stays visible at large text scales.
-          TextButton(
-            onPressed: () => launchUrl(Uri.parse(MapConfig.attributionUrl)),
-            child: const Text(
-              MapConfig.attribution,
-              textAlign: TextAlign.center,
             ),
           ),
           if (_failed) ...[
