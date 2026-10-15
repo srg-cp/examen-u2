@@ -1,72 +1,10 @@
+import '../state/pet_photos_state.dart';
+export '../state/pet_photos_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/pet.dart';
+import '../../../../core/domain/utils/new_entity_id.dart';
 import '../../domain/entities/pet_photo.dart';
 import '../../providers/pet_providers.dart';
 import 'pet_list_view_model.dart';
-
-class PetPhotosState {
-  const PetPhotosState({
-    this.photos = const [],
-    this.pending = const [],
-    this.pendingRemovals = const {},
-    this.busy = false,
-    this.loading = false,
-    this.issue,
-    this.errorId = 0,
-    this.recovered = false,
-    this.pendingPrimaryId,
-    this.pendingPrimaryVersion,
-  });
-  final List<PetPhoto> photos;
-  final List<PetPhotoDraft> pending;
-  final Set<String> pendingRemovals;
-  final String? pendingPrimaryId;
-  final int? pendingPrimaryVersion;
-  String? get visiblePrimaryId =>
-      pendingPrimaryId ??
-      visiblePhotos.where((p) => p.isPrimary && p.ready).firstOrNull?.id ??
-      visiblePhotos.where((p) => p.ready).firstOrNull?.id ??
-      pending.firstOrNull?.id;
-  List<PetPhoto> get visiblePhotos =>
-      photos.where((photo) => !pendingRemovals.contains(photo.id)).toList();
-  bool get hasPendingChanges =>
-      pending.isNotEmpty ||
-      pendingRemovals.isNotEmpty ||
-      pendingPrimaryId != null;
-  final bool busy;
-  final bool loading;
-  final PetPhotoFailureKind? issue;
-  final int errorId;
-  final bool recovered;
-  PetPhotosState copy({
-    List<PetPhoto>? photos,
-    List<PetPhotoDraft>? pending,
-    Set<String>? pendingRemovals,
-    bool busy = false,
-    bool loading = false,
-    PetPhotoFailureKind? issue,
-    int? errorId,
-    bool? recovered,
-    String? pendingPrimaryId,
-    int? pendingPrimaryVersion,
-    bool clearPrimary = false,
-  }) => PetPhotosState(
-    photos: photos ?? this.photos,
-    pending: pending ?? this.pending,
-    pendingRemovals: pendingRemovals ?? this.pendingRemovals,
-    busy: busy,
-    loading: loading,
-    issue: issue,
-    errorId: errorId ?? this.errorId,
-    recovered: recovered ?? this.recovered,
-    pendingPrimaryId: clearPrimary
-        ? null
-        : pendingPrimaryId ?? this.pendingPrimaryId,
-    pendingPrimaryVersion: clearPrimary
-        ? null
-        : pendingPrimaryVersion ?? this.pendingPrimaryVersion,
-  );
-}
 
 final petPhotosViewModelProvider = NotifierProvider.autoDispose
     .family<PetPhotosViewModel, PetPhotosState, String>(PetPhotosViewModel.new);
@@ -82,7 +20,7 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     _generation++;
     _initialization = null;
     ref.watch(petSessionProvider);
-    return const PetPhotosState();
+    return PetPhotosState();
   }
 
   String? get _owner => ref.read(petSessionProvider).asData?.value?.userId;
@@ -109,7 +47,7 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
           .where((photo) => !state.pendingRemovals.contains(photo.id))
           .length;
       if (recovered != null && visibleCount + drafts.length < 3) {
-        drafts.add(PetPhotoDraft(id: newPetId(), bytes: recovered));
+        drafts.add(PetPhotoDraft(id: newEntityId(), bytes: recovered));
       }
       state = state.copy(
         photos: photos,
@@ -118,7 +56,11 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
       );
     } catch (e) {
       if (_valid(generation, owner)) {
-        state = state.copy(issue: _kind(e), errorId: ++_errorId);
+        state = state.copy(
+          issue: _kind(e),
+          failedOperation: PetPhotosOperation.load,
+          errorId: ++_errorId,
+        );
       }
     }
   }
@@ -131,7 +73,11 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
     final owner = _owner;
     if (owner == null) return;
     if (state.visiblePhotos.length + state.pending.length >= 3) {
-      state = state.copy(issue: PetPhotoFailureKind.limit, errorId: ++_errorId);
+      state = state.copy(
+        issue: PetPhotoFailureKind.limit,
+        failedOperation: PetPhotosOperation.choose,
+        errorId: ++_errorId,
+      );
       return;
     }
     final generation = _generation;
@@ -145,11 +91,18 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
       state = state.copy(
         pending: bytes == null
             ? state.pending
-            : [...state.pending, PetPhotoDraft(id: newPetId(), bytes: bytes)],
+            : [
+                ...state.pending,
+                PetPhotoDraft(id: newEntityId(), bytes: bytes),
+              ],
       );
     } catch (e) {
       if (_valid(generation, owner)) {
-        state = state.copy(issue: _kind(e), errorId: ++_errorId);
+        state = state.copy(
+          issue: _kind(e),
+          failedOperation: PetPhotosOperation.choose,
+          errorId: ++_errorId,
+        );
       }
     } finally {
       lifetime.close();
@@ -167,6 +120,8 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
   }
 
   Future<bool> savePendingChanges() async {
+    // Detail observes this notifier. The editor refreshes detail after saving;
+    // invalidating it here would introduce a circular provider dependency.
     if (!state.hasPendingChanges) return true;
     if (state.busy || state.loading) return false;
     final owner = _owner;
@@ -190,7 +145,6 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
           ),
         );
         ref.invalidate(petListViewModelProvider);
-        ref.invalidate(petDetailViewModelProvider(petId));
       }
       for (final draft in List<PetPhotoDraft>.of(state.pending)) {
         final photo = await useCase.upload(owner, petId, draft);
@@ -224,14 +178,17 @@ class PetPhotosViewModel extends Notifier<PetPhotosState> {
         if (!_valid(generation, owner)) return false;
         state = state.copy(photos: selected, busy: true, clearPrimary: true);
         ref.invalidate(petListViewModelProvider);
-        ref.invalidate(petDetailViewModelProvider(petId));
       }
       if (!_valid(generation, owner)) return false;
       state = state.copy(recovered: false);
       return true;
     } catch (e) {
       if (_valid(generation, owner)) {
-        state = state.copy(issue: _kind(e), errorId: ++_errorId);
+        state = state.copy(
+          issue: _kind(e),
+          failedOperation: PetPhotosOperation.save,
+          errorId: ++_errorId,
+        );
       }
       return false;
     } finally {

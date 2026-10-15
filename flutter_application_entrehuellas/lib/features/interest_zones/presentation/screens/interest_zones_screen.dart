@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -65,9 +66,15 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
     }
 
     return ConfirmationToastHost(
-      confirmed: data?.confirmation != null,
-      message: data?.confirmation ?? '',
-      noticeId: '${data?.ownerId}/${data?.noticeId}',
+      confirmed:
+          async.hasError || data?.issue != null || data?.confirmation != null,
+      isError: async.hasError || data?.issue != null,
+      message: async.hasError
+          ? 'No se pudieron consultar tus zonas.'
+          : data?.issue != null
+          ? zoneFailureLabel(data!.issue!)
+          : data?.confirmation ?? '',
+      noticeId: (data?.ownerId, data?.noticeId, data?.errorId, async.error),
       child: PopScope(
         canPop: data?.busy != true && data?.draft == null,
         onPopInvokedWithResult: (didPop, _) {
@@ -75,7 +82,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
         },
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: SafeArea(
+          body: ScrollSafeArea(
             top: false,
             child: Center(
               child: ConstrainedBox(
@@ -89,7 +96,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                         24,
                         MediaQuery.paddingOf(context).top + 80,
                         24,
-                        32,
+                        ScrollSafeArea.bottomPadding(context, 32),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -129,12 +136,6 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              const Text(
-                                                'No se pudieron consultar tus zonas.',
-                                                style: TextStyle(
-                                                  color: Color(0xFFB53F48),
-                                                ),
-                                              ),
                                               TextButton(
                                                 onPressed: vm.retry,
                                                 child: const Text('Reintentar'),
@@ -163,19 +164,6 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
                                           children: [
-                                            Text(
-                                              data.issue ==
-                                                      ZoneFailureKind.conflict
-                                                  ? 'La zona cambió en otro dispositivo. Consulta la versión actual antes de volver a editar.'
-                                                  : data.issue ==
-                                                        ZoneFailureKind
-                                                            .unavailable
-                                                  ? 'La zona no está disponible. Consulta tus zonas actuales para continuar.'
-                                                  : 'No se pudo completar la operación. Tus cambios se conservan; puedes reintentar.',
-                                              style: const TextStyle(
-                                                color: Color(0xFFB53F48),
-                                              ),
-                                            ),
                                             if (data.issue ==
                                                     ZoneFailureKind.conflict ||
                                                 data.issue ==
@@ -347,3 +335,18 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
     ),
   );
 }
+
+String zoneFailureLabel(ZoneFailureKind kind) => switch (kind) {
+  ZoneFailureKind.invalidName =>
+    'Escribe un nombre de zona de 1 a 60 caracteres.',
+  ZoneFailureKind.invalidPoint =>
+    'Selecciona un punto válido en el mapa o indica sus coordenadas.',
+  ZoneFailureKind.invalidRadius => 'El radio debe estar entre 0.1 y 50 km.',
+  ZoneFailureKind.conflict =>
+    'La zona cambió en otro dispositivo. Consulta la versión actual antes de volver a editar.',
+  ZoneFailureKind.signedOut => 'Tu sesión cambió. Vuelve a ingresar.',
+  ZoneFailureKind.unavailable =>
+    'La zona no está disponible. Consulta tus zonas actuales.',
+  ZoneFailureKind.network =>
+    'No se pudo completar la operación. Tus cambios se conservan; puedes reintentar.',
+};

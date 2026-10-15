@@ -10,7 +10,6 @@ class AppTextField extends StatefulWidget {
     required this.controller,
     this.icon,
     this.hint,
-    this.errorText,
     this.invalid = false,
     this.footer,
     this.enabled = true,
@@ -31,7 +30,6 @@ class AppTextField extends StatefulWidget {
   final TextEditingController controller;
   final IconData? icon;
   final String? hint;
-  final String? errorText;
   final bool invalid;
   final Widget? footer;
   final bool enabled;
@@ -71,7 +69,6 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) => AppFieldSurface(
     label: widget.label,
     icon: widget.icon,
-    errorText: widget.errorText,
     invalid: widget.invalid,
     footer: widget.footer,
     enabled: widget.enabled,
@@ -95,7 +92,7 @@ class _AppTextFieldState extends State<AppTextField> {
           fontFamily: AppTheme.fontFamily,
           fontSize: 16,
           height: 27 / 16,
-          color: widget.invalid || widget.errorText != null
+          color: widget.invalid
               ? AppColors.error
               : widget.enabled
               ? AppColors.ink

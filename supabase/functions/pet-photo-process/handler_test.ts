@@ -22,7 +22,7 @@ function request(
 ) {
   return new Request("https://example.invalid/photo", {
     method: "POST",
-    body: content,
+    body: Uint8Array.from(content),
     headers: {
       authorization: "Bearer fake-session",
       "content-type": "image/jpeg",
@@ -33,7 +33,14 @@ function request(
   });
 }
 function fixture(
-  options: { denied?: boolean; alienPet?: boolean; failStorage?: boolean } = {},
+  options: {
+    denied?: boolean;
+    alienPet?: boolean;
+    failStorage?: boolean;
+    retireOnFailure?: boolean;
+    failSecond?: boolean;
+    found?: boolean;
+  } = {},
 ) {
   const previous = globalThis.fetch;
   const savedEnv = new Map(
@@ -50,7 +57,7 @@ function fixture(
   let hash: string | undefined;
   const row = {
     id,
-    pet_id: pet,
+    ...(options.found ? { case_id: pet } : { pet_id: pet }),
     owner_id: owner,
     status: "pending",
     processed_at: null as string | null,
@@ -68,16 +75,26 @@ function fixture(
         user_metadata: {},
         created_at: "2026-10-10T00:00:00Z",
       };
-    } else if (path === "/rest/v1/pets") {
+    } else if (
+      path === (options.found ? "/rest/v1/found_cases" : "/rest/v1/pets")
+    ) {
       data = options.alienPet ? null : { id: pet };
-    } else if (path === "/rest/v1/rpc/prepare_pet_photo") {
+    } else if (
+      path ===
+        (options.found
+          ? "/rest/v1/rpc/prepare_found_case_photo"
+          : "/rest/v1/rpc/prepare_pet_photo")
+    ) {
       const command = await req.json();
       assert(
-        command.p_owner === owner && command.p_pet_id === pet &&
+        command.p_owner === owner &&
+          (options.found ? command.p_case_id : command.p_pet_id) === pet &&
           command.p_id === id,
       );
       assert(/^[0-9a-f]{64}$/.test(command.p_hash));
-      if (hash && hash !== command.p_hash) {
+      if (
+        (options.retireOnFailure && hash) || (hash && hash !== command.p_hash)
+      ) {
         status = 400;
         data = { code: "40001", message: "photo_conflict" };
       } else {
@@ -86,21 +103,37 @@ function fixture(
           published
             ? {
               ...row,
-              status: "published",
+              status: options.found ? "ready" : "published",
               processed_at: "2026-10-10T00:00:00Z",
             }
             : row,
         ];
       }
     } else if (path.startsWith("/storage/v1/object/")) {
-      if (options.failStorage) {
+      if (req.method === "DELETE") {
+        const { prefixes } = await req.json();
+        for (const key of uploaded.keys()) {
+          if (prefixes.some((prefix: string) => key.endsWith("/" + prefix))) {
+            uploaded.delete(key);
+          }
+        }
+        data = [];
+      } else if (
+        options.failStorage ||
+        (options.failSecond && path.includes("thumbnails"))
+      ) {
         status = 503;
         data = { error: "unavailable", message: "private detail" };
       } else {
         uploaded.set(path, new Uint8Array(await req.arrayBuffer()));
         data = { Key: path };
       }
-    } else if (path === "/rest/v1/rpc/complete_pet_photo_processing") {
+    } else if (
+      path ===
+        (options.found
+          ? "/rest/v1/rpc/complete_found_case_photo"
+          : "/rest/v1/rpc/complete_pet_photo_processing")
+    ) {
       const command = await req.json();
       assert(
         command.p_owner === owner && command.p_hash === hash &&
@@ -109,7 +142,7 @@ function fixture(
       published = true;
       data = [{
         ...row,
-        status: "published",
+        status: options.found ? "ready" : "published",
         processed_at: "2026-10-10T00:00:00Z",
         is_primary: true,
       }];
@@ -129,6 +162,86 @@ function fixture(
     },
   };
 }
+function foundRequest() {
+  return new Request("https://example.invalid/photo", {
+    method: "POST",
+    body: bytes,
+    headers: {
+      authorization: "Bearer fake-session",
+      "content-type": "image/jpeg",
+      "x-found-case-id": pet,
+      "x-photo-id": id,
+    },
+  });
+}
+Deno.test("Found photos authorize the reporter, use separate cleaned buckets and retry the same hash without a pet", async () => {
+  const fake = fixture({ found: true });
+  try {
+    const response = await handlePhotoRequest(foundRequest());
+    assert(response.status === 200);
+    const data = await response.json();
+    assert(
+      data.status === "ready" && data.case_id === pet &&
+        data.pet_id === undefined && data.content_hash === undefined,
+    );
+    assert(fake.uploaded.size === 2);
+    assert([...fake.uploaded.keys()].every((p) => p.includes("/found-photo-")));
+    assert(
+      !fake.calls.some((p) =>
+        p === "/rest/v1/pets" || p.includes("prepare_pet_photo")
+      ),
+    );
+    const previous = fake.uploaded.size;
+    assert((await handlePhotoRequest(foundRequest())).status === 200);
+    assert(fake.uploaded.size === previous);
+  } finally {
+    fake.dispose();
+  }
+});
+Deno.test("Found photos deny a different reporter before storage and reject mixed context headers", async () => {
+  const fake = fixture({ found: true, alienPet: true });
+  try {
+    assert((await handlePhotoRequest(foundRequest())).status === 403);
+    assert(
+      (await handlePhotoRequest(request(bytes, { "x-found-case-id": pet })))
+        .status === 422,
+    );
+    assert(
+      !fake.calls.some((p) => p.includes("/rpc/") || p.includes("/storage/")),
+    );
+  } finally {
+    fake.dispose();
+  }
+});
+Deno.test("A failed found rendition never confirms processing", async () => {
+  const fake = fixture({ found: true, failStorage: true });
+  try {
+    assert((await handlePhotoRequest(foundRequest())).status === 503);
+    assert(!fake.calls.some((p) => p.includes("complete_found_case_photo")));
+  } finally {
+    fake.dispose();
+  }
+});
+Deno.test("A discarded found photo cleans partial late bytes without publishing", async () => {
+  const fake = fixture({
+    found: true,
+    failSecond: true,
+    retireOnFailure: true,
+  });
+  try {
+    assert((await handlePhotoRequest(foundRequest())).status === 503);
+    assert(fake.uploaded.size === 0);
+    assert(!fake.calls.some((p) => p.includes("complete_found_case_photo")));
+    assert(
+      fake.calls.some((p) => p === "/storage/v1/object/found-photo-renditions"),
+    );
+    assert(
+      fake.calls.some((p) => p === "/storage/v1/object/found-photo-thumbnails"),
+    );
+  } finally {
+    fake.dispose();
+  }
+});
 Deno.test("Auth and ownership are checked before reserving or writing bytes", async () => {
   for (const option of [{ denied: true }, { alienPet: true }]) {
     const fake = fixture(option);

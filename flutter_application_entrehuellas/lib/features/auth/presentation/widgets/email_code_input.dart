@@ -160,18 +160,7 @@ class _EmailCodeInputState extends State<EmailCodeInput> {
           ),
         ),
       ),
-      if (widget.errorHint != null)
-        Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Semantics(
-            liveRegion: true,
-            child: Text(
-              widget.errorHint!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Color(0xFFB53F48)),
-            ),
-          ),
-        ),
+
       // Automatic verification on digit six, with an explicit retry for a
       // connection failure or a keyboard which does not send a done action.
       if (_controller.text.length == 6) ...[

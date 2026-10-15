@@ -2,52 +2,18 @@ import 'dart:typed_data';
 import 'dart:isolate';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
+import '../../../../core/data_sources/photo_preparation.dart';
 import 'profile_photo_source.dart';
 
 /// A fresh image copies only pixels, dropping EXIF/GPS from the original.
 Uint8List prepareProfilePhoto(Uint8List bytes) {
   try {
-    return _prepareProfilePhoto(bytes);
-  } on ProfilePhotoSourceFailure {
-    rethrow;
-  } catch (_) {
+    return normalizePhoto(bytes, maxSide: 512, square: true);
+  } on PhotoPreparationFailure {
     throw const ProfilePhotoSourceFailure(
       ProfilePhotoSourceFailureKind.invalidPhoto,
     );
   }
-}
-
-Uint8List _prepareProfilePhoto(Uint8List bytes) {
-  if (bytes.isEmpty || bytes.length > 10485760) {
-    throw const ProfilePhotoSourceFailure(
-      ProfilePhotoSourceFailureKind.invalidPhoto,
-    );
-  }
-  final decoder = img.findDecoderForData(bytes);
-  final info = decoder?.startDecode(bytes);
-  if (info == null ||
-      info.width > 4096 ||
-      info.height > 4096 ||
-      info.width * info.height > 16000000) {
-    throw const ProfilePhotoSourceFailure(
-      ProfilePhotoSourceFailureKind.invalidPhoto,
-    );
-  }
-  final decoded = decoder!.decodeFrame(0);
-  if (decoded == null) {
-    throw const ProfilePhotoSourceFailure(
-      ProfilePhotoSourceFailureKind.invalidPhoto,
-    );
-  }
-  final cropped = img.copyResizeCropSquare(
-    img.bakeOrientation(decoded),
-    size: 512,
-  );
-  final clean = img.Image(width: 512, height: 512);
-  img.fill(clean, color: img.ColorRgb8(245, 245, 247));
-  img.compositeImage(clean, cropped);
-  return img.encodeJpg(clean, quality: 85);
 }
 
 Future<Uint8List> _prepareWithoutBlocking(Uint8List bytes) async {

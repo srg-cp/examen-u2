@@ -8,9 +8,16 @@ import 'package:flutter_application_entrehuellas/features/pets/data/data_sources
 import 'package:flutter_application_entrehuellas/features/pets/data/data_sources/pet_photo_data_source.dart';
 
 void main() {
-  for (final status in [200, 403, 422, 409]) {
+  for (final scenario in [
+    (edge: 200, storage: 200),
+    (edge: 403, storage: 200),
+    (edge: 422, storage: 200),
+    (edge: 409, storage: 200),
+    (edge: 200, storage: 403),
+  ]) {
+    final status = scenario.edge;
     test(
-      'Photo upload uses authenticated Edge processing and private signed renditions; HTTP=$status',
+      'Photo upload uses authenticated Edge processing and private signed renditions; Edge=$status Storage=${scenario.storage}',
       () async {
         final bytes = img.encodeJpg(img.Image(width: 10, height: 10));
         final calls = <String>[];
@@ -52,6 +59,7 @@ void main() {
               responseStatus = status;
               body = status == 200 ? row : {'error': 'photo_failed'};
             } else {
+              responseStatus = scenario.storage;
               expect(
                 path,
                 anyOf(
@@ -59,10 +67,16 @@ void main() {
                   '/storage/v1/object/sign/pet-photo-thumbnails/owner/pet/photo.jpg',
                 ),
               );
-              body = {
-                'signedURL':
-                    '/object/sign/${path.split('/sign/').last}?token=fake',
-              };
+              body = scenario.storage == 200
+                  ? {
+                      'signedURL':
+                          '/object/sign/${path.split('/sign/').last}?token=fake',
+                    }
+                  : {
+                      'statusCode': '403',
+                      'error': 'Forbidden',
+                      'message': 'private SDK detail',
+                    };
             }
           }
           return http.Response(
@@ -91,13 +105,15 @@ void main() {
           email: 'test@example.invalid',
           password: 'fake',
         );
-        if (status == 200) {
+        if (status == 200 && scenario.storage == 200) {
           final result = await source.upload('owner', 'pet', 'photo', bytes);
           expect(result.toEntity().isPrimary, true);
           expect(result.uri!.path, contains('pet-photo-renditions'));
           expect(result.thumbnailUri!.path, contains('pet-photo-thumbnails'));
         } else {
-          final kind = switch (status) {
+          final kind = switch (scenario.storage != 200
+              ? scenario.storage
+              : status) {
             403 => PetPhotoSourceFailureKind.forbidden,
             422 => PetPhotoSourceFailureKind.invalidPhoto,
             _ => PetPhotoSourceFailureKind.conflict,
@@ -110,7 +126,14 @@ void main() {
           );
         }
         expect(calls.first, '/functions/v1/pet-photo-process');
-        expect(calls.length, status == 200 ? 3 : 1);
+        expect(
+          calls.length,
+          status != 200
+              ? 1
+              : scenario.storage == 200
+              ? 3
+              : 2,
+        );
         expect(
           calls.any((path) => path.contains('/rest/v1/rpc/publish_pet_photo')),
           false,

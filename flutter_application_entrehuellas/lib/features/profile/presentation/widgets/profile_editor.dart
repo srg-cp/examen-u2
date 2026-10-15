@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/failure_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
@@ -25,47 +26,22 @@ class ProfileEditor extends ConsumerWidget {
       );
     }
     if (profile.hasError) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Semantics(
-            liveRegion: true,
-            child: Text(
-              'No se pudo cargar tu perfil. Reintenta.',
-              style: TextStyle(fontSize: 16, color: Color(0xFFB53F48)),
-            ),
-          ),
-          const SizedBox(height: 16),
-          LoadingShimmer(
-            isLoading: profile.isLoading,
-            loadingLabel: 'Cargando perfil',
-            child: OutlinedButton(
-              style: primaryActionButtonStyle(context).copyWith(
-                backgroundColor: const WidgetStatePropertyAll(
-                  Colors.transparent,
-                ),
-                foregroundColor: const WidgetStatePropertyAll(
-                  Color(0xFF111111),
-                ),
-                side: const WidgetStatePropertyAll(
-                  BorderSide(color: Color(0xFFE5E5EA)),
-                ),
-              ),
-              onPressed: profile.isLoading
-                  ? null
-                  : () => ref.read(profileViewModelProvider.notifier).retry(),
-              child: const Text('Reintentar'),
-            ),
-          ),
-        ],
+      return FailureFeedback(
+        message: 'No se pudo cargar tu perfil. Reintenta.',
+        noticeId: profile.error,
+        onRetry: () => ref.read(profileViewModelProvider.notifier).retry(),
       );
     }
     final value = profile.requireValue;
     final model = ref.read(profileViewModelProvider.notifier);
     return ConfirmationToastHost(
       key: ValueKey(value.profile.userId),
-      confirmed: value.saved,
-      message: 'Cambios guardados',
+      confirmed: value.saved || value.issue != null,
+      isError: value.issue != null,
+      noticeId: (value.errorId, value.saved),
+      message: value.issue == null
+          ? 'Cambios guardados'
+          : profileFailureLabel(value.issue!),
       child: _ProfileFields(
         value: value,
         onEdit: model.edit,
@@ -122,7 +98,6 @@ class _ProfileFieldsState extends State<_ProfileFields> {
     final state = widget.value;
     final nameError = state.issue == ProfileFailureKind.invalidName;
     final cityError = state.issue == ProfileFailureKind.invalidCity;
-    const errorColor = Color(0xFFB53F48);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -154,7 +129,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
             autofillHints: const [AutofillHints.name],
             hint: 'Tu nombre',
             icon: Icons.person_outline_rounded,
-            errorText: nameError ? 'Usa hasta 120 caracteres.' : null,
+            invalid: nameError,
             onChanged: (value) => widget.onEdit(displayName: value),
           ),
         ),
@@ -171,7 +146,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
             autofillHints: const [AutofillHints.addressCity],
             hint: 'Tu ciudad',
             icon: Icons.location_city_outlined,
-            errorText: cityError ? 'Usa hasta 120 caracteres.' : null,
+            invalid: cityError,
             onChanged: (value) => widget.onEdit(city: value),
             onSubmitted: (_) {
               if (state.isDirty && !state.isBusy) widget.onSave();
@@ -188,23 +163,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
             child: const Text('Guardar cambios'),
           ),
         ),
-        if (state.issue != null && !nameError && !cityError)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Semantics(
-              liveRegion: true,
-              child: Text(switch (state.issue) {
-                ProfileFailureKind.signedOut =>
-                  'Tu sesión cambió. Vuelve a ingresar.',
-                ProfileFailureKind.missing =>
-                  'Tu perfil no está disponible. Reintenta.',
-                ProfileFailureKind.forbidden =>
-                  'No se pudo guardar tu perfil. Reintenta.',
-                _ =>
-                  'No se pudo guardar. Conservamos tus cambios para reintentar.',
-              }, style: const TextStyle(fontSize: 16, color: errorColor)),
-            ),
-          ),
+
         if (state.isDirty)
           TextButton(
             onPressed: state.isBusy ? null : widget.onDiscard,
@@ -214,3 +173,11 @@ class _ProfileFieldsState extends State<_ProfileFields> {
     );
   }
 }
+
+String profileFailureLabel(ProfileFailureKind kind) => switch (kind) {
+  ProfileFailureKind.invalidName => 'Nombre: usa hasta 120 caracteres.',
+  ProfileFailureKind.invalidCity => 'Ciudad: usa hasta 120 caracteres.',
+  ProfileFailureKind.signedOut => 'Tu sesión cambió. Vuelve a ingresar.',
+  ProfileFailureKind.missing => 'Tu perfil no está disponible. Reintenta.',
+  _ => 'No se pudo guardar. Conservamos tus cambios para reintentar.',
+};

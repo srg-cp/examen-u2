@@ -1,3 +1,19 @@
+import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
+import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
+import '../features/pets/presentation/view_models/pet_list_view_model.dart';
+import '../features/found_cases/providers/found_case_providers.dart';
+import '../features/found_cases/domain/entities/found_case.dart';
+import 'navigation/entity_editor_page.dart';
+import 'navigation/entity_detail_page.dart';
+import '../features/found_cases/presentation/screens/found_editor_screen.dart';
+import '../features/found_cases/presentation/screens/found_detail_screen.dart';
+import '../features/found_cases/presentation/screens/my_found_cases_screen.dart';
+import 'screens/lost_report_screen.dart';
+import '../features/found_cases/presentation/screens/recovery_reports_screen.dart';
+import '../features/home/presentation/widgets/home_content.dart'
+    show openLostReport;
+import '../features/lost_cases/presentation/screens/case_detail_screen.dart';
+import '../features/lost_cases/presentation/screens/my_cases_screen.dart';
 import '../core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,6 +83,26 @@ final routerProvider = Provider<GoRouter>((ref) {
       };
       if (path == '/access' &&
           ['/register', '/recover-password'].contains(state.uri.path)) {
+        return null;
+      }
+      if (path == '/home' &&
+          state.uri.path == '/home/found-cases/new' &&
+          ((state.uri.queryParameters['case'] ?? '').trim().isEmpty ||
+              !{
+                'true',
+                'false',
+              }.contains(state.uri.queryParameters['community']))) {
+        return '/home';
+      }
+      if (path == '/home' &&
+          (state.uri.path == '/home/found-cases/new' ||
+              state.uri.path == '/home/my-found-cases' ||
+              state.uri.path.startsWith('/home/found-cases/') ||
+              state.uri.path == '/home/lost-cases/new' ||
+              state.uri.path == '/home/lost-cases/community/new' ||
+              state.uri.path == '/home/my-cases' ||
+              state.uri.path == '/home/my-reports' ||
+              state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
       if (path == '/home' && state.uri.path == '/home/profile') return null;
@@ -156,6 +192,115 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
         routes: [
           GoRoute(
+            path: 'my-reports',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: RecoveryReportsScreen(
+                onReport: (source, onReturn) =>
+                    openLostReport(source, onReturn: onReturn, radius: 28),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'found-cases/new',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ProviderScope(
+                overrides: [
+                  foundEditorContextProvider.overrideWithValue(
+                    FoundEditorContext(
+                      communitySearch: false,
+                      targetId: state.uri.queryParameters['case'],
+                      communityTarget:
+                          state.uri.queryParameters['community'] == 'true',
+                    ),
+                  ),
+                ],
+                child: const FoundEditorScreen(),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'my-found-cases',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const MyFoundCasesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'found-cases/:id',
+            pageBuilder: (context, state) => entityDetailPage(
+              context: context,
+              origin: state.extra is Rect ? state.extra as Rect : null,
+              key: state.pageKey,
+              child: FoundDetailScreen(id: state.pathParameters['id']!),
+            ),
+          ),
+          GoRoute(
+            path: 'lost-cases/community/new',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ProviderScope(
+                overrides: [
+                  foundEditorContextProvider.overrideWithValue(
+                    const FoundEditorContext(),
+                  ),
+                ],
+                child: const LostReportScreen(initialCommunity: true),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'lost-cases/new',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ProviderScope(
+                overrides: [
+                  foundEditorContextProvider.overrideWithValue(
+                    const FoundEditorContext(),
+                  ),
+                ],
+                child: const LostReportScreen(),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'my-cases',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const MyCasesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'cases/:id',
+            pageBuilder: (context, state) => entityDetailPage(
+              context: context,
+              origin: state.extra is Rect ? state.extra as Rect : null,
+              key: state.pageKey,
+              child: CaseDetailScreen(
+                id: state.pathParameters['id']!,
+                recoveryActions: (value, onChanged) => RecoveryCaseActions(
+                  id: value.id,
+                  community: false,
+                  canResolve: value.canResolve,
+                  open: value.status == 'active',
+                  onChanged: () {
+                    onChanged();
+                    ref.invalidate(myCasesViewModelProvider);
+                    ref.invalidate(petListViewModelProvider);
+                    ref.invalidate(petDetailViewModelProvider);
+                  },
+                ),
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'alert-preferences',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -164,28 +309,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'pets/new',
-            pageBuilder: (context, state) => CustomTransitionPage<void>(
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
               key: state.pageKey,
-              transitionDuration: MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : const Duration(milliseconds: 320),
-              reverseTransitionDuration: MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : const Duration(milliseconds: 260),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) =>
-                      OriginPageTransition(
-                        animation: animation,
-                        source: state.extra is OriginPageSource
-                            ? state.extra as OriginPageSource
-                            : null,
-                        origin: state.extra is OriginPageSource
-                            ? (state.extra as OriginPageSource).bounds
-                            : state.extra is Rect
-                            ? state.extra as Rect
-                            : null,
-                        child: child,
-                      ),
+              source: state.extra,
               child: const PetEditorScreen(petId: 'new'),
             ),
           ),
@@ -197,26 +324,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 savedPet: state.extra is Pet ? state.extra as Pet : null,
                 canEdit: state.extra != 'inspect',
               );
-              if (state.extra is! Rect) {
-                return NoTransitionPage(key: state.pageKey, child: child);
-              }
-              return CustomTransitionPage<void>(
+              return entityDetailPage(
+                context: context,
                 key: state.pageKey,
-                transitionDuration: MediaQuery.disableAnimationsOf(context)
-                    ? Duration.zero
-                    : const Duration(milliseconds: 320),
-                reverseTransitionDuration:
-                    MediaQuery.disableAnimationsOf(context)
-                    ? Duration.zero
-                    : const Duration(milliseconds: 260),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) =>
-                        OriginPageTransition(
-                          animation: animation,
-                          origin: state.extra as Rect,
-                          child: child,
-                        ),
                 child: child,
+                origin: state.extra is Rect ? state.extra as Rect : null,
               );
             },
             routes: [

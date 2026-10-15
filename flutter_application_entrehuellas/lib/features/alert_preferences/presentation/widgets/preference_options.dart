@@ -127,21 +127,6 @@ class PreferenceOptions extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (state.issue != null) ...[
-                Semantics(
-                  liveRegion: true,
-                  child: Text(switch (state.issue!) {
-                    PreferenceFailureKind.invalidTypes =>
-                      'Elige al menos un tipo de aviso o desactiva Recibir alertas.',
-                    PreferenceFailureKind.invalidChannels =>
-                      'Elige al menos un canal o desactiva Recibir alertas.',
-                    PreferenceFailureKind.conflict =>
-                      'Las preferencias cambiaron en otro dispositivo. Consulta la versión actual antes de volver a guardar.',
-                    PreferenceFailureKind.signedOut =>
-                      'Tu sesión cambió. Vuelve a ingresar para guardar.',
-                    PreferenceFailureKind.unavailable =>
-                      'No se pudo completar la operación. Tu selección se conserva; puedes reintentar.',
-                  }, style: const TextStyle(fontSize: 16, color: Color(0xFFB53F48))),
-                ),
                 if (state.issue == PreferenceFailureKind.conflict)
                   TextButton(
                     onPressed: state.busy

@@ -1,3 +1,5 @@
+import '../../domain/failures/pet_failure.dart';
+import '../../../../core/presentation/widgets/photo_gallery_strip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -53,10 +55,14 @@ class _PetDetailScreenState extends ConsumerState<PetDetailScreen> {
       canPop: !lifecycle.busy,
       child: ConfirmationToastHost(
         confirmed:
+            lifecycle.issue != null ||
             lifecycle.confirmed ||
             (_confirmed && value.asData?.value.ownerId == _confirmationOwner),
-        noticeId: lifecycle.confirmed ? lifecycle.noticeId : null,
-        message: lifecycle.confirmed
+        noticeId: lifecycle.noticeId,
+        isError: lifecycle.issue != null,
+        message: lifecycle.issue != null
+            ? petLifecycleFailureLabel(lifecycle.issue!)
+            : lifecycle.confirmed
             ? (lifecycle.archived ? 'Mascota archivada' : 'Mascota restaurada')
             : 'Mascota guardada',
         child: PetScreenShell(
@@ -143,7 +149,7 @@ class _PetIdentity extends ConsumerWidget {
       children: [
         LayoutBuilder(
           builder: (context, constraints) {
-            final size = constraints.maxWidth.clamp(112, 160).toDouble();
+            final size = PhotoGalleryStrip.detailTileSize(constraints.maxWidth);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -230,3 +236,11 @@ class _PetInformation extends StatelessWidget {
     ),
   );
 }
+
+String petLifecycleFailureLabel(PetFailureKind kind) => switch (kind) {
+  PetFailureKind.activeCase =>
+    'Resuelve o cancela el caso activo antes de archivar.',
+  PetFailureKind.conflict => 'La ficha cambió. Actualízala antes de continuar.',
+  PetFailureKind.missing => 'Esta mascota ya no está disponible.',
+  _ => 'No se pudo completar la acción. Puedes reintentar.',
+};

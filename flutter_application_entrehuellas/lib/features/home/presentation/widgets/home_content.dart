@@ -1,3 +1,5 @@
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../state/home_view_state.dart';
@@ -9,7 +11,7 @@ class HomeContent extends StatelessWidget {
     super.key,
   });
   final ValueChanged<HomeSection> onSelect;
-  final VoidCallback onReport;
+  final ValueChanged<BuildContext> onReport;
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,18 +75,18 @@ class HomeContent extends StatelessWidget {
             final cards = [
               HomeQuickAction(
                 icon: Icons.search_rounded,
-                label: 'Perdida',
+                label: 'Reportar',
                 onTap: onReport,
               ),
               HomeQuickAction(
-                icon: Icons.favorite_border_rounded,
-                label: 'Encontrada',
-                onTap: onReport,
+                icon: Icons.assignment_outlined,
+                label: 'Mis reportes',
+                onTap: (source) => source.push('/home/my-reports'),
               ),
               HomeQuickAction(
                 icon: Icons.pets_outlined,
                 label: 'Mis mascotas',
-                onTap: () => onSelect(HomeSection.pets),
+                onTap: (_) => onSelect(HomeSection.pets),
               ),
             ];
             return vertical
@@ -154,14 +156,14 @@ class HomeQuickAction extends StatelessWidget {
   });
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final ValueChanged<BuildContext> onTap;
   @override
   Widget build(BuildContext context) => Material(
     color: const Color(0xFFF5F5F7),
     borderRadius: BorderRadius.circular(22),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
-      onTap: onTap,
+      onTap: () => onTap(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: SizedBox(
@@ -273,49 +275,33 @@ void showHomeInfo(
   ),
 );
 
-void showReportOptions(BuildContext context) => showModalBottomSheet<void>(
-  context: context,
-  isScrollControlled: true,
-  sheetAnimationStyle: MediaQuery.disableAnimationsOf(context)
-      ? AnimationStyle.noAnimation
-      : null,
-  useSafeArea: true,
-  showDragHandle: true,
-  backgroundColor: Colors.white,
-  builder: (context) => SingleChildScrollView(
-    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'Reportar',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'La publicación de reportes aún no está disponible.',
-          style: TextStyle(fontSize: 16, height: 1.4, color: Color(0xFF6E6E73)),
-        ),
-        const SizedBox(height: 20),
-        const HomeNotice(
-          icon: Icons.search_rounded,
-          title: 'Mascota perdida',
-          description: 'Publicar una búsqueda con foto, fecha y zona.',
-        ),
-        const SizedBox(height: 12),
-        const HomeNotice(
-          icon: Icons.favorite_border_rounded,
-          title: 'Mascota encontrada',
-          description:
-              'Avisar que encontraste una mascota cuyo responsable desconoces.',
-        ),
-        const SizedBox(height: 16),
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cerrar'),
-        ),
-      ],
-    ),
-  ),
-);
+void openLostReport(
+  BuildContext context, {
+  VoidCallback? onReturn,
+  Color color = const Color(0xFF111111),
+  double radius = 32,
+}) {
+  final box = context.findRenderObject();
+  final navigator = Navigator.of(context).context.findRenderObject();
+  final origin = box is RenderBox && box.hasSize
+      ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
+      : null;
+  context
+      .push(
+        '/home/lost-cases/new',
+        extra: origin == null
+            ? null
+            : OriginPageSource(
+                bounds: origin,
+                color: color,
+                radius: radius,
+                child: Icon(
+                  Icons.search_rounded,
+                  color: color == const Color(0xFF111111)
+                      ? Colors.white
+                      : const Color(0xFF111111),
+                ),
+              ),
+      )
+      .then((_) => onReturn?.call());
+}

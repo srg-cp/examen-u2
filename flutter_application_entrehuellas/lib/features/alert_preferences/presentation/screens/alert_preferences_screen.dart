@@ -1,3 +1,5 @@
+import '../../domain/failures/preference_failure.dart';
+import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,9 +38,15 @@ class AlertPreferencesScreen extends ConsumerWidget {
     }
 
     return ConfirmationToastHost(
-      confirmed: data?.confirmed == true,
-      message: 'Preferencias guardadas',
-      noticeId: '${data?.saved.ownerId}/${data?.noticeId}',
+      confirmed:
+          async.hasError || data?.issue != null || data?.confirmed == true,
+      isError: async.hasError || data?.issue != null,
+      message: async.hasError
+          ? 'No se pudieron consultar tus preferencias.'
+          : data?.issue != null
+          ? preferenceFailureLabel(data!.issue!)
+          : 'Preferencias guardadas',
+      noticeId: (data?.saved.ownerId, data?.noticeId, data?.issue, async.error),
       child: PopScope(
         canPop: data?.busy != true && data?.dirty != true,
         onPopInvokedWithResult: (didPop, _) {
@@ -46,7 +54,7 @@ class AlertPreferencesScreen extends ConsumerWidget {
         },
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: SafeArea(
+          body: ScrollSafeArea(
             top: false,
             child: Center(
               child: ConstrainedBox(
@@ -60,7 +68,7 @@ class AlertPreferencesScreen extends ConsumerWidget {
                         24,
                         MediaQuery.paddingOf(context).top + 80,
                         24,
-                        32,
+                        ScrollSafeArea.bottomPadding(context, 32),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,13 +101,6 @@ class AlertPreferencesScreen extends ConsumerWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.stretch,
                                       children: [
-                                        const Text(
-                                          'No se pudieron consultar tus preferencias.',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Color(0xFFB53F48),
-                                          ),
-                                        ),
                                         TextButton(
                                           onPressed: vm.retry,
                                           child: const Text('Reintentar'),
@@ -149,3 +150,16 @@ class AlertPreferencesScreen extends ConsumerWidget {
     );
   }
 }
+
+String preferenceFailureLabel(PreferenceFailureKind kind) => switch (kind) {
+  PreferenceFailureKind.invalidTypes =>
+    'Elige al menos un tipo de aviso o desactiva Recibir alertas.',
+  PreferenceFailureKind.invalidChannels =>
+    'Elige al menos un canal o desactiva Recibir alertas.',
+  PreferenceFailureKind.conflict =>
+    'Las preferencias cambiaron en otro dispositivo. Consulta la versión actual antes de volver a guardar.',
+  PreferenceFailureKind.signedOut =>
+    'Tu sesión cambió. Vuelve a ingresar para guardar.',
+  PreferenceFailureKind.unavailable =>
+    'No se pudo completar la operación. Tu selección se conserva; puedes reintentar.',
+};

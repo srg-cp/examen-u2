@@ -1219,4 +1219,803 @@ grant execute on function public.prepare_pet_photo(uuid,uuid,uuid,text),public.c
 revoke all on function public.list_pet_photos(uuid),public.set_primary_pet_photo(uuid,uuid,integer),public.begin_pet_photo_removal(uuid,uuid),public.owns_pet_photo_rendition(text,boolean) from public,anon,authenticated;
 grant execute on function public.list_pet_photos(uuid),public.set_primary_pet_photo(uuid,uuid,integer),public.begin_pet_photo_removal(uuid,uuid),public.owns_pet_photo_rendition(text,boolean) to authenticated;
 
+-- Source: database/tables/048_lost_cases.sql | normalized SHA256: 0909d5ee9caa355b7bdb8a84a6d567016d7fe07ab8366dbceaeded6772c5cda8
+-- HU-05 / RF-05. Private source, explicit public projection via RPC only.
+create table if not exists public.lost_cases (
+    id uuid primary key,
+    owner_id uuid not null references auth.users(id),
+    pet_id uuid not null references public.pets(id),
+    pet_version integer not null,
+    status text not null default 'active' check(status in ('active','resolved')),
+    occurred_at timestamptz not null,
+    latitude double precision not null check(latitude between -85 and 85),
+    longitude double precision not null check(longitude between -180 and 180),
+    place_reference text not null check(char_length(place_reference) between 1 and 120),
+    public_latitude double precision not null,
+    public_longitude double precision not null,
+    pet_name text not null,
+    species text not null,
+    species_detail text,
+    size text not null,
+    sex text,
+    age_months integer not null,
+    traits text not null,
+    photo_ids uuid[] not null check(cardinality(photo_ids) between 1 and 3),
+    created_at timestamptz not null default clock_timestamp()
+);
+create unique index if not exists lost_cases_one_active_pet on public.lost_cases(pet_id) where status='active';
+create index if not exists lost_cases_owner_created on public.lost_cases(owner_id,created_at desc,id);
+create table if not exists public.case_events (
+    id bigint generated always as identity primary key,
+    case_id uuid not null references public.lost_cases(id),
+    actor_id uuid not null references auth.users(id),
+    event_type text not null check(event_type in ('published','resolved')),
+    created_at timestamptz not null default clock_timestamp(),
+    unique(case_id,event_type)
+);
+alter table public.lost_cases enable row level security;
+alter table public.case_events enable row level security;
+
+-- Source: database/functions/049_lost_case_commands.sql | normalized SHA256: a2c4fbc22eae57018781befa6c2e22b8d5abd13be6afc6f5dcb92b9f5c9bfb3f
+create or replace function public.publish_lost_case(
+    p_id uuid,p_pet_id uuid,p_pet_version integer,p_occurred_at timestamptz,
+    p_latitude double precision,p_longitude double precision,p_place_reference text,p_photo_ids uuid[])
+returns setof public.lost_cases language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_pet public.pets; v_case public.lost_cases; v_photos uuid[];
+begin
+    if v_owner is null then raise exception using errcode='42501',message='case_unauthorized'; end if;
+    if p_id is null or p_pet_id is null then raise exception using errcode='23514',message='case_invalid'; end if;
+    -- Lock order shared with photo processing/archive/delete: pet first.
+    select * into v_pet from public.pets where id=p_pet_id for update;
+    if not found or v_pet.owner_id<>v_owner then raise exception using errcode='42501',message='case_unauthorized'; end if;
+    -- Normalize selection order: it has no business meaning.
+    select array_agg(id order by id) into v_photos from (select distinct unnest(p_photo_ids) id) selected;
+    select * into v_case from public.lost_cases where id=p_id;
+    if found then
+        if v_case.owner_id<>v_owner or v_case.pet_id<>p_pet_id then raise exception using errcode='42501',message='case_unauthorized'; end if;
+        if v_case.pet_version=p_pet_version and v_case.occurred_at=p_occurred_at
+            and v_case.latitude=p_latitude and v_case.longitude=p_longitude
+            and v_case.place_reference=public.pet_trim(p_place_reference) and v_case.photo_ids=v_photos then
+            return next v_case; return;
+        end if;
+        raise exception using errcode='40001',message='case_conflict';
+    end if;
+    if v_pet.archived_at is not null or v_pet.deletion_requested_at is not null then raise exception using errcode='23514',message='case_pet_unavailable'; end if;
+    if exists(select 1 from public.lost_cases where pet_id=p_pet_id and status='active') then raise exception using errcode='23505',message='case_already_active'; end if;
+    if p_pet_version is null or p_pet_version<>v_pet.version then raise exception using errcode='40001',message='case_conflict'; end if;
+    if p_occurred_at is null or p_occurred_at>clock_timestamp() or p_occurred_at<'2000-01-01'::timestamptz
+        or p_latitude is null or not(p_latitude between -85 and 85)
+        or p_longitude is null or not(p_longitude between -180 and 180)
+        or p_place_reference is null or char_length(public.pet_trim(p_place_reference)) not between 1 and 120
+        or p_photo_ids is null or cardinality(p_photo_ids) not between 1 and 3
+        or cardinality(v_photos)<>cardinality(p_photo_ids) or array_position(p_photo_ids,null) is not null then
+        raise exception using errcode='23514',message='case_invalid';
+    end if;
+    perform public.validate_pet_fields(v_pet.name,v_pet.species,v_pet.sex,v_pet.age_months,v_pet.traits);
+    if v_pet.size is null or v_pet.age_months is null or v_pet.traits is null
+        or char_length(v_pet.traits) not between 1 and 200
+        or (v_pet.species='other' and v_pet.species_detail is null) then
+        raise exception using errcode='23514',message='case_pet_incomplete';
+    end if;
+    -- Historic unprocessed photos never become public by publication of a case.
+    if (select count(*) from public.pet_photos ph where ph.id=any(v_photos) and ph.pet_id=p_pet_id
+        and ph.owner_id=v_owner and ph.status='published' and ph.processed_at is not null
+        and ph.content_hash is not null)<>cardinality(v_photos) then
+        raise exception using errcode='23514',message='case_photos_unverified';
+    end if;
+    insert into public.lost_cases(id,owner_id,pet_id,pet_version,occurred_at,latitude,longitude,place_reference,
+        public_latitude,public_longitude,pet_name,species,species_detail,size,sex,age_months,traits,photo_ids)
+    values(p_id,v_owner,p_pet_id,p_pet_version,p_occurred_at,p_latitude,p_longitude,public.pet_trim(p_place_reference),
+        floor(p_latitude*100)/100+0.005,least(179.995,floor(p_longitude*100)/100+0.005),
+        v_pet.name,v_pet.species,v_pet.species_detail,v_pet.size,v_pet.sex,v_pet.age_months,v_pet.traits,v_photos)
+    returning * into v_case;
+    update public.pets set case_history_at=coalesce(case_history_at,v_case.created_at),active_case_count=active_case_count+1,
+        version=version+1,updated_at=v_case.created_at where id=p_pet_id;
+    insert into public.case_events(case_id,actor_id,event_type) values(p_id,v_owner,'published');
+    return next v_case;
+end; $$;
+
+-- Metadata of processed bytes is projected, never originals/profile/private location.
+create or replace function public.read_public_lost_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    pet_name text,species text,species_detail text,size text,sex text,age_months integer,traits text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.pet_name,c.species,c.species_detail,c.size,c.sex,c.age_months,c.traits,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg')
+            order by ph.is_primary desc,ph.created_at,ph.id) from public.pet_photos ph
+            where ph.id=any(c.photo_ids) and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null),'[]'::jsonb)
+    from public.lost_cases c where c.id=p_id and c.status='active';
+$$;
+
+create or replace function public.is_public_case_rendition(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+    select exists(select 1 from public.lost_cases c join public.pet_photos ph on ph.id=any(c.photo_ids) and ph.pet_id=c.pet_id
+        where c.status='active' and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null
+        and p_name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg');
+$$;
+
+-- Source: database/policies/050_lost_case_policies.sql | normalized SHA256: 96974550d0b18345a5ae77b4b79257427ef004ab8c5844f9204cd0a8b8a4207d
+drop policy if exists lost_cases_owner_read on public.lost_cases;
+create policy lost_cases_owner_read on public.lost_cases for select to authenticated using(owner_id=auth.uid());
+drop policy if exists lost_cases_owner_guard on public.lost_cases;
+create policy lost_cases_owner_guard on public.lost_cases as restrictive for all to authenticated using(owner_id=auth.uid()) with check(false);
+drop policy if exists lost_cases_anon_guard on public.lost_cases;
+create policy lost_cases_anon_guard on public.lost_cases as restrictive for all to anon using(false) with check(false);
+drop policy if exists case_events_client_guard on public.case_events;
+create policy case_events_client_guard on public.case_events as restrictive for all to anon,authenticated using(false) with check(false);
+-- Buckets stay private. Grant only selected verified derivatives in active cases.
+drop policy if exists pet_renditions_read_guard on storage.objects;
+create policy pet_renditions_read_guard on storage.objects as restrictive for select to authenticated
+using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails') or public.owns_pet_photo_rendition(name,true) or public.is_public_case_rendition(name));
+drop policy if exists pet_renditions_anon_guard on storage.objects;
+create policy pet_renditions_anon_guard on storage.objects as restrictive for select to anon
+using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails') or public.is_public_case_rendition(name));
+drop policy if exists pet_renditions_anon_insert_guard on storage.objects;
+create policy pet_renditions_anon_insert_guard on storage.objects as restrictive for insert to anon
+with check(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails'));
+drop policy if exists pet_renditions_anon_update_guard on storage.objects;
+create policy pet_renditions_anon_update_guard on storage.objects as restrictive for update to anon
+using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails'))
+with check(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails'));
+-- Anonymous DELETE must remain impossible even if a future permissive policy grants it.
+drop policy if exists pet_renditions_anon_delete_guard on storage.objects;
+create policy pet_renditions_anon_delete_guard on storage.objects as restrictive for delete to anon
+using(bucket_id not in ('pet-photo-renditions','pet-photo-thumbnails'));
+drop policy if exists pet_renditions_case_read on storage.objects;
+create policy pet_renditions_case_read on storage.objects for select to anon,authenticated
+using(bucket_id in ('pet-photo-renditions','pet-photo-thumbnails') and public.is_public_case_rendition(name));
+
+-- Source: database/grants/051_lost_case_permissions.sql | normalized SHA256: ff7c952b469fa60c4a21d4d44134d639df4733fa0934a1ffc5e019b4f17dde8b
+revoke all on public.lost_cases,public.case_events from public,anon,authenticated;
+grant select on public.lost_cases to authenticated;
+revoke all on function public.publish_lost_case(uuid,uuid,integer,timestamptz,double precision,double precision,text,uuid[]) from public,anon,authenticated;
+grant execute on function public.publish_lost_case(uuid,uuid,integer,timestamptz,double precision,double precision,text,uuid[]) to authenticated;
+revoke all on function public.read_public_lost_case(uuid),public.is_public_case_rendition(text) from public,anon,authenticated;
+grant execute on function public.read_public_lost_case(uuid),public.is_public_case_rendition(text) to anon,authenticated;
+
+-- Source: database/tables/052_found_cases.sql | normalized SHA256: 12dfeda1857e6ec4906aee7b03a7892e5fd1dcd023b664d818b7cb2e1cb4d81e
+create table if not exists public.found_cases (
+    id uuid primary key,
+    owner_id uuid not null references auth.users(id),
+    pet_id uuid references public.pets(id),
+    status text not null default 'draft' check(status in ('draft','active','resolved','discarded')),
+    occurred_at timestamptz,
+    latitude double precision,
+    longitude double precision,
+    place_reference text,
+    public_latitude double precision,
+    public_longitude double precision,
+    species text check(species in ('dog','cat','other')),
+    species_detail text,
+    size text check(size in ('small','medium','large')),
+    sex text check(sex in ('male','female')),
+    traits text,
+    custody text check(custody in ('with_me','not_with_me')),
+    photo_ids uuid[] not null,
+    created_at timestamptz not null default clock_timestamp(),
+    published_at timestamptz,
+    constraint found_cases_no_inferred_pet check(pet_id is null),
+    constraint found_cases_photo_count check(cardinality(photo_ids) between 1 and 3 and array_position(photo_ids,null) is null),
+    constraint found_cases_active_fields check(status in ('draft','discarded') or (
+        occurred_at is not null and occurred_at>='2000-01-01'::timestamptz and
+        latitude is not null and latitude between -85 and 85 and longitude is not null and longitude between -180 and 180 and
+        public_latitude is not null and public_longitude is not null and
+        place_reference is not null and char_length(place_reference) between 1 and 120 and
+        species is not null and (species<>'other' or (species_detail is not null and char_length(species_detail) between 1 and 40)) and
+        traits is not null and char_length(traits) between 1 and 200 and published_at is not null))
+);
+create index if not exists found_cases_owner_idx on public.found_cases(owner_id,created_at desc);
+create table if not exists public.found_case_photos (
+    id uuid primary key,
+    case_id uuid not null references public.found_cases(id),
+    owner_id uuid not null references auth.users(id),
+    content_hash text not null check(content_hash ~ '^[0-9a-f]{64}$'),
+    processed_at timestamptz,
+    status text not null default 'pending' check(status in ('pending','ready','removed')),
+    created_at timestamptz not null default clock_timestamp()
+);
+create table if not exists public.found_case_events (
+    case_id uuid not null references public.found_cases(id),
+    actor_id uuid not null references auth.users(id),
+    event_type text not null check(event_type='published'),
+    created_at timestamptz not null default clock_timestamp(),
+    primary key(case_id,event_type)
+);
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values
+    ('found-photo-renditions','found-photo-renditions',false,2097152,array['image/jpeg']),
+    ('found-photo-thumbnails','found-photo-thumbnails',false,262144,array['image/jpeg'])
+on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
+
+-- Source: database/functions/053_found_case_commands.sql | normalized SHA256: 6755f53baa0707895605b3458c1adeba87a7e6d972ee4d4afa14c431cb77a352
+-- Drafts reserve the selected photo IDs before the server decodes any image.
+create or replace function public.prepare_found_case(p_id uuid,p_photo_ids uuid[])
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_case public.found_cases; v_ids uuid[];
+begin
+    if v_owner is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    if p_id is null or p_photo_ids is null or cardinality(p_photo_ids) not between 1 and 3 or array_position(p_photo_ids,null) is not null then
+        raise exception using errcode='23514',message='found_invalid'; end if;
+    select array_agg(id order by id) into v_ids from (select distinct unnest(p_photo_ids) id) s;
+    if cardinality(v_ids)<>cardinality(p_photo_ids) then raise exception using errcode='23514',message='found_invalid'; end if;
+    -- Serializes quota and UUID creation across independent connections.
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text,14));
+    select * into v_case from public.found_cases where id=p_id for update;
+    if found then
+        if v_case.owner_id<>v_owner then raise exception using errcode='42501',message='found_unauthorized'; end if;
+        if v_case.status='discarded' then raise exception using errcode='40001',message='found_conflict'; end if;
+        if v_case.status<>'draft' then
+            if v_case.photo_ids<>v_ids then raise exception using errcode='40001',message='found_conflict'; end if;
+            return;
+        end if;
+        update public.found_case_photos set status='removed' where case_id=p_id and not(id=any(v_ids));
+        update public.found_cases set photo_ids=v_ids where id=p_id;
+    else
+        if (select count(*) from public.found_cases where owner_id=v_owner and status='draft')>=10 then
+            raise exception using errcode='23514',message='found_draft_limit'; end if;
+        insert into public.found_cases(id,owner_id,photo_ids) values(p_id,v_owner,v_ids);
+    end if;
+end; $$;
+
+create or replace function public.prepare_found_case_photo(p_owner uuid,p_case_id uuid,p_id uuid,p_hash text)
+returns setof public.found_case_photos language plpgsql security definer set search_path='' as $$
+declare v_case public.found_cases; v_photo public.found_case_photos;
+begin
+    select * into v_case from public.found_cases where id=p_case_id for update;
+    if not found or v_case.owner_id<>p_owner or not(p_id=any(v_case.photo_ids)) then
+        raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_photo from public.found_case_photos where id=p_id;
+    if found then
+        if v_photo.owner_id<>p_owner or v_photo.case_id<>p_case_id then raise exception using errcode='42501',message='found_unauthorized'; end if;
+        if v_photo.content_hash<>p_hash or v_photo.status='removed' then raise exception using errcode='40001',message='found_conflict'; end if;
+        return next v_photo; return;
+    end if;
+    if v_case.status<>'draft' then raise exception using errcode='40001',message='found_conflict'; end if;
+    if (select count(*) from public.found_case_photos where case_id=p_case_id)>=30 then raise exception using errcode='23514',message='found_photo_limit'; end if;
+    insert into public.found_case_photos(id,case_id,owner_id,content_hash) values(p_id,p_case_id,p_owner,p_hash) returning * into v_photo;
+    return next v_photo;
+end; $$;
+
+create or replace function public.complete_found_case_photo(p_owner uuid,p_case_id uuid,p_id uuid,p_hash text)
+returns setof public.found_case_photos language plpgsql security definer set search_path='' as $$
+declare v_case public.found_cases; v_photo public.found_case_photos; v_path text;
+begin
+    select * into v_case from public.found_cases where id=p_case_id for update;
+    if not found or v_case.owner_id<>p_owner or not(p_id=any(v_case.photo_ids)) then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_photo from public.found_case_photos where id=p_id for update;
+    if not found or v_photo.owner_id<>p_owner or v_photo.case_id<>p_case_id then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    if v_photo.content_hash<>p_hash or v_photo.status='removed' then raise exception using errcode='40001',message='found_conflict'; end if;
+    if v_photo.status='ready' then return next v_photo; return; end if;
+    if v_case.status<>'draft' then raise exception using errcode='40001',message='found_conflict'; end if;
+    v_path:=p_owner::text||'/'||p_case_id::text||'/'||p_id::text||'.jpg';
+    if not exists(select 1 from storage.objects where bucket_id='found-photo-renditions' and name=v_path and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 1 and 2097152)
+       or not exists(select 1 from storage.objects where bucket_id='found-photo-thumbnails' and name=v_path and metadata->>'mimetype'='image/jpeg' and (metadata->>'size')::bigint between 1 and 262144) then
+        raise exception using errcode='23514',message='found_photo_incomplete'; end if;
+    update public.found_case_photos set status='ready',processed_at=clock_timestamp() where id=p_id returning * into v_photo;
+    return next v_photo;
+end; $$;
+
+create or replace function public.publish_found_case(p_id uuid,p_occurred_at timestamptz,p_latitude double precision,p_longitude double precision,
+    p_place_reference text,p_species text,p_species_detail text,p_size text,p_sex text,p_traits text,p_custody text,p_photo_ids uuid[])
+returns setof public.found_cases language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=auth.uid(); v_case public.found_cases; v_ids uuid[];
+    v_place text:=public.pet_trim(p_place_reference); v_detail text:=nullif(public.pet_trim(p_species_detail),''); v_traits text:=public.pet_trim(p_traits);
+begin
+    if v_owner is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_case from public.found_cases where id=p_id for update;
+    if not found or v_case.owner_id<>v_owner then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select array_agg(id order by id) into v_ids from (select distinct unnest(p_photo_ids) id) s;
+    if v_case.status<>'draft' then
+        if v_case.occurred_at=p_occurred_at and v_case.latitude=p_latitude and v_case.longitude=p_longitude and v_case.place_reference=v_place
+            and v_case.species=p_species and v_case.species_detail is not distinct from v_detail and v_case.size is not distinct from p_size
+            and v_case.sex is not distinct from p_sex and v_case.traits=v_traits and v_case.custody is not distinct from p_custody and v_case.photo_ids=v_ids then
+            return next v_case; return;
+        end if;
+        raise exception using errcode='40001',message='found_conflict';
+    end if;
+    if p_occurred_at is null or p_occurred_at>clock_timestamp() or p_occurred_at<'2000-01-01'::timestamptz
+        or p_latitude is null or not(p_latitude between -85 and 85) or p_longitude is null or not(p_longitude between -180 and 180)
+        or v_place is null or char_length(v_place) not between 1 and 120 or p_species is null or p_species not in ('dog','cat','other')
+        or (p_species='other' and (v_detail is null or char_length(v_detail) not between 1 and 40)) or (p_species<>'other' and v_detail is not null)
+        or (p_size is not null and p_size not in ('small','medium','large')) or (p_sex is not null and p_sex not in ('male','female'))
+        or v_traits is null or char_length(v_traits) not between 1 and 200 or (p_custody is not null and p_custody not in ('with_me','not_with_me'))
+        or p_photo_ids is null or cardinality(p_photo_ids) not between 1 and 3 or array_position(p_photo_ids,null) is not null
+        or cardinality(v_ids)<>cardinality(p_photo_ids) or v_ids<>v_case.photo_ids then raise exception using errcode='23514',message='found_invalid'; end if;
+    if (select count(*) from public.found_case_photos where case_id=p_id and owner_id=v_owner and id=any(v_ids) and status='ready' and processed_at is not null)<>cardinality(v_ids) then
+        raise exception using errcode='23514',message='found_photos_unverified'; end if;
+    update public.found_cases set status='active',occurred_at=p_occurred_at,latitude=p_latitude,longitude=p_longitude,place_reference=v_place,
+        public_latitude=floor(p_latitude*100)/100+0.005,public_longitude=least(179.995,floor(p_longitude*100)/100+0.005),
+        species=p_species,species_detail=v_detail,size=p_size,sex=p_sex,traits=v_traits,custody=p_custody,published_at=clock_timestamp()
+        where id=p_id returning * into v_case;
+    insert into public.found_case_events(case_id,actor_id,event_type) values(p_id,v_owner,'published');
+    return next v_case;
+end; $$;
+
+create or replace function public.read_public_found_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    species text,species_detail text,size text,sex text,traits text,custody text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.species,c.species_detail,c.size,c.sex,c.traits,c.custody,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg') order by ph.created_at,ph.id)
+            from public.found_case_photos ph where ph.case_id=c.id and ph.id=any(c.photo_ids) and ph.status='ready' and ph.processed_at is not null),'[]'::jsonb)
+    from public.found_cases c where c.id=p_id and c.status='active';
+$$;
+
+-- Draft cleanup is authorized by metadata; active publications cannot be discarded.
+create or replace function public.begin_found_case_discard(p_id uuid)
+returns table(path text) language plpgsql security definer set search_path='' as $$
+declare v_case public.found_cases;
+begin
+    if auth.uid() is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_case from public.found_cases where id=p_id for update;
+    if not found then return; end if;
+    if v_case.owner_id<>auth.uid() then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    if v_case.status not in ('draft','discarded') then raise exception using errcode='40001',message='found_conflict'; end if;
+    update public.found_case_photos set status='removed' where case_id=p_id;
+    return query select ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' from public.found_case_photos ph where ph.case_id=p_id;
+end; $$;
+create or replace function public.finish_found_case_discard(p_id uuid)
+returns void language plpgsql security definer set search_path='' as $$
+declare v_case public.found_cases;
+begin
+    if auth.uid() is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_case from public.found_cases where id=p_id for update;
+    if not found then return; end if;
+    if v_case.owner_id<>auth.uid() then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    if v_case.status not in ('draft','discarded') or exists(select 1 from public.found_case_photos where case_id=p_id and status<>'removed') then raise exception using errcode='40001',message='found_conflict'; end if;
+    if exists(select 1 from storage.objects o join public.found_case_photos ph on o.name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+        where ph.case_id=p_id and o.bucket_id in ('found-photo-renditions','found-photo-thumbnails')) then raise exception using errcode='23514',message='found_photo_incomplete'; end if;
+    -- Keep an authorization ledger for late processing and prevent UUID resurrection.
+    update public.found_cases set status='discarded' where id=p_id;
+end; $$;
+
+create or replace function public.list_found_photo_cleanup(p_id uuid)
+returns table(path text) language plpgsql security definer set search_path='' as $$
+declare v_case public.found_cases;
+begin
+    if auth.uid() is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_case from public.found_cases where id=p_id;
+    if not found or v_case.owner_id<>auth.uid() then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    return query select ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' from public.found_case_photos ph where ph.case_id=p_id and ph.status='removed';
+end; $$;
+
+create or replace function public.can_read_found_photo(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+    select exists(select 1 from public.found_case_photos ph join public.found_cases c on c.id=ph.case_id
+        where p_name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' and
+            (ph.owner_id=auth.uid() or (c.status='active' and ph.status='ready' and ph.processed_at is not null and ph.id=any(c.photo_ids))));
+$$;
+create or replace function public.list_my_found_cases()
+returns table(id uuid,owner_id uuid,status text,species text,created_at timestamptz)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.owner_id,c.status,c.species,c.created_at from public.found_cases c
+    where c.owner_id=auth.uid() and (c.status<>'discarded' or exists(
+        select 1 from storage.objects o join public.found_case_photos ph on ph.case_id=c.id
+            and o.name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+        where o.bucket_id in ('found-photo-renditions','found-photo-thumbnails')))
+    order by c.created_at desc;
+$$;
+create or replace function public.can_delete_found_photo(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+    select exists(select 1 from public.found_case_photos ph join public.found_cases c on c.id=ph.case_id
+        where p_name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' and ph.owner_id=auth.uid() and c.status in ('draft','discarded') and ph.status='removed');
+$$;
+
+-- Source: database/policies/054_found_case_policies.sql | normalized SHA256: 6c191fa3b08d3488aa0ce6f10ad31bf1b3eac487a25599089ee4be4580ac8106
+alter table public.found_cases enable row level security;
+alter table public.found_case_photos enable row level security;
+alter table public.found_case_events enable row level security;
+drop policy if exists found_cases_own on public.found_cases;
+create policy found_cases_own on public.found_cases for select to authenticated using(owner_id=auth.uid());
+drop policy if exists found_cases_guard on public.found_cases;
+create policy found_cases_guard on public.found_cases as restrictive for all to authenticated using(owner_id=auth.uid()) with check(false);
+drop policy if exists found_cases_anon_guard on public.found_cases;
+create policy found_cases_anon_guard on public.found_cases as restrictive for all to anon using(false) with check(false);
+drop policy if exists found_photos_guard on public.found_case_photos;
+create policy found_photos_guard on public.found_case_photos as restrictive for all to authenticated,anon using(false) with check(false);
+drop policy if exists found_events_guard on public.found_case_events;
+create policy found_events_guard on public.found_case_events as restrictive for all to authenticated,anon using(false) with check(false);
+drop policy if exists found_storage_read on storage.objects;
+create policy found_storage_read on storage.objects for select to authenticated,anon using(bucket_id in ('found-photo-renditions','found-photo-thumbnails') and public.can_read_found_photo(name));
+drop policy if exists found_storage_delete on storage.objects;
+create policy found_storage_delete on storage.objects for delete to authenticated using(bucket_id in ('found-photo-renditions','found-photo-thumbnails') and public.can_delete_found_photo(name));
+drop policy if exists found_storage_select_guard on storage.objects;
+create policy found_storage_select_guard on storage.objects as restrictive for select to authenticated,anon using(bucket_id not in ('found-photo-renditions','found-photo-thumbnails') or public.can_read_found_photo(name));
+drop policy if exists found_storage_insert_guard on storage.objects;
+create policy found_storage_insert_guard on storage.objects as restrictive for insert to authenticated,anon with check(bucket_id not in ('found-photo-renditions','found-photo-thumbnails'));
+drop policy if exists found_storage_update_guard on storage.objects;
+create policy found_storage_update_guard on storage.objects as restrictive for update to authenticated,anon using(bucket_id not in ('found-photo-renditions','found-photo-thumbnails')) with check(bucket_id not in ('found-photo-renditions','found-photo-thumbnails'));
+drop policy if exists found_storage_delete_guard on storage.objects;
+create policy found_storage_delete_guard on storage.objects as restrictive for delete to authenticated,anon using(bucket_id not in ('found-photo-renditions','found-photo-thumbnails') or public.can_delete_found_photo(name));
+
+-- Source: database/grants/055_found_case_permissions.sql | normalized SHA256: 9fccc40fc87661aa213f9c5fac825900020a9aa2c4bc63dc85b5d352f18e853d
+revoke all on public.found_cases,public.found_case_photos,public.found_case_events from public,anon,authenticated;
+revoke all on function public.list_found_photo_cleanup(uuid) from public,anon,authenticated;
+grant execute on function public.list_found_photo_cleanup(uuid) to authenticated;
+revoke all on function public.list_my_found_cases() from public,anon,authenticated;
+grant execute on function public.list_my_found_cases() to authenticated;
+grant select(id,owner_id,status,species,created_at) on public.found_cases to authenticated;
+revoke all on function public.prepare_found_case(uuid,uuid[]),public.publish_found_case(uuid,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]),
+    public.begin_found_case_discard(uuid),public.finish_found_case_discard(uuid) from public,anon,authenticated;
+grant execute on function public.prepare_found_case(uuid,uuid[]),public.publish_found_case(uuid,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]),
+    public.begin_found_case_discard(uuid),public.finish_found_case_discard(uuid) to authenticated;
+revoke all on function public.prepare_found_case_photo(uuid,uuid,uuid,text),public.complete_found_case_photo(uuid,uuid,uuid,text) from public,anon,authenticated;
+grant execute on function public.prepare_found_case_photo(uuid,uuid,uuid,text),public.complete_found_case_photo(uuid,uuid,uuid,text) to service_role;
+revoke all on function public.read_public_found_case(uuid),public.can_read_found_photo(text),public.can_delete_found_photo(text) from public,anon,authenticated;
+grant execute on function public.read_public_found_case(uuid),public.can_read_found_photo(text),public.can_delete_found_photo(text) to anon,authenticated;
+
+-- Source: database/functions/056_lost_case_lock_timeout.sql | normalized SHA256: 0c3169a060002909b36d2aecae5e344bfb47f3070a17801c484f6388df6b0007
+-- HU-05 / RF-05: stop lock waits before the client publication deadline.
+-- Function-local configuration preserves auth, RLS, search_path and deduplication.
+-- A timeout aborts the command; it never bypasses the pet lock or validation.
+alter function public.publish_lost_case(uuid,uuid,integer,timestamptz,double precision,double precision,text,uuid[])
+    set lock_timeout = '5s';
+
+-- Source: database/tables/057_case_deletion.sql | normalized SHA256: 9a6246fa8827e6a37da5c596df6f0cfe6d5d24a4171a3ffde782c5b838af931e
+-- Retain stable publication IDs and history while removing public/list visibility.
+alter table public.lost_cases add column if not exists deleted_at timestamptz;
+alter table public.found_cases add column if not exists deleted_at timestamptz;
+
+-- Source: database/functions/058_case_collection_commands.sql | normalized SHA256: 4c27416bfb9fec90baceee1c4e8250d1c0cbb7d94af46ce63817cdc5832c47fe
+-- HU-05/HU-06. Owner-only, idempotent removal. Never delete the pet or its photos.
+create or replace function public.delete_lost_case(p_id uuid)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_owner uuid:=auth.uid(); v_pet uuid; v_case public.lost_cases%rowtype;
+begin
+ if v_owner is null then raise exception using errcode='42501',message='case_unauthorized'; end if;
+ select pet_id into v_pet from public.lost_cases where id=p_id and owner_id=v_owner;
+ if not found then raise exception using errcode='42501',message='case_unauthorized'; end if;
+ -- Same lock order as publish: pet, then case. Recheck ownership under the lock.
+ perform 1 from public.pets where id=v_pet for update;
+ select * into v_case from public.lost_cases where id=p_id for update;
+ if v_case.owner_id<>v_owner then raise exception using errcode='42501',message='case_unauthorized'; end if;
+ if v_case.deleted_at is not null then return; end if;
+ if v_case.status='active' then
+   update public.pets set active_case_count=active_case_count-1,version=version+1,updated_at=clock_timestamp() where id=v_pet;
+ end if;
+ update public.lost_cases set status='resolved',deleted_at=clock_timestamp() where id=p_id;
+end; $$;
+
+create or replace function public.delete_found_case(p_id uuid)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_owner uuid:=auth.uid(); v_case public.found_cases%rowtype;
+begin
+ if v_owner is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+ select * into v_case from public.found_cases where id=p_id for update;
+ if not found or v_case.owner_id<>v_owner then raise exception using errcode='42501',message='found_unauthorized'; end if;
+ if v_case.deleted_at is not null then return; end if;
+ if v_case.status not in ('active','resolved') then raise exception using errcode='40001',message='found_conflict'; end if;
+ update public.found_cases set status='resolved',deleted_at=clock_timestamp() where id=p_id;
+end; $$;
+
+create or replace function public.list_my_lost_case_cards()
+returns table(id uuid,owner_id uuid,pet_id uuid,status text,pet_name text,cover_path text)
+language sql stable security definer set search_path='' as $$
+ select c.id,c.owner_id,c.pet_id,c.status,c.pet_name,
+ (select ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg'
+ from public.pet_photos ph where ph.id=any(c.photo_ids) and ph.status='published' and ph.processed_at is not null
+ order by ph.is_primary desc,ph.created_at,ph.id limit 1)
+ from public.lost_cases c where c.owner_id=auth.uid() and c.deleted_at is null order by c.created_at desc,c.id;
+$$;
+create or replace function public.list_my_found_case_cards()
+returns table(id uuid,owner_id uuid,status text,species text,created_at timestamptz,cover_path text)
+language sql stable security definer set search_path='' as $$
+ select c.id,c.owner_id,c.status,c.species,c.created_at,
+ (select ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+ from public.found_case_photos ph where ph.id=any(c.photo_ids) and ph.status='ready' and ph.processed_at is not null
+ order by ph.created_at,ph.id limit 1)
+ from public.found_cases c where c.owner_id=auth.uid() and c.deleted_at is null
+ and (c.status<>'discarded' or exists(select 1 from storage.objects o
+ where o.bucket_id in ('found-photo-renditions','found-photo-thumbnails') and o.name like c.owner_id::text||'/'||c.id::text||'/%'))
+ order by c.created_at desc,c.id;
+$$;
+
+create or replace function public.read_public_lost_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    pet_name text,species text,species_detail text,size text,sex text,age_months integer,traits text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.pet_name,c.species,c.species_detail,c.size,c.sex,c.age_months,c.traits,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg')
+            order by ph.is_primary desc,ph.created_at,ph.id) from public.pet_photos ph
+            where ph.id=any(c.photo_ids) and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null),'[]'::jsonb)
+    from public.lost_cases c where c.id=p_id and c.deleted_at is null and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()));
+$$;
+
+create or replace function public.read_public_found_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    species text,species_detail text,size text,sex text,traits text,custody text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.species,c.species_detail,c.size,c.sex,c.traits,c.custody,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg') order by ph.created_at,ph.id)
+            from public.found_case_photos ph where ph.case_id=c.id and ph.id=any(c.photo_ids) and ph.status='ready' and ph.processed_at is not null),'[]'::jsonb)
+    from public.found_cases c where c.id=p_id and c.deleted_at is null and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()));
+$$;
+
+
+create or replace function public.list_my_found_cases()
+returns table(id uuid,owner_id uuid,status text,species text,created_at timestamptz)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.owner_id,c.status,c.species,c.created_at from public.found_cases c
+    where c.owner_id=auth.uid() and c.deleted_at is null and (c.status<>'discarded' or exists(
+        select 1 from storage.objects o join public.found_case_photos ph on ph.case_id=c.id
+            and o.name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+        where o.bucket_id in ('found-photo-renditions','found-photo-thumbnails')))
+    order by c.created_at desc;
+$$;
+
+-- Source: database/policies/059_case_deletion_visibility.sql | normalized SHA256: ab7b183528e281ad4cb3ffe8f888a32c66d95a2b2d0160602ae521e51e64f808
+drop policy if exists lost_cases_owner_read on public.lost_cases;
+create policy lost_cases_owner_read on public.lost_cases for select to authenticated using(owner_id=auth.uid() and deleted_at is null);
+
+-- Source: database/grants/060_case_collection_permissions.sql | normalized SHA256: d7e5db6115f27bc1b25896cb45b13c84013fca3b88ec5552c82250f165574c81
+revoke all on function public.delete_lost_case(uuid),public.delete_found_case(uuid),public.list_my_lost_case_cards(),public.list_my_found_case_cards() from public,anon,authenticated;
+grant execute on function public.delete_lost_case(uuid),public.delete_found_case(uuid),public.list_my_lost_case_cards(),public.list_my_found_case_cards() to authenticated;
+
+-- Source: database/functions/061_found_case_lock_timeout.sql | normalized SHA256: f407c475fb60fbbb46ef7a2706ab0453b461d7b8a4e634f2ad4283140c5268fa
+-- Bound transaction lock waits without changing authorization or function bodies.
+alter function public.prepare_found_case(uuid,uuid[]) set lock_timeout = '5s';
+alter function public.prepare_found_case_photo(uuid,uuid,uuid,text) set lock_timeout = '5s';
+alter function public.complete_found_case_photo(uuid,uuid,uuid,text) set lock_timeout = '5s';
+alter function public.publish_found_case(uuid,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]) set lock_timeout = '5s';
+alter function public.begin_found_case_discard(uuid) set lock_timeout = '5s';
+alter function public.finish_found_case_discard(uuid) set lock_timeout = '5s';
+
+-- Source: database/tables/062_recovery_report_links.sql | normalized SHA256: b858c4b81ce41c769836c12efe365e676b6ba343610ad47bb6a67ad2f3fdda16
+-- Existing independent found reports remain explicitly legacy; never infer ownership/linkage.
+alter table public.found_cases add column if not exists report_kind text not null default 'legacy_found';
+alter table public.found_cases add column if not exists target_lost_case_id uuid references public.lost_cases(id);
+alter table public.found_cases add column if not exists target_community_case_id uuid references public.found_cases(id);
+do $$ begin
+ if not exists(select 1 from pg_constraint where conname='found_report_link_shape' and conrelid='public.found_cases'::regclass) then
+  alter table public.found_cases add constraint found_report_link_shape check (
+   (report_kind in ('legacy_found','possible_loss') and target_lost_case_id is null and target_community_case_id is null)
+   or (report_kind in ('sighting','with_reporter') and num_nonnulls(target_lost_case_id,target_community_case_id)=1
+       and target_community_case_id is distinct from id));
+ end if;
+end $$;
+create index if not exists found_reports_lost_target on public.found_cases(target_lost_case_id) where deleted_at is null;
+create index if not exists found_reports_community_target on public.found_cases(target_community_case_id) where deleted_at is null;
+
+alter table public.found_case_events drop constraint if exists found_case_events_event_type_check;
+alter table public.found_case_events add constraint found_case_events_event_type_check check(event_type in ('published','resolved'));
+
+-- Public snapshots may reuse the registered pet's full type without truncation.
+alter table public.found_cases drop constraint if exists found_cases_active_fields;
+alter table public.found_cases add constraint found_cases_active_fields check(status in ('draft','discarded') or (
+ occurred_at is not null and occurred_at>='2000-01-01'::timestamptz and latitude is not null and latitude between -85 and 85
+ and longitude is not null and longitude between -180 and 180 and public_latitude is not null and public_longitude is not null
+ and place_reference is not null and char_length(place_reference) between 1 and 120 and species is not null
+ and (species<>'other' or (species_detail is not null and char_length(species_detail) between 1 and 60))
+ and traits is not null and char_length(traits) between 1 and 200 and published_at is not null));
+
+alter table public.found_cases drop constraint if exists found_cases_photo_count;
+alter table public.found_cases add constraint found_cases_photo_count check(array_position(photo_ids,null) is null and
+ (cardinality(photo_ids) between 1 and 3 or (cardinality(photo_ids)=0 and report_kind in ('sighting','with_reporter'))));
+
+-- Source: database/functions/063_recovery_report_commands.sql | normalized SHA256: 4ff23527e9497163f1f1dc8b5553f9fde9ff0c6c6199ef1b1837bc8f6db09995
+-- Versioned replacement: target metadata can contain a 60-character registered pet type.
+create or replace function public.publish_found_case(p_id uuid,p_occurred_at timestamptz,p_latitude double precision,p_longitude double precision,
+    p_place_reference text,p_species text,p_species_detail text,p_size text,p_sex text,p_traits text,p_custody text,p_photo_ids uuid[])
+returns setof public.found_cases language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_owner uuid:=auth.uid(); v_case public.found_cases; v_ids uuid[];
+    v_place text:=public.pet_trim(p_place_reference); v_detail text:=nullif(public.pet_trim(p_species_detail),''); v_traits text:=public.pet_trim(p_traits);
+begin
+    if v_owner is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select * into v_case from public.found_cases where id=p_id for update;
+    if not found or v_case.owner_id<>v_owner then raise exception using errcode='42501',message='found_unauthorized'; end if;
+    select coalesce(array_agg(id order by id),'{}'::uuid[]) into v_ids from (select distinct unnest(p_photo_ids) id) s;
+    if v_case.status<>'draft' then
+        if v_case.occurred_at=p_occurred_at and v_case.latitude=p_latitude and v_case.longitude=p_longitude and v_case.place_reference=v_place
+            and v_case.species=p_species and v_case.species_detail is not distinct from v_detail and v_case.size is not distinct from p_size
+            and v_case.sex is not distinct from p_sex and v_case.traits=v_traits and v_case.custody is not distinct from p_custody and v_case.photo_ids=v_ids then
+            return next v_case; return;
+        end if;
+        raise exception using errcode='40001',message='found_conflict';
+    end if;
+    if p_occurred_at is null or p_occurred_at>clock_timestamp() or p_occurred_at<'2000-01-01'::timestamptz
+        or p_latitude is null or not(p_latitude between -85 and 85) or p_longitude is null or not(p_longitude between -180 and 180)
+        or v_place is null or char_length(v_place) not between 1 and 120 or p_species is null or p_species not in ('dog','cat','other')
+        or (p_species='other' and (v_detail is null or char_length(v_detail) not between 1 and 60)) or (p_species<>'other' and v_detail is not null)
+        or (p_size is not null and p_size not in ('small','medium','large')) or (p_sex is not null and p_sex not in ('male','female'))
+        or v_traits is null or char_length(v_traits) not between 1 and 200 or (p_custody is not null and p_custody not in ('with_me','not_with_me'))
+        or p_photo_ids is null or cardinality(p_photo_ids) not between (case when v_case.report_kind in ('sighting','with_reporter') then 0 else 1 end) and 3 or array_position(p_photo_ids,null) is not null
+        or cardinality(v_ids)<>cardinality(p_photo_ids) or v_ids<>v_case.photo_ids then raise exception using errcode='23514',message='found_invalid'; end if;
+    if (select count(*) from public.found_case_photos where case_id=p_id and owner_id=v_owner and id=any(v_ids) and status='ready' and processed_at is not null)<>cardinality(v_ids) then
+        raise exception using errcode='23514',message='found_photos_unverified'; end if;
+    update public.found_cases set status='active',occurred_at=p_occurred_at,latitude=p_latitude,longitude=p_longitude,place_reference=v_place,
+        public_latitude=floor(p_latitude*100)/100+0.005,public_longitude=least(179.995,floor(p_longitude*100)/100+0.005),
+        species=p_species,species_detail=v_detail,size=p_size,sex=p_sex,traits=v_traits,custody=p_custody,published_at=clock_timestamp()
+        where id=p_id returning * into v_case;
+    insert into public.found_case_events(case_id,actor_id,event_type) values(p_id,v_owner,'published');
+    return next v_case;
+end; $$;
+
+create or replace function public.publish_recovery_report(p_id uuid,p_report_kind text,p_target_id uuid,p_community_target boolean,
+ p_occurred_at timestamptz,p_latitude double precision,p_longitude double precision,p_place_reference text,
+ p_species text,p_species_detail text,p_size text,p_sex text,p_traits text,p_custody text,p_photo_ids uuid[])
+returns setof public.found_cases language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_case public.found_cases; v_lost public.lost_cases; v_community public.found_cases;
+ v_species text:=p_species; v_detail text:=p_species_detail; v_size text:=p_size; v_sex text:=p_sex; v_saved public.found_cases;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+ if p_report_kind='possible_loss' and char_length(public.pet_trim(p_species_detail))>40 then raise exception using errcode='23514',message='found_invalid'; end if;
+ if p_report_kind is null or p_report_kind not in ('possible_loss','sighting','with_reporter') or p_community_target is null
+ or (p_report_kind='possible_loss' and (p_target_id is not null or p_community_target))
+ or (p_report_kind<>'possible_loss' and (p_target_id is null or p_target_id=p_id)) then
+  raise exception using errcode='23514',message='found_invalid'; end if;
+ -- Target first, report second: both publication and resolution serialize on the search.
+ if p_report_kind<>'possible_loss' then
+  if p_community_target then
+   select * into v_community from public.found_cases where id=p_target_id for update;
+   if not found or v_community.report_kind<>'possible_loss' then raise exception using errcode='23514',message='found_invalid'; end if;
+   v_species:=v_community.species;v_detail:=v_community.species_detail;v_size:=v_community.size;v_sex:=v_community.sex;
+  else
+   select * into v_lost from public.lost_cases where id=p_target_id for update;
+   if not found then raise exception using errcode='23514',message='found_invalid'; end if;
+   v_species:=v_lost.species;v_detail:=v_lost.species_detail;v_size:=v_lost.size;v_sex:=v_lost.sex;
+  end if;
+ end if;
+ select * into v_case from public.found_cases where id=p_id for update;
+ if not found or v_case.owner_id<>auth.uid() then raise exception using errcode='42501',message='found_unauthorized'; end if;
+ if v_case.deleted_at is not null then raise exception using errcode='40001',message='found_conflict'; end if;
+ if v_case.status<>'draft' then
+  if v_case.report_kind<>p_report_kind or v_case.target_lost_case_id is distinct from (case when not p_community_target then p_target_id end)
+   or v_case.target_community_case_id is distinct from (case when p_community_target then p_target_id end) then
+   raise exception using errcode='40001',message='found_conflict'; end if;
+ elsif p_report_kind<>'possible_loss' and (
+  (p_community_target and (v_community.status<>'active' or v_community.deleted_at is not null))
+  or (not p_community_target and (v_lost.status<>'active' or v_lost.deleted_at is not null))) then
+  raise exception using errcode='40001',message='found_target_closed';
+ end if;
+ if v_case.status='draft' then
+  update public.found_cases set report_kind=p_report_kind,
+   target_lost_case_id=case when not p_community_target then p_target_id end,
+   target_community_case_id=case when p_community_target then p_target_id end where id=p_id;
+ end if;
+ -- Existing attestation/deduplication and identity checks stay authoritative.
+ select * into v_saved from public.publish_found_case(p_id,p_occurred_at,p_latitude,p_longitude,p_place_reference,
+  v_species,v_detail,v_size,v_sex,p_traits,
+  case when p_report_kind='with_reporter' then 'with_me' when p_report_kind='sighting' then 'not_with_me' else null end,p_photo_ids);
+ update public.found_cases set report_kind=p_report_kind,
+  target_lost_case_id=case when not p_community_target then p_target_id end,
+  target_community_case_id=case when p_community_target then p_target_id end where id=p_id returning * into v_saved;
+ return next v_saved;
+end $$;
+
+create or replace function public.list_open_recovery_searches()
+returns table(id uuid,community boolean,name text,species text,species_detail text,size text,sex text)
+language sql stable security definer set search_path='' as $$
+ select q.id,q.community,q.name,q.species,q.species_detail,q.size,q.sex from (
+  select c.id,false community,c.pet_name name,c.species,c.species_detail,c.size,c.sex,c.created_at
+   from public.lost_cases c where c.status='active' and c.deleted_at is null
+  union all
+  select c.id,true,coalesce(c.species_detail,case c.species when 'dog' then 'Perro' when 'cat' then 'Gato' else 'Otra especie' end),
+   c.species,c.species_detail,c.size,c.sex,c.created_at from public.found_cases c
+   where c.report_kind='possible_loss' and c.status='active' and c.deleted_at is null
+ ) q where auth.uid() is not null order by q.created_at desc,q.id;
+$$;
+
+create or replace function public.resolve_recovery_search(p_id uuid,p_community boolean)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_case public.lost_cases;v_report public.found_cases;v_pet uuid;
+begin
+ if auth.uid() is null or p_community is null then raise exception using errcode='42501',message='case_unauthorized'; end if;
+ if p_community then
+  select * into v_report from public.found_cases where id=p_id for update;
+  if not found or v_report.owner_id<>auth.uid() or v_report.report_kind<>'possible_loss' or v_report.deleted_at is not null then
+   raise exception using errcode='42501',message='case_unauthorized'; end if;
+  if v_report.status='resolved' then return; end if;
+  if v_report.status<>'active' then raise exception using errcode='40001',message='found_conflict'; end if;
+  update public.found_cases set status='resolved' where id=p_id;
+  insert into public.found_case_events(case_id,actor_id,event_type) values(p_id,auth.uid(),'resolved') on conflict(case_id,event_type) do nothing;
+ else
+  select pet_id into v_pet from public.lost_cases where id=p_id and owner_id=auth.uid() and deleted_at is null;
+  if not found then raise exception using errcode='42501',message='case_unauthorized'; end if;
+  perform 1 from public.pets where id=v_pet for update;
+  select * into v_case from public.lost_cases where id=p_id for update;
+  if v_case.owner_id<>auth.uid() or v_case.deleted_at is not null then raise exception using errcode='42501',message='case_unauthorized'; end if;
+  if v_case.status='resolved' then return; end if;
+  update public.lost_cases set status='resolved' where id=p_id;
+  update public.pets set active_case_count=active_case_count-1,version=version+1,updated_at=clock_timestamp() where id=v_pet;
+  insert into public.case_events(case_id,actor_id,event_type) values(p_id,auth.uid(),'resolved') on conflict(case_id,event_type) do nothing;
+ end if;
+end $$;
+
+create or replace function public.prepare_recovery_report(p_id uuid,p_photo_ids uuid[],p_report_kind text,p_target_id uuid,p_community_target boolean)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_owner uuid:=auth.uid();v_case public.found_cases;v_ids uuid[];
+begin
+ if v_owner is null then raise exception using errcode='42501',message='found_unauthorized'; end if;
+ if p_id is null or p_photo_ids is null or p_report_kind is null or p_community_target is null
+ or p_report_kind not in ('possible_loss','sighting','with_reporter') or array_position(p_photo_ids,null) is not null
+ or cardinality(p_photo_ids) not between (case when p_report_kind='possible_loss' then 1 else 0 end) and 3
+ or (p_report_kind='possible_loss' and (p_target_id is not null or p_community_target))
+ or (p_report_kind<>'possible_loss' and (p_target_id is null or p_target_id=p_id)) then
+  raise exception using errcode='23514',message='found_invalid'; end if;
+ select coalesce(array_agg(id order by id),'{}'::uuid[]) into v_ids from (select distinct unnest(p_photo_ids) id) s;
+ if cardinality(v_ids)<>cardinality(p_photo_ids) then raise exception using errcode='23514',message='found_invalid'; end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text,14));
+ select * into v_case from public.found_cases where id=p_id for update;
+ if found then
+  if v_case.owner_id<>v_owner then raise exception using errcode='42501',message='found_unauthorized'; end if;
+  if v_case.status='discarded' or v_case.deleted_at is not null then raise exception using errcode='40001',message='found_conflict'; end if;
+  if v_case.status<>'draft' then
+   if v_case.photo_ids<>v_ids or v_case.report_kind<>p_report_kind
+    or v_case.target_lost_case_id is distinct from (case when not p_community_target then p_target_id end)
+    or v_case.target_community_case_id is distinct from (case when p_community_target then p_target_id end) then
+     raise exception using errcode='40001',message='found_conflict'; end if;
+   return;
+  end if;
+  update public.found_case_photos set status='removed' where case_id=p_id and not(id=any(v_ids));
+  update public.found_cases set photo_ids=v_ids,report_kind=p_report_kind,
+    target_lost_case_id=case when not p_community_target then p_target_id end,
+    target_community_case_id=case when p_community_target then p_target_id end where id=p_id;
+ else
+  if (select count(*) from public.found_cases where owner_id=v_owner and status='draft')>=10 then raise exception using errcode='23514',message='found_draft_limit'; end if;
+  insert into public.found_cases(id,owner_id,photo_ids,report_kind,target_lost_case_id,target_community_case_id)
+  values(p_id,v_owner,v_ids,p_report_kind,case when not p_community_target then p_target_id end,case when p_community_target then p_target_id end);
+ end if;
+end $$;
+
+-- Source: database/functions/064_recovery_public_projections.sql | normalized SHA256: f7fa9710381b9cc787ff67c7a1e4dec90affab632bd93b2d7a32cf5366a319b5
+create or replace function public.read_recovery_pet_case(p_id uuid)
+returns setof jsonb language sql stable security definer set search_path='' as $$
+ select to_jsonb(r)||jsonb_build_object('can_resolve',coalesce(c.owner_id=auth.uid() and c.status='active',false))
+ from public.read_public_lost_case(p_id) r join public.lost_cases c on c.id=r.id;
+$$;
+create or replace function public.read_recovery_report(p_id uuid)
+returns setof jsonb language sql stable security definer set search_path='' as $$
+ select to_jsonb(r)||jsonb_build_object('status',case when c.status='active' and c.report_kind in ('sighting','with_reporter') and not (
+ exists(select 1 from public.lost_cases target where target.id=c.target_lost_case_id and target.status='active' and target.deleted_at is null)
+ or exists(select 1 from public.found_cases target where target.id=c.target_community_case_id and target.report_kind='possible_loss' and target.status='active' and target.deleted_at is null))
+ then 'resolved' else c.status end,'report_kind',c.report_kind,'target_id',coalesce(c.target_lost_case_id,c.target_community_case_id),
+  'community_target',c.target_community_case_id is not null,
+  'can_resolve',coalesce(c.owner_id=auth.uid() and c.report_kind='possible_loss' and c.status='active',false))
+ from public.read_public_found_case(p_id) r join public.found_cases c on c.id=r.id
+ where c.report_kind in ('legacy_found','possible_loss') or c.owner_id=auth.uid()
+ or (c.target_lost_case_id is not null and exists(select 1 from public.read_public_lost_case(c.target_lost_case_id)))
+ or (c.target_community_case_id is not null and exists(select 1 from public.read_public_found_case(c.target_community_case_id)));
+$$;
+create or replace function public.list_my_recovery_reports()
+returns setof jsonb language sql stable security definer set search_path='' as $$
+ select to_jsonb(r)||jsonb_build_object('status',case when c.status='active' and c.report_kind in ('sighting','with_reporter') and not (
+ exists(select 1 from public.lost_cases target where target.id=c.target_lost_case_id and target.status='active' and target.deleted_at is null)
+ or exists(select 1 from public.found_cases target where target.id=c.target_community_case_id and target.report_kind='possible_loss' and target.status='active' and target.deleted_at is null))
+ then 'resolved' else c.status end,'report_kind',c.report_kind,'target_id',coalesce(c.target_lost_case_id,c.target_community_case_id),
+  'community_target',c.target_community_case_id is not null)
+ from public.list_my_found_case_cards() r join public.found_cases c on c.id=r.id;
+$$;
+-- Only public approximate data and processed photos, never coordinates/place/owner IDs.
+create or replace function public.list_recovery_observations(p_id uuid,p_community boolean)
+returns setof jsonb language sql stable security definer set search_path='' as $$
+ select to_jsonb(r)||jsonb_build_object('report_kind',c.report_kind)
+ from public.found_cases c cross join lateral public.read_public_found_case(c.id) r
+ where c.deleted_at is null and c.status='active' and c.report_kind in ('sighting','with_reporter')
+ and ((not p_community and c.target_lost_case_id=p_id and exists(select 1 from public.read_public_lost_case(p_id)))
+ or (p_community and c.target_community_case_id=p_id and exists(select 1 from public.read_public_found_case(p_id))));
+$$;
+
+create or replace function public.can_read_found_photo(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+ select exists(select 1 from public.found_case_photos ph join public.found_cases c on c.id=ph.case_id
+ where p_name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' and
+ (ph.owner_id=auth.uid() or (c.status='active' and c.deleted_at is null and ph.status='ready' and ph.processed_at is not null and ph.id=any(c.photo_ids)
+ and (c.report_kind in ('legacy_found','possible_loss')
+ or exists(select 1 from public.lost_cases target where target.id=c.target_lost_case_id and target.deleted_at is null and (target.status='active' or target.owner_id=auth.uid()))
+ or exists(select 1 from public.found_cases target where target.id=c.target_community_case_id and target.report_kind='possible_loss'
+ and target.deleted_at is null and (target.status='active' or target.owner_id=auth.uid()))))));
+$$;
+
+-- Source: database/grants/065_recovery_permissions.sql | normalized SHA256: 52a0dbc1ebcc6587826f205021cb9007022a71b7684e0dc3c32abc319008f2bb
+-- All modifications remain RPC-only; clients cannot forge links by updating rows.
+revoke execute on function public.publish_found_case(uuid,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]) from public,anon,authenticated;
+revoke all on function public.publish_recovery_report(uuid,text,uuid,boolean,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]),
+ public.list_open_recovery_searches(),public.resolve_recovery_search(uuid,boolean),public.list_my_recovery_reports() from public,anon,authenticated;
+grant execute on function public.publish_recovery_report(uuid,text,uuid,boolean,timestamptz,double precision,double precision,text,text,text,text,text,text,text,uuid[]),
+ public.list_open_recovery_searches(),public.resolve_recovery_search(uuid,boolean),public.list_my_recovery_reports() to authenticated;
+revoke all on function public.read_recovery_pet_case(uuid),public.read_recovery_report(uuid),public.list_recovery_observations(uuid,boolean) from public,anon,authenticated;
+grant execute on function public.read_recovery_pet_case(uuid),public.read_recovery_report(uuid),public.list_recovery_observations(uuid,boolean) to anon,authenticated;
+
+revoke all on function public.prepare_recovery_report(uuid,uuid[],text,uuid,boolean) from public,anon,authenticated;
+grant execute on function public.prepare_recovery_report(uuid,uuid[],text,uuid,boolean) to authenticated;
+
 commit;

@@ -18,6 +18,11 @@ class PetListViewModel extends AsyncNotifier<List<Pet>> {
     final useCase = ref.watch(listMyPetsProvider);
     final session = await ref.watch(petSessionProvider.future);
     if (session == null) throw const PetFailure(PetFailureKind.signedOut);
+    final changes = ref
+        .watch(petChangesProvider)
+        .watch(session.userId)
+        .listen((_) => ref.invalidateSelf());
+    ref.onDispose(changes.cancel);
     return useCase(session.userId, archived: archived);
   }
 
@@ -38,6 +43,11 @@ class PetDetailViewModel extends AsyncNotifier<Pet> {
     final useCase = ref.watch(readPetProvider);
     final session = await ref.watch(petSessionProvider.future);
     if (session == null) throw const PetFailure(PetFailureKind.signedOut);
+    final changes = ref
+        .watch(petChangesProvider)
+        .watch(session.userId, petId: petId)
+        .listen((_) => ref.invalidateSelf());
+    ref.onDispose(changes.cancel);
     final photos = ref.watch(petPhotosViewModelProvider(petId).notifier);
     final results = await Future.wait<Object?>([
       useCase(session.userId, petId),

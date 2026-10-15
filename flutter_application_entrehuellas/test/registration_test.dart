@@ -166,7 +166,6 @@ void main() {
           5,
           6,
           7,
-          8,
         });
         double fieldOpacity(String field) => tester
             .widget<Opacity>(
@@ -208,6 +207,7 @@ void main() {
           find.byKey(const ValueKey('register-email')),
           'a@example.com',
         );
+        await tester.pump();
         await tester.pump();
         expect(fieldOpacity('email'), 1);
         expect(find.text('Correo no válido'), findsNothing);

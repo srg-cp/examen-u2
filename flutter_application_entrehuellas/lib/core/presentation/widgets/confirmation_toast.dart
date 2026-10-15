@@ -27,10 +27,13 @@ class ConfirmationToastHost extends StatefulWidget {
 }
 
 class _ConfirmationToastHostState extends State<ConfirmationToastHost> {
+  // A nested image host and its screen must never stack competing notices.
+  static _ConfirmationToastHostState? _visibleHost;
   OverlayEntry? _entry;
   Timer? _timer;
   int _generation = 0;
   void _clear() {
+    if (identical(_visibleHost, this)) _visibleHost = null;
     _timer?.cancel();
     _timer = null;
     _entry?.remove();
@@ -60,30 +63,38 @@ class _ConfirmationToastHostState extends State<ConfirmationToastHost> {
     if (!widget.confirmed) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || generation != _generation) return;
+      _visibleHost?._clear();
+      _visibleHost = this;
       final media = MediaQuery.of(context);
       _entry = OverlayEntry(
         builder: (context) => Positioned(
           top: MediaQuery.paddingOf(context).top + 12,
           left: 24,
           right: 24,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 360),
-              child: MediaQuery(
-                data: media,
-                child: _ConfirmationToast(
-                  message: widget.message,
-                  isError: widget.isError,
-                  actionLabel: widget.actionLabel,
-                  onAction: widget.onAction == null
-                      ? null
-                      : () {
-                          final action = widget.onAction;
-                          _clear();
-                          action?.call();
-                        },
-                  onClose: _clear,
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 12,
+          child: LayoutBuilder(
+            builder: (context, bounds) => Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 360,
+                  maxHeight: (bounds.maxHeight * .3).clamp(48.0, 220.0),
+                ),
+                child: MediaQuery(
+                  data: media,
+                  child: _ConfirmationToast(
+                    message: widget.message,
+                    isError: widget.isError,
+                    actionLabel: widget.actionLabel,
+                    onAction: widget.onAction == null
+                        ? null
+                        : () {
+                            final action = widget.onAction;
+                            _clear();
+                            action?.call();
+                          },
+                    onClose: _clear,
+                  ),
                 ),
               ),
             ),
@@ -128,6 +139,7 @@ class _ConfirmationToast extends StatefulWidget {
 
 class _ConfirmationToastState extends State<_ConfirmationToast>
     with SingleTickerProviderStateMixin {
+  final _scroll = ScrollController();
   late final _animation = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 180),
@@ -144,6 +156,7 @@ class _ConfirmationToastState extends State<_ConfirmationToast>
 
   @override
   void dispose() {
+    _scroll.dispose();
     _animation.dispose();
     super.dispose();
   }
@@ -184,6 +197,7 @@ class _ConfirmationToastState extends State<_ConfirmationToast>
                   hint: 'Toca para cerrar',
                   onDismiss: widget.onClose,
                   child: InkWell(
+                    key: const ValueKey('feedback-toast'),
                     onTap: widget.onClose,
                     splashFactory: NoSplash.splashFactory,
                     overlayColor: const WidgetStatePropertyAll(
@@ -191,64 +205,73 @@ class _ConfirmationToastState extends State<_ConfirmationToast>
                     ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 48),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ExcludeSemantics(
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Color(0x0D24282A),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: SizedBox(
-                                  width: 32,
-                                  height: 32,
-                                  child: Icon(
-                                    widget.isError
-                                        ? Icons.error_outline_rounded
-                                        : Icons.check_rounded,
-                                    color: widget.isError
-                                        ? const Color(0xFFB53F48)
-                                        : const Color(0xFF111111),
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
+                      child: Scrollbar(
+                        controller: _scroll,
+                        thumbVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _scroll,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
                             ),
-                            const SizedBox(width: 10),
-                            Flexible(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.message,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF111111),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ExcludeSemantics(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: Color(0x0D24282A),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: SizedBox(
+                                      width: 32,
+                                      height: 32,
+                                      child: Icon(
+                                        widget.isError
+                                            ? Icons.error_outline_rounded
+                                            : Icons.check_rounded,
+                                        color: widget.isError
+                                            ? const Color(0xFFB53F48)
+                                            : const Color(0xFF111111),
+                                        size: 20,
+                                      ),
                                     ),
                                   ),
-                                  if (widget.actionLabel != null &&
-                                      widget.onAction != null)
-                                    TextButton(
-                                      onPressed: widget.onAction,
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: const Color(
-                                          0xFF111111,
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.message,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF111111),
                                         ),
                                       ),
-                                      child: Text(widget.actionLabel!),
-                                    ),
-                                ],
-                              ),
+                                      if (widget.actionLabel != null &&
+                                          widget.onAction != null)
+                                        TextButton(
+                                          onPressed: widget.onAction,
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: const Color(
+                                              0xFF111111,
+                                            ),
+                                          ),
+                                          child: Text(widget.actionLabel!),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

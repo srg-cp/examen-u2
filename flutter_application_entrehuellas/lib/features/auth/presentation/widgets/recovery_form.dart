@@ -91,7 +91,6 @@ class _RecoveryFormState extends State<RecoveryForm> {
                   ? Icons.mail_outline_rounded
                   : Icons.lock_outline_rounded,
               invalid: invalid,
-              errorText: invalid ? widget.state.fieldHint : null,
               suffix: toggle == null
                   ? null
                   : IconButton(
@@ -153,25 +152,8 @@ class _RecoveryFormState extends State<RecoveryForm> {
             toggle: () => setState(() => _hideSecond = !_hideSecond),
           ),
           const SizedBox(height: 12),
-          const StaggerRevealItem(
-            order: 6,
-            child: Text(
-              'Usa al menos 8 caracteres.',
-              style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
-            ),
-          ),
         ],
-        if (widget.state.message != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Semantics(
-              liveRegion: true,
-              child: Text(
-                widget.state.message!,
-                style: const TextStyle(fontSize: 16, color: Color(0xFFB53F48)),
-              ),
-            ),
-          ),
+
         const SizedBox(height: 24),
         StaggerRevealItem(
           order: widget.reset ? 7 : 5,

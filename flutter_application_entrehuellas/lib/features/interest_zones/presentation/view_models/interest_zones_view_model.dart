@@ -1,4 +1,4 @@
-import 'dart:math';
+import '../../../../core/domain/utils/new_entity_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/interest_zone.dart';
 import '../../domain/entities/zone_point.dart';
@@ -56,7 +56,7 @@ class InterestZonesViewModel extends AsyncNotifier<ZoneViewState> {
     state = AsyncData(
       current.copyWith(
         draft: ZoneDraft(
-          id: zone?.id ?? _newId(),
+          id: zone?.id ?? newEntityId(),
           name: zone?.name ?? '',
           latitude: zone?.latitude,
           longitude: zone?.longitude,
@@ -228,15 +228,5 @@ class InterestZonesViewModel extends AsyncNotifier<ZoneViewState> {
         );
       }
     }
-  }
-
-  // Stable per draft, UUIDv4; retries and edits keep the same identity.
-  String _newId() {
-    final random = Random.secure();
-    final bytes = List.generate(16, (_) => random.nextInt(256));
-    bytes[6] = (bytes[6] & 15) | 64;
-    bytes[8] = (bytes[8] & 63) | 128;
-    final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
   }
 }

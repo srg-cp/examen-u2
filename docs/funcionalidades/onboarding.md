@@ -29,3 +29,9 @@ movimiento reducido. No repite animaciones por edición ni por cada frame de un 
 Depende de Auth, perfil y RPC de finalización. Verificar cuenta nueva, cuenta
 completada, reinicio, cambio de cuenta y fallo de red al pulsar Comenzar.
 El registro de pruebas ejecutadas y pendientes está en [ESTADO](../ESTADO.md).
+
+## Corrección de consistencia — 11 de octubre de 2026
+
+Entrada observa el contrato de sesión y CheckOnboarding sin importar ViewModels de auth. El cierre usa SignOut mediante EntryExitViewModel. Fallos de consulta, guardado y salida usan toast; reintentos conservados.
+
+Carga mediante skeleton/shimmer y refresh conservado sin indicadores circulares/lineales. Véanse [ADR-027](../decisiones/027-feedback-global-toast-shimmer.md), [ADR-028](../decisiones/028-consistencia-fronteras-y-reutilizacion.md) y [ESTADO](../ESTADO.md) para evidencia local y pendientes. Esta corrección no cierra por sí sola la HU ni acredita pruebas remotas/Android autenticadas.

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
 import '../../../../core/presentation/widgets/startup_reveal.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
-import '../../../auth/presentation/view_models/login_view_model.dart';
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../view_models/entry_view_model.dart';
 
 class EntryScreen extends ConsumerWidget {
@@ -11,53 +11,56 @@ class EntryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final flow = ref.watch(entryViewModelProvider);
-    final login = ref.watch(loginViewModelProvider);
-    return Scaffold(
-      backgroundColor: StartupReveal.background,
-      body: SafeArea(
-        child: Center(
-          child: flow.hasError
-              ? Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'No pudimos preparar tu cuenta. Revisa tu conexión e inténtalo de nuevo.',
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: login.isBusy
-                            ? null
-                            : () => ref
-                                  .read(entryViewModelProvider.notifier)
-                                  .retry(),
-                        child: const Text('Reintentar'),
-                      ),
-                      LoadingShimmer(
-                        isLoading: login.isBusy,
-                        loadingLabel: 'Cerrando sesión',
-                        highlight: const Color(0x3324282A),
-                        child: TextButton(
-                          onPressed: login.isBusy
+    final exit = ref.watch(entryExitViewModelProvider);
+    return ConfirmationToastHost(
+      confirmed: flow.hasError || exit.hasError,
+      noticeId: (flow.error, exit.error),
+      isError: true,
+      message: exit.hasError
+          ? 'No pudimos cerrar sesión. Reintenta.'
+          : 'No pudimos preparar tu cuenta. Revisa tu conexión e inténtalo de nuevo.',
+      child: Scaffold(
+        backgroundColor: StartupReveal.background,
+        body: SafeArea(
+          child: Center(
+            child: flow.hasError
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FilledButton(
+                          onPressed: exit.isLoading
                               ? null
                               : () => ref
-                                    .read(loginViewModelProvider.notifier)
-                                    .signOut(),
-                          child: const Text('Cerrar sesión'),
+                                    .read(entryViewModelProvider.notifier)
+                                    .retry(),
+                          child: const Text('Reintentar'),
                         ),
-                      ),
-                    ],
+                        LoadingShimmer(
+                          isLoading: exit.isLoading,
+                          loadingLabel: 'Cerrando sesión',
+                          highlight: const Color(0x3324282A),
+                          child: TextButton(
+                            onPressed: exit.isLoading
+                                ? null
+                                : () => ref
+                                      .read(entryExitViewModelProvider.notifier)
+                                      .signOut(),
+                            child: const Text('Cerrar sesión'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Semantics(
+                    label: 'Preparando tu cuenta',
+                    liveRegion: true,
+                    child: const ExcludeSemantics(
+                      child: BrandWordmark(iconSize: 80, textSize: 32),
+                    ),
                   ),
-                )
-              : Semantics(
-                  label: 'Preparando tu cuenta',
-                  liveRegion: true,
-                  child: const ExcludeSemantics(
-                    child: BrandWordmark(iconSize: 80, textSize: 32),
-                  ),
-                ),
+          ),
         ),
       ),
     );

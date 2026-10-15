@@ -22,7 +22,8 @@ class PetPhoto {
 }
 
 class PetPhotoDraft {
-  const PetPhotoDraft({required this.id, required this.bytes});
+  PetPhotoDraft({required this.id, required Uint8List bytes})
+    : bytes = Uint8List.fromList(bytes).asUnmodifiableView();
   final String id;
   final Uint8List bytes;
 }

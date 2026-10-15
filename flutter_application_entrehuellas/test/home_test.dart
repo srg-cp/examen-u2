@@ -45,7 +45,7 @@ void main() {
                 builder: (context, update) => LiquidNavigation(
                   selected: selected,
                   onSelect: (section) => update(() => selected = section),
-                  onReport: () {},
+                  onReport: (_) {},
                 ),
               ),
             ),
@@ -111,9 +111,7 @@ void main() {
   );
 
   for (final small in [false, true]) {
-    testWidgets('Navigation and report sheet remain usable; small=$small', (
-      tester,
-    ) async {
+    testWidgets('Navigation remains usable; small=$small', (tester) async {
       tester.view.physicalSize = small
           ? const Size(320, 350)
           : const Size(390, 844);
@@ -150,13 +148,6 @@ void main() {
         find.textContaining('El registro de mascotas aún no está disponible.'),
         findsOneWidget,
       );
-      await tester.tap(find.byTooltip('Reportar'));
-      await tester.pumpAndSettle();
-      expect(find.text('Mascota perdida'), findsOneWidget);
-      expect(find.text('Mascota encontrada'), findsOneWidget);
-      await tester.ensureVisible(find.text('Cerrar'));
-      await tester.tap(find.text('Cerrar'));
-      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
   }

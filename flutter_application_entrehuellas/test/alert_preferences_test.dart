@@ -378,6 +378,8 @@ void main() {
         );
         await capture(tester, boundary, small, 'save-error');
         repo.failSave = false;
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
+        await tester.pumpAndSettle();
         await tester.ensureVisible(find.text('Guardar preferencias'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Guardar preferencias'));

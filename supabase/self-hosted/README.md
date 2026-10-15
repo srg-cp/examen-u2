@@ -87,3 +87,8 @@ Referencia de la versión desplegada:
 
 Referencias: [funciones autohospedadas](https://supabase.com/docs/guides/self-hosting/self-hosted-functions),
 [Compose oficial](https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml).
+# Recuperación de conexiones de PostgREST
+
+**Indicación retirada para el incidente actual:** el usuario objetó los pasos operacionales y no se ejecutó un reinicio por el agente. No seguir el reinicio como próximo paso sobre las capturas existentes. La lectura de fotos se recuperó mediante reconsulta Android; publicación y causa definitiva siguen pendientes. El script se conserva como artefacto de la propuesta anterior, no como activación obligatoria ni reparación confirmada.
+
+Para el incidente de publicación bloqueada del10 de octubre, `restart-rest-connections.sh` reinicia solo el contenedor con labels de proyecto `entrehuellas-supabase-bmcwgm` y servicio `rest`. Exige una única coincidencia en ejecución e imagen postgrest/postgrest; si falla la selección, muestra nombres/imágenes y no reinicia otro servicio. Ejecutar en el servidor con Bash y acceso Docker. Interrumpe trabajo API pendiente y revierte transacciones no confirmadas de las conexiones cerradas; publicaciones confirmadas se conservan. No usar un redeploy completo ni modificar Compose/credenciales para esta recuperación. El patch015 ya fue aplicado según el usuario; no repetir SQL ni subir fotos. Después comprobar diagnóstico sin cadena, consultar Mis casos y probar una publicación una sola vez. Reinicio preparado, no ejecutado remotamente por el agente; origen definitivo del bloqueo pendiente.

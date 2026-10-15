@@ -1,3 +1,5 @@
+import '../domain/services/pet_changes.dart';
+import '../domain/use_cases/notify_pet_changed.dart';
 import '../domain/use_cases/archive_pet.dart';
 import '../domain/use_cases/restore_pet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,4 +48,14 @@ final archivePetProvider = Provider(
 );
 final restorePetProvider = Provider(
   (ref) => RestorePet(ref.watch(petRepositoryProvider)),
+);
+
+// Owned by ProviderScope; listeners are released by each screen ViewModel.
+final petChangesProvider = Provider((ref) {
+  final changes = PetChanges();
+  ref.onDispose(changes.dispose);
+  return changes;
+});
+final notifyPetChangedProvider = Provider(
+  (ref) => NotifyPetChanged(ref.watch(petChangesProvider)),
 );

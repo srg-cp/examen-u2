@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'pet_photo_data_source.dart';
 import '../models/pet_photo_dto.dart';
@@ -24,7 +26,24 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
             ? PetPhotoSourceFailureKind.invalidPhoto
             : PetPhotoSourceFailureKind.unavailable,
       );
-  Future<T> _run<T>(String owner, Future<T> Function() action) async {
+  void _diagnostic(String operation, String kind, String? code) {
+    // Never log SDK messages, photo bytes, paths or signed URL credentials.
+    final safeCode = RegExp(r'^[A-Z0-9]{3,10}$').hasMatch(code ?? '')
+        ? code
+        : 'unknown';
+    final message = '$operation failed: $kind code=$safeCode';
+    developer.log(message, name: 'pet_photos');
+    assert(() {
+      Zone.current.print('[pet_photos] $message');
+      return true;
+    }());
+  }
+
+  Future<T> _run<T>(
+    String owner,
+    String operation,
+    Future<T> Function() action,
+  ) async {
     _owner(owner);
     try {
       final result = await action();
@@ -33,11 +52,17 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     } on PetPhotoSourceFailure {
       rethrow;
     } on PostgrestException catch (e) {
+      _diagnostic(operation, 'PostgREST', e.code);
       throw _failure(e.code, e.message);
+    } on StorageException catch (e) {
+      _diagnostic(operation, 'Storage', e.statusCode);
+      throw _failure(e.statusCode, null);
     } on FunctionException catch (e) {
+      _diagnostic(operation, 'Edge', '${e.status}');
       final detail = e.details;
       throw _failure('${e.status}', detail is Map ? detail['error'] : null);
-    } catch (_) {
+    } catch (e) {
+      _diagnostic(operation, '${e.runtimeType}', null);
       throw const PetPhotoSourceFailure(PetPhotoSourceFailureKind.unavailable);
     }
   }
@@ -74,7 +99,7 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
 
   @override
   Future<List<PetPhotoDto>> list(String owner, String pet) =>
-      _run(owner, () async {
+      _run(owner, 'list', () async {
         final rows = await _client.rpc(
           'list_pet_photos',
           params: {'p_pet_id': pet},
@@ -91,7 +116,7 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     String pet,
     String id,
     Uint8List bytes,
-  ) => _run(owner, () async {
+  ) => _run(owner, 'upload', () async {
     final response = await _client.functions.invoke(
       'pet-photo-process',
       body: bytes,
@@ -108,7 +133,7 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
   });
   @override
   Future<void> remove(String owner, String pet, String id) =>
-      _run(owner, () async {
+      _run(owner, 'remove', () async {
         await _client.rpc(
           'begin_pet_photo_removal',
           params: {'p_id': id, 'p_pet_id': pet},
@@ -134,7 +159,7 @@ class SupabasePetPhotoSource implements PetPhotoDataSource {
     String pet,
     String id,
     int expectedVersion,
-  ) => _run(owner, () async {
+  ) => _run(owner, 'set_primary', () async {
     await _client.rpc(
       'set_primary_pet_photo',
       params: {

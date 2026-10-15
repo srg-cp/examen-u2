@@ -6,6 +6,7 @@ import 'package:flutter_application_entrehuellas/features/pets/domain/repositori
 class FakePetPhotos implements PetPhotoRepository {
   Completer<void>? pendingList;
   int lists = 0;
+  bool failList = false;
   Uint8List? selection;
   Uint8List? recovered;
   bool loseAcknowledgement = false;
@@ -41,6 +42,9 @@ class FakePetPhotos implements PetPhotoRepository {
   Future<List<PetPhoto>> list(String owner, String pet) async {
     lists++;
     await pendingList?.future;
+    if (failList) {
+      throw const PetPhotoFailure(PetPhotoFailureKind.unavailable);
+    }
     return photos.values
         .where((p) => p.ownerId == owner && p.petId == pet)
         .toList();

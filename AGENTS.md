@@ -52,3 +52,12 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 - La publicación, despliegue y acciones en GitHub siguen la autorización del usuario en la tarea actual; esta guía no concede por sí sola autorización para ejecutarlas.
 
 - ADR-016, por instrucción explícita del usuario, exige nombre/especie/tamaño/edad/rasgos al guardar mascotas, rasgos hasta200 con contador interior; sexo opcional con Macho inicial. En Registrar/Editar los errores de campos, guardado y fotos usan shake danger y toast superior, sin mensajes debajo; las demás pantallas conservan feedback previo. No inventar datos de fichas antiguas incompletas: completar al editar metadatos y conservar sus operaciones de ciclo de vida.
+
+
+## Feedback de reportes: corrección del 10 de octubre de 2026
+
+Por instrucción explícita del usuario, los mensajes de error, validación y resultado se muestran en el toast superior compartido, sin texto contextual dentro de la pantalla ni debajo de campos/acciones. Esta instrucción sustituye las restricciones anteriores que reservaban el toast a excepciones y exigían feedback contextual. Etiquetas, datos, estados e instrucciones de privacidad se mantienen. El incremento adapta los flujos de reportes perdidos/encontrados; conserva invalid/ShakeField, acciones de reintento y ciclo de vida del aviso. Las demás funcionalidades existentes se adaptarán al intervenir sus flujos; no se afirma una migración global completada. Véase [ADR-023](docs/decisiones/023-feedback-reportes-toast-superior.md).
+
+## Feedback global y consistencia: instrucción del 11 de octubre de 2026
+
+El usuario extiende el toast superior a errores, validación y resultados de toda la app, sin mensajes bajo inputs ni errorText/helperText. No usar loaders circulares/lineales ni textos de carga: skeleton y LoadingShimmer; ContentRefresh aplica shimmer sobre contenido conservado en refresh. Mantener invalid/ShakeField, semántica, acciones reales y ciclo de vida del toast. Esta instrucción sustituye las reservas contextuales anteriores y la adaptación diferida de ADR-023. Véanse docs/decisiones/027-feedback-global-toast-shimmer.md y028-consistencia-fronteras-y-reutilizacion.md. No permitir presentation/data entre funcionalidades ni core→features; colaboración mediante dominio/providers declarativos.

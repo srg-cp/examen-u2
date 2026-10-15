@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/collection_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -164,40 +165,10 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
 class _PetsHeader extends StatelessWidget {
   const _PetsHeader({required this.hasPets});
   final bool hasPets;
-
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      const title = Text(
-        'Mis mascotas',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          color: Color(0xFF111111),
-        ),
-      );
-      const action = PetRegistrationButton(compact: true);
-      if (constraints.maxWidth < 300 ||
-          MediaQuery.textScalerOf(context).scale(32) > 42) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            title,
-            if (hasPets) ...[
-              const SizedBox(height: 12),
-              const Align(alignment: Alignment.centerRight, child: action),
-            ],
-          ],
-        );
-      }
-      return Row(
-        children: [
-          const Expanded(child: title),
-          const SizedBox(width: 12),
-          hasPets ? action : const SizedBox.square(dimension: 56),
-        ],
-      );
-    },
+  Widget build(BuildContext context) => CollectionHeader(
+    title: 'Mis mascotas',
+    action: hasPets ? const PetRegistrationButton(compact: true) : null,
   );
 }
 

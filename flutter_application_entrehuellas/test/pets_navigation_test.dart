@@ -413,9 +413,7 @@ void main() {
           findsOneWidget,
         );
         await capture('error');
-        await tester.tap(
-          find.text('No se pudo guardar la mascota. Tus cambios siguen aquí.'),
-        );
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
         await tester.pumpAndSettle();
         pets.fail = false;
         await tester.ensureVisible(find.text('Guardar cambios'));
@@ -551,13 +549,23 @@ void main() {
           tester.getBottomRight(deleteButton).dx,
           tester
               .getBottomRight(
-                find.byKey(const ValueKey('pet-deletion-actions')),
+                find
+                    .ancestor(
+                      of: find.text('Cancelar'),
+                      matching: find.byType(LayoutBuilder),
+                    )
+                    .first,
               )
               .dx,
         );
         await capture('delete_confirmation');
         await tester.ensureVisible(
-          find.byKey(const ValueKey('pet-deletion-actions')),
+          find
+              .ancestor(
+                of: find.text('Cancelar'),
+                matching: find.byType(LayoutBuilder),
+              )
+              .first,
         );
         await tester.pumpAndSettle();
         await capture('delete_actions');
@@ -588,9 +596,7 @@ void main() {
           findsNothing,
         );
         await capture('delete_error_toast');
-        await tester.tap(
-          find.text('No se pudo eliminar la mascota. Desliza para reintentar.'),
-        );
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
         await tester.pumpAndSettle();
         pets.fail = false;
         await tester.ensureVisible(find.byType(SwipePetCard));

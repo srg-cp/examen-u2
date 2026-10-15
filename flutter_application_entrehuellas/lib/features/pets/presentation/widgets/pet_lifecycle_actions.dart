@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
-import '../../../../core/presentation/widgets/origin_dialog_transition.dart';
+import '../../../../core/presentation/widgets/confirm_action_dialog.dart';
 import '../../domain/entities/pet.dart';
 import '../../domain/failures/pet_failure.dart';
 import '../view_models/pet_lifecycle_view_model.dart';
@@ -52,17 +52,6 @@ class PetLifecycleActions extends ConsumerWidget {
         ),
         if (state.issue != null) ...[
           const SizedBox(height: 12),
-          Semantics(
-            liveRegion: true,
-            child: Text(switch (state.issue!) {
-              PetFailureKind.activeCase =>
-                'Resuelve o cancela el caso activo antes de archivar.',
-              PetFailureKind.conflict =>
-                'La ficha cambió. Actualízala antes de continuar.',
-              PetFailureKind.missing => 'Esta mascota ya no está disponible.',
-              _ => 'No se pudo completar la acción. Puedes reintentar.',
-            }, style: const TextStyle(fontSize: 16, color: Color(0xFFB53F48))),
-          ),
           if (state.issue == PetFailureKind.conflict)
             TextButton(
               onPressed: () => ref
@@ -76,60 +65,15 @@ class PetLifecycleActions extends ConsumerWidget {
   }
 }
 
-Future<bool> _confirmArchive(BuildContext context, Pet pet) async =>
-    await showGeneralDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black54,
-      transitionDuration: MediaQuery.disableAnimationsOf(context)
-          ? Duration.zero
-          : const Duration(milliseconds: 320),
-      transitionBuilder: (context, animation, secondaryAnimation, child) =>
-          OriginDialogTransition(animation: animation, child: child),
-      pageBuilder: (context, animation, secondaryAnimation) => Semantics(
-        scopesRoute: true,
-        namesRoute: true,
-        label: 'Confirmar archivo de mascota',
-        explicitChildNodes: true,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '¿Archivar mascota?',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF111111),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '${pet.fields.name} pasará a Archivadas. Su ficha y fotos se conservarán y podrás restaurarla.',
-                style: const TextStyle(fontSize: 16, color: Color(0xFF6E6E73)),
-              ),
-              const SizedBox(height: 24),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancelar'),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text('Archivar'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ) ??
-    false;
+Future<bool> _confirmArchive(
+  BuildContext context,
+  Pet pet,
+) => confirmActionDialog(
+  context,
+  title: '¿Archivar mascota?',
+  description:
+      '${pet.fields.name} pasará a Archivadas. Su ficha y fotos se conservarán y podrás restaurarla.',
+  action: 'Archivar',
+  semanticLabel: 'Confirmar archivo de mascota',
+  destructive: false,
+);

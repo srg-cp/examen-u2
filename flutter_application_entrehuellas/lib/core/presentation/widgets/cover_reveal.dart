@@ -94,7 +94,8 @@ class _AuthStageTransitionState extends State<AuthStageTransition>
       _controller.value = 1;
       return;
     }
-    if (oldWidget.stage == widget.stage) return;
+    // Completing loading is the same entrance, including its skeleton history.
+    if (!oldWidget.enabled || oldWidget.stage == widget.stage) return;
     _previous = oldWidget.builder(true);
     _previousKey = _stageKey;
     _stageKey = GlobalKey();

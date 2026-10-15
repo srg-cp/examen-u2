@@ -6,12 +6,8 @@ InputDecoration appInputDecoration(
   Widget? suffix,
   bool invalid = false,
   double verticalPadding = 22,
-  String? errorText,
 }) => InputDecoration(
   hintText: hint,
-  errorText: errorText,
-  errorStyle: const TextStyle(fontSize: 13),
-  errorMaxLines: 2,
   errorBorder: OutlineInputBorder(
     borderRadius: BorderRadius.circular(22),
     borderSide: const BorderSide(color: Color(0xFFB53F48), width: 3.5),

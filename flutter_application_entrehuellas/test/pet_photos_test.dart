@@ -14,12 +14,116 @@ import 'package:flutter_application_entrehuellas/features/pets/domain/entities/p
 import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/view_models/pet_editor_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/view_models/pet_photos_view_model.dart';
+import 'package:flutter_application_entrehuellas/features/pets/presentation/view_models/pet_list_view_model.dart';
 import 'app_test.dart' show FakeAuthRepository;
 import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  for (final operation in ['remove', 'primary', 'replace']) {
+    test(
+      'Photo $operation saves while detail and editor stay observed',
+      () async {
+        final auth = FakeAuthRepository()
+          ..current = const AuthSession(userId: 'one');
+        final pets = FakePets();
+        pets.pets['pet'] = const Pet(
+          id: 'pet',
+          ownerId: 'one',
+          version: 1,
+          fields: PetFields(
+            name: 'Luna',
+            species: PetSpecies.cat,
+            size: PetSize.medium,
+            ageMonths: 24,
+            traits: 'Blanca',
+          ),
+        );
+        final photos = FakePetPhotos()
+          ..selection = img.encodeJpg(img.Image(width: 10, height: 10));
+        for (final id in ['first', 'second']) {
+          photos.photos[id] = PetPhoto(
+            id: id,
+            petId: 'pet',
+            ownerId: 'one',
+            ready: true,
+            uri: Uri.parse('https://example.invalid/$id.jpg'),
+            isPrimary: id == 'first',
+          );
+        }
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(auth),
+            petRepositoryProvider.overrideWithValue(pets),
+            petPhotoRepositoryProvider.overrideWithValue(photos),
+          ],
+        );
+        final gallery = petPhotosViewModelProvider('pet');
+        final editor = petEditorViewModelProvider('pet');
+        final detail = petDetailViewModelProvider('pet');
+        final subscriptions = [
+          container.listen(detail, (_, __) {}),
+          container.listen(editor, (_, __) {}),
+          container.listen(gallery, (_, __) {}),
+          container.listen(petListViewModelProvider, (_, __) {}),
+        ];
+        addTearDown(() async {
+          for (final subscription in subscriptions) {
+            subscription.close();
+          }
+          container.dispose();
+          await auth.controller.close();
+        });
+        await container.read(detail.future);
+        await container.read(editor.future);
+        final model = container.read(gallery.notifier);
+        if (operation == 'primary') {
+          model.stagePrimary('second');
+        } else {
+          model.stageRemoval('first');
+          if (operation == 'replace') await model.choose(true);
+        }
+        await container.read(editor.notifier).save();
+        expect(container.read(gallery).issue, isNull);
+        expect(container.read(gallery).hasPendingChanges, isFalse);
+        expect(container.read(editor).requireValue.saved, isNotNull);
+        expect((await container.read(detail.future)).id, 'pet');
+        if (operation == 'primary') {
+          expect(photos.photos['second']!.isPrimary, isTrue);
+        } else {
+          expect(photos.photos.containsKey('first'), isFalse);
+          expect(photos.photos, hasLength(operation == 'replace' ? 2 : 1));
+        }
+      },
+    );
+  }
+  test('Failed photo read identifies load and clears it after retry', () async {
+    final auth = FakeAuthRepository()
+      ..current = const AuthSession(userId: 'one');
+    final photos = FakePetPhotos()..failList = true;
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(auth),
+        petPhotoRepositoryProvider.overrideWithValue(photos),
+      ],
+    );
+    final provider = petPhotosViewModelProvider('pet');
+    final subscription = container.listen(provider, (_, __) {});
+    addTearDown(() async {
+      subscription.close();
+      container.dispose();
+      await auth.controller.close();
+    });
+    await container.read(petSessionProvider.future);
+    final model = container.read(provider.notifier);
+    await model.initialize(true);
+    expect(container.read(provider).failedOperation, PetPhotosOperation.load);
+    photos.failList = false;
+    await model.initialize(true);
+    expect(container.read(provider).failedOperation, isNull);
+    expect(container.read(provider).issue, isNull);
+  });
   test(
     'Lost gallery data is scoped to account and pet, and profile does not consume it',
     () async {
@@ -109,12 +213,14 @@ void main() {
       expect(pets.pets.length, 1);
       expect(container.read(editor).requireValue.saved, isNull);
       expect(container.read(gallery).pending.single.id, id);
+      expect(container.read(gallery).failedOperation, PetPhotosOperation.save);
       await model.save();
       expect(pets.creates, 1);
       expect(pets.updates, 0);
       expect(photos.attempts, [id, id]);
       expect(photos.photos.length, 1);
       expect(container.read(gallery).pending, isEmpty);
+      expect(container.read(gallery).failedOperation, isNull);
       expect(container.read(editor).requireValue.saved, isNotNull);
       photos.selection = null;
       await photoModel.choose(true);

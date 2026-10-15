@@ -86,7 +86,7 @@ void main() {
                                 label: 'Nombre',
                                 controller: name,
                                 enabled: enabled,
-                                errorText: invalid ? 'Revisa el nombre.' : null,
+                                invalid: invalid,
                                 onChanged: (_) => edits++,
                               ),
                               const SizedBox(height: 16),
@@ -188,7 +188,19 @@ void main() {
         update(() => invalid = true);
         await tester.pumpAndSettle();
         await tester.ensureVisible(nameInput);
-        expect(find.text('Revisa el nombre.'), findsOneWidget);
+        expect(find.text('Revisa el nombre.'), findsNothing);
+        final surface = tester.widget<InputDecorator>(
+          find
+              .ancestor(of: nameInput, matching: find.byType(InputDecorator))
+              .first,
+        );
+        expect(surface.decoration.errorText, isNull);
+        expect(
+          (surface.decoration.enabledBorder! as OutlineInputBorder)
+              .borderSide
+              .width,
+          3.5,
+        );
         await capture('error');
         name.clear();
         await tester.pumpAndSettle();

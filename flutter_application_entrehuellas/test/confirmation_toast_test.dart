@@ -4,6 +4,97 @@ import 'package:flutter_application_entrehuellas/core/presentation/widgets/confi
 
 void main() {
   testWidgets(
+    'Long scaled toast scrolls in bounded area and dismisses from its surface',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 350));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      const message =
+          'No pudimos confirmar la operación. Conservamos los datos para reintentar sin duplicar el envío.';
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(
+              size: Size(320, 350),
+              textScaler: TextScaler.linear(2),
+            ),
+            child: Scaffold(
+              body: ConfirmationToastHost(
+                confirmed: true,
+                message: message,
+                isError: true,
+                child: Text('Contenido conservado'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final toast = find.byKey(const ValueKey('feedback-toast'));
+      expect(tester.getRect(toast).height, lessThanOrEqualTo(110));
+      final scroll = find.descendant(
+        of: toast,
+        matching: find.byType(SingleChildScrollView),
+      );
+      final controller = tester
+          .widget<SingleChildScrollView>(scroll)
+          .controller!;
+      expect(controller.position.maxScrollExtent, greaterThan(0));
+      await tester.drag(scroll, const Offset(0, -180));
+      await tester.pumpAndSettle();
+      expect(controller.offset, greaterThan(0));
+      expect(find.text('Contenido conservado'), findsOneWidget);
+      await tester.tap(toast);
+      await tester.pumpAndSettle();
+      expect(find.text(message), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'A new screen notice replaces the photo notice without stacking',
+    (tester) async {
+      var failed = false;
+      var showPhoto = true;
+      late StateSetter update;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                update = setState;
+                return ConfirmationToastHost(
+                  confirmed: failed,
+                  isError: true,
+                  message: 'Publicación rechazada',
+                  child: showPhoto
+                      ? const ConfirmationToastHost(
+                          confirmed: true,
+                          isError: true,
+                          message: 'Foto no disponible',
+                          child: Icon(Icons.broken_image_outlined),
+                        )
+                      : const SizedBox(),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Foto no disponible'), findsOneWidget);
+      update(() => failed = true);
+      await tester.pumpAndSettle();
+      expect(find.text('Foto no disponible'), findsNothing);
+      expect(find.text('Publicación rechazada'), findsOneWidget);
+      update(() => showPhoto = false);
+      await tester.pumpAndSettle();
+      expect(find.text('Publicación rechazada'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 4));
+      expect(find.text('Publicación rechazada'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
     'Error notices repeat by event, conflict action dismisses and disposal clears overlay',
     (tester) async {
       var active = false;

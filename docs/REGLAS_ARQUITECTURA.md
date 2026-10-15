@@ -1,5 +1,7 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
+
 Estado: norma del proyecto. Fecha: 7 de octubre de 2026, America/Lima.
 
 La decisión que sustenta estas reglas está registrada en [ADR-001: arquitectura de la aplicación](decisiones/001-arquitectura-aplicacion.md). La separación de capas permite mantener y probar las reglas de recuperación mientras evolucionan la interfaz, el acceso remoto y el almacenamiento local.
@@ -144,7 +146,7 @@ Estas reglas describen requisitos de cada incremento; no afirman que todas las f
 
 ## Regla de feedback visual
 
-**No utilizar SnackBar en ninguna funcionalidad de la app**, ni directamente ni mediante wrappers/paquetes. No eludir la regla con una notificación inferior equivalente. Usar feedback junto al campo o acción, accesible y breve. En el login, el error modifica el borde y el icono; conserva el fondo. La decisión y las comprobaciones se registran en [ADR-005](decisiones/005-feedback-sin-snackbar.md).
+**No utilizar SnackBar en ninguna funcionalidad de la app**, ni directamente ni mediante wrappers/paquetes. No eludir la regla con una notificación inferior equivalente. Usar el toast superior compartido, accesible y breve, para errores, validación y resultados. En el login, el error modifica el borde y el icono; conserva el fondo. La decisión y las comprobaciones se registran en [ADR-005](decisiones/005-feedback-sin-snackbar.md).
 
 ## 9. Verificación obligatoria de cambios
 
@@ -177,10 +179,15 @@ Ningún documento garantiza por sí solo que la arquitectura nunca se rompa. Su 
 
 ## Evolución explícita del feedback de éxito
 
-[ADR-007](decisiones/007-confirmacion-toast-superior.md) permite un toast superior propio para éxitos confirmados, por nueva instrucción del usuario. Es presentación: widget de core con overlay/timer ligados al ciclo de vida de la pantalla, disparado por nueva confirmación de estado. No introduce SDK, persistencia ni decisiones de negocio en UI. Errores siguen contextuales y el componente inferior prohibido no se incorpora. Mantener pruebas de limpieza, no duplicación y accesibilidad, además del escaneo existente.
+[ADR-007](decisiones/007-confirmacion-toast-superior.md) permite un toast superior propio para éxitos confirmados, por nueva instrucción del usuario. Es presentación: widget de core con overlay/timer ligados al ciclo de vida de la pantalla, disparado por nueva confirmación de estado. No introduce SDK, persistencia ni decisiones de negocio en UI. ADR-027 extiende ahora el toast a errores y validación; el componente inferior prohibido no se incorpora. Mantener pruebas de limpieza, no duplicación y accesibilidad, además del escaneo existente.
 
-ADR-009 permite errores de foto en el componente toast superior existente por instrucción expresa. Sigue siendo feedback de presentación con ciclo de vida local; los demás errores conservan feedback contextual y no se incorpora el componente inferior prohibido.
+ADR-009 permite errores de foto en el componente toast superior existente por instrucción expresa. Sigue siendo feedback de presentación con ciclo de vida local; ADR-027 extiende ahora el mismo feedback a todas las funcionalidades y no se incorpora el componente inferior prohibido.
 
 ## Validación y feedback del editor de mascotas — ADR-016
 
-Por instrucción explícita del usuario, Registrar/Editar valida nombre, especie, tamaño, edad y rasgos obligatorios (máximo200); sexo opcional. Dominio expresa validación, ViewModel reúne errores y bloquea escritura inválida, UI aplica shake/borde danger y toast superior sin errorText bajo campos. Incluye fallos de guardado/fotos del editor; no generaliza a otras pantallas. Fuente SQL034/trigger035 valida metadatos en servidor sin modificar datos antiguos ni impedir archivo/restauración/eliminación. Véase [ADR-016](decisiones/016-validacion-formulario-mascotas.md).
+Por instrucción explícita del usuario, Registrar/Editar valida nombre, especie, tamaño, edad y rasgos obligatorios (máximo200); sexo opcional. Dominio expresa validación, ViewModel reúne errores y bloquea escritura inválida, UI aplica shake/borde danger y toast superior sin errorText bajo campos. Incluye fallos de guardado/fotos del editor; ADR-027 generaliza ahora la ubicación del feedback a las demás pantallas. Fuente SQL034/trigger035 valida metadatos en servidor sin modificar datos antiguos ni impedir archivo/restauración/eliminación. Véase [ADR-016](decisiones/016-validacion-formulario-mascotas.md).
+
+
+## Feedback de reportes: corrección del 10 de octubre de 2026
+
+Por instrucción explícita del usuario, los mensajes de error, validación y resultado se muestran en el toast superior compartido, sin texto contextual dentro de la pantalla ni debajo de campos/acciones. Esta instrucción sustituye las restricciones anteriores que reservaban el toast a excepciones y exigían feedback contextual. Etiquetas, datos, estados e instrucciones de privacidad se mantienen. El incremento adapta los flujos de reportes perdidos/encontrados; conserva invalid/ShakeField, acciones de reintento y ciclo de vida del aviso. Las demás funcionalidades existentes se adaptarán al intervenir sus flujos; no se afirma una migración global completada. Véase [ADR-023](decisiones/023-feedback-reportes-toast-superior.md).

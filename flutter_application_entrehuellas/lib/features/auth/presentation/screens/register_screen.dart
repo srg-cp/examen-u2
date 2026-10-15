@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,40 +25,46 @@ class RegisterScreen extends ConsumerWidget {
       }
     }
 
-    return PopScope(
-      canPop: !state.isBusy,
-      child: StaggerReveal(
-        count: 9,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: AuthPageLayout(
-            title: state.confirmationEmail == null ? 'Crear cuenta' : null,
-            showClose: true,
-            onClose: state.isBusy ? null : login,
-            reveal: true,
-            contentBuilder: (content) => AuthStageTransition(
-              stage: state.confirmationEmail != null,
-              builder: (play) => state.confirmationEmail == null
-                  ? content
-                  : StaggerReveal(
-                      key: const ValueKey('registration-code-reveal'),
-                      count: 9,
-                      play: play,
-                      child: content,
+    return ConfirmationToastHost(
+      confirmed: state.fieldHint != null || state.message != null,
+      message: state.fieldHint ?? state.message ?? '',
+      isError: state.errorField != null || state.messageIsError,
+      noticeId: (state.errorId, state.message),
+      child: PopScope(
+        canPop: !state.isBusy,
+        child: StaggerReveal(
+          count: 8,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: AuthPageLayout(
+              title: state.confirmationEmail == null ? 'Crear cuenta' : null,
+              showClose: true,
+              onClose: state.isBusy ? null : login,
+              reveal: true,
+              contentBuilder: (content) => AuthStageTransition(
+                stage: state.confirmationEmail != null,
+                builder: (play) => state.confirmationEmail == null
+                    ? content
+                    : StaggerReveal(
+                        key: const ValueKey('registration-code-reveal'),
+                        count: 9,
+                        play: play,
+                        child: content,
+                      ),
+              ),
+              child: state.confirmationEmail != null
+                  ? RegistrationConfirmation(
+                      state: state,
+                      onResend: vm.resend,
+                      onVerify: vm.verify,
+                      onCodeEdited: () => vm.edited(RegistrationField.code),
+                    )
+                  : RegistrationForm(
+                      state: state,
+                      onEdited: vm.edited,
+                      onSubmit: vm.submit,
                     ),
             ),
-            child: state.confirmationEmail != null
-                ? RegistrationConfirmation(
-                    state: state,
-                    onResend: vm.resend,
-                    onVerify: vm.verify,
-                    onCodeEdited: () => vm.edited(RegistrationField.code),
-                  )
-                : RegistrationForm(
-                    state: state,
-                    onEdited: vm.edited,
-                    onSubmit: vm.submit,
-                  ),
           ),
         ),
       ),
