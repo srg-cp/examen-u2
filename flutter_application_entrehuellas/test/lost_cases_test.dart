@@ -1,3 +1,4 @@
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_publication_preview.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -29,6 +30,9 @@ import 'package:flutter_application_entrehuellas/features/lost_cases/presentatio
 import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/state/case_editor_state.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/screens/case_editor_screen.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/screens/case_detail_screen.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/photo_gallery_strip.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
+import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/widgets/case_public_content.dart';
 import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
 import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
@@ -44,12 +48,14 @@ const fields = PetFields(
 class FakeCases implements LostCaseRepository {
   final attempts = <LostCaseDraft>[];
   bool loseResponse = false, failRead = false, wrongOwner = false;
+  CaseFailureKind? failure;
   Completer<void>? pending;
   Completer<void>? pendingRead;
   PublicLostCase? publicCase;
   @override
   Future<PublishedLostCase> publish(String owner, LostCaseDraft draft) async {
     attempts.add(draft);
+    if (failure != null) throw CaseFailure(failure!);
     await pending?.future;
     if (loseResponse) {
       loseResponse = false;
@@ -71,7 +77,20 @@ class FakeCases implements LostCaseRepository {
   }
 
   @override
-  Future<List<PublishedLostCase>> listMine(String owner) async => [];
+  Future<List<PublishedLostCase>> listMine(String owner) async =>
+      mine.where((c) => c.ownerId == owner).toList();
+  @override
+  Future<void> delete(String owner, String id) async {
+    if (failDelete) throw const CaseFailure(CaseFailureKind.unavailable);
+    await pendingDelete?.future;
+    deletes.add(id);
+    mine.removeWhere((c) => c.id == id);
+  }
+
+  bool failDelete = false;
+  Completer<void>? pendingDelete;
+  final deletes = <String>[];
+  final mine = <PublishedLostCase>[];
 }
 
 LostCaseDraft draft({
@@ -104,6 +123,7 @@ void main() {
           null,
         );
   });
+
   test(
     'Publication rejects invalid coordinates, future time, duplicate/absent photos, and untrusted success',
     () async {
@@ -191,6 +211,113 @@ void main() {
     }
   }
 
+  test(
+    'Date and time remain independent and partial selection cannot publish',
+    () async {
+      final subscription = container.listen(
+        caseEditorViewModelProvider,
+        (_, _) {},
+      );
+      addTearDown(subscription.close);
+      await container.read(caseEditorViewModelProvider.future);
+      final model = container.read(caseEditorViewModelProvider.notifier);
+      model.chooseDate(DateTime(2026, 10, 9));
+      var value = container.read(caseEditorViewModelProvider).requireValue;
+      expect(value.dateTimeDraft.date, DateTime(2026, 10, 9));
+      expect(value.dateTimeDraft.hour, isNull);
+      expect(value.occurredAt, isNull);
+      model.chooseTime(14, 25);
+      value = container.read(caseEditorViewModelProvider).requireValue;
+      expect(value.occurredAt, DateTime(2026, 10, 9, 14, 25));
+      model.chooseDate(DateTime(2026, 10, 8));
+      expect(
+        container.read(caseEditorViewModelProvider).requireValue.occurredAt,
+        DateTime(2026, 10, 8, 14, 25),
+      );
+      model.chooseTime(8, 45);
+      expect(
+        container.read(caseEditorViewModelProvider).requireValue.occurredAt,
+        DateTime(2026, 10, 8, 8, 45),
+      );
+    },
+  );
+
+  test(
+    'Case removal retains failures, blocks duplicates and ignores old identity completion',
+    () async {
+      const open = PublishedLostCase(
+        id: 'open',
+        ownerId: 'one',
+        status: 'active',
+        petId: 'pet',
+        petName: 'Luna',
+      );
+      const resolved = PublishedLostCase(
+        id: 'done',
+        ownerId: 'one',
+        status: 'resolved',
+        petId: 'pet',
+        petName: 'Luna',
+      );
+      cases.mine.addAll([open, resolved]);
+      container.listen(myCasesViewModelProvider, (_, _) {});
+      await container.read(myCasesViewModelProvider.future);
+      final model = container.read(myCasesViewModelProvider.notifier);
+      cases.failDelete = true;
+      await model.delete(open);
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.cases.length,
+        2,
+      );
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.noticeIsError,
+        isTrue,
+      );
+      cases.failDelete = false;
+      cases.pendingDelete = Completer<void>();
+      final pending = model.delete(open);
+      await model.delete(open);
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.busyId,
+        'open',
+      );
+      cases.pendingDelete!.complete();
+      await pending;
+      expect(cases.deletes, ['open']);
+      expect(
+        container
+            .read(myCasesViewModelProvider)
+            .requireValue
+            .cases
+            .map((c) => c.id),
+        ['done'],
+      );
+      cases.pendingDelete = null;
+      await model.delete(resolved);
+      expect(cases.deletes, ['open', 'done']);
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.cases,
+        isEmpty,
+      );
+      cases.mine.add(open);
+      await model.retry();
+      cases.pendingDelete = Completer<void>();
+      final late = model.delete(open);
+      auth.emit(const AuthSession(userId: 'two'));
+      await Future<void>.delayed(Duration.zero);
+      await container.read(myCasesViewModelProvider.future);
+      cases.pendingDelete!.complete();
+      await late;
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.ownerId,
+        'two',
+      );
+      expect(
+        container.read(myCasesViewModelProvider).requireValue.notice,
+        isNull,
+      );
+    },
+  );
   testWidgets(
     'Report entry opens protected editor; dirty exit cancels or discards; signed out routes redirect',
     (tester) async {
@@ -353,6 +480,61 @@ void main() {
     },
   );
   test(
+    'A stalled publication ends, keeps its command and ignores late success',
+    () async {
+      final scope = ProviderContainer(
+        parent: container,
+        overrides: [
+          caseEditorViewModelProvider.overrideWith(
+            () => CaseEditorViewModel(
+              publicationTimeout: const Duration(milliseconds: 30),
+            ),
+          ),
+        ],
+      );
+      addTearDown(scope.dispose);
+      scope.listen(caseEditorViewModelProvider, (_, _) {});
+      await scope.read(caseEditorViewModelProvider.future);
+      final model = scope.read(caseEditorViewModelProvider.notifier);
+      await model.selectPet('pet');
+      model.togglePhoto('photo');
+      model.edit(
+        occurredAt: DateTime.utc(2026, 10, 9),
+        latitude: -12.0464,
+        longitude: -77.0428,
+        placeReference: 'Referencia privada',
+      );
+      model.preview();
+      final delayed = Completer<void>();
+      cases.pending = delayed;
+      final first = model.publish();
+      await model.publish();
+      expect(cases.attempts, hasLength(1));
+      await first;
+      final timedOut = scope.read(caseEditorViewModelProvider).requireValue;
+      expect(timedOut.busy, false);
+      expect(timedOut.issue, CaseFailureKind.timedOut);
+      expect(timedOut.lockedDraft, same(cases.attempts.single));
+      model.backToForm();
+      model.edit(placeReference: 'Changed');
+      expect(
+        scope.read(caseEditorViewModelProvider).requireValue.stage,
+        CaseEditorStage.preview,
+      );
+      cases.pending = null;
+      await model.publish();
+      final confirmed = scope.read(caseEditorViewModelProvider).requireValue;
+      expect(confirmed.stage, CaseEditorStage.confirmed);
+      expect(cases.attempts[1], same(cases.attempts[0]));
+      delayed.complete();
+      await tick();
+      expect(
+        scope.read(caseEditorViewModelProvider).requireValue,
+        same(confirmed),
+      );
+    },
+  );
+  test(
     'Session change discards draft and late publication; same account recovers after stream failure',
     () async {
       await init();
@@ -428,6 +610,76 @@ void main() {
     (const Size(390, 844), 1.0),
     (const Size(320, 350), 2.0),
   ]) {
+    testWidgets('Report uses map and shared swipe gallery at $size', (
+      tester,
+    ) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      for (final id in ['second', 'third']) {
+        photos.photos[id] = PetPhoto(
+          id: id,
+          petId: 'pet',
+          ownerId: 'one',
+          ready: true,
+        );
+      }
+      await tester.runAsync(init);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: const CaseEditorScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Latitud'), findsNothing);
+      expect(find.text('Longitud'), findsNothing);
+      expect(find.text('Usar coordenadas'), findsNothing);
+      final gallery = find.byType(PhotoGalleryStrip);
+      await tester.pump(const Duration(seconds: 7));
+      await Scrollable.ensureVisible(tester.element(gallery), alignment: .5);
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<PhotoGalleryTile>(find.byType(PhotoGalleryTile).first)
+            .size,
+        PhotoGalleryStrip.detailTileSize(size.width - 48),
+      );
+      await tester.drag(gallery, const Offset(-350, 0));
+      await tester.pumpAndSettle();
+      final third = find.byKey(const ValueKey('photo_selection_third'));
+      await tester.tap(third);
+      await tester.pump();
+      expect(
+        container.read(caseEditorViewModelProvider).requireValue.selectedPhotos,
+        contains('third'),
+      );
+      final map = tester.widget<ZoneMapPicker>(find.byType(ZoneMapPicker));
+      map.onSelect!(-12.05, -77.04);
+      await tester.pump();
+      final state = container.read(caseEditorViewModelProvider).requireValue;
+      expect(state.latitude, -12.05);
+      expect(state.longitude, -77.04);
+      container.read(caseEditorViewModelProvider.notifier).preview();
+      await tester.pumpAndSettle();
+      expect(find.text('Vista previa pública'), findsNothing);
+      expect(find.byType(PageView), findsOneWidget);
+      expect(
+        tester
+            .widget<CasePreviewContent>(find.byType(CasePreviewContent))
+            .value
+            .photos
+            .map((photo) => photo.id),
+        ['photo', 'third'],
+      );
+      expect(tester.takeException(), isNull);
+    });
     testWidgets(
       'Form, preview, error and confirmed public content fit $size with text $scale',
       (tester) async {
@@ -493,11 +745,11 @@ void main() {
         await tester.pumpWidget(
           UncontrolledProviderScope(
             container: container,
-            child: MaterialApp(
-              theme: AppTheme.light,
-              home: RepaintBoundary(
-                key: boundary,
-                child: const CaseEditorScreen(),
+            child: RepaintBoundary(
+              key: boundary,
+              child: MaterialApp(
+                theme: AppTheme.light,
+                home: const CaseEditorScreen(),
               ),
             ),
           ),
@@ -531,17 +783,78 @@ void main() {
         await tester.runAsync(init);
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 7));
+        expect(find.text('Volver a consultar fotos'), findsNothing);
+        expect(find.text('Mis casos'), findsNothing);
         await shot('form');
+        if (capture) {
+          await Scrollable.ensureVisible(
+            tester.element(find.byType(PhotoGalleryStrip)),
+            alignment: .5,
+          );
+          await tester.pumpAndSettle();
+          await shot('gallery');
+        }
         final model = container.read(caseEditorViewModelProvider.notifier);
         model.preview();
         await tester.pumpAndSettle();
-        expect(find.text('Vista previa pública'), findsOneWidget);
+        expect(find.text('Vista previa pública'), findsNothing);
         expect(find.text('Referencia privada'), findsNothing);
+        expect(find.byType(ZoneMapPicker), findsNothing);
+        final sheetForpreviewMap = tester.widget<DraggableScrollableSheet>(
+          find.byType(DraggableScrollableSheet),
+        );
+        sheetForpreviewMap.controller!.animateTo(
+          sheetForpreviewMap.maxChildSize,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.linear,
+        );
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byType(ZoneMapPicker, skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        final previewMap = tester.widget<ZoneMapPicker>(
+          find.byType(ZoneMapPicker),
+        );
+        final composition = tester.widget<CasePublicationPreview>(
+          find.byType(CasePublicationPreview),
+        );
+        expect(previewMap.latitude, composition.latitude);
+        expect(previewMap.longitude, composition.longitude);
+        expect(previewMap.readOnly, isTrue);
+        expect(previewMap.showCenterMarker, isFalse);
+        expect(find.byType(CasePublicationPreview), findsOneWidget);
         await shot('preview');
+        // The server's photo rejection must live only in the top overlay.
+        const photoError = 'Vuelve a guardar las fotos en Editar mascota.';
+        cases.failure = CaseFailureKind.photosUnverified;
+        await tester.runAsync(model.publish);
+        await tester.pumpAndSettle();
+        expect(find.text(photoError), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(SingleChildScrollView).first,
+            matching: find.text(photoError),
+          ),
+          findsNothing,
+        );
+        await shot('photo-error-toast');
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
+        await tester.pumpAndSettle();
+        expect(find.text(photoError), findsNothing);
+        await tester.runAsync(model.publish);
+        await tester.pumpAndSettle();
+        expect(find.text(photoError), findsOneWidget);
+        await tester.pump(const Duration(seconds: 4));
+        expect(find.text(photoError), findsNothing);
+        cases.failure = null;
         cases.loseResponse = true;
         await tester.runAsync(model.publish);
         await tester.pumpAndSettle();
         await shot('error');
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
+        await tester.pumpAndSettle();
         await tester.drag(
           find.byType(SingleChildScrollView).first,
           const Offset(0, -2000),
@@ -575,11 +888,11 @@ void main() {
         await tester.pumpWidget(
           UncontrolledProviderScope(
             container: container,
-            child: MaterialApp(
-              theme: AppTheme.light,
-              home: RepaintBoundary(
-                key: boundary,
-                child: const CaseDetailScreen(id: 'case'),
+            child: RepaintBoundary(
+              key: boundary,
+              child: MaterialApp(
+                theme: AppTheme.light,
+                home: const CaseDetailScreen(id: 'case'),
               ),
             ),
           ),
@@ -587,7 +900,40 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Luna'), findsOneWidget);
         expect(tester.takeException(), isNull);
+        expect(find.byType(CasePublicationPreview), findsOneWidget);
+        expect(find.byType(PageView), findsOneWidget);
+        expect(find.byType(ZoneMapPicker), findsNothing);
+        final sheetForpublicMap = tester.widget<DraggableScrollableSheet>(
+          find.byType(DraggableScrollableSheet),
+        );
+        sheetForpublicMap.controller!.animateTo(
+          sheetForpublicMap.maxChildSize,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.linear,
+        );
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byType(ZoneMapPicker, skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        final publicMap = tester.widget<ZoneMapPicker>(
+          find.byType(ZoneMapPicker),
+        );
+        expect(publicMap.latitude, -12.045);
+        expect(publicMap.longitude, -77.045);
+        expect(publicMap.readOnly, isTrue);
+        expect(publicMap.showCenterMarker, isFalse);
+        expect(publicMap.onSelect, isNull);
+        expect(publicMap.radiusMeters, 1000);
+        expect(find.text('Ficha pública'), findsNothing);
+        expect(find.text('Vista previa pública'), findsNothing);
+        expect(find.text('Publicar caso'), findsNothing);
+        expect(find.text('Editar reporte'), findsNothing);
         await shot('public');
+        expect(find.text('Volver a consultar'), findsNothing);
+        expect(find.text('Reintentar'), findsNothing);
+        expect(tester.takeException(), isNull);
+        await shot('public-actions');
         await tester.pumpWidget(const SizedBox());
       },
     );

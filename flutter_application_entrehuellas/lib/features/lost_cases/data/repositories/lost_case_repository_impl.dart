@@ -22,9 +22,15 @@ class LostCaseRepositoryImpl implements LostCaseRepository {
       _run(() async => (await _source.publish(owner, draft)).toPublished());
   @override
   Future<List<PublishedLostCase>> listMine(String owner) => _run(
-    () async => (await _source.listMine(
-      owner,
-    )).map((dto) => dto.toPublished()).toList(),
+    () async => Future.wait(
+      (await _source.listMine(owner)).map(
+        (dto) async => dto.toPublished(
+          coverUri: dto.row['cover_path'] == null
+              ? null
+              : await _source.photoUri(dto.row['cover_path'] as String),
+        ),
+      ),
+    ),
   );
   @override
   Future<PublicLostCase?> readPublic(String id) async {
@@ -43,4 +49,8 @@ class LostCaseRepositoryImpl implements LostCaseRepository {
       return dto.toPublic(photos);
     });
   }
+
+  @override
+  Future<void> delete(String owner, String id) =>
+      _run(() => _source.delete(owner, id));
 }

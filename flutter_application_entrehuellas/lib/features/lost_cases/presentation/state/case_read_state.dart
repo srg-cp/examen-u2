@@ -4,10 +4,17 @@ class CaseListState {
   CaseListState({
     required this.ownerId,
     required List<PublishedLostCase> cases,
+    this.busyId,
+    this.notice,
+    this.noticeId = 0,
+    this.noticeIsError = false,
     this.refreshing = false,
     this.refreshFailed = false,
   }) : cases = List.unmodifiable(cases);
   final String ownerId;
+  final String? busyId, notice;
+  final int noticeId;
+  final bool noticeIsError;
   final List<PublishedLostCase> cases;
   final bool refreshing, refreshFailed;
 }

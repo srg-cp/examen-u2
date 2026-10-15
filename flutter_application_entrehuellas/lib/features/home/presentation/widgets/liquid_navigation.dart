@@ -11,7 +11,7 @@ class LiquidNavigation extends StatelessWidget {
   });
   final HomeSection selected;
   final ValueChanged<HomeSection> onSelect;
-  final VoidCallback onReport;
+  final ValueChanged<BuildContext> onReport;
   static const labels = ['Inicio', 'Explorar', 'Mis mascotas'];
   static const icons = [
     Icons.home_outlined,
@@ -114,17 +114,19 @@ class LiquidNavigation extends StatelessWidget {
         ),
       ),
       const SizedBox(width: 12),
-      IconButton(
-        tooltip: 'Reportar',
-        onPressed: onReport,
-        style: IconButton.styleFrom(
-          backgroundColor: const Color(0xFF111111),
-          foregroundColor: Colors.white,
-          minimumSize: const Size(64, 64),
-          padding: const EdgeInsets.all(20),
-          shape: const CircleBorder(),
+      Builder(
+        builder: (source) => IconButton(
+          tooltip: 'Reportar',
+          onPressed: () => onReport(source),
+          style: IconButton.styleFrom(
+            backgroundColor: const Color(0xFF111111),
+            foregroundColor: Colors.white,
+            minimumSize: const Size(64, 64),
+            padding: const EdgeInsets.all(20),
+            shape: const CircleBorder(),
+          ),
+          icon: const CustomPaint(size: Size(24, 24), painter: _NineDots()),
         ),
-        icon: const CustomPaint(size: Size(24, 24), painter: _NineDots()),
       ),
     ],
   );

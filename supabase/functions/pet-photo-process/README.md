@@ -50,3 +50,9 @@ automáticamente; antes de exposición de casos deben reemplazarse o convertirse
 explícitamente con lectura/decodificación segura. S3 deberá crear una proyección
 pública solo de derivados verificados. Ver
 [ADR-020](../../../docs/decisiones/020-procesamiento-y-principal-fotos.md).
+
+## Contexto de encontrado — HU-06 / patch014
+
+El mismo endpoint ahora acepta x-found-case-id en lugar de x-pet-id; ambos encabezados juntos se rechazan. Primero valida Auth y propiedad del reporte reservado por prepare_found_case, sin exigir mascotas. Las RPC prepare_found_case_photo/complete_found_case_photo son exclusivas de servicio y vinculan selección, UUID/hash y presencia de ambos derivados. Mismo procesador orienta/decodifica/elimina EXIF/GPS; guarda únicamente JPEG sanitizados en found-photo-renditions y found-photo-thumbnails. No declara publicación del caso: publish_found_case la confirma después de todas las fotos verificadas.
+
+Aplicar patch014 y actualizar index.ts del worker existente junto con los assets/processor vigentes. Build-PhotoBundle.ps1 prepara el paquete self-hosted actualizado, sin cambiar ruta del router ni añadir función. No se desplegó remotamente en esta tarea. Pruebas HTTP nuevas comprueban contexto sin pet, reportero ajeno, encabezados incompatibles, reintento/hash y falla de Storage; procesador real conserva pruebas de eliminación de EXIF/GPS. Demo runtime/Storage real pendiente; [ADR-022](../../../docs/decisiones/022-publicacion-casos-encontrados.md).

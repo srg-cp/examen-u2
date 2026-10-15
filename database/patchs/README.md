@@ -27,3 +27,10 @@ Generar mediante `database/scripts/Build-PetPhotoProcessingPatch.ps1`. Aplicar t
 ## Patch013: casos perdidos
 
 `013_patch_lost_cases.sql`, generado con `database/scripts/Build-LostCasesPatch.ps1`, se ejecuta completo después de012. Añade publicación autorizada/idempotente, historial/contador atómicos y proyección pública con derivados elegidos/verificados. Mantener buckets privados; sin DML cliente. Preparado y probado localmente; ejecución confirmada por el usuario el 10 de octubre de 2026, sin verificación remota por el agente. Ver CONFIGURACION y ADR-021.
+
+## Patch014: casos encontrados
+
+[014_patch_found_cases.sql](014_patch_found_cases.sql) se genera con Build-FoundCasesPatch.ps1 desde plan014/SQL052–055. Ejecutar completo después de013 y actualizar el handler existente pet-photo-process para x-found-case-id. No editar el artefacto ni volver a generar fuentes aplicadas con contenido diferente. Añade casos sin mascota/dueño conocido, fotos sanitizadas verificadas en buckets privados propios, publicación/evento idempotentes y limpieza autorizada de drafts. Preparado y probado localmente; activación remota pendiente. Ver CONFIGURACION/ADR-022.
+# Límite de bloqueos al publicar perdido — patch015
+
+Ejecutar completo [015_patch_lost_case_lock_timeout.sql](015_patch_lost_case_lock_timeout.sql), una vez aplicados los comandos de patch013. Regenerar con `./database/scripts/Build-LostCaseLockTimeoutPatch.ps1`. Plan015/fuente056 conserva historial previo y limita a5s cada espera de bloqueo dentro de la RPC; no cambia autorizaciones ni deduplicación. Su repetición y la de run_all están validadas localmente. No libera solicitudes antiguas ni acredita recuperación remota. La recuperación de la cola observada es un procedimiento operacional separado; no ejecutar scripts de cancelación como migraciones.

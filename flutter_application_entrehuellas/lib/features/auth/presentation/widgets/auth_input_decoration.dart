@@ -7,12 +7,10 @@ InputDecoration authInputDecoration(
   Widget? suffix,
   bool invalid = false,
   double verticalPadding = 22,
-  String? errorText,
 }) => appInputDecoration(
   hint,
   icon,
   suffix: suffix,
   invalid: invalid,
   verticalPadding: verticalPadding,
-  errorText: errorText,
 );

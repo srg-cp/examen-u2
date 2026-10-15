@@ -1,3 +1,4 @@
+import '../domain/use_cases/delete_lost_case.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../domain/repositories/lost_case_repository.dart';
@@ -18,4 +19,8 @@ final listMyLostCasesProvider = Provider(
 );
 final caseSessionProvider = StreamProvider.autoDispose(
   (ref) => ref.watch(watchAuthSessionProvider)(),
+);
+
+final deletePublishedLostCaseProvider = Provider(
+  (ref) => DeletePublishedLostCase(ref.watch(lostCaseRepositoryProvider)),
 );

@@ -1,5 +1,7 @@
 # Base de datos de Entre Huellas
 
+Publicación de perdido con espera de bloqueo: [patch015](patchs/015_patch_lost_case_lock_timeout.sql), generado por `Build-LostCaseLockTimeoutPatch.ps1`, añade un límite de5s solo a la RPC existente. Requiere patch013. No cambia permisos ni publica datos; no cancela solicitudes antiguas. Diagnóstico operacional de solo lectura en `tests/diagnose_lost_case_waits.sql`; cancelación de los PIDs observados separada del historial de migraciones. Validación local registrada en ESTADO; activación remota pendiente.
+
 Corrección vigente de avatar: usar [patchs/004_patch_profile_avatars.sql](patchs/004_patch_profile_avatars.sql) completo en SQL Editor. La migración 003 falló por ALTER TABLE sobre Storage administrado; plan 004/fuente 012 validan RLS existente sin alterar su propietario/configuración. Historial previo conservado. Regenerar con `./database/scripts/Build-AvatarPatch.ps1`; run_all también utiliza la corrección. Detalles en [patchs/README.md](patchs/README.md).
 
 Esta carpeta contiene las fuentes SQL de PostgreSQL/Supabase, organizadas por tipo de objeto. El esquema y los permisos se incorporan por funcionalidad. La base de datos se ejecuta en Supabase; este directorio guarda su código versionado.
@@ -197,3 +199,15 @@ Prueba nueva en run_all.test.mjs ejecuta upgrade desde011, repite patch/run_all 
 ## Publicación de casos perdidos — plan013
 
 HU-05 / RF-05 / issue#5: fuentes048–051 y plan013 generan supabase/migrations/20261010001300_lost_cases.sql y patchs/013_patch_lost_cases.sql mediante Build-LostCasesPatch.ps1/Build-RunAll.ps1. Requiere012; aplicar patch completo en desarrollo, sin editar migraciones previas. Publicación bloquea mascota, valida actor/version/fotos/fecha/punto, reconoce reintento idéntico, impide otro activo y actualiza evento/historial/contador/versión atómicamente. Tabla base privada, proyección pública por RPC y SELECT de bytes de derivados elegidos/verificados en casos activos, con guards de escritura anónima. Repetición preserva filas/eventos. Prueba PGlite en run_all.test.mjs; concurrencia con sesiones independientes y Storage real pendientes. ADR-021 y CONFIGURACION documentan límites y activación.
+
+## Publicación de casos encontrados — plan014
+
+HU-06 / RF-06 / issue#6: fuentes052–055/plan014 generan migración20261010001400_found_cases.sql y patch014 mediante Build-FoundCasesPatch.ps1/Build-RunAll.ps1. Requiere013 y handler pet-photo-process actualizado para contexto encontrado. No altera fuentes/migraciones aplicadas anteriores. Found cases conservan pet_id nulo y reportero autorizado; selección/fotos verificadas/publicación/evento, permisos, proyección segura y limpieza de drafts con confirmación de ausencia de bytes. Buckets propios privados, sin originales ni DML cliente. Repetición conserva publicaciones/eventos. Prueba PGlite en run_all.test.mjs cubre roles, hash, metadata y reintento; Storage/concurrencia independientes pendientes. ADR-022 y CONFIGURACION explican activación y límites.
+
+
+Listas/eliminación de casos: aplicar `supabase/migrations/20261010001600_case_collections.sql`, generada con plan016/fuentes057–060. Requiere esquema de casos perdidos/encontrados y patch015. Nuevas RPC de tarjetas del dueño/retirada, permisos y ocultación de eliminados; clientes actualizados dependen de este contrato. Verificación PGlite local, aplicación remota y Android pendientes. No sustituye diagnóstico del incidente previo de publicación.
+
+Plan017 agrega functions/061_found_case_lock_timeout.sql y genera supabase/migrations/20261011001700_found_case_lock_timeout.sql. Repetible sin cambiar cuerpos/permisos; run_all incorpora061 mediante su generador. Activación remota pendiente. CI backend ejecuta las pruebas SQL/Edge, sin despliegue.
+
+
+Recorridos redefinidos por usuario (11 octubre): fuentes062–065 y plan018 añaden búsquedas posiblemente perdidas y avisos vinculados. [Migración018](../supabase/migrations/20261011001800_recovery_report_links.sql) requiere001–017 y pipeline de fotos anterior. Nuevas RPC autorizadas; viejo publish_found_case deja de ser ejecutable por clientes. Datos antiguos conservan legacy_found y sus relaciones originales. Regenerar con Build-Migration.ps1 -Plan migration_plans/018_recovery_report_links.json y Build-RunAll.ps1. Validación y activación pendientes en ESTADO/CONFIGURACION/ADR-034.

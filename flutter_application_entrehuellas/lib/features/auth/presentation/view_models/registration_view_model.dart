@@ -88,6 +88,7 @@ class RegistrationViewModel extends Notifier<RegistrationViewState> {
       errorField: field,
       fieldHint: field == null ? null : hint,
       message: field == null ? hint : null,
+      messageIsError: field == null,
       errorId: ++_errors,
     );
     if (state.confirmationEmail != null &&

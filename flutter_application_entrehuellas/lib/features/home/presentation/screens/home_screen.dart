@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
@@ -18,7 +19,8 @@ class HomeScreen extends ConsumerWidget {
     final model = ref.read(homeViewModelProvider.notifier);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
+      body: ScrollSafeArea(
+        top: true,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
@@ -69,17 +71,20 @@ class HomeScreen extends ConsumerWidget {
                             count: state.section == HomeSection.home ? 3 : 2,
                             play: play,
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
+                              padding: EdgeInsets.fromLTRB(
                                 24,
                                 6,
                                 24,
-                                130,
+                                ScrollSafeArea.bottomPadding(context, 130),
                               ),
                               child: state.section == HomeSection.home
                                   ? HomeContent(
                                       onSelect: model.select,
-                                      onReport: () =>
-                                          showReportOptions(context),
+                                      onReport: (source) => openLostReport(
+                                        source,
+                                        color: const Color(0xFFF5F5F7),
+                                        radius: 22,
+                                      ),
                                     )
                                   : state.section == HomeSection.pets &&
                                         petsContent != null
@@ -134,11 +139,11 @@ class HomeScreen extends ConsumerWidget {
                 Positioned(
                   left: 16,
                   right: 16,
-                  bottom: 16,
+                  bottom: ScrollSafeArea.bottomPadding(context, 16),
                   child: LiquidNavigation(
                     selected: state.section,
                     onSelect: model.select,
-                    onReport: () => showReportOptions(context),
+                    onReport: (source) => openLostReport(source),
                   ),
                 ),
               ],

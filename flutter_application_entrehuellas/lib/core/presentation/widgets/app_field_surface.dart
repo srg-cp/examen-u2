@@ -9,7 +9,6 @@ class AppFieldSurface extends StatelessWidget {
     required this.child,
     this.icon,
     this.suffix,
-    this.errorText,
     this.invalid = false,
     this.footer,
     this.enabled = true,
@@ -21,7 +20,6 @@ class AppFieldSurface extends StatelessWidget {
   final Widget child;
   final IconData? icon;
   final Widget? suffix;
-  final String? errorText;
   final bool invalid;
   final Widget? footer;
   final bool enabled;
@@ -29,7 +27,7 @@ class AppFieldSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasError = invalid || errorText != null;
+    final hasError = invalid;
     final color = hasError ? AppColors.error : AppColors.secondary;
     return InputDecorator(
       isFocused: focused,
@@ -38,7 +36,6 @@ class AppFieldSurface extends StatelessWidget {
         null,
         suffix: suffix,
         invalid: hasError,
-        errorText: errorText,
         verticalPadding: 16,
       ).copyWith(enabled: enabled),
       child: Row(

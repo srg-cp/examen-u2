@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/content_refresh.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/skeleton_form_fields.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -13,25 +14,10 @@ class PetRefreshProgress extends StatelessWidget {
   final bool refreshing;
   final Widget child;
   @override
-  Widget build(BuildContext context) => Stack(
-    children: [
-      child,
-      if (refreshing)
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: TickerMode(
-            enabled: !MediaQuery.disableAnimationsOf(context),
-            child: const LinearProgressIndicator(
-              semanticsLabel: 'Actualizando información de mascotas',
-              minHeight: 2,
-              color: Color(0xFF111111),
-              backgroundColor: Color(0xFFE5E5EA),
-            ),
-          ),
-        ),
-    ],
+  Widget build(BuildContext context) => ContentRefresh(
+    refreshing: refreshing,
+    label: 'Actualizando información de mascotas',
+    child: child,
   );
 }
 

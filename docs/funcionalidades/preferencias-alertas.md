@@ -40,3 +40,19 @@ estuviera implementada.
 
 HU-12 deberá consultar preferencias vigentes al generar/reintentar avisos y
 persistir la notificación antes de intentar push. [ADR-019](../decisiones/019-preferencias-alertas-por-cuenta.md).
+
+
+## Reutilización visual — 10 de octubre de 2026
+
+Confirmaciones delegadas al diálogo completo confirmActionDialog de core, con acciones de geometría/alineación y adaptación compartidas, sin layouts propios. En reportes, terminar carga conserva la entrada del skeleton y no dispara cover/stagger nuevos; vista previa y confirmación conservan su transición. Validación local y límites en ESTADO; no cambia persistencia/permisos ni cierra la historia remota.
+
+
+## Área inferior del scroll — 10 de octubre de 2026
+
+El layout utiliza ScrollSafeArea compartido: contenido visible hasta el borde inferior, espacio del gesto dentro del padding final y acciones flotantes protegidas. No se recorta el viewport dejando una franja blanca fija. Teclado conserva acceso a campos/acciones. No cambia persistencia ni operaciones; [ADR-025](../decisiones/025-scroll-continuo-area-gesto.md) y ESTADO registran pruebas locales y comprobación nativa pendiente.
+
+## Corrección de consistencia — 11 de octubre de 2026
+
+Errores de consulta, validación, guardado y conflicto usan toast; sin mensajes intercalados en opciones. Se conservan selecciones y acciones de reintento/actualización.
+
+Carga mediante skeleton/shimmer y refresh conservado sin indicadores circulares/lineales. Véanse [ADR-027](../decisiones/027-feedback-global-toast-shimmer.md), [ADR-028](../decisiones/028-consistencia-fronteras-y-reutilizacion.md) y [ESTADO](../ESTADO.md) para evidencia local y pendientes. Esta corrección no cierra por sí sola la HU ni acredita pruebas remotas/Android autenticadas.

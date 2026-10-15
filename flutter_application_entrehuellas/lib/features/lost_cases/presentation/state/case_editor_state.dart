@@ -1,3 +1,5 @@
+import '../../../../core/presentation/state/event_date_time_draft.dart';
+import '../../../../core/domain/use_cases/approximate_case_location.dart';
 import '../../../pets/domain/entities/pet.dart';
 import '../../../pets/domain/entities/pet_photo.dart';
 import '../../domain/entities/lost_case.dart';
@@ -12,7 +14,8 @@ class CaseEditorState {
     this.pet,
     List<PetPhoto> photos = const [],
     Set<String> selectedPhotos = const {},
-    this.occurredAt,
+    DateTime? occurredAt,
+    EventDateTimeDraft? dateTimeDraft,
     this.latitude,
     this.longitude,
     this.placeReference = '',
@@ -25,7 +28,8 @@ class CaseEditorState {
     this.lockedDraft,
     this.stage = CaseEditorStage.form,
     this.published,
-  }) : pets = List.unmodifiable(pets),
+  }) : dateTimeDraft = dateTimeDraft ?? EventDateTimeDraft.from(occurredAt),
+       pets = List.unmodifiable(pets),
        photos = List.unmodifiable(photos),
        selectedPhotos = Set.unmodifiable(selectedPhotos),
        invalidFields = Set.unmodifiable(invalidFields);
@@ -34,7 +38,8 @@ class CaseEditorState {
   final Pet? pet;
   final List<PetPhoto> photos;
   final Set<String> selectedPhotos;
-  final DateTime? occurredAt;
+  final EventDateTimeDraft dateTimeDraft;
+  DateTime? get occurredAt => dateTimeDraft.value;
   final double? latitude, longitude;
   final int errorId;
   final CaseFailureKind? issue;
@@ -44,11 +49,29 @@ class CaseEditorState {
   final PublishedLostCase? published;
   // Ambiguous response: freeze the exact command until its retry is confirmed.
   final LostCaseDraft? lockedDraft;
+  PublicLostCase get preview {
+    final location = approximateCaseLocation(latitude!, longitude!);
+    return PublicLostCase(
+      id: draftId,
+      status: 'active',
+      occurredAt: occurredAt!,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      fields: pet!.fields,
+      photos: photos
+          .where((p) => selectedPhotos.contains(p.id))
+          .map((p) => CasePhoto(id: p.id, uri: p.uri))
+          .toList(),
+    );
+  }
+
   CaseEditorState copyWith({
+    bool clearPoint = false,
     Pet? pet,
     List<PetPhoto>? photos,
     Set<String>? selectedPhotos,
     DateTime? occurredAt,
+    EventDateTimeDraft? dateTimeDraft,
     double? latitude,
     double? longitude,
     String? placeReference,
@@ -69,9 +92,13 @@ class CaseEditorState {
     pet: pet ?? this.pet,
     photos: photos ?? this.photos,
     selectedPhotos: selectedPhotos ?? this.selectedPhotos,
-    occurredAt: occurredAt ?? this.occurredAt,
-    latitude: latitude ?? this.latitude,
-    longitude: longitude ?? this.longitude,
+    dateTimeDraft:
+        dateTimeDraft ??
+        (occurredAt == null
+            ? this.dateTimeDraft
+            : EventDateTimeDraft.from(occurredAt)),
+    latitude: clearPoint ? null : latitude ?? this.latitude,
+    longitude: clearPoint ? null : longitude ?? this.longitude,
     placeReference: placeReference ?? this.placeReference,
     issue: clearIssue ? null : issue ?? this.issue,
     errorId: issue != null ? errorId + 1 : errorId,

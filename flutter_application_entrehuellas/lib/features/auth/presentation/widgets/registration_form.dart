@@ -96,7 +96,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
               hint,
               icon,
               invalid: invalid,
-              errorText: invalid ? widget.state.fieldHint : null,
               suffix: password
                   ? IconButton(
                       tooltip: obscure
@@ -160,28 +159,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
           toggle: () => setState(() => _hideConfirmation = !_hideConfirmation),
           autofillHints: const [AutofillHints.newPassword],
         ),
-        const SizedBox(height: 12),
-        const StaggerRevealItem(
-          order: 7,
-          child: Text(
-            'Usa al menos 8 caracteres.',
-            style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
-          ),
-        ),
-        if (widget.state.message != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Semantics(
-              liveRegion: true,
-              child: Text(
-                widget.state.message!,
-                style: const TextStyle(color: Color(0xFFB53F48), fontSize: 16),
-              ),
-            ),
-          ),
         const SizedBox(height: 24),
         StaggerRevealItem(
-          order: 8,
+          order: 7,
           child: LoadingShimmer(
             isLoading: widget.state.isBusy,
             loadingLabel: 'Creando cuenta',

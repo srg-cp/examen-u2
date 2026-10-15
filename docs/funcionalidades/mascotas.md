@@ -53,3 +53,30 @@ eliminación fallida y aislamiento A/B. Evidencia y pendientes en [ESTADO](../ES
 ## Integración con HU-05
 
 La publicación local de un caso perdido actualiza historial permanente, contador activo y versión de mascota en la misma transacción. Con caso activo no puede archivarse; con historial no puede eliminarse definitivamente. Patch013/activación y demo real pendientes. El reporte vuelve a consultar ficha/fotos para usar la versión vigente; ver [Casos perdidos](casos-perdidos.md).
+
+
+## Reutilización visual — 10 de octubre de 2026
+
+Confirmaciones delegadas al diálogo completo confirmActionDialog de core, con acciones de geometría/alineación y adaptación compartidas, sin layouts propios. En reportes, terminar carga conserva la entrada del skeleton y no dispara cover/stagger nuevos; vista previa y confirmación conservan su transición. Validación local y límites en ESTADO; no cambia persistencia/permisos ni cierra la historia remota.
+
+
+## Área inferior del scroll — 10 de octubre de 2026
+
+El layout utiliza ScrollSafeArea compartido: contenido visible hasta el borde inferior, espacio del gesto dentro del padding final y acciones flotantes protegidas. No se recorta el viewport dejando una franja blanca fija. Teclado conserva acceso a campos/acciones. No cambia persistencia ni operaciones; [ADR-025](../decisiones/025-scroll-continuo-area-gesto.md) y ESTADO registran pruebas locales y comprobación nativa pendiente.
+
+## Corrección de consistencia — 11 de octubre de 2026
+
+Errores de carga y ciclo de vida usan toast con reintento. Las listas activas/archivadas y detalle observados se actualizan por notificación de dominio al confirmar un cambio de reporte perdido; fallos no notifican.
+
+Carga mediante skeleton/shimmer y refresh conservado sin indicadores circulares/lineales. Véanse [ADR-027](../decisiones/027-feedback-global-toast-shimmer.md), [ADR-028](../decisiones/028-consistencia-fronteras-y-reutilizacion.md) y [ESTADO](../ESTADO.md) para evidencia local y pendientes. Esta corrección no cierra por sí sola la HU ni acredita pruebas remotas/Android autenticadas.
+
+## Apertura y acciones de consulta — 11 de octubre
+
+La ficha usa la apertura/retorno compartidos desde la tarjeta real (ADR-029), con movimiento reducido y navegación directa sin origen cuando corresponde. Los casos no presentan una acción permanente de volver a consultar; Reintentar aparece únicamente ante un fallo real. Se preservan guardado/inspección de mascotas, borrado/estados de casos, sus permisos y la invalidación tras operaciones confirmadas. Evidencia y límites en ESTADO.
+
+
+## Casos con la referencia aprobada de Mascotas — 11 de octubre de 2026
+
+Por instrucción del usuario, la UI de Mascotas se conserva y se reutiliza en Casos. EntityScreenShell y entityEditorPage extraen su contenedor/apertura existentes: mismos márgenes, navegación glass y cover→stagger, fuente visual del botón y retorno. Registrar perdido/encontrado desde Reportar o+ usa esa misma transición; todos los campos, fotos, instrucciones y acciones participan del timeline existente, sin reiniciarlo por edición/teclado/selección. PhotoAddTile y SizeChoiceSelector comparten las implementaciones aprobadas; Encontrados conserva tamaño/sexo/custodia opcionales y los contratos del reporte. Listados usan cabecera/grupo de contenido con entrada compartida, sin count por registro. No se altera el panel de ficha inmersiva solicitado en ADR-030. Véase [ADR-031](../decisiones/031-casos-reutilizan-ui-mascotas.md).
+
+Validación local: suite completa309 pruebas aprobadas;8 regresiones nuevas repetidas tras reforzar el descarte en tamaños390×844/320×350 texto2 y movimiento reducido. Renders revisados en build/ui-preview/case-creation. Pendiente revisar Android autenticado con fotos/teselas reales; la aprobación visual no cierra historias ni confirma backend remoto.

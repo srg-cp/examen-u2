@@ -1,3 +1,5 @@
+import '../../../../core/presentation/widgets/app_input_decoration.dart';
+import '../../../../core/presentation/widgets/validation_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -32,32 +34,29 @@ class ZoneEditor extends ConsumerWidget {
             initialValue: draft.name,
             style: const TextStyle(fontSize: 16, color: Color(0xFF111111)),
             enabled: !state.busy,
-            decoration: _decoration(
-              'Nombre de la zona',
-              invalidName ? 'Escribe entre 1 y 60 caracteres.' : null,
-            ),
+            decoration: _decoration('Nombre de la zona', invalidName),
             onChanged: (name) => vm.edit(name: name),
           ),
         ),
         const SizedBox(height: 20),
-        ZoneMapPicker(
-          latitude: draft.latitude,
-          longitude: draft.longitude,
-          radiusMeters: draft.radiusMeters,
-          onSelect: state.busy
-              ? null
-              : (lat, lng) => vm.edit(latitude: lat, longitude: lng),
+        ValidationSurface(
+          invalid: state.issue == ZoneFailureKind.invalidPoint,
+          errorId: state.errorId,
+          child: ZoneMapPicker(
+            latitude: draft.latitude,
+            longitude: draft.longitude,
+            radiusMeters: draft.radiusMeters,
+            onSelect: state.busy
+                ? null
+                : (lat, lng) => vm.edit(latitude: lat, longitude: lng),
+          ),
         ),
         if (draft.latitude == null)
           const Text(
             'Aún no seleccionaste un punto.',
             style: TextStyle(color: Color(0xFF6E6E73)),
           ),
-        if (state.issue == ZoneFailureKind.invalidPoint)
-          const Text(
-            'Selecciona un punto válido en el mapa o indica sus coordenadas.',
-            style: TextStyle(color: Color(0xFFB53F48)),
-          ),
+
         const SizedBox(height: 12),
         Text(
           'Radio: ${(draft.radiusMeters / 1000).toStringAsFixed(1)} km',
@@ -110,25 +109,8 @@ class ZoneEditor extends ConsumerWidget {
   }
 }
 
-InputDecoration _decoration(String label, [String? error]) => InputDecoration(
-  labelText: label,
-  filled: true,
-  fillColor: const Color(0xFFF5F5F7),
-  errorText: error,
-  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(22),
-    borderSide: const BorderSide(color: Color(0xFFE5E5EA)),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(22),
-    borderSide: const BorderSide(color: Color(0xFFE5E5EA)),
-  ),
-  errorBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(22),
-    borderSide: const BorderSide(color: Color(0xFFB53F48), width: 3.5),
-  ),
-);
+InputDecoration _decoration(String label, [bool invalid = false]) =>
+    appInputDecoration(label, null, invalid: invalid);
 
 class _CoordinateFields extends StatefulWidget {
   const _CoordinateFields({

@@ -12,4 +12,7 @@ class UnavailableLostCaseRepository implements LostCaseRepository {
   @override
   Future<PublicLostCase?> readPublic(String id) async =>
       throw const CaseFailure(CaseFailureKind.unavailable);
+  @override
+  Future<void> delete(String owner, String id) async =>
+      throw const CaseFailure(CaseFailureKind.unavailable);
 }

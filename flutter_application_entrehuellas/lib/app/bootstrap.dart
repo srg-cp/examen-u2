@@ -1,3 +1,7 @@
+import '../features/found_cases/domain/repositories/found_case_repository.dart';
+import '../features/found_cases/data/data_sources/supabase_found_case_data_source.dart';
+import '../features/found_cases/data/repositories/found_case_repository_impl.dart';
+import '../features/found_cases/data/repositories/unavailable_found_case_repository.dart';
 import '../features/lost_cases/domain/repositories/lost_case_repository.dart';
 import '../features/lost_cases/data/data_sources/supabase_lost_case_data_source.dart';
 import '../features/lost_cases/data/repositories/lost_case_repository_impl.dart';
@@ -68,6 +72,7 @@ class AppBootstrap {
     required this.interestZoneRepository,
     required this.alertPreferenceRepository,
     required this.lostCaseRepository,
+    this.foundCaseRepository = const UnavailableFoundCaseRepository(),
   });
 
   final StartupState state;
@@ -83,6 +88,7 @@ class AppBootstrap {
   final InterestZoneRepository interestZoneRepository;
   final AlertPreferenceRepository alertPreferenceRepository;
   final LostCaseRepository lostCaseRepository;
+  final FoundCaseRepository foundCaseRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -107,6 +113,13 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          foundCaseRepository: FoundCaseRepositoryImpl(
+            SupabaseFoundCaseDataSource(supabase.client),
+            NativePhotoGallerySource(
+              ImagePicker(),
+              pendingMarker: 'found_photo_pending',
+            ),
+          ),
           lostCaseRepository: LostCaseRepositoryImpl(
             SupabaseLostCaseDataSource(supabase.client),
           ),

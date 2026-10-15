@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
@@ -49,68 +50,65 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       }
     });
     final vm = ref.read(onboardingViewModelProvider.notifier);
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: BrandWordmark(iconSize: 56, textSize: 24),
+    return ConfirmationToastHost(
+      confirmed: state.hasError,
+      message: 'No se pudo guardar. Inténtalo de nuevo.',
+      isError: true,
+      noticeId: state,
+      child: PopScope(
+        canPop: false,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: BrandWordmark(iconSize: 56, textSize: 24),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (notification) {
-                        if (notification.depth == 0 && _pages.hasClients) {
-                          final position = _pages.page!;
-                          final page = position.round();
-                          // Start near arrival instead of waiting for ScrollEnd.
-                          if ((position - page).abs() <= .15 &&
-                              _revealPage != page) {
-                            setState(() => _revealPage = page);
+                    Expanded(
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.depth == 0 && _pages.hasClients) {
+                            final position = _pages.page!;
+                            final page = position.round();
+                            // Start near arrival instead of waiting for ScrollEnd.
+                            if ((position - page).abs() <= .15 &&
+                                _revealPage != page) {
+                              setState(() => _revealPage = page);
+                            }
                           }
-                        }
-                        return false;
-                      },
-                      child: PageView.builder(
-                        controller: _pages,
-                        itemCount: 3,
-                        onPageChanged: vm.selectPage,
-                        physics: state.isBusy
-                            ? const NeverScrollableScrollPhysics()
-                            : null,
-                        itemBuilder: (context, page) => OnboardingPage(
-                          page: page,
-                          isActive: state.page == page && _revealPage == page,
-                          title: _titles[page],
-                          description: _descriptions[page],
+                          return false;
+                        },
+                        child: PageView.builder(
+                          controller: _pages,
+                          itemCount: 3,
+                          onPageChanged: vm.selectPage,
+                          physics: state.isBusy
+                              ? const NeverScrollableScrollPhysics()
+                              : null,
+                          itemBuilder: (context, page) => OnboardingPage(
+                            page: page,
+                            isActive: state.page == page && _revealPage == page,
+                            title: _titles[page],
+                            description: _descriptions[page],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  if (state.hasError)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        'No se pudo guardar. Inténtalo de nuevo.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFFAD3030)),
-                      ),
+                    OnboardingActions(
+                      page: state.page,
+                      isBusy: state.isBusy,
+                      onNext: vm.next,
                     ),
-                  OnboardingActions(
-                    page: state.page,
-                    isBusy: state.isBusy,
-                    onNext: vm.next,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

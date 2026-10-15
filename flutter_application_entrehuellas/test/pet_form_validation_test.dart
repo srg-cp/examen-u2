@@ -112,7 +112,7 @@ void main() {
             .read(petEditorViewModelProvider('new'))
             .requireValue
             .errorId;
-        await tester.tap(find.text('Completa los campos obligatorios.'));
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Registrar mascota').last);
         await tester.pumpAndSettle();
@@ -123,7 +123,7 @@ void main() {
               .errorId,
           greaterThan(previous),
         );
-        await tester.tap(find.text('Completa los campos obligatorios.'));
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
         await tester.pumpAndSettle();
         final traits = find.descendant(
           of: find.byWidgetPredicate(
@@ -183,9 +183,7 @@ void main() {
           ),
           findsNothing,
         );
-        await tester.tap(
-          find.text('No se pudo abrir la galería. Inténtalo de nuevo.'),
-        );
+        await tester.tap(find.byKey(const ValueKey('feedback-toast')));
         await tester.pumpAndSettle();
         photos.fail = false;
         await tester.tap(find.byIcon(Icons.add_photo_alternate_outlined));

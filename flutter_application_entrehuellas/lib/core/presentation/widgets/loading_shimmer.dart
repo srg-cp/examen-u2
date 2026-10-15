@@ -8,6 +8,7 @@ class LoadingShimmer extends StatefulWidget {
     required this.loadingLabel,
     required this.child,
     this.radius = 24,
+    this.isAction = true,
     this.highlight = const Color(0x44FFFFFF),
     super.key,
   });
@@ -15,6 +16,7 @@ class LoadingShimmer extends StatefulWidget {
   final String loadingLabel;
   final Widget child;
   final double radius;
+  final bool isAction;
   final Color highlight;
   @override
   State<LoadingShimmer> createState() => _LoadingShimmerState();
@@ -67,22 +69,21 @@ class _LoadingShimmerState extends State<LoadingShimmer>
   @override
   Widget build(BuildContext context) {
     if (!widget.isLoading) return widget.child;
+    final painted = ClipRRect(
+      borderRadius: BorderRadius.circular(widget.radius),
+      child: CustomPaint(
+        foregroundPainter: _ShimmerPainter(_controller, widget.highlight),
+        child: Opacity(opacity: widget.isAction ? .72 : 1, child: widget.child),
+      ),
+    );
     return Semantics(
-      button: true,
-      enabled: false,
+      button: widget.isAction,
+      enabled: widget.isAction ? false : null,
       liveRegion: true,
       label: widget.loadingLabel,
-      child: ExcludeSemantics(
-        child: IgnorePointer(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(widget.radius),
-            child: CustomPaint(
-              foregroundPainter: _ShimmerPainter(_controller, widget.highlight),
-              child: Opacity(opacity: .72, child: widget.child),
-            ),
-          ),
-        ),
-      ),
+      child: widget.isAction
+          ? ExcludeSemantics(child: IgnorePointer(child: painted))
+          : painted,
     );
   }
 }

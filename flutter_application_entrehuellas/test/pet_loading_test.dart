@@ -1,3 +1,4 @@
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
 import 'dart:async';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,15 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       expect(find.text('Luna'), findsOneWidget);
       expect(find.byType(PetSkeleton), findsNothing);
-      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is LoadingShimmer &&
+              w.isLoading &&
+              w.loadingLabel == 'Actualizando información de mascotas',
+        ),
+        findsOneWidget,
+      );
       auth.emit(const AuthSession(userId: 'two'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));

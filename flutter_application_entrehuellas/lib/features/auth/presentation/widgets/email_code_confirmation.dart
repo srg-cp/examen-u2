@@ -126,18 +126,6 @@ class EmailCodeConfirmation extends StatelessWidget {
           ),
         ),
       ),
-      if (message != null)
-        Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Semantics(
-            liveRegion: true,
-            child: Text(
-              message!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ),
     ],
   );
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +17,7 @@ void main() {
       var calls = 0;
       String? failure;
       bool missing = false;
+      Completer<http.Response>? pendingPublication;
       const headers = {'content-type': 'application/json'};
       final mock = MockClient((request) async {
         Object response;
@@ -39,7 +41,11 @@ void main() {
           if (failure != null) {
             return http.Response(
               jsonEncode({
-                'code': failure == 'case_already_active' ? '23505' : '40001',
+                'code': switch (failure) {
+                  'case_already_active' => '23505',
+                  'PRIVATE LOCK DETAILS' => '55P03',
+                  _ => '40001',
+                },
                 'message': failure,
               }),
               409,
@@ -47,13 +53,8 @@ void main() {
               request: request,
             );
           }
-          if (request.url.path == '/rest/v1/lost_cases') {
-            expect(request.method, 'GET');
-            expect(request.url.queryParameters['owner_id'], 'eq.owner');
-            expect(
-              request.url.queryParameters['select'],
-              'id,owner_id,pet_id,status,pet_name',
-            );
+          if (request.url.path == '/rest/v1/rpc/list_my_lost_case_cards') {
+            expect(request.method, 'POST');
             response = [
               {
                 'id': 'case',
@@ -61,8 +62,12 @@ void main() {
                 'owner_id': 'owner',
                 'status': 'active',
                 'pet_name': 'Luna',
+                'cover_path': 'opaque/photo.jpg',
               },
             ];
+          } else if (request.url.path == '/rest/v1/rpc/delete_lost_case') {
+            expect(jsonDecode(request.body), {'p_id': 'case'});
+            response = [];
           } else if (request.url.path == '/rest/v1/rpc/publish_lost_case') {
             expect(jsonDecode(request.body), {
               'p_id': 'case',
@@ -74,6 +79,7 @@ void main() {
               'p_place_reference': 'Privada',
               'p_photo_ids': ['photo'],
             });
+            if (pendingPublication != null) return pendingPublication.future;
             response = [
               {
                 'id': 'case',
@@ -82,7 +88,8 @@ void main() {
                 'status': 'active',
               },
             ];
-          } else if (request.url.path == '/rest/v1/rpc/read_public_lost_case') {
+          } else if (request.url.path ==
+              '/rest/v1/rpc/read_recovery_pet_case') {
             expect(jsonDecode(request.body), {'p_id': 'case'});
             response = missing
                 ? []
@@ -128,7 +135,12 @@ void main() {
         httpClient: mock,
       );
       addTearDown(client.dispose);
-      final repo = LostCaseRepositoryImpl(SupabaseLostCaseDataSource(client));
+      final repo = LostCaseRepositoryImpl(
+        SupabaseLostCaseDataSource(
+          client,
+          publicationTimeout: const Duration(milliseconds: 50),
+        ),
+      );
       final draft = LostCaseDraft(
         id: 'case',
         petId: 'pet',
@@ -160,7 +172,10 @@ void main() {
         fail('Publication failed with ${e.kind}');
       }
       PublicLostCase? pub;
-      expect((await ListMyLostCases(repo)('owner')).single.petName, 'Luna');
+      final cards = await ListMyLostCases(repo)('owner');
+      expect(cards.single.petName, 'Luna');
+      expect(cards.single.coverUri, isNotNull);
+      await repo.delete('owner', 'case');
       try {
         pub = await ReadPublicLostCase(repo)('case');
       } on CaseFailure catch (e) {
@@ -191,9 +206,35 @@ void main() {
           ),
         ),
       );
+      failure = 'PRIVATE LOCK DETAILS';
+      await expectLater(
+        PublishLostCase(repo)('owner', draft),
+        throwsA(
+          isA<CaseFailure>().having(
+            (e) => e.kind,
+            'kind',
+            CaseFailureKind.busy,
+          ),
+        ),
+      );
       failure = null;
       missing = true;
       expect(await ReadPublicLostCase(repo)('case'), null);
+      pendingPublication = Completer<http.Response>();
+      final lateResponse = pendingPublication;
+      await expectLater(
+        PublishLostCase(repo)('owner', draft),
+        throwsA(
+          isA<CaseFailure>().having(
+            (e) => e.kind,
+            'kind',
+            CaseFailureKind.timedOut,
+          ),
+        ),
+      );
+      pendingPublication = null;
+      expect((await PublishLostCase(repo)('owner', draft)).status, 'active');
+      lateResponse.complete(http.Response('[]', 200, headers: headers));
     },
   );
 }

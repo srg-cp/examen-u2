@@ -1,3 +1,4 @@
+import 'scroll_safe_area.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -33,7 +34,8 @@ class AppPageLayout extends StatelessWidget {
   Widget _content(Widget content) => contentBuilder?.call(content) ?? content;
 
   @override
-  Widget build(BuildContext context) => SafeArea(
+  Widget build(BuildContext context) => ScrollSafeArea(
+    top: true,
     child: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
@@ -45,9 +47,15 @@ class AppPageLayout extends StatelessWidget {
                   // Retain the login's normal-scale anchor, independent of form.
                   padding: EdgeInsets.fromLTRB(
                     24,
-                    math.max(28, (constraints.maxHeight - 660) / 2),
+                    math.max(
+                      28,
+                      (constraints.maxHeight -
+                              MediaQuery.paddingOf(context).bottom -
+                              660) /
+                          2,
+                    ),
                     24,
-                    28,
+                    ScrollSafeArea.bottomPadding(context, 28),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

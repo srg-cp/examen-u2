@@ -9,6 +9,7 @@ class RegistrationViewState {
     this.errorField,
     this.fieldHint,
     this.message,
+    this.messageIsError = false,
     this.errorId = 0,
     this.resendSeconds = 0,
   });
@@ -19,6 +20,7 @@ class RegistrationViewState {
   final RegistrationField? errorField;
   final String? fieldHint;
   final String? message;
+  final bool messageIsError;
   final int errorId;
   final int resendSeconds;
 
@@ -36,6 +38,7 @@ class RegistrationViewState {
     errorField: clearError ? null : errorField,
     fieldHint: clearError ? null : fieldHint,
     message: clearError ? message : message ?? this.message,
+    messageIsError: clearError ? false : messageIsError,
     errorId: errorId,
     resendSeconds: resendSeconds ?? this.resendSeconds,
   );

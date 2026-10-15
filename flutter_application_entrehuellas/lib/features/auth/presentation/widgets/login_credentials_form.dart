@@ -83,7 +83,6 @@ class _LoginCredentialsFormState extends State<LoginCredentialsForm> {
               'Correo electrónico',
               Icons.mail_outline_rounded,
               invalid: widget.feedback.emailInvalid,
-              errorText: widget.feedback.emailHint,
             ),
           ),
         ),
@@ -113,7 +112,6 @@ class _LoginCredentialsFormState extends State<LoginCredentialsForm> {
               'Contraseña',
               Icons.lock_outline_rounded,
               invalid: widget.feedback.passwordInvalid,
-              errorText: widget.feedback.passwordHint,
               suffix: IconButton(
                 tooltip: _obscure ? 'Mostrar contraseña' : 'Ocultar contraseña',
                 onPressed: widget.isBusy

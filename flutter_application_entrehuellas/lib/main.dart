@@ -1,3 +1,4 @@
+import 'features/found_cases/providers/found_case_providers.dart';
 import 'features/lost_cases/providers/lost_case_providers.dart';
 import 'features/onboarding/providers/onboarding_providers.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        foundCaseRepositoryProvider.overrideWithValue(
+          bootstrap.foundCaseRepository,
+        ),
         lostCaseRepositoryProvider.overrideWithValue(
           bootstrap.lostCaseRepository,
         ),

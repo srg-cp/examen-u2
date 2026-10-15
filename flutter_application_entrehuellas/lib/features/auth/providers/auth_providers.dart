@@ -24,3 +24,8 @@ final signInProvider = Provider<SignIn>(
 final signOutProvider = Provider<SignOut>(
   (ref) => SignOut(ref.watch(accessRepositoryProvider)),
 );
+
+final authSessionProvider = StreamProvider.autoDispose(
+  (ref) => ref.watch(watchAuthSessionProvider)(),
+  retry: (_, _) => null,
+);

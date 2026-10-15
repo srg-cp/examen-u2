@@ -19,21 +19,23 @@ class AppSelectField<T> extends StatefulWidget {
   const AppSelectField({
     required this.label,
     this.hint,
+    this.sheetTitle,
     this.icon,
     required this.options,
     required this.value,
     required this.onChanged,
-    this.errorText,
     this.invalid = false,
     super.key,
   }) : assert(options.length > 0);
   final String label;
   final String? hint;
+
+  /// Short heading for option panels when the field label is descriptive.
+  final String? sheetTitle;
   final IconData? icon;
   final List<AppSelectOption<T>> options;
   final T? value;
   final ValueChanged<T>? onChanged;
-  final String? errorText;
   final bool invalid;
   @override
   State<AppSelectField<T>> createState() => _AppSelectFieldState<T>();
@@ -77,7 +79,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
             accessibleNavigation: media.accessibleNavigation,
           ),
           child: _SelectPanel<T>(
-            label: widget.label,
+            label: widget.sheetTitle ?? widget.label,
             options: widget.options,
             value: widget.value,
           ),
@@ -97,7 +99,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
     final selected = widget.options
         .where((option) => option.value == widget.value)
         .firstOrNull;
-    final invalid = widget.invalid || widget.errorText != null;
+    final invalid = widget.invalid;
     final enabled = widget.onChanged != null;
     return Semantics(
       label: widget.label,
@@ -105,7 +107,7 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
       button: true,
       enabled: enabled,
       onTap: enabled ? _choose : null,
-      hint: widget.errorText,
+      hint: invalid ? 'Revisa este campo' : null,
       liveRegion: invalid,
       excludeSemantics: true,
       child: Material(
@@ -125,7 +127,6 @@ class _AppSelectFieldState<T> extends State<AppSelectField<T>> {
             icon: widget.icon,
             focused: _focused || _open,
             enabled: enabled,
-            errorText: widget.errorText,
             invalid: invalid,
             suffix: AnimatedRotation(
               turns: _open ? .5 : 0,

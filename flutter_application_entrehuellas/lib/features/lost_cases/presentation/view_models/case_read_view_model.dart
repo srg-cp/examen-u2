@@ -1,3 +1,6 @@
+import '../../../../core/presentation/state/retained_read.dart';
+import '../../../pets/providers/pet_providers.dart'
+    show notifyPetChangedProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/lost_case.dart';
 import '../../providers/lost_case_providers.dart';
@@ -26,7 +29,7 @@ class MyCasesViewModel extends AsyncNotifier<CaseListState> {
       ref.invalidateSelf();
       return;
     }
-    if (current.refreshing) return;
+    if (current.refreshing || current.busyId != null) return;
     final generation = _generation;
     state = AsyncData(
       CaseListState(
@@ -35,15 +38,16 @@ class MyCasesViewModel extends AsyncNotifier<CaseListState> {
         refreshing: true,
       ),
     );
-    try {
-      final cases = await ref.read(listMyLostCasesProvider)(current.ownerId);
-      if (ref.mounted && generation == _generation && !state.isLoading) {
+    await retainedRead(
+      request: () => ref.read(listMyLostCasesProvider)(current.ownerId),
+      isCurrent: () =>
+          ref.mounted && generation == _generation && !state.isLoading,
+      onSuccess: (cases) {
         state = AsyncData(
           CaseListState(ownerId: current.ownerId, cases: cases),
         );
-      }
-    } catch (_) {
-      if (ref.mounted && generation == _generation && !state.isLoading) {
+      },
+      onFailure: () {
         state = AsyncData(
           CaseListState(
             ownerId: current.ownerId,
@@ -51,7 +55,46 @@ class MyCasesViewModel extends AsyncNotifier<CaseListState> {
             refreshFailed: true,
           ),
         );
-      }
+      },
+    );
+  }
+
+  Future<void> delete(PublishedLostCase item) async {
+    final current = state.asData?.value;
+    if (current == null || current.refreshing || current.busyId != null) return;
+    final generation = _generation;
+    state = AsyncData(
+      CaseListState(
+        ownerId: current.ownerId,
+        cases: current.cases,
+        busyId: item.id,
+        noticeId: current.noticeId,
+      ),
+    );
+    try {
+      await ref.read(deletePublishedLostCaseProvider)(current.ownerId, item);
+      if (!ref.mounted || generation != _generation || state.isLoading) return;
+      state = AsyncData(
+        CaseListState(
+          ownerId: current.ownerId,
+          cases: current.cases.where((c) => c.id != item.id).toList(),
+          notice: 'Caso eliminado',
+          noticeId: current.noticeId + 1,
+        ),
+      );
+      ref.read(notifyPetChangedProvider)(current.ownerId, item.petId);
+      ref.invalidate(publicCaseViewModelProvider(item.id));
+    } catch (_) {
+      if (!ref.mounted || generation != _generation || state.isLoading) return;
+      state = AsyncData(
+        CaseListState(
+          ownerId: current.ownerId,
+          cases: current.cases,
+          notice: 'No se pudo eliminar el caso. Desliza para reintentar.',
+          noticeIsError: true,
+          noticeId: current.noticeId + 1,
+        ),
+      );
     }
   }
 }
@@ -91,15 +134,16 @@ class PublicCaseViewModel extends AsyncNotifier<PublicCaseState> {
         refreshing: true,
       ),
     );
-    try {
-      final value = await ref.read(readPublicLostCaseProvider)(id);
-      if (ref.mounted && generation == _generation && !state.isLoading) {
+    await retainedRead(
+      request: () => ref.read(readPublicLostCaseProvider)(id),
+      isCurrent: () =>
+          ref.mounted && generation == _generation && !state.isLoading,
+      onSuccess: (value) {
         state = AsyncData(
           PublicCaseState(ownerId: current.ownerId, value: value),
         );
-      }
-    } catch (_) {
-      if (ref.mounted && generation == _generation && !state.isLoading) {
+      },
+      onFailure: () {
         state = AsyncData(
           PublicCaseState(
             ownerId: current.ownerId,
@@ -107,7 +151,7 @@ class PublicCaseViewModel extends AsyncNotifier<PublicCaseState> {
             refreshFailed: true,
           ),
         );
-      }
-    }
+      },
+    );
   }
 }

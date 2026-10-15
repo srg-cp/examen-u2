@@ -36,3 +36,14 @@ Verificar actualización, galería cancelada/interrumpida, sesión A/B y reapert
 Validación acreditada y pendientes: [ESTADO](../ESTADO.md).
 Decisiones: [ADR-008](../decisiones/008-avatar-privado-cuenta.md) y
 [ADR-009](../decisiones/009-error-foto-toast-avatar.md).
+
+
+## Área inferior del scroll — 10 de octubre de 2026
+
+El layout utiliza ScrollSafeArea compartido: contenido visible hasta el borde inferior, espacio del gesto dentro del padding final y acciones flotantes protegidas. No se recorta el viewport dejando una franja blanca fija. Teclado conserva acceso a campos/acciones. No cambia persistencia ni operaciones; [ADR-025](../decisiones/025-scroll-continuo-area-gesto.md) y ESTADO registran pruebas locales y comprobación nativa pendiente.
+
+## Corrección de consistencia — 11 de octubre de 2026
+
+Consulta, edición, errores de campos y cierre de sesión usan toast. La preparación del avatar delega en el normalizador compartido, manteniendo el recorte512 y la recuperación nativa por cuenta.
+
+Carga mediante skeleton/shimmer y refresh conservado sin indicadores circulares/lineales. Véanse [ADR-027](../decisiones/027-feedback-global-toast-shimmer.md), [ADR-028](../decisiones/028-consistencia-fronteras-y-reutilizacion.md) y [ESTADO](../ESTADO.md) para evidencia local y pendientes. Esta corrección no cierra por sí sola la HU ni acredita pruebas remotas/Android autenticadas.

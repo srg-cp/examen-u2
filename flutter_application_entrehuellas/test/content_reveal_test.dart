@@ -3,8 +3,70 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_screen_shell.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_screen_shell.dart';
 
 void main() {
+  for (final delay in [50, 2000]) {
+    testWidgets('Report loading is not a new stage after ${delay}ms', (
+      tester,
+    ) async {
+      var loading = true;
+      Object stage = 'initial';
+      var taps = 0;
+      late StateSetter update;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: StatefulBuilder(
+            builder: (context, setState) {
+              update = setState;
+              return CaseScreenShell(
+                title: 'Mascota perdida',
+                loading: loading,
+                stage: stage,
+                child: StaggerRevealItem(
+                  order: 0,
+                  child: TextButton(
+                    onPressed: () => taps++,
+                    child: Text(loading ? 'Skeleton' : '$stage'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pump(Duration(milliseconds: delay));
+      update(() {
+        loading = false;
+        stage = 'editing';
+      });
+      await tester.pump();
+      expect(find.byType(CoverReveal), findsNothing);
+      expect(find.text('Skeleton'), findsNothing);
+      expect(
+        tester
+            .widget<Opacity>(
+              find
+                  .ancestor(
+                    of: find.text('editing'),
+                    matching: find.byType(Opacity),
+                  )
+                  .first,
+            )
+            .opacity,
+        1,
+      );
+      await tester.tap(find.text('editing'));
+      expect(taps, 1);
+      update(() => stage = 'preview');
+      await tester.pump();
+      expect(find.byType(CoverReveal), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('editing'), findsNothing);
+      expect(find.text('preview'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
   for (final delay in [50, 2000]) {
     for (final result in ['Datos', 'Vacío', 'Error']) {
       testWidgets(

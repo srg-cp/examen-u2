@@ -1346,3 +1346,7 @@ Avance posterior de HU-04 del 10 de octubre: en codex/pet-photos están preparad
 ### Avance local de HU-05 — 10 de octubre de 2026
 
 Issue#5 conserva snapshot remoto Backlog; no se actualizó GitHub en esta tarea. Implementación local de publicación autorizada, ubicación manual, preview/proyección pública y consultas en feature/lost-pet-cases. SQL048–051/plan013 y validación local preparados; aplicar/verificar en Android/Supabase y concurrencia real antes de cerrar. [Ficha funcional](funcionalidades/casos-perdidos.md).
+
+## Avance local de HU-06 — 10 de octubre de 2026
+
+HU-06 / RF-06 / issue#6 implementada localmente en feature/found-pet-cases, con [ficha de encontrados](funcionalidades/casos-encontrados.md). Pendientes activación SQL/handler y demo Android/Supabase; el snapshot de GitHub/Projects no se actualiza ni la historia se cierra por esta implementación. Siguiente funcionalidad de S3: HU-07 / RF-13, lista/mapa con filtros y cercanía en servidor.

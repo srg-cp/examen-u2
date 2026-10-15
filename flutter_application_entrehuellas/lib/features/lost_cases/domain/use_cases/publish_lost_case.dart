@@ -1,3 +1,4 @@
+import '../../../pets/domain/entities/pet.dart';
 import '../entities/lost_case.dart';
 import '../repositories/lost_case_repository.dart';
 
@@ -48,5 +49,11 @@ class PublishLostCase {
       throw const CaseFailure(CaseFailureKind.unavailable);
     }
     return result;
+  }
+}
+
+void validateLostCasePet(Pet? pet) {
+  if (pet != null && pet.activeCaseCount > 0) {
+    throw const CaseFailure(CaseFailureKind.activeCase);
   }
 }

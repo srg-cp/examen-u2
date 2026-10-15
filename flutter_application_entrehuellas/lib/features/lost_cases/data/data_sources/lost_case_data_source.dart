@@ -6,6 +6,7 @@ abstract interface class LostCaseDataSource {
   Future<LostCaseDto?> readPublic(String id);
   Future<List<LostCaseDto>> listMine(String owner);
   Future<Uri?> photoUri(String path);
+  Future<void> delete(String owner, String id);
 }
 
 class CaseSourceFailure implements Exception {

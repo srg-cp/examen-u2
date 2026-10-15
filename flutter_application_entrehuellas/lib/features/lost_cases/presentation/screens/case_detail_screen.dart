@@ -1,27 +1,37 @@
+import '../../domain/entities/lost_case.dart';
+import '../../../../core/presentation/widgets/content_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/presentation/widgets/skeleton_form_fields.dart';
-import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import '../../../../core/presentation/widgets/case_public_skeleton.dart';
 import '../view_models/case_read_view_model.dart';
 import '../widgets/case_screen_shell.dart';
 import '../widgets/case_public_content.dart';
 
 class CaseDetailScreen extends ConsumerWidget {
-  const CaseDetailScreen({required this.id, super.key});
+  const CaseDetailScreen({required this.id, this.recoveryActions, super.key});
   final String id;
+  final Widget Function(PublicLostCase, VoidCallback)? recoveryActions;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(publicCaseViewModelProvider(id));
     final model = ref.read(publicCaseViewModelProvider(id).notifier);
     return CaseScreenShell(
       title: 'Ficha pública',
+      immersive: state.isLoading || state.asData?.value.value != null,
       loading: state.isLoading,
+      notice: state.hasError
+          ? 'No pudimos consultar el caso.'
+          : state.asData?.value.refreshFailed == true
+          ? 'No pudimos actualizar. Se conserva la última consulta.'
+          : !state.isLoading && state.asData?.value.value == null
+          ? 'Este caso no está disponible públicamente.'
+          : null,
+      noticeId: state.error ?? state.asData?.value,
       child: state.isLoading
-          ? const SkeletonFormFields(fieldCount: 3)
+          ? const CasePublicSkeleton()
           : state.hasError
           ? Column(
               children: [
-                const Text('No pudimos consultar el caso.'),
                 TextButton(
                   onPressed: model.retry,
                   child: const Text('Reintentar'),
@@ -30,30 +40,25 @@ class CaseDetailScreen extends ConsumerWidget {
             )
           : state.requireValue.value == null
           ? const Text('Este caso no está disponible públicamente.')
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (state.requireValue.refreshing)
-                  const LinearProgressIndicator(minHeight: 2),
-                const StaggerRevealItem(
-                  order: 0,
-                  child: Text('Búsqueda activa'),
+          : ContentRefresh(
+              refreshing: state.requireValue.refreshing,
+              label: 'Actualizando caso',
+              child: CasePublicContent(
+                value: state.requireValue.value!,
+                actions: Column(
+                  children: [
+                    if (recoveryActions != null)
+                      recoveryActions!(state.requireValue.value!, model.retry),
+                    if (state.requireValue.refreshFailed)
+                      TextButton(
+                        onPressed: state.requireValue.refreshing
+                            ? null
+                            : model.retry,
+                        child: const Text('Reintentar'),
+                      ),
+                  ],
                 ),
-                if (state.requireValue.refreshFailed)
-                  const Text(
-                    'No pudimos actualizar. Se conserva la última consulta.',
-                    style: TextStyle(color: Color(0xFFB53F48)),
-                  ),
-                const SizedBox(height: 16),
-                StaggerRevealItem(
-                  order: 1,
-                  child: CasePublicContent(value: state.requireValue.value!),
-                ),
-                TextButton(
-                  onPressed: state.requireValue.refreshing ? null : model.retry,
-                  child: const Text('Volver a consultar'),
-                ),
-              ],
+              ),
             ),
     );
   }

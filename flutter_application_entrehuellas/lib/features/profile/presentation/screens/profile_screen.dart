@@ -1,3 +1,5 @@
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,113 +19,115 @@ class ProfileScreen extends ConsumerWidget {
     final routeAnimation =
         ModalRoute.of(context)?.animation ??
         const AlwaysStoppedAnimation<double>(1);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    24,
-                    MediaQuery.paddingOf(context).top + 72,
-                    24,
-                    32,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _ProfileEntrance(
-                        animation: routeAnimation,
-                        loading: ref.watch(profileViewModelProvider).isLoading,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            StaggerRevealItem(
-                              order: 0,
-                              child: ProfilePhotoEditor(),
-                            ),
-                            SizedBox(height: 28),
-                            StaggerRevealItem(order: 1, child: ProfileEditor()),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      TextButton.icon(
-                        onPressed: exit.isLoading
-                            ? null
-                            : () => context.push('/home/alert-preferences'),
-                        icon: const Icon(Icons.notifications_outlined),
-                        label: const Text('Preferencias de alertas'),
-                      ),
-                      TextButton.icon(
-                        onPressed: exit.isLoading
-                            ? null
-                            : () => context.push('/home/interest-zones'),
-                        icon: const Icon(Icons.location_on_outlined),
-                        label: const Text('Zonas de interés'),
-                      ),
-                      const SizedBox(height: 16),
-                      LoadingShimmer(
-                        isLoading: exit.isLoading,
-                        loadingLabel: 'Cerrando sesión',
-                        radius: 18,
-                        child: FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFF9ECEE),
-                            foregroundColor: const Color(0xFFB53F48),
-                            disabledBackgroundColor: const Color(0xFFF9ECEE),
-                            disabledForegroundColor: const Color(0xFFB53F48),
-                            minimumSize: const Size(0, 48),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            textStyle: const TextStyle(
-                              fontFamily: 'sans-serif',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+    return ConfirmationToastHost(
+      confirmed: exit.hasError,
+      message: 'No se pudo cerrar la sesión. Reintenta.',
+      isError: true,
+      noticeId: exit.error,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: ScrollSafeArea(
+          top: false,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      24,
+                      MediaQuery.paddingOf(context).top + 72,
+                      24,
+                      ScrollSafeArea.bottomPadding(context, 32),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _ProfileEntrance(
+                          animation: routeAnimation,
+                          loading: ref
+                              .watch(profileViewModelProvider)
+                              .isLoading,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              StaggerRevealItem(
+                                order: 0,
+                                child: ProfilePhotoEditor(),
+                              ),
+                              SizedBox(height: 28),
+                              StaggerRevealItem(
+                                order: 1,
+                                child: ProfileEditor(),
+                              ),
+                            ],
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        TextButton.icon(
                           onPressed: exit.isLoading
                               ? null
-                              : () => ref
-                                    .read(profileExitViewModelProvider.notifier)
-                                    .signOut(),
-                          child: const Text('Cerrar sesión'),
+                              : () => context.push('/home/alert-preferences'),
+                          icon: const Icon(Icons.notifications_outlined),
+                          label: const Text('Preferencias de alertas'),
                         ),
-                      ),
-                      if (exit.hasError)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 12),
-                          child: Text(
-                            'No se pudo cerrar la sesión. Reintenta.',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFFB53F48),
+                        TextButton.icon(
+                          onPressed: exit.isLoading
+                              ? null
+                              : () => context.push('/home/interest-zones'),
+                          icon: const Icon(Icons.location_on_outlined),
+                          label: const Text('Zonas de interés'),
+                        ),
+                        const SizedBox(height: 16),
+                        LoadingShimmer(
+                          isLoading: exit.isLoading,
+                          loadingLabel: 'Cerrando sesión',
+                          radius: 18,
+                          child: FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFFF9ECEE),
+                              foregroundColor: const Color(0xFFB53F48),
+                              disabledBackgroundColor: const Color(0xFFF9ECEE),
+                              disabledForegroundColor: const Color(0xFFB53F48),
+                              minimumSize: const Size(0, 48),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'sans-serif',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+                            onPressed: exit.isLoading
+                                ? null
+                                : () => ref
+                                      .read(
+                                        profileExitViewModelProvider.notifier,
+                                      )
+                                      .signOut(),
+                            child: const Text('Cerrar sesión'),
                           ),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: MediaQuery.paddingOf(context).top + 4,
-                  left: 24,
-                  child: GlassNavigationButton(
-                    tooltip: 'Cerrar perfil',
-                    onPressed: () => context.pop(),
-                    icon: Icons.close_rounded,
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 4,
+                    left: 24,
+                    child: GlassNavigationButton(
+                      tooltip: 'Cerrar perfil',
+                      onPressed: () => context.pop(),
+                      icon: Icons.close_rounded,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

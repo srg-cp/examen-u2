@@ -1,5 +1,7 @@
+import '../../../../core/presentation/state/event_date_time_draft.dart';
+import '../../../../core/domain/utils/new_entity_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../pets/domain/entities/pet.dart';
+import '../../domain/use_cases/publish_lost_case.dart';
 import '../../../pets/providers/pet_providers.dart';
 import '../../domain/entities/lost_case.dart';
 import '../../providers/lost_case_providers.dart';
@@ -13,6 +15,11 @@ final caseEditorViewModelProvider =
     );
 
 class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
+  CaseEditorViewModel({Duration? publicationTimeout})
+    : _publicationTimeout = publicationTimeout;
+  final Duration? _publicationTimeout;
+  Duration get publicationTimeout =>
+      _publicationTimeout ?? const Duration(seconds: 35);
   int _generation = 0;
   @override
   Future<CaseEditorState> build() async {
@@ -22,7 +29,7 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     final pets = await ref.read(listMyPetsProvider)(session.userId);
     return CaseEditorState(
       ownerId: session.userId,
-      draftId: newPetId(),
+      draftId: newEntityId(),
       pets: pets.where((p) => !p.isArchived).toList(),
     );
   }
@@ -81,6 +88,59 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     }
   }
 
+  /// Restores report fields without changing animal data or photos.
+  void restoreReportDetails({
+    required String ownerId,
+    required EventDateTimeDraft dateTime,
+    required double? latitude,
+    required double? longitude,
+    required String placeReference,
+  }) {
+    final current = state.asData?.value;
+    if (!_editable(current) || current!.ownerId != ownerId) return;
+    final hasDetails =
+        dateTime.date != null ||
+        dateTime.hour != null ||
+        latitude != null ||
+        longitude != null ||
+        placeReference.isNotEmpty;
+    state = AsyncData(
+      current.copyWith(
+        dateTimeDraft: dateTime,
+        latitude: latitude,
+        longitude: longitude,
+        clearPoint: latitude == null && longitude == null,
+        placeReference: placeReference,
+        dirty: current.dirty || hasDetails,
+        clearIssue: true,
+      ),
+    );
+  }
+
+  void chooseDate(DateTime date) {
+    final current = state.asData?.value;
+    if (!_editable(current)) return;
+    state = AsyncData(
+      current!.copyWith(
+        dateTimeDraft: current.dateTimeDraft.withDate(date),
+        dirty: true,
+        clearIssue: true,
+      ),
+    );
+  }
+
+  void chooseTime(int hour, int minute) {
+    final current = state.asData?.value;
+    if (!_editable(current)) return;
+    state = AsyncData(
+      current!.copyWith(
+        dateTimeDraft: current.dateTimeDraft.withTime(hour, minute),
+        dirty: true,
+        clearIssue: true,
+      ),
+    );
+  }
+
   void edit({
     DateTime? occurredAt,
     double? latitude,
@@ -99,30 +159,6 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
         clearIssue: true,
       ),
     );
-  }
-
-  void chooseCoordinates(String latitude, String longitude) {
-    final lat = double.tryParse(latitude.replaceAll(',', '.')),
-        lon = double.tryParse(longitude.replaceAll(',', '.'));
-    final current = state.asData?.value;
-    if (!_editable(current)) return;
-    if (lat == null ||
-        lon == null ||
-        !lat.isFinite ||
-        !lon.isFinite ||
-        lat < -85 ||
-        lat > 85 ||
-        lon < -180 ||
-        lon > 180) {
-      state = AsyncData(
-        current!.copyWith(
-          issue: CaseFailureKind.invalid,
-          invalidFields: {CaseField.point},
-        ),
-      );
-      return;
-    }
-    edit(latitude: lat, longitude: lon);
   }
 
   void togglePhoto(String id) {
@@ -152,9 +188,7 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     final current = state.asData?.value;
     if (!_editable(current)) return;
     try {
-      if ((current!.pet?.activeCaseCount ?? 0) > 0) {
-        throw const CaseFailure(CaseFailureKind.activeCase);
-      }
+      validateLostCasePet(current!.pet);
       final draft = _draft(current);
       ref.read(publishLostCaseProvider).validate(draft, DateTime.now());
       state = AsyncData(
@@ -193,10 +227,12 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
       state = AsyncData(
         current.copyWith(busy: true, lockedDraft: draft, clearIssue: true),
       );
-      final published = await ref.read(publishLostCaseProvider)(
-        current.ownerId,
-        draft,
-      );
+      final published = await ref
+          .read(publishLostCaseProvider)(current.ownerId, draft)
+          .timeout(
+            publicationTimeout,
+            onTimeout: () => throw const CaseFailure(CaseFailureKind.timedOut),
+          );
       if (!_current(generation, current.ownerId)) return;
       state = AsyncData(
         state.requireValue.copyWith(
@@ -207,7 +243,7 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
           clearIssue: true,
         ),
       );
-      ref.invalidate(listMyPetsProvider);
+      ref.read(notifyPetChangedProvider)(current.ownerId, draft.petId);
       ref.invalidate(myCasesViewModelProvider);
     } catch (e) {
       if (_current(generation, current.ownerId)) {
@@ -215,7 +251,9 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
           state.requireValue.copyWith(
             busy: false,
             clearLockedDraft:
-                e is CaseFailure && e.kind != CaseFailureKind.unavailable,
+                e is CaseFailure &&
+                e.kind != CaseFailureKind.unavailable &&
+                e.kind != CaseFailureKind.timedOut,
             issue: e is CaseFailure ? e.kind : CaseFailureKind.unavailable,
             invalidFields: e is CaseFailure ? e.fields : {},
           ),

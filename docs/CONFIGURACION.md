@@ -275,3 +275,38 @@ de leer del servidor antes de activar; no se ha desplegado remotamente.
 5. Interrumpir red al publicar: el formulario conserva UUID y solicitud; reintentar confirma una sola fila/evento. Con dos conexiones independientes y UUID distintos, publicar simultáneamente la misma mascota: solo un caso activo. Probar versión desactualizada, fecha futura, foto no procesada, archivo y eliminación con historial.
 
 No solicita GPS; selección manual disponible aunque permisos de ubicación estén denegados. URLs públicas de derivados se firman por300s y pueden sobrevivir ese plazo tras revocar nuevos accesos. La web QR, tokens revocables, exploración/cercanía PostGIS y cierre autorizado se activan en sus historias posteriores. Ver [ADR-021](decisiones/021-publicacion-casos-perdidos.md).
+
+## Activación de HU-06: publicar mascotas encontradas
+
+1. Mantener patch013 aplicado y procesamiento de fotos operativo. Ejecutar completo [patch014](../database/patchs/014_patch_found_cases.sql), generado con Build-FoundCasesPatch.ps1. Requiere013; no modificar SQL aplicado ni hacer públicos los buckets nuevos.
+2. Actualizar el handler del endpoint existente `pet-photo-process` en Supabase self-hosted: el código nuevo reconoce `x-found-case-id`, procesa con el mismo WASM y escribe exclusivamente derivados sanitizados en los buckets found-photo-renditions/found-photo-thumbnails. El paquete local se regenera con `./supabase/self-hosted/Build-PhotoBundle.ps1` según [procedimiento del servidor](../supabase/self-hosted/README.md). No hace falta otra Edge Function ni cambiar main/router. SQL solo no activa el nuevo contexto. No se ejecutó despliegue/reinicio remoto en esta tarea.
+3. Actualizar/reconstruir Android. Con una cuenta sin mascotas registradas, abrir Reportar → Mascota encontrada, indicar especie/rasgos/fotos/fecha/punto manual/referencia; dejar custodia sin indicar. Revisar la vista previa pública, publicar y reabrir desde Mis encontrados tras reiniciar. Repetir con custodia indicada y especie Otra; no debe crear mascota ni asignarle dueño.
+4. Probar GPS/cámara denegados (selección manual/galería disponibles), bytes manipulados, error de Storage y pérdida de respuesta. Reintentar conserva mismo UUID/comando y produce una publicación/evento. Solicitud incompatible produce conflicto. Con dos conexiones independientes, comprobar la misma clave simultánea.
+5. A/B/anónimo: pendientes privados, tabla fuente solo del reportero y columnas permitidas; proyección sin referencia/posición exacta/perfil, derivados activos elegidos legibles y ninguna escritura anónima/autenticada. Descargar los JPEG reales y verificar EXIF/GPS; las fixtures SQL solo representan metadata.
+6. Probar salida tras tentativa fallida y descarte de pendiente desde Mis encontrados. Confirmar eliminación de ambos buckets antes de marcar descartado y liberar su cuota; activo no se puede descartar, error mantiene datos y admite reintento. Draft remoto no recupera metadatos locales tras cerrar proceso; persistencia offline es HU-15.
+
+Ver [ficha de encontrados](funcionalidades/casos-encontrados.md) y [ADR-022](decisiones/022-publicacion-casos-encontrados.md). Patch014 y handler remoto aún pendientes de activar; no se cierra HU-06 por las suites locales.
+
+## Recuperación de publicación perdida bloqueada
+
+Si la app vence al publicar y `database/tests/diagnose_lost_case_waits.sql` confirma una cadena de PostgREST en Lock/tuple, detener los reintentos mientras se investiga el origen. El timeout Flutter no cancela la transacción del servidor. El script operacional de cancelación preparado para el incidente del10 de octubre limita la acción a los PIDs observados y consultas de publicación activas esperando bloqueos; no usar sus PIDs para otros incidentes ni como limpieza automática.
+
+Después de cancelar las consultas pendientes y comprobar el diagnóstico, ejecutar completo [patch015](../database/patchs/015_patch_lost_case_lock_timeout.sql), que requiere patch013. Solo configura lock_timeout5s en la RPC existente; no requiere Edge ni nueva subida de fotos. La app actualizada convierte55P03 en aviso superior de mascota ocupada. Consultar Mis casos antes de reintentar una sola vez con el comando conservado, y comprobar reapertura/singularidad del caso. El patch no libera transacciones antiguas ni resuelve por sí solo el origen de un bloqueo persistente. Aplicación y comprobación remota pendientes.
+
+
+Listas/eliminación de casos: aplicar `supabase/migrations/20261010001600_case_collections.sql`, generada con plan016/fuentes057–060. Requiere esquema de casos perdidos/encontrados y patch015. Nuevas RPC de tarjetas del dueño/retirada, permisos y ocultación de eliminados; clientes actualizados dependen de este contrato. Verificación PGlite local, aplicación remota y Android pendientes. No sustituye diagnóstico del incidente previo de publicación.
+
+## Límite de escritura de encontrados — incremento017
+
+Tras los incrementos anteriores, aplicar en desarrollo la migración20261011001700_found_case_lock_timeout.sql generada con el plan017. No editar SQL aplicado ni ejecutar únicamente en Dashboard. Las pruebas locales verifican permisos/repetición, no contención real concurrente ni salud del servidor. Esta tarea no aplica ni despliega migraciones.
+
+### PGRST202 al consultar Mis casos/Mis reportes
+
+Ejecutar database/tests/diagnose_case_collection_rpcs.sql en la misma base usada por la app. Resultado esperado: function_exists=true, authenticated_can_execute=true y anon_can_execute=false para ambas RPC. Si falta una función, revisar/aplicar completa migración016 tras sus requisitos;017 no la sustituye. Si las funciones y permisos están presentes, recargar la caché de esquema con NOTIFY pgrst, 'reload schema'; y reintentar. PGRST202 por sí solo no demuestra cuál de esas condiciones ocurre. No reiniciar contenedores ni reescribir migraciones aplicadas como primer paso.
+
+
+## Activación del nuevo flujo de búsquedas/avisos — migración018
+
+Aplicar en desarrollo el esquema001–017 antes de [018](../supabase/migrations/20261011001800_recovery_report_links.sql), generado desde [plan018](../database/migration_plans/018_recovery_report_links.json). Requiere pipeline de procesamiento de fotos anterior; no hay una nueva Edge Function en este incremento. Activar la app que consume prepare_recovery_report/publish_recovery_report/list_open_recovery_searches/read_recovery_* junto con018: el RPC antiguo de publicación independiente ya no está autorizado a clientes. No reaplicar patches antiguos aislados sobre la nueva versión.
+
+Validación local en ESTADO; no se aplicó esta migración a Supabase remoto. Comprobar dos cuentas: búsqueda propia/comunitaria, aviso con/sin foto a búsqueda abierta, foto/ubicación pública aproximada, rechazo al cerrar y cierre idempotente por autor. Reintentar no duplica avisos ni cambia el caso a recuperado. Registrar concurrencia multiconexión/Android autenticado como verificación separada. La configuración pública local y credenciales existentes se conservaron.

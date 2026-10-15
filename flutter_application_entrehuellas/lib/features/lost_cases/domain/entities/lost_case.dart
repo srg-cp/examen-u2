@@ -2,6 +2,8 @@ import '../../../pets/domain/entities/pet.dart';
 
 enum CaseFailureKind {
   unavailable,
+  timedOut,
+  busy,
   forbidden,
   invalid,
   conflict,
@@ -45,6 +47,7 @@ class CasePhoto {
 class PublicLostCase {
   PublicLostCase({
     required this.id,
+    this.canResolve = false,
     required this.status,
     required this.occurredAt,
     required this.latitude,
@@ -53,6 +56,7 @@ class PublicLostCase {
     required List<CasePhoto> photos,
   }) : photos = List.unmodifiable(photos);
   final String id, status;
+  final bool canResolve;
   final DateTime occurredAt;
   final double latitude, longitude;
   final PetFields fields;
@@ -65,7 +69,9 @@ class PublishedLostCase {
     required this.ownerId,
     required this.petId,
     required this.status,
+    this.coverUri,
     this.petName = '',
   });
+  final Uri? coverUri;
   final String id, ownerId, petId, status, petName;
 }

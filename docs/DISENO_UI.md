@@ -1,5 +1,7 @@
 # Diseño de la interfaz: implementación y revisión
 
+**Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
+
 La norma obligatoria es [REGLAS_UI_UX.md](REGLAS_UI_UX.md). Su referencia son las pantallas actuales de Login, Crear cuenta, Recuperar contraseña, Revisa tu correo, Nueva contraseña y Contraseña actualizada. Este documento es un índice de implementación; no mantiene otra paleta ni reglas diferentes. Sustituye las propuestas antiguas de superficies coloreadas y la UI retirada de Inicio.
 
 ## Componentes de referencia
@@ -239,3 +241,117 @@ Galería del editor conserva tiles, shake danger y toast superior. Añade Tomar 
 ## Casos perdidos — HU-05
 
 Entrada por Reportar, sin AppBar genérica. CaseScreenShell mantiene cabecera fuera de cover/stagger y GlassNavigationButton flotante; scroll vuelve arriba solo al cambiar etapa formulario/vista previa/confirmación. Selector de mascota, fotos públicas explícitas, calendario/reloj, mapa compartido y coordenadas alternativas, referencia privada y vista previa. Campos/persistencia con errores contextuales; acción Publicar caso conserva etiqueta con LoadingShimmer y bloquea duplicados. Confirmación es una etapa persistida con acción Ver ficha pública. Consultas usan skeleton inicial y contenido retenido con progreso fino durante actualización explícita, sin circular ni textos de carga. Renders en build/ui-preview/cases:390×844 y320×350 texto2; fixtures no acreditan cartografía/bytes reales ni rendimiento Android.
+
+## Casos encontrados — HU-06
+
+Reportar → Mascota encontrada abre Reportar hallazgo, con geometría y shell compartidos con casos perdidos; título32 permite texto ampliado sin partir palabras. Especie/rasgos obligatorios, opcionales explícitos sin datos inventados, fotos cuadradas160 de galería/cámara, fecha/hora y lugar manual con referencia privada. Contador interior de rasgos200, validación contextual/shake y Publicar caso con etiqueta estable/shimmer. Vista previa incluye fotos/custodia/datos públicos aproximados; punto/referencia privados excluidos. Mis encontrados diferencia draft de publicación; descarte de pendientes requiere confirmación y limpieza autorizada. Renders en build/ui-preview/found-cases con fuentes reales,390×844 y320×350 texto2; solo fixtures locales, sin acreditar mapa/Storage real. Cover/stagger por etapa, glass flotante, skeleton/progreso fino y movimiento reducido según reglas vigentes.
+
+Los accesos conservan el nombre Mis encontrados; el título de su pantalla usa Mis reportes para mantener palabras completas con texto ampliado. La limpieza tardía se presenta como pendiente y conserva reintento autorizado, sin mostrarse como publicación.
+
+
+## Feedback de reportes: corrección del 10 de octubre de 2026
+
+Por instrucción explícita del usuario, los mensajes de error, validación y resultado se muestran en el toast superior compartido, sin texto contextual dentro de la pantalla ni debajo de campos/acciones. Esta instrucción sustituye las restricciones anteriores que reservaban el toast a excepciones y exigían feedback contextual. Etiquetas, datos, estados e instrucciones de privacidad se mantienen. El incremento adapta los flujos de reportes perdidos/encontrados; conserva invalid/ShakeField, acciones de reintento y ciclo de vida del aviso. Las demás funcionalidades existentes se adaptarán al intervenir sus flujos; no se afirma una migración global completada. Véase [ADR-023](decisiones/023-feedback-reportes-toast-superior.md).
+
+
+## Reutilización de carga y confirmaciones — 10 de octubre de 2026
+
+Resolver skeleton a datos/vacío/error pertenece a la misma entrada: AuthStageTransition conserva el subárbol cuando vuelve a habilitarse después de carga; ContentReveal conserva su historial de skeleton. Vista previa/confirmación siguen siendo cambios discretos con cover seguido de stagger. No usar un nuevo reveal por terminar una consulta.
+
+Todas las confirmaciones de salir/descartar/archivar/eliminar delegan en confirmActionDialog de core: ruta, transición OriginDialogTransition, superficie centrada/ancho máximo420, padding24, cabecera/cierre, scroll y acciones. Se conserva la geometría aprobada de eliminación: pareja de botones con igual tamaño, alineados a la derecha, cancelar primero y confirmar después; se apilan según ancho/texto medido. Altura mínima48 y radio18, ampliables; el tamaño del contenido y las etiquetas pueden variar sin cambiar la regla de composición. Solo texto, semántica, origen de apertura y carácter destructivo se parametrizan. Los wrappers de funcionalidad no construyen botones ni layout.
+
+
+## Reporte perdido: mapa y fotos compartidas — 10 de octubre de 2026
+
+Por instrucción del usuario, HU-05 retira campos/lectura de coordenadas numéricas del formulario: selección manual en mapa sin GPS, preservando coordenadas privadas internamente. Fotos del formulario y vista previa reutilizan PhotoGalleryStrip/PhotoGalleryTile de core, extraídos de la galería de mascotas; misma geometría de detalle112–160, separación10, radio22 y scroll horizontal. Selección de fotos públicas pertenece al ViewModel del reporte, sin cambiar principal ni contenido privado de la mascota. No copiar galerías con disposición vertical al incorporar este recorrido.
+
+
+## Vista previa de publicación inmersiva — 10 de octubre de 2026
+
+Por referencia e instrucción explícita del usuario, perdidos/encontrados comparten CasePublicationPreview: fotografías protagonistas deslizables a ancho completo, indicador de foto, nombre/especie destacado y panel inferior GlassSurface con datos y acciones reales. CaseScreenShell conserva retorno glass, cabecera fuera de la transición, scroll y cover→stagger por etapa; se eliminan márgenes/cabecera de formulario solo en vista previa. La galería del formulario sigue usando PhotoGalleryStrip/PhotoGalleryTile; la vista previa sustituye sus tiles por el pager protagonista. primaryActionButtonStyle, LoadingShimmer y toast mantienen implementación única.
+
+ExpandableDescription comparte contracción a dos líneas y expansión/contracción al tocar el texto, con AnimatedSize320ms/easeInOutCubic. Movimiento reducido presenta contenido inmediatamente. No reproduce el reveal ni cambia foto, borrador o envío al expandir. Se permite scroll y crecimiento con texto ampliado. Datos privados/funcionalidades de venta de la referencia no se añaden. Decisión y revisión en [ADR-024](decisiones/024-vista-previa-publicacion-inmersiva.md).
+
+
+## Scroll continuo hasta el área del gesto — 10 de octubre de 2026
+
+Por captura e instrucción del usuario, las páginas con scroll usan ScrollSafeArea de core: el viewport llega al borde inferior y no reserva una banda blanca fija con SafeArea(bottom:true). El espacio del gesto se suma al padding final del contenido y a los controles flotantes mediante bottomPadding; con teclado abierto se usa el inset efectivo, sin sumar una segunda franja. Mantener protegidos el último campo/botón y los márgenes laterales/superiores. La barra de navegación del sistema se solicita transparente, sin divisor ni contraste opaco; iconos oscuros sobre formularios y claros sobre vista previa fotográfica. Modales/onboarding mantienen sus áreas seguras específicas. Véase [ADR-025](decisiones/025-scroll-continuo-area-gesto.md).
+
+
+Ficha pública y vista previa de perdidos/encontrados deben usar la misma composición CasePublicationPreview, con fotos grandes deslizables, panel glass y descripción expandible. Solo cambian título, texto preventivo y acciones según el estado del recorrido; no conservar una ficha con layout anterior. En el formulario de perdida se retiran Volver a consultar fotos y Mis casos; la recuperación de envíos ambiguos sigue disponible. Véase ADR-024 actualizado.
+
+
+Actualización del 10 de octubre de 2026: por instrucción del usuario se retira el título glass flotante de la ficha/vista previa inmersiva; se conserva únicamente GlassNavigationButton para volver. Fecha del suceso a20px/negrita, con ajuste por texto ampliado. La ubicación se representa mediante ZoneMapPicker compartido en modo lectura, con la zona aproximada pública, círculo y sin marcador de punto exacto; formulario conserva edición del punto privado. Preview usa la proyección aproximada existente y ficha solo las coordenadas públicas del contrato. Errores del mapa usan toast superior compartido y conservan Reintentar mapa, sin mensajes bajo el mapa ni solicitud de coordenadas numéricas. La consulta no modifica ubicación ni captura el scroll vertical. Sustituye las indicaciones previas de título inmersivo y ubicación explicada solo por texto.
+
+
+## Listas de casos consistentes con mascotas — 10 de octubre de 2026
+
+Por instrucción del usuario, Mis casos/Mis reportes usan la implementación extraída de Mis mascotas a core: EntityCardContent/EntityCardSurface, SwipeActionCard, TwoOptionFilter, CollectionHeader/CollectionAddButton. Mascotas delega en los mismos componentes y conserva su referencia aprobada. Abiertos/Resueltos, foto real disponible y botón+ de56 reemplazan ListTile y el botón grande inferior. Swipe devuelve posición y abre confirmActionDialog común; shimmer/errores/confirmación siguen el patrón existente. Borradores encontrados conservan descarte con superficie compartida. Presentación consume ViewModels/casos de uso; dominio no adquiere dependencias de Flutter/SDK. Incremento de gestión por dueño solicitado sobre HU-05/RF-05 y HU-06/RF-06: eliminación de casos active/resolved y consulta privada de resueltos, con IDs/historial conservados y permisos versionados en016. No implica cierre de historias. Véase [ADR-026](decisiones/026-listas-casos-componentes-compartidos.md).
+
+## Componentes consolidados — 11 de octubre
+
+ContentRefresh delega en LoadingShimmer con semántica de contenido. FailureFeedback ofrece toast y acción real de reintento. ValidationSurface reúne semántica, ShakeField y borde danger para fotos/mapa. Galería encontrada reutiliza PhotoGalleryStrip/PhotoGalleryTile. Los campos compartidos no aceptan textos de error/ayuda debajo del input. Los avisos largos se recorren en el toast acotado; las acciones de pantalla permanecen alcanzables. ADR-027/028 conservan las decisiones y ESTADO la evidencia.
+
+## Skeleton de ficha/vista previa de casos — 11 de octubre
+
+CasePublicSkeleton sustituye SkeletonFormFields en la carga inicial de las fichas perdidas/encontradas. Conserva la composición inmersiva: espacio de foto, nombre, panel GlassSurface con formas de datos y mapa; usa LoadingShimmer sin textos visibles, datos ficticios ni petición de tiles. La navegación glass permanece fuera del efecto. CasePreviewGeometry comparte espacio superior/márgenes/radio con CasePublicationPreview; la altura del mapa reutiliza ZoneMapPicker.viewportHeight. CasePhotoView comparte foto local/remota, shimmer hasta primer fotograma y CasePhotoFailure para error con toast. El refresh de la misma cuenta conserva contenido mediante ContentRefresh; el skeleton no sustituye esos datos.
+
+Pruebas en case_loading_test.dart cubren ambos tipos/tamaños, fin de consulta y primer fotograma/fallo de foto. Capturas en build/ui-preview/case-loading. El skeleton representa una estructura de contenido, no la longitud desconocida de cada dato del servidor.
+
+## Apertura de mascotas y casos — 11 de octubre
+
+app/navigation/entity_detail_page.dart centraliza la configuración de la apertura y el retorno. ManagedCaseCollection entrega el rectángulo de tarjeta como Mis mascotas; sus pantallas pasan extra sin importar app. No hay acción permanente Volver a consultar en ninguna pantalla. Reintentar se conserva condicionado al fallo, con toast. Fichas/vista previa mantienen sus campos y composición aprobados, skeleton y navegación glass; la apertura comparte ahora el comportamiento de mascotas. ADR-029 y pruebas case_navigation_test.dart/pets_navigation_test.dart conservan las comprobaciones.
+
+
+## Panel de ficha expandible — 11 de octubre de 2026
+
+Por solicitud del usuario, ficha pública y vista previa comparten un panel inferior arrastrable con apertura por toque en el indicador; foto/pager permanecen detrás. Desaparición (Encuentro en encontrados) aparece en badge fuera del glass, junto al nombre cuando hay espacio y debajo con texto ampliado. Nombre con sombra leve, máximo dos líneas y elipsis; la etiqueta accesible conserva el nombre completo. El mapa no se monta hasta abrir el panel; fecha, ubicación aproximada y privacidad se muestran en los datos ampliados. El contenido se desplaza dentro del panel y las acciones existentes conservan sus operaciones reales. Movimiento reducido desactiva animación y snap; no se reproduce reveal durante gestos. Véase [ADR-030](decisiones/030-panel-ficha-expandible.md).
+
+
+### Corrección del anclaje inferior — 11 de octubre de 2026
+
+Por corrección del usuario, el resumen inicial baja (36% del viewport para ficha sin acciones,46% para vista previa con acciones; texto ampliado conserva espacio desplazable). El panel glass ocupa como mínimo el espacio restante hasta el margen seguro inferior aunque haya pocos datos, evitando una tarjeta suspendida con vacío debajo. Nombre con sombra más sutil: opacidad20%, blur3 y desplazamiento vertical1. Apertura/mapa/acciones conservados.
+
+
+## Casos con la referencia aprobada de Mascotas — 11 de octubre de 2026
+
+Por instrucción del usuario, la UI de Mascotas se conserva y se reutiliza en Casos. EntityScreenShell y entityEditorPage extraen su contenedor/apertura existentes: mismos márgenes, navegación glass y cover→stagger, fuente visual del botón y retorno. Registrar perdido/encontrado desde Reportar o+ usa esa misma transición; todos los campos, fotos, instrucciones y acciones participan del timeline existente, sin reiniciarlo por edición/teclado/selección. PhotoAddTile y SizeChoiceSelector comparten las implementaciones aprobadas; Encontrados conserva tamaño/sexo/custodia opcionales y los contratos del reporte. Listados usan cabecera/grupo de contenido con entrada compartida, sin count por registro. No se altera el panel de ficha inmersiva solicitado en ADR-030. Véase [ADR-031](decisiones/031-casos-reutilizan-ui-mascotas.md).
+
+Validación local: suite completa309 pruebas aprobadas;8 regresiones nuevas repetidas tras reforzar el descarte en tamaños390×844/320×350 texto2 y movimiento reducido. Renders revisados en build/ui-preview/case-creation. Pendiente revisar Android autenticado con fotos/teselas reales; la aprobación visual no cierra historias ni confirma backend remoto.
+
+
+## Fecha y hora independientes — 11 de octubre de 2026
+
+Por solicitud del usuario, los reportes muestran Fecha y Hora en dos inputs con AppFieldSurface, lado a lado en tamaño normal y apilados con texto ampliado. EventDateTimeFields se comparte entre perdidos/encontrados, con calendario y reloj separados. EventDateTimeDraft conserva selecciones parciales en el estado del ViewModel: elegir una no inventa la otra; el timestamp existe solo con ambas y cambiar una conserva la otra. Las operaciones bloqueadas por envío/respuesta ambigua siguen sin admitir cambios. Valores existentes preservan UTC/segundos hasta una edición explícita. Validación, shake/toast y entrada por stagger conservados. [ADR-032](decisiones/032-fecha-hora-independientes-casos.md).
+
+Edición revisada: casos publicados todavía no tienen contrato/caso de uso/RPC de actualización ni ruta de edición. Editar reporte modifica solo el borrador antes de publicar. Recomendación propuesta: permitir al autor corregir información de casos abiertos, con versionado/historial y misma ficha; alcance todavía no aprobado ni implementado.
+
+
+## Consistencia de formularios perdido/hallazgo — 11 de octubre de 2026
+
+Corrección explícita del usuario tras detectar controles extra en hallazgo. Se retiran Latitud/Longitud, Usar coordenadas, lectura numérica del punto, Recuperar foto interrumpida y el acceso permanente Mis encontrados dentro del formulario. CaseLocationFields de core compone ambos formularios con la misma selección en mapa, instrucciones de privacidad, referencia privada, invalid/shake y stagger; solo cambia el título del suceso y los callbacks del ViewModel. Coordenadas continúan internas, sin nueva captura numérica ni GPS. Fecha/hora siguen compartidas por ADR-032. Fotos usan la misma etiqueta pública y galerías/controles compartidos.
+
+Se conservan las diferencias propias del producto: perdido elige mascota/fotos registradas; hallazgo describe y fotografía una mascota sin dueño conocido y permite custodia opcional. Consultar la lista permanece solo ante envío ambiguo, igual en ambos recorridos. La API de recuperación de fotos permanece para el ciclo de vida existente, sin botón técnico permanente ni afirmación de recuperación automática nueva. [ADR-033](decisiones/033-formularios-reportes-consistentes.md).
+
+Validación:50 pruebas de reportes, entrada real, preview, arquitectura y consistencia aprobadas; análisis sin incidencias. Las8 pruebas de creación verifican controles retirados ausentes, uso del bloque común, punto del mapa entregado al estado y ausencia de coordenadas visibles, tamaños390×844/320×350 texto2 y movimiento reducido. Capturas regeneradas y revisadas; no acreditan fotos/teselas reales. Revisión Android pendiente.
+
+
+## Nuevo significado de búsqueda y aviso — 11 de octubre de2026
+
+Por instrucción del usuario, Mascota perdida admite Mi mascota u Otra mascota posiblemente perdida. Mascota encontrada avisa en una búsqueda abierta con La vi o La encontré y está conmigo, sin cerrarla. Desde ficha se vincula automáticamente el aviso; solo el autor confirma Ya fue recuperada. Se conservan UI de Mascotas, coordenadas privadas/zonas públicas y órdenes estables. Aviso admite foto opcional; búsqueda comunitaria exige fotos. Registros anteriores siguen como Reporte anterior, sin reclasificación automática. [ADR-034](decisiones/034-busquedas-y-avisos-vinculados.md) y [ficha](funcionalidades/busquedas-y-avisos.md).
+
+Cambio de alcance autorizado: HU-05/RF-05 y HU-06/RF-06; se adelantan partes app de HU-10/RF-11 y confirmación de HU-13/RF-07. No se cierran historias ni se entrega web/QR, moderación completa, push o exploración/paginación de HU-07. Fuentes062–065/plan018, migración generada y probada localmente; activación remota/Android y concurrencia multiconexión pendientes.
+
+
+Mi mascota/Otra mascota es selección local del formulario de búsqueda: título/GlassNavigationButton/TwoOptionFilter persistentes, cuerpo con cambio inmediato, sin transición entre opciones. No reinicia skeleton/cover/stagger al alternar. Mantiene cada borrador hasta salir; confirma descarte al salir. Ver [ADR-035](decisiones/035-alternar-origen-sin-recargar-formulario.md).
+
+
+Reportar compacto: dos filas de opción con icono/nombre/descripción14 regular/chevrón, superficieF5F5F7, título28/700 negro, separación12 y padding24. Sin párrafo largo, Cerrar o enlaces de consulta. Inicio centraliza gestión en Mis reportes con componentes de Mascotas; + reaprovecha el panel. Texto ampliado permite scroll y seleccionar por etiqueta. [ADR-036](decisiones/036-reportar-y-mis-reportes.md).
+
+
+Reportar directo y aviso contextual: Inicio/navegación/+ abren formulario de pérdida sin panel. Ficha abierta ofrece La vi o la encontré; aviso presenta referencia estática y tipo de observación, sin selector de destinos. Toast y retorno ante destino cerrado, conservando borrador hasta salir. Origen real del control y apertura compartida conservados. [ADR-037](decisiones/037-avisos-desde-ficha.md).
+
+
+## Mascota perdida: formulario único — 12 de octubre de 2026
+
+Mascota a reportar usa AppSelectField con fichas existentes y No está en mis mascotas; panel corto Mascota. Sustituye pestañas Mi mascota/Otra mascota. Resumen de datos disponibles/fotos de ficha o descripción/fotos sin registro propio; CaseReportFields comparte fecha/hora/mapa/referencia/revisión con avisos y editores. Un solo bloque visible, conservado al seleccionar sin recarga/reveal; datos/fotos de origen separados. Shell, glass, controles, feedback y vista previa mantienen referencia. [ADR-038](decisiones/038-formulario-unico-mascota-perdida.md). Renders normal/pequeño en build/ui-preview/unified-report; no acreditan Android/teselas/fotos reales.
