@@ -156,6 +156,7 @@ class _PullToRefreshState extends State<PullToRefresh>
             : null,
         child: Stack(
           fit: StackFit.passthrough,
+          clipBehavior: Clip.none,
           children: [
             ScrollConfiguration(
               behavior: ScrollConfiguration.of(

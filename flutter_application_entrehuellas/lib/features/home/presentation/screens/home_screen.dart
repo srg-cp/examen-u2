@@ -31,11 +31,11 @@ class HomeScreen extends ConsumerWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: PullToRefresh(
-                    key: ValueKey(state.section),
+            child: PullToRefresh(
+              key: ValueKey(state.section),
+              child: Stack(
+                children: [
+                  Positioned.fill(
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
@@ -154,18 +154,18 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: ScrollSafeArea.bottomPadding(context, 16),
-                  child: LiquidNavigation(
-                    selected: state.section,
-                    onSelect: model.select,
-                    onReport: (source) => openLostReport(source),
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: ScrollSafeArea.bottomPadding(context, 16),
+                    child: LiquidNavigation(
+                      selected: state.section,
+                      onSelect: model.select,
+                      onReport: (source) => openLostReport(source),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
