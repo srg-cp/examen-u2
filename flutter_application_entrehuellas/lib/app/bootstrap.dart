@@ -1,4 +1,11 @@
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
+import '../features/case_posters/domain/repositories/case_poster_repository.dart';
+import '../features/case_posters/data/repositories/unavailable_case_poster_repository.dart';
+import '../features/case_posters/data/repositories/case_poster_repository_impl.dart';
+import '../features/case_posters/data/data_sources/supabase_poster_case_source.dart';
+import '../features/case_posters/data/data_sources/pdf_poster_document_source.dart';
+import '../features/case_posters/data/data_sources/native_poster_export_source.dart';
 import '../features/saved_cases/domain/repositories/saved_cases_repository.dart';
 import '../features/saved_cases/data/data_sources/supabase_saved_cases_data_source.dart';
 import '../features/saved_cases/data/repositories/saved_cases_repository_impl.dart';
@@ -75,6 +82,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.casePosterRepository = const UnavailableCasePosterRepository(),
     required this.state,
     required this.authRepository,
     required this.accessRepository,
@@ -97,6 +105,7 @@ class AppBootstrap {
   });
 
   final StartupState state;
+  final CasePosterRepository casePosterRepository;
   final AuthRepository authRepository;
   final AccessRepository accessRepository;
   final OnboardingRepository onboardingRepository;
@@ -138,6 +147,20 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          casePosterRepository: CasePosterRepositoryImpl(
+            SupabasePosterCaseSource(supabase.client),
+            PdfPosterDocumentSource(
+              regularFont: () =>
+                  rootBundle.load('assets/fonts/Roboto-Regular.ttf'),
+              boldFont: () => rootBundle.load('assets/fonts/Roboto-Bold.ttf'),
+            ),
+            const NativePosterExportSource(),
+            webBaseUrl: const String.fromEnvironment(
+              'PUBLIC_CASE_WEB_URL',
+              defaultValue: 'https://entrehuellas.kormind.com',
+            ),
+            publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
+          ),
           savedCasesRepository: SavedCasesRepositoryImpl(
             SupabaseSavedCasesDataSource(supabase.client),
           ),

@@ -3,6 +3,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/content_refresh.dart';
 
 void main() {
+  testWidgets('Refresh preserves child state at start and completion', (
+    tester,
+  ) async {
+    var refreshing = false;
+    late StateSetter update;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: StatefulBuilder(
+          builder: (_, change) {
+            update = change;
+            return ContentRefresh(
+              refreshing: refreshing,
+              label: 'Actualizando mascotas',
+              child: const _StateProbe(),
+            );
+          },
+        ),
+      ),
+    );
+    final original = tester.state(find.byType(_StateProbe));
+    update(() => refreshing = true);
+    await tester.pump();
+    expect(identical(tester.state(find.byType(_StateProbe)), original), isTrue);
+    update(() => refreshing = false);
+    await tester.pumpAndSettle();
+    expect(identical(tester.state(find.byType(_StateProbe)), original), isTrue);
+  });
   for (final reduced in [false, true]) {
     testWidgets(
       'Refresh retains geometry, content semantics and actions; reduced=$reduced',
@@ -56,4 +83,15 @@ void main() {
       },
     );
   }
+}
+
+class _StateProbe extends StatefulWidget {
+  const _StateProbe();
+  @override
+  State<_StateProbe> createState() => _StateProbeState();
+}
+
+class _StateProbeState extends State<_StateProbe> {
+  @override
+  Widget build(BuildContext context) => const Text('Ficha conservada');
 }

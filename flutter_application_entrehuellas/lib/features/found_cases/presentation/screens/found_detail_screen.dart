@@ -9,8 +9,14 @@ import '../../../../core/presentation/widgets/case_screen_shell.dart';
 import '../widgets/found_public_content.dart';
 
 class FoundDetailScreen extends ConsumerWidget {
-  const FoundDetailScreen({required this.id, this.savedAction, super.key});
+  const FoundDetailScreen({
+    required this.id,
+    this.savedAction,
+    this.posterAction,
+    super.key,
+  });
   final Widget? savedAction;
+  final Widget? posterAction;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,32 +58,40 @@ class FoundDetailScreen extends ConsumerWidget {
               label: 'Actualizando caso',
               child: FoundPublicContent(
                 value: state.requireValue.value!,
-                actions: state.requireValue.value!.reportKind == 'possible_loss'
-                    ? RecoveryCaseActions(
-                        id: id,
-                        community: true,
-                        canResolve: state.requireValue.value!.canResolve,
-                        open: state.requireValue.value!.status == 'active',
-                        onChanged: model.retry,
-                      )
-                    : state.requireValue.value!.targetId != null &&
-                          state.requireValue.value!.status == 'active'
-                    ? TextButton(
-                        onPressed: () => context.push(
-                          state.requireValue.value!.communityTarget
-                              ? '/home/found-cases/${state.requireValue.value!.targetId}'
-                              : '/home/cases/${state.requireValue.value!.targetId}',
-                        ),
-                        child: const Text('Ver búsqueda'),
-                      )
-                    : state.requireValue.refreshFailed
-                    ? TextButton(
-                        onPressed: state.requireValue.refreshing
-                            ? null
-                            : model.retry,
-                        child: const Text('Reintentar'),
-                      )
-                    : null,
+                actions: Column(
+                  children: [
+                    if ((state.requireValue.value!.canGeneratePoster ||
+                            state.requireValue.value!.canResolve) &&
+                        posterAction != null)
+                      posterAction!,
+                    state.requireValue.value!.reportKind == 'possible_loss'
+                        ? RecoveryCaseActions(
+                            id: id,
+                            community: true,
+                            canResolve: state.requireValue.value!.canResolve,
+                            open: state.requireValue.value!.status == 'active',
+                            onChanged: model.retry,
+                          )
+                        : state.requireValue.value!.targetId != null &&
+                              state.requireValue.value!.status == 'active'
+                        ? TextButton(
+                            onPressed: () => context.push(
+                              state.requireValue.value!.communityTarget
+                                  ? '/home/found-cases/${state.requireValue.value!.targetId}'
+                                  : '/home/cases/${state.requireValue.value!.targetId}',
+                            ),
+                            child: const Text('Ver búsqueda'),
+                          )
+                        : state.requireValue.refreshFailed
+                        ? TextButton(
+                            onPressed: state.requireValue.refreshing
+                                ? null
+                                : model.retry,
+                            child: const Text('Reintentar'),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ),
             ),
     );

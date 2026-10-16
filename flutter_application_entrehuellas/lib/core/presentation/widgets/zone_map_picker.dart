@@ -19,7 +19,10 @@ class ZoneMapPicker extends StatefulWidget {
     this.readOnlyNavigation = false,
     this.markers = const [],
     this.height = viewportHeight,
-    this.attribution,
+    this.borderRadius = 22,
+    this.cameraPadding = const EdgeInsets.all(24),
+    this.controller,
+    this.onMapTap,
     super.key,
   });
   final double? latitude;
@@ -31,7 +34,10 @@ class ZoneMapPicker extends StatefulWidget {
   final bool readOnlyNavigation;
   final List<Marker> markers;
   final double height;
-  final Widget? attribution;
+  final double borderRadius;
+  final EdgeInsets cameraPadding;
+  final MapController? controller;
+  final VoidCallback? onMapTap;
   final void Function(double latitude, double longitude)? onSelect;
   final TileProvider Function()? createTileProvider;
   @override
@@ -39,7 +45,7 @@ class ZoneMapPicker extends StatefulWidget {
 }
 
 class _ZoneMapPickerState extends State<ZoneMapPicker> {
-  final _controller = MapController();
+  late final _controller = widget.controller ?? MapController();
   late TileProvider _tiles;
   TileProvider _createTiles() =>
       widget.createTileProvider?.call() ?? NetworkTileProvider();
@@ -70,7 +76,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
               ),
             )
             .toList(),
-        padding: const EdgeInsets.all(24),
+        padding: widget.cameraPadding,
         maxZoom: 16,
       ),
     );
@@ -100,7 +106,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
@@ -126,11 +132,10 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
       message: 'No se pudo mostrar el mapa. Reintenta.',
       noticeId: _attempt,
       isError: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
             child: SizedBox(
               height: widget.height,
               child: FlutterMap(
@@ -152,6 +157,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                   maxZoom: 18,
                   backgroundColor: const Color(0xFFF5F5F7),
                   onTap: (_, location) {
+                    widget.onMapTap?.call();
                     if (!_failed && !widget.readOnly) {
                       widget.onSelect?.call(
                         location.latitude,
@@ -197,22 +203,26 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                     ),
                   if (widget.markers.isNotEmpty)
                     MarkerLayer(markers: widget.markers),
-                  if (widget.attribution != null) widget.attribution!,
                 ],
               ),
             ),
           ),
-          if (_failed) ...[
-            TextButton(
-              onPressed: () => setState(() {
-                _failed = false;
-                _mapReady = false;
-                _attempt++;
-                _tiles = _createTiles();
-              }),
-              child: const Text('Reintentar mapa'),
+          if (_failed)
+            Positioned(
+              top: widget.borderRadius == 0
+                  ? MediaQuery.paddingOf(context).top + 8
+                  : 8,
+              right: 8,
+              child: TextButton(
+                onPressed: () => setState(() {
+                  _failed = false;
+                  _mapReady = false;
+                  _attempt++;
+                  _tiles = _createTiles();
+                }),
+                child: const Text('Reintentar mapa'),
+              ),
             ),
-          ],
         ],
       ),
     );

@@ -34,15 +34,6 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     return const PlaceSearchState();
   }
 
-  void attributionUnavailable() {
-    state = PlaceSearchState(
-      places: state.places,
-      busy: state.busy,
-      notice: 'No pudimos abrir la información de OpenStreetMap.',
-      noticeId: state.noticeId + 1,
-    );
-  }
-
   void clear() {
     _generation++;
     _debounce?.cancel();

@@ -12,7 +12,6 @@ import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../../../../core/presentation/widgets/two_option_filter.dart';
 import '../../domain/entities/explore_page.dart';
 import '../view_models/explore_view_model.dart';
-import 'explore_case_map.dart';
 import 'explore_filters.dart';
 import 'explore_case_grid.dart';
 
@@ -95,29 +94,12 @@ class ExploreSection extends ConsumerWidget {
       }
     }
 
-    final Widget results;
-    if (data == null ||
-        (data.mapSelected &&
-            (data.needsLocation || (data.failed && data.items.isEmpty)))) {
-      results = const SizedBox.shrink();
-    } else if (!data.mapSelected) {
-      results = ExploreCaseGrid(
-        items: data.items,
-        onOpen: data.busy ? null : openCase,
-      );
-    } else if (data.refreshing && data.items.isEmpty) {
-      results = const SizedBox(
-        height: 320,
-        child: ColoredBox(color: Color(0xFFE5E5EA)),
-      );
-    } else {
-      results = ExploreCaseMap(
-        key: ValueKey((data.owner, data.query)),
-        items: data.items,
-        query: data.query,
-        onOpen: data.busy ? null : openCase,
-      );
-    }
+    final Widget results = data == null
+        ? const SizedBox.shrink()
+        : ExploreCaseGrid(
+            items: data.items,
+            onOpen: data.busy ? null : openCase,
+          );
 
     return _layout(
       PullToRefreshTarget(
@@ -144,26 +126,54 @@ class ExploreSection extends ConsumerWidget {
                         enabled: !data.busy,
                         applying: data.applying,
                         query: data.query,
-                        onUseCurrentLocation: vm.useCurrentLocation,
+                        locationLabel: data.locationLabel,
+                        centerName: data.centerName,
+                        onUseCurrentLocation: vm.locateForFilter,
                         locationSearchBuilder: locationSearchBuilder,
-                        onApply:
-                            (kind, species, status, days, lat, lon, radius) =>
-                                vm.apply(
-                                  kind: kind,
-                                  species: species,
-                                  status: status,
-                                  days: days,
-                                  latitude: lat,
-                                  longitude: lon,
-                                  radiusMeters: radius,
-                                ),
+                        onApply: vm.applySelection,
                       ),
                     ),
                   const SizedBox(height: 16),
                   if (data != null) ...[
                     TwoOptionFilter(
-                      secondSelected: data.mapSelected,
-                      onChanged: data.busy ? null : vm.selectMap,
+                      secondSelected: false,
+                      onChanged: null,
+                      onOptionPressed: data.busy
+                          ? null
+                          : (map, source) {
+                              if (!map) return;
+                              final box =
+                                  source.findRenderObject() as RenderBox?;
+                              final navigator = Navigator.of(
+                                source,
+                              ).context.findRenderObject();
+                              final bounds = box == null
+                                  ? null
+                                  : box.localToGlobal(
+                                          Offset.zero,
+                                          ancestor: navigator,
+                                        ) &
+                                        box.size;
+                              source.push(
+                                '/home/explore-map',
+                                extra: bounds == null
+                                    ? null
+                                    : OriginPageSource(
+                                        bounds: bounds,
+                                        color: const Color(0xFFE5E5EA),
+                                        radius: 26,
+                                        child: const Center(
+                                          child: Text(
+                                            'Mapa',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            },
                       firstLabel: 'Lista',
                       secondLabel: 'Mapa',
                       indicatorKey: const ValueKey('explore-view-indicator'),
@@ -195,9 +205,7 @@ class ExploreSection extends ConsumerWidget {
                                 'Elige una ubicación para ver casos cercanos.',
                               ),
                             )
-                          else if (data.refreshing &&
-                              data.items.isEmpty &&
-                              !data.mapSelected)
+                          else if (data.refreshing && data.items.isEmpty)
                             const ExploreCaseGrid.skeleton()
                           else if (data.items.isEmpty &&
                               !data.failed &&
@@ -206,17 +214,7 @@ class ExploreSection extends ConsumerWidget {
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Text('No hay casos con estos filtros.'),
                             ),
-                          AuthStageTransition(
-                            stage: data.mapSelected,
-                            builder: (play) => StaggerReveal(
-                              count: 1,
-                              play: play,
-                              child: StaggerRevealItem(
-                                order: 0,
-                                child: results,
-                              ),
-                            ),
-                          ),
+                          results,
                           if (data.failed)
                             TextButton(
                               onPressed: data.busy

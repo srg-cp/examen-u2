@@ -86,6 +86,7 @@ class PublicFoundCase {
     required this.id,
     this.reportKind = 'possible_loss',
     this.canResolve = false,
+    this.canGeneratePoster = false,
     this.targetId,
     this.communityTarget = false,
     required this.status,
@@ -104,6 +105,7 @@ class PublicFoundCase {
   final String? targetId;
   final bool communityTarget;
   final bool canResolve;
+  final bool canGeneratePoster;
   final String id, status, species, traits;
   final String? speciesDetail, size, sex, custody;
   final DateTime occurredAt;

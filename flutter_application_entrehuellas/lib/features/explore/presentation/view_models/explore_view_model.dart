@@ -3,6 +3,8 @@ import '../../domain/entities/explore_query.dart';
 import '../../domain/failures/explore_failure.dart';
 import '../../providers/explore_providers.dart';
 import '../state/explore_state.dart';
+import '../state/explore_filter_selection.dart';
+import '../../../places/domain/entities/search_place.dart';
 
 final exploreViewModelProvider =
     AsyncNotifierProvider.autoDispose<ExploreViewModel, ExploreState>(
@@ -12,14 +14,6 @@ final exploreViewModelProvider =
 
 class ExploreViewModel extends AsyncNotifier<ExploreState> {
   int _generation = 0;
-
-  void selectMap(bool selected) {
-    final current = state.isLoading ? null : state.asData?.value;
-    if (current == null || current.busy || current.mapSelected == selected) {
-      return;
-    }
-    state = AsyncData(current.withMapSelected(selected));
-  }
 
   @override
   Future<ExploreState> build() async {
@@ -55,6 +49,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         query: query,
         items: page.items,
         cursor: page.nextCursor,
+        centerName: 'Ubicación actual',
       );
     } catch (_) {
       return ExploreState(
@@ -63,6 +58,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         items: const [],
         failed: true,
         notice: 'No pudimos consultar los casos. Puedes reintentar.',
+        centerName: 'Ubicación actual',
         noticeId: 1,
       );
     }
@@ -76,6 +72,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     double? latitude,
     double? longitude,
     int? radiusMeters,
+    String? locationLabel,
+    String? centerName,
   }) async {
     final now = DateTime.now().toUtc();
     final query = ExploreQuery(
@@ -104,12 +102,73 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           notice:
               'Selecciona una ubicación en el mapa para filtrar por distancia.',
           noticeId: current.noticeId + 1,
-          mapSelected: current.mapSelected,
+          locationLabel: current.locationLabel,
+          centerName: current.centerName,
         ),
       );
       return;
     }
-    await _load(current, query: query, replace: true);
+    await _load(
+      current,
+      query: query,
+      replace: true,
+      locationLabel: locationLabel,
+      centerName: centerName,
+    );
+  }
+
+  Future<void> applySelection(ExploreFilterSelection selection) => apply(
+    kind: selection.kind,
+    species: selection.species,
+    status: selection.status,
+    days: selection.days,
+    latitude: selection.lat,
+    longitude: selection.lon,
+    radiusMeters: selection.radius,
+    locationLabel: selection.label,
+    centerName: selection.centerName,
+  );
+
+  int? _filterLocationGeneration;
+  Future<SearchPlace?> locateForFilter() async {
+    final old = state.asData?.value;
+    if (old == null || old.busy || _filterLocationGeneration == _generation) {
+      return null;
+    }
+    _filterLocationGeneration = _generation;
+    final generation = _generation;
+    try {
+      final place = await ref.read(getCurrentExploreLocationProvider)();
+      if (!ref.mounted ||
+          generation != _generation ||
+          state.asData?.value.owner != old.owner) {
+        return null;
+      }
+      return place;
+    } catch (error) {
+      if (ref.mounted &&
+          generation == _generation &&
+          state.asData?.value.owner == old.owner) {
+        state = AsyncData(
+          ExploreState(
+            owner: old.owner,
+            query: old.query,
+            items: old.items,
+            cursor: old.cursor,
+            failed: old.failed,
+            locationLabel: old.locationLabel,
+            centerName: old.centerName,
+            notice: _locationNotice(error),
+            noticeId: old.noticeId + 1,
+          ),
+        );
+      }
+      return null;
+    } finally {
+      if (_filterLocationGeneration == generation) {
+        _filterLocationGeneration = null;
+      }
+    }
   }
 
   Future<void> refresh() async {
@@ -150,7 +209,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         cursor: old.cursor,
         refreshing: true,
         noticeId: old.noticeId,
-        mapSelected: old.mapSelected,
+        locationLabel: old.locationLabel,
+        centerName: old.centerName,
       ),
     );
     try {
@@ -170,6 +230,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           radiusMeters: previous.radiusMeters ?? 15000,
         ),
         replace: true,
+        locationLabel: '',
+        centerName: 'Ubicación actual',
       );
     } catch (error) {
       if (!ref.mounted || generation != _generation || state.isLoading) return;
@@ -182,7 +244,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           failed: old.failed,
           notice: _locationNotice(error),
           noticeId: old.noticeId + 1,
-          mapSelected: old.mapSelected,
+          locationLabel: old.locationLabel,
+          centerName: old.centerName,
         ),
       );
     }
@@ -201,14 +264,23 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     ExploreState old, {
     required ExploreQuery query,
     required bool replace,
+    String? locationLabel,
+    String? centerName,
   }) async {
     final g = ++_generation;
     // A different query must never display results from the preceding filters.
     final same = identical(query, old.query);
+    final samePoint =
+        query.latitude == old.query.latitude &&
+        query.longitude == old.query.longitude;
+    final appliedLabel = locationLabel ?? (samePoint ? old.locationLabel : '');
+    final appliedName = centerName ?? (samePoint ? old.centerName : '');
     final retained = same ? old.items : <Never>[];
     state = AsyncData(
       ExploreState(
         owner: old.owner,
+        locationLabel: appliedLabel,
+        centerName: appliedName,
         query: query,
         items: retained,
         cursor: replace ? null : old.cursor,
@@ -216,7 +288,6 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         applying: replace && !same,
         appending: !replace,
         noticeId: old.noticeId,
-        mapSelected: old.mapSelected,
       ),
     );
     try {
@@ -238,11 +309,12 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          locationLabel: appliedLabel,
+          centerName: appliedName,
           query: query,
           items: items,
           cursor: page.nextCursor,
           noticeId: old.noticeId,
-          mapSelected: old.mapSelected,
         ),
       );
     } catch (_) {
@@ -250,6 +322,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          locationLabel: appliedLabel,
+          centerName: appliedName,
           query: query,
           items: retained,
           cursor: replace ? null : old.cursor,
@@ -258,7 +332,6 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
               ? 'No pudimos consultar los casos. Puedes reintentar.'
               : 'No pudimos traer más casos. Puedes reintentar.',
           noticeId: old.noticeId + 1,
-          mapSelected: old.mapSelected,
         ),
       );
     }

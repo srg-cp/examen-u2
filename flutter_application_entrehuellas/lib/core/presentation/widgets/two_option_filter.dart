@@ -9,6 +9,7 @@ class TwoOptionFilter extends StatelessWidget {
     required this.firstLabel,
     required this.secondLabel,
     this.indicatorKey = const ValueKey('pet-list-active-indicator'),
+    this.onOptionPressed,
     super.key,
   });
 
@@ -16,6 +17,7 @@ class TwoOptionFilter extends StatelessWidget {
   final String firstLabel, secondLabel;
   final Key indicatorKey;
   final ValueChanged<bool>? onChanged;
+  final void Function(bool, BuildContext)? onOptionPressed;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -90,30 +92,38 @@ class TwoOptionFilter extends StatelessWidget {
     },
   );
 
-  Widget _option(bool option, TextStyle style, double position) => Semantics(
-    selected: secondSelected == option,
-    button: true,
-    child: Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(SelectionPillSurface.optionRadius),
-      child: InkWell(
-        onTap: onChanged == null ? null : () => onChanged!(option),
+  Widget _option(bool option, TextStyle style, double position) => Builder(
+    builder: (source) => Semantics(
+      selected: secondSelected == option,
+      button: true,
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(SelectionPillSurface.optionRadius),
-        splashFactory: NoSplash.splashFactory,
-        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Center(
-              child: Text(
-                option ? secondLabel : firstLabel,
-                textAlign: TextAlign.center,
-                style: style.copyWith(
-                  color: Color.lerp(
-                    SelectionPillSurface.selected,
-                    Colors.white,
-                    option ? position : 1 - position,
+        child: InkWell(
+          onTap: onChanged == null && onOptionPressed == null
+              ? null
+              : () => onOptionPressed != null
+                    ? onOptionPressed!(option, source)
+                    : onChanged!(option),
+          borderRadius: BorderRadius.circular(
+            SelectionPillSurface.optionRadius,
+          ),
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Center(
+                child: Text(
+                  option ? secondLabel : firstLabel,
+                  textAlign: TextAlign.center,
+                  style: style.copyWith(
+                    color: Color.lerp(
+                      SelectionPillSurface.selected,
+                      Colors.white,
+                      option ? position : 1 - position,
+                    ),
                   ),
                 ),
               ),

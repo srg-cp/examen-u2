@@ -1,5 +1,7 @@
 # Buscador compartido de ubicaciones y ciudades
 
+Corrección16 de octubre: por instrucción explícita del usuario, se retiran créditos/enlace visibles del proveedor y el mensaje de fallo asociado. Aplica al componente compartido tanto en Ubicación como en Ciudad del perfil; búsqueda/selección conservadas.
+
 Módulo places, extraído el16 de octubre de2026 para Explorar (HU-07/RF-13) y Perfil (HU-01.7/RF-01). [ADR-051](../decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
 
 ## Qué hace y recorrido

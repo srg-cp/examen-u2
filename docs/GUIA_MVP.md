@@ -146,6 +146,10 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Revisión posterior16 de octubre de HU-07.2/RF-13/issue #33: el panel inferior del mapa contiene filtros en borrador y Aplicar; el caso se abre desde una etiqueta junto al pin. Reutiliza el formulario existente, conserva consulta compartida y no busca por editar/GPS/pan hasta confirmar. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye la ficha inferior de ADR-055, sin ampliar alcance ni cambiar SQL/permisos.
+
+Refinamiento autorizado16 de octubre de HU-07.2/RF-13/issue #33: Mapa abre pantalla propia mediante expansión desde su opción, mapa a todo viewport y panel inferior deslizable con una ficha de ancho completo. Consulta/páginas compartidas con lista; sin nueva operación de producto ni SQL. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md) sustituye la alternancia integrada de ADR-052. No cierra automáticamente historia ni implica publicación.
+
 Incremento16 de octubre: HU-07.2 / RF-13 / issue #33 implementada localmente en feature/explore-case-map. Lista/Mapa comparte filtros, páginas y contrato019; marcadores públicos aproximados agrupados por coordenada, tarjetas/fichas existentes y recuperación de teselas. Pan/zoom no modifica la búsqueda. Sin SQL nuevo, QR, push u offline; demo Android/hosted y cierre de historia pendientes. Véanse [ficha](funcionalidades/explorar.md) y [ADR-052](decisiones/052-explorar-mapa-de-resultados.md). Patch021 de Guardados ya aplicado según confirmación del usuario; sustituye las notas antiguas de activación pendiente.
 
 Ampliación posterior16 de octubre: listado Guardados dentro de Explorar (HU-07/RF-13) y Ciudad del perfil (HU-01.7/RF-01) mediante el mismo buscador de Ubicación. Plan021 solo para índice/RPC de listado privado paginado, sin modificar020 aplicado según usuario. Ciudad reutiliza places y exige elegir sugerencia para texto nuevo; sin SQL nuevo de perfil ni certificado oficial de ciudad. Sin seguimiento/offline o cierre de historias; análisis limpio, pruebas omitidas por instrucción y021/Android pendientes. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
@@ -166,6 +170,8 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+Incremento16 de octubre: por instrucción del usuario se deja la generación de APK para más adelante y se inicia feature/pet-poster-qr, HU-08.1/#34 y HU-08.2/#35. Cartel A4 público, QR opaco estable, impresión/guardado y compartir PDF/enlace; fuente077–079/plan022. El usuario indica dominio entrehuellas.kormind.com; la generación se activa solo después de aplicar022 y disponer de HU-09 en ese dominio. La raíz responde404 al comprobarla; no se entrega ni despliega web en HU-08. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md). Sin ampliación a push/offline/moderación ni cierre automático de historias.
 
 - **HU-08 / RF-08,37:** cartel PDF legible, QR y compartir. Se puede generar en Flutter para el MVP; conservar enlace estable y permitir reintento de la generación.
 - **HU-09 / RF-09:** crear `apps/public-web` cuando haga falta; web ligera que abre el QR y muestra estado sin instalar la app. Token revocado no revela identidad privada.
