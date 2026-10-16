@@ -1,5 +1,7 @@
 # Arquitectura de Entre Huellas
 
+Casos guardados (16 octubre): saved_cases separa referencia/contrato/casos de uso, DTO/fuente Supabase/repositorios y estado/ViewModel/botón. Providers declarativos e inyección bootstrap/main. Router compone botón en slots de fichas; core solo expone trailingAction, sin imports entre presentaciones. RPC020/RLS privadas, CAS/reintentos; no cambia visibilidad ni implica seguimiento/offline. [ADR-050](decisiones/050-casos-guardados-por-cuenta.md).
+
 Actualización por gesto: PullToRefresh/PullToRefreshTarget en core comparten solo callbacks de presentación. HomeScreen posee el scroll y cada funcionalidad registra su operación de ViewModel, sin imports entre presentaciones ni core→features. Ubicaciones utiliza callback directo en su scroll. No cambian casos de uso/repositorios/SQL; [ADR-048](decisiones/048-actualizar-listas-al-jalar.md).
 
 Actualización de Explorar,15 de octubre: CurrentLocationRepository/GetCurrentExploreLocation en dominio, DeviceLocationSource (geolocator14.0.2) y repositorio en data, inyección bootstrap/main y coordinación en ExploreViewModel. Primera consulta solo con ubicación/radio15km; fallo de ubicación deja selección manual. SDK protegido por comprobación de fronteras. Sin SQL nuevo, stream de ubicación ni persistencia del dispositivo. [ADR-047](decisiones/047-ubicacion-actual-y-radio-inicial.md). No se han ejecutado pruebas nativas por instrucción del usuario.

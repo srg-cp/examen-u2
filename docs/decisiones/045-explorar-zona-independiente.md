@@ -2,6 +2,8 @@
 
 Estado: aceptada por instrucción explícita del usuario, 15 de octubre de 2026.
 
+Corrección explícita del16 de octubre de2026: control denominado Ubicación según ADR-047, siempre a la izquierda y Filtrar casos a la derecha en la misma fila, sin disposición apilada. Cápsulas compactas, etiquetas/fuente/área táctil conservadas y altura adaptable; omitir icono inicial cuando falta espacio. Paneles de ancho completo anclados a izquierda/derecha respectivamente. Sustituye el orden/apilado descritos abajo, manteniendo selección y operaciones independientes. Formato/análisis estático; sin pruebas ejecutadas por instrucción del usuario, revisión Android pendiente.
+
 ## Decisión
 
 El usuario considera sobrecargado Filtrar casos. Se separa en dos controles: Filtrar casos contiene tipo, especie, estado y fecha; Zona contiene Todas las zonas/Por ubicación, búsqueda de ciudad o dirección, mapa y radio. Su acción es Aplicar zona. Ambos comparten el desplegable anclado y transición de ADR-044, sin mover el listado al abrir.

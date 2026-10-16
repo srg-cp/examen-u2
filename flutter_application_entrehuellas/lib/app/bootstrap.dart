@@ -1,4 +1,8 @@
 import 'package:http/http.dart' as http;
+import '../features/saved_cases/domain/repositories/saved_cases_repository.dart';
+import '../features/saved_cases/data/data_sources/supabase_saved_cases_data_source.dart';
+import '../features/saved_cases/data/repositories/saved_cases_repository_impl.dart';
+import '../features/saved_cases/data/repositories/unavailable_saved_cases_repository.dart';
 import '../features/explore/domain/repositories/current_location_repository.dart';
 import '../features/explore/data/data_sources/device_location_source.dart';
 import '../features/explore/data/repositories/current_location_repository_impl.dart';
@@ -88,6 +92,7 @@ class AppBootstrap {
     this.currentLocationRepository =
         const UnavailableCurrentLocationRepository(),
     this.exploreRepository = const UnavailableExploreRepository(),
+    this.savedCasesRepository = const UnavailableSavedCasesRepository(),
     this.foundCaseRepository = const UnavailableFoundCaseRepository(),
   });
 
@@ -106,6 +111,7 @@ class AppBootstrap {
   final LostCaseRepository lostCaseRepository;
   final FoundCaseRepository foundCaseRepository;
   final ExploreRepository exploreRepository;
+  final SavedCasesRepository savedCasesRepository;
   final PlaceSearchRepository placeSearchRepository;
   final CurrentLocationRepository currentLocationRepository;
 }
@@ -132,6 +138,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          savedCasesRepository: SavedCasesRepositoryImpl(
+            SupabaseSavedCasesDataSource(supabase.client),
+          ),
           currentLocationRepository: const CurrentLocationRepositoryImpl(
             DeviceLocationSource(),
           ),

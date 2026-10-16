@@ -16,6 +16,8 @@ class FilterExpansion<T> extends StatefulWidget {
     this.icon = Icons.tune_rounded,
     this.panelWidth,
     this.alignPanelToEnd = false,
+    this.compact = false,
+    this.showLeadingIcon = true,
     super.key,
   });
   final String label;
@@ -25,6 +27,7 @@ class FilterExpansion<T> extends StatefulWidget {
   final IconData icon;
   final double? panelWidth;
   final bool alignPanelToEnd;
+  final bool compact, showLeadingIcon;
   @override
   State<FilterExpansion<T>> createState() => _FilterExpansionState<T>();
 }
@@ -146,14 +149,20 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 48),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: widget.compact ? 8 : 16,
                           vertical: 12,
                         ),
                         child: Row(
                           children: [
-                            Icon(widget.icon, size: 20, color: foreground),
-                            const SizedBox(width: 10),
+                            if (widget.showLeadingIcon) ...[
+                              Icon(
+                                widget.icon,
+                                size: widget.compact ? 18 : 20,
+                                color: foreground,
+                              ),
+                              SizedBox(width: widget.compact ? 6 : 10),
+                            ],
                             Expanded(
                               child: Text(
                                 widget.label,
@@ -168,6 +177,7 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                               angle: -pi * progress,
                               child: Icon(
                                 Icons.keyboard_arrow_down_rounded,
+                                size: widget.compact ? 18 : 24,
                                 color: foreground,
                               ),
                             ),

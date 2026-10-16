@@ -8,7 +8,13 @@ import '../widgets/case_screen_shell.dart';
 import '../widgets/case_public_content.dart';
 
 class CaseDetailScreen extends ConsumerWidget {
-  const CaseDetailScreen({required this.id, this.recoveryActions, super.key});
+  const CaseDetailScreen({
+    required this.id,
+    this.recoveryActions,
+    this.savedAction,
+    super.key,
+  });
+  final Widget? savedAction;
   final String id;
   final Widget Function(PublicLostCase, VoidCallback)? recoveryActions;
   @override
@@ -17,6 +23,12 @@ class CaseDetailScreen extends ConsumerWidget {
     final model = ref.read(publicCaseViewModelProvider(id).notifier);
     return CaseScreenShell(
       title: 'Ficha pública',
+      trailingAction:
+          !state.isLoading &&
+              !state.hasError &&
+              state.asData?.value.value != null
+          ? savedAction
+          : null,
       immersive: state.isLoading || state.asData?.value.value != null,
       loading: state.isLoading,
       notice: state.hasError

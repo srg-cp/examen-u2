@@ -1,4 +1,6 @@
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/saved_cases/domain/entities/saved_case_ref.dart';
+import '../features/saved_cases/presentation/widgets/save_case_button.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
 import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
 import '../features/pets/presentation/view_models/pet_list_view_model.dart';
@@ -237,7 +239,15 @@ final routerProvider = Provider<GoRouter>((ref) {
               context: context,
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
-              child: FoundDetailScreen(id: state.pathParameters['id']!),
+              child: FoundDetailScreen(
+                id: state.pathParameters['id']!,
+                savedAction: SaveCaseButton(
+                  target: SavedCaseRef(
+                    source: SavedCaseSource.found,
+                    id: state.pathParameters['id']!,
+                  ),
+                ),
+              ),
             ),
           ),
           GoRoute(
@@ -287,6 +297,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: CaseDetailScreen(
                 id: state.pathParameters['id']!,
+                savedAction: SaveCaseButton(
+                  target: SavedCaseRef(
+                    source: SavedCaseSource.lost,
+                    id: state.pathParameters['id']!,
+                  ),
+                ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
                   id: value.id,
                   community: false,

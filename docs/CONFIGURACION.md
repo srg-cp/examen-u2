@@ -1,5 +1,9 @@
 # Configuración y validación de la app
 
+Actualización posterior: el usuario confirma aplicado el patch020. No equivale a verificación independiente de RPC/RLS ni prueba Android; esas comprobaciones siguen pendientes y no se ejecutan pruebas por instrucción vigente.
+
+Casos guardados,16 de octubre: aplicar020 después de001–019 en desarrollo. [Patch020](../database/patchs/020_patch_saved_cases.sql)/migración20261016002000_saved_cases.sql derivados de070–073/plan020 con Build-SavedCasesPatch/Build-RunAll. Activar cliente y RPC juntos: sin contrato el marcador informa error de consulta, sin simular guardado. Sin claves/SDK/variables nuevos. Sin SQL remoto ni pruebas ejecutadas por petición del usuario; validar permisos/concurrencia/repetición antes de desplegar. [Ficha](funcionalidades/casos-guardados.md).
+
 Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar los comandos desde `flutter_application_entrehuellas`. Se mantienen el nombre del paquete y las plataformas existentes. Android conserva el identificador provisional `com.example.flutter_application_entrehuellas`; revisarlo antes de distribuir.
 
 ## Arranque

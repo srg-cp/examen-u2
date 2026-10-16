@@ -1,5 +1,7 @@
 # Base de datos de Entre Huellas
 
+Casos guardados: fuentes070–073/plan020, migración20261016002000_saved_cases.sql y patch020 derivados con Build-SavedCasesPatch/Build-RunAll, tras001–019. Tabla privada por cuenta/origen/UUID, RLS restrictiva, lectura de columnas/RPC autenticadas con visibilidad, versión y tombstone. Sin fotos/coordenadas copiadas ni ampliación de acceso a casos. Generación realizada; pruebas no ejecutadas por instrucción del usuario y aplicación remota pendiente. [ADR-050](../docs/decisiones/050-casos-guardados-por-cuenta.md).
+
 Publicación de perdido con espera de bloqueo: [patch015](patchs/015_patch_lost_case_lock_timeout.sql), generado por `Build-LostCaseLockTimeoutPatch.ps1`, añade un límite de5s solo a la RPC existente. Requiere patch013. No cambia permisos ni publica datos; no cancela solicitudes antiguas. Diagnóstico operacional de solo lectura en `tests/diagnose_lost_case_waits.sql`; cancelación de los PIDs observados separada del historial de migraciones. Validación local registrada en ESTADO; activación remota pendiente.
 
 Corrección vigente de avatar: usar [patchs/004_patch_profile_avatars.sql](patchs/004_patch_profile_avatars.sql) completo en SQL Editor. La migración 003 falló por ALTER TABLE sobre Storage administrado; plan 004/fuente 012 validan RLS existente sin alterar su propietario/configuración. Historial previo conservado. Regenerar con `./database/scripts/Build-AvatarPatch.ps1`; run_all también utiliza la corrección. Detalles en [patchs/README.md](patchs/README.md).

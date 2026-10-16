@@ -6,6 +6,8 @@ Módulo `explore`. HU-07.1 / RF-13 / issue #32; implementación local. [ADR-039]
 
 ## Qué hace y recorrido
 
+**Distribución vigente,16 de octubre:** Ubicación a la izquierda y Filtrar casos a la derecha en la misma fila, sin disposición vertical. Cápsulas compactas, etiquetas/fuente/área táctil conservadas y altura adaptable; se omiten iconos iniciales cuando falta espacio. Los paneles siguen usando todo el ancho, anclados a sus extremos respectivos. Se conservan selección, búsqueda, radio y transición. Formato/análisis estático, sin pruebas ejecutadas por instrucción vigente; revisión visual Android pendiente. Sustituye las notas históricas de apilado.
+
 Indicador de gesto actualizado: icono de recarga que baja siguiendo el dedo, se acomoda al soltar, gira durante refresh y se retira al terminar/cancelar; conserva filtros y shimmer del contenido. Movimiento reducido sin giro/retorno animado. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Formato/análisis del componente sin incidencias; sin nuevas pruebas ejecutadas ni revisión Android.
 
 **Actualizar vigente:** jalar hacia abajo desde el borde superior y soltar reemplaza el icono Actualizar casos. Conserva centro/radio/filtros, renueva primera página y mantiene contenido con shimmer; lista vacía/corta permite gesto y cancelar antes del umbral no consulta. Reintento de fallo conservado. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Formato/análisis sin incidencias; sin pruebas ejecutadas, gesto Android pendiente.

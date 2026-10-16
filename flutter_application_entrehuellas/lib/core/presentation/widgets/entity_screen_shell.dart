@@ -10,6 +10,7 @@ class EntityScreenShell extends StatefulWidget {
     this.title,
     this.header,
     this.persistentHeader,
+    this.trailingAction,
     this.stage = 'content',
     this.immersive = false,
     this.navigationTooltip = 'Volver',
@@ -23,6 +24,7 @@ class EntityScreenShell extends StatefulWidget {
   final String? title;
   final Widget? header;
   final Widget? persistentHeader;
+  final Widget? trailingAction;
   final Object stage;
   final bool immersive;
   final String navigationTooltip;
@@ -80,6 +82,12 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
                                 : context.go('/home'),
                 ),
               ),
+              if (widget.trailingAction != null)
+                Positioned(
+                  top: MediaQuery.paddingOf(context).top + 4,
+                  right: 24,
+                  child: widget.trailingAction!,
+                ),
             ],
           ),
         ),

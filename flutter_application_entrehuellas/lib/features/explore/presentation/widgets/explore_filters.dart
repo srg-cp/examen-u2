@@ -64,14 +64,17 @@ class _ExploreFiltersState extends State<ExploreFilters> {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final stacked =
-          constraints.maxWidth < 390 ||
-          MediaQuery.textScalerOf(context).scale(14) > 16;
+      final showLeadingIcons =
+          constraints.maxWidth >= 330 &&
+          MediaQuery.textScalerOf(context).scale(14) <= 16;
       final filters = FilterExpansion<_FilterSelection>(
         label: 'Filtrar casos',
         enabled: widget.enabled,
         applying: widget.applying,
         panelWidth: constraints.maxWidth,
+        compact: true,
+        showLeadingIcon: showLeadingIcons,
+        alignPanelToEnd: true,
         editorBuilder: (context, confirm) =>
             _ExploreFilterEditor(initial: _selection, onConfirm: confirm),
         onApply: _apply,
@@ -82,7 +85,8 @@ class _ExploreFiltersState extends State<ExploreFilters> {
         enabled: widget.enabled,
         applying: widget.applying,
         panelWidth: constraints.maxWidth,
-        alignPanelToEnd: !stacked,
+        compact: true,
+        showLeadingIcon: showLeadingIcons,
         editorBuilder: (context, confirm) => _ExploreFilterEditor(
           initial: _selection,
           zoneOnly: true,
@@ -91,18 +95,16 @@ class _ExploreFiltersState extends State<ExploreFilters> {
         ),
         onApply: _apply,
       );
-      return stacked
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [filters, const SizedBox(height: 10), zone],
-            )
-          : Row(
-              children: [
-                Expanded(child: filters),
-                const SizedBox(width: 10),
-                Expanded(child: zone),
-              ],
-            );
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: zone),
+            const SizedBox(width: 8),
+            Expanded(child: filters),
+          ],
+        ),
+      );
     },
   );
 

@@ -1,6 +1,22 @@
 # Estado del proyecto
 
-Última actualización: 15 de octubre de 2026, America/Lima.
+Última actualización: 16 de octubre de 2026, America/Lima.
+
+## Guardar casos desde la ficha — 16 de octubre de 2026
+
+Confirmación posterior del usuario: patch020 aplicado (respuesta «okey ya esta» al paso de activación). Se registra como confirmación del usuario, sin ejecución/inspección remota independiente del agente. Persistencia y permisos todavía pendientes de comprobar en app/servidor; no se ejecutan pruebas por instrucción vigente ni se cierra historia.
+
+Ampliación explícita del usuario de HU-07/RF-13, sin issue nuevo: marcador glass arriba a la derecha en fichas disponibles lost/found, incluidas búsquedas comunitarias. Guardar/quitar por cuenta, marca confirmada tras servidor, toast/shimmer y bloqueo de dobles envíos. Router inyecta SaveCaseButton mediante slots opcionales de ficha/shell; ninguna dependencia entre presentaciones ni core→features. saved_cases separa dominio/casos de uso, DTO/fuente/repositorio, providers y ViewModel autoDispose por identidad. Bootstrap/main inyectan.
+
+Plan020/fuentes070–073: tabla privada owner/origen/UUID, RLS restrictiva, grants sin DML cliente y RPC autenticadas con visibilidad al guardar. Versionado/bloqueo/tombstone para reintentos; timeout conserva operación deseada, conflicto requiere reconsulta. Sin ampliar permisos del caso ni suscribir alertas. Recorrido desde ficha, sin listado propio/descarga offline.
+
+Formato y **flutter analyze --no-pub sin incidencias**. Build-RunAll generó migración20261016002000_saved_cases.sql/patch020/run_all y verificó migraciones previas. **Sin pruebas por instrucción del usuario**, incluidas SQL; sin APK/build/renders ni aplicación remota por el agente. Tras confirmación de aplicación por el usuario, pendiente verificar A/B/anónimo, visibilidad, CAS/reintentos/concurrencia, repetición y persistencia/reinicio/cuenta/Android. Generación o confirmación de aplicación no acredita esas verificaciones. [ADR-050](decisiones/050-casos-guardados-por-cuenta.md), [ficha](funcionalidades/casos-guardados.md). Sin publicación/commit/push ni cierre de historia.
+
+## Explorar: controles en una fila — 16 de octubre de 2026
+
+Por instrucción del usuario, Ubicación queda a la izquierda y Filtrar casos a la derecha, siempre en la misma fila. Se retira la disposición apilada. FilterExpansion admite presentación compacta: menor padding horizontal/iconos, sin reducir fuente ni área táctil. Con poco ancho o texto ampliado se omite solo el icono inicial para dar espacio a las etiquetas; texto puede crecer en altura y ambas cápsulas conservan altura compartida. Desplegables mantienen ancho completo, anclaje izquierdo para Ubicación y derecho para Filtrar casos, blur/transición y selección previos. Sin cambios de consulta, radio, permisos o backend.
+
+Formato aplicado; análisis estático de los dos componentes. Sin pruebas, renders ni build por instrucción vigente; pendiente comprobación visual en Android normal/pequeño/texto ampliado. Se conserva feature/explore-case-list y el trabajo existente, sin publicación ni cierre de historia.
 
 ## Ajuste vigente de Explorar: desplegable y distancia — 15 de octubre de 2026
 

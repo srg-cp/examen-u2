@@ -146,6 +146,8 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Ampliación explícita solicitada el16 de octubre de2026 de HU-07/RF-13: guardar/quitar casos por cuenta desde marcador superior derecho de la ficha. saved_cases/plan020, sin issue asignado ni cierre de historia. Recorrido por ficha; sin listado propio, seguimiento/push ni descarga offline HU-15.3. [Ficha](funcionalidades/casos-guardados.md), [ADR-050](decisiones/050-casos-guardados-por-cuenta.md). Validación/aplicación020 y Android pendientes; sin pruebas ejecutadas por petición del usuario.
+
 - **HU-05 / RF-05:** publicar perdido con fecha y zona; restricción de un caso activo por mascota y creación idempotente.
 - **HU-06 / RF-06:** publicar encontrado sin propietario conocido ni `pet_id` obligatorio.
 - **HU-07 / RF-13:** lista y mapa con filtros coherentes y paginación; coordenadas públicas aproximadas y datos privados protegidos.
