@@ -2,6 +2,24 @@
 
 Última actualización: 16 de octubre de 2026, America/Lima.
 
+## Guardados: pantalla con expansión desde el marcador —16 de octubre de2026
+
+Ajuste vigente del16 de octubre: el marcador compacto de Explorar abre la pantalla independiente Guardados en /home/saved-cases. Reutiliza OriginPageSource/OriginPageTransition mediante entityEditorPage: expansión desde el icono y retorno al origen al cerrar, con movimiento reducido respetado. Sustituye el cambio de vista en la cabecera y la segunda pulsación. SavedCasesScreen reutiliza EntityScreenShell con retorno glass y cover→stagger, SavedCasesSection y PullToRefresh; scroll siempre desplazable incluso con lista vacía. Explorar permanece debajo con filtros/posición conservados. Sin cambios SQL;021 sigue pendiente de aplicación y revisión Android.
+
+Validación: formato y dart analyze lib sin incidencias. Sin pruebas, renders ni build por instrucción vigente; revisión de apertura/retorno/gesto en Android pendiente. No se ejecutó SQL, despliegue ni commit/push.
+
+## Explorar → Guardados y Ciudad con sugerencias — 16 de octubre de2026
+
+Por instrucción del usuario, Explorar incorpora Guardados mediante un marcador pequeño junto al título (icono24/área48), sin selector de secciones, por corrección posterior del usuario. Vacío/lleno indica vista cercana/guardados; título identifica la vista y una segunda pulsación vuelve a Explorar. Cabecera en una fila y entrada cover→stagger del contenido. Mantiene consulta cercana al cambiar; Guardados pagina marcas propias20, comparte grilla/fichas, jalar/Ver más/reintentos y refresca al volver de ficha. Excluye casos no visibles; no exige GPS/radio en la colección privada. PublicCaseCard/Kind/Status, DTO y grilla extraídos a core con alias compatibles de Explore, sin duplicar UI ni core→features.
+
+Buscador Photon extraído de explore a places y compuesto desde router en slots de Ubicación/Perfil, sin imports entre presentaciones. Ciudad usa modo layer=city, valida tipo/nombre/longitud y exige seleccionar sugerencia antes de guardar texto nuevo; vacío opcional/ciudades antiguas sin editar se conservan. Estados/caché separados por modo; mismo debounce600ms, serialización, descarte por identidad y toast/shimmer. Perfil guarda etiqueta, no coordenadas; SQL de perfil no certifica procedencia de la selección.
+
+Plan021/fuentes074–076: índice parcial y RPC list_saved_cases autenticada, cursor por propietario/as_of/fecha/origen/UUID y proyecciones vigentes. Migración20261016002100_saved_case_list.sql/patch021/run_all generados sin alterar020, cuya aplicación solo está confirmada por el usuario. **021 aún no aplicado**. Formato y flutter analyze --no-pub sin incidencias; contratos/imports/fixtures adaptados, **sin pruebas ejecutadas por instrucción vigente**, sin SQL/geocodificación real/build/renders/despliegue. Pendientes permisos/paginación/visibilidad/concurrencia, cobertura de ciudades y recorridos Android de selección/descartar/fallo/cuenta. Siguiente paso: validar/aplicar021 y revisar ambos recorridos. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md), [buscador](funcionalidades/ubicaciones-buscador.md). Sin commit/push ni cierre de historia.
+
+## Indicador de recarga glass — 16 de octubre de 2026
+
+Por petición del usuario, PullToRefresh usa GlassSurface compartido con el retorno: círculo52/radio26, icono28, mismo desenfoque/transparencia/ribete/sombra. Se retira su superficie gris/borde propios y se ajusta el punto oculto a52 para conservar la retirada completa. Gesto, giro, callbacks y movimiento reducido conservados. Aplica a Explorar, Mis mascotas y Ubicaciones de interés. Formato/dart analyze del componente sin incidencias; sin pruebas/renders/build por instrucción vigente, aspecto/rendimiento Android pendientes.
+
 ## Guardar casos desde la ficha — 16 de octubre de 2026
 
 Confirmación posterior del usuario: patch020 aplicado (respuesta «okey ya esta» al paso de activación). Se registra como confirmación del usuario, sin ejecución/inspección remota independiente del agente. Persistencia y permisos todavía pendientes de comprobar en app/servidor; no se ejecutan pruebas por instrucción vigente ni se cierra historia.

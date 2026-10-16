@@ -1,4 +1,4 @@
-import '../../domain/entities/search_place.dart';
+import '../../../places/domain/entities/search_place.dart';
 import '../../domain/failures/explore_failure.dart';
 import '../../domain/repositories/current_location_repository.dart';
 import '../data_sources/device_location_source.dart';

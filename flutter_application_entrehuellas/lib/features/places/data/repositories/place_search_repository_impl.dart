@@ -1,5 +1,5 @@
 import '../../domain/entities/search_place.dart';
-import '../../domain/failures/explore_failure.dart';
+import '../../domain/failures/place_search_failure.dart';
 import '../../domain/repositories/place_search_repository.dart';
 import '../data_sources/place_search_data_source.dart';
 
@@ -8,15 +8,21 @@ class PlaceSearchRepositoryImpl implements PlaceSearchRepository {
   final PlaceSearchDataSource _source;
   final _cache = <String, ({DateTime expires, List<SearchPlace> places})>{};
   @override
-  Future<List<SearchPlace>> search(String query) async {
-    final key = query.toLowerCase();
+  Future<List<SearchPlace>> search(
+    String query, {
+    bool citiesOnly = false,
+  }) async {
+    final key = '$citiesOnly:${query.toLowerCase()}';
     final cached = _cache[key];
     if (cached != null && DateTime.now().isBefore(cached.expires)) {
       return cached.places;
     }
     try {
       final rows = List<SearchPlace>.unmodifiable(
-        (await _source.search(query)).map((dto) => dto.toEntity()),
+        (await _source.search(
+          query,
+          citiesOnly: citiesOnly,
+        )).map((dto) => dto.toEntity()),
       );
       if (_cache.length >= 30) _cache.remove(_cache.keys.first);
       _cache[key] = (
@@ -25,7 +31,7 @@ class PlaceSearchRepositoryImpl implements PlaceSearchRepository {
       );
       return rows;
     } catch (_) {
-      throw const ExploreFailure(ExploreFailureKind.unavailable);
+      throw const PlaceSearchFailure(PlaceSearchFailureKind.unavailable);
     }
   }
 }

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CollectionHeader extends StatelessWidget {
-  const CollectionHeader({required this.title, this.action, super.key});
+  const CollectionHeader({
+    required this.title,
+    this.action,
+    this.keepActionInline = false,
+    super.key,
+  });
   final String title;
   final Widget? action;
+  final bool keepActionInline;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -17,8 +23,9 @@ class CollectionHeader extends StatelessWidget {
         ),
       );
       if (action == null) return heading;
-      if (constraints.maxWidth < 300 ||
-          MediaQuery.textScalerOf(context).scale(32) > 42) {
+      if (!keepActionInline &&
+          (constraints.maxWidth < 300 ||
+              MediaQuery.textScalerOf(context).scale(32) > 42)) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

@@ -19,6 +19,7 @@ class EntityScreenShell extends StatefulWidget {
     required this.loading,
     required this.child,
     this.count = 9,
+    this.scrollPhysics,
     super.key,
   });
   final String? title;
@@ -33,6 +34,7 @@ class EntityScreenShell extends StatefulWidget {
   final bool loading;
   final Widget child;
   final int count;
+  final ScrollPhysics? scrollPhysics;
   @override
   State<EntityScreenShell> createState() => _EntityScreenShellState();
 }
@@ -96,6 +98,7 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
   );
   Widget _content(BuildContext context) => SingleChildScrollView(
     controller: _scroll,
+    physics: widget.scrollPhysics,
     padding: widget.immersive
         ? EdgeInsets.zero
         : EdgeInsets.fromLTRB(

@@ -6,10 +6,10 @@ import '../features/saved_cases/data/repositories/unavailable_saved_cases_reposi
 import '../features/explore/domain/repositories/current_location_repository.dart';
 import '../features/explore/data/data_sources/device_location_source.dart';
 import '../features/explore/data/repositories/current_location_repository_impl.dart';
-import '../features/explore/domain/repositories/place_search_repository.dart';
-import '../features/explore/data/data_sources/photon_place_data_source.dart';
-import '../features/explore/data/repositories/place_search_repository_impl.dart';
-import '../features/explore/data/repositories/unavailable_place_search_repository.dart';
+import '../features/places/domain/repositories/place_search_repository.dart';
+import '../features/places/data/data_sources/photon_place_data_source.dart';
+import '../features/places/data/repositories/place_search_repository_impl.dart';
+import '../features/places/data/repositories/unavailable_place_search_repository.dart';
 import '../features/explore/domain/repositories/explore_repository.dart';
 import '../features/explore/data/data_sources/supabase_explore_data_source.dart';
 import '../features/explore/data/repositories/explore_repository_impl.dart';

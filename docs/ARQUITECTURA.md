@@ -1,5 +1,7 @@
 # Arquitectura de Entre Huellas
 
+Reutilización16 octubre: places extrae de explore el buscador público (dominio/fallos/data/providers/ViewModel/widget), con modos ciudad/dirección y caché/estado separados. Router lo compone por slots en Explore/Profile, sin dependencia entre presentaciones; GPS consume solo entidad de dominio. PublicCaseCard/Kind/Status, DTO y grilla se comparten en core, con alias de Explore. saved_cases agrega ListSavedCases/ViewModel/lista y RPC021 paginada por cuenta, sin radio. UpdateProfile recibe citySelected explícito para rechazar texto nuevo sin selección. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
 Casos guardados (16 octubre): saved_cases separa referencia/contrato/casos de uso, DTO/fuente Supabase/repositorios y estado/ViewModel/botón. Providers declarativos e inyección bootstrap/main. Router compone botón en slots de fichas; core solo expone trailingAction, sin imports entre presentaciones. RPC020/RLS privadas, CAS/reintentos; no cambia visibilidad ni implica seguimiento/offline. [ADR-050](decisiones/050-casos-guardados-por-cuenta.md).
 
 Actualización por gesto: PullToRefresh/PullToRefreshTarget en core comparten solo callbacks de presentación. HomeScreen posee el scroll y cada funcionalidad registra su operación de ViewModel, sin imports entre presentaciones ni core→features. Ubicaciones utiliza callback directo en su scroll. No cambian casos de uso/repositorios/SQL; [ADR-048](decisiones/048-actualizar-listas-al-jalar.md).

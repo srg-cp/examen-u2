@@ -1,6 +1,7 @@
 import 'dart:math' show pi;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart' show CustomSemanticsAction;
+import 'glass_surface.dart';
 
 /// Edge-only pull gesture with a refresh glyph that follows and retracts.
 class PullToRefresh extends StatefulWidget {
@@ -174,7 +175,7 @@ class _PullToRefreshState extends State<PullToRefresh>
               ),
             ),
             Positioned(
-              top: widget.indicatorTop - 48,
+              top: widget.indicatorTop - 52,
               left: 0,
               right: 0,
               child: IgnorePointer(
@@ -196,27 +197,23 @@ class _PullToRefreshState extends State<PullToRefresh>
                                   : armed
                                   ? 'Suelta para actualizar'
                                   : 'Jala para actualizar',
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F5F7),
-                                  border: Border.all(
-                                    color: const Color(0xFFE5E5EA),
-                                  ),
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Transform.rotate(
-                                    angle: _reduced
-                                        ? 0
-                                        : (offset / 64 * .75 +
-                                                  _rotation.value) *
-                                              2 *
-                                              pi,
-                                    child: const Icon(
-                                      Icons.refresh_rounded,
-                                      size: 22,
-                                      color: Color(0xFF111111),
+                              child: GlassSurface(
+                                radius: 26,
+                                child: SizedBox.square(
+                                  dimension: 52,
+                                  child: Center(
+                                    child: Transform.rotate(
+                                      angle: _reduced
+                                          ? 0
+                                          : (offset / 64 * .75 +
+                                                    _rotation.value) *
+                                                2 *
+                                                pi,
+                                      child: const Icon(
+                                        Icons.refresh_rounded,
+                                        size: 28,
+                                        color: Color(0xFF111111),
+                                      ),
                                     ),
                                   ),
                                 ),

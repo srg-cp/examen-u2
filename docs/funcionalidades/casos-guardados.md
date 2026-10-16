@@ -1,10 +1,14 @@
 # Casos guardados
 
+Ajuste vigente del16 de octubre: el marcador compacto de Explorar abre la pantalla independiente Guardados en /home/saved-cases. Reutiliza OriginPageSource/OriginPageTransition mediante entityEditorPage: expansión desde el icono y retorno al origen al cerrar, con movimiento reducido respetado. Sustituye el cambio de vista en la cabecera y la segunda pulsación. SavedCasesScreen reutiliza EntityScreenShell con retorno glass y cover→stagger, SavedCasesSection y PullToRefresh; scroll siempre desplazable incluso con lista vacía. Explorar permanece debajo con filtros/posición conservados. Sin cambios SQL;021 sigue pendiente de aplicación y revisión Android.
+
 Módulo saved_cases. Ampliación explícita del16 de octubre de2026 de HU-07/RF-13, sin issue asignado. Patch020 aplicado según confirmación posterior del usuario; sin comprobación remota independiente ni historia cerrada. [ADR-050](../decisiones/050-casos-guardados-por-cuenta.md).
 
 ## Qué hace y recorrido
 
-Entrar a una ficha pública disponible muestra marcador glass arriba a la derecha. Vacío: Guardar caso; lleno: Quitar de guardados. Estado consultado por cuenta al abrir y cambio confirmado únicamente tras servidor. Se recupera al volver/reiniciar una vez activado020. Disponible en origen lost/found, incluidas búsquedas comunitarias y avisos anteriores. No añade listado propio de guardados, seguimiento/push o descarga offline. Guardar no garantiza acceso posterior a un caso retirado/oculto.
+**Recorrido vigente:** Explorar → marcador pequeño junto al título → Guardados. Sin selector de secciones; marcador lleno y título Guardados, segunda pulsación vuelve a Explorar conservando filtros cercanos. Misma grilla, páginas20/Ver más, jalar para actualizar y apertura de ficha; al volver se refresca para reflejar guardados retirados. Solo cuenta actual y casos todavía visibles, sin filtro de radio/GPS. Estado de error distinto de vacío; datos conservados en refresco. Requiere nuevo [patch021](../../database/patchs/021_patch_saved_case_list.sql) tras020; no aplicado aún. [ADR-051](../decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md) amplía el recorrido inicial solo por ficha. Sin pruebas ejecutadas por instrucción vigente; validación remota/Android pendiente.
+
+Entrar a una ficha pública disponible muestra marcador glass arriba a la derecha. Vacío: Guardar caso; lleno: Quitar de guardados. Estado consultado por cuenta al abrir y cambio confirmado únicamente tras servidor. Se recupera al volver/reiniciar una vez activado020. Disponible en origen lost/found, incluidas búsquedas comunitarias y avisos anteriores. El listado de021 no añade seguimiento/push ni descarga offline. Guardar no garantiza acceso posterior a un caso retirado/oculto.
 
 ## Reglas y campos
 

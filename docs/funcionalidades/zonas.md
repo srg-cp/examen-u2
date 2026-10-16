@@ -1,5 +1,7 @@
 # Ubicaciones de interés privadas
 
+Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva gesto/giro/retirada y bloqueo al editar. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.
+
 Refinamiento del gesto: icono de recarga sigue el jalón, gira durante actualización real y retorna al terminar/cancelar, con movimiento reducido respetado. Edición conserva bloqueo de gesto. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.
 
 Actualización del15 de octubre: jalar desde el borde superior y soltar reemplaza Actualizar ubicaciones. Lista conservada con ContentRefresh, sin franja fina anterior; gesto disponible con vacío/lista corta y deshabilitado durante edición, guardado/eliminación o refresh. Reintentos conservados. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Formato/análisis sin incidencias; sin pruebas ejecutadas por instrucción del usuario, gesto Android pendiente.

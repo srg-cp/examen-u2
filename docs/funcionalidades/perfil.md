@@ -1,5 +1,7 @@
 # Perfil y fotografía de cuenta
 
+Ciudad (16 octubre): reutiliza places, el mismo autocompletado de Ubicación en modo ciudad. Debounce600ms/mínimo3, selección obligatoria para texto nuevo; vacío opcional y valor antiguo sin cambiar conservados. UpdateProfile recibe citySelected explícito; edición/guardado/foto/fallo conservan esa condición y Descartar restituye valor/limpia sugerencias. Guarda nombre/región/país≤120, sin coordenadas nuevas ni cambios SQL del perfil. Router compone el widget por slot, sin import de otra presentación. No es validación de catálogo oficial en servidor. Formato/análisis sin incidencias; sin pruebas ejecutadas por instrucción del usuario, cobertura/Android pendientes. [ADR-051](../decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
 Ajuste del15 de octubre: acceso visible Ubicaciones de interés en lugar de Zonas de interés; rutas y permisos conservados. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
 
 Módulo: `profile`. HU-01.7 / RF-01; [issue #23](../backlog/023-HU-01.7.md).

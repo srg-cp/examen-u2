@@ -7,41 +7,92 @@ import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import '../../../../core/presentation/widgets/cover_reveal.dart';
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../view_models/explore_view_model.dart';
 import 'explore_filters.dart';
 import 'explore_case_grid.dart';
 
 class ExploreSection extends ConsumerWidget {
-  const ExploreSection({super.key});
+  const ExploreSection({this.locationSearchBuilder, super.key});
+  final LocationSearchBuilder? locationSearchBuilder;
+  Widget _layout(Widget content) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: CollectionHeader(
+          title: 'Explorar',
+          keepActionInline: true,
+          action: Builder(
+            builder: (source) => IconButton(
+              tooltip: 'Ver casos guardados',
+              constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+              iconSize: 24,
+              color: const Color(0xFF111111),
+              icon: const Icon(Icons.bookmark_border_rounded),
+              onPressed: () {
+                final box = source.findRenderObject();
+                final navigator = Navigator.of(
+                  source,
+                ).context.findRenderObject();
+                final bounds = box is RenderBox && box.hasSize
+                    ? box.localToGlobal(Offset.zero, ancestor: navigator) &
+                          box.size
+                    : null;
+                source.push(
+                  '/home/saved-cases',
+                  extra: bounds == null
+                      ? null
+                      : OriginPageSource(
+                          bounds: bounds,
+                          color: Colors.white,
+                          radius: 24,
+                          child: const Center(
+                            child: Icon(
+                              Icons.bookmark_border_rounded,
+                              size: 24,
+                              color: Color(0xFF111111),
+                            ),
+                          ),
+                        ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(height: 12),
+      AuthStageTransition(
+        stage: 'content',
+        builder: (play) => StaggerReveal(
+          count: 1,
+          play: play,
+          child: StaggerRevealItem(order: 0, child: content),
+        ),
+      ),
+    ],
+  );
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(exploreViewModelProvider);
     final data = async.isLoading || async.hasError ? null : async.asData?.value;
     final vm = ref.read(exploreViewModelProvider.notifier);
-    return PullToRefreshTarget(
-      onRefresh: vm.refresh,
-      enabled: !async.isLoading && data?.busy != true,
-      child: ConfirmationToastHost(
-        confirmed: async.hasError || data?.notice != null,
-        isError: true,
-        message: async.hasError
-            ? 'No pudimos consultar los casos.'
-            : data?.notice ?? '',
-        noticeId: (async.error, data?.noticeId),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StaggerRevealItem(
-              order: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: const CollectionHeader(title: 'Explorar'),
-              ),
-            ),
-            const SizedBox(height: 12),
-            StaggerRevealItem(
-              order: 1,
-              child: Column(
+    return _layout(
+      PullToRefreshTarget(
+        onRefresh: vm.refresh,
+        enabled: !async.isLoading && data?.busy != true,
+        child: ConfirmationToastHost(
+          confirmed: async.hasError || data?.notice != null,
+          isError: true,
+          message: async.hasError
+              ? 'No pudimos consultar los casos.'
+              : data?.notice ?? '',
+          noticeId: (async.error, data?.noticeId),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (data != null)
@@ -53,6 +104,7 @@ class ExploreSection extends ConsumerWidget {
                         applying: data.applying,
                         query: data.query,
                         onUseCurrentLocation: vm.useCurrentLocation,
+                        locationSearchBuilder: locationSearchBuilder,
                         onApply:
                             (kind, species, status, days, lat, lon, radius) =>
                                 vm.apply(
@@ -146,8 +198,8 @@ class ExploreSection extends ConsumerWidget {
                     ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

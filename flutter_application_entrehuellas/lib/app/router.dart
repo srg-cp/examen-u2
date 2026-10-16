@@ -1,4 +1,6 @@
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/places/presentation/widgets/place_search_fields.dart';
+import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
 import '../features/saved_cases/presentation/widgets/save_case_button.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
@@ -189,12 +191,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const HomeScreen(
-          profileAvatar: ProfileAvatarButton(),
-          petsContent: PetsSection(),
-          exploreContent: ExploreSection(),
+        builder: (context, state) => HomeScreen(
+          profileAvatar: const ProfileAvatarButton(),
+          petsContent: const PetsSection(),
+          exploreContent: ExploreSection(
+            locationSearchBuilder: (label, onSelect) =>
+                PlaceSearchFields(initialLabel: label, onSelect: onSelect),
+          ),
         ),
         routes: [
+          GoRoute(
+            path: 'saved-cases',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: const SavedCasesScreen(),
+            ),
+          ),
           GoRoute(
             path: 'my-reports',
             pageBuilder: (context, state) => NoTransitionPage<void>(
@@ -378,7 +392,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                             : null,
                         child: child,
                       ),
-              child: const ProfileScreen(),
+              child: ProfileScreen(
+                cityFieldBuilder: (city, enabled, invalid, onQuery, onSelect) =>
+                    PlaceSearchFields(
+                      citiesOnly: true,
+                      initialLabel: city,
+                      enabled: enabled,
+                      invalid: invalid,
+                      onQueryChanged: onQuery,
+                      onSelect: (place) => onSelect(place.label),
+                    ),
+              ),
             ),
           ),
           GoRoute(

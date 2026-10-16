@@ -40,7 +40,7 @@ void main() {
     () async {
       final update = UpdateProfile(repo);
       await expectLater(
-        update('one', displayName: 'x' * 121, city: ''),
+        update('one', displayName: 'x' * 121, city: '', citySelected: true),
         throwsA(
           isA<ProfileFailure>().having(
             (e) => e.kind,
@@ -50,7 +50,7 @@ void main() {
         ),
       );
       await expectLater(
-        update('one', displayName: '', city: 'x' * 121),
+        update('one', displayName: '', city: 'x' * 121, citySelected: true),
         throwsA(
           isA<ProfileFailure>().having(
             (e) => e.kind,
@@ -64,10 +64,16 @@ void main() {
         'one',
         displayName: '🐾' * 120,
         city: ' Lima ',
+        citySelected: true,
       );
       expect(unicode.city, 'Lima');
       expect(unicode.displayName!.runes.length, 120);
-      final clear = await update('one', displayName: ' ', city: '');
+      final clear = await update(
+        'one',
+        displayName: ' ',
+        city: '',
+        citySelected: true,
+      );
       expect(clear.displayName, isNull);
       expect(clear.city, isNull);
     },

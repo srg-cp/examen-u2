@@ -2,6 +2,8 @@
 
 Estado: aceptada por instrucción explícita del usuario, 16 de octubre de 2026.
 
+Ampliación posterior: [ADR-051](051-guardados-en-explorar-y-ciudad-con-sugerencias.md) añade listado paginado en Explorar → Guardados mediante021. Sustituye la limitación de recorrido solo por ficha descrita aquí, conservando marcas/permisos de020.
+
 ## Alcance
 
 El usuario solicita favoritos/guardar casos arriba a la derecha de la ficha. Ampliación explícita de HU-07/RF-13, sin issue nuevo asignado. No cierra HU-07.1/#32, seguimiento HU-12 ni consulta offline HU-15.3/#49.

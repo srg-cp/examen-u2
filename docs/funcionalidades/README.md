@@ -8,6 +8,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
+| [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación del usuario16/10/2026 de HU-07/RF-13; sin issue asignado; local |
 | [Acceso y recuperación](acceso.md) | auth | HU-01; RF-01,34; issue #1 y subtareas |
 | [Onboarding por cuenta](onboarding.md) | onboarding | Flujo de entrada de HU-01; ADR-004 |

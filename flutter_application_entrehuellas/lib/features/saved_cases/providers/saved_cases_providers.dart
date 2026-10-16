@@ -4,6 +4,11 @@ import '../../auth/providers/auth_providers.dart';
 import '../domain/repositories/saved_cases_repository.dart';
 import '../domain/use_cases/read_saved_case.dart';
 import '../domain/use_cases/set_saved_case.dart';
+import '../domain/use_cases/list_saved_cases.dart';
+
+final listSavedCasesProvider = Provider(
+  (ref) => ListSavedCases(ref.watch(savedCasesRepositoryProvider)),
+);
 
 final savedCasesRepositoryProvider = Provider<SavedCasesRepository>(
   (ref) => throw StateError('SavedCasesRepository must be injected'),

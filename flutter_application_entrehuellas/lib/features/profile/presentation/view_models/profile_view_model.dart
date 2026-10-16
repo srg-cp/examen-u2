@@ -40,6 +40,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         displayName: current.displayName,
         city: current.city,
         saving: current.saving,
+        citySelected: current.citySelected,
         issue: current.issue,
         errorId: current.errorId,
       ),
@@ -58,6 +59,9 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         profile: current.profile,
         displayName: displayName ?? current.displayName,
         city: city ?? current.city,
+        citySelected: city == null
+            ? current.citySelected
+            : city.trim().isEmpty || city == current.profile.city,
         errorId: current.errorId,
         issue: keepIssue ? current.issue : null,
       ),
@@ -71,6 +75,23 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
     }
   }
 
+  void selectCity(String city) {
+    final current = state.asData?.value;
+    if (current == null || current.isBusy) return;
+    state = AsyncData(
+      ProfileEditState(
+        profile: current.profile,
+        displayName: current.displayName,
+        city: city,
+        citySelected: true,
+        issue: current.issue == ProfileFailureKind.invalidName
+            ? current.issue
+            : null,
+        errorId: current.errorId,
+      ),
+    );
+  }
+
   Future<void> save() async {
     final current = state.asData?.value;
     if (current == null || current.isBusy || !current.isDirty) return;
@@ -82,6 +103,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         displayName: current.displayName,
         city: current.city,
         saving: const AsyncLoading(),
+        citySelected: current.citySelected,
       ),
     );
     try {
@@ -89,6 +111,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         current.profile.userId,
         displayName: current.displayName,
         city: current.city,
+        citySelected: current.citySelected,
       );
       if (ref.mounted && generation == _generation) {
         state = AsyncData(
@@ -111,6 +134,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
             displayName: current.displayName,
             city: current.city,
             saving: AsyncError(failure, stack),
+            citySelected: current.citySelected,
             issue: failure.kind,
             errorId: ++_errorId,
           ),

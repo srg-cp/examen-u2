@@ -146,6 +146,8 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Ampliación posterior16 de octubre: listado Guardados dentro de Explorar (HU-07/RF-13) y Ciudad del perfil (HU-01.7/RF-01) mediante el mismo buscador de Ubicación. Plan021 solo para índice/RPC de listado privado paginado, sin modificar020 aplicado según usuario. Ciudad reutiliza places y exige elegir sugerencia para texto nuevo; sin SQL nuevo de perfil ni certificado oficial de ciudad. Sin seguimiento/offline o cierre de historias; análisis limpio, pruebas omitidas por instrucción y021/Android pendientes. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
 Ampliación explícita solicitada el16 de octubre de2026 de HU-07/RF-13: guardar/quitar casos por cuenta desde marcador superior derecho de la ficha. saved_cases/plan020, sin issue asignado ni cierre de historia. Recorrido por ficha; sin listado propio, seguimiento/push ni descarga offline HU-15.3. [Ficha](funcionalidades/casos-guardados.md), [ADR-050](decisiones/050-casos-guardados-por-cuenta.md). Validación/aplicación020 y Android pendientes; sin pruebas ejecutadas por petición del usuario.
 
 - **HU-05 / RF-05:** publicar perdido con fecha y zona; restricción de un caso activo por mascota y creación idempotente.
@@ -461,3 +463,5 @@ Ajuste solicitado de HU-07.1/RF-13: panel flotante reutilizable que mantiene fij
 ## Ajuste de filtros y zona de HU-07.1 — 15 de octubre de 2026
 
 Por nueva instrucción, filtros desplegados dentro de Explorar sin popup. Cards eliminan texto Mascota perdida y conservan nombre/especie más badges. El usuario confirma búsqueda de ciudad/dirección, selección en mapa y radio en kilómetros. Incremento de HU-07.1/RF-13 con geocodificación de lectura Photon y selección manual alternativa, sin GPS, SQL nuevo o mapa de resultados HU-07.2. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md), ficha y ESTADO separan evidencias locales de demo autenticada.
+
+Corrección visual16 de octubre de2026 de Guardados (HU-07/RF-13): pantalla independiente desde marcador compacto, con expansión/retorno OriginPageTransition compartido y shell glass; sustituye alternancia de vistas dentro de Explorar. Sin ampliación funcional ni SQL nuevo;021/Android pendientes y sin pruebas por instrucción del usuario.

@@ -11,7 +11,10 @@ class PhotonPlaceDataSource implements PlaceSearchDataSource {
   final http.Client _client;
   final String endpoint;
   @override
-  Future<List<SearchPlaceDto>> search(String query) async {
+  Future<List<SearchPlaceDto>> search(
+    String query, {
+    bool citiesOnly = false,
+  }) async {
     final base = Uri.parse(endpoint);
     if (base.scheme != 'https' ||
         base.host.isEmpty ||
@@ -20,7 +23,13 @@ class PhotonPlaceDataSource implements PlaceSearchDataSource {
     }
     final response = await _client
         .get(
-          base.replace(queryParameters: {'q': query, 'limit': '5'}),
+          base.replace(
+            queryParameters: {
+              'q': query,
+              'limit': '5',
+              if (citiesOnly) 'layer': 'city',
+            },
+          ),
           headers: {
             'Accept': 'application/json',
             'User-Agent':
@@ -37,7 +46,10 @@ class PhotonPlaceDataSource implements PlaceSearchDataSource {
     for (final feature in features.take(5)) {
       try {
         rows.add(
-          SearchPlaceDto.fromJson(Map<String, dynamic>.from(feature as Map)),
+          SearchPlaceDto.fromJson(
+            Map<String, dynamic>.from(feature as Map),
+            citiesOnly: citiesOnly,
+          ),
         );
       } on FormatException {
         continue;
@@ -47,7 +59,7 @@ class PhotonPlaceDataSource implements PlaceSearchDataSource {
         continue;
       }
     }
-    if (features.isNotEmpty && rows.isEmpty) {
+    if (!citiesOnly && features.isNotEmpty && rows.isEmpty) {
       throw const FormatException('No valid places');
     }
     return rows;

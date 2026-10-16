@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:flutter_application_entrehuellas/features/explore/domain/entities/search_place.dart';
-import 'package:flutter_application_entrehuellas/features/explore/domain/repositories/place_search_repository.dart';
-import 'package:flutter_application_entrehuellas/features/explore/domain/failures/explore_failure.dart';
+import 'package:flutter_application_entrehuellas/features/places/domain/entities/search_place.dart';
+import 'package:flutter_application_entrehuellas/features/places/domain/repositories/place_search_repository.dart';
+import 'package:flutter_application_entrehuellas/features/places/domain/failures/place_search_failure.dart';
 
 class FakePlaceSearch implements PlaceSearchRepository {
   final queries = <String>[];
@@ -13,9 +13,14 @@ class FakePlaceSearch implements PlaceSearchRepository {
     longitude: -77.03,
   );
   @override
-  Future<List<SearchPlace>> search(String query) async {
+  Future<List<SearchPlace>> search(
+    String query, {
+    bool citiesOnly = false,
+  }) async {
     queries.add(query);
-    if (fail) throw const ExploreFailure(ExploreFailureKind.unavailable);
+    if (fail) {
+      throw const PlaceSearchFailure(PlaceSearchFailureKind.unavailable);
+    }
     if (pending != null) return pending!.future;
     return const [place];
   }

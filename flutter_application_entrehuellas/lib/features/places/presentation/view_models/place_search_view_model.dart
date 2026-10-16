@@ -1,16 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/failures/explore_failure.dart';
-import '../../providers/explore_providers.dart';
+import '../../domain/failures/place_search_failure.dart';
+import '../../providers/places_providers.dart';
 import '../state/place_search_state.dart';
 
-final placeSearchViewModelProvider =
-    NotifierProvider.autoDispose<PlaceSearchViewModel, PlaceSearchState>(
+final placeSearchByModeViewModelProvider = NotifierProvider.autoDispose
+    .family<PlaceSearchViewModel, PlaceSearchState, bool>(
       PlaceSearchViewModel.new,
     );
+final placeSearchViewModelProvider = placeSearchByModeViewModelProvider(false);
 
 class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
+  PlaceSearchViewModel(this.citiesOnly);
+  final bool citiesOnly;
   int _generation = 0;
   Timer? _debounce;
   String _input = '';
@@ -22,7 +25,7 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     _debounce?.cancel();
     _queued = null;
     _input = '';
-    ref.watch(exploreSessionProvider);
+    ref.watch(placesSessionProvider);
     ref.onDispose(() {
       _generation++;
       _debounce?.cancel();
@@ -75,10 +78,13 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     final g = ++_generation, id = state.noticeId;
     state = PlaceSearchState(busy: true, noticeId: id);
     try {
-      if (ref.read(exploreSessionProvider).asData?.value == null) {
-        throw const ExploreFailure(ExploreFailureKind.forbidden);
+      if (ref.read(placesSessionProvider).asData?.value == null) {
+        throw const PlaceSearchFailure(PlaceSearchFailureKind.forbidden);
       }
-      final places = await ref.read(searchPlacesProvider)(query);
+      final places = await ref.read(searchPlacesProvider)(
+        query,
+        citiesOnly: citiesOnly,
+      );
       if (!ref.mounted || g != _generation) return;
       state = PlaceSearchState(
         places: places,
@@ -90,7 +96,8 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     } catch (e) {
       if (!ref.mounted || g != _generation) return;
       state = PlaceSearchState(
-        notice: e is ExploreFailure && e.kind == ExploreFailureKind.invalid
+        notice:
+            e is PlaceSearchFailure && e.kind == PlaceSearchFailureKind.invalid
             ? 'Escribe entre 2 y 120 caracteres para buscar.'
             : 'No pudimos buscar la ubicación. Puedes reintentar o elegirla en el mapa.',
         noticeId: id + 1,

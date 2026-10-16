@@ -1,4 +1,5 @@
 import 'features/explore/providers/explore_providers.dart';
+import 'features/places/providers/places_providers.dart';
 import 'features/saved_cases/providers/saved_cases_providers.dart';
 import 'features/found_cases/providers/found_case_providers.dart';
 import 'features/lost_cases/providers/lost_case_providers.dart';

@@ -1,8 +1,10 @@
-enum ExploreKind { all, lost, found, sighting }
+import '../../../../core/domain/entities/public_case_card.dart';
+
+typedef ExploreKind = PublicCaseKind;
 
 enum ExploreSpecies { all, dog, cat, other }
 
-enum ExploreStatus { all, active, resolved }
+typedef ExploreStatus = PublicCaseStatus;
 
 class ExploreQuery {
   const ExploreQuery({

@@ -2,6 +2,8 @@
 
 Estado: aceptada por instrucción explícita del usuario, 15 de octubre de 2026.
 
+Refinamiento solicitado el16 de octubre: superficie del indicador igual al retorno, reutilizando GlassSurface (círculo52/radio26/icono28) con su material/desenfoque/ribete/sombra. Se retira decoración gris propia y se ajusta la posición oculta a52. No cambia gesto/giro/retorno; formato/análisis sin incidencias, sin pruebas/renders ejecutados por instrucción del usuario y revisión Android pendiente.
+
 ## Referencia y decisión
 
 El usuario corrige la flecha de ADR-048 y pide investigar el indicador habitual: símbolo de recarga, descenso durante el jalón y regreso al soltar. La referencia oficial de [RefreshIndicator](https://api.flutter.dev/flutter/material/RefreshIndicator-class.html) y su [displacement](https://api.flutter.dev/flutter/material/RefreshIndicator/displacement.html) describe el desplazamiento durante arrastre y posición de espera; el equivalente [CupertinoSliverRefreshControl](https://api.flutter.dev/flutter/cupertino/CupertinoSliverRefreshControl-class.html) reserva espacio durante la actualización. Se conserva el reconocimiento nativo actual, sin migrar los scrolls a slivers.

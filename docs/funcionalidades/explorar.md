@@ -1,10 +1,16 @@
 # Explorar: lista de casos
 
+Ajuste vigente del16 de octubre: el marcador compacto de Explorar abre la pantalla independiente Guardados en /home/saved-cases. Reutiliza OriginPageSource/OriginPageTransition mediante entityEditorPage: expansión desde el icono y retorno al origen al cerrar, con movimiento reducido respetado. Sustituye el cambio de vista en la cabecera y la segunda pulsación. SavedCasesScreen reutiliza EntityScreenShell con retorno glass y cover→stagger, SavedCasesSection y PullToRefresh; scroll siempre desplazable incluso con lista vacía. Explorar permanece debajo con filtros/posición conservados. Sin cambios SQL;021 sigue pendiente de aplicación y revisión Android.
+
 Módulo `explore`. HU-07.1 / RF-13 / issue #32; implementación local. [ADR-039](../decisiones/039-explorar-lista-publica-paginada.md).
 
 **Presentación vigente, última corrección del 15 de octubre:** una sola insignia de estado Abierto/Resuelto en la imagen; debajo, nombre (Sin nombre si falta) y distancia aproximada desde el centro elegido: A 4 km o A menos de 1 km. Sin especie, fecha ni badge de tipo. Sin distancia del servidor se omite esa línea. Filtros anclados debajo de su cápsula y superpuestos a las cards, con scroll independiente; fuera/Atrás cancela y Aplicar confirma. [ADR-043](../decisiones/043-explorar-desplegable-anclado-y-distancia.md) sustituye las variantes visuales históricas descritas abajo. No se ejecutan pruebas ni renders para este último ajuste por instrucción del usuario; pendiente revisión Android.
 
 ## Qué hace y recorrido
+
+**Vistas actuales:** Marcador compacto junto al título para abrir Guardados, sin selector de secciones. Marcador lleno/título Guardados identifica esta vista; pulsarlo otra vez vuelve a Explorar. Cabecera persistente en una fila, área táctil48/icono24 y cover→stagger en cambio discreto. Guardados compuesta por router con saved_cases, misma grilla core, paginación/refresco y fichas; solo marcas privadas disponibles, sin radio/GPS. Cercanos conserva filtros/centro durante el cambio. El buscador de Ubicación ahora pertenece a places y llega por slot. Guardados requiere021 tras020; sin aplicación/pruebas de021 ni verificación Android. [ADR-051](../decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
+Indicador de recarga (ajuste16 de octubre): mismo material glass del retorno, con GlassSurface52/radio26/icono28. Mantiene seguimiento del jalón, giro y retirada; sin botón permanente. Formato/análisis sin incidencias; sin pruebas/renders por instrucción del usuario, revisión Android pendiente.
 
 **Distribución vigente,16 de octubre:** Ubicación a la izquierda y Filtrar casos a la derecha en la misma fila, sin disposición vertical. Cápsulas compactas, etiquetas/fuente/área táctil conservadas y altura adaptable; se omiten iconos iniciales cuando falta espacio. Los paneles siguen usando todo el ancho, anclados a sus extremos respectivos. Se conservan selección, búsqueda, radio y transición. Formato/análisis estático, sin pruebas ejecutadas por instrucción vigente; revisión visual Android pendiente. Sustituye las notas históricas de apilado.
 

@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
-import 'package:flutter_application_entrehuellas/features/explore/domain/use_cases/search_places.dart';
-import 'package:flutter_application_entrehuellas/features/explore/domain/failures/explore_failure.dart';
-import 'package:flutter_application_entrehuellas/features/explore/data/data_sources/photon_place_data_source.dart';
-import 'package:flutter_application_entrehuellas/features/explore/data/repositories/place_search_repository_impl.dart';
-import 'package:flutter_application_entrehuellas/features/explore/presentation/view_models/place_search_view_model.dart';
-import 'package:flutter_application_entrehuellas/features/explore/providers/explore_providers.dart';
+import 'package:flutter_application_entrehuellas/features/places/domain/use_cases/search_places.dart';
+import 'package:flutter_application_entrehuellas/features/places/domain/failures/place_search_failure.dart';
+import 'package:flutter_application_entrehuellas/features/places/data/data_sources/photon_place_data_source.dart';
+import 'package:flutter_application_entrehuellas/features/places/data/repositories/place_search_repository_impl.dart';
+import 'package:flutter_application_entrehuellas/features/places/presentation/view_models/place_search_view_model.dart';
+import 'package:flutter_application_entrehuellas/features/places/providers/places_providers.dart';
 import 'support/fake_place_search.dart';
 
 void main() {
@@ -49,7 +49,7 @@ void main() {
       final use = SearchPlaces(
         PlaceSearchRepositoryImpl(PhotonPlaceDataSource(client)),
       );
-      expect(() => use('x'), throwsA(isA<ExploreFailure>()));
+      expect(() => use('x'), throwsA(isA<PlaceSearchFailure>()));
       expect(requests, 0);
       final rows = await use('  Miraflores   Lima  ');
       expect(rows.single.label, 'Miraflores, Perú');
@@ -81,7 +81,7 @@ void main() {
           PlaceSearchRepositoryImpl(
             PhotonPlaceDataSource(client),
           ).search('Lima'),
-          throwsA(isA<ExploreFailure>()),
+          throwsA(isA<PlaceSearchFailure>()),
         );
       }
       final failing = MockClient(
@@ -92,7 +92,7 @@ void main() {
         PlaceSearchRepositoryImpl(
           PhotonPlaceDataSource(failing),
         ).search('Lima'),
-        throwsA(isA<ExploreFailure>()),
+        throwsA(isA<PlaceSearchFailure>()),
       );
       final empty = MockClient(
         (_) async => http.Response('{"features":[]}', 200),
@@ -114,7 +114,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           placeSearchRepositoryProvider.overrideWithValue(repo),
-          exploreSessionProvider.overrideWith((_) => sessions.stream),
+          placesSessionProvider.overrideWith((_) => sessions.stream),
         ],
       );
       addTearDown(container.dispose);
@@ -123,7 +123,7 @@ void main() {
       addTearDown(sub.close);
       await Future<void>.delayed(Duration.zero);
       sessions.add(const AuthSession(userId: 'a'));
-      await container.read(exploreSessionProvider.future);
+      await container.read(placesSessionProvider.future);
       repo.pending = Completer();
       final late = repo.pending!;
       final work = container
@@ -152,7 +152,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           placeSearchRepositoryProvider.overrideWithValue(repo),
-          exploreSessionProvider.overrideWith(
+          placesSessionProvider.overrideWith(
             (_) => Stream.value(const AuthSession(userId: 'a')),
           ),
         ],
@@ -160,7 +160,7 @@ void main() {
       addTearDown(container.dispose);
       final sub = container.listen(placeSearchViewModelProvider, (_, _) {});
       addTearDown(sub.close);
-      await container.read(exploreSessionProvider.future);
+      await container.read(placesSessionProvider.future);
       final model = container.read(placeSearchViewModelProvider.notifier);
       await model.search('Lima');
       expect(container.read(placeSearchViewModelProvider).notice, isNotNull);

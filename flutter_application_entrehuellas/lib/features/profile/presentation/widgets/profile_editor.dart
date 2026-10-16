@@ -12,8 +12,18 @@ import '../../domain/failures/profile_failure.dart';
 import '../state/profile_edit_state.dart';
 import '../view_models/profile_view_model.dart';
 
+typedef ProfileCityFieldBuilder =
+    Widget Function(
+      String city,
+      bool enabled,
+      bool invalid,
+      ValueChanged<String> onQuery,
+      ValueChanged<String> onSelect,
+    );
+
 class ProfileEditor extends ConsumerWidget {
-  const ProfileEditor({super.key});
+  const ProfileEditor({this.cityFieldBuilder, super.key});
+  final ProfileCityFieldBuilder? cityFieldBuilder;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileViewModelProvider);
@@ -47,6 +57,8 @@ class ProfileEditor extends ConsumerWidget {
         onEdit: model.edit,
         onSave: model.save,
         onDiscard: model.discard,
+        cityFieldBuilder: cityFieldBuilder,
+        onSelectCity: model.selectCity,
       ),
     );
   }
@@ -58,11 +70,15 @@ class _ProfileFields extends StatefulWidget {
     required this.onEdit,
     required this.onSave,
     required this.onDiscard,
+    required this.onSelectCity,
+    this.cityFieldBuilder,
   });
   final ProfileEditState value;
   final void Function({String? displayName, String? city}) onEdit;
   final VoidCallback onSave;
   final VoidCallback onDiscard;
+  final ValueChanged<String> onSelectCity;
+  final ProfileCityFieldBuilder? cityFieldBuilder;
   @override
   State<_ProfileFields> createState() => _ProfileFieldsState();
 }
@@ -137,21 +153,29 @@ class _ProfileFieldsState extends State<_ProfileFields> {
         ShakeField(
           errorId: state.errorId,
           hasError: cityError,
-          child: AppTextField(
-            label: 'Ciudad',
-            controller: _city,
-            enabled: !state.isBusy,
-            textCapitalization: TextCapitalization.words,
-            textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.addressCity],
-            hint: 'Tu ciudad',
-            icon: Icons.location_city_outlined,
-            invalid: cityError,
-            onChanged: (value) => widget.onEdit(city: value),
-            onSubmitted: (_) {
-              if (state.isDirty && !state.isBusy) widget.onSave();
-            },
-          ),
+          child:
+              widget.cityFieldBuilder?.call(
+                state.city,
+                !state.isBusy,
+                cityError,
+                (value) => widget.onEdit(city: value),
+                widget.onSelectCity,
+              ) ??
+              AppTextField(
+                label: 'Ciudad',
+                controller: _city,
+                enabled: !state.isBusy,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.addressCity],
+                hint: 'Tu ciudad',
+                icon: Icons.location_city_outlined,
+                invalid: cityError,
+                onChanged: (value) => widget.onEdit(city: value),
+                onSubmitted: (_) {
+                  if (state.isDirty && !state.isBusy) widget.onSave();
+                },
+              ),
         ),
         const SizedBox(height: 24),
         LoadingShimmer(
@@ -176,7 +200,8 @@ class _ProfileFieldsState extends State<_ProfileFields> {
 
 String profileFailureLabel(ProfileFailureKind kind) => switch (kind) {
   ProfileFailureKind.invalidName => 'Nombre: usa hasta 120 caracteres.',
-  ProfileFailureKind.invalidCity => 'Ciudad: usa hasta 120 caracteres.',
+  ProfileFailureKind.invalidCity =>
+    'Selecciona una ciudad de las sugerencias (hasta 120 caracteres).',
   ProfileFailureKind.signedOut => 'Tu sesión cambió. Vuelve a ingresar.',
   ProfileFailureKind.missing => 'Tu perfil no está disponible. Reintenta.',
   _ => 'No se pudo guardar. Conservamos tus cambios para reintentar.',

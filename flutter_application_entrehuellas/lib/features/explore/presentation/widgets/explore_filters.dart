@@ -6,7 +6,10 @@ import '../../../../core/presentation/widgets/primary_action_button_style.dart';
 import '../../../../core/presentation/widgets/zone_map_picker.dart';
 import '../../../../core/presentation/widgets/shake_field.dart';
 import '../../domain/entities/explore_query.dart';
-import 'place_search_fields.dart';
+import '../../../places/domain/entities/search_place.dart';
+
+typedef LocationSearchBuilder =
+    Widget Function(String label, ValueChanged<SearchPlace> onSelect);
 
 class ExploreFilters extends StatefulWidget {
   const ExploreFilters({
@@ -14,12 +17,14 @@ class ExploreFilters extends StatefulWidget {
     this.applying = false,
     this.query = const ExploreQuery(radiusMeters: 15000),
     this.onUseCurrentLocation,
+    this.locationSearchBuilder,
     required this.onApply,
     super.key,
   });
   final bool enabled, applying;
   final ExploreQuery query;
   final VoidCallback? onUseCurrentLocation;
+  final LocationSearchBuilder? locationSearchBuilder;
   final void Function(
     ExploreKind,
     ExploreSpecies,
@@ -36,10 +41,16 @@ class ExploreFilters extends StatefulWidget {
 
 class _ExploreFiltersState extends State<ExploreFilters> {
   late _FilterSelection _selection = _FilterSelection(
+    kind: widget.query.kind,
+    species: widget.query.species,
+    status: widget.query.status,
+    days: widget.query.since == null || widget.query.until == null
+        ? 0
+        : widget.query.until!.difference(widget.query.since!).inDays,
     lat: widget.query.latitude,
     lon: widget.query.longitude,
     radius: widget.query.radiusMeters ?? 15000,
-    label: widget.query.latitude == null ? '' : 'Ubicación actual',
+    label: widget.query.latitude == null ? '' : 'Ubicación seleccionada',
   );
 
   @override
@@ -91,6 +102,7 @@ class _ExploreFiltersState extends State<ExploreFilters> {
           initial: _selection,
           zoneOnly: true,
           onUseCurrentLocation: widget.onUseCurrentLocation,
+          locationSearchBuilder: widget.locationSearchBuilder,
           onConfirm: confirm,
         ),
         onApply: _apply,
@@ -146,9 +158,11 @@ class _ExploreFilterEditor extends StatefulWidget {
     required this.initial,
     required this.onConfirm,
     this.zoneOnly = false,
+    this.locationSearchBuilder,
     this.onUseCurrentLocation,
   });
   final bool zoneOnly;
+  final LocationSearchBuilder? locationSearchBuilder;
   final VoidCallback? onUseCurrentLocation;
   final ValueChanged<_FilterSelection> onConfirm;
   final _FilterSelection initial;
@@ -242,15 +256,16 @@ class _ExploreFilterEditorState extends State<_ExploreFilterEditor> {
               label: const Text('Usar mi ubicación actual'),
             ),
           const SizedBox(height: 16),
-          PlaceSearchFields(
-            initialLabel: _label,
-            onSelect: (place) => setState(() {
-              _lat = place.latitude;
-              _lon = place.longitude;
-              _label = place.label;
-              _invalid = false;
-            }),
-          ),
+          if (widget.locationSearchBuilder != null)
+            widget.locationSearchBuilder!(
+              _label,
+              (place) => setState(() {
+                _lat = place.latitude;
+                _lon = place.longitude;
+                _label = place.label;
+                _invalid = false;
+              }),
+            ),
           const SizedBox(height: 12),
           Text(
             'Radio: ${(_radius / 1000).round()} km',

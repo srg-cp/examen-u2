@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 import 'support/fake_place_search.dart';
+import 'package:flutter_application_entrehuellas/features/places/providers/places_providers.dart';
+import 'package:flutter_application_entrehuellas/features/places/presentation/widgets/place_search_fields.dart';
 import 'support/fake_current_location.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/filter_choice_group.dart';
@@ -421,9 +423,14 @@ void main() {
           routes: [
             GoRoute(
               path: '/home',
-              builder: (_, _) => const HomeScreen(
-                profileAvatar: SizedBox(width: 40),
-                exploreContent: ExploreSection(),
+              builder: (_, _) => HomeScreen(
+                profileAvatar: const SizedBox(width: 40),
+                exploreContent: ExploreSection(
+                  locationSearchBuilder: (label, onSelect) => PlaceSearchFields(
+                    initialLabel: label,
+                    onSelect: onSelect,
+                  ),
+                ),
               ),
             ),
             GoRoute(
@@ -439,6 +446,9 @@ void main() {
             overrides: [
               homeViewModelProvider.overrideWith(ExploreHome.new),
               placeSearchRepositoryProvider.overrideWithValue(places),
+              placesSessionProvider.overrideWith(
+                (_) => Stream.value(const AuthSession(userId: 'a')),
+              ),
               exploreRepositoryProvider.overrideWithValue(repo),
               currentLocationRepositoryProvider.overrideWithValue(
                 const FakeCurrentLocation(),
