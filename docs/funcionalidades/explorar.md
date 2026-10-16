@@ -1,5 +1,7 @@
 # Explorar: lista y mapa de casos
 
+Resultado final16 de octubre:04b3a13 publicado; Flutter38947608248 aprobado en Linux con339 pruebas, formato y análisis. Recorrido Android real y limitación de APK documentados abajo y en ESTADO.
+
 Seguimiento16 de octubre: CI Linux de c727b2f aprobado con339 pruebas, formato y análisis. Recorrido autenticado en emulador Android16 sobre la instalación debug existente, actualizado por attach/hot restart: ubicación manual real Photon/Lima,3 casos con fotos y teselas reales en ambas vistas, selección→ficha→retorno y filtro Gato con1 resultado coincidente. Se corrige el singular del contador. Capturas/evidencia en ESTADO. Gradle falla al construir APK nuevo por conexión local de Java; no se acredita instalación/arranque frío nuevos. Pendientes Android físico, denegación explícita, fallo controlado de teselas, volumen y permisos/concurrencia hosted; no se cierra historia.
 
 ## Incremento vigente: mapa de resultados — 16 de octubre de 2026
