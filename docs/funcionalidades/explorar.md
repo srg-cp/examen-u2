@@ -1,5 +1,7 @@
 # Explorar: lista y mapa de casos
 
+Seguimiento16 de octubre: CI Linux de c727b2f aprobado con339 pruebas, formato y análisis. Recorrido autenticado en emulador Android16 sobre la instalación debug existente, actualizado por attach/hot restart: ubicación manual real Photon/Lima,3 casos con fotos y teselas reales en ambas vistas, selección→ficha→retorno y filtro Gato con1 resultado coincidente. Se corrige el singular del contador. Capturas/evidencia en ESTADO. Gradle falla al construir APK nuevo por conexión local de Java; no se acredita instalación/arranque frío nuevos. Pendientes Android físico, denegación explícita, fallo controlado de teselas, volumen y permisos/concurrencia hosted; no se cierra historia.
+
 ## Incremento vigente: mapa de resultados — 16 de octubre de 2026
 
 HU-07.2 / RF-13 / issue #33 implementada localmente en `feature/explore-case-map`. Lista/Mapa reutiliza TwoOptionFilter y cambia de vista con cover→stagger; cabecera y filtros se conservan. Ambas vistas observan exactamente la misma consulta y páginas, sin nueva petición al alternar. Ver más casos añade resultados a ambas; el contador del mapa describe los casos consultados, sin prometer todos los del área.

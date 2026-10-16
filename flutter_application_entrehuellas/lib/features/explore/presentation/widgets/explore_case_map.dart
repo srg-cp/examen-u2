@@ -151,7 +151,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
-              '${widget.items.length} casos consultados. Lista y mapa comparten los mismos resultados.',
+              '${widget.items.length} ${widget.items.length == 1 ? 'caso consultado' : 'casos consultados'}. Lista y mapa comparten los mismos resultados.',
               style: const TextStyle(color: Color(0xFF6E6E73)),
             ),
           ),
