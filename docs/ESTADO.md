@@ -2,6 +2,10 @@
 
 Última actualización: 16 de octubre de 2026, America/Lima.
 
+## Corrección de navegación a Guardados —16 de octubre de2026
+
+Corrección16 de octubre: el guard de sesión del router omitía /home/saved-cases y redirigía a /home al pulsar el marcador. Se permite explícitamente esa ruta solo cuando EntryDestination.home está resuelto; acceso/onboarding/recuperación mantienen sus controles. Se conserva OriginPageTransition existente. Formato y análisis estático de router sin incidencias; sin pruebas por instrucción del usuario y sin verificación Android. Pendiente revisar apertura/retorno en dispositivo;021 sigue pendiente para cargar el listado.
+
 ## Guardados: pantalla con expansión desde el marcador —16 de octubre de2026
 
 Ajuste vigente del16 de octubre: el marcador compacto de Explorar abre la pantalla independiente Guardados en /home/saved-cases. Reutiliza OriginPageSource/OriginPageTransition mediante entityEditorPage: expansión desde el icono y retorno al origen al cerrar, con movimiento reducido respetado. Sustituye el cambio de vista en la cabecera y la segunda pulsación. SavedCasesScreen reutiliza EntityScreenShell con retorno glass y cover→stagger, SavedCasesSection y PullToRefresh; scroll siempre desplazable incluso con lista vacía. Explorar permanece debajo con filtros/posición conservados. Sin cambios SQL;021 sigue pendiente de aplicación y revisión Android.

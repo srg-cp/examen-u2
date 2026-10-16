@@ -107,6 +107,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/lost-cases/community/new' ||
               state.uri.path == '/home/my-cases' ||
               state.uri.path == '/home/my-reports' ||
+              state.uri.path == '/home/saved-cases' ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
