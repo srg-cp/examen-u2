@@ -21,7 +21,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Casos perdidos](casos-perdidos.md) | lost_cases | HU-05; RF-05; issue #5; implementación local |
 | [Avisos y reportes anteriores](casos-encontrados.md) | found_cases | HU-06; RF-06; issue #6; implementación local |
 | [Búsquedas y avisos vinculados](busquedas-y-avisos.md) | lost_cases / found_cases | HU-05/06; partes HU-10/13; ADR-034; implementación local |
-| [Explorar: grilla filtrada](explorar.md) | explore | HU-07.1; RF-13; issue #32; implementación local |
+| [Explorar: lista y mapa filtrados](explorar.md) | explore | HU-07.1/07.2; RF-13; issues #32/#33; implementación local |
 | [Mis reportes](mis-reportes.md) | found_cases / dominio lost_cases | HU-05/06; consulta unificada; ADR-036 |
 
 Las HU son identificadores del producto; los números # son issues de GitHub.

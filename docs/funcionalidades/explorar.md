@@ -1,4 +1,16 @@
-# Explorar: lista de casos
+# Explorar: lista y mapa de casos
+
+## Incremento vigente: mapa de resultados — 16 de octubre de 2026
+
+HU-07.2 / RF-13 / issue #33 implementada localmente en `feature/explore-case-map`. Lista/Mapa reutiliza TwoOptionFilter y cambia de vista con cover→stagger; cabecera y filtros se conservan. Ambas vistas observan exactamente la misma consulta y páginas, sin nueva petición al alternar. Ver más casos añade resultados a ambas; el contador del mapa describe los casos consultados, sin prometer todos los del área.
+
+El mapa permite pan/zoom sin cambiar filtros ni centro. Ubicación continúa siendo el editor de centro/radio, con selección manual disponible sin GPS. Los puntos usan coordenadas públicas aproximadas ya recibidas; coincidencias se agrupan y muestran las tarjetas compartidas debajo del mapa. Cada tarjeta abre la ficha existente y el retorno refresca la misma consulta. El origen diferencia UUID iguales. La vista se conserva durante filtros/refresco/reintentos y se reinicia al cambiar de cuenta.
+
+Carga inicial/consulta nueva conserva skeleton y shimmer; refresh de la misma consulta conserva contenido. Error de consulta vacío no se presenta como resultado confirmado. Fallo de teselas usa toast y Reintentar mapa de ZoneMapPicker; fallo del enlace de atribución usa toast. Reintentar recrea proveedor/mapa y ajusta cámara al radio. No hay escrituras, SQL nuevo, seguimiento continuo ni descarga offline.
+
+Dependencias: backend019 y fotos operativos, igual que la lista;020/021 corresponden a Guardados y su aplicación está confirmada por el usuario. Mapa usa MAP_TILE_URL/flutter_map y atribución OpenStreetMap visible; disponibilidad, caché y condiciones antes de distribución en [ADR-052](../decisiones/052-explorar-mapa-de-resultados.md). La nota anterior de HU-07.2 pendiente queda sustituida por esta implementación local.
+
+Validación: pruebas de paridad de consulta/páginas, errores/reintentos/filtros, agrupación por ubicación con orígenes distintos, apertura de tarjetas y navegación sin editar centro; renders normal/pequeño con texto2/movimiento reducido revisados con teselas neutras de prueba. Sin demo Android/hosted ni cierre de historia. Resultados completos en ESTADO.
 
 Confirmación del usuario16 de octubre: patch021 aplicado y recorrido de guardar/Guardados probado con resultado correcto («ya esta el patch ese, si permite guardar ya lo probe y todo esta bien»). Sustituye el pendiente de activación021 en notas anteriores; evidencia comunicada por el usuario, sin inspección remota independiente ni certificación adicional de permisos/concurrencia.
 

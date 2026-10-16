@@ -16,12 +16,22 @@ class ZoneMapPicker extends StatefulWidget {
     this.readOnly = false,
     this.fitRadius = false,
     this.showCenterMarker = true,
+    this.readOnlyNavigation = false,
+    this.markers = const [],
+    this.height = viewportHeight,
+    this.attribution,
     super.key,
   });
   final double? latitude;
   final double? longitude;
   final int radiusMeters;
   final bool readOnly, showCenterMarker, fitRadius;
+
+  /// Result maps can be explored without changing the selected search center.
+  final bool readOnlyNavigation;
+  final List<Marker> markers;
+  final double height;
+  final Widget? attribution;
   final void Function(double latitude, double longitude)? onSelect;
   final TileProvider Function()? createTileProvider;
   @override
@@ -122,7 +132,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
           ClipRRect(
             borderRadius: BorderRadius.circular(22),
             child: SizedBox(
-              height: ZoneMapPicker.viewportHeight,
+              height: widget.height,
               child: FlutterMap(
                 mapController: _controller,
                 key: ValueKey(_attempt),
@@ -134,7 +144,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                   initialCenter: point ?? const LatLng(-12.0464, -77.0428),
                   initialZoom: 12,
                   interactionOptions: InteractionOptions(
-                    flags: widget.readOnly
+                    flags: widget.readOnly && !widget.readOnlyNavigation
                         ? InteractiveFlag.none
                         : InteractiveFlag.all,
                   ),
@@ -185,6 +195,9 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                         ),
                       ],
                     ),
+                  if (widget.markers.isNotEmpty)
+                    MarkerLayer(markers: widget.markers),
+                  if (widget.attribution != null) widget.attribution!,
                 ],
               ),
             ),
@@ -193,6 +206,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
             TextButton(
               onPressed: () => setState(() {
                 _failed = false;
+                _mapReady = false;
                 _attempt++;
                 _tiles = _createTiles();
               }),

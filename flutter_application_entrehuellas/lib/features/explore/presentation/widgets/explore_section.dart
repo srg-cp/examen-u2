@@ -9,7 +9,10 @@ import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../../../../core/presentation/widgets/cover_reveal.dart';
 import '../../../../core/presentation/widgets/origin_page_transition.dart';
+import '../../../../core/presentation/widgets/two_option_filter.dart';
+import '../../domain/entities/explore_page.dart';
 import '../view_models/explore_view_model.dart';
+import 'explore_case_map.dart';
 import 'explore_filters.dart';
 import 'explore_case_grid.dart';
 
@@ -78,6 +81,44 @@ class ExploreSection extends ConsumerWidget {
     final async = ref.watch(exploreViewModelProvider);
     final data = async.isLoading || async.hasError ? null : async.asData?.value;
     final vm = ref.read(exploreViewModelProvider.notifier);
+    Future<void> openCase(ExploreCase item, BuildContext source) async {
+      final box = source.findRenderObject() as RenderBox?;
+      final origin = box == null
+          ? null
+          : box.localToGlobal(Offset.zero) & box.size;
+      await context.push(
+        '/home/${item.fromPet ? 'cases' : 'found-cases'}/${item.id}',
+        extra: origin,
+      );
+      if (context.mounted) {
+        ref.read(exploreViewModelProvider.notifier).refresh();
+      }
+    }
+
+    final Widget results;
+    if (data == null ||
+        (data.mapSelected &&
+            (data.needsLocation || (data.failed && data.items.isEmpty)))) {
+      results = const SizedBox.shrink();
+    } else if (!data.mapSelected) {
+      results = ExploreCaseGrid(
+        items: data.items,
+        onOpen: data.busy ? null : openCase,
+      );
+    } else if (data.refreshing && data.items.isEmpty) {
+      results = const SizedBox(
+        height: 320,
+        child: ColoredBox(color: Color(0xFFE5E5EA)),
+      );
+    } else {
+      results = ExploreCaseMap(
+        key: ValueKey((data.owner, data.query)),
+        items: data.items,
+        query: data.query,
+        onOpen: data.busy ? null : openCase,
+      );
+    }
+
     return _layout(
       PullToRefreshTarget(
         onRefresh: vm.refresh,
@@ -119,6 +160,16 @@ class ExploreSection extends ConsumerWidget {
                       ),
                     ),
                   const SizedBox(height: 16),
+                  if (data != null) ...[
+                    TwoOptionFilter(
+                      secondSelected: data.mapSelected,
+                      onChanged: data.busy ? null : vm.selectMap,
+                      firstLabel: 'Lista',
+                      secondLabel: 'Mapa',
+                      indicatorKey: const ValueKey('explore-view-indicator'),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   if (async.isLoading)
                     const LoadingShimmer(
                       isLoading: true,
@@ -144,36 +195,27 @@ class ExploreSection extends ConsumerWidget {
                                 'Elige una ubicación para ver casos cercanos.',
                               ),
                             )
-                          else if (data.refreshing && data.items.isEmpty)
+                          else if (data.refreshing &&
+                              data.items.isEmpty &&
+                              !data.mapSelected)
                             const ExploreCaseGrid.skeleton()
-                          else if (data.items.isEmpty && !data.failed)
+                          else if (data.items.isEmpty &&
+                              !data.failed &&
+                              !data.refreshing)
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Text('No hay casos con estos filtros.'),
                             ),
-                          ExploreCaseGrid(
-                            items: data.items,
-                            onOpen: data.busy
-                                ? null
-                                : (item, source) async {
-                                    final box =
-                                        source.findRenderObject() as RenderBox?;
-                                    final origin = box == null
-                                        ? null
-                                        : box.localToGlobal(Offset.zero) &
-                                              box.size;
-                                    await context.push(
-                                      '/home/${item.fromPet ? 'cases' : 'found-cases'}/${item.id}',
-                                      extra: origin,
-                                    );
-                                    if (context.mounted) {
-                                      ref
-                                          .read(
-                                            exploreViewModelProvider.notifier,
-                                          )
-                                          .refresh();
-                                    }
-                                  },
+                          AuthStageTransition(
+                            stage: data.mapSelected,
+                            builder: (play) => StaggerReveal(
+                              count: 1,
+                              play: play,
+                              child: StaggerRevealItem(
+                                order: 0,
+                                child: results,
+                              ),
+                            ),
                           ),
                           if (data.failed)
                             TextButton(

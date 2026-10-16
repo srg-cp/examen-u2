@@ -85,6 +85,7 @@ void main() {
       await container.read(profileViewModelProvider.future);
       final model = container.read(profileViewModelProvider.notifier);
       model.edit(displayName: ' Ana María ', city: 'Cusco');
+      model.selectCity('Cusco');
       repo.pendingUpdate = Completer<void>();
       repo.failUpdate = true;
       final saving = model.save();

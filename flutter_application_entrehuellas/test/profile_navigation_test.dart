@@ -1,4 +1,5 @@
 import 'explore_test.dart' show SearchFake;
+import 'support/fake_current_location.dart';
 import 'package:flutter_application_entrehuellas/features/explore/providers/explore_providers.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_section.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,9 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             exploreRepositoryProvider.overrideWithValue(SearchFake()),
+            currentLocationRepositoryProvider.overrideWithValue(
+              const FakeCurrentLocation(),
+            ),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),

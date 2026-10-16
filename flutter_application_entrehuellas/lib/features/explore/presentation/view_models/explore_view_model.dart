@@ -12,6 +12,15 @@ final exploreViewModelProvider =
 
 class ExploreViewModel extends AsyncNotifier<ExploreState> {
   int _generation = 0;
+
+  void selectMap(bool selected) {
+    final current = state.isLoading ? null : state.asData?.value;
+    if (current == null || current.busy || current.mapSelected == selected) {
+      return;
+    }
+    state = AsyncData(current.withMapSelected(selected));
+  }
+
   @override
   Future<ExploreState> build() async {
     final generation = ++_generation;
@@ -95,6 +104,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           notice:
               'Selecciona una ubicación en el mapa para filtrar por distancia.',
           noticeId: current.noticeId + 1,
+          mapSelected: current.mapSelected,
         ),
       );
       return;
@@ -140,6 +150,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         cursor: old.cursor,
         refreshing: true,
         noticeId: old.noticeId,
+        mapSelected: old.mapSelected,
       ),
     );
     try {
@@ -171,6 +182,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           failed: old.failed,
           notice: _locationNotice(error),
           noticeId: old.noticeId + 1,
+          mapSelected: old.mapSelected,
         ),
       );
     }
@@ -204,6 +216,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         applying: replace && !same,
         appending: !replace,
         noticeId: old.noticeId,
+        mapSelected: old.mapSelected,
       ),
     );
     try {
@@ -229,6 +242,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           items: items,
           cursor: page.nextCursor,
           noticeId: old.noticeId,
+          mapSelected: old.mapSelected,
         ),
       );
     } catch (_) {
@@ -244,6 +258,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
               ? 'No pudimos consultar los casos. Puedes reintentar.'
               : 'No pudimos traer más casos. Puedes reintentar.',
           noticeId: old.noticeId + 1,
+          mapSelected: old.mapSelected,
         ),
       );
     }
