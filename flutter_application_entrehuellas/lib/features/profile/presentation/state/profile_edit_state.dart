@@ -11,6 +11,7 @@ final class ProfileEditState {
     this.issue,
     this.errorId = 0,
     this.saved = false,
+    this.citySelected = true,
   });
   factory ProfileEditState.fromProfile(AccountProfile profile) =>
       ProfileEditState(
@@ -25,6 +26,7 @@ final class ProfileEditState {
   final ProfileFailureKind? issue;
   final int errorId;
   final bool saved;
+  final bool citySelected;
   bool get isBusy => saving.isLoading;
   bool get isDirty =>
       displayName.trim() != (profile.displayName ?? '') ||

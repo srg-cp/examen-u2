@@ -9,6 +9,7 @@ final class UpdateProfile {
     String userId, {
     required String displayName,
     required String city,
+    required bool citySelected,
   }) async {
     if (userId.isEmpty) {
       throw const ProfileFailure(ProfileFailureKind.signedOut);
@@ -18,7 +19,7 @@ final class UpdateProfile {
     if (name.runes.length > 120) {
       throw const ProfileFailure(ProfileFailureKind.invalidName);
     }
-    if (place.runes.length > 120) {
+    if (place.runes.length > 120 || (place.isNotEmpty && !citySelected)) {
       throw const ProfileFailure(ProfileFailureKind.invalidCity);
     }
     final saved = await _repository.update(

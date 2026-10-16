@@ -8,6 +8,7 @@ class CaseScreenShell extends StatelessWidget {
     required this.child,
     this.header,
     this.persistentHeader,
+    this.trailingAction,
     this.count = 8,
     this.onBack,
     this.stage = 'content',
@@ -25,6 +26,7 @@ class CaseScreenShell extends StatelessWidget {
   final Widget child;
   final Widget? header;
   final Widget? persistentHeader;
+  final Widget? trailingAction;
   final VoidCallback? onBack;
   final Object stage;
   final bool loading;
@@ -46,6 +48,7 @@ class CaseScreenShell extends StatelessWidget {
       title: title,
       header: header,
       persistentHeader: persistentHeader,
+      trailingAction: trailingAction,
       onBack: onBack,
       stage: stage,
       loading: loading,

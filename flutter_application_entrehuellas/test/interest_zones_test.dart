@@ -407,7 +407,7 @@ void main() {
         }
 
         expect(
-          find.text('Todavía no tienes zonas de interés.'),
+          find.text('Todavía no tienes ubicaciones de interés.'),
           findsOneWidget,
         );
         await capture('empty');
@@ -445,7 +445,7 @@ void main() {
         repo.failSave = true;
         await vm.save();
         await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Guardar zona'));
+        await tester.ensureVisible(find.text('Guardar ubicación'));
         await tester.pumpAndSettle();
         await capture('save-error');
         expect(find.textContaining('Tus cambios se conservan'), findsOneWidget);
@@ -464,7 +464,7 @@ void main() {
               .single,
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.byTooltip('Volver a mis zonas'));
+        await tester.tap(find.byTooltip('Volver a mis ubicaciones'));
         await tester.pumpAndSettle();
         expect(find.text('¿Descartar cambios?'), findsOneWidget);
         await capture('discard-confirmation');

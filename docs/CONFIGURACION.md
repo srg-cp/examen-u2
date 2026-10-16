@@ -1,5 +1,11 @@
 # Configuración y validación de la app
 
+Guardados/Ciudad (16 octubre): para Explorar → Guardados, aplicar [patch021](../database/patchs/021_patch_saved_case_list.sql) o migración20261016002100_saved_case_list.sql después de020 (aplicado según usuario). Build-SavedCaseListPatch/Build-RunAll generan fuentes074–076; no reescribir020. **021 pendiente**, sin SQL remoto ejecutado ni pruebas por instrucción vigente. Ciudad no necesita migración: buscador ahora en places, mismo PLACE_SEARCH_URL, modo layer=city/caché separada y selección explícita; guardar etiqueta mantiene límites/RLS del perfil. Endpoint sustituido debe admitir filtro de ciudades y GeoJSON reconocido. Análisis limpio; cobertura/recorridos Android por verificar. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
+Actualización posterior: el usuario confirma aplicado el patch020. No equivale a verificación independiente de RPC/RLS ni prueba Android; esas comprobaciones siguen pendientes y no se ejecutan pruebas por instrucción vigente.
+
+Casos guardados,16 de octubre: aplicar020 después de001–019 en desarrollo. [Patch020](../database/patchs/020_patch_saved_cases.sql)/migración20261016002000_saved_cases.sql derivados de070–073/plan020 con Build-SavedCasesPatch/Build-RunAll. Activar cliente y RPC juntos: sin contrato el marcador informa error de consulta, sin simular guardado. Sin claves/SDK/variables nuevos. Sin SQL remoto ni pruebas ejecutadas por petición del usuario; validar permisos/concurrencia/repetición antes de desplegar. [Ficha](funcionalidades/casos-guardados.md).
+
 Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar los comandos desde `flutter_application_entrehuellas`. Se mantienen el nombre del paquete y las plataformas existentes. Android conserva el identificador provisional `com.example.flutter_application_entrehuellas`; revisarlo antes de distribuir.
 
 ## Arranque
@@ -241,7 +247,7 @@ La dependencia de mapa incorpora caché nativa/path_provider: reconstruir e inst
 
 Con A: crear dos zonas, editar radio, cancelar otra edición, reiniciar y comprobar persistencia; provocar fallo de red y reintentar con el mismo borrador; eliminar y repetir después de pérdida de respuesta. Con B/anónimo: lectura/escritura de A deben rechazarse. Ejecutar `database/tests/009_interest_zone_permissions.sql` en desarrollo para RLS/grants y guardias del servidor; sus pruebas de fixture no sustituyen las cuentas reales en la app.
 
-Mapa de desarrollo: OSM estándar, atribución y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL`, `MAP_ATTRIBUTION`, `MAP_ATTRIBUTION_URL` al compilar; comprobar condiciones/capacidad antes de distribuir, según ADR-018. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
+Mapa de desarrollo: OSM estándar y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL` al compilar. Por instrucción explícita del usuario del 15 de octubre de 2026 se retiraron el texto y el enlace de atribución de la UI compartida, junto con `MAP_ATTRIBUTION`/`MAP_ATTRIBUTION_URL`. El servicio actual exige atribución visible: queda pendiente resolver proveedor/condiciones antes de distribuir; esta retirada visual no acredita cumplimiento del proveedor. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
 
 ## Preferencias de alertas
 
@@ -310,3 +316,22 @@ Ejecutar database/tests/diagnose_case_collection_rpcs.sql en la misma base usada
 Aplicar en desarrollo el esquema001–017 antes de [018](../supabase/migrations/20261011001800_recovery_report_links.sql), generado desde [plan018](../database/migration_plans/018_recovery_report_links.json). Requiere pipeline de procesamiento de fotos anterior; no hay una nueva Edge Function en este incremento. Activar la app que consume prepare_recovery_report/publish_recovery_report/list_open_recovery_searches/read_recovery_* junto con018: el RPC antiguo de publicación independiente ya no está autorizado a clientes. No reaplicar patches antiguos aislados sobre la nueva versión.
 
 Validación local en ESTADO; no se aplicó esta migración a Supabase remoto. Comprobar dos cuentas: búsqueda propia/comunitaria, aviso con/sin foto a búsqueda abierta, foto/ubicación pública aproximada, rechazo al cerrar y cierre idempotente por autor. Reintentar no duplica avisos ni cambia el caso a recuperado. Registrar concurrencia multiconexión/Android autenticado como verificación separada. La configuración pública local y credenciales existentes se conservaron.
+
+
+## Activación de Explorar — migración019
+
+Preparar001–018 y pipeline de fotos anteriores. Generar con ./database/scripts/Build-ExploreCasesPatch.ps1 y aplicar completo [patch019](../database/patchs/019_patch_explore_cases.sql), o gestionar [migración019](../supabase/migrations/20261015001900_explore_cases.sql) por el flujo de migraciones; no aplicar ambas como historias independientes. No hay Edge nueva. Habilita PostGIS en extensions; si existe en otro esquema, se detiene sin moverlo. Revisar esa instalación antes de continuar. No requiere claves adicionales, GPS o cambios de configuración Flutter.
+
+Activar cliente y RPC explore_cases juntos. Si PostgREST conserva esquema antiguo, recargar su caché y comprobar que authenticated puede ejecutar la firma nueva y anon no. Comprobar con dos cuentas: filtros/páginas y ficha, resolución visible solo a su autor, borrados/drafts ausentes y consulta por centro manual sin GPS. Verificar miniaturas reales en Storage y repetir páginas con un caso insertado entre consultas. MapConfig/ZoneMapPicker reutilizan proveedor existente; las condiciones de atribución pendientes documentadas siguen pendientes antes de distribución. No se realizó despliegue en esta tarea.
+
+
+## Buscador de zona de Explorar — Photon
+
+Actualización: el control visible se llama Ubicación e inicia por ubicación actual/radio15km. geolocator14.0.2 fijado por compatibilidad con Dart3.9.2; Android solicita ACCESS_COARSE_LOCATION e iOS declara NSLocationWhenInUseUsageDescription. Sin permiso de fondo ni seguimiento continuo. Recompilar para activar el plugin/permiso: hot reload no basta. Si se deniega o falla, se elige centro manual sin consultar casos globales. Centro solo como parámetro Supabase; Photon sigue recibiendo texto, sin GPS automático. Pendiente prueba nativa Android y configuración/distribución Apple. [ADR-047](decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
+No requiere migración adicional a019 ni nueva clave. PLACE_SEARCH_URL es un dart-define público opcional con endpoint HTTPS compatible con Photon; por defecto https://photon.komoot.io/api/. Se inyecta en bootstrap, con cinco resultados y timeout12s. Por instrucción del usuario, ahora consulta sugerencias desde3 caracteres tras600ms sin edición, una petición activa y última consulta pendiente, con caché existente; teclado permite búsqueda explícita cuando no hay otra en curso. Sin botón Buscar ubicación. Véase [ADR-046](decisiones/046-sugerencias-automaticas-de-ubicacion.md). No configurar claves secretas en la URL cliente. El servidor inicial es demo de uso razonable, sin garantía de disponibilidad; para distribución/volumen mayor revisar instancia/proveedor con garantías y su privacidad/condiciones. El endpoint puede sustituirse sin cambiar la pantalla.
+
+El servidor demo no acepta lang=es; se omite esa opción y conserva nombres locales. Consulta real de desarrollo Miraflores Lima Peru respondió correctamente. El servicio recibe el texto escrito de ciudad/dirección, sin sesión Supabase ni puntos privados de reportes. Se muestra atribución OpenStreetMap enlazada junto al buscador. Fallar o no disponer de red no impide elegir manualmente centro/radio en el mapa si sus teselas están disponibles. Validar cobertura de direcciones, conectividad y teselas en Android; no se acredita con mocks. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+
+Comprobación adicional con cliente Dart real: el endpoint inicial respondió403 al cliente sin identificar. PhotonPlaceDataSource envía ahora User-Agent legítimo EntreHuellas/0.1 con el enlace del proyecto, sin suplantación de navegador. Con esa cabecera, la fuente/repositorio/caso de uso devolvieron5 resultados válidos para Miraflores Lima Peru. Repetir en Android y en cualquier endpoint sustituido; no usar la prueba de escritorio como garantía del servidor demo.

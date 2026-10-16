@@ -2018,4 +2018,240 @@ grant execute on function public.read_recovery_pet_case(uuid),public.read_recove
 revoke all on function public.prepare_recovery_report(uuid,uuid[],text,uuid,boolean) from public,anon,authenticated;
 grant execute on function public.prepare_recovery_report(uuid,uuid[],text,uuid,boolean) to authenticated;
 
+-- Source: database/extensions/066_explore_postgis.sql | normalized SHA256: b15b69170c9660af418a1331cb9848a569615195ac7490677a9505671b9b3550
+-- Keep extension objects outside the exposed public schema.
+create schema if not exists extensions;
+create extension if not exists postgis with schema extensions;
+do $$ begin
+    if (select extnamespace from pg_extension where extname='postgis') <> 'extensions'::regnamespace then
+        raise exception 'explore_postgis_schema: PostGIS must be installed in extensions';
+    end if;
+end $$;
+
+-- Source: database/indexes/067_explore_public_locations.sql | normalized SHA256: 8ecf4bd5eefe8439ebc779051e5d067dcc7c9f2c17cb9a7872b1295bade579ca
+-- Search only the public approximate points: radius queries cannot reveal exact locations.
+create index if not exists lost_cases_public_location_gist on public.lost_cases using gist
+ ((extensions.st_setsrid(extensions.st_makepoint(public_longitude,public_latitude),4326)::extensions.geography))
+ where deleted_at is null;
+create index if not exists found_cases_public_location_gist on public.found_cases using gist
+ ((extensions.st_setsrid(extensions.st_makepoint(public_longitude,public_latitude),4326)::extensions.geography))
+ where deleted_at is null and status in ('active','resolved');
+create index if not exists lost_cases_explore_order on public.lost_cases(created_at desc,id desc) where deleted_at is null;
+create index if not exists found_cases_explore_order on public.found_cases(published_at desc,id desc) where deleted_at is null;
+
+-- Source: database/functions/068_explore_cases.sql | normalized SHA256: f49ddc61057246a9b8b8ca8bcc5f7eec54007d4967d352dd9e8bae851b66f7ef
+-- HU-07.1 / RF-13. Bounded keyset pagination over the existing visibility contracts.
+create or replace function public.explore_cases(
+ p_kind text default 'all', p_species text default 'all', p_status text default 'active',
+ p_since timestamptz default null, p_until timestamptz default null,
+ p_latitude double precision default null, p_longitude double precision default null,
+ p_radius_meters integer default null, p_cursor jsonb default null, p_limit integer default 20
+) returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='8s' as $$
+declare
+ v_query jsonb; v_as_of timestamptz; v_after timestamptz; v_source text; v_id uuid;
+ v_point extensions.geography; v_rows jsonb; v_items jsonb; v_last jsonb; v_next jsonb;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='explore_unauthorized'; end if;
+ if p_kind is null or p_kind not in ('all','lost','found','sighting') or p_species is null or p_species not in ('all','dog','cat','other')
+ or p_status is null or p_status not in ('all','active','resolved') or p_limit is null or p_limit not between 1 and 50
+ or (p_since is not null and not isfinite(p_since)) or (p_until is not null and not isfinite(p_until))
+ or (p_since is not null and p_until is not null and p_since>p_until)
+ or (num_nonnulls(p_latitude,p_longitude,p_radius_meters) not in (0,3))
+ or (p_latitude is not null and not(p_latitude between -85 and 85))
+ or (p_longitude is not null and not(p_longitude between -180 and 180))
+ or (p_radius_meters is not null and p_radius_meters not between 100 and 50000)
+ then raise exception using errcode='22023',message='explore_invalid'; end if;
+ v_query=jsonb_build_array(p_kind,p_species,p_status,p_since,p_until,p_latitude,p_longitude,p_radius_meters);
+ v_as_of=statement_timestamp();
+ if p_cursor is not null then
+  begin
+   if jsonb_typeof(p_cursor)<>'object' or (p_cursor->'query') is distinct from v_query
+    or not(p_cursor ?& array['as_of','published_at','source','id']) then raise exception 'invalid'; end if;
+   v_as_of=(p_cursor->>'as_of')::timestamptz;
+   v_after=(p_cursor->>'published_at')::timestamptz; v_source=p_cursor->>'source'; v_id=(p_cursor->>'id')::uuid;
+   if v_as_of is null or not isfinite(v_as_of) or v_as_of>statement_timestamp() or v_after is null or not isfinite(v_after)
+    or v_after>v_as_of or v_source is null or v_source not in ('lost','found') or v_id is null then raise exception 'invalid'; end if;
+  exception when others then raise exception using errcode='22023',message='explore_cursor_invalid'; end;
+ end if;
+ if p_latitude is not null then
+  v_point=extensions.st_setsrid(extensions.st_makepoint(p_longitude,p_latitude),4326)::extensions.geography;
+ end if;
+ with candidates as (
+  select c.id,'lost'::text as source,c.created_at as published_at,'lost'::text as kind,c.species,c.occurred_at,
+   c.public_latitude as latitude,c.public_longitude as longitude
+  from public.lost_cases c where c.deleted_at is null and c.created_at<=v_as_of
+   and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()))
+   and (v_point is null or extensions.st_dwithin(extensions.st_setsrid(extensions.st_makepoint(c.public_longitude,c.public_latitude),4326)::extensions.geography,v_point,p_radius_meters))
+  union all
+  select c.id,'found',c.published_at,case when c.report_kind='possible_loss' then 'lost' when c.report_kind='sighting' then 'sighting' else 'found' end,
+   c.species,c.occurred_at,c.public_latitude,c.public_longitude
+  from public.found_cases c where c.deleted_at is null and c.published_at<=v_as_of
+   and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()))
+   and (v_point is null or extensions.st_dwithin(extensions.st_setsrid(extensions.st_makepoint(c.public_longitude,c.public_latitude),4326)::extensions.geography,v_point,p_radius_meters))
+ ), visible as (
+  select c.*,r.data from candidates c cross join lateral (
+   select x as data from public.read_recovery_pet_case(c.id) x where c.source='lost'
+   union all select x from public.read_recovery_report(c.id) x where c.source='found'
+  ) r
+  where (p_kind='all' or c.kind=p_kind) and (p_species='all' or c.species=p_species)
+   and (p_status='all' or r.data->>'status'=p_status)
+   and (p_since is null or c.occurred_at>=p_since) and (p_until is null or c.occurred_at<=p_until)
+   and (v_after is null or (c.published_at,c.source,c.id)<(v_after,v_source,v_id))
+  order by c.published_at desc,c.source desc,c.id desc limit p_limit+1
+ ) select coalesce(jsonb_agg(jsonb_build_object(
+  'id',id,'source',source,'published_at',published_at,'kind',kind,'status',data->>'status',
+  'report_kind',coalesce(data->>'report_kind','own_loss'),'name',coalesce(data->>'pet_name',''),'species',species,'species_detail',data->>'species_detail',
+  'traits',data->>'traits','occurred_at',occurred_at,'latitude',latitude,'longitude',longitude,
+  'distance_meters',case when v_point is null then null else round(extensions.st_distance(
+   extensions.st_setsrid(extensions.st_makepoint(longitude,latitude),4326)::extensions.geography,v_point)) end,
+  'cover_path',data->'photos'->0->>'path') order by published_at desc,source desc,id desc),'[]'::jsonb) into v_rows from visible;
+ select coalesce(jsonb_agg(value order by ordinality),'[]'::jsonb) into v_items from jsonb_array_elements(v_rows) with ordinality where ordinality<=p_limit;
+ if jsonb_array_length(v_rows)>p_limit then
+  v_last=v_items->(p_limit-1);
+  v_next=jsonb_build_object('as_of',v_as_of,'published_at',v_last->'published_at','source',v_last->>'source','id',v_last->>'id','query',v_query);
+ end if;
+ return jsonb_build_object('items',v_items,'next_cursor',v_next);
+end; $$;
+
+-- Source: database/grants/069_explore_permissions.sql | normalized SHA256: 0a2ef9ff1ed461a387b7269b436cc9b197008b4a1ecca6298b53ef5b54fbfd85
+revoke all on function public.explore_cases(text,text,text,timestamptz,timestamptz,double precision,double precision,integer,jsonb,integer) from public,anon,authenticated;
+grant execute on function public.explore_cases(text,text,text,timestamptz,timestamptz,double precision,double precision,integer,jsonb,integer) to authenticated;
+
+-- Source: database/tables/070_saved_cases.sql | normalized SHA256: 30a1f20adbede4fbd4af7b4d739b4a007169093f1d2e47d9fc9d33046b0497f7
+-- User-requested extension of HU-07 / RF-13: private saved-case markers.
+create table if not exists public.saved_cases (
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ case_source text not null check (case_source in ('lost','found')),
+ case_id uuid not null,
+ saved boolean not null,
+ version integer not null default 1 check (version > 0),
+ updated_at timestamptz not null default now(),
+ primary key (owner_id,case_source,case_id)
+);
+alter table public.saved_cases enable row level security;
+
+-- Source: database/functions/071_saved_case_commands.sql | normalized SHA256: a7e98545031cf742d2f2fb9f9346c144477030daf1e76d7422e67534a14ec17d
+create or replace function public.read_saved_case(p_source text,p_case_id uuid)
+returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='8s' as $$
+declare v_saved boolean;v_version integer;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='saved_case_unauthorized'; end if;
+ if p_source is null or p_source not in ('lost','found') or p_case_id is null then
+  raise exception using errcode='22023',message='saved_case_invalid'; end if;
+ select saved,version into v_saved,v_version from public.saved_cases
+  where owner_id=auth.uid() and case_source=p_source and case_id=p_case_id;
+ return jsonb_build_object('saved',coalesce(v_saved,false),'version',coalesce(v_version,0));
+end $$;
+
+create or replace function public.set_saved_case(p_source text,p_case_id uuid,p_saved boolean,p_expected_version integer)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' set statement_timeout='8s' as $$
+declare v_owner uuid:=auth.uid();v_row public.saved_cases;v_exists boolean;v_visible boolean;v_version integer;
+begin
+ if v_owner is null then raise exception using errcode='42501',message='saved_case_unauthorized'; end if;
+ if p_source is null or p_source not in ('lost','found') or p_case_id is null or p_saved is null
+  or p_expected_version is null or p_expected_version < 0 or p_expected_version >= 2147483647 then
+  raise exception using errcode='22023',message='saved_case_invalid'; end if;
+ -- Serialize even the first insertion; origin prevents UUID collisions across case tables.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_owner::text||':'||p_source||':'||p_case_id::text,0));
+ select * into v_row from public.saved_cases
+  where owner_id=v_owner and case_source=p_source and case_id=p_case_id for update;
+ v_exists:=found;
+ -- Retrying the same confirmed choice is a no-op, preserving version and timestamps.
+ if v_exists and v_row.saved=p_saved then
+  return jsonb_build_object('saved',v_row.saved,'version',v_row.version);
+ end if;
+ v_version:=case when v_exists then v_row.version else 0 end;
+ if v_version<>p_expected_version then
+  raise exception using errcode='40001',message='saved_case_conflict'; end if;
+ -- Saving requires current visibility; removing an existing marker is always allowed.
+ if p_saved or not v_exists then
+  if p_source='lost' then
+   select exists(select 1 from public.read_recovery_pet_case(p_case_id)) into v_visible;
+  else
+   select exists(select 1 from public.read_recovery_report(p_case_id)) into v_visible;
+  end if;
+  if not v_visible then raise exception using errcode='P0002',message='saved_case_unavailable'; end if;
+ end if;
+ if v_exists then
+  update public.saved_cases set saved=p_saved,version=version+1,updated_at=clock_timestamp()
+   where owner_id=v_owner and case_source=p_source and case_id=p_case_id returning * into v_row;
+ else
+  insert into public.saved_cases(owner_id,case_source,case_id,saved)
+   values(v_owner,p_source,p_case_id,p_saved) returning * into v_row;
+ end if;
+ -- Unsave retains a private tombstone so delayed opposite retries cannot restore it.
+ return jsonb_build_object('saved',v_row.saved,'version',v_row.version);
+end $$;
+
+-- Source: database/policies/072_saved_cases_owner_policies.sql | normalized SHA256: 224e1f73032d25cfbfdb860253ed2c89389aa1cfa1f0feec85c8d3d8e69cac4d
+drop policy if exists saved_cases_owner_read on public.saved_cases;
+create policy saved_cases_owner_read on public.saved_cases for select to authenticated
+ using (owner_id=(select auth.uid()));
+drop policy if exists saved_cases_owner_guard on public.saved_cases;
+create policy saved_cases_owner_guard on public.saved_cases as restrictive for all to authenticated
+ using (owner_id=(select auth.uid())) with check (owner_id=(select auth.uid()));
+
+-- Source: database/grants/073_saved_cases_permissions.sql | normalized SHA256: f8bfce04e36b6c72d8b20f7cd10e5daefcfc8201149bb83b77f3100cb5e0766f
+revoke all on table public.saved_cases from public,anon,authenticated;
+grant select(owner_id,case_source,case_id,saved,version) on public.saved_cases to authenticated;
+revoke all on function public.read_saved_case(text,uuid) from public,anon,authenticated;
+revoke all on function public.set_saved_case(text,uuid,boolean,integer) from public,anon,authenticated;
+grant execute on function public.read_saved_case(text,uuid) to authenticated;
+grant execute on function public.set_saved_case(text,uuid,boolean,integer) to authenticated;
+
+-- Source: database/indexes/074_saved_cases_order.sql | normalized SHA256: 541ffcd736b0cfc574cdb3e0acf348567e48a5388d22982e1184a1eacf6dcffd
+create index if not exists saved_cases_owner_order_idx
+ on public.saved_cases(owner_id,updated_at desc,case_source desc,case_id desc) where saved;
+
+-- Source: database/functions/075_list_saved_cases.sql | normalized SHA256: 24e6a6ad8529273620dcd7869f3103e76f09aaa32f175891402dd3ed4e1d96f6
+create or replace function public.list_saved_cases(p_cursor jsonb default null,p_limit integer default 20)
+returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='8s' as $$
+declare v_owner uuid:=auth.uid();v_as_of timestamptz:=statement_timestamp();v_after timestamptz;
+ v_source text;v_id uuid;v_rows jsonb;v_items jsonb;v_last jsonb;v_next jsonb;
+begin
+ if v_owner is null then raise exception using errcode='42501',message='saved_case_unauthorized'; end if;
+ if p_limit is null or p_limit not between 1 and 50 then raise exception using errcode='22023',message='saved_case_invalid'; end if;
+ if p_cursor is not null then
+  begin
+   if jsonb_typeof(p_cursor)<>'object' or not(p_cursor ?& array['owner','as_of','saved_at','source','id'])
+    or (p_cursor->>'owner')::uuid is distinct from v_owner then raise exception 'invalid'; end if;
+   v_as_of=(p_cursor->>'as_of')::timestamptz;v_after=(p_cursor->>'saved_at')::timestamptz;
+   v_source=p_cursor->>'source';v_id=(p_cursor->>'id')::uuid;
+   if v_as_of is null or not isfinite(v_as_of) or v_as_of>statement_timestamp()
+    or v_after is null or not isfinite(v_after) or v_after>v_as_of
+    or v_source is null or v_source not in ('lost','found') or v_id is null then raise exception 'invalid'; end if;
+  exception when others then raise exception using errcode='22023',message='saved_case_cursor_invalid'; end;
+ end if;
+ with visible as (
+  select s.case_id,s.case_source,s.updated_at,r.data from public.saved_cases s
+  cross join lateral (
+   select x as data from public.read_recovery_pet_case(s.case_id) x where s.case_source='lost'
+   union all select x from public.read_recovery_report(s.case_id) x where s.case_source='found'
+  ) r
+  where s.owner_id=v_owner and s.saved and s.updated_at<=v_as_of
+   and (v_after is null or (s.updated_at,s.case_source,s.case_id)<(v_after,v_source,v_id))
+  order by s.updated_at desc,s.case_source desc,s.case_id desc limit p_limit+1
+ ) select coalesce(jsonb_agg(jsonb_build_object(
+  'id',case_id,'source',case_source,'saved_at',updated_at,
+  'kind',case when case_source='lost' or data->>'report_kind'='possible_loss' then 'lost'
+    when data->>'report_kind'='sighting' then 'sighting' else 'found' end,
+  'status',data->>'status','report_kind',coalesce(data->>'report_kind','own_loss'),
+  'name',coalesce(data->>'pet_name',''),'species',data->>'species','traits',coalesce(data->>'traits',''),
+  'occurred_at',data->'occurred_at','latitude',data->'latitude','longitude',data->'longitude',
+  'distance_meters',null,'cover_path',data->'photos'->0->>'path'
+ ) order by updated_at desc,case_source desc,case_id desc),'[]'::jsonb) into v_rows from visible;
+ select coalesce(jsonb_agg(value order by ordinality),'[]'::jsonb) into v_items
+  from jsonb_array_elements(v_rows) with ordinality where ordinality<=p_limit;
+ if jsonb_array_length(v_rows)>p_limit then
+  v_last=v_items->(p_limit-1);
+  v_next=jsonb_build_object('owner',v_owner,'as_of',v_as_of,'saved_at',v_last->'saved_at',
+   'source',v_last->>'source','id',v_last->>'id');
+ end if;
+ return jsonb_build_object('items',v_items,'next_cursor',v_next);
+end $$;
+
+-- Source: database/grants/076_saved_case_list_permissions.sql | normalized SHA256: ad31f856466c8a8391e9d0e732d461648a7ecaefd7cbd96ac9356cfe0cfd869e
+revoke all on function public.list_saved_cases(jsonb,integer) from public,anon,authenticated;
+grant execute on function public.list_saved_cases(jsonb,integer) to authenticated;
+
 commit;

@@ -1,4 +1,19 @@
-# Zonas de interés privadas
+# Ubicaciones de interés privadas
+
+Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva gesto/giro/retirada y bloqueo al editar. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.
+
+Refinamiento del gesto: icono de recarga sigue el jalón, gira durante actualización real y retorna al terminar/cancelar, con movimiento reducido respetado. Edición conserva bloqueo de gesto. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.
+
+Actualización del15 de octubre: jalar desde el borde superior y soltar reemplaza Actualizar ubicaciones. Lista conservada con ContentRefresh, sin franja fina anterior; gesto disponible con vacío/lista corta y deshabilitado durante edición, guardado/eliminación o refresh. Reintentos conservados. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Formato/análisis sin incidencias; sin pruebas ejecutadas por instrucción del usuario, gesto Android pendiente.
+
+Ajuste del15 de octubre: por instrucción del usuario, etiquetas y mensajes Zona/Zonas pasan a Ubicación/Ubicaciones. Se conservan módulo/rutas/contratos/datos/reglas de esta ficha; el archivo mantiene su enlace. Solo formato/análisis, sin ejecutar pruebas por instrucción vigente. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
+Cambio visual del 15 de octubre de 2026: por instrucción explícita del usuario,
+ZoneMapPicker deja de mostrar el texto de atribución y su botón/enlace en todas
+sus instancias (zonas, formularios y fichas de reportes). Se eliminan las opciones
+de configuración de ese texto/enlace. El proveedor de teselas sigue siendo el
+existente; sus condiciones de atribución quedan pendientes de resolver antes de
+distribuir, según CONFIGURACION. Selección, círculo y reintento se conservan.
 
 Módulo: `interest_zones`. HU-02.1 / RF-02,16;
 [issue #26](../backlog/026-HU-02.1.md).

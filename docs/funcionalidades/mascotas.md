@@ -1,5 +1,11 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva selección de lista, giro, retirada y movimiento reducido. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.
+
+Refinamiento del gesto: icono de recarga sigue el jalón, gira durante actualización real y retorna al terminar/cancelar, con movimiento reducido respetado. Conserva lista Activas/Archivadas y shimmer. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.
+
+Actualización del15 de octubre: jalar desde el inicio de Mis mascotas y soltar refresca la lista seleccionada (Activas/Archivadas), incluso vacía/corta; conserva contenido con shimmer y espera su consulta real. No duplica operación durante carga/eliminación y mantiene acciones de reintento. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Formato/análisis sin incidencias; sin pruebas ejecutadas por instrucción del usuario, revisión Android pendiente.
+
 Módulo: `pets`. HU-03 / RF-03; issues
 [#28](../backlog/028-HU-03.1.md) y [#29](../backlog/029-HU-03.2.md).
 

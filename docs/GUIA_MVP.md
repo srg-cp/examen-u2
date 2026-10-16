@@ -146,6 +146,12 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Incremento16 de octubre: HU-07.2 / RF-13 / issue #33 implementada localmente en feature/explore-case-map. Lista/Mapa comparte filtros, páginas y contrato019; marcadores públicos aproximados agrupados por coordenada, tarjetas/fichas existentes y recuperación de teselas. Pan/zoom no modifica la búsqueda. Sin SQL nuevo, QR, push u offline; demo Android/hosted y cierre de historia pendientes. Véanse [ficha](funcionalidades/explorar.md) y [ADR-052](decisiones/052-explorar-mapa-de-resultados.md). Patch021 de Guardados ya aplicado según confirmación del usuario; sustituye las notas antiguas de activación pendiente.
+
+Ampliación posterior16 de octubre: listado Guardados dentro de Explorar (HU-07/RF-13) y Ciudad del perfil (HU-01.7/RF-01) mediante el mismo buscador de Ubicación. Plan021 solo para índice/RPC de listado privado paginado, sin modificar020 aplicado según usuario. Ciudad reutiliza places y exige elegir sugerencia para texto nuevo; sin SQL nuevo de perfil ni certificado oficial de ciudad. Sin seguimiento/offline o cierre de historias; análisis limpio, pruebas omitidas por instrucción y021/Android pendientes. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
+Ampliación explícita solicitada el16 de octubre de2026 de HU-07/RF-13: guardar/quitar casos por cuenta desde marcador superior derecho de la ficha. saved_cases/plan020, sin issue asignado ni cierre de historia. Recorrido por ficha; sin listado propio, seguimiento/push ni descarga offline HU-15.3. [Ficha](funcionalidades/casos-guardados.md), [ADR-050](decisiones/050-casos-guardados-por-cuenta.md). Validación/aplicación020 y Android pendientes; sin pruebas ejecutadas por petición del usuario.
+
 - **HU-05 / RF-05:** publicar perdido con fecha y zona; restricción de un caso activo por mascota y creación idempotente.
 - **HU-06 / RF-06:** publicar encontrado sin propietario conocido ni `pet_id` obligatorio.
 - **HU-07 / RF-13:** lista y mapa con filtros coherentes y paginación; coordenadas públicas aproximadas y datos privados protegidos.
@@ -439,3 +445,25 @@ Corrección autorizada del12 de octubre: Reportar crea pérdida; avisos solo des
 
 
 Corrección UX autorizada el12 de octubre: Mascota perdida es un único formulario con selección de ficha o No está en mis mascotas. Datos del reporte compartidos/conservados; detalles/fotos independientes por origen. HU-05/RF-05 y búsqueda comunitaria de HU-06/RF-06, sin ampliación del MVP, SQL nuevo o historias cerradas. [ADR-038](decisiones/038-formulario-unico-mascota-perdida.md).
+
+
+## HU-07.1: lista de Explorar — 15 de octubre de 2026
+
+Tras validación de la rama actual confirmada por el usuario, se continúa S3 con HU-07.1 / RF-13 / issue #32. Módulo explore: lista real por tipo/especie/estado/período/zona manual, distancia pública aproximada PostGIS y cursor por publicación/origen/ID. Abre fichas existentes y conserva clasificación de búsquedas/avisos/anteriores. Estados respetan visibilidad previa (resueltos del autor). SQL066–069/plan019, sin Edge nueva. HU-07.2 / issue #33 continúa pendiente; el mapa de selección del filtro no equivale a ese mapa de resultados. Sin ampliación del MVP, publicación/despliegue o historias cerradas automáticamente. [Ficha](funcionalidades/explorar.md), [ADR-039](decisiones/039-explorar-lista-publica-paginada.md) y ESTADO distinguen evidencia local y demo remota.
+
+
+## Presentación de Explorar en grilla — 15 de octubre de 2026
+
+Ajuste explícito del usuario sobre HU-07.1/RF-13: cards fotográficas en dos columnas adaptables a una, imagen protagonista y datos debajo. Conserva filtros/páginas/ficha y contrato019. Sin ampliación de MVP, SQL nuevo o cierre de historia. [ADR-040](decisiones/040-explorar-grilla-fotografica.md) y [ficha](funcionalidades/explorar.md).
+
+
+## Filtros de Explorar superpuestos — 15 de octubre de 2026
+
+Ajuste solicitado de HU-07.1/RF-13: panel flotante reutilizable que mantiene fija la grilla y usa cápsulas compartidas con el selector Activas/Archivadas. Cancelar descarta cambios sin confirmar; Aplicar conserva los contratos/paginación existentes. Sin SQL, ampliación del MVP ni cierre automático de historia. [ADR-041](decisiones/041-filtros-flotantes-reutilizables.md) y [ficha](funcionalidades/explorar.md).
+
+
+## Ajuste de filtros y zona de HU-07.1 — 15 de octubre de 2026
+
+Por nueva instrucción, filtros desplegados dentro de Explorar sin popup. Cards eliminan texto Mascota perdida y conservan nombre/especie más badges. El usuario confirma búsqueda de ciudad/dirección, selección en mapa y radio en kilómetros. Incremento de HU-07.1/RF-13 con geocodificación de lectura Photon y selección manual alternativa, sin GPS, SQL nuevo o mapa de resultados HU-07.2. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md), ficha y ESTADO separan evidencias locales de demo autenticada.
+
+Corrección visual16 de octubre de2026 de Guardados (HU-07/RF-13): pantalla independiente desde marcador compacto, con expansión/retorno OriginPageTransition compartido y shell glass; sustituye alternancia de vistas dentro de Explorar. Sin ampliación funcional ni SQL nuevo;021/Android pendientes y sin pruebas por instrucción del usuario.

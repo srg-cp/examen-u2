@@ -439,6 +439,12 @@ Future<void> loadFonts() async {
   final root = configFile.uri
       .resolve('${flutter['rootUri']}/')
       .resolve('../../bin/cache/artifacts/material_fonts/');
+  // The SDK archive preserves mixed-case filenames on Linux; Windows resolves
+  // the old lowercase paths as well. Resolve the actual file on both systems.
+  final fontFiles = {
+    for (final file in Directory.fromUri(root).listSync().whereType<File>())
+      file.uri.pathSegments.last.toLowerCase(): file,
+  };
   for (final entry in {
     'sans-serif': [
       'roboto-regular.ttf',
@@ -450,9 +456,9 @@ Future<void> loadFonts() async {
     final loader = FontLoader(entry.key);
     for (final font in entry.value) {
       loader.addFont(
-        File.fromUri(
-          root.resolve(font),
-        ).readAsBytes().then(ByteData.sublistView),
+        (fontFiles[font] ?? (throw StateError('SDK font missing: $font')))
+            .readAsBytes()
+            .then(ByteData.sublistView),
       );
     }
     await loader.load();

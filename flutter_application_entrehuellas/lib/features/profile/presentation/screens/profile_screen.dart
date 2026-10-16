@@ -12,7 +12,8 @@ import '../view_models/profile_exit_view_model.dart';
 import '../view_models/profile_view_model.dart';
 
 class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({this.cityFieldBuilder, super.key});
+  final ProfileCityFieldBuilder? cityFieldBuilder;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final exit = ref.watch(profileExitViewModelProvider);
@@ -59,7 +60,9 @@ class ProfileScreen extends ConsumerWidget {
                               SizedBox(height: 28),
                               StaggerRevealItem(
                                 order: 1,
-                                child: ProfileEditor(),
+                                child: ProfileEditor(
+                                  cityFieldBuilder: cityFieldBuilder,
+                                ),
                               ),
                             ],
                           ),
@@ -77,7 +80,7 @@ class ProfileScreen extends ConsumerWidget {
                               ? null
                               : () => context.push('/home/interest-zones'),
                           icon: const Icon(Icons.location_on_outlined),
-                          label: const Text('Zonas de interés'),
+                          label: const Text('Ubicaciones de interés'),
                         ),
                         const SizedBox(height: 16),
                         LoadingShimmer(

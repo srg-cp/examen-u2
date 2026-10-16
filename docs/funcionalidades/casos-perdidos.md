@@ -1,5 +1,9 @@
 # Casos de mascotas perdidas
 
+Ampliación del16 de octubre: marcador glass superior derecho para Guardar caso/Quitar de guardados, compuesto por router con [saved_cases](casos-guardados.md). Estado operativo/permisos conservados. Requiere020; formato/análisis sin incidencias, sin pruebas ejecutadas ni activación remota. [ADR-050](../decisiones/050-casos-guardados-por-cuenta.md).
+
+Ajuste del15 de octubre: texto visible Zona/Zonas pasa a Ubicación/Ubicaciones, incluidas indicaciones de privacidad. No cambian precisión pública, campos, permisos ni datos. Formato/análisis; sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
 Trazabilidad: **HU-05 / RF-05**, sprint S3, **issue #5**. Rama `feature/lost-pet-cases`. Implementación local; no historia cerrada ni despliegue confirmado. Contratos en [ADR-021](../decisiones/021-publicacion-casos-perdidos.md); evidencia en [ESTADO](../ESTADO.md).
 
 ## Qué hace y recorrido

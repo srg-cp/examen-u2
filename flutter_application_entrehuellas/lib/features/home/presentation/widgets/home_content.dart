@@ -128,9 +128,9 @@ class HomeContent extends StatelessWidget {
             const SizedBox(height: 14),
             const HomeNotice(
               icon: Icons.location_on_outlined,
-              title: 'Conectemos tu zona',
+              title: 'Explora cerca de ti',
               description:
-                  'Los casos cercanos aparecerán aquí cuando estén disponibles la búsqueda y tus zonas de interés.',
+                  'Consulta casos cercanos con tu ubicación actual y un radio inicial de 15 km, o elige otra ubicación manualmente.',
             ),
             const SizedBox(height: 8),
             Align(

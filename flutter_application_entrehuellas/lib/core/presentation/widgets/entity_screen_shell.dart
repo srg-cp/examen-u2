@@ -10,6 +10,7 @@ class EntityScreenShell extends StatefulWidget {
     this.title,
     this.header,
     this.persistentHeader,
+    this.trailingAction,
     this.stage = 'content',
     this.immersive = false,
     this.navigationTooltip = 'Volver',
@@ -18,11 +19,13 @@ class EntityScreenShell extends StatefulWidget {
     required this.loading,
     required this.child,
     this.count = 9,
+    this.scrollPhysics,
     super.key,
   });
   final String? title;
   final Widget? header;
   final Widget? persistentHeader;
+  final Widget? trailingAction;
   final Object stage;
   final bool immersive;
   final String navigationTooltip;
@@ -31,6 +34,7 @@ class EntityScreenShell extends StatefulWidget {
   final bool loading;
   final Widget child;
   final int count;
+  final ScrollPhysics? scrollPhysics;
   @override
   State<EntityScreenShell> createState() => _EntityScreenShellState();
 }
@@ -80,6 +84,12 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
                                 : context.go('/home'),
                 ),
               ),
+              if (widget.trailingAction != null)
+                Positioned(
+                  top: MediaQuery.paddingOf(context).top + 4,
+                  right: 24,
+                  child: widget.trailingAction!,
+                ),
             ],
           ),
         ),
@@ -88,6 +98,7 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
   );
   Widget _content(BuildContext context) => SingleChildScrollView(
     controller: _scroll,
+    physics: widget.scrollPhysics,
     padding: widget.immersive
         ? EdgeInsets.zero
         : EdgeInsets.fromLTRB(

@@ -1,3 +1,19 @@
+import 'package:http/http.dart' as http;
+import '../features/saved_cases/domain/repositories/saved_cases_repository.dart';
+import '../features/saved_cases/data/data_sources/supabase_saved_cases_data_source.dart';
+import '../features/saved_cases/data/repositories/saved_cases_repository_impl.dart';
+import '../features/saved_cases/data/repositories/unavailable_saved_cases_repository.dart';
+import '../features/explore/domain/repositories/current_location_repository.dart';
+import '../features/explore/data/data_sources/device_location_source.dart';
+import '../features/explore/data/repositories/current_location_repository_impl.dart';
+import '../features/places/domain/repositories/place_search_repository.dart';
+import '../features/places/data/data_sources/photon_place_data_source.dart';
+import '../features/places/data/repositories/place_search_repository_impl.dart';
+import '../features/places/data/repositories/unavailable_place_search_repository.dart';
+import '../features/explore/domain/repositories/explore_repository.dart';
+import '../features/explore/data/data_sources/supabase_explore_data_source.dart';
+import '../features/explore/data/repositories/explore_repository_impl.dart';
+import '../features/explore/data/repositories/unavailable_explore_repository.dart';
 import '../features/found_cases/domain/repositories/found_case_repository.dart';
 import '../features/found_cases/data/data_sources/supabase_found_case_data_source.dart';
 import '../features/found_cases/data/repositories/found_case_repository_impl.dart';
@@ -72,6 +88,11 @@ class AppBootstrap {
     required this.interestZoneRepository,
     required this.alertPreferenceRepository,
     required this.lostCaseRepository,
+    this.placeSearchRepository = const UnavailablePlaceSearchRepository(),
+    this.currentLocationRepository =
+        const UnavailableCurrentLocationRepository(),
+    this.exploreRepository = const UnavailableExploreRepository(),
+    this.savedCasesRepository = const UnavailableSavedCasesRepository(),
     this.foundCaseRepository = const UnavailableFoundCaseRepository(),
   });
 
@@ -89,6 +110,10 @@ class AppBootstrap {
   final AlertPreferenceRepository alertPreferenceRepository;
   final LostCaseRepository lostCaseRepository;
   final FoundCaseRepository foundCaseRepository;
+  final ExploreRepository exploreRepository;
+  final SavedCasesRepository savedCasesRepository;
+  final PlaceSearchRepository placeSearchRepository;
+  final CurrentLocationRepository currentLocationRepository;
 }
 
 /// Initializes the SDK once, before the provider tree and router are mounted.
@@ -113,6 +138,24 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          savedCasesRepository: SavedCasesRepositoryImpl(
+            SupabaseSavedCasesDataSource(supabase.client),
+          ),
+          currentLocationRepository: const CurrentLocationRepositoryImpl(
+            DeviceLocationSource(),
+          ),
+          placeSearchRepository: PlaceSearchRepositoryImpl(
+            PhotonPlaceDataSource(
+              http.Client(),
+              endpoint: const String.fromEnvironment(
+                'PLACE_SEARCH_URL',
+                defaultValue: 'https://photon.komoot.io/api/',
+              ),
+            ),
+          ),
+          exploreRepository: ExploreRepositoryImpl(
+            SupabaseExploreDataSource(supabase.client),
+          ),
           foundCaseRepository: FoundCaseRepositoryImpl(
             SupabaseFoundCaseDataSource(supabase.client),
             NativePhotoGallerySource(

@@ -1,5 +1,9 @@
 # Base de datos de Entre Huellas
 
+Listado privado de guardados:074–076/plan021, migración20261016002100_saved_case_list.sql/patch021 generados por Build-SavedCaseListPatch/Build-RunAll. Requiere020, cuyo usuario confirma aplicación;021 no aplicado. Índice parcial owner/fecha/origen/UUID y RPC autenticada paginada20 (máximo50), cursor por cuenta y proyecciones públicas vigentes. Excluye destinos no visibles sin ampliar permisos. Sin SQL nuevo para Ciudad del perfil; selección de sugerencia validada por flujo de app, no certificado en servidor. Generación/análisis sin incidencias, pruebas/SQL no ejecutados por instrucción vigente. [ADR-051](../docs/decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
+
+Casos guardados: fuentes070–073/plan020, migración20261016002000_saved_cases.sql y patch020 derivados con Build-SavedCasesPatch/Build-RunAll, tras001–019. Tabla privada por cuenta/origen/UUID, RLS restrictiva, lectura de columnas/RPC autenticadas con visibilidad, versión y tombstone. Sin fotos/coordenadas copiadas ni ampliación de acceso a casos. Generación realizada; pruebas no ejecutadas por instrucción del usuario y aplicación remota pendiente. [ADR-050](../docs/decisiones/050-casos-guardados-por-cuenta.md).
+
 Publicación de perdido con espera de bloqueo: [patch015](patchs/015_patch_lost_case_lock_timeout.sql), generado por `Build-LostCaseLockTimeoutPatch.ps1`, añade un límite de5s solo a la RPC existente. Requiere patch013. No cambia permisos ni publica datos; no cancela solicitudes antiguas. Diagnóstico operacional de solo lectura en `tests/diagnose_lost_case_waits.sql`; cancelación de los PIDs observados separada del historial de migraciones. Validación local registrada en ESTADO; activación remota pendiente.
 
 Corrección vigente de avatar: usar [patchs/004_patch_profile_avatars.sql](patchs/004_patch_profile_avatars.sql) completo en SQL Editor. La migración 003 falló por ALTER TABLE sobre Storage administrado; plan 004/fuente 012 validan RLS existente sin alterar su propietario/configuración. Historial previo conservado. Regenerar con `./database/scripts/Build-AvatarPatch.ps1`; run_all también utiliza la corrección. Detalles en [patchs/README.md](patchs/README.md).
@@ -211,3 +215,10 @@ Plan017 agrega functions/061_found_case_lock_timeout.sql y genera supabase/migra
 
 
 Recorridos redefinidos por usuario (11 octubre): fuentes062–065 y plan018 añaden búsquedas posiblemente perdidas y avisos vinculados. [Migración018](../supabase/migrations/20261011001800_recovery_report_links.sql) requiere001–017 y pipeline de fotos anterior. Nuevas RPC autorizadas; viejo publish_found_case deja de ser ejecutable por clientes. Datos antiguos conservan legacy_found y sus relaciones originales. Regenerar con Build-Migration.ps1 -Plan migration_plans/018_recovery_report_links.json y Build-RunAll.ps1. Validación y activación pendientes en ESTADO/CONFIGURACION/ADR-034.
+
+
+## Lista filtrada de Explorar — plan019
+
+HU-07.1 / RF-13 / issue #32: fuentes066–069, plan019, migración20261015001900_explore_cases.sql y patch019 generados mediante Build-ExploreCasesPatch.ps1/Build-RunAll.ps1. Requiere001–018 y fotos anteriores. PostGIS en extensions con comprobación expresa de esquema, índices GiST sobre puntos públicos y RPC explore_cases autenticada; no cambia filas ni permisos de tablas/Storage. Filtros por tipo/especie/estado/fecha/radio, cursor vinculado a consulta y publicación/origen/UUID. Proyecciones existentes conservan privacidad y lectura de resueltos por autor. Cercanía sobre puntos aproximados para evitar inferencia del exacto.
+
+Pruebas locales usan @electric-sql/pglite0.5.10 y su extensión PostGIS0.2.10 fijadas en package-lock; se ejecuta PostGIS, sin simular sus funciones. El paquete de extensión es experimental y solo de tests. npm test verifica filtros combinados, permisos, ubicación privada distinta, paginación/empates/inserción y repetición. No acredita Supabase hosted, Storage, multiconexión ni rendimiento. Activación remota de019 pendiente; [ficha](../docs/funcionalidades/explorar.md) y [ADR-039](../docs/decisiones/039-explorar-lista-publica-paginada.md).

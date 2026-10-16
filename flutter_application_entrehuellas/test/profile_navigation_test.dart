@@ -1,3 +1,7 @@
+import 'explore_test.dart' show SearchFake;
+import 'support/fake_current_location.dart';
+import 'package:flutter_application_entrehuellas/features/explore/providers/explore_providers.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,6 +44,10 @@ void main() {
         final recovery = FakePasswordRecovery();
         final container = ProviderContainer(
           overrides: [
+            exploreRepositoryProvider.overrideWithValue(SearchFake()),
+            currentLocationRepositoryProvider.overrideWithValue(
+              const FakeCurrentLocation(),
+            ),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),
@@ -81,11 +89,11 @@ void main() {
         expect(transition.origin, avatarBounds);
         await tester.pumpAndSettle();
         expect(find.text('Perfil'), findsOneWidget);
-        await tester.ensureVisible(find.text('Zonas de interés'));
-        await tester.tap(find.text('Zonas de interés'));
+        await tester.ensureVisible(find.text('Ubicaciones de interés'));
+        await tester.tap(find.text('Ubicaciones de interés'));
         await tester.pumpAndSettle();
         expect(
-          find.text('Todavía no tienes zonas de interés.'),
+          find.text('Todavía no tienes ubicaciones de interés.'),
           findsOneWidget,
         );
         await tester.tap(find.byTooltip('Volver al perfil'));
@@ -131,10 +139,7 @@ void main() {
               .path,
           '/home',
         );
-        expect(
-          find.textContaining('La búsqueda de casos aún no está disponible'),
-          findsOneWidget,
-        );
+        expect(find.byType(ExploreSection), findsOneWidget);
         auth.emit(null);
         await tester.pumpAndSettle();
         container.read(routerProvider).go('/home/profile');
@@ -144,7 +149,7 @@ void main() {
         container.read(routerProvider).go('/home/interest-zones');
         await tester.pumpAndSettle();
         expect(find.text('Iniciar sesión'), findsOneWidget);
-        expect(find.text('Zonas de interés'), findsNothing);
+        expect(find.text('Ubicaciones de interés'), findsNothing);
         container.read(routerProvider).go('/home/alert-preferences');
         await tester.pumpAndSettle();
         expect(find.text('Iniciar sesión'), findsOneWidget);

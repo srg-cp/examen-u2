@@ -1,3 +1,4 @@
+import 'selection_pill_surface.dart';
 import 'package:flutter/material.dart';
 
 /// Joined selector for the two real pet lists, with a single moving indicator.
@@ -36,58 +37,53 @@ class TwoOptionFilter extends StatelessWidget {
       final stacked = (constraints.maxWidth - 12) / 2 < painter.width + 32;
       painter.dispose();
       final rtl = Directionality.of(context) == TextDirection.rtl;
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          color: const Color(0xFFE5E5EA),
-          borderRadius: BorderRadius.circular(32),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(6),
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(
-              begin: secondSelected ? 1.0 : 0.0,
-              end: secondSelected ? 1.0 : 0.0,
-            ),
-            duration: MediaQuery.disableAnimationsOf(context)
-                ? Duration.zero
-                : const Duration(milliseconds: 320),
-            curve: Curves.easeInOutCubic,
-            builder: (context, position, _) => Stack(
-              children: [
-                Positioned.fill(
-                  child: Align(
-                    alignment: stacked
-                        ? Alignment(0, position * 2 - 1)
-                        : Alignment((rtl ? 1 - position : position) * 2 - 1, 0),
-                    child: FractionallySizedBox(
-                      widthFactor: stacked ? 1 : .5,
-                      heightFactor: stacked ? .5 : 1,
-                      child: DecoratedBox(
-                        key: indicatorKey,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF111111),
-                          borderRadius: BorderRadius.circular(26),
+      return SelectionPillSurface(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(
+            begin: secondSelected ? 1.0 : 0.0,
+            end: secondSelected ? 1.0 : 0.0,
+          ),
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 320),
+          curve: Curves.easeInOutCubic,
+          builder: (context, position, _) => Stack(
+            children: [
+              Positioned.fill(
+                child: Align(
+                  alignment: stacked
+                      ? Alignment(0, position * 2 - 1)
+                      : Alignment((rtl ? 1 - position : position) * 2 - 1, 0),
+                  child: FractionallySizedBox(
+                    widthFactor: stacked ? 1 : .5,
+                    heightFactor: stacked ? .5 : 1,
+                    child: DecoratedBox(
+                      key: indicatorKey,
+                      decoration: BoxDecoration(
+                        color: SelectionPillSurface.selected,
+                        borderRadius: BorderRadius.circular(
+                          SelectionPillSurface.optionRadius,
                         ),
                       ),
                     ),
                   ),
                 ),
-                Flex(
-                  direction: stacked ? Axis.vertical : Axis.horizontal,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: stacked
-                      ? CrossAxisAlignment.stretch
-                      : CrossAxisAlignment.center,
-                  children: [
-                    for (final option in [false, true])
-                      if (stacked)
-                        _option(option, style, position)
-                      else
-                        Expanded(child: _option(option, style, position)),
-                  ],
-                ),
-              ],
-            ),
+              ),
+              Flex(
+                direction: stacked ? Axis.vertical : Axis.horizontal,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: stacked
+                    ? CrossAxisAlignment.stretch
+                    : CrossAxisAlignment.center,
+                children: [
+                  for (final option in [false, true])
+                    if (stacked)
+                      _option(option, style, position)
+                    else
+                      Expanded(child: _option(option, style, position)),
+                ],
+              ),
+            ],
           ),
         ),
       );
@@ -99,10 +95,10 @@ class TwoOptionFilter extends StatelessWidget {
     button: true,
     child: Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(26),
+      borderRadius: BorderRadius.circular(SelectionPillSurface.optionRadius),
       child: InkWell(
         onTap: onChanged == null ? null : () => onChanged!(option),
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(SelectionPillSurface.optionRadius),
         splashFactory: NoSplash.splashFactory,
         overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         child: ConstrainedBox(
@@ -115,7 +111,7 @@ class TwoOptionFilter extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: style.copyWith(
                   color: Color.lerp(
-                    const Color(0xFF111111),
+                    SelectionPillSurface.selected,
                     Colors.white,
                     option ? position : 1 - position,
                   ),

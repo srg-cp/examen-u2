@@ -9,7 +9,8 @@ import '../../../../core/presentation/widgets/case_screen_shell.dart';
 import '../widgets/found_public_content.dart';
 
 class FoundDetailScreen extends ConsumerWidget {
-  const FoundDetailScreen({required this.id, super.key});
+  const FoundDetailScreen({required this.id, this.savedAction, super.key});
+  final Widget? savedAction;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,6 +18,12 @@ class FoundDetailScreen extends ConsumerWidget {
     final model = ref.read(publicFoundViewModelProvider(id).notifier);
     return CaseScreenShell(
       title: 'Ficha pública',
+      trailingAction:
+          !state.isLoading &&
+              !state.hasError &&
+              state.asData?.value.value != null
+          ? savedAction
+          : null,
       immersive: state.isLoading || state.asData?.value.value != null,
       loading: state.isLoading,
       notice: state.hasError

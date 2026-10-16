@@ -119,7 +119,7 @@ void main() {
                     description: description,
                     occurredAt: 'Desaparición: 10/10/2026 15:30',
                     privacy:
-                        'Zona pública aproximada. Punto y referencia privados. Al publicar, estos datos y fotos serán públicos; evita domicilio, documentos y datos personales.',
+                        'Ubicación pública aproximada. Punto y referencia privados. Al publicar, estos datos y fotos serán públicos; evita domicilio, documentos y datos personales.',
                     actions: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
