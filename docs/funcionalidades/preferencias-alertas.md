@@ -1,5 +1,7 @@
 # Preferencias de alertas por cuenta
 
+Ajuste del15 de octubre: etiquetas Zona/Zonas se denominan Ubicación/Ubicaciones; contratos y preferencias persistidas conservados. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
 Módulo: `alert_preferences`. HU-02.2 / RF-02,16;
 [issue #27](../backlog/027-HU-02.2.md).
 

@@ -77,7 +77,7 @@ class ProfileScreen extends ConsumerWidget {
                               ? null
                               : () => context.push('/home/interest-zones'),
                           icon: const Icon(Icons.location_on_outlined),
-                          label: const Text('Zonas de interés'),
+                          label: const Text('Ubicaciones de interés'),
                         ),
                         const SizedBox(height: 16),
                         LoadingShimmer(

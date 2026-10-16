@@ -130,7 +130,7 @@ class InterestZonesViewModel extends AsyncNotifier<ZoneViewState> {
           clearDraft: true,
           busy: false,
           clearIssue: true,
-          confirmation: 'Zona guardada',
+          confirmation: 'Ubicación guardada',
           noticeId: current.noticeId + 1,
         ),
       );
@@ -175,7 +175,7 @@ class InterestZonesViewModel extends AsyncNotifier<ZoneViewState> {
           zones: current.zones.where((item) => item.id != zone.id).toList(),
           busy: false,
           clearIssue: true,
-          confirmation: 'Zona eliminada',
+          confirmation: 'Ubicación eliminada',
           noticeId: current.noticeId + 1,
         ),
       );

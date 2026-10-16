@@ -1,4 +1,6 @@
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
+import '../../../../core/presentation/widgets/pull_to_refresh.dart';
+import '../../../../core/presentation/widgets/content_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -70,7 +72,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
           async.hasError || data?.issue != null || data?.confirmation != null,
       isError: async.hasError || data?.issue != null,
       message: async.hasError
-          ? 'No se pudieron consultar tus zonas.'
+          ? 'No se pudieron consultar tus ubicaciones.'
           : data?.issue != null
           ? zoneFailureLabel(data!.issue!)
           : data?.confirmation ?? '',
@@ -90,111 +92,134 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    SingleChildScrollView(
-                      controller: _scroll,
-                      padding: EdgeInsets.fromLTRB(
-                        24,
-                        MediaQuery.paddingOf(context).top + 80,
-                        24,
-                        ScrollSafeArea.bottomPadding(context, 32),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'Zonas de interés',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF111111),
+                    PullToRefresh(
+                      indicatorTop: MediaQuery.paddingOf(context).top + 8,
+                      enabled:
+                          !async.isLoading &&
+                          data != null &&
+                          data.draft == null &&
+                          !data.busy &&
+                          !data.refreshing,
+                      onRefresh: vm.refresh,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: _scroll,
+                        padding: EdgeInsets.fromLTRB(
+                          24,
+                          MediaQuery.paddingOf(context).top + 80,
+                          24,
+                          ScrollSafeArea.bottomPadding(context, 32),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'Ubicaciones de interés',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF111111),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          AuthStageTransition(
-                            key: ValueKey(data?.ownerId ?? 'unavailable'),
-                            startCovered: true,
-                            stage: data?.draft?.id ?? 'list',
-                            builder: (play) => ContentReveal(
-                              loading: async.isLoading,
-                              count: 2,
-                              play: play,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  StaggerRevealItem(
-                                    order: 0,
-                                    child: async.isLoading
-                                        ? LoadingShimmer(
-                                            isLoading: true,
-                                            loadingLabel: 'Consultando zonas',
-                                            child: const SkeletonFormFields(
-                                              fieldCount: 3,
+                            const SizedBox(height: 20),
+                            AuthStageTransition(
+                              key: ValueKey(data?.ownerId ?? 'unavailable'),
+                              startCovered: true,
+                              stage: data?.draft?.id ?? 'list',
+                              builder: (play) => ContentReveal(
+                                loading: async.isLoading,
+                                count: 2,
+                                play: play,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    StaggerRevealItem(
+                                      order: 0,
+                                      child: async.isLoading
+                                          ? LoadingShimmer(
+                                              isLoading: true,
+                                              loadingLabel:
+                                                  'Consultando ubicaciones',
+                                              child: const SkeletonFormFields(
+                                                fieldCount: 3,
+                                              ),
+                                            )
+                                          : async.hasError
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                TextButton(
+                                                  onPressed: vm.retry,
+                                                  child: const Text(
+                                                    'Reintentar',
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : data == null
+                                          ? const SizedBox.shrink()
+                                          : data.draft != null
+                                          ? ZoneEditor(
+                                              key: ValueKey(data.draft!.id),
+                                              state: data,
+                                            )
+                                          : ContentRefresh(
+                                              refreshing: data.refreshing,
+                                              label: 'Actualizando ubicaciones',
+                                              child: _list(context, vm, data),
                                             ),
-                                          )
-                                        : async.hasError
-                                        ? Column(
+                                    ),
+                                    if (data?.issue != null &&
+                                        data!.issue !=
+                                            ZoneFailureKind.invalidName &&
+                                        data.issue !=
+                                            ZoneFailureKind.invalidPoint)
+                                      StaggerRevealItem(
+                                        order: 1,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 16,
+                                          ),
+                                          child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              TextButton(
-                                                onPressed: vm.retry,
-                                                child: const Text('Reintentar'),
-                                              ),
-                                            ],
-                                          )
-                                        : data == null
-                                        ? const SizedBox.shrink()
-                                        : data.draft != null
-                                        ? ZoneEditor(
-                                            key: ValueKey(data.draft!.id),
-                                            state: data,
-                                          )
-                                        : _list(context, vm, data),
-                                  ),
-                                  if (data?.issue != null &&
-                                      data!.issue !=
-                                          ZoneFailureKind.invalidName &&
-                                      data.issue !=
-                                          ZoneFailureKind.invalidPoint)
-                                    StaggerRevealItem(
-                                      order: 1,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            if (data.issue ==
-                                                    ZoneFailureKind.conflict ||
-                                                data.issue ==
-                                                    ZoneFailureKind.unavailable)
-                                              TextButton(
-                                                onPressed: () async {
-                                                  if (data.draft == null ||
-                                                      await confirmZoneAction(
-                                                        context,
-                                                        '¿Consultar versión actual?',
-                                                        'Se descartará la edición sin guardar.',
-                                                        'Consultar',
-                                                      )) {
-                                                    if (context.mounted) {
-                                                      vm.retry();
+                                              if (data.issue ==
+                                                      ZoneFailureKind
+                                                          .conflict ||
+                                                  data.issue ==
+                                                      ZoneFailureKind
+                                                          .unavailable)
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    if (data.draft == null ||
+                                                        await confirmZoneAction(
+                                                          context,
+                                                          '¿Consultar versión actual?',
+                                                          'Se descartará la edición sin guardar.',
+                                                          'Consultar',
+                                                        )) {
+                                                      if (context.mounted) {
+                                                        vm.retry();
+                                                      }
                                                     }
-                                                  }
-                                                },
-                                                child: const Text(
-                                                  'Consultar versión actual',
+                                                  },
+                                                  child: const Text(
+                                                    'Consultar versión actual',
+                                                  ),
                                                 ),
-                                              ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(
@@ -202,27 +227,12 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                       left: 24,
                       child: GlassNavigationButton(
                         tooltip: data?.draft != null
-                            ? 'Volver a mis zonas'
+                            ? 'Volver a mis ubicaciones'
                             : 'Volver al perfil',
                         icon: Icons.chevron_left_rounded,
                         onPressed: data?.busy == true ? null : back,
                       ),
                     ),
-                    if (data?.refreshing == true)
-                      Positioned(
-                        top: MediaQuery.paddingOf(context).top + 64,
-                        left: 24,
-                        right: 24,
-                        child: LoadingShimmer(
-                          isLoading: true,
-                          loadingLabel: 'Actualizando zonas',
-                          radius: 2,
-                          child: const SizedBox(
-                            height: 3,
-                            child: ColoredBox(color: Color(0xFFE5E5EA)),
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -249,7 +259,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Text(
-            'Todavía no tienes zonas de interés.',
+            'Todavía no tienes ubicaciones de interés.',
             style: TextStyle(fontSize: 18),
           ),
         ),
@@ -258,12 +268,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
       FilledButton(
         style: primaryActionButtonStyle(context),
         onPressed: data.busy || data.refreshing ? null : () => vm.startEditor(),
-        child: const Text('Añadir zona'),
-      ),
-      const SizedBox(height: 12),
-      TextButton(
-        onPressed: data.busy || data.refreshing ? null : vm.refresh,
-        child: const Text('Actualizar zonas'),
+        child: const Text('Añadir ubicación'),
       ),
     ],
   );
@@ -307,7 +312,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
               ),
               LoadingShimmer(
                 isLoading: data.busy && data.busyZoneId == zone.id,
-                loadingLabel: 'Procesando zona',
+                loadingLabel: 'Procesando ubicación',
                 radius: 18,
                 child: TextButton(
                   onPressed: data.busy || data.refreshing
@@ -315,8 +320,8 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                       : () async {
                           if (await confirmZoneAction(
                             context,
-                            '¿Eliminar zona?',
-                            'Dejarás de usar «${zone.name}» como zona de interés.',
+                            '¿Eliminar ubicación?',
+                            'Dejarás de usar «${zone.name}» como ubicación de interés.',
                             'Eliminar',
                           )) {
                             if (context.mounted) await vm.delete(zone);
@@ -338,15 +343,15 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
 
 String zoneFailureLabel(ZoneFailureKind kind) => switch (kind) {
   ZoneFailureKind.invalidName =>
-    'Escribe un nombre de zona de 1 a 60 caracteres.',
+    'Escribe un nombre de ubicación de 1 a 60 caracteres.',
   ZoneFailureKind.invalidPoint =>
     'Selecciona un punto válido en el mapa o indica sus coordenadas.',
   ZoneFailureKind.invalidRadius => 'El radio debe estar entre 0.1 y 50 km.',
   ZoneFailureKind.conflict =>
-    'La zona cambió en otro dispositivo. Consulta la versión actual antes de volver a editar.',
+    'La ubicación cambió en otro dispositivo. Consulta la versión actual antes de volver a editar.',
   ZoneFailureKind.signedOut => 'Tu sesión cambió. Vuelve a ingresar.',
   ZoneFailureKind.unavailable =>
-    'La zona no está disponible. Consulta tus zonas actuales.',
+    'La ubicación no está disponible. Consulta tus ubicaciones actuales.',
   ZoneFailureKind.network =>
     'No se pudo completar la operación. Tus cambios se conservan; puedes reintentar.',
 };

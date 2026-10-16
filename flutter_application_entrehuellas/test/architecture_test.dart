@@ -212,7 +212,7 @@ void main() {
               '$appRoot/${imported.substring('package:flutter_application_entrehuellas/'.length)}';
         } else if (imported.startsWith('package:')) {
           final isDataSdk = RegExp(
-            r'^package:(supabase|gotrue|postgrest|storage_client|realtime_client|http|drift|sqflite|image_picker|image/|shared_preferences|cross_file)',
+            r'^package:(supabase|gotrue|postgrest|storage_client|realtime_client|http|drift|sqflite|image_picker|image/|shared_preferences|cross_file|geolocator)',
           ).hasMatch(imported);
           if (isDomain ||
               (isDataSdk &&

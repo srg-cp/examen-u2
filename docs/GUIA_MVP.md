@@ -439,3 +439,23 @@ Corrección autorizada del12 de octubre: Reportar crea pérdida; avisos solo des
 
 
 Corrección UX autorizada el12 de octubre: Mascota perdida es un único formulario con selección de ficha o No está en mis mascotas. Datos del reporte compartidos/conservados; detalles/fotos independientes por origen. HU-05/RF-05 y búsqueda comunitaria de HU-06/RF-06, sin ampliación del MVP, SQL nuevo o historias cerradas. [ADR-038](decisiones/038-formulario-unico-mascota-perdida.md).
+
+
+## HU-07.1: lista de Explorar — 15 de octubre de 2026
+
+Tras validación de la rama actual confirmada por el usuario, se continúa S3 con HU-07.1 / RF-13 / issue #32. Módulo explore: lista real por tipo/especie/estado/período/zona manual, distancia pública aproximada PostGIS y cursor por publicación/origen/ID. Abre fichas existentes y conserva clasificación de búsquedas/avisos/anteriores. Estados respetan visibilidad previa (resueltos del autor). SQL066–069/plan019, sin Edge nueva. HU-07.2 / issue #33 continúa pendiente; el mapa de selección del filtro no equivale a ese mapa de resultados. Sin ampliación del MVP, publicación/despliegue o historias cerradas automáticamente. [Ficha](funcionalidades/explorar.md), [ADR-039](decisiones/039-explorar-lista-publica-paginada.md) y ESTADO distinguen evidencia local y demo remota.
+
+
+## Presentación de Explorar en grilla — 15 de octubre de 2026
+
+Ajuste explícito del usuario sobre HU-07.1/RF-13: cards fotográficas en dos columnas adaptables a una, imagen protagonista y datos debajo. Conserva filtros/páginas/ficha y contrato019. Sin ampliación de MVP, SQL nuevo o cierre de historia. [ADR-040](decisiones/040-explorar-grilla-fotografica.md) y [ficha](funcionalidades/explorar.md).
+
+
+## Filtros de Explorar superpuestos — 15 de octubre de 2026
+
+Ajuste solicitado de HU-07.1/RF-13: panel flotante reutilizable que mantiene fija la grilla y usa cápsulas compartidas con el selector Activas/Archivadas. Cancelar descarta cambios sin confirmar; Aplicar conserva los contratos/paginación existentes. Sin SQL, ampliación del MVP ni cierre automático de historia. [ADR-041](decisiones/041-filtros-flotantes-reutilizables.md) y [ficha](funcionalidades/explorar.md).
+
+
+## Ajuste de filtros y zona de HU-07.1 — 15 de octubre de 2026
+
+Por nueva instrucción, filtros desplegados dentro de Explorar sin popup. Cards eliminan texto Mascota perdida y conservan nombre/especie más badges. El usuario confirma búsqueda de ciudad/dirección, selección en mapa y radio en kilómetros. Incremento de HU-07.1/RF-13 con geocodificación de lectura Photon y selección manual alternativa, sin GPS, SQL nuevo o mapa de resultados HU-07.2. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md), ficha y ESTADO separan evidencias locales de demo autenticada.

@@ -1,0 +1,107 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/loading_shimmer.dart';
+import '../../../../core/presentation/widgets/skeleton_form_fields.dart';
+import '../../domain/entities/search_place.dart';
+import '../view_models/place_search_view_model.dart';
+
+class PlaceSearchFields extends ConsumerStatefulWidget {
+  const PlaceSearchFields({
+    required this.onSelect,
+    this.initialLabel = '',
+    super.key,
+  });
+  final ValueChanged<SearchPlace> onSelect;
+  final String initialLabel;
+  @override
+  ConsumerState<PlaceSearchFields> createState() => _PlaceSearchFieldsState();
+}
+
+class _PlaceSearchFieldsState extends ConsumerState<PlaceSearchFields> {
+  late final _controller = TextEditingController(text: widget.initialLabel);
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(placeSearchViewModelProvider);
+    final model = ref.read(placeSearchViewModelProvider.notifier);
+    return ConfirmationToastHost(
+      confirmed: state.notice != null,
+      isError: true,
+      message: state.notice ?? '',
+      noticeId: state.noticeId,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppTextField(
+            label: 'Ciudad o dirección',
+            hint: 'Por ejemplo, Miraflores, Lima',
+            icon: Icons.search_rounded,
+            controller: _controller,
+            textInputAction: TextInputAction.search,
+            onChanged: model.queryChanged,
+            onSubmitted: (_) => model.search(_controller.text),
+          ),
+          if (state.busy)
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: LoadingShimmer(
+                isLoading: true,
+                isAction: false,
+                loadingLabel: 'Consultando lugares',
+                child: SkeletonFormFields(fieldCount: 1),
+              ),
+            ),
+          for (final place in state.places)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  minimumSize: const Size(0, 48),
+                  padding: const EdgeInsets.all(12),
+                  backgroundColor: const Color(0xFFF5F5F7),
+                ),
+                onPressed: () {
+                  _controller.text = place.label;
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  widget.onSelect(place);
+                  model.clear();
+                },
+                icon: const Icon(Icons.location_on_outlined),
+                label: Text(place.label),
+              ),
+            ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () async {
+                var opened = false;
+                try {
+                  opened = await launchUrl(
+                    Uri.parse('https://www.openstreetmap.org/copyright'),
+                    mode: LaunchMode.externalApplication,
+                  );
+                } catch (_) {
+                  opened = false;
+                }
+                if (!opened && mounted) model.attributionUnavailable();
+              },
+              child: const Text(
+                '© OpenStreetMap contributors',
+                style: TextStyle(fontSize: 12, color: Color(0xFF6E6E73)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

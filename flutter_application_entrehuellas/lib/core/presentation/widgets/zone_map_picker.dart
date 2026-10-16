@@ -14,13 +14,14 @@ class ZoneMapPicker extends StatefulWidget {
     required this.onSelect,
     this.createTileProvider,
     this.readOnly = false,
+    this.fitRadius = false,
     this.showCenterMarker = true,
     super.key,
   });
   final double? latitude;
   final double? longitude;
   final int radiusMeters;
-  final bool readOnly, showCenterMarker;
+  final bool readOnly, showCenterMarker, fitRadius;
   final void Function(double latitude, double longitude)? onSelect;
   final TileProvider Function()? createTileProvider;
   @override
@@ -38,13 +39,48 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
     _tiles = _createTiles();
   }
 
+  bool _mapReady = false;
+  void _fitSelection() {
+    if (!_mapReady ||
+        !widget.fitRadius ||
+        widget.latitude == null ||
+        widget.longitude == null) {
+      return;
+    }
+    final center = LatLng(widget.latitude!, widget.longitude!);
+    final distance = const Distance();
+    _controller.fitCamera(
+      CameraFit.coordinates(
+        coordinates: [0.0, 90.0, 180.0, 270.0]
+            .map(
+              (bearing) => distance.offset(
+                center,
+                widget.radiusMeters.toDouble(),
+                bearing,
+              ),
+            )
+            .toList(),
+        padding: const EdgeInsets.all(24),
+        maxZoom: 16,
+      ),
+    );
+  }
+
   @override
   void didUpdateWidget(ZoneMapPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.latitude != null &&
-        widget.longitude != null &&
-        (widget.latitude != oldWidget.latitude ||
-            widget.longitude != oldWidget.longitude)) {
+    final pointChanged =
+        widget.latitude != oldWidget.latitude ||
+        widget.longitude != oldWidget.longitude;
+    if (widget.fitRadius &&
+        (pointChanged ||
+            widget.radiusMeters != oldWidget.radiusMeters ||
+            !oldWidget.fitRadius)) {
+      _fitSelection();
+    } else if (pointChanged &&
+        _mapReady &&
+        widget.latitude != null &&
+        widget.longitude != null) {
       _controller.move(
         LatLng(widget.latitude!, widget.longitude!),
         _controller.camera.zoom,
@@ -91,6 +127,10 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                 mapController: _controller,
                 key: ValueKey(_attempt),
                 options: MapOptions(
+                  onMapReady: () {
+                    _mapReady = true;
+                    _fitSelection();
+                  },
                   initialCenter: point ?? const LatLng(-12.0464, -77.0428),
                   initialZoom: 12,
                   interactionOptions: InteractionOptions(

@@ -1,5 +1,11 @@
 # Inicio y navegación
 
+Refinamiento del gesto compartido: icono de recarga acompaña el descenso, gira durante refresh y retorna al finalizar/cancelar. Se mantiene inscripción por sección y navegación flotante. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.
+
+Actualización del15 de octubre: el scroll principal integra PullToRefresh con destino registrado por la sección visible, Explorar o Mis mascotas. Cada sección controla su ViewModel, sin colaboración entre presentaciones de funcionalidades. Vacío/lista corta permite jalar; estado del gesto se descarta al cambiar sección y la navegación flotante se conserva. Inicio sin consulta remota no tiene refresco ficticio. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Análisis sin incidencias, sin pruebas ejecutadas por instrucción del usuario; revisión Android pendiente.
+
+Ajuste del15 de octubre: texto Zona/Zonas sustituido por Ubicación/Ubicaciones y descripción de Explorar actualizada al inicio por ubicación actual/radio15km con alternativa manual. Sin cambios de rutas. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
 Módulo: `home`; composición y protección de rutas en `app`.
 
 ## Qué hace y cómo se usa
@@ -16,9 +22,8 @@ ni combine directamente providers de infraestructura.
 ## Alcance actual y estados
 
 Mis mascotas permite el recorrido documentado en [Mascotas](mascotas.md).
-Los accesos de exploración y alertas pendientes muestran información
-explícita de disponibilidad. No representan una lista/mapa de casos ni una
-bandeja operativa, y no publican una pérdida al pulsarlos.
+Explorar recibe desde app el listado filtrado real de [Explorar](explorar.md).
+Alertas conserva información de disponibilidad pendiente; no hay bandeja operativa.
 
 La cabecera permanece fuera del reveal del contenido. Navegación y cargas
 reutilizan las reglas visuales compartidas; al cambiar identidad se protege el
@@ -55,3 +60,8 @@ Sustituye los accesos intercalados anteriores: Reportar contiene únicamente Mas
 ## Reportar directo — 12 de octubre de 2026
 
 Por decisión explícita del usuario, se retira Mascota encontrada del acceso Reportar y el panel intermedio. Reportar abre Mascota perdida con Mi mascota/Otra mascota. Avisos solo desde ficha abierta con caso vinculado; Mis reportes conserva consulta/gestión. Explorar es destino previsto de consulta pública pero su implementación continúa pendiente. [ADR-037](../decisiones/037-avisos-desde-ficha.md).
+
+
+## Explorar operativo localmente — 15 de octubre de 2026
+
+Sustituye la disponibilidad pendiente de las notas anteriores: Explorar consulta tarjetas públicas con filtros y paginación y abre las fichas existentes. App inyecta ExploreSection; Home no importa otras presentaciones. La cabecera y navegación se conservan, con entrada cover→stagger; consultas no repiten la animación. Actualizar y retorno desde ficha conservan datos durante refresh. Requiere backend019; evidencia local y pendientes en [ficha](explorar.md)/ESTADO. No incluye mapa de resultados ni entrega de alertas.

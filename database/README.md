@@ -211,3 +211,10 @@ Plan017 agrega functions/061_found_case_lock_timeout.sql y genera supabase/migra
 
 
 Recorridos redefinidos por usuario (11 octubre): fuentes062–065 y plan018 añaden búsquedas posiblemente perdidas y avisos vinculados. [Migración018](../supabase/migrations/20261011001800_recovery_report_links.sql) requiere001–017 y pipeline de fotos anterior. Nuevas RPC autorizadas; viejo publish_found_case deja de ser ejecutable por clientes. Datos antiguos conservan legacy_found y sus relaciones originales. Regenerar con Build-Migration.ps1 -Plan migration_plans/018_recovery_report_links.json y Build-RunAll.ps1. Validación y activación pendientes en ESTADO/CONFIGURACION/ADR-034.
+
+
+## Lista filtrada de Explorar — plan019
+
+HU-07.1 / RF-13 / issue #32: fuentes066–069, plan019, migración20261015001900_explore_cases.sql y patch019 generados mediante Build-ExploreCasesPatch.ps1/Build-RunAll.ps1. Requiere001–018 y fotos anteriores. PostGIS en extensions con comprobación expresa de esquema, índices GiST sobre puntos públicos y RPC explore_cases autenticada; no cambia filas ni permisos de tablas/Storage. Filtros por tipo/especie/estado/fecha/radio, cursor vinculado a consulta y publicación/origen/UUID. Proyecciones existentes conservan privacidad y lectura de resueltos por autor. Cercanía sobre puntos aproximados para evitar inferencia del exacto.
+
+Pruebas locales usan @electric-sql/pglite0.5.10 y su extensión PostGIS0.2.10 fijadas en package-lock; se ejecuta PostGIS, sin simular sus funciones. El paquete de extensión es experimental y solo de tests. npm test verifica filtros combinados, permisos, ubicación privada distinta, paginación/empates/inserción y repetición. No acredita Supabase hosted, Storage, multiconexión ni rendimiento. Activación remota de019 pendiente; [ficha](../docs/funcionalidades/explorar.md) y [ADR-039](../docs/decisiones/039-explorar-lista-publica-paginada.md).

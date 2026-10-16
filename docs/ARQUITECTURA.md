@@ -1,5 +1,9 @@
 # Arquitectura de Entre Huellas
 
+Actualización por gesto: PullToRefresh/PullToRefreshTarget en core comparten solo callbacks de presentación. HomeScreen posee el scroll y cada funcionalidad registra su operación de ViewModel, sin imports entre presentaciones ni core→features. Ubicaciones utiliza callback directo en su scroll. No cambian casos de uso/repositorios/SQL; [ADR-048](decisiones/048-actualizar-listas-al-jalar.md).
+
+Actualización de Explorar,15 de octubre: CurrentLocationRepository/GetCurrentExploreLocation en dominio, DeviceLocationSource (geolocator14.0.2) y repositorio en data, inyección bootstrap/main y coordinación en ExploreViewModel. Primera consulta solo con ubicación/radio15km; fallo de ubicación deja selección manual. SDK protegido por comprobación de fronteras. Sin SQL nuevo, stream de ubicación ni persistencia del dispositivo. [ADR-047](decisiones/047-ubicacion-actual-y-radio-inicial.md). No se han ejecutado pruebas nativas por instrucción del usuario.
+
 **Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
 
 El comportamiento de cada módulo, sus recorridos y límites actuales se documentan
@@ -333,3 +337,18 @@ ReadRecoverySearch (dominio found_cases) colabora mediante contratos de reposito
 ## Composición del formulario único de pérdida — 12 de octubre de 2026
 
 LostReportScreen sustituye el selector de pestañas por elección de ficha y compone los datos específicos con un único CaseReportFields de core. Los ViewModels exponen restoreReportDetails para transferir fecha parcial/hora/punto/referencia del mismo reporte al cambiar origen, comprobando identidad y bloqueo, sin tocar mascota/fotos/UUID. La composición permanece en app; core recibe valores/callbacks sin importar features y las funcionalidades no importan presentación entre sí. Sin cambios de dominio/SQL/permisos; [ADR-038](decisiones/038-formulario-unico-mascota-perdida.md) sustituye la interfaz de ADR-035.
+
+
+## Explorar — HU-07.1
+
+Módulo explore con domain/entities/repositories/use_cases/failures, providers declarativos, data_sources/models/repositories y presentation/state/view_models/widgets. ExploreSection consume ExploreViewModel→SearchCases→ExploreRepository; repositorio mapea DTO y fallos y firma miniaturas mediante la fuente de datos. Bootstrap/main inyectan implementaciones y router entrega el widget a HomeScreen; home no conoce otras presentaciones. Consulta server-side paginada/filtrada sobre proyecciones existentes, índices públicos PostGIS y cursor ligado a filtros, sin ampliar lectura privada. [ADR-039](decisiones/039-explorar-lista-publica-paginada.md) y [ficha](funcionalidades/explorar.md).
+
+
+## Panel de filtros reutilizable
+
+Core contiene FilterPopover<T>, FilterChoiceGroup<T> y SelectionPillSurface. El primero posee y libera su ruta modal; los demás renderizan valores/callbacks sin dependencias de negocio. TwoOptionFilter conserva su operación y delega la superficie compartida. ExploreFilters compone el editor/borrador visual, confirma selección y llama al callback de ExploreViewModel; no adquiere SDK/repositorios ni imports de otra presentación. Dominio y SQL conservan las reglas existentes. [ADR-041](decisiones/041-filtros-flotantes-reutilizables.md).
+
+
+## Búsqueda de lugares y filtros integrados
+
+ADR-042 sustituye la ruta modal de ADR-041 por FilterExpansion<T>, manteniendo SelectionPillSurface/FilterChoiceGroup compartidos y sin dependencias core→features. ExploreFilters conserva borrador local y confirmación hacia ExploreViewModel. SearchPlaces→PlaceSearchRepository→PlaceSearchRepositoryImpl→PhotonPlaceDataSource incorpora búsqueda de ciudades/direcciones; DTO GeoJSON y errores/caché permanecen en data. PlaceSearchViewModel autoDispose gobierna consulta y descarte por cuenta/disposición. Bootstrap/main inyectan cliente/endpoint/repositorio; providers declaran contratos. ZoneMapPicker añade fitRadius opt-in sin reglas de negocio. Sin cambios de permisos o contrato SQL019. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).

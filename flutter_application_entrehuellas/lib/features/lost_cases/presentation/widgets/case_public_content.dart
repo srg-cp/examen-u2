@@ -55,7 +55,7 @@ class CasePreviewContent extends StatelessWidget {
       name: f.name,
       latitude: value.latitude,
       longitude: value.longitude,
-      locationLabel: 'Zona de desaparición',
+      locationLabel: 'Ubicación de desaparición',
       photos: [
         for (final photo in value.photos)
           photo.uri == null
@@ -90,8 +90,8 @@ class CasePreviewContent extends StatelessWidget {
       description: f.traits ?? '',
       occurredAt: 'Desaparición: ${caseDateLabel(value.occurredAt)}',
       privacy: isPreview
-          ? 'Zona pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
-          : 'Zona pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
+          ? 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
+          : 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
       actions: actions,
     );
   }

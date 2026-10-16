@@ -14,11 +14,12 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Perfil y foto de cuenta](perfil.md) | profile | HU-01.7; RF-01; issue #23 |
 | [Mascotas](mascotas.md) | pets | HU-03; RF-03; issues #3, #28, #29 |
 | [Fotos de mascotas](fotos-mascotas.md) | pets y Edge pet-photo-process | HU-04; RF-03; issues #4, #30, #31 |
-| [Zonas de interés](zonas.md) | interest_zones | HU-02.1; RF-02,16; issue #26 |
+| [Ubicaciones de interés](zonas.md) | interest_zones | HU-02.1; RF-02,16; issue #26 |
 | [Preferencias de alertas](preferencias-alertas.md) | alert_preferences | HU-02.2; RF-02,16; issue #27 |
 | [Casos perdidos](casos-perdidos.md) | lost_cases | HU-05; RF-05; issue #5; implementación local |
 | [Avisos y reportes anteriores](casos-encontrados.md) | found_cases | HU-06; RF-06; issue #6; implementación local |
 | [Búsquedas y avisos vinculados](busquedas-y-avisos.md) | lost_cases / found_cases | HU-05/06; partes HU-10/13; ADR-034; implementación local |
+| [Explorar: grilla filtrada](explorar.md) | explore | HU-07.1; RF-13; issue #32; implementación local |
 | [Mis reportes](mis-reportes.md) | found_cases / dominio lost_cases | HU-05/06; consulta unificada; ADR-036 |
 
 Las HU son identificadores del producto; los números # son issues de GitHub.
@@ -30,7 +31,7 @@ Las sesiones y permisos se comprueban también en servidor; la UI no sustituye
 RLS, grants ni restricciones. Al cambiar de cuenta se descartan resultados
 tardíos y datos privados de la identidad anterior.
 
-Exploración de casos, cartel/QR y avistamientos desde web,
+Mapa de resultados de Explorar, cartel/QR y avistamientos desde web,
 bandeja y entrega real de alertas siguen en los sprints posteriores de
 [GUIA_MVP](../GUIA_MVP.md). Las preferencias guardadas no envían avisos.
 

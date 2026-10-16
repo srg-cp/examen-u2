@@ -690,7 +690,7 @@ Registrar el escenario, resultado y evidencia en este issue y en docs/ESTADO.md.
 
 **Estado de partida**
 
-Pendiente de implementación. Las casillas permanecen pendientes hasta verificar los criterios completos.
+Implementación local del15 de octubre de2026 en feature/explore-case-list. Lista/filtros/paginación y zona manual con PostGIS; estados conservan privacidad previa (resueltos solo del autor). [Ficha](funcionalidades/explorar.md), [ADR-039](decisiones/039-explorar-lista-publica-paginada.md) y ESTADO registran evidencia local. Pendientes activación019/demo Android y verificación hosted. Casillas sin cierre automático ni actualización de GitHub. HU-07.2 continúa pendiente.
 
 ### HU-07.2 — Explorar los mismos casos en el mapa — [#33](https://github.com/srg-cp/entrehuellas/issues/33)
 

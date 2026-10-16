@@ -22,7 +22,7 @@ class ZoneEditor extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
-          'Nombra tu zona y toca el mapa para elegir su centro. Puedes moverlo y ampliar la vista.',
+          'Nombra tu ubicación y toca el mapa para elegir su centro. Puedes moverlo y ampliar la vista.',
           style: TextStyle(fontSize: 16, color: Color(0xFF6E6E73), height: 1.4),
         ),
         const SizedBox(height: 20),
@@ -34,7 +34,7 @@ class ZoneEditor extends ConsumerWidget {
             initialValue: draft.name,
             style: const TextStyle(fontSize: 16, color: Color(0xFF111111)),
             enabled: !state.busy,
-            decoration: _decoration('Nombre de la zona', invalidName),
+            decoration: _decoration('Nombre de la ubicación', invalidName),
             onChanged: (name) => vm.edit(name: name),
           ),
         ),
@@ -95,12 +95,12 @@ class ZoneEditor extends ConsumerWidget {
         const SizedBox(height: 20),
         LoadingShimmer(
           isLoading: state.busy,
-          loadingLabel: 'Guardando zona',
+          loadingLabel: 'Guardando ubicación',
           child: FilledButton(
             style: primaryActionButtonStyle(context, isLoading: state.busy),
             onPressed: state.busy ? null : vm.save,
             child: Text(
-              draft.version == 0 ? 'Guardar zona' : 'Guardar cambios',
+              draft.version == 0 ? 'Guardar ubicación' : 'Guardar cambios',
             ),
           ),
         ),

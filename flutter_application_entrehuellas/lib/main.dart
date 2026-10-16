@@ -1,3 +1,4 @@
+import 'features/explore/providers/explore_providers.dart';
 import 'features/found_cases/providers/found_case_providers.dart';
 import 'features/lost_cases/providers/lost_case_providers.dart';
 import 'features/onboarding/providers/onboarding_providers.dart';
@@ -22,6 +23,15 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        currentLocationRepositoryProvider.overrideWithValue(
+          bootstrap.currentLocationRepository,
+        ),
+        placeSearchRepositoryProvider.overrideWithValue(
+          bootstrap.placeSearchRepository,
+        ),
+        exploreRepositoryProvider.overrideWithValue(
+          bootstrap.exploreRepository,
+        ),
         foundCaseRepositoryProvider.overrideWithValue(
           bootstrap.foundCaseRepository,
         ),

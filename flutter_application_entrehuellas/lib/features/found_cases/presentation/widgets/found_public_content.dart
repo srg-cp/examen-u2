@@ -51,8 +51,8 @@ class FoundPreviewContent extends StatelessWidget {
     latitude: value.latitude,
     longitude: value.longitude,
     locationLabel: value.reportKind == 'possible_loss'
-        ? 'Zona de posible desaparición'
-        : 'Zona del aviso',
+        ? 'Ubicación de posible desaparición'
+        : 'Ubicación del aviso',
     photos: [
       for (final photo in value.photos)
         localPhotos[photo.id] != null
@@ -93,8 +93,8 @@ class FoundPreviewContent extends StatelessWidget {
     },
     occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',
     privacy: isPreview
-        ? 'Zona pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
-        : 'Zona pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
+        ? 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
+        : 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
     actions: actions,
   );
 }

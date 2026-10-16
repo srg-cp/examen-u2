@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Usar tu ubicación para mostrar casos cercanos en un radio inicial de 15 km. También puedes elegirla manualmente.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Seleccionar fotos de tu perfil y tus mascotas desde la galería.</string>
 	<key>NSCameraUsageDescription</key>

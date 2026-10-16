@@ -16,6 +16,7 @@ class CollectionHeader extends StatelessWidget {
           color: Color(0xFF111111),
         ),
       );
+      if (action == null) return heading;
       if (constraints.maxWidth < 300 ||
           MediaQuery.textScalerOf(context).scale(32) > 42) {
         return Column(

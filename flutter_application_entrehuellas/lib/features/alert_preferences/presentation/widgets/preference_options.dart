@@ -67,13 +67,13 @@ class PreferenceOptions extends ConsumerWidget {
               ),
               toggle(
                 'Mascotas perdidas',
-                'Nuevos casos en tus zonas de interés.',
+                'Nuevos casos en tus ubicaciones de interés.',
                 choices.lostPets,
                 (value) => vm.edit(lostPets: value),
               ),
               toggle(
                 'Mascotas encontradas',
-                'Mascotas encontradas en tus zonas de interés.',
+                'Mascotas encontradas en tus ubicaciones de interés.',
                 choices.foundPets,
                 (value) => vm.edit(foundPets: value),
               ),

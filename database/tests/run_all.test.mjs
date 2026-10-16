@@ -2,8 +2,63 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
+import { postgis } from '@electric-sql/pglite-postgis';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+test('Explore filters approximate locations, preserves visibility and paginates across both origins', async(t)=>{
+ const db=await database(t);
+ await db.exec(bundle.split('-- Source: database/extensions/066_explore_postgis.sql')[0]+'\ncommit;');
+ const patch=await readFile(new URL('../patchs/019_patch_explore_cases.sql',import.meta.url),'utf8');
+ await db.exec(patch);await db.exec(patch);
+ const a='11111111-1111-4111-8111-111111111170',b='22222222-2222-4222-8222-222222222270';
+ await db.query('insert into auth.users(id) values($1),($2)',[a,b]);
+ const id=n=>'aaaaaaaa-aaaa-4aaa-8aaa-'+String(n).padStart(12,'0');
+ for(let n=1;n<=8;n++){
+  await db.query("insert into public.pets(id,owner_id,name,species,size,age_months,traits) values($1,$2,'Luna','dog','small',12,'Blanca')",[id(n+100),a]);
+  await db.query("insert into public.lost_cases(id,owner_id,pet_id,pet_version,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,pet_name,species,size,age_months,traits,photo_ids,created_at,deleted_at) values($1,$2,$3,1,$4,now()-interval '2 days',-40,50,'SECRET EXACT ADDRESS',-12.05,-77.04,'Luna','dog','small',12,'Blanca',array[$1]::uuid[],now()-interval '1 day',$5)",[id(n),a,id(n+100),n==7?'resolved':'active',n==8?new Date():null]);
+ }
+ for(const [n,kind,target,lat] of [[11,'possible_loss',null,-12.05],[12,'with_reporter',id(1),-12.05],[13,'sighting',id(1),-12.05],[1,'legacy_found',null,10]]){
+  await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind,target_lost_case_id) values($1,$2,'active',now()-interval '3 days',-40,50,'SECRET FOUND ADDRESS',$3,-77.04,'cat','Negra',array[$1]::uuid[],now()-interval '1 day',$4,$5)",[id(n),b,lat,kind,target]);
+ }
+ const actor=async(who,role='authenticated')=>{await db.exec('reset role');await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify(who?{sub:who}:{})]);await db.exec('set role '+role);};
+ const query=async(params={})=>{
+  const args={kind:'all',species:'all',status:'active',since:null,until:null,lat:null,lon:null,radius:null,cursor:null,limit:3,...params};
+  return (await db.query('select public.explore_cases($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) as page',Object.values(args))).rows[0].page;
+ };
+ await actor(b);
+ let page=await query(),cursor=page.next_cursor;const rows=[...page.items];
+ assert.equal(rows.length,3);assert.ok(cursor);
+ // Newly published rows cannot move into an existing pagination window.
+ await db.exec('reset role');
+ await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind) values($1,$2,'active',now(),-40,50,'SECRET NEW',-12.05,-77.04,'cat','Nueva',array[$1]::uuid[],clock_timestamp(),'possible_loss')",[id(15),b]);
+ await actor(b);
+ while(cursor){page=await query({cursor});rows.push(...page.items);cursor=page.next_cursor;}
+ assert.equal(rows.length,10);assert.equal(new Set(rows.map(r=>r.source+':'+r.id)).size,10);
+ assert.ok(rows.every(r=>![id(7),id(8),id(15)].includes(r.id)));
+ assert.equal(rows.find(r=>r.id===id(12)).kind,'found');
+ assert.equal(rows.find(r=>r.id===id(13)).kind,'sighting');
+ for(const row of rows){assert.ok(!('owner_id' in row));assert.ok(!('place_reference' in row));assert.equal(row.longitude,-77.04);assert.notEqual(row.latitude,-40);}
+ assert.ok(!JSON.stringify(rows).includes('SECRET'));
+ assert.equal((await query({kind:'lost',species:'cat',limit:50})).items.length,2);
+ assert.equal((await query({kind:'found',limit:50})).items.length,2);
+ assert.equal((await query({kind:'sighting',limit:50})).items.length,1);
+ assert.equal((await query({lat:-12.05,lon:-77.04,radius:100,limit:50})).items.length,10);
+ assert.ok((await query({lat:-12.05,lon:-77.04,radius:100,limit:50})).items.every(r=>r.distance_meters===0));
+ assert.equal((await query({since:new Date(Date.now()+86400000),limit:50})).items.length,0);
+ assert.equal((await query({status:'resolved',limit:50})).items.length,0);
+ await assert.rejects(query({kind:'found',cursor:(await query()).next_cursor}),/explore_cursor_invalid/);
+ await assert.rejects(query({lat:1}),/explore_invalid/);
+ await assert.rejects(query({lat:NaN,lon:0,radius:100}),/explore_invalid/);
+ await assert.rejects(query({limit:51}),/explore_invalid/);
+ await assert.rejects(query({cursor:{}}),/explore_cursor_invalid/);
+ await actor(a);assert.equal((await query({status:'resolved',limit:50})).items.length,1);
+ await actor(null);await assert.rejects(query(),/explore_unauthorized/);
+ await actor(null,'anon');await assert.rejects(query(),/permission denied/);
+ await db.exec('reset role');
+ await actor(a);const before=(await query({limit:50})).items;await db.exec('reset role');
+ await db.exec(bundle);await db.exec(bundle);
+ await actor(a);assert.deepEqual((await query({limit:50})).items,before);
+});
 test('Publication lock timeout is local, repeatable and preserves authorization and rollback', async (t) => {
   const db = await database(t);
   await db.exec(bundle);
@@ -235,7 +290,7 @@ test('Profile editing enforces server column grants, optional values, Unicode an
 });
 
 async function database(t) {
-  const db = await PGlite.create();
+  const db = await PGlite.create({ extensions: { postgis } });
   t.after(() => db.close());
   await db.exec(`
     create role anon;

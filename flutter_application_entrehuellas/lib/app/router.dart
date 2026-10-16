@@ -1,3 +1,4 @@
+import '../features/explore/presentation/widgets/explore_section.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
 import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
 import '../features/pets/presentation/view_models/pet_list_view_model.dart';
@@ -189,6 +190,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const HomeScreen(
           profileAvatar: ProfileAvatarButton(),
           petsContent: PetsSection(),
+          exploreContent: ExploreSection(),
         ),
         routes: [
           GoRoute(

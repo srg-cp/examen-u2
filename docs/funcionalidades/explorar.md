@@ -1,0 +1,72 @@
+# Explorar: lista de casos
+
+Módulo `explore`. HU-07.1 / RF-13 / issue #32; implementación local. [ADR-039](../decisiones/039-explorar-lista-publica-paginada.md).
+
+**Presentación vigente, última corrección del 15 de octubre:** una sola insignia de estado Abierto/Resuelto en la imagen; debajo, nombre (Sin nombre si falta) y distancia aproximada desde el centro elegido: A 4 km o A menos de 1 km. Sin especie, fecha ni badge de tipo. Sin distancia del servidor se omite esa línea. Filtros anclados debajo de su cápsula y superpuestos a las cards, con scroll independiente; fuera/Atrás cancela y Aplicar confirma. [ADR-043](../decisiones/043-explorar-desplegable-anclado-y-distancia.md) sustituye las variantes visuales históricas descritas abajo. No se ejecutan pruebas ni renders para este último ajuste por instrucción del usuario; pendiente revisión Android.
+
+## Qué hace y recorrido
+
+Indicador de gesto actualizado: icono de recarga que baja siguiendo el dedo, se acomoda al soltar, gira durante refresh y se retira al terminar/cancelar; conserva filtros y shimmer del contenido. Movimiento reducido sin giro/retorno animado. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Formato/análisis del componente sin incidencias; sin nuevas pruebas ejecutadas ni revisión Android.
+
+**Actualizar vigente:** jalar hacia abajo desde el borde superior y soltar reemplaza el icono Actualizar casos. Conserva centro/radio/filtros, renueva primera página y mantiene contenido con shimmer; lista vacía/corta permite gesto y cancelar antes del umbral no consulta. Reintento de fallo conservado. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Formato/análisis sin incidencias; sin pruebas ejecutadas, gesto Android pendiente.
+
+**Ubicación vigente:** Explorar intenta usar ubicación actual con radio inicial15km. Sin permiso/servicio/posición disponible, aviso superior y elección manual por buscador/mapa, sin consulta global ni falso vacío. Ubicación reemplaza Zona; se retiran Todas las ubicaciones y Por ubicación. Centro/radio obligatorios para consultar;1–50km ajustable, otra dirección manual y Usar mi ubicación actual conservan filtros. Permiso aproximado de primer plano, sin seguimiento ni persistencia de ubicación del dispositivo; centro enviado como parámetro de consulta a Supabase y no a Photon. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md) sustituye los valores iniciales/ausencia de GPS anteriores. Formato/análisis sin incidencias, sin pruebas ejecutadas por petición del usuario; recompilación y revisión Android pendientes.
+
+**Búsqueda de ubicación vigente:** al escribir al menos3 caracteres se consultan sugerencias tras600ms de pausa, sin botón Buscar ubicación. Campo siempre editable; solo una solicitud activa y una consulta pendiente más reciente. Editar/limpiar/seleccionar/cambiar cuenta/desmontar invalida respuestas anteriores y cancela esperas. Seleccionar resultado centra mapa; escribir no aplica filtros ni elige centro. Errores en toast y mapa manual conservados; sin toast por cada vacío de sugerencias automáticas. El teclado permite búsqueda explícita cuando no hay otra en curso. Texto se envía al proveedor después de la pausa. [ADR-046](../decisiones/046-sugerencias-automaticas-de-ubicacion.md) sustituye las notas históricas de búsqueda exclusivamente explícita. Sin nuevas pruebas ejecutadas por instrucción vigente.
+
+**Distribución vigente:** Filtrar casos contiene solamente tipo, especie, estado y fecha. El control independiente Zona (Zona de búsqueda en disposición vertical) abre ciudad/dirección, mapa y radio, con Aplicar zona. Los controles se disponen en fila cuando caben y en vertical con ancho reducido/texto ampliado; los paneles usan todo el ancho del área disponible. Cada aplicación conserva los valores confirmados del otro control; cerrar descarta solo el borrador. Sin nuevas consultas por abrir/editar. [ADR-045](../decisiones/045-explorar-zona-independiente.md) sustituye la distribución unificada descrita en las notas anteriores.
+
+El deslizamiento del indicador de opción dura180ms (antes320ms), por petición del usuario de una selección más rápida. Conserva curva suave y movimiento reducido; no cambia la transición del panel. Ajuste sin nuevas pruebas por instrucción vigente.
+
+La cápsula Filtrar casos interpola fondo, texto e iconos y gira su chevrón con la misma animación del panel, tanto al abrir como al cerrar. Las opciones comparten NoSplash y overlay transparente con Mis mascotas: sin destello claro temporal al pulsarlas; se conserva el indicador de selección móvil. Ajuste con formato/revisión de código, sin nuevas pruebas ni renders por instrucción del usuario.
+
+Al abrir/cerrar filtros, desenfoque y sombreado del fondo progresan junto con expansión/fundido del panel desde arriba, inspirados en Control Center de iPhone. El selector Filtrar casos queda fuera del blur/velo y permanece nítido, igual que el editor. Sin cover/stagger en esta interacción; movimiento reducido directo. Tocar el fondo o selector cierra sin aplicar; no mueve la grilla. [ADR-044](../decisiones/044-filtros-transicion-control-center.md). Último ajuste sin nuevas pruebas por petición del usuario; revisión visual Android pendiente.
+
+Desde la sección Explorar de Inicio se consultan tarjetas reales de búsquedas y avisos. Filtrar casos despliega opciones ancladas debajo de su cápsula, superpuestas a la grilla sin desplazarla: tipo, especie, estado, período y ubicación/radio. El editor tiene scroll propio y conserva las cápsulas compartidas. Aplicar filtros empieza una consulta nueva; Ver más casos añade otra página. Actualizar y volver de una ficha refrescan la consulta. Una tarjeta abre la misma ficha pública existente; en búsquedas abiertas se puede enviar un aviso vinculado. No hay swipe de eliminación en esta consulta colaborativa.
+
+## Reglas y campos
+
+Tipos: Todos, Perdidas (propias/comunitarias), Encontradas (con custodia y anteriores), Avistamientos. Los anteriores se identifican como Reporte anterior sin reclasificarlos. Especies: todas/perro/gato/otra. Estados: abiertos, resueltos visibles para mí, todos los visibles. Se conservan los permisos previos: resueltos solo para su autor.
+
+Períodos por fecha del suceso: cualquiera, últimas24h,7,30 o90 días. La ventana queda fijada al aplicar. Radio ajustable de1–50km desde un centro buscado o elegido en el mapa, o cualquier zona. Sin GPS ni solicitud de permisos; selección manual disponible siempre. La distancia es aproximada, calculada en servidor sobre la zona pública. No se muestran coordenadas numéricas.
+
+Las páginas tienen20 elementos, orden estable por publicación/origen/ID y cursor asociado a todos los filtros. La primera consulta limita temporalmente las siguientes: publicaciones nuevas aparecen al refrescar. Cada petición revalida visibilidad; cambios de estado/retirada pueden reducir resultados. No se promete una instantánea transaccional entre páginas.
+
+## Persistencia y permisos
+
+Consulta sin escrituras ni datos de demostración en producción. Fuentes066–069/plan019: PostGIS en extensions, índices y RPC autorizada `explore_cases`. Reutiliza proyecciones existentes y excluye borrados/borradores/destinos ocultos. Solo coordenadas públicas aproximadas; sin referencia privada, documentos u originales. Miniaturas verificadas seleccionadas, URLs temporales firmadas por data. Los filtros viven durante la visita a la sección; no se añaden preferencias persistentes ni caché offline.
+
+## Errores y reintentos
+
+Carga inicial con skeleton; acciones con shimmer. Refresh de la misma consulta conserva datos; cambiar filtros los oculta. No hay casos solo tras respuesta exitosa vacía. Errores en toast superior con Reintentar; fallo de página conserva cursor y páginas previas. No se mezclan orígenes con UUID iguales; doble envío bloqueado. Cambio de cuenta oculta datos y descarta respuestas tardías; recuperación de sesión tras error admitida. Radio sin centro produce toast y shake/borde en mapa. Fallo de teselas usa recuperación del componente compartido.
+
+## Dependencias y activación
+
+Aplicar [migración019](../../supabase/migrations/20261015001900_explore_cases.sql) o [patch019](../../database/patchs/019_patch_explore_cases.sql), tras001–018 y fotos operativas. Generadores Build-ExploreCasesPatch/Build-RunAll; no ejecutar patches antiguos sobre este contrato. PostGIS debe instalarse en extensions; si existe en otro esquema, el script falla expresamente para revisión. La app y la RPC se activan juntas. HU-07.2 (mapa de resultados), QR/web, push y offline quedan para sus incrementos.
+
+## Validación y pendiente
+
+Pruebas SQL/PostGIS locales de filtros, distancia, privacidad, permisos, repetición e inserciones entre páginas; Flutter de repositorio, dominio, concurrencia de solicitudes, cuentas, refresh/reintento, navegación y renders390×844/320×350 texto2/movimiento reducido. Evidencia final en [ESTADO](../ESTADO.md).
+
+Pendientes activación de019, demo Android autenticada con fotos/teselas reales, permisos Storage hosted y rendimiento con volumen representativo. La validación del usuario de la rama anterior no acredita este contrato nuevo ni cierra HU-07.1. El proveedor del mapa mantiene las condiciones pendientes registradas en configuración.
+
+
+## Grilla fotográfica — 15 de octubre de 2026
+
+Por instrucción del usuario, los resultados se presentan en cards con foto horizontal4:3 protagonista, nombre/tipo y especie/distancia debajo. Por ajuste posterior del usuario, la fecha se retira de la tarjeta (se conserva en ficha/filtros) y el estado pasa a un badge en la esquina superior derecha de la imagen. Por aclaración posterior con captura, dos columnas completas, margen lateral12 y desplazamiento exclusivamente vertical. Se retira el scroll horizontal y el tamaño al76%; las cards son menores que esa variante y aprovechan el espacio lateral. Una columna del ancho disponible con ancho reducido/texto ampliado; alturas naturales sin truncar datos. La tarjeta completa abre la ficha. CasePhotoView y EntityCardSurface compartidos conservan skeleton, shimmer, errores en toast y superficie/radios aprobados. Sin foto se muestra icono sobre superficie neutra. Carga inicial con cuatro cards skeleton. No cambia persistencia, filtros, paginación, permisos, activación019 ni alcance de HU-07.1; [ADR-040](../decisiones/040-explorar-grilla-fotografica.md). Renders de prueba usan imágenes locales de fixture, sin demostrar fotos de Supabase.
+
+
+## Panel flotante de filtros — 15 de octubre de 2026
+
+Sustituye el despliegue dentro de la grilla. La cápsula Filtrar casos abre FilterPopover compartido por encima del contenido; las opciones siguen el selector Activas/Archivadas mediante FilterChoiceGroup y SelectionPillSurface comunes. Cabecera corta Filtros, X glass, grupos adaptables y scroll dentro del panel. La grilla conserva posición/geometría. Cerrar por fuera/X/Atrás descarta la edición; Aplicar confirma y consulta, y al reabrir se restaura esa selección. Abrir/editar no consulta servidor. Radio sin centro mantiene panel abierto con shake/toast y no aplica.
+
+El panel se retira al desmontar el propietario/cambiar cuenta; bloqueo de aperturas y confirmaciones duplicadas. Movimiento reducido y texto ampliado respetados. No hay SQL nuevo ni cambio de permisos/activación019. [ADR-041](../decisiones/041-filtros-flotantes-reutilizables.md) y ESTADO registran validación local y pendientes.
+
+
+## Filtros integrados y ubicación de búsqueda — 15 de octubre de 2026
+
+Sustituye el panel modal descrito arriba, por nueva corrección explícita del usuario. FilterExpansion reutilizable despliega el editor dentro de Explorar; cerrar descarta edición sin aplicar, y Aplicar confirma/colapsa y devuelve al listado. Se mantiene estilo de Activas/Archivadas mediante cápsulas compartidas. Separación16 respecto a cards; texto bajo fotos solo nombre/especie, sin Mascota perdida. Tipo/estado en badges y especie como título único si no hay nombre.
+
+Zona de búsqueda: Todas las zonas o Por ubicación. En esta última se escribe ciudad/dirección y se pulsa Buscar ubicación o la acción del teclado; no hay autocomplete por tecla. Seleccionar un resultado centra el mapa; slider de1–50km cambia el radio/círculo y ajusta cámara. Tocar mapa permite ajustar el centro manualmente. Sin GPS ni permiso nuevo. Al aplicar se usan los mismos parámetros geográficos de019, siempre sobre ubicación aproximada pública de los casos. Sin centro se conserva shake/toast y no aplica.
+
+Búsqueda de lugares mediante Photon/OpenStreetMap, cinco resultados y caché en memoria, sin historial persistente. El texto escrito se consulta al proveedor; no se envían tokens o datos privados de casos. Atribución enlazada junto al buscador. PLACE_SEARCH_URL permite sustituir el endpoint; el servidor demo inicial admite uso razonable sin garantías y requiere revisión antes de distribución/volumen mayor. Error del servicio mantiene opción manual y reintento, con feedback superior. [ADR-042](../decisiones/042-filtros-integrados-y-busqueda-zonas.md).

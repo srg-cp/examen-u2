@@ -1,5 +1,7 @@
 # Casos encontrados — HU-06 / RF-06 / issue #6
 
+Ajuste del15 de octubre: texto visible Zona/Zonas pasa a Ubicación/Ubicaciones, incluidas indicaciones de privacidad. No cambian precisión pública, campos, permisos ni datos. Formato/análisis; sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
 Implementación local en `feature/found-pet-cases`. No equivale a historia cerrada ni a despliegue remoto.
 
 ## Qué hace y recorrido

@@ -1,5 +1,7 @@
 # Perfil y fotografía de cuenta
 
+Ajuste del15 de octubre: acceso visible Ubicaciones de interés en lugar de Zonas de interés; rutas y permisos conservados. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
+
 Módulo: `profile`. HU-01.7 / RF-01; [issue #23](../backlog/023-HU-01.7.md).
 
 ## Qué hace y cómo se usa
