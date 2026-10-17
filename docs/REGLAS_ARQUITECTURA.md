@@ -34,7 +34,7 @@ Las instrucciones explícitas del usuario prevalecen. Ante discrepancias documen
 | Estado inmutable y flujo en una dirección | La UI envía acciones al ViewModel y recibe nuevos estados; no modifica entidades o datos compartidos. |
 | SOLID | Las responsabilidades, contratos y sustituciones deben poder explicarse y probarse. |
 
-Stack acordado: Flutter, Riverpod, go_router y Supabase. Android primero; la app existente permanece en `flutter_application_entrehuellas`. La web pública QR forma parte del sistema y conserva sus propios límites de acceso. No se añaden ASP.NET Core, SignalR, Redis o workers de IA sin una nueva decisión arquitectónica registrada.
+Stack acordado: Flutter, Riverpod, go_router y Supabase. Android primero; la app existente permanece en `apps/mobile`. La web pública QR forma parte del sistema y conserva sus propios límites de acceso. No se añaden ASP.NET Core, SignalR, Redis o workers de IA sin una nueva decisión arquitectónica registrada.
 
 ## 2. Organización por funcionalidad
 
@@ -170,7 +170,7 @@ Antes de considerar completo un cambio de código, comprobar los puntos que le c
 - La configuración pública está separada de secretos y las migraciones/políticas necesarias están versionadas.
 - La documentación de estado registra resultados, limitaciones y siguiente paso. No se acepta una excepción arquitectónica silenciosa.
 
-Comandos desde `flutter_application_entrehuellas`:
+Comandos desde `apps/mobile`:
 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test

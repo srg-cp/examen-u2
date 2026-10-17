@@ -12,6 +12,8 @@ permanece independiente hasta su integración en la plataforma.
 Se realizan dos movimientos con commits separados. Primer commit: plataforma,
 workflow y referencias web; Flutter todavía permanece en su ubicación anterior.
 Segundo commit: Flutter, rutas de editor/CI/pruebas/docs y normas de ubicación.
+El segundo movimiento conserva config local y todos los archivos del proyecto,
+incluidos artefactos ignorados; el package name Dart continúa siendo el mismo.
 Actualizar Dokploy al nuevo contexto apps/platform y Dockerfile
 apps/platform/Dockerfile cuando esta revisión se publique. No se modifica su
 panel ni se dispara un despliegue con el movimiento local.

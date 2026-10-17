@@ -8,7 +8,7 @@ Originales exportados desde Figma. Se conservan aquí como fuentes de diseño.
 
 ## Regeneración Android
 
-Desde `flutter_application_entrehuellas`, con dependencias resueltas:
+Desde `apps/mobile`, con dependencias resueltas:
 
 ```powershell
 flutter pub get --enforce-lockfile

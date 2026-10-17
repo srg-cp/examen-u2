@@ -46,7 +46,7 @@ node scripts/check-browser.mjs
 ```
 
 Usa fixtures solo de prueba y el asset aprobado de onboarding; guarda capturas
-en `flutter_application_entrehuellas/build/ui-preview/public-web`. No acredita
+en `apps/mobile/build/ui-preview/public-web`. No acredita
 un QR físico, iPhone/Safari ni Storage real.
 
 ## Configuración y publicación pendiente

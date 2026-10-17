@@ -10,9 +10,9 @@ const { chromium } = runtime.default || runtime;
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true });
 let server;
 try {
-  const output = new URL('../../../flutter_application_entrehuellas/build/ui-preview/public-web/', import.meta.url);
+  const output = new URL('../../../apps/mobile/build/ui-preview/public-web/', import.meta.url);
   await mkdir(output, { recursive: true });
-  const art = await readFile(new URL('../../../flutter_application_entrehuellas/assets/onboarding/dog_with_map.png', import.meta.url));
+  const art = await readFile(new URL('../../../apps/mobile/assets/onboarding/dog_with_map.png', import.meta.url));
   const fixturePage = await browser.newPage({ viewport: { width: 720, height: 720 } });
   await fixturePage.setContent(`<body style="margin:0;background:white"><img style="width:720px;height:720px;object-fit:contain" src="data:image/png;base64,${art.toString('base64')}"></body>`);
   await fixturePage.locator('img').evaluate(img => img.decode());

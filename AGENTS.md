@@ -12,7 +12,10 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 - Comprobar rama, cambios locales y estado real antes de editar. Conservar el trabajo existente.
 - Usar las HU y RF originales para trazabilidad; separar el número de historia del número de issue de GitHub.
 - Implementar un incremento completo con criterios de aceptación. No ampliar el MVP por la existencia de funciones futuras en el PDF.
-- La app existente se conserva en `flutter_application_entrehuellas` (decisión del usuario del 6 de octubre de 2026). No recrearla ni moverla a `apps/mobile`. Crear los demás componentes cuando su sprint los necesite.
+- Por decisión explícita del usuario del17 de octubre de2026, las aplicaciones
+  se organizan en `apps/mobile` (Flutter existente) y `apps/platform` (Vue/Nuxt).
+  Esta instrucción sustituye la ubicación en la raíz acordada el6 de octubre.
+  No recrear los proyectos ni cambiar identificadores de paquete por moverlos.
 
 ## Implementación
 

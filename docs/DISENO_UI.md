@@ -49,7 +49,7 @@ La norma obligatoria es [REGLAS_UI_UX.md](REGLAS_UI_UX.md). Su referencia son la
 
 ## Componentes de referencia
 
-Rutas relativas a `flutter_application_entrehuellas/lib`:
+Rutas relativas a `apps/mobile/lib`:
 
 | Responsabilidad | Fuente |
 | --- | --- |

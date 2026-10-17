@@ -56,7 +56,12 @@ Los seis sprints son una secuencia de entregas. Si se conserva la duración de d
 
 ## 4. Chat 00: proyecto y estructura
 
-La app existente se conserva en `flutter_application_entrehuellas`, según la decisión del 6 de octubre de 2026. Esa carpeta reemplaza la ubicación propuesta `apps/mobile`. La estructura utiliza `presentation`, `domain` y `data` por funcionalidad, con MVVM y Riverpod. La base de navegación y configuración está implementada; consultar [ESTADO.md](ESTADO.md) para validación real y [CONFIGURACION.md](CONFIGURACION.md) para comandos y deep links. La sección anterior conserva el estado histórico de la preparación.
+Por decisión del17 de octubre de2026, la aplicación Flutter existente se traslada
+a `apps/mobile` y la web se ubica en `apps/platform`. Sustituye la ubicación de
+Flutter en la raíz acordada el6 de octubre, sin recrear proyectos ni cambiar
+identificadores. Se conservan presentation/domain/data por funcionalidad, MVVM
+y Riverpod en móvil. [ADR-059](decisiones/059-directorios-apps-platform-mobile.md),
+[ESTADO](ESTADO.md) y [CONFIGURACION](CONFIGURACION.md) conservan validación y comandos.
 
 Orden de trabajo:
 
@@ -69,7 +74,7 @@ La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISE
 1. Leer `AGENTS.md` y los documentos; comprobar Git y conservar los archivos existentes.
 2. Completar el entorno Android. En Android Studio, abrir SDK Manager y revisar SDK Tools: instalar **Android SDK Command-line Tools**, comprobar Platform-Tools, Build-Tools y una plataforma compatible. El usuario revisa los términos con `flutter doctor --android-licenses`. Volver a ejecutar `flutter doctor` y detectar un teléfono o emulador. [Configuración Android oficial](https://docs.flutter.dev/platform-integration/android/setup).
 3. Elegir una versión de Flutter y dependencias compatibles. La instalada es un punto de partida; cualquier actualización se evalúa y documenta.
-4. Conservar la app existente en `flutter_application_entrehuellas` y organizar `lib/app`, `lib/core` y funcionalidades con `presentation`, `domain` y `data`. Revisar el identificador Android provisional antes de distribuir.
+4. Conservar la app existente en `apps/mobile` y organizar `lib/app`, `lib/core` y funcionalidades con `presentation`, `domain` y `data`. Revisar el identificador Android provisional antes de distribuir.
 5. Incorporar inicialmente Riverpod, go_router y supabase_flutter. Añadir Drift/SQLite cuando se implemente el almacenamiento local. Cada paquete debe resolver una necesidad concreta.
 6. Preparar configuración con ejemplos sin credenciales. Verificar la app con una pantalla inicial y estado explícito de configuración si Supabase aún no existe.
 7. Crear CI con formato, análisis y pruebas pertinentes. Documentar los comandos y fijar la versión de Flutter usada por CI.
@@ -78,7 +83,7 @@ La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISE
 La app ya existe: no ejecutar `flutter create` sobre ella. Para trabajar desde la raíz:
 
 ```powershell
-Set-Location flutter_application_entrehuellas
+Set-Location apps/mobile
 flutter pub get --enforce-lockfile
 ```
 
@@ -94,7 +99,7 @@ Lee AGENTS.md, docs/ARQUITECTURA.md, docs/ESTADO.md y la sección 4 de docs/GUIA
 
 El repositorio es https://github.com/srg-cp/entrehuellas. Origin y la rama main ya fueron configurados; compruébalos sin volver a clonar encima de la carpeta.
 
-Continúa sobre la app Flutter existente en flutter_application_entrehuellas. Lee docs/REGLAS_ARQUITECTURA.md y conserva las capas presentation, domain y data por funcionalidad, MVVM, Riverpod, casos de uso, repositorios, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos, el deep link entrehuellas://login-callback/ y CI para formato, análisis y pruebas pertinentes.
+Continúa sobre la app Flutter existente en apps/mobile. Lee docs/REGLAS_ARQUITECTURA.md y conserva las capas presentation, domain y data por funcionalidad, MVVM, Riverpod, casos de uso, repositorios, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos, el deep link entrehuellas://login-callback/ y CI para formato, análisis y pruebas pertinentes.
 
 Revisa Flutter y Android. Ya se detectaron Command-line Tools y licencias pendientes. Ayúdame a resolver los pasos que requieran mi intervención mientras avanzas con lo independiente. Registra la versión de SDK y el identificador Android elegidos.
 
@@ -288,7 +293,7 @@ Siguiente paso concreto:
 
 Una historia está terminada cuando sus criterios están verificados, los permisos y errores pertinentes están cubiertos, los cambios de datos están versionados y se puede demostrar el resultado. Una interfaz con datos simulados se identifica como tal; no equivale al flujo integrado.
 
-Para trabajos de implementación con Flutter, ejecutar según corresponda desde `flutter_application_entrehuellas`:
+Para trabajos de implementación con Flutter, ejecutar según corresponda desde `apps/mobile`:
 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test

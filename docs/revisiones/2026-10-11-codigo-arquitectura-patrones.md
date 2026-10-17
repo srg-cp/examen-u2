@@ -14,7 +14,7 @@ Inventario: 289 archivos Dart en lib y 65 en test. Se revisaron las normas, esta
 
 ### R01 — P2: eliminar un caso perdido no actualiza los consumidores de mascotas
 
-Ubicación: [MyCasesViewModel.delete](../../flutter_application_entrehuellas/lib/features/lost_cases/presentation/view_models/case_read_view_model.dart), líneas 58–81; [PetListViewModel / PetDetailViewModel](../../flutter_application_entrehuellas/lib/features/pets/presentation/view_models/pet_list_view_model.dart); [delete_lost_case](../../database/functions/058_case_collection_commands.sql).
+Ubicación: [MyCasesViewModel.delete](../../apps/mobile/lib/features/lost_cases/presentation/view_models/case_read_view_model.dart), líneas 58–81; [PetListViewModel / PetDetailViewModel](../../apps/mobile/lib/features/pets/presentation/view_models/pet_list_view_model.dart); [delete_lost_case](../../database/functions/058_case_collection_commands.sql).
 
 SQL decrementa active_case_count y aumenta version de la mascota al eliminar el caso activo. El ViewModel retira el caso de su lista e invalida su consulta pública, pero no notifica a los consumidores de la mascota modificada. Un listado o ficha todavía observado puede conservar la versión y contador anteriores. La siguiente edición/operación de ciclo de vida puede partir de datos obsoletos y provocar un conflicto evitable.
 
@@ -24,7 +24,7 @@ Corrección propuesta: notificar el cambio de la mascota mediante un contrato/se
 
 ### R02 — P2: onboarding depende de presentación de otra funcionalidad
 
-Ubicación: [entry_view_model.dart](../../flutter_application_entrehuellas/lib/features/onboarding/presentation/view_models/entry_view_model.dart), líneas 2 y 15; [entry_screen.dart](../../flutter_application_entrehuellas/lib/features/onboarding/presentation/screens/entry_screen.dart), líneas 6 y 16.
+Ubicación: [entry_view_model.dart](../../apps/mobile/lib/features/onboarding/presentation/view_models/entry_view_model.dart), líneas 2 y 15; [entry_screen.dart](../../apps/mobile/lib/features/onboarding/presentation/screens/entry_screen.dart), líneas 6 y 16.
 
 EntryViewModel importa/observa AuthViewModel; EntryScreen importa/consume LoginViewModel para cerrar sesión. La norma prohíbe importar presentación de otra funcionalidad: la colaboración debe expresarse mediante contratos/casos de uso inyectados. Cambiar el estado del login o su ViewModel puede obligar a cambiar onboarding.
 
@@ -32,7 +32,7 @@ Corrección propuesta: coordinar arranque, sesión, comprobación de onboarding 
 
 ### R03 — P2: el test de arquitectura no detecta esa frontera
 
-Ubicación: [architecture_test.dart](../../flutter_application_entrehuellas/test/architecture_test.dart), líneas 126–180.
+Ubicación: [architecture_test.dart](../../apps/mobile/test/architecture_test.dart), líneas 126–180.
 
 El test distingue domain/data/presentation/providers por segmentos de ruta, pero no compara funcionalidad origen/destino. Permite presentation de onboarding → presentation de auth; ambas son presentación. Además, el escaneo de dependencias parte de lib/features y no revisa las dependencias salientes de core. Actualmente pasa pese a R02.
 
@@ -40,7 +40,7 @@ Corrección propuesta: verificar funcionalidad y capa destino, resolver las ruta
 
 ### R04 — P2: faltan marcas de validación para fotos y ubicación
 
-Ubicación: [found_editor_screen.dart](../../flutter_application_entrehuellas/lib/features/found_cases/presentation/screens/found_editor_screen.dart), líneas 363–397 y 443–481; [case_editor_screen.dart](../../flutter_application_entrehuellas/lib/features/lost_cases/presentation/screens/case_editor_screen.dart), bloque ZoneMapPicker; validación en los casos de uso de publicación.
+Ubicación: [found_editor_screen.dart](../../apps/mobile/lib/features/found_cases/presentation/screens/found_editor_screen.dart), líneas 363–397 y 443–481; [case_editor_screen.dart](../../apps/mobile/lib/features/lost_cases/presentation/screens/case_editor_screen.dart), bloque ZoneMapPicker; validación en los casos de uso de publicación.
 
 PublishFoundCase produce FoundField.photos y FoundField.point, y el ViewModel los guarda en invalidFields. La pantalla no consume esos dos indicadores para marcar/sacudir sus controles: la galería es un Row propio y el mapa/coordenadas no pasan por el wrapper de ShakeField. El toast genérico pide revisar campos marcados que, en estos casos, no están marcados. En perdido la selección de fotos sí usa la marca, pero el mapa tampoco consume CaseField.point.
 
@@ -48,7 +48,7 @@ Corrección propuesta: conectar errorId/invalidFields a las superficies de foto 
 
 ### R05 — P2: dos pruebas de navegación quedaron desactualizadas
 
-Ubicación: [pets_navigation_test.dart](../../flutter_application_entrehuellas/test/pets_navigation_test.dart), línea 553 y búsquedas posteriores; [confirm_action_dialog.dart](../../flutter_application_entrehuellas/lib/core/presentation/widgets/confirm_action_dialog.dart).
+Ubicación: [pets_navigation_test.dart](../../apps/mobile/test/pets_navigation_test.dart), línea 553 y búsquedas posteriores; [confirm_action_dialog.dart](../../apps/mobile/lib/core/presentation/widgets/confirm_action_dialog.dart).
 
 Las variantes normal y pequeña buscan pet-deletion-actions, clave que ya no existe tras la extracción del diálogo. Ambas fallan en getBottomRight antes de verificar el resto del recorrido de cancelación/error/eliminación. La centralización funciona en las pruebas específicas del diálogo, pero la regresión integrada quedó rota.
 
@@ -56,7 +56,7 @@ Corrección propuesta: actualizar los finders al componente compartido, conserva
 
 ### R06 — P2: los datos de fotos de mascotas no son realmente inmutables
 
-Ubicación: [PetPhotosState](../../flutter_application_entrehuellas/lib/features/pets/presentation/view_models/pet_photos_view_model.dart), líneas 10–26; [PetPhotoDraft](../../flutter_application_entrehuellas/lib/features/pets/domain/entities/pet_photo.dart), líneas 24–27. Comparación: FoundEditorState usa colecciones no modificables y FoundPhotoDraft copia/protege bytes.
+Ubicación: [PetPhotosState](../../apps/mobile/lib/features/pets/presentation/view_models/pet_photos_view_model.dart), líneas 10–26; [PetPhotoDraft](../../apps/mobile/lib/features/pets/domain/entities/pet_photo.dart), líneas 24–27. Comparación: FoundEditorState usa colecciones no modificables y FoundPhotoDraft copia/protege bytes.
 
 PetPhotosState almacena directamente listas/sets recibidos; final impide reasignar la referencia, no modificar su contenido. PetPhotoDraft conserva el Uint8List mutable recibido. Se confirmó con una prueba de diagnóstico que añadir a la lista original modifica el snapshot y que cambiar el buffer modifica los bytes del borrador sin emitir estado nuevo.
 
@@ -66,7 +66,7 @@ Corrección propuesta: copiar y proteger colecciones/buffers en sus límites, si
 
 ### R07 — P2: refresh de casos perdió parte del patrón existente
 
-Ubicación: [my_cases_screen.dart](../../flutter_application_entrehuellas/lib/features/lost_cases/presentation/screens/my_cases_screen.dart), línea 55; [my_found_cases_screen.dart](../../flutter_application_entrehuellas/lib/features/found_cases/presentation/screens/my_found_cases_screen.dart), línea 59; ambas fichas de casos. Referencia: [PetRefreshProgress](../../flutter_application_entrehuellas/lib/features/pets/presentation/widgets/pet_skeleton.dart), líneas 7–34.
+Ubicación: [my_cases_screen.dart](../../apps/mobile/lib/features/lost_cases/presentation/screens/my_cases_screen.dart), línea 55; [my_found_cases_screen.dart](../../apps/mobile/lib/features/found_cases/presentation/screens/my_found_cases_screen.dart), línea 59; ambas fichas de casos. Referencia: [PetRefreshProgress](../../apps/mobile/lib/features/pets/presentation/widgets/pet_skeleton.dart), líneas 7–34.
 
 Las listas insertan LinearProgressIndicator dentro de Column y desplazan el contenido al refrescar, en vez de superponerlo según ADR-011. Las fichas sí usan overlay, pero los cuatro indicadores omiten el control de TickerMode/movimiento reducido y la etiqueta semántica presentes en PetRefreshProgress.
 
@@ -74,7 +74,7 @@ Corrección propuesta: extraer la responsabilidad de progreso superpuesto a core
 
 ### R08 — P2: encontrados no adopta un límite explícito de espera de publicación
 
-Ubicación: [FoundEditorViewModel.publish/discard](../../flutter_application_entrehuellas/lib/features/found_cases/presentation/view_models/found_editor_view_model.dart), líneas 174–249; [SupabaseFoundCaseDataSource](../../flutter_application_entrehuellas/lib/features/found_cases/data/data_sources/supabase_found_case_data_source.dart); [SQL053](../../database/functions/053_found_case_commands.sql).
+Ubicación: [FoundEditorViewModel.publish/discard](../../apps/mobile/lib/features/found_cases/presentation/view_models/found_editor_view_model.dart), líneas 174–249; [SupabaseFoundCaseDataSource](../../apps/mobile/lib/features/found_cases/data/data_sources/supabase_found_case_data_source.dart); [SQL053](../../database/functions/053_found_case_commands.sql).
 
 Perdido tiene deadline cliente, fallo timedOut y lock_timeout versionado. Encontrado no aplica un deadline propio al preparar, procesar fotos, publicar o descartar; sus RPC toman bloqueos de fila y prepare_found_case toma además advisory lock sin lock_timeout explícito. Mientras el Future no termine, busy bloquea salida y reintento. Los límites efectivos pueden depender del transporte/proxy/servidor, que no se comprobaron aquí.
 
@@ -84,7 +84,7 @@ Corrección propuesta: definir una política de espera para encontrado y cada et
 
 ### R09 — P3: galería propia en el formulario de encontrados
 
-[found_editor_screen.dart](../../flutter_application_entrehuellas/lib/features/found_cases/presentation/screens/found_editor_screen.dart), líneas 363–397, dispone cada foto en un Row vertical, tamaño fijo 160 y botón de retirada separado. No usa PhotoGalleryStrip/PhotoGalleryTile, que ya gobiernan galería horizontal, geometría adaptable y selección en mascotas/perdidos. La vista previa pública de ambos reportes sí reutiliza CasePublicationPreview correctamente.
+[found_editor_screen.dart](../../apps/mobile/lib/features/found_cases/presentation/screens/found_editor_screen.dart), líneas 363–397, dispone cada foto en un Row vertical, tamaño fijo 160 y botón de retirada separado. No usa PhotoGalleryStrip/PhotoGalleryTile, que ya gobiernan galería horizontal, geometría adaptable y selección en mascotas/perdidos. La vista previa pública de ambos reportes sí reutiliza CasePublicationPreview correctamente.
 
 Propuesta: adaptar tiles compartidos para imágenes locales y retirada; mantener sus diferencias reales de negocio (encontrado agrega bytes, perdido selecciona fotos existentes). La presencia de coordenadas numéricas en encontrado y su ausencia en perdido también constituye una diferencia de interacción a revisar; la orden de retirarlas fue específica para perdido y no se interpreta aquí como autorización para eliminar la alternativa de encontrado.
 
@@ -110,7 +110,7 @@ No toda repetición merece extracción: contratos independientes, validaciones c
 | node --test database/tests/run_all.test.mjs | 19 aprobadas |
 | Probes locales de sincronización e inmutabilidad | 2 aprobadas; confirman comportamientos defectuosos actuales, no una corrección |
 
-Log de Flutter: flutter_application_entrehuellas/build/review-20261011-tests.log. Probes reproducibles: flutter_application_entrehuellas/build/review_20261011_probe_test.dart; ambos en build ignorado. La ejecución inicial npm test desde database no encontró package.json; se ejecutó después el runner real de database/tests y pasó.
+Log de Flutter: apps/mobile/build/review-20261011-tests.log. Probes reproducibles: apps/mobile/build/review_20261011_probe_test.dart; ambos en build ignorado. La ejecución inicial npm test desde database no encontró package.json; se ejecutó después el runner real de database/tests y pasó.
 
 No se ejecutaron build Android, instalación, renders nuevos, llamadas remotas, concurrencia con conexiones PostgreSQL independientes ni pruebas Deno del handler/procesador (deno no disponible en PATH). PGlite valida el fixture SQL, no el servicio Storage/Edge desplegado ni los permisos remotos. No se cerraron HU/issues ni se resolvió el incidente remoto documentado.
 

@@ -3,11 +3,11 @@ name: Flutter
 on:
   push:
     paths:
-      - 'flutter_application_entrehuellas/**'
+      - 'apps/mobile/**'
       - '.github/workflows/flutter.yml'
   pull_request:
     paths:
-      - 'flutter_application_entrehuellas/**'
+      - 'apps/mobile/**'
       - '.github/workflows/flutter.yml'
 
 permissions:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: flutter_application_entrehuellas
+        working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

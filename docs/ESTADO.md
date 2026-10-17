@@ -1,5 +1,27 @@
 # Estado del proyecto
 
+## Organización apps: segundo movimiento —17 de octubre de2026
+
+Primer commit **eb94af4**: web en apps/platform con build/11 pruebas aprobadas.
+Ahora Flutter se mueve completo a apps/mobile, conservando config local verificada
+por hash y sin cambiar package name/imports/identificadores nativos. Windows negó
+el rename de la carpeta raíz; se trasladaron sus contenidos y se retiró la carpeta
+vacía, sin pérdida. Se detuvo un Gradle daemon identificado que podía retener
+archivos; gradlew --stop reprodujo el problema de loopback ya conocido, sin build.
+Rutas CI/F5/CMake/documentación/scripts adaptadas, sin recrear aplicación.
+La instrucción del usuario sustituye la prohibición histórica de mover Flutter.
+Los paths de documentación se normalizan a la nueva ubicación; logs/artefactos
+previos se conservan dentro del build trasladado. Sin push ni despliegue.
+
+Validación final desde apps/mobile: pub get --enforce-lockfile correcto, lockfile
+idéntico al original; formato488 archivos sin cambios, análisis sin incidencias y
+**359 pruebas Flutter aprobadas**. Evidencia en build/mobile-move-{pub,format,
+analyze,tests}.log. Browser QA de apps/platform aprobado con las rutas de assets
+y salida nuevas (build/platform-mobile-move-browser.log):390×844,1280×900 y320×350/
+texto200%, SSR sin consulta duplicada, copia, galería, errores y cierre/revocación.
+Revisión del diff/staging sin secretos ni artefactos ignorados. No se generó APK
+ni se acredita build nativo o CI remoto de la nueva estructura.
+
 ## Organización apps: primer movimiento —17 de octubre de2026
 
 Por instrucción del usuario se renombra la web a apps/platform, con workflow
@@ -24,7 +46,7 @@ de Auth, SDK, contratos ni configuración remota. Ficha de acceso actualizada.
 
 Validación: formato correcto,11 pruebas existentes de Facebook/layout y
 arquitectura aprobadas en build/social-buttons-tests.log; análisis sin incidencias en
-build/social-buttons-analyze.log, dentro de flutter_application_entrehuellas.
+build/social-buttons-analyze.log, dentro de apps/mobile.
 Renders normales/pequeños con texto2 revisados en build/ui-preview/facebook. Pendiente
 comprobación Android real; sin APK, commit, push o despliegue.
 
@@ -44,7 +66,7 @@ Validación local: **29 pruebas Flutter aprobadas**, incluyendo URL de los tres
 proveedores con PKCE y retorno móvil, lanzamiento fallido/reintento, Facebook
 desde pantalla con doble envío bloqueado y recuperación tras error, y pruebas
 existentes de acceso/feedback/fronteras. Registro en
-`flutter_application_entrehuellas/build/facebook-tests.log`. Formato de los
+`apps/mobile/build/facebook-tests.log`. Formato de los
 5 archivos Dart correcto; `flutter analyze --no-pub` sin incidencias en
 `build/facebook-analyze.log`. Renders revisados en
 `build/ui-preview/facebook` a390×844 y320×350/texto2/movimiento reducido;
@@ -300,7 +322,7 @@ Validación de este ajuste: formato Dart y revisión estática; **no se ejecutar
 
 - Carpeta actual: `C:\Users\Administrator\Documents\projects\entreHuellas`.
 - Comprobación inicial del chat 00: `main`, commit de partida `8c5fdee` (`init`), árbol limpio. El proyecto ya tenía commits y una app Flutter multiplataforma con una pantalla `Hello World!`; el estado previo del 4 de octubre quedó desactualizado.
-- La app se conserva en `flutter_application_entrehuellas`, según la decisión de ubicación del 6 de octubre de 2026. No se creó `apps/mobile` ni se regeneraron las plataformas.
+- La app se conserva en `apps/mobile`, según la decisión de ubicación del 6 de octubre de 2026. No se creó `apps/mobile` ni se regeneraron las plataformas.
 - Flutter 3.35.3 stable / Dart 3.9.2. No se actualizó el SDK.
 - `flutter doctor`: Android SDK 36.1.0-rc1, Command-line Tools ausentes y licencias de estado desconocido. `flutter devices`: Windows, Chrome y Edge; ningún Android conectado.
 - Identificador Android conservado: `com.example.flutter_application_entrehuellas`, provisional. El proyecto mantiene firma debug para release; distribución pendiente.
@@ -343,7 +365,7 @@ Validación de este ajuste: formato Dart y revisión estática; **no se ejecutar
 
 ## Validación de la base del 6 de octubre de 2026
 
-Desde `flutter_application_entrehuellas`:
+Desde `apps/mobile`:
 
 - `flutter pub get --enforce-lockfile`: correcto.
 - `dart format --output=none --set-exit-if-changed lib test`: correcto, 17 archivos sin cambios después del formato inicial.
@@ -405,7 +427,7 @@ Las pruebas de sesión usan un repositorio sustituido; no equivalen a acceso con
 
 ## Arranque desde main.dart, 7 de octubre de 2026
 
-- Configurado `templateFor` del perfil local en ambos launch.json: `flutter_application_entrehuellas/lib` al abrir el repositorio y `lib` al abrir la app. Run/Debug predeterminado de Dart/Flutter utiliza los argumentos del JSON sin seleccionar manualmente el perfil. El perfil sin Supabase permanece disponible para ejecución explícita.
+- Configurado `templateFor` del perfil local en ambos launch.json: `apps/mobile/lib` al abrir el repositorio y `lib` al abrir la app. Run/Debug predeterminado de Dart/Flutter utiliza los argumentos del JSON sin seleccionar manualmente el perfil. El perfil sin Supabase permanece disponible para ejecución explícita.
 - Se conservaron los settings existentes y los valores de configuración. La plantilla no se aplica a las pruebas ni añade argumentos globales a otros proyectos.
 - Validación: JSON, rutas de plantilla/entrada/configuración y diff comprobados. El comportamiento de templateFor se contrastó con la documentación de Dart Code. El relanzamiento desde el botón del editor aún requiere comprobarse en la sesión de VS Code; no se volvió a compilar ni se ejecutaron pruebas de lógica por este cambio de configuración.
 - Siguiente paso: detener con el botón cuadrado y relanzar desde Run/Debug de main.dart; comprobar `Servicio de acceso preparado` en acceso. La ejecución Android observada anteriormente sigue siendo válida para la base sin configuración.
@@ -483,7 +505,7 @@ Las pruebas de sesión usan un repositorio sustituido; no equivalen a acceso con
 ## Ilustraciones independientes del onboarding, 7 de octubre de 2026
 
 - Por solicitud del usuario, reemplazados los recortes de baja resolución del tablero por tres PNG independientes derivados del mockup con la herramienta integrada image_gen: dog_waving.png, dog_with_map.png y dog_and_cat.png.
-- Assets en flutter_application_entrehuellas/assets/onboarding, 1254×1254 RGBA con transparencia real. Copiados desde las salidas originales sin redimensionar/recomprimir; orejas, patas y colas inspeccionadas. Son reconstrucciones generadas a partir de la referencia, no una ampliación determinista del tablero.
+- Assets en apps/mobile/assets/onboarding, 1254×1254 RGBA con transparencia real. Copiados desde las salidas originales sin redimensionar/recomprimir; orejas, patas y colas inspeccionadas. Son reconstrucciones generadas a partir de la referencia, no una ampliación determinista del tablero.
 - OnboardingIllustration simplificado a Image.asset con BoxFit.contain y filtrado medio. Eliminada del bundle la copia del tablero usada anteriormente; el original de mockups se conserva. Prompts exactos versionados en assets/onboarding/generation_prompts.json y procedencia/método en su README.
 - Configuración de assets y captura QA actualizadas. Resolución con lockfile, formato, análisis sin incidencias y **36 pruebas Flutter aprobadas**; render QA adicional aprobado y las tres pantallas inspeccionadas sobre fondo blanco, incluyendo composición/bordes. No se realizó nuevo build/instalación Android ni cambios SQL, de sesión, despliegue o GitHub.
 - Actualizados diseño, ADR-004 y documentación de assets. Para ver la sustitución en el emulador, detener la app y ejecutar nuevamente desde main.dart. El onboarding ya completado por una cuenta continúa sin repetirse, según su persistencia existente.
@@ -1477,8 +1499,8 @@ Revisión adicional de avatar: iniciales tratadas como gráfico decorativo de ta
 
 - Solicitud del usuario: analizar el estado actual del código, arquitectura, patrones y duplicación. Rama `feature/found-pet-cases`, incluidos cambios locales previos modificados/no rastreados, conservados. Revisión transversal de HU-01/02/03/04/05/06; sin cierre de historias/issues, commit/push ni acciones remotas. Informe: [revisión completa](revisiones/2026-10-11-codigo-arquitectura-patrones.md).
 - Hallazgos: eliminación de caso perdido no sincroniza contador/versión en consumidores de mascotas todavía observados; onboarding importa presentación de Auth y la comprobación de arquitectura no detecta cruces entre funcionalidades; fotos de mascotas conservan colecciones/bytes mutables; marcas de validación de fotos/punto no se consumen completamente en reportes; refresh de listas desplaza contenido y casos no reutiliza la pausa por movimiento reducido de mascotas. Encontrados conserva galería propia y no define deadline de publicación/descarte equivalente al perdido. Duplicación menor de UUID, fechas, preparación de imágenes, proyección aproximada y coordinación de lectura documentada con propuestas específicas, sin clases base genéricas.
-- Validación: formato lib/test **354 archivos, 0 cambios**; `flutter analyze --no-pub` sin incidencias. Suite completa **280 aprobadas, 2 fallidas**, repetida para obtener diagnóstico con mismo resultado: `pets_navigation_test.dart` variantes normal/pequeña buscan la clave retirada `pet-deletion-actions` en línea553. Log `flutter_application_entrehuellas/build/review-20261011-tests.log`. **19 pruebas SQL/PGlite aprobadas** mediante `node --test database/tests/run_all.test.mjs`; el primer intento de npm desde database no encontró package.json y se sustituyó por el runner correcto.
-- Dos probes locales en `flutter_application_entrehuellas/build/review_20261011_probe_test.dart` confirman lista de mascotas obsoleta tras borrar caso y mutación externa del estado/bytes de fotos; pasan porque verifican esos comportamientos actuales, **no porque estén corregidos**. Archivo en build ignorado, sin añadir pruebas defectuosas a la suite versionada. `git diff --check` sin errores de whitespace, con avisos de conversión LF/CRLF existentes.
+- Validación: formato lib/test **354 archivos, 0 cambios**; `flutter analyze --no-pub` sin incidencias. Suite completa **280 aprobadas, 2 fallidas**, repetida para obtener diagnóstico con mismo resultado: `pets_navigation_test.dart` variantes normal/pequeña buscan la clave retirada `pet-deletion-actions` en línea553. Log `apps/mobile/build/review-20261011-tests.log`. **19 pruebas SQL/PGlite aprobadas** mediante `node --test database/tests/run_all.test.mjs`; el primer intento de npm desde database no encontró package.json y se sustituyó por el runner correcto.
+- Dos probes locales en `apps/mobile/build/review_20261011_probe_test.dart` confirman lista de mascotas obsoleta tras borrar caso y mutación externa del estado/bytes de fotos; pasan porque verifican esos comportamientos actuales, **no porque estén corregidos**. Archivo en build ignorado, sin añadir pruebas defectuosas a la suite versionada. `git diff --check` sin errores de whitespace, con avisos de conversión LF/CRLF existentes.
 - Sin cambios de producción, esquema, permisos, guías de alcance o fichas funcionales: es análisis, no incremento implementado. Solo informe y relevo de estado. No se ejecutaron build/instalación Android, renders nuevos, pruebas remotas ni concurrencia con PostgreSQL independiente. Deno no disponible en PATH; handler/procesador no ejecutados en esta revisión. PGlite no acredita Storage/Edge/RLS remotos ni resuelve el incidente previo de publicación.
 - Siguiente paso: actualizar finders de la prueba de navegación conservando sus verificaciones; después corregir sincronización casos→mascotas mediante contratos/inyección y ampliar pruebas de fronteras. Seguir con inmutabilidad, validación/progreso compartido y política de espera de encontrados; priorización y referencias en el informe. Activación pendiente de016 y demo remota mantienen su estado anterior.
 
@@ -1500,7 +1522,7 @@ Validación real:
 - PostgreSQL local en memoria:20 pruebas aprobadas de permisos/invariantes/repetición; SQL061 no cambia grants, security definer ni search_path y no contamina lock_timeout de sesión. No prueba contención concurrente remota.
 - Deno2.9.6: prepare-wasm y check index.ts aprobados;11 pruebas processor_test/handler_test aprobadas con comprobación de tipos. Sin despliegue.
 - Capturas normales390×844 y pequeñas320×350 texto2 revisadas en build/ui-preview (casos, encontrados, preferencias y campos). Toast largo ofrece scroll visible; regresión comprueba límite de altura/scroll/cierre. Geometría/semántica de refresh y movimiento reducido probados. Capturas usan sustitutos, sin datos remotos.
-- git diff --check sin incidencias. Logs locales ignorados en flutter_application_entrehuellas/build/consistency-*.log.
+- git diff --check sin incidencias. Logs locales ignorados en apps/mobile/build/consistency-*.log.
 
 Bloqueos/límites: APK debug intentado dos veces, falla en Gradle con java.io.IOException: Unable to establish loopback connection; preferIPv4Stack no lo resolvió. No hay APK nuevo ni prueba Android autenticada de este incremento. Migración017 no aplicada; validaciones remotas de incrementos anteriores siguen pendientes. CI está preparado, no ejecutado en GitHub. Los diagnósticos iniciales y su seguimiento están en docs/revisiones/2026-10-11-codigo-arquitectura-patrones.md.
 

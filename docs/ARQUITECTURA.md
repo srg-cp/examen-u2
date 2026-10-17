@@ -57,8 +57,8 @@ entreHuellas/
   README.md
   docs/
   .github/
-  flutter_application_entrehuellas/  # App Flutter existente; Android primero
   apps/
+    mobile/                 # App Flutter existente; Android primero
     platform/               # Plataforma web Vue/Nuxt; QR y futuros módulos
   database/                 # Fuentes SQL numeradas por tipo de objeto
     tables/
@@ -71,11 +71,14 @@ entreHuellas/
     functions/              # Integraciones y operaciones server-side necesarias
 ```
 
-La app existente se conserva en `flutter_application_entrehuellas`, según la decisión de ubicación del 6 de octubre de 2026. `apps/platform` y las Edge Functions se crearán cuando su sprint los requiera. `supabase/migrations` ya contiene el primer paquete SQL generado.
+Por decisión del usuario del17 de octubre de2026, Flutter se ubica en
+`apps/mobile` y la web Vue/Nuxt en `apps/platform`, sustituyendo la conservación
+de Flutter en la raíz acordada el6 de octubre. Los proyectos se trasladan sin
+recrearlos ni cambiar sus identidades. Véase [ADR-059](decisiones/059-directorios-apps-platform-mobile.md).
 
 `database` guarda las fuentes SQL en carpetas por objeto, con secuencia global `001_...sql`. Las migraciones agrupan cambios en orden de dependencia; sus fuentes y su historial no se modifican después de aplicarlos. La estructura inicial y la separación entre SQL y Edge Functions se describen en [database/README.md](../database/README.md) y [ADR-002](decisiones/002-organizacion-database.md). El incremento de perfiles 001–007 y el generador PowerShell están preparados. La migración y sus pruebas de permisos deben ejecutarse en Supabase de desarrollo; no se han desplegado.
 
-En `flutter_application_entrehuellas/lib`:
+En `apps/mobile/lib`:
 
 ```text
 app/                        # App, router y bootstrap de implementaciones
