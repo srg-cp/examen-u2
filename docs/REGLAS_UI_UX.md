@@ -1,5 +1,13 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Web pública QR,16 octubre: la ficha ligera de HU-09 comparte marca y tokens
+aprobados, jerarquía/áreas táctiles, botones glass de galería, cover→stagger,
+skeleton, shimmer sobre contenido conservado y toast superior en componentes
+DOM reutilizados por sus estados. Layout móvil de una columna y escritorio de
+dos; texto ampliado sin recortar acciones. Enlace externo solo con zona pública,
+sin proveedor de teselas nuevo. Sin controles de avistamiento vacíos mientras
+no exista HU-10.1. [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md).
+
 **Mapa, revisión del 16 octubre:** panel inferior destinado a filtros reutilizados y Aplicar filtros; al tocar un pin se reduce y aparece una etiqueta compacta con Abrir caso junto al punto. Sin ficha automática en el panel. Coincidencias se recorren dentro de la etiqueta. Borrador hasta Aplicar, CTA fijo cuando cabe y accesible por scroll en altura reducida; GPS/centro visual no buscan hasta confirmar. Aplicar recupera panel42% y conserva resultados/consulta compartidos con la lista. Mantener expansión de pantalla, retorno glass, privacidad, toast, shimmer real y movimiento reducido. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye estos detalles de ADR-055.
 
 Mapa inmersivo de Explorar (16 octubre): Mapa abre `/home/explore-map` con OriginPageSource/OriginPageTransition desde la opción real, y vuelve a ella al cerrar. Mapa ocupa el viewport con retorno glass flotante e insets; ficha inferior deslizable al 14/42/90%, tirador persistente y una ficha de ancho completo. Coincidencias se recorren individualmente. Mantener consulta/lista debajo, datos públicos aproximados, feedback y movimiento reducido; no repetir entrada por gestos/selección/refresh. Sustituye la alternancia integrada Lista/Mapa de ADR-052. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md).

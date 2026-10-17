@@ -1,0 +1,12 @@
+# Only these inputs enter the Docker build context. No .env, fixtures or modules.
+**
+!Dockerfile
+!.dockerignore
+!package.json
+!scripts/
+!scripts/build.mjs
+!scripts/healthcheck.mjs
+!src/
+!src/**
+!public/
+!public/**

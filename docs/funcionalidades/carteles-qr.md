@@ -1,5 +1,10 @@
 # Carteles PDF y QR
 
+Actualización16 octubre: [lector público HU-09](ficha-publica-qr.md) implementado
+localmente; falta aplicar023 y publicar/comprobar Node/TLS en el dominio acordado.
+PUBLIC_CASE_WEB_READY sigue false. No se habilitan carteles reales por la sola
+existencia del código web; formulario HU-10.1 e integración remota pendientes.
+
 Módulo case_posters. HU-08.1/#34 y HU-08.2/#35; HU original08/issue#8; RF-08,37. Implementado localmente en feature/pet-poster-qr, sin historia cerrada. [ADR-053](../decisiones/053-carteles-pdf-y-enlaces-qr.md).
 
 ## Qué hace y recorrido

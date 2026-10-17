@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+Web QR16 de octubre: apps/public-web separa dominio/casos de uso/contrato,
+data REST/mapeo, presentación DOM/ViewModel y bootstrap HTTP Node22. Solo el
+servidor consume RPC080 con secreto; cliente recibe proyección pública y fotos
+por índice revalidadas. SQL080–082/plan023 sin permisos anónimos nuevos.
+Supabase conserva reglas y persistencia. [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md).
+
 Revisión del mapa,16 octubre: ExploreFilterEditor/ExploreFilterSelection compartidos por lista y panel del mapa; presentation mantiene borrador, metadatos de lugar y acción GPS sin consulta automática. ExploreMapScreen consume applySelection/locateForFilter del ViewModel, que invoca casos de uso existentes y protege identidad/generación. ExploreCaseMap solo coordina cámara/pins/etiqueta y panel; ZoneMapPicker admite controlador visual externo sin conocer features o repositorios. Router compone places mediante slot también en mapa. Sin cambios de dominio/datos/SQL; [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye el contenido inferior de ADR-055.
 
 Mapa inmersivo,16 octubre: ExploreMapScreen comparte ExploreViewModel/consulta/páginas con la lista; router protege `/home/explore-map` y compone entityEditorPage/OriginPageSource desde la opción Mapa. La vista deja de ser estado del ViewModel (`mapSelected` retirado). ExploreCaseMap conserva agrupación pública, pero usa panel deslizable de una ficha y grilla compartida de una columna. No cambian dominio/datos/SQL ni se importan pantallas desde providers. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md) sustituye la composición integrada de ADR-052.
@@ -44,7 +50,7 @@ entreHuellas/
   .github/
   flutter_application_entrehuellas/  # App Flutter existente; Android primero
   apps/
-    public-web/             # Web QR ligera, se crea en S4
+    public-web/             # Web QR S4: cliente ligero + adaptador HTTP Node
   database/                 # Fuentes SQL numeradas por tipo de objeto
     tables/
     functions/

@@ -1,0 +1,41 @@
+name: Public QR web validation
+on:
+  push:
+    paths: ['apps/public-web/**', '.github/workflows/public-web.yml']
+  pull_request:
+    paths: ['apps/public-web/**', '.github/workflows/public-web.yml']
+permissions:
+  contents: read
+jobs:
+  reader:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/public-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - name: Build production container
+        run: docker build --tag entrehuellas-public-web:ci .
+      - name: Smoke test container without production secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'docker rm -f public-web-ci >/dev/null 2>&1 || true' EXIT
+          docker run --detach --name public-web-ci \
+            --env SUPABASE_URL=https://example.invalid \
+            --env SUPABASE_SERVER_KEY=sb_secret_ci-placeholder-only \
+            entrehuellas-public-web:ci
+          for attempt in {1..15}; do
+            if docker exec public-web-ci node scripts/healthcheck.mjs; then
+              test "$(docker exec public-web-ci id -u)" != "0"
+              docker exec public-web-ci sh -c 'test ! -e /app/.env && test ! -d /app/tests && test ! -d /app/public'
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs public-web-ci
+          exit 1

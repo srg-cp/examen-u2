@@ -5,6 +5,53 @@ import { PGlite } from '@electric-sql/pglite';
 import { postgis } from '@electric-sql/pglite-postgis';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+
+test('QR reader is server-only, live, scoped to processed photos and neutral after revoke/delete', async(t)=>{
+ const db=await database(t);await db.exec(bundle);
+ const a='11111111-1111-4111-8111-111111111199', b='22222222-2222-4222-8222-222222222299';
+ const id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa99',pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb99',photo='cccccccc-cccc-4ccc-8ccc-cccccccccc99';
+ await db.query('insert into auth.users(id) values($1),($2)',[a,b]);
+ await db.query("insert into public.pets(id,owner_id,name,species,size,age_months,traits) values($1,$2,'Luna','dog','small',12,'Blanca')",[pet,a]);
+ await db.query("insert into public.pet_photos(id,pet_id,owner_id,status,processed_at,content_hash,is_primary) values($1,$2,$3,'published',now(),repeat('a',64),true)",[photo,pet,a]);
+ await db.query("insert into public.lost_cases(id,owner_id,pet_id,pet_version,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,pet_name,species,size,age_months,traits,photo_ids) values($1,$2,$3,1,now(),-40,50,'PRIVATE EXACT HOME',-12.05,-77.04,'Luna','dog','small',12,'Blanca',array[$4]::uuid[])",[id,a,pet,photo]);
+ await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind) values($1,$2,'active',now(),-40,50,'PRIVATE REFERENCE',-12.05,-77.04,'cat','Negra',array[$3]::uuid[],now(),'possible_loss')",[id,a,photo]);
+ await db.query("insert into public.found_case_photos(id,case_id,owner_id,status,processed_at,content_hash) values($1,$2,$3,'ready',now(),repeat('b',64))",[photo,id,a]);
+ for(const [bucket,target] of [['pet-photo-renditions',pet],['found-photo-renditions',id]]) await db.query(
+  "insert into storage.objects(id,bucket_id,name,metadata) values(gen_random_uuid(),$1,$2,'{\"mimetype\":\"image/jpeg\",\"size\":100}')",[bucket,`${a}/${target}/${photo}.jpg`]);
+ const actor=async(owner)=>{await db.exec('reset role');await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub:owner})]);await db.exec('set role authenticated');};
+ const read=async(slug)=>{await db.exec('reset role;set role service_role');return (await db.query('select public.read_qr_case($1) value',[slug])).rows[0].value;};
+ await actor(a);
+ const lost=(await db.query("select public.prepare_case_poster('lost',$1) value",[id])).rows[0].value.public_slug;
+ const found=(await db.query("select public.prepare_case_poster('found',$1) value",[id])).rows[0].value.public_slug;
+ assert.notEqual(lost,found);
+ const active=await read(lost);assert.equal(active.state,'active');assert.equal(active.name,'Luna');
+ assert.deepEqual(active.area,{latitude:-12.05,longitude:-77.04});
+ assert.equal(active.photo_objects[0].bucket,'pet-photo-renditions');
+ assert.equal(JSON.stringify(active).includes('PRIVATE'),false);
+ for(const field of ['owner_id','id','place_reference','latitude','longitude','custody']) assert.equal(Object.hasOwn(active,field),false);
+ assert.equal((await read(found)).photo_objects[0].bucket,'found-photo-renditions');
+ for(const role of ['anon','authenticated']) {
+  await db.exec(`reset role;set role ${role}`);
+  await assert.rejects(db.query('select public.read_qr_case($1)',[lost]),/permission denied/);
+  await assert.rejects(db.query('select * from public.case_public_links'),/permission denied/);
+ }
+ await db.exec('reset role');await db.query("update public.pet_photos set processed_at=null where id=$1",[photo]);
+ assert.deepEqual(await read(lost),{state:'unavailable'});
+ await db.exec('reset role');await db.query("update public.pet_photos set processed_at=now() where id=$1",[photo]);
+ await actor(a);await db.query('select public.resolve_recovery_search($1,true)',[id]);
+ const closed=await read(found);assert.equal(closed.state,'closed');assert.equal(closed.resolution,'resolved');assert.ok(closed.closed_at);
+ assert.deepEqual(Object.keys(closed).sort(),['closed_at','resolution','state']);
+ await actor(b);await assert.rejects(db.query("select public.revoke_case_public_link('lost',$1)",[id]),/link_unauthorized/);
+ await actor(a);await db.query("select public.revoke_case_public_link('lost',$1)",[id]);
+ await db.query("select public.revoke_case_public_link('lost',$1)",[id]);
+ await assert.rejects(db.query("select public.prepare_case_poster('lost',$1)",[id]),/poster_link_unavailable/);
+ const neutral={state:'unavailable'};
+ for(const slug of [lost,'not-a-token','f'.repeat(64),null]) assert.deepEqual(await read(slug),neutral);
+ await db.exec('reset role');await db.query('update public.found_cases set deleted_at=now() where id=$1',[id]);
+ assert.deepEqual(await read(found),neutral);
+ await db.exec('reset role');await db.exec(bundle); // Repeatability must preserve revocation.
+ assert.deepEqual(await read(lost),neutral);
+});
 test('Poster links are stable per origin, owner-only, public-field-only and do not reactivate closed cases', async(t)=>{
  const db=await database(t);await db.exec(bundle);
  const a='11111111-1111-4111-8111-111111111190',b='22222222-2222-4222-8222-222222222290';

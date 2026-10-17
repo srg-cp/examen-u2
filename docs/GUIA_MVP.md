@@ -171,6 +171,13 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+Incremento16 de octubre, feature/public-qr-case-web: HU-09/RF-09/#9 implementa
+consulta web ligera y contrato privado de resolución/fotos, plan023. Estados
+activo/cerrado/neutral, galería, compartir/copia y actualización real. Falta
+HU-10.1/#36 para formulario y validación hosted/TLS/QR desde otro teléfono;
+no se cierra la historia. PUBLIC_CASE_WEB_READY sigue false. Sin despliegue/APK.
+[Ficha](funcionalidades/ficha-publica-qr.md), [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md).
+
 Incremento16 de octubre: por instrucción del usuario se deja la generación de APK para más adelante y se inicia feature/pet-poster-qr, HU-08.1/#34 y HU-08.2/#35. Cartel A4 público, QR opaco estable, impresión/guardado y compartir PDF/enlace; fuente077–079/plan022. El usuario indica dominio entrehuellas.kormind.com; la generación se activa solo después de aplicar022 y disponer de HU-09 en ese dominio. La raíz responde404 al comprobarla; no se entrega ni despliega web en HU-08. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md). Sin ampliación a push/offline/moderación ni cierre automático de historias.
 
 - **HU-08 / RF-08,37:** cartel PDF legible, QR y compartir. Se puede generar en Flutter para el MVP; conservar enlace estable y permitir reintento de la generación.

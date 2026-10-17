@@ -1,5 +1,18 @@
 # Configuración y validación de la app
 
+Dokploy17 octubre: preparación para Application desde GitHub, Dockerfile
+apps/public-web/Dockerfile, contexto apps/public-web y puerto interno5173.
+Campos, Environment, DNS/TLS, Auto Deploy y comprobaciones en
+[DOKPLOY.md](../apps/public-web/DOKPLOY.md). El usuario añade secretos en el panel;
+no se incorporan a Git/build. Healthcheck es de proceso, no valida Supabase.
+
+Web QR16 octubre: consulta HU-09 implementada localmente en apps/public-web.
+Aplicar [023](../database/patchs/023_patch_public_qr_case.sql) tras022 en desarrollo;
+hosting Node22 con secreto servidor/TLS, sin caché/logs de tokens. Pasos en
+[README](../apps/public-web/README.md). No se ha desplegado; PUBLIC_CASE_WEB_READY
+sigue false y formulario HU-10.1 pendiente. Actualiza el pendiente de implementación
+de la nota histórica de carteles siguiente.
+
 Carteles/QR (16 octubre): aplicar [patch022](../database/patchs/022_patch_case_posters.sql) después de001–021, con fotos operativas. Configurar PUBLIC_CASE_WEB_URL (base acordada: https://entrehuellas.kormind.com) y mantener PUBLIC_CASE_WEB_READY=false hasta implementar/verificar la ficha pública de HU-09 en `/c/<slug>`. El ejemplo versionado ya contiene estos valores públicos. No habilitar con una página provisional: al revisar, GET/ devuelve404. Con ready=false o URL no HTTPS no se crean enlaces ni PDFs; la UI informa mediante toast. No hay claves nuevas de servidor ni cambio de Auth. Los plugins printing/share_plus se prueban tras la próxima recompilación nativa; no se genera APK por instrucción del usuario. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md).
 
 Guardados/Ciudad (16 octubre): para Explorar → Guardados, aplicar [patch021](../database/patchs/021_patch_saved_case_list.sql) o migración20261016002100_saved_case_list.sql después de020 (aplicado según usuario). Build-SavedCaseListPatch/Build-RunAll generan fuentes074–076; no reescribir020. **021 pendiente**, sin SQL remoto ejecutado ni pruebas por instrucción vigente. Ciudad no necesita migración: buscador ahora en places, mismo PLACE_SEARCH_URL, modo layer=city/caché separada y selección explícita; guardar etiqueta mantiene límites/RLS del perfil. Endpoint sustituido debe admitir filtro de ciudades y GeoJSON reconocido. Análisis limpio; cobertura/recorridos Android por verificar. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).

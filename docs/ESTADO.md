@@ -1,5 +1,59 @@
 # Estado del proyecto
 
+## Preparación Dokploy desde GitHub —17 de octubre de2026
+
+Por petición del usuario se prepara apps/public-web para su VDS/Dokploy, conservando
+el trabajo local de HU-09 en feature/public-qr-case-web. Dockerfile multietapa con
+runtime no root/puerto5173, .dockerignore con entradas permitidas y healthcheck
+Node sin curl. GitHub Actions amplía validación con build/smoke del contenedor
+sin credenciales reales ni despliegue. [Guía exacta](../apps/public-web/DOKPLOY.md)
+para Application/proveedor GitHub, rama, Dockerfile/contexto, Environment,
+DNS/HTTPS, health, Auto Deploy y límites del proxy. Usuario completa Environment.
+
+Docker CLI instalado pero daemon Docker Desktop Linux no disponible; build/arranque
+de imagen local no verificados, CI remoto pendiente. Se valida arranque Node con
+el bootstrap real y probe de salud sin Supabase: **10 pruebas Node aprobadas**
+en build/dokploy-web-tests.log, incluido ese recorrido. /health es liveness, no evidencia
+de RPC/Storage. Pendientes: publicar la rama, configurar panel/DNS/secretos, aplicar
+SQL022/023 según estado real y comprobar caso real/cierre/revocación. Sin commit,
+push, acceso a Dokploy, despliegue ni cambio de PUBLIC_CASE_WEB_READY.
+
+## HU-09: ficha pública QR —16 de octubre de2026
+
+Incremento local en **feature/public-qr-case-web**, desde3db6de6 con árbol inicial
+limpio. Consulta sin app/cuenta en apps/public-web, dominio acordado
+https://entrehuellas.kormind.com y ruta /c/<token64hex>. Activo: fotos procesadas,
+rasgos/campos públicos, fecha/zona aproximada, compartir/copia y actualización.
+Cerrado: estado/fecha real sin exponer ficha privada; inexistente/revocado/eliminado:
+mismo neutral. Consulta cada60s visible/al volver a pestaña y manual; sin prometer
+tiempo real ni retirar copias ya descargadas.
+
+Cliente DOM con ViewModel/casos de uso/repositorios y servidor HTTP Node de lectura;
+secreto solo en servidor. SQL080–082/plan023 genera migración20261016002300_public_qr_case.sql,
+patch023 y run_all sin reescribir migraciones anteriores. read_qr_case solo
+service_role; revocación solo autor, idempotente. Fotos por índice con revalidación
+después de descargar; navegador no recibe UUID privados/paths Storage ni URLs
+firmadas. Sin ampliar grants anónimos de tablas/Storage. Se corrigió en validación
+el uso del marcador real deletion_requested_at de pets y la invocación de fetch
+del navegador conservando su receptor global.
+
+**Validación local:**24 pruebas SQL/PostGIS aprobadas (build/qr-web-sql-tests.log);
+9 pruebas Node aprobadas (build/qr-web-node-tests.log). Chrome headless mediante
+Playwright1.62.1:390×844,1280×900 y320×350 con texto200%/movimiento reducido,
+galería, copia real, offline/reintento, cierre, revocación e inexistente, CSP y
+ausencia de desbordamiento horizontal (build/qr-web-browser.log). Capturas con
+fixtures de prueba/asset aprobado revisadas en build/ui-preview/public-web.
+Node local24.18.0; workflow nuevo usa22, aún sin ejecución remota. Flutter no se
+modificó y no se repitió su suite ni se generó APK. Dockerfile preparado, sin build.
+
+**Pendientes:** aplicar022/023 en desarrollo según estado real, configurar hosting
+Node/secreto/TLS en el dominio y comprobar Supabase/Storage reales, proxy sin caché,
+otro teléfono sin app/Safari y QR físico. PUBLIC_CASE_WEB_READY permanece false.
+Formulario HU-10.1/#36 todavía pendiente; es el siguiente incremento funcional.
+HU-09/#9 no cerrada. Sin SQL remoto, despliegue, commit/push ni cambios en GitHub.
+[Ficha](funcionalidades/ficha-publica-qr.md), [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md),
+[operación](../apps/public-web/README.md). La evidencia local no sustituye activación remota.
+
 Revisión del mapa: filtros inferiores y acceso junto al pin,16 de octubre. Se conserva pantalla/expansión de ADR-055, pero el panel contiene ExploreFilterEditor compartido con lista y Aplicar filtros. Borrador hasta confirmar (incluidos GPS/centro visual); CTA fijo si cabe, scroll con altura mínima/texto ampliado. Pin muestra etiqueta compacta de un caso/Abrir caso, reduce filtros y acomoda cámara; coincidencias se recorren en etiqueta. Aplicar retira selección y recupera panel42%. Metadatos del lugar en ExploreState conservan la cápsula de Ubicación al volver/refrescar/paginar; GPS deduplicado por generación y resultados de otra cuenta descartados. Sin SDK nuevo, SQL, permisos o persistencia adicional. Se retiran opciones de grilla añadidas para la ficha inferior que ya no tienen consumidores. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye contenido inferior/selección inicial de ADR-055. Formato y análisis global limpios (build/map-filters-final-analyze.log); suite final de353 pruebas aprobada (build/map-filters-full-tests.log),25 focalizadas y6 finales de mapa/GPS con renders (build/map-filters-focused-tests.log y build/map-filters-final-renders.log). Capturas normal/pequeña/texto2 revisadas en build/ui-preview/explore-map: screen-*.png para filtros y normal.png/small.png para etiquetas. Usan teselas neutras, sin validar cartografía real. Revisión Android pendiente; sin APK ni publicación. Trabajo previo conservado.
 
 Diagnóstico de parámetros del selector,16 de octubre: captura muestra subtitle/placement no definidos en FilterExpansion. En los archivos guardados ambos parámetros, sus campos y FilterPanelPlacement están presentes; solo existe una declaración de cada tipo y el import de ExploreFilters apunta a ella. `dart analyze lib/core/presentation/widgets/filter_expansion.dart lib/features/explore/presentation/widgets/explore_filters.dart` termina sin incidencias (build/filter-parameter-diagnostic.log). No se reproduce el error de la captura ni se modifica la API correcta. Estado desactualizado del analizador, buffers sin guardar u otra copia abierta siguen como hipótesis; reinicio del analizador/editor y confirmación visual pendientes.
