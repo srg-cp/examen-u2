@@ -47,6 +47,12 @@ modo de pruebas/publicación y recorrido de validación en
 migración SQL. Activación remota y acceso real con Facebook pendientes;
 la implementación no cierra HU-01.
 
+Ajuste visual solicitado el17 de octubre: Facebook usa azul #0866FF e icono
+de24px para igualar la presencia visual del asset Google de20px (el glifo
+Material incorpora margen interior). Ambos botones sociales comparten altura
+mínima50px y padding vertical10px; conservan crecimiento con texto ampliado,
+área táctil, shimmer y comportamiento de acceso.
+
 
 ## Área inferior del scroll — 10 de octubre de 2026
 

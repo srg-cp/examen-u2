@@ -95,7 +95,11 @@ class AccessScreen extends ConsumerWidget {
                   isLoading: login.isBusy,
                   label: 'Continuar con Facebook',
                   icon: const ExcludeSemantics(
-                    child: Icon(Icons.facebook, size: 20),
+                    child: Icon(
+                      Icons.facebook,
+                      size: 24,
+                      color: Color(0xFF0866FF),
+                    ),
                   ),
                   onPressed: login.isBusy
                       ? null

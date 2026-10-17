@@ -1,5 +1,19 @@
 # Estado del proyecto
 
+## Ajuste visual de botones sociales —17 de octubre de2026
+
+Por solicitud del usuario, Facebook pasa a azul #0866FF y glifo24px para
+igualar visualmente el asset Google20px con el margen interno de Material.
+SocialSignInButton reduce padding vertical13→10 y altura mínima56→50 para
+ambos proveedores, conservando área táctil y adaptación de texto. Sin cambios
+de Auth, SDK, contratos ni configuración remota. Ficha de acceso actualizada.
+
+Validación: formato correcto,11 pruebas existentes de Facebook/layout y
+arquitectura aprobadas en build/social-buttons-tests.log; análisis sin incidencias en
+build/social-buttons-analyze.log, dentro de flutter_application_entrehuellas.
+Renders normales/pequeños con texto2 revisados en build/ui-preview/facebook. Pendiente
+comprobación Android real; sin APK, commit, push o despliegue.
+
 ## Login con Facebook —17 de octubre de2026
 
 Solicitud explícita del usuario, ampliación de HU-01 / RF-01,34 / issue #1.

@@ -24,8 +24,8 @@ class SocialSignInButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFF17191D),
-          minimumSize: const Size(0, 56),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+          minimumSize: const Size(0, 50),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
           side: const BorderSide(color: Color(0xFFE0E1E7)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
