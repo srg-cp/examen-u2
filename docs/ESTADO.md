@@ -1,5 +1,87 @@
 # Estado del proyecto
 
+## Login con Facebook —17 de octubre de2026
+
+Solicitud explícita del usuario, ampliación de HU-01 / RF-01,34 / issue #1.
+En la rama real `feature/vue-nuxt-web`, conservando cambios locales previos de
+la web, se añade Continuar con Facebook debajo de Google. Reutiliza
+SocialSignInButton, LoginViewModel, SignIn, contrato/repositorio y fuente
+Supabase. SocialProvider añade facebook y el adaptador usa switch exhaustivo
+para no enviar proveedores nuevos a Google accidentalmente. Conserva
+toast superior, bloqueo/shimmer real, cover→stagger y scroll/texto ampliado.
+La sesión y el onboarding por cuenta solo avanzan al recibir Auth válido;
+abrir OAuth no se considera sesión iniciada. Sin SDK nativo nuevo ni SQL.
+
+Validación local: **29 pruebas Flutter aprobadas**, incluyendo URL de los tres
+proveedores con PKCE y retorno móvil, lanzamiento fallido/reintento, Facebook
+desde pantalla con doble envío bloqueado y recuperación tras error, y pruebas
+existentes de acceso/feedback/fronteras. Registro en
+`flutter_application_entrehuellas/build/facebook-tests.log`. Formato de los
+5 archivos Dart correcto; `flutter analyze --no-pub` sin incidencias en
+`build/facebook-analyze.log`. Renders revisados en
+`build/ui-preview/facebook` a390×844 y320×350/texto2/movimiento reducido;
+el contenido pequeño continúa por scroll. Pruebas con plataforma/repositorio
+sustituidos: no acreditan OAuth remoto ni permisos reales de Meta.
+
+[Guía de activación Meta/Dokploy](LOGIN_FACEBOOK.md), configuración, guía MVP
+y ficha de acceso actualizadas. Siguiente paso: crear/configurar Meta,
+añadir App ID/Secret al servicio Auth y retorno móvil a su allowlist, activar
+el servicio con autorización de despliegue y probar Android con cuentas de
+prueba/nuevas/existentes, cancelación y reentrada. Publicación Live depende de
+los requisitos de privacidad/eliminación/permisos que muestre Meta. Sin acceso
+remoto, secretos nuevos en Flutter, APK, commit, push ni despliegue; HU-01
+no se declara cerrada.
+
+## Web Vue/Nuxt: migración de ficha QR —17 de octubre de2026
+
+Decisión explícita del usuario: web única Vue/Nuxt/TypeScript para público,
+usuarios y administración organizada por módulos y permisos; Flutter en móvil.
+Rama nueva **feature/vue-nuxt-web** desde14b6978 con árbol limpio. Se conserva
+apps/public-web y se migra por completo su funcionalidad QR existente, sin crear
+pantallas vacías de login/admin ni modificar el worktree de feature/landing-page.
+La integración/conversión de esa landing y los flujos web autenticados son
+incrementos posteriores. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
+
+Vue3.5.44/Nuxt4.6.2/TypeScript6.0.3 con lockfile, Node24 LTS para CI/Docker.
+Dominio/contratos/ViewModel puros TypeScript y fuentes/repositorios del servidor
+separados de componentes. SSR entrega ficha pública en HTML; hidratación no
+consulta otra vez. Vue conserva diseño, galería, compartir/copia, refresh y
+neutral/cerrado. API/URLs/SQL/variables Dokploy se conservan. Nuevo nonce CSP por
+respuesta para scripts de hidratación, no unsafe-inline; no se serializan
+credenciales, descriptores Storage ni campos privados. Estado por petición,
+deduplicación/abort y borrado al confirmar revocación. Se retira servidor/vista
+DOM manual para evitar dos implementaciones de la misma funcionalidad.
+
+Validación local: TypeScript estricto sin errores (build/nuxt-typecheck.log),
+**9 pruebas unitarias/arquitectura aprobadas** (build/nuxt-tests.log), build SSR
+correcto (build/nuxt-build.log), **2 pruebas del servidor compilado aprobadas**
+(build/nuxt-production-tests.log): HTML inicial, API, fotos, nonce, secreto/path
+canario excluido, cierre/revocación/error, health y límites60/min con leases
+liberados. Browser QA Chrome/Playwright1.62.1 aprobado (build/nuxt-browser.log):
+390×844,1280×900 y320×350/texto200%/movimiento reducido, galería/copia/offline/
+reintento/cierre/neutral, CSP sin rechazos, sin desbordamiento y sin segunda
+consulta al hidratar. Capturas con fixtures en build/ui-preview/public-web,
+revisión visual realizada; no acreditan backend real ni Safari.
+
+Auditoría runtime declarado y dependencias exactas de .output/server:0 avisos
+conocidos (build/nuxt-runtime-audit.json y nuxt-bundled-runtime-audit.log). El árbol
+de build/desarrollo conserva11 altas transitivas por braces/node-forge sin
+versión corregida disponible; compatible audit fix no resuelve. Paquetes
+afectados ausentes del inventario runtime; sin downgrade forzado ni ocultar
+avisos. Mantener seguimiento/revisión antes de distribución. No equivale a una
+certificación de seguridad del bundle.
+
+El usuario confirma022/023 aplicados, dominio publicado y generación/lectura QR
+funcionando en versión previa; configuración Flutter local true conservada.
+Esta evidencia sustituye pendientes históricos de activación comunicados, sin
+verificación independiente de políticas/Storage/concurrencia. La migración Vue
+no se ha desplegado ni probado contra sus casos reales. Docker/CI actualizado,
+sin imagen local ni workflow remoto nuevo verificados. Sin SQL nuevo, APK,
+commit/push o redeploy. Documentación de iniciación y operación actualizada:
+[DESARROLLO](../apps/public-web/DESARROLLO.md), [Dokploy](../apps/public-web/DOKPLOY.md).
+Siguiente paso: publicar/revisar migración en Dokploy y coordinar integración
+de landing; HU-10.1/formulario y aplicación web privada siguen pendientes.
+
 ## Preparación Dokploy desde GitHub —17 de octubre de2026
 
 Por petición del usuario se prepara apps/public-web para su VDS/Dokploy, conservando

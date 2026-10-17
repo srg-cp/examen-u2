@@ -16,6 +16,13 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Web, decisión explícita del17/10/2026: Vue + Nuxt + TypeScript en una sola
+  aplicación para público, usuarios y administración, organizada por funcionalidad
+  y permisos de servidor. Flutter permanece en móvil. No separar proyectos por
+  roles ni crear pantallas/guards ficticios antes de implementar autorización.
+  SSR, generación estática o cliente se eligen por recorrido. Seguir ADR-058;
+  ningún secreto en app/public/shared cliente, payload SSR o NUXT_PUBLIC.
+
 - Cumplir [las reglas de oro de arquitectura](docs/REGLAS_ARQUITECTURA.md). Ningún incremento está completo si rompe sus fronteras. Registrar cambios de reglas como decisiones arquitectónicas versionadas y actualizar documentación/comprobaciones; no introducir excepciones implícitas por alcance MVP o urgencia.
 
 - Presentation contiene pantallas, ViewModels y estado; data contiene implementaciones de repositorios y acceso a datos. Las operaciones del producto se expresan mediante casos de uso de dominio consumidos por ViewModels.

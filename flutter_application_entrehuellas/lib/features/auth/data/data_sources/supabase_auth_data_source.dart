@@ -49,12 +49,11 @@ final class SupabaseAuthDataSource
   @override
   Future<void> signInWithProvider(SocialProvider provider) =>
       _execute(() async {
-        final launched = await _client.auth.signInWithOAuth(
-          provider == SocialProvider.apple
-              ? OAuthProvider.apple
-              : OAuthProvider.google,
-          redirectTo: redirectUri,
-        );
+        final launched = await _client.auth.signInWithOAuth(switch (provider) {
+          SocialProvider.apple => OAuthProvider.apple,
+          SocialProvider.google => OAuthProvider.google,
+          SocialProvider.facebook => OAuthProvider.facebook,
+        }, redirectTo: redirectUri);
         if (!launched) {
           throw const AccessSourceFailure(AccessSourceFailureKind.unavailable);
         }

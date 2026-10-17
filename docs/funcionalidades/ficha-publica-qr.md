@@ -1,5 +1,14 @@
 # Ficha pública QR
 
+Migración17/10/2026 en feature/vue-nuxt-web: Vue/Nuxt/TypeScript sustituye
+la vista DOM y HTTP manual, manteniendo proyección, /c/<token>, API y fotos.
+Primera lectura SSR con entidad permitida e hidratación sin segunda consulta;
+componentes Vue compartidos, nonce CSP y estado por petición. Sin SQL nuevo.
+Usuario confirma022/023 aplicados y recorrido QR funcionando en versión previa;
+la migración Vue sigue local hasta publicación/redeploy. [ADR-058](../decisiones/058-web-unica-vue-nuxt-y-roles.md),
+[guía Vue](../../apps/public-web/DESARROLLO.md). Landing, login/admin web e integración
+HU-10 siguen fuera de este incremento.
+
 HU-09 / RF-09 / issue #9. Incremento local del16 de octubre de2026 en
 `feature/public-qr-case-web`. Consulta implementada; historia abierta por
 integración HU-10.1 y validación/activación remota pendientes.

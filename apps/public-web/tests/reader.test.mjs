@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { publicCase, ReaderFailure } from '../src/features/case_reader/domain/case.mjs';
-import { ReadCase, ReadCasePhoto } from '../src/features/case_reader/domain/read_case.mjs';
-import { SupabaseCaseRepository } from '../src/features/case_reader/data/supabase_case_repository.mjs';
-import { SupabaseCaseDataSource } from '../src/features/case_reader/data/supabase_case_data_source.mjs';
-import { HttpCaseRepository } from '../src/features/case_reader/data/http_case_repository.mjs';
-import { ReaderViewModel } from '../src/features/case_reader/presentation/reader_view_model.mjs';
+import { publicCase, ReaderFailure } from '../shared/features/case_reader/domain/case.ts';
+import { ReadCase, ReadCasePhoto } from '../shared/features/case_reader/domain/read_case.ts';
+import { SupabaseCaseRepository } from '../server/features/case_reader/data/supabase_case_repository.ts';
+import { SupabaseCaseDataSource } from '../server/features/case_reader/data/supabase_case_data_source.ts';
+import { HttpCaseRepository } from '../shared/features/case_reader/data/http_case_repository.ts';
+import { ReaderViewModel } from '../shared/features/case_reader/presentation/reader_view_model.ts';
 import { slug, rawActive, active, photo } from './fixtures.mjs';
 
 test('Read use cases reject invalid identifiers before accessing a repository', async () => {
@@ -52,8 +52,8 @@ test('Source uses proper secret/legacy headers, bounded payloads, timeout and sa
 });
 
 test('Browser repository distinguishes neutral, rate limiting and offline without propagating server details', async () => {
-  assert.deepEqual(await new HttpCaseRepository(async () => new Response('{}', { status: 404 })).read(slug), { state: 'unavailable' });
-  await assert.rejects(new HttpCaseRepository(async () => new Response('private', { status: 429 })).read(slug), { kind: 'rate_limited' });
+  assert.deepEqual(await new HttpCaseRepository(async () => ({ state: 'unavailable' })).read(slug), { state: 'unavailable' });
+  await assert.rejects(new HttpCaseRepository(async () => { throw new ReaderFailure('rate_limited'); }).read(slug), { kind: 'rate_limited' });
   await assert.rejects(new HttpCaseRepository(async () => { throw new Error('SDK PRIVATE'); }).read(slug), { kind: 'unavailable' });
 });
 

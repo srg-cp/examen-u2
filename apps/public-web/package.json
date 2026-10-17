@@ -2,11 +2,16 @@
   "name": "entrehuellas-public-web",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": { "node": "^22.22.3 || ^24.15.0 || >=26.0.0" },
   "scripts": {
-    "pretest": "node scripts/build.mjs",
-    "build": "node scripts/build.mjs",
-    "start": "node --env-file-if-exists=.env src/app/main.mjs",
-    "test": "node --test"
-  }
+    "dev": "nuxt dev --host 127.0.0.1 --port 5173",
+    "build": "nuxt build",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "start": "node --env-file-if-exists=.env .output/server/index.mjs",
+    "test": "node --experimental-transform-types --test tests/reader.test.mjs tests/architecture.test.mjs",
+    "test:server": "node --test tests/production.test.mjs"
+  },
+  "dependencies": { "vue": "3.5.44", "vue-router": "5.4.0" },
+  "devDependencies": { "nuxt": "4.6.2", "typescript": "6.0.3", "vue-tsc": "3.3.13", "@types/node": "24.10.1" }
 }

@@ -1,5 +1,18 @@
 # Configuración y validación de la app
 
+Vue/Nuxt17 octubre: Node24.15+ recomendado; npm ci en apps/public-web y
+npm run dev para desarrollo. No instalar Nuxt/Vue globalmente. Typecheck,
+unitarias, build y pruebas de producción documentados en
+[DESARROLLO.md](../apps/public-web/DESARROLLO.md). Dokploy conserva variables,
+contexto, stage y puerto; el comando de imagen ahora ejecuta .output de Nitro.
+Publicar la rama nueva antes de redeploy. Usuario confirma022/023 aplicados y
+generación/lectura QR operativas en la versión anterior; no se reejecuta SQL.
+
+Facebook,17 de octubre: botón preparado en login sobre Supabase OAuth y retorno
+móvil existente. Activar Meta y el servicio Auth de Dokploy según
+[LOGIN_FACEBOOK.md](LOGIN_FACEBOOK.md), con callback HTTPS exacto y secreto
+solo en servidor. Sin configuración remota ni demo Android acreditadas.
+
 Dokploy17 octubre: preparación para Application desde GitHub, Dockerfile
 apps/public-web/Dockerfile, contexto apps/public-web y puerto interno5173.
 Campos, Environment, DNS/TLS, Auto Deploy y comprobaciones en

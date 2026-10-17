@@ -32,7 +32,7 @@ class AccessScreen extends ConsumerWidget {
             stage: 'login',
             startCovered: true,
             builder: (play) =>
-                StaggerReveal(count: 10, play: play, child: content),
+                StaggerReveal(count: 11, play: play, child: content),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,9 +88,23 @@ class AccessScreen extends ConsumerWidget {
                       : () => vm.social(SocialProvider.google),
                 ),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 12),
               StaggerRevealItem(
                 order: 9,
+                child: SocialSignInButton(
+                  isLoading: login.isBusy,
+                  label: 'Continuar con Facebook',
+                  icon: const ExcludeSemantics(
+                    child: Icon(Icons.facebook, size: 20),
+                  ),
+                  onPressed: login.isBusy
+                      ? null
+                      : () => vm.social(SocialProvider.facebook),
+                ),
+              ),
+              const SizedBox(height: 26),
+              StaggerRevealItem(
+                order: 10,
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,

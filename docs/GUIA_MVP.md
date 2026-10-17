@@ -114,6 +114,11 @@ Se conserva la numeración original para relacionar implementación, informe aca
 
 ### S1 - Acceso y cuenta
 
+- Ampliación autorizada el17 de octubre de2026 de **HU-01 / RF-01,34 / issue #1**:
+  acceso con Facebook además de correo/Google, conservando sesión y onboarding
+  por cuenta. Código local y [guía de activación](LOGIN_FACEBOOK.md); Meta/Auth
+  y prueba Android pendientes, sin cierre automático de historia.
+
 - Dirección visual obligatoria: [REGLAS_UI_UX.md](REGLAS_UI_UX.md), basada en acceso/cuenta/OTP/contraseña aprobados. Retirado Inicio anterior; destino provisional conserva bienvenida y cierre real, sin ampliar funcionalidades.
 
 - **HU-01 / RF-01,34:** acceso por correo/Google, sesión, perfil y gestión de cuenta. Inicio válido crea o recupera un único perfil; otro usuario no puede editarlo. Solicitud de baja trazable y exportación básica de los datos del usuario según el alcance acordado.
@@ -170,6 +175,12 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+17/10/2026: usuario adopta una sola web Vue/Nuxt/TypeScript para público,
+usuarios y administración por roles, conservando Flutter móvil. Primer incremento
+en feature/vue-nuxt-web migra consulta QR a Vue/SSR con mismos contratos y URLs;
+no amplía este paso a login/admin/HU-10 ni modifica la rama de landing en curso.
+No hay nueva migración SQL. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
 
 Incremento16 de octubre, feature/public-qr-case-web: HU-09/RF-09/#9 implementa
 consulta web ligera y contrato privado de resolución/fotos, plan023. Estados

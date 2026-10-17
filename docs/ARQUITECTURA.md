@@ -1,5 +1,14 @@
 # Arquitectura de Entre Huellas
 
+Web17/10/2026: decisión vigente Vue3/Nuxt4/TypeScript en apps/public-web,
+una sola aplicación por módulos y permisos. Este incremento migra QR a SSR+Vue;
+landing de su rama, login web y administración aún por integrar/implementar.
+shared/features contiene dominio/casos de uso, data HTTP y ViewModel puros;
+app contiene componentes/páginas y composición por petición; server encapsula
+REST/DTO Supabase, transporte y seguridad. Nitro sustituye el HTTP manual,
+sin cambiar SQL/URLs/variables del usuario. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md)
+sustituye la implementación de la siguiente nota histórica.
+
 Web QR16 de octubre: apps/public-web separa dominio/casos de uso/contrato,
 data REST/mapeo, presentación DOM/ViewModel y bootstrap HTTP Node22. Solo el
 servidor consume RPC080 con secreto; cliente recibe proyección pública y fotos

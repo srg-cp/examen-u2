@@ -8,7 +8,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Ficha pública QR](ficha-publica-qr.md) | apps/public-web | HU-09; RF-09; issue #9; consulta local, hosting/HU-10 pendientes |
+| [Ficha pública QR](ficha-publica-qr.md) | apps/public-web (Vue/Nuxt) | HU-09; RF-09; issue #9; versión anterior operativa según usuario, migración Vue local/HU-10 pendiente |
 | [Carteles PDF y QR](carteles-qr.md) | case_posters | HU-08.1/08.2; RF-08,37; issues #34/#35; implementación local, activación pendiente |
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación del usuario16/10/2026 de HU-07/RF-13; sin issue asignado; local |

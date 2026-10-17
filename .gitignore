@@ -22,6 +22,8 @@ local.properties
 # Desarrollo web
 node_modules/
 dist/
+.nuxt/
+.output/
 
 # Estado local de Supabase
 supabase/.temp/

@@ -4,10 +4,16 @@ Preparado el17 de octubre de2026. Dokploy construye la imagen del repositorio
 y ejecuta el servidor; los secretos se añaden en su panel. No se necesita
 registry, Docker Compose, volúmenes ni compilar Flutter.
 
+Actualización Vue/Nuxt: el Dockerfile ahora construye Nuxt sobre Node24 y ejecuta
+.output/server/index.mjs. Mantiene stage runtime/puerto5173/health y las mismas
+variables SUPABASE_*, sin secretos de build. Contexto y dominio no cambian.
+Seleccionar la rama que contenga esta migración: feature/vue-nuxt-web, una vez
+publicada; la instancia actual seguirá con la versión anterior hasta redeploy.
+
 ## 1. Código disponible en GitHub
 
 Repositorio: `https://github.com/srg-cp/entrehuellas`.
-Rama preparada: `feature/public-qr-case-web`. Estos cambios deben estar
+Rama preparada: `feature/vue-nuxt-web`. Estos cambios deben estar
 confirmados y enviados a esa rama antes de que Dokploy pueda descargarlos.
 Si luego se integra en main, cambiar la rama seleccionada en Dokploy.
 Esta preparación local no realiza commit/push ni configura tu instancia.
@@ -22,7 +28,7 @@ Guardar la configuración siguiente:
 | --- | --- |
 | Provider | GitHub |
 | Repository | srg-cp/entrehuellas |
-| Branch | feature/public-qr-case-web, una vez publicada |
+| Branch | feature/vue-nuxt-web, una vez publicada |
 | Build Path | / |
 | Build Type | Dockerfile |
 | Dockerfile Path | apps/public-web/Dockerfile |

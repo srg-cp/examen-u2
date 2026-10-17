@@ -1,12 +1,22 @@
-# Ficha pública QR — HU-09 / RF-09 / issue #9
+# Web Entre Huellas — Vue + Nuxt + TypeScript
+
+Incremento17/10/2026 en feature/vue-nuxt-web. Migra HU-09/RF-09/#9 a Vue,
+conservando diseño, /c/<token>, API, fotos privadas y SQL022/023. Esta base es
+la aplicación web única acordada para público/usuarios/administración por roles.
+En este incremento solo está implementada la ficha QR; no hay login web ni panel
+administrativo ficticio. La landing tiene trabajo independiente en su rama y
+todavía no se integra aquí. La raíz conserva el estado neutral anterior.
+
+Guía para empezar con Vue: **[DESARROLLO.md](DESARROLLO.md)**.
 
 Despliegue en el VDS del usuario: **[guía Dokploy desde GitHub](DOKPLOY.md)**.
 Dockerfile listo para contexto apps/public-web, stage runtime y puerto5173;
 variables solo en ejecución, healthcheck incorporado y CI de contenedor preparado.
 
-Cliente ligero y servidor HTTP de lectura Node22+, sin dependencias de producción.
+Vue3, Nuxt4, TypeScript estricto y servidor Nitro. Node24.15+ recomendado
+(local verificado24.18.0); Docker y CI usan Node24.
 Ruta acordada: `https://entrehuellas.kormind.com/c/<token opaco de 64 hex>`.
-Incremento local: no acredita publicación ni cierra HU-09. El formulario y la
+Migración local: no acredita un nuevo despliegue ni cierra HU-09. El formulario y la
 recepción de avistamientos corresponden a HU-10.1/#36 y aún no existen aquí.
 
 ## Ejecución
@@ -22,8 +32,10 @@ npm start
 
 Abrir `http://127.0.0.1:5173/c/<token-real>`; sin token válido se muestra la
 página neutral. No se crea una sesión ni se incluyen casos de demostración.
-`npm test` reconstruye el cliente y ejecuta contratos, privacidad, HTTP, reintentos,
-límites de solicitudes y fronteras. No necesita credenciales ni conexión Supabase.
+Ejecutar `npm ci` antes del primer build. Para desarrollar: `npm run dev`;
+Nuxt carga .env local. Para validar: `npm run typecheck`, `npm test`,
+`npm run build`, `npm run test:server`. Las pruebas usan un backend HTTP de prueba
+y nunca Supabase real. El script de navegador requiere build previo.
 
 QA visual reproducible con Playwright1.62.1 instalado fuera de producción:
 
@@ -46,9 +58,9 @@ según [la documentación de Supabase](https://supabase.com/docs/guides/getting-
 El navegador solo recibe entidades con campos permitidos y fotos por índice;
 no recibe credenciales, UUID de propietario, paths privados ni URLs firmadas.
 
-El servidor sirve exclusivamente el manifiesto de `dist`; nunca publicar el
-checkout ni `.env` como raíz estática. Este proyecto necesita un proceso Node:
-subir solo `dist` a hosting estático no implementa `/api/c/...`.
+El despliegue ejecuta `.output/server/index.mjs`, con assets de `.output/public`.
+Nunca publicar el checkout ni .env como raíz estática. Se necesita un proceso Node:
+subir solo assets a hosting estático no implementa SSR ni `/api/c/...`.
 Dockerfile multietapa incluye solo fuentes necesarios y build público, corre sin
 root e incluye healthcheck. .dockerignore excluye secretos/fixtures del contexto.
 El workflow comprueba build/arranque del contenedor, sin desplegar. Ver DOKPLOY.md.
@@ -83,11 +95,33 @@ también existe Actualizar estado. Sin canal en tiempo real.
 
 ## Límites de capas
 
-`domain` valida entidades públicas y declara operaciones/contrato, sin DOM/Node/SDK.
-`data` encapsula REST Supabase y HTTP del cliente, mapea DTO y normaliza fallos.
-`presentation` contiene ViewModel/estado y vista DOM sin infraestructura.
-`app` compone adaptadores, rutas, configuración y controles HTTP.
-El build copia solo cliente/dominio/presentación/adaptador HTTP y assets explícitos.
+`shared/features/case_reader/domain` valida entidades y declara contratos/casos
+de uso sin Vue/Node/SDK. Data HTTP y ViewModel puros en shared; widgets/pantalla Vue
+en app/features, composición por petición en app/plugins y páginas en app/pages.
+`server/features` encapsula DTO/REST Supabase, `server/utils` compone casos de uso,
+`server/api` transporta respuestas y middleware/plugins gestionan límites/CSP.
+Credenciales existentes SUPABASE_* se leen solo en server, sin runtimeConfig.public.
+El payload SSR solo contiene la entidad pública; no se cachea por token.
 La RPC privada devuelve descriptores Storage solo al servidor; este los valida,
 descarga JPEG procesado y vuelve a comprobar estado/revocación antes de responder.
 Una lectura anónima no amplía grants de tablas ni permisos Storage.
+
+El Node antiguo y su vista DOM manual se han retirado. HTML inicial SSR con
+hidratación sin segunda consulta, nonce CSP por respuesta y eventos Vue;
+no v-html para contenido de casos. .output contiene solo el runtime construido.
+No activar prerender/ISR/cache de fichas o sesiones. La landing podrá tener
+generación estática al integrarla, sin aplicar esa política a contenido privado.
+
+## Auditoría de dependencias del17/10/2026
+
+`npm audit --omit=dev` y auditoría independiente de las dependencias exactas del
+package.json generado en .output/server:0 vulnerabilidades conocidas. Esto no
+prueba ausencia de fallos en el código compilado. El árbol completo instalado
+reporta11 altas, propagadas desde braces<=3.0.3 y node-forge<=1.4.0 a herramientas
+de Nuxt/Nitro (glob/dev server). No había versiones corregidas publicadas para
+esas dos dependencias al verificar; npm audit fix compatible no las resuelve.
+No se aplicó downgrade forzado ni se suprimieron avisos. Esos paquetes no están
+en los node_modules del runtime generado, comprobado por inventario. Nuxt es
+dependencia de desarrollo/build; la imagen final solo copia .output. El servidor
+dev no debe exponerse públicamente. Mantener seguimiento de upstream y repetir
+audit completo/runtime antes de distribuir nuevas versiones.

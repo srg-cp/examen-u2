@@ -1,5 +1,14 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Web,17/10/2026:** por decisión del usuario se adopta Vue/Nuxt/TypeScript
+para una única aplicación web con módulos públicos, usuarios y administración.
+Los roles no se resuelven solo en navegación: cada operación debe autorizarlos
+en backend. La separación dominio/data/presentation también aplica a TypeScript;
+dominio sin Vue/Nuxt/SDK, composición por petición y estado SSR sin singleton de
+usuario. SSR público solo serializa proyecciones permitidas. Flutter permanece
+en móvil. Sin rutas vacías de administración ni separación de proyectos por rol.
+[ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
+
 **Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
 
 Estado: norma del proyecto. Fecha: 7 de octubre de 2026, America/Lima.
