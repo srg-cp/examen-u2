@@ -96,7 +96,7 @@ html:has(.landing-page) {
   line-height: 0.9;
   white-space: nowrap;
 }
-.landing-page .brand svg {
+.landing-page .brand img {
   width: clamp(25px, 3.3vw, 42px);
   height: auto;
 }
@@ -237,12 +237,10 @@ html:has(.landing-page) {
   flex-shrink: 0;
 }
 .landing-page .art img {
-  position: absolute;
-  width: var(--art-width);
-  max-width: none;
-  height: auto;
-  left: var(--art-left);
-  top: var(--art-top);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   pointer-events: none;
   user-select: none;
 }
@@ -579,7 +577,7 @@ html:has(.landing-page) {
   text-align: left;
   gap: 9px;
 }
-.landing-page .brand-footer svg {
+.landing-page .brand-footer img {
   width: 45px;
 }
 .landing-page .development {
@@ -756,7 +754,7 @@ html:has(.landing-page) {
   .landing-page .brand-footer {
     font-size: 18px;
   }
-  .landing-page .brand-footer svg {
+  .landing-page .brand-footer img {
     width: 32px;
   }
   .landing-page .development {
@@ -792,7 +790,7 @@ html:has(.landing-page) {
   .landing-page .brand {
     font-size: 20px;
   }
-  .landing-page .brand svg {
+  .landing-page .brand img {
     width: 30px;
   }
   .landing-page .header-cta {
@@ -1063,7 +1061,7 @@ html:has(.landing-page) {
   .landing-page .brand-footer {
     font-size: 22px;
   }
-  .landing-page .brand-footer svg {
+  .landing-page .brand-footer img {
     width: 36px;
   }
   .landing-page .development {
@@ -1130,25 +1128,7 @@ html:has(.landing-page) {
 .landing-page .footer-links > * {
   min-width: 0;
 }
-.landing-page .footer-dog {
-  clip-path: polygon(
-    0 100%,
-    0 38%,
-    10% 35%,
-    14% 27%,
-    22% 34%,
-    37% 52%,
-    51% 49%,
-    57% 27%,
-    64% 6%,
-    68% 0,
-    75% 5%,
-    84% 24%,
-    91% 54%,
-    98% 80%,
-    98% 100%
-  );
-}
+
 @media (max-width: 600px) {
   .landing-page .header nav {
     flex-wrap: wrap;
@@ -1180,7 +1160,7 @@ html:has(.landing-page) {
     overflow-wrap: break-word;
   }
 }
-/* Full illustration windows avoid seams between the card sky and its header. */
+/* Labels and backgrounds belong to the card component, not the illustration. */
 .landing-page .character {
   padding-top: 0;
   background: #8bc7fb;
@@ -1317,28 +1297,58 @@ html:has(.landing-page) {
     overflow-wrap: anywhere;
   }
 }
-.landing-page .footer-dog {
-  clip-path: none;
-}
-.landing-page .opportunity > .art {
-  mask-image: linear-gradient(to right, transparent, #000 12%);
-}
+
+
 
 /* Approved illustration windows; static classes keep CSP free of inline styles. */
-.landing-page .art-hero-dog { aspect-ratio: 54/47; --art-width: 1288.888888888889%; --art-left: -340.74074074074076%; --art-top: -165.95744680851064%; }
-.landing-page .art-hero-cat { aspect-ratio: 54/43; --art-width: 1288.888888888889%; --art-left: -820.3703703703704%; --art-top: -225.58139534883722%; }
-.landing-page .art-return { aspect-ratio: 145/221; --art-width: 480%; --art-left: -350.34482758620686%; --art-top: -126.69683257918551%; }
-.landing-page .art-search { aspect-ratio: 143/220; --art-width: 486.7132867132868%; --art-left: -32.86713286713287%; --art-top: -126.81818181818181%; }
-.landing-page .art-found { aspect-ratio: 145/221; --art-width: 480%; --art-left: -137.24137931034483%; --art-top: -127.60180995475112%; }
-.landing-page .art-help { aspect-ratio: 145/222; --art-width: 480%; --art-left: -242.75862068965517%; --art-top: -123.42342342342343%; }
-.landing-page .art-step-search { aspect-ratio: 297/82; --art-width: 234.34343434343435%; --art-left: -117.84511784511784%; --art-top: -747.560975609756%; }
-.landing-page .art-step-found { aspect-ratio: 296/82; --art-width: 235.13513513513513%; --art-left: -17.22972972972973%; --art-top: -851.2195121951219%; }
-.landing-page .art-step-help { aspect-ratio: 295/85; --art-width: 235.93220338983053%; --art-left: -119.3220338983051%; --art-top: -919.9999999999999%; }
-.landing-page .art-step-return { aspect-ratio: 296/85; --art-width: 235.13513513513513%; --art-left: -17.22972972972973%; --art-top: -1021.1764705882352%; }
-.landing-page .art-home { aspect-ratio: 354/161; --art-width: 196.61016949152543%; --art-left: -88.70056497175142%; --art-top: -608.0745341614906%; }
-.landing-page .art-map { aspect-ratio: 305/123; --art-width: 228.19672131147541%; --art-left: -115.08196721311475%; --art-top: -936.5853658536585%; }
-.landing-page .art-report { aspect-ratio: 98/90; --art-width: 710.204081632653%; --art-left: -122.44897959183673%; --art-top: -1507.7777777777778%; }
-.landing-page .art-share { aspect-ratio: 98/90; --art-width: 710.204081632653%; --art-left: -305.1020408163265%; --art-top: -1507.7777777777778%; }
-.landing-page .art-collaborate { aspect-ratio: 98/90; --art-width: 710.204081632653%; --art-left: -487.7551020408164%; --art-top: -1507.7777777777778%; }
-.landing-page .art-footer-dog { aspect-ratio: 259/121; --art-width: 268.72586872586874%; --art-left: 0%; --art-top: -1592.5619834710744%; }
-.landing-page .art-footer-cat { aspect-ratio: 265/110; --art-width: 262.64150943396226%; --art-left: -162.64150943396228%; --art-top: -1761.8181818181818%; }
+
+/* Independent alpha artwork; all surfaces, labels and decoration are native CSS. */
+.landing-page .brand img { object-fit: contain; border-radius: 27%; flex-shrink: 0; }
+.landing-page .art { aspect-ratio: 1; }
+.landing-page .hero-dog { background: linear-gradient(145deg,#e9ffb0,#bcff58); padding: 3%; }
+.landing-page .hero-cat { background: linear-gradient(145deg,#a4e8ff,#73caff); padding: 3%; }
+.landing-page .character {
+  aspect-ratio: 145 / 221;
+  background: radial-gradient(ellipse at 80% 80%,#fffab4,transparent 55%),linear-gradient(165deg,#79b5ff 0%,#a9ddf6 48%,#fff6b0 100%);
+}
+.landing-page .character .art { position:absolute; inset:14% 0 0; width:100%; aspect-ratio:auto; }
+.landing-page .character .art img { object-fit:cover; object-position:50% 100%; }
+.landing-page .character-label { box-shadow:0 1px 0 #ffffffb3; }
+.landing-page .step-art { aspect-ratio: 3.6 / 1; isolation:isolate; background:linear-gradient(165deg,#8acbff,#d1f1ee 58%,#fff5a5); }
+.landing-page .step-art img { width:65%; margin-inline:auto; object-fit:contain; object-position:50% 30%; }
+.landing-page .art-step-search img { width:75%; }
+.landing-page .art-step-return img { width:80%; }
+.landing-page .art-step-found::after,.landing-page .art-step-help::after {
+  content:'';position:absolute;z-index:-1;right:18%;bottom:20%;width:12%;aspect-ratio:1;
+  background:radial-gradient(circle at 50% 45%,#fff 0 22%,transparent 24%),linear-gradient(140deg,#b0a1ff,#7662ed);
+  border-radius:50% 50% 50% 8%;transform:rotate(-45deg);box-shadow:-7px 7px 20px #7970e333;
+}
+.landing-page .art-step-found::before { content:'';position:absolute;left:14%;top:22%;width:11%;height:4%;border-radius:30px;background:#fff;transform:rotate(-35deg); }
+.landing-page .art-home { aspect-ratio:354 / 161; }
+.landing-page .art-home img { object-position:50% 100%; }
+.landing-page .art-map { aspect-ratio:305 / 123; background:linear-gradient(165deg,#84c7ff,#d7f4e9 70%,#fff4ae); }
+.landing-page .art-map img { object-fit:contain; }
+.landing-page .collaborate-grid .art { background:linear-gradient(160deg,#80d4ff,#ddfaff 60%,#faffd8); }
+.landing-page .art-report,.landing-page .art-share,.landing-page .art-collaborate { aspect-ratio:1; }
+.landing-page .collaborate-grid .art img { object-fit:contain; }
+.landing-page .footer-dog,.landing-page .footer-cat { aspect-ratio:1; overflow:visible; }
+.landing-page .footer-dog img,.landing-page .footer-cat img { object-fit:contain; object-position:50% 100%; }
+.landing-page .footer { min-height:clamp(220px,25vw,350px); }
+@media(max-width:600px){
+  .landing-page .opportunity { background:linear-gradient(#80cbfa,#b4e8f0); }
+  .landing-page .hero-dog,.landing-page .hero-cat { padding:2px; }
+  .landing-page .footer { min-height:390px; }
+}
+.landing-page .character { margin:0; }
+.landing-page .character-spark { position:absolute;right:9%;top:27%;width:14%;height:auto;color:#fff9bd;pointer-events:none; }
+.landing-page .character:nth-child(3n) .character-spark { left:8%;right:auto;color:#fff;transform:rotate(-18deg); }
+/* Frame the independent portraits at the same visual prominence as the reference. */
+.landing-page .hero-dog,.landing-page .hero-cat { padding:0; }
+.landing-page .hero-dog img,.landing-page .hero-cat img { width:150%;height:150%;max-width:none;transform:translate(-16.666%,0);object-position:50% 0; }
+.landing-page .step-art img { object-fit:cover;object-position:50% 27%; }
+.landing-page .art-step-return img { object-position:50% 24%; }
+.landing-page .art-share::after { content:'';position:absolute;left:12%;bottom:16%;width:23%;aspect-ratio:1;background:radial-gradient(circle at 50% 45%,#fff 0 22%,transparent 24%),linear-gradient(140deg,#b0a1ff,#7662ed);border-radius:50% 50% 50% 8%;transform:rotate(-45deg); }
+/* Keep complete faces/ears in the wide step windows; only the lower body may leave the stage. */
+.landing-page .step-art img { position:absolute;top:0;left:17.5%;width:65%;height:150%;margin:0;object-fit:contain;object-position:50% 0; }
+.landing-page .art-step-search img { height:135%; }
+.landing-page .art-step-return img { left:10%;width:80%;height:130%; }

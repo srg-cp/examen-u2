@@ -8,8 +8,8 @@ Proviene del trabajo de feature/landing-page, conservado sin modificar allí.
 
 Presenta Entre Huellas con header/anclas, hero, personajes, propósito, cuatro
 pasos, oportunidad, comunidad, colaboración, beneficios, FAQ, cierre y footer.
-Mantiene diseño y contenido del mockup aprobado: ilustraciones locales mediante
-ventanas CSS y contenido HTML real. CTA enlazan secciones existentes. FAQ nativo
+Mantiene composición y contenido aprobados, con siete ilustraciones independientes
+generadas con imagegen y componentes Vue/CSS/SVG reales, sin capturas por debajo. CTA enlazan secciones existentes. FAQ nativo
 exclusivo, operable con teclado y sin JavaScript. Responsive/movimiento reducido.
 
 ## Reglas, campos y persistencia
@@ -19,9 +19,12 @@ simulados, estadísticas, contacto, descargas ni autenticación ficticios. No gu
 datos personales, sesión o cookies de usuario. Las fichas /c/<token> siguen siendo
 la funcionalidad HU-09 independiente en rutas, dentro del mismo proyecto/despliegue.
 
-Paleta institucional del mockup aislada de QR/app. Recursos raster conservan su
-resolución original; no se acredita nitidez equivalente a assets independientes.
-CSS de recortes fijo, sin estilos inline y sin ampliar permisos CSP. La raíz es
+Paleta institucional aislada de QR/app. Cinco PNG RGBA de1254×1254 y dos de1774×887,
+con carga diferida salvo hero. LandingCharacterCard contiene tarjetas/etiquetas/
+decoraciones HTML/SVG y LandingArt consume assets independientes sin atlas ni
+offsets de captura. Logo oficial /brand.png en header/footer y hero aprobado
+conservado con los mismos tiempos/movimiento reducido. CSP sin cambios. Prompts
+y procedencia en apps/platform/LANDING_ASSETS.md. La raíz es
 indexable con título/description/canonical/social; sitemap solo raíz, robots
 excluye QR/API/rutas privadas y el servidor mantiene noindex fuera de la raíz.
 

@@ -47,3 +47,7 @@ producto, robots/canonical, navegación, FAQ y regresión de QR. Revisión de re
 1440/731/390/320px, texto200%, movimiento reducido y navegación SPA en ambos
 sentidos para comprobar que no se mezclan estilos. Resultados en ESTADO.
 La evidencia local no certifica Safari/Firefox, posicionamiento ni un redeploy.
+
+## Corrección visual —17 de octubre de2026
+
+Por instrucción del usuario se retira completamente landing-reference.png del público. LandingArt deja de leer ventanas/offsets de una captura y consume siete PNG independientes generados uno por uno con imagegen, con transparencia real: personajes, saludo, reencuentro, aviso, casa y mapa. Metadatos y nombres están en landing_artwork.ts. LandingCharacterCard implementa figura/etiqueta/decoración reales; gradientes, superficies, marcadores decorativos, círculos y bordes se dibujan en CSS/SVG. Se usa /brand.png oficial en ambas marcas; no se genera otro logo. El hero conserva exactamente sus animaciones, tiempos y movimiento reducido aprobados. Prompts y procedencia en apps/platform/LANDING_ASSETS.md. No se cambia arquitectura, datos, QR ni condiciones de publicación de esta decisión.

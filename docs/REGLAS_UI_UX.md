@@ -424,3 +424,8 @@ Por instrucción explícita del usuario, Filtrar casos abre un panel superpuesto
 ## Filtros integrados y zona con buscador — 15 de octubre de 2026
 
 La nueva instrucción del usuario sustituye el popup de ADR-041: desplegar filtros ahí mismo, con cápsulas compartidas. FilterExpansion en core conserva el disparador y despliega el editor dentro del scroll vertical, sin rutas modales. Cerrar descarta borrador; aplicar colapsa y confirma. Movimiento reducido monta directamente; demás entradas cover→stagger sin reinicio por edición. Separación16 entre control y cards, nombre/especie debajo y tipo/estado en badges, sin texto repetido Mascota perdida. Zona combina búsqueda explícita de ciudad/dirección, selección en mapa y slider1–50km, con carga/errores según norma. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+Corrección17/10/2026 de landing: el mockup solo sirve como referencia, nunca
+como atlas/fondo recortado de la UI. Usar las ilustraciones imagegen independientes
+y el logo oficial, con tarjetas/etiquetas/superficies Vue/CSS/SVG. La animación
+principal está aprobada y se conserva con sus tiempos y movimiento reducido.

@@ -1,5 +1,43 @@
 # Estado del proyecto
 
+## Landing: ilustraciones independientes y componentes reales —17 de octubre de2026
+
+Por instrucción del usuario, en la rama vigente feature/vue-nuxt-web y apps/platform,
+se retiran TODOS los recortes del mockup: eliminado del público landing-reference.png,
+sin atlas, offsets ni imagen de UI por debajo. Siete PNG generados individualmente
+con la herramienta integrada image_gen/habilidad imagegen: perro curioso, gato,
+saludo, reencuentro, aviso, casa y mapa; cinco1254×1254 y dos1774×887 con transparencia.
+Se conservan los originales sin reescalado artificial en public/images/landing;
+prompts/procedencia en apps/platform/LANDING_ASSETS.md. LandingArt usa recursos
+independientes/dimensiones reales y carga diferida salvo hero; LandingCharacterCard
+contiene figura/etiqueta/trazos SVG. Fondos, degradados, superficies, círculos y pins
+decorativos son CSS/SVG. Header/footer usan el logo oficial /brand.png existente.
+La animación principal aprobada conserva cover/stagger, duración/demoras y movimiento
+reducido. Textos, anclas y FAQ siguen siendo HTML; sin operaciones nuevas de producto.
+[Ficha](funcionalidades/landing-page.md) y corrección de [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
+Validación: typecheck estricto y9 pruebas unitarias/fronteras aprobados; build Nuxt
+SSR correcto y3 pruebas del servidor compilado aprobadas. El comando estándar de
+build detectó un dev server ajeno activo en5173/PID9128; no se detuvo ni se ignoró
+su lock. Se construyó mediante loadNuxt/build oficiales con buildDir separado en
+apps/mobile/build/platform-landing-nuxt, conservando la configuración del proyecto.
+Log final: apps/mobile/build/landing-generated-art-build.log. QA Chrome/Playwright
+en1440/731/390/320px y320px/texto200%: siete recursos reales, ambos logos, imágenes
+decodificadas también tras ampliar texto, anclas/FAQ/teclado/sin JS, aislamiento SPA
+landing→QR→landing, sin overflow ni errores CSP/hidratación/recursos. Verificación
+de cover-reveal0.7s y stagger-reveal/demora0.2s, sin animación con movimiento reducido.
+Log final: apps/mobile/build/landing-generated-art-browser.log. Regresión completa
+QR también aprobada: galería, copia, offline/reintento, cierre/revocación, desconocido
+y CSP con fixtures. Capturas revisadas en apps/mobile/build/ui-preview/landing-vue,
+incluidas characters.png, desktop-top.png y small-text-200.png.
+
+Sin cambios de SQL, dependencias, configuración sensible, acceso/roles ni código
+Flutter. PNG originales suman aproximadamente12.5MB y usan lazy/reutilización; no se
+ha medido transferencia móvil real ni Core Web Vitals. Pendientes: revisión del
+usuario, Safari/Firefox y publicación/redeploy cuando se autoricen. Sin commit,
+push ni despliegue; no se cierra HU-09 ni se afirma indexación/posicionamiento.
+Siguiente paso: revisar la landing local y publicar el incremento cuando corresponda.
+
 ## Landing integrada en la plataforma Vue —17 de octubre de2026
 
 Por solicitud del usuario se integra en / de apps/platform el trabajo existente

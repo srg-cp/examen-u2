@@ -426,3 +426,15 @@ Sustituye el desplegable que empujaba la grilla. FilterPopover<T> mantiene una c
 Por corrección del usuario, se retira FilterPopover y se usa FilterExpansion<T>, sin DialogRoute ni popup. Conserva SelectionPillSurface y FilterChoiceGroup: fondo gris, selección negra e indicador adaptable. Editor dentro del scroll existente, cerrar descarta y Aplicar confirma/colapsa. Separación16 respecto a la primera fila. Cards con nombre/especie, tipo/estado en badges y sin texto redundante; nombre ausente usa especie una sola vez.
 
 Zona con Todas las zonas/Por ubicación, AppTextField de ciudad/dirección, botón Buscar ubicación con LoadingShimmer, resultados reales, atribución enlazada y mapa con centro/círculo. Slider1–50km y ZoneMapPicker.fitRadius opt-in. Sin GPS ni coordenadas numéricas visibles. Renders normales/pequeños y evidencia en ESTADO; [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+## Ilustraciones independientes de landing —17/10/2026
+
+Se sustituye el raster compuesto de ADR-060 por siete assets independientes
+imagegen con transparencia, documentados en apps/platform/LANDING_ASSETS.md.
+LandingArt mapea nombres semánticos a archivos/dimensiones nativas, sin offsets
+ni ventanas de mockup; LandingCharacterCard contiene figura, etiqueta HTML y
+trazos SVG. Gradientes/bordes/superficies/círculos/pins decorativos son CSS real.
+Se elimina del público landing-reference.png. Header/footer usan el logo oficial
+/brand.png; ningún logo generado. Conservar hero y sus cover/stagger, tiempos y
+movimiento reducido aprobados por el usuario. Composición y CSS siguen aislados
+de QR; escenas pueden reencuadrarse como ilustraciones, nunca como capturas UI.

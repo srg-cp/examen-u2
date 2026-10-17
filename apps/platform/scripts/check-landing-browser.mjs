@@ -19,11 +19,26 @@ try {
     const response = await page.goto(server.origin, { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200); assert.equal(await page.locator('h1').count(), 1);
     assert.equal(await page.locator('html').getAttribute('lang'), 'es');
-    await page.evaluate(async () => Promise.all([...document.images].map(img => img.decode())));
+    // Scroll the real page so lazy illustrations load as they do for a visitor.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
+        scrollTo(0, y); await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+      scrollTo(0, 0);
+      await Promise.all([...document.images].map(img => img.decode()));
+    });
+    const artwork = await page.locator('.art img').evaluateAll(images => images.map(img => ({ src: img.getAttribute('src'), width: img.naturalWidth, height: img.naturalHeight })));
+    assert.ok(artwork.length >= 17);
+    assert.ok(artwork.every(img => img.src.startsWith('/images/landing/') && img.width >= 1024 && img.height >= 800), 'Independent high-resolution artwork required everywhere');
+    assert.equal(new Set(artwork.map(img => img.src)).size, 7);
+    assert.equal(await page.locator('.character-label').count(), 6);
+    assert.equal(await page.locator('.brand img[src="/brand.png"]').count(), 2);
+    assert.equal(await page.locator('img[src*="landing-reference"]').count(), 0);
+    assert.equal(await page.locator('.hero').evaluate(el => getComputedStyle(el).animationName), 'none');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${name}: overflow`);
     const broken = await page.locator('a[href^="#"]').evaluateAll(links => links.filter(a => !document.getElementById(a.getAttribute('href').slice(1))).map(a => a.getAttribute('href')));
     assert.deepEqual(broken, []);
-    assert.equal(await page.locator('[style]').count(), 0, 'Static crop classes must preserve strict CSP');
+    assert.equal(await page.locator('[style]').count(), 0, 'Native components must preserve strict CSP');
     assert.equal(await page.locator('details').count(), 4);
     await page.screenshot({ path: fileURLToPath(new URL(`${name}.png`, output)), fullPage: true });
     const privacy = page.locator('summary').filter({ hasText: '¿Cómo se cuida la privacidad?' });
@@ -33,15 +48,31 @@ try {
     await page.waitForFunction(() => location.hash === '#comunidad');
     assert.equal(await page.locator('#comunidad').evaluate(el => Math.abs(el.getBoundingClientRect().top) < 100), true);
     assert.deepEqual(errors, []); assert.equal(server.reads(), 0);
-    results.push(`${name}: HTML, native FAQ/keyboard, anchors, image decode, no overflow, no inline styles/CSP/hydration errors`);
+    results.push(`${name}: HTML, native FAQ/keyboard, anchors, 7 independent illustrations, official logo, native cards, image decode, no overflow, no inline styles/CSP/hydration errors`);
     await page.close();
   }
+  const animated = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  await animated.goto(server.origin, { waitUntil: 'networkidle' });
+  assert.equal(await animated.locator('.hero').evaluate(el => getComputedStyle(el).animationName), 'cover-reveal');
+  assert.equal(await animated.locator('.hero-heading').evaluate(el => getComputedStyle(el).animationName), 'stagger-reveal');
+  assert.equal(await animated.locator('.hero').evaluate(el => getComputedStyle(el).animationDuration), '0.7s');
+  assert.equal(await animated.locator('.hero-heading').evaluate(el => getComputedStyle(el).animationDelay), '0.2s');
+  await animated.waitForTimeout(1100);
+  await animated.screenshot({ path: fileURLToPath(new URL('desktop-top.png', output)) });
+  await animated.locator('.character-strip').screenshot({ path: fileURLToPath(new URL('characters.png', output)) });
+  await animated.close();
   const page = await browser.newPage({ viewport: { width: 320, height: 700 }, reducedMotion: 'reduce' });
   await page.goto(server.origin, { waitUntil: 'networkidle' });
   await page.evaluate(() => {
     const nodes = [...document.querySelectorAll('h1,h2,h3,p,a,summary,.character-label,.step-number,.small-number')];
     const sizes = nodes.map(node => parseFloat(getComputedStyle(node).fontSize));
     nodes.forEach((node, index) => { node.style.fontSize = `${sizes[index] * 2}px`; });
+  });
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
+      scrollTo(0, y); await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+    scrollTo(0, 0); await Promise.all([...document.images].map(img => img.decode()));
   });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, '200% text overflow');
   await page.screenshot({ path: fileURLToPath(new URL('small-text-200.png', output)), fullPage: true });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LandingArt from '../widgets/LandingArt.vue';
+import LandingCharacterCard from '../widgets/LandingCharacterCard.vue';
 import LandingIcon from '../widgets/LandingIcon.vue';
 import LandingBrand from '../widgets/LandingBrand.vue';
 import LandingActions from '../widgets/LandingActions.vue';
@@ -38,7 +39,7 @@ const questions = [
         <ul class="hero-values"><li><LandingIcon name="report" />Reporta</li><li><LandingIcon name="share" />Comparte</li><li><LandingIcon name="heart" />Colabora</li></ul>
       </section>
       <section class="character-strip" aria-label="Busco, encontré, ayudo y volvemos"><div class="character-track">
-        <div v-for="(card, index) in characters" :key="`${card.art}-${index}`" class="character" :aria-hidden="index === 0 || index === 5 ? true : undefined"><span class="character-label">{{ card.title }}</span><LandingArt :name="card.art" /></div>
+        <LandingCharacterCard v-for="(card, index) in characters" :key="`${card.art}-${index}`" :title="card.title" :art="card.art" :decorative="index === 0 || index === 5" />
       </div></section>
       <section id="proyecto" class="purpose panel wrap" aria-labelledby="purpose-title">
         <div class="purpose-heading"><h2 id="purpose-title">Una comunidad<br>con un propósito.</h2><p>Entre Huellas es un proyecto colaborativo para conectar a personas que han perdido una mascota, a quienes la han encontrado y a quienes quieren ayudar.</p></div>

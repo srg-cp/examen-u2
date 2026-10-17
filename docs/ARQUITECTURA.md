@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+Recursos de landing17/10: LandingArt consume siete ilustraciones independientes
+imagegen, sin atlas del mockup; LandingCharacterCard compone figura/caption/SVG,
+CSS dibuja superficies y decoración y LandingBrand usa /brand.png oficial.
+No hay cambios de dominio/datos, stack, permisos ni SSR. Se conserva la animación
+principal aprobada. Corrección documentada en ADR-060 y ficha de landing.
+
 Landing17/10/2026: / compone LandingPage Vue en apps/platform; HTML SSR sin
 consultas de producto ni estado de usuario. app/features/landing separa pantalla,
 widgets y estilos de presentación reales; no añade dominio/repositorio vacíos.

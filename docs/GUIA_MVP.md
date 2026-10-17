@@ -502,3 +502,12 @@ Ajuste solicitado de HU-07.1/RF-13: panel flotante reutilizable que mantiene fij
 Por nueva instrucción, filtros desplegados dentro de Explorar sin popup. Cards eliminan texto Mascota perdida y conservan nombre/especie más badges. El usuario confirma búsqueda de ciudad/dirección, selección en mapa y radio en kilómetros. Incremento de HU-07.1/RF-13 con geocodificación de lectura Photon y selección manual alternativa, sin GPS, SQL nuevo o mapa de resultados HU-07.2. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md), ficha y ESTADO separan evidencias locales de demo autenticada.
 
 Corrección visual16 de octubre de2026 de Guardados (HU-07/RF-13): pantalla independiente desde marcador compacto, con expansión/retorno OriginPageTransition compartido y shell glass; sustituye alternancia de vistas dentro de Explorar. Sin ampliación funcional ni SQL nuevo;021/Android pendientes y sin pruebas por instrucción del usuario.
+
+## Calidad visual de landing —17/10/2026
+
+Por petición explícita se reemplazan todos los recortes del mockup por siete
+ilustraciones transparentes generadas individualmente con imagegen. Componentes
+Vue/CSS/SVG para tarjetas, etiquetas, superficies y decoración; logo oficial.
+No se cambia el stack Nuxt ni el hero aprobado, ni se implementan operaciones
+nuevas de producto. Sin HU/RF/issue nuevos ni cierre de historias. Revisión local
+según ESTADO; publicación/redeploy no incluidos.
