@@ -3,9 +3,9 @@
 Incremento17/10/2026 en feature/vue-nuxt-web. Migra HU-09/RF-09/#9 a Vue,
 conservando diseño, /c/<token>, API, fotos privadas y SQL022/023. Esta base es
 la aplicación web única acordada para público/usuarios/administración por roles.
-En este incremento solo está implementada la ficha QR; no hay login web ni panel
-administrativo ficticio. La landing tiene trabajo independiente en su rama y
-todavía no se integra aquí. La raíz conserva el estado neutral anterior.
+La raíz / integra la landing de feature/landing-page, convertida a componentes
+Vue y conservando su diseño. Las fichas siguen en /c/<token>. No hay todavía
+login web ni administración; no se añaden rutas de producto ficticias.
 
 Guía para empezar con Vue: **[DESARROLLO.md](DESARROLLO.md)**.
 
@@ -30,12 +30,17 @@ npm run build
 npm start
 ```
 
-Abrir `http://127.0.0.1:5173/c/<token-real>`; sin token válido se muestra la
-página neutral. No se crea una sesión ni se incluyen casos de demostración.
+Abrir `http://127.0.0.1:5173/` para la presentación y `/c/<token-real>` para
+una ficha; un token inválido conserva el estado neutral. No se crea una sesión
+ni se incluyen casos de demostración.
 Ejecutar `npm ci` antes del primer build. Para desarrollar: `npm run dev`;
 Nuxt carga .env local. Para validar: `npm run typecheck`, `npm test`,
 `npm run build`, `npm run test:server`. Las pruebas usan un backend HTTP de prueba
 y nunca Supabase real. El script de navegador requiere build previo.
+
+Con .env.local: `npm run dev -- --dotenv .env.local`. QA de la landing con
+`node scripts/check-landing-browser.mjs`, usando PLAYWRIGHT_MODULE y CHROME_PATH
+como en el QA de QR; resultados en apps/mobile/build/ui-preview/landing-vue.
 
 QA visual reproducible con Playwright1.62.1 instalado fuera de producción:
 

@@ -1,5 +1,10 @@
 # Despliegue GitHub → Dokploy → entrehuellas.kormind.com
 
+Landing integrada17/10/2026: / muestra la presentación institucional, sin consultas
+Supabase; /c/<token> conserva las fichas y requiere backend configurado. Mismo
+contexto/puerto/Environment; basta publicar esta revisión y redeploy. Raíz indexable,
+robots/sitemap limitados a contenido institucional y QR noindex. No relajar CSP.
+
 Movimiento17/10/2026: al publicar esta revisión, cambiar Dockerfile Path a
 apps/platform/Dockerfile, Docker Context Path a apps/platform y Watch Paths a
 apps/platform/**. Mantener dominio, stage runtime, puerto5173 y Environment.

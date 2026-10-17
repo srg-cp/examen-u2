@@ -18,7 +18,12 @@ Copiar el ejemplo solo si no tienes .env; no sobrescribir credenciales existente
 Completar SUPABASE_URL y SUPABASE_SERVER_KEY con las mismas variables del servidor
 Dokploy. No usar las claves de supabase.local.json del cliente Flutter como clave
 de servidor. Nuxt dev muestra http://127.0.0.1:5173. Abrir /c/<token-real> para ficha;
-/ sin token conserva neutral. No se registran tokens ni se incluyen casos demo.
+/ muestra la landing y /c/<token> inválido conserva neutral. No se registran
+tokens ni se incluyen casos demo. La landing no necesita credenciales para leerse.
+
+Si utilizas .env.local, iniciar con `npm run dev -- --dotenv .env.local` para
+seleccionarlo explícitamente. No renombrar ni sobrescribir ese archivo. En Dokploy
+siguen usándose las variables del contenedor; .env.local no entra en la imagen.
 
 ## Qué estás programando
 

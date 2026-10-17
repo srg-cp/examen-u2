@@ -5,6 +5,19 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { productionFixture } from './server_fixture.mjs';
 import { slug, photo } from './fixtures.mjs';
+test('Landing SSR is public, works without product requests and keeps crawler policy separate from QR', async t => {
+  const server = await productionFixture(); t.after(server.close);
+  const response = await fetch(server.origin + '/'); const html = await response.text();
+  assert.equal(response.status, 200); assert.equal(response.headers.get('x-robots-tag'), 'index, follow');
+  assert.match(html, /Más huellas juntas/); assert.match(html, /<title>Entre Huellas/); assert.match(html, /name="description"/);
+  assert.equal((html.match(/<details[\s>]/g) || []).length, 4);
+  assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.kormind.com\/"/);
+  assert.equal(server.reads(), 0, 'Landing must not query cases or Supabase');
+  assert.doesNotMatch(html, /sb_secret_test-private-canary|photo_objects|v-html|noindex/);
+  const robots = await (await fetch(server.origin + '/robots.txt')).text(); assert.match(robots, /Disallow: \/c\//); assert.match(robots, /Disallow: \/admin\//);
+  const sitemap = await (await fetch(server.origin + '/sitemap.xml')).text(); assert.equal((sitemap.match(/<loc>/g) || []).length, 1); assert.doesNotMatch(sitemap, /\/c\/|\/admin\/|\/api\//);
+  const qr = await fetch(`${server.origin}/c/unknown`); assert.match(qr.headers.get('x-robots-tag'), /noindex/);
+});
 test('Built Nuxt SSR, API and photo proxy preserve public contracts and never expose server credentials/paths', async t => {
   const server = await productionFixture(); t.after(server.close);
   const health = await fetch(`${server.origin}/health`); assert.deepEqual(await health.json(), { status: 'ok' });

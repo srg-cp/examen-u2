@@ -1,5 +1,12 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Landing17/10/2026: al integrar la referencia de feature/landing-page, conservar
+su mockup institucional aprobado del11 de octubre (crema/lima/celeste/personajes).
+Es excepción deliberada para presentación, sin extender esa paleta a QR/acceso/
+móvil. Aislar CSS y mantener anclas reales, FAQ nativo, texto ampliado, movimiento
+reducido y entrada original. No inventar descargas/login/datos de producto.
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web17/10/2026: componentes Vue compartidos (WebShell, ActionButton, TopToast,
 ContentSkeleton) y CaseGallery sustituyen la vista DOM manual del QR. Conservar
 composición y colores aprobados, cover→stagger solo al entrar/cambiar etapa,

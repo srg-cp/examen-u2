@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+Landing17/10/2026: / compone LandingPage Vue en apps/platform; HTML SSR sin
+consultas de producto ni estado de usuario. app/features/landing separa pantalla,
+widgets y estilos de presentación reales; no añade dominio/repositorio vacíos.
+CSS .landing-page y lector .reader-shell aíslan ambas composiciones. Raíz indexable
+y QR/API noindex; nonce CSP conservado. [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web17/10/2026: decisión vigente Vue3/Nuxt4/TypeScript en apps/platform,
 una sola aplicación por módulos y permisos. Este incremento migra QR a SSR+Vue;
 landing de su rama, login web y administración aún por integrar/implementar.

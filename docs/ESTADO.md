@@ -1,5 +1,41 @@
 # Estado del proyecto
 
+## Landing integrada en la plataforma Vue —17 de octubre de2026
+
+Por solicitud del usuario se integra en / de apps/platform el trabajo existente
+del worktree feature/landing-page (fuentes React/Next sin confirmar allí).
+Conversión a componentes Vue/TypeScript, sin cambiar ni confirmar el worktree
+original. Header/hero/personajes/propósito/pasos/comunidad/FAQ/footer conservan
+la referencia aprobada. LandingPage, Art/Icon/Brand/Actions y CSS propios de
+presentación; no se añaden dominio/repositorio vacíos ni otro runtime Next.
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md),
+[ficha](funcionalidades/landing-page.md).
+
+CSS limitado a .landing-page y QR a .reader-shell, comprobado al navegar en SPA
+en ambos sentidos. Ilustración raster autorizada copiada intacta; recortes con
+clases CSS fijas sin styles inline, sin relajar CSP. La landing se entrega en HTML
+SSR con nonce por respuesta, FAQ nativo y anclas reales, sin consultas Supabase,
+sesión, formularios, métricas inventadas ni descargas falsas. / indexable con
+metadatos/canonical; robots excluye fichas/API/app/admin, sitemap solo raíz. QR
+conserva URLs/proyección/noindex/no-store/controles de acceso y su apariencia.
+Sin SQL, dependencias, nuevas variables ni cambios Flutter.
+
+Validación final: TypeScript estricto y build correctos;9 unitarias/fronteras y
+3 pruebas del servidor compilado aprobadas. Logs landing-nuxt-{typecheck,tests,
+build,production}.log en apps/mobile/build. Browser QA Chrome/Playwright aprobado
+en1440×1000,731×1000,390×844,320×700 y texto200%: imágenes, anclas, FAQ por teclado
+y sin JS, no overflow ni errores CSP/hidratación, sin lecturas de producto,
+aislamiento SPA. Capturas revisadas en build/ui-preview/landing-vue y comparadas
+con referencia original; mantienen su composición y limitación del raster.
+Regresión QR completa también aprobada (build/landing-qr-regression-browser.log).
+
+Publicación de la migración/directorios previos confirmada por el usuario; esta
+integración nueva permanece local hasta push/redeploy. Mismo Dokploy/contexto/
+puerto/Environment. .env.local conservado; para desarrollo se documenta la opción
+--dotenv .env.local, sin exponerlo al build. Pendientes: revisión del usuario,
+Safari/Firefox, redeploy y seguimiento SEO. Sin commit/push/despliegue ni APK en
+este incremento. Login/admin web y HU-10.1/formulario siguen pendientes.
+
 ## Organización apps: segundo movimiento —17 de octubre de2026
 
 Primer commit **eb94af4**: web en apps/platform con build/11 pruebas aprobadas.

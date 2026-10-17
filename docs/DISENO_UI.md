@@ -1,5 +1,11 @@
 # Diseño de la interfaz: implementación y revisión
 
+Landing17/10/2026: app/features/landing de plataforma compone LandingPage,
+LandingArt/Icon/Brand/Actions y landing.css limitado a .landing-page. Recortes
+de ilustración en clases CSS fijas compatibles con CSP, no inline. Referencia:
+mockup de la rama landing, conservado al portar React→Vue. Lectores QR usan
+.reader-shell para evitar interferencia al navegar. [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web Vue17/10/2026: app/components comparte WebShell/ActionButton/TopToast/
 ContentSkeleton; app/features/case_reader contiene pantalla y galería Vue.
 app/assets/main.css conserva los tokens y geometría de la ficha anterior.

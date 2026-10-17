@@ -10,7 +10,7 @@ export default defineEventHandler(event => {
   setHeaders(event, {
     'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY', 'Cross-Origin-Resource-Policy': 'same-origin',
-    'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+    'X-Robots-Tag': path === '/' ? 'index, follow' : 'noindex, nofollow, noarchive, nosnippet',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   });
   const nonce = randomBytes(18).toString('base64'); event.context.cspNonce = nonce;

@@ -181,6 +181,12 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+Integración17/10/2026 solicitada por usuario: landing de feature/landing-page
+portada de React a Vue en / de apps/platform, junto a QR /c/<token>. Conserva
+referencia y controles reales; sin nuevas HU/RF/issues ni cierre de HU-09/HU-10.
+Mismo despliegue, sin SQL ni dependencia nueva. [Ficha](funcionalidades/landing-page.md),
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 17/10/2026: usuario adopta una sola web Vue/Nuxt/TypeScript para público,
 usuarios y administración por roles, conservando Flutter móvil. Primer incremento
 en feature/vue-nuxt-web migra consulta QR a Vue/SSR con mismos contratos y URLs;
