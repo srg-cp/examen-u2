@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -111,27 +110,6 @@ class _PlaceSearchFieldsState extends ConsumerState<PlaceSearchFields> {
                 label: Text(place.label),
               ),
             ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () async {
-                var opened = false;
-                try {
-                  opened = await launchUrl(
-                    Uri.parse('https://www.openstreetmap.org/copyright'),
-                    mode: LaunchMode.externalApplication,
-                  );
-                } catch (_) {
-                  opened = false;
-                }
-                if (!opened && mounted) model.attributionUnavailable();
-              },
-              child: const Text(
-                '© OpenStreetMap contributors',
-                style: TextStyle(fontSize: 12, color: Color(0xFF6E6E73)),
-              ),
-            ),
-          ),
         ],
       ),
     );

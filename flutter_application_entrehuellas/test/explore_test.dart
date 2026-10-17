@@ -337,6 +337,50 @@ void main() {
       );
     },
   );
+  for (final placement in FilterPanelPlacement.values) {
+    testWidgets(
+      'Filter exit retains its panel and reverses mid-opening $placement',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: FilterExpansion<int>(
+                label: 'Abrir selector',
+                placement: placement,
+                editorBuilder: (_, confirm) => TextButton(
+                  onPressed: () => confirm(1),
+                  child: const Text('Confirmar selección'),
+                ),
+                onApply: (_) {},
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('Abrir selector'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 140));
+        final panelOpacity = find
+            .ancestor(
+              of: find.text('Confirmar selección'),
+              matching: find.byType(Opacity),
+            )
+            .first;
+        final beforeClose = tester.widget<Opacity>(panelOpacity).opacity;
+        await tester.tapAt(const Offset(790, 590));
+        await tester.pump();
+        expect(
+          tester.widget<Opacity>(panelOpacity).opacity,
+          closeTo(beforeClose, .001),
+        );
+        await tester.pump(const Duration(milliseconds: 80));
+        expect(find.text('Confirmar selección'), findsOneWidget);
+        expect(tester.widget<Opacity>(panelOpacity).opacity, greaterThan(0));
+        await tester.pumpAndSettle();
+        expect(find.text('Confirmar selección'), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets('Inline filters discard their editor when the host leaves', (
     tester,
   ) async {
@@ -575,10 +619,28 @@ void main() {
         await tester.tap(find.text('Aplicar filtros'));
         await tester.pumpAndSettle();
         expect(repo.calls.last.$2.kind, ExploreKind.lost);
-        await tester.ensureVisible(find.text('Ubicación'));
+        final locationControl = find.byKey(
+          const ValueKey('explore-location-filter'),
+        );
+        await tester.ensureVisible(locationControl);
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Ubicación'));
+        final locationOrigin = tester.getRect(locationControl);
+        await tester.tap(locationControl);
         await tester.pumpAndSettle();
+        final locationPanel = tester.getRect(
+          find
+              .ancestor(
+                of: find.text('Ubicación de búsqueda'),
+                matching: find.byType(Material),
+              )
+              .first,
+        );
+        expect(
+          locationPanel.top,
+          closeTo(locationOrigin.top.clamp(8, 844), .01),
+        );
+        expect(locationPanel.left, closeTo(locationOrigin.left, .01));
+        await capture(tester, key, small, 'location-origin');
         expect(find.byType(FilterChoiceGroup<ExploreKind>), findsNothing);
         expect(find.text('Todas las ubicaciones'), findsNothing);
         await tester.ensureVisible(find.byType(TextField));
@@ -621,6 +683,18 @@ void main() {
         expect(repo.calls.last.$2.kind, ExploreKind.lost);
         expect(repo.calls.last.$2.radiusMeters, 25000);
         expect(repo.calls.last.$2.latitude, FakePlaceSearch.place.latitude);
+        expect(
+          find.descendant(
+            of: locationControl,
+            matching: find.text(FakePlaceSearch.place.label),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: locationControl, matching: find.text('25 km')),
+          findsOneWidget,
+        );
+        await capture(tester, key, small, 'location-applied');
         expect(find.byType(Dialog), findsNothing);
         expect(tester.getRect(cards.first).size, collectionBounds.size);
         expect(find.byType(FilterChoiceGroup<ExploreKind>), findsNothing);

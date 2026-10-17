@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../core/presentation/widgets/filter_choice_group.dart';
 import '../../../../core/presentation/widgets/filter_expansion.dart';
-import '../../../../core/presentation/widgets/confirmation_toast.dart';
-import '../../../../core/presentation/widgets/primary_action_button_style.dart';
-import '../../../../core/presentation/widgets/zone_map_picker.dart';
-import '../../../../core/presentation/widgets/shake_field.dart';
 import '../../domain/entities/explore_query.dart';
 import '../../../places/domain/entities/search_place.dart';
-
-typedef LocationSearchBuilder =
-    Widget Function(String label, ValueChanged<SearchPlace> onSelect);
+import '../state/explore_filter_selection.dart';
+import 'explore_filter_editor.dart';
+export 'explore_filter_editor.dart' show LocationSearchBuilder;
 
 class ExploreFilters extends StatefulWidget {
   const ExploreFilters({
@@ -18,56 +13,38 @@ class ExploreFilters extends StatefulWidget {
     this.query = const ExploreQuery(radiusMeters: 15000),
     this.onUseCurrentLocation,
     this.locationSearchBuilder,
+    this.locationLabel = '',
+    this.centerName = '',
     required this.onApply,
     super.key,
   });
   final bool enabled, applying;
   final ExploreQuery query;
-  final VoidCallback? onUseCurrentLocation;
+  final Future<SearchPlace?> Function()? onUseCurrentLocation;
+  final String locationLabel, centerName;
   final LocationSearchBuilder? locationSearchBuilder;
-  final void Function(
-    ExploreKind,
-    ExploreSpecies,
-    ExploreStatus,
-    int,
-    double?,
-    double?,
-    int?,
-  )
-  onApply;
+  final ValueChanged<ExploreFilterSelection> onApply;
   @override
   State<ExploreFilters> createState() => _ExploreFiltersState();
 }
 
 class _ExploreFiltersState extends State<ExploreFilters> {
-  late _FilterSelection _selection = _FilterSelection(
-    kind: widget.query.kind,
-    species: widget.query.species,
-    status: widget.query.status,
-    days: widget.query.since == null || widget.query.until == null
-        ? 0
-        : widget.query.until!.difference(widget.query.since!).inDays,
-    lat: widget.query.latitude,
-    lon: widget.query.longitude,
-    radius: widget.query.radiusMeters ?? 15000,
-    label: widget.query.latitude == null ? '' : 'Ubicación seleccionada',
+  late ExploreFilterSelection _selection = ExploreFilterSelection.fromQuery(
+    widget.query,
+    label: widget.locationLabel,
+    centerName: widget.centerName,
   );
 
   @override
   void didUpdateWidget(covariant ExploreFilters oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.query.latitude != _selection.lat ||
-        widget.query.longitude != _selection.lon ||
-        widget.query.radiusMeters != _selection.radius) {
-      _selection = _FilterSelection(
-        kind: widget.query.kind,
-        species: widget.query.species,
-        status: widget.query.status,
-        days: _selection.days,
-        lat: widget.query.latitude,
-        lon: widget.query.longitude,
-        radius: widget.query.radiusMeters ?? 15000,
-        label: widget.query.latitude == null ? '' : 'Ubicación actual',
+    if (!identical(widget.query, oldWidget.query) ||
+        widget.locationLabel != oldWidget.locationLabel ||
+        widget.centerName != oldWidget.centerName) {
+      _selection = ExploreFilterSelection.fromQuery(
+        widget.query,
+        label: widget.locationLabel,
+        centerName: widget.centerName,
       );
     }
   }
@@ -78,7 +55,7 @@ class _ExploreFiltersState extends State<ExploreFilters> {
       final showLeadingIcons =
           constraints.maxWidth >= 330 &&
           MediaQuery.textScalerOf(context).scale(14) <= 16;
-      final filters = FilterExpansion<_FilterSelection>(
+      final filters = FilterExpansion<ExploreFilterSelection>(
         label: 'Filtrar casos',
         enabled: widget.enabled,
         applying: widget.applying,
@@ -87,18 +64,27 @@ class _ExploreFiltersState extends State<ExploreFilters> {
         showLeadingIcon: showLeadingIcons,
         alignPanelToEnd: true,
         editorBuilder: (context, confirm) =>
-            _ExploreFilterEditor(initial: _selection, onConfirm: confirm),
+            ExploreFilterEditor(initial: _selection, onConfirm: confirm),
         onApply: _apply,
       );
-      final zone = FilterExpansion<_FilterSelection>(
-        label: 'Ubicación',
+      final zone = FilterExpansion<ExploreFilterSelection>(
+        key: const ValueKey('explore-location-filter'),
+        label: _selection.lat == null
+            ? 'Ubicación'
+            : _selection.centerName.isEmpty
+            ? 'Ubicación actual'
+            : _selection.centerName,
+        subtitle: _selection.lat == null
+            ? null
+            : '${_selection.radius ~/ 1000} km',
+        placement: FilterPanelPlacement.atOrigin,
         icon: Icons.location_on_outlined,
         enabled: widget.enabled,
         applying: widget.applying,
         panelWidth: constraints.maxWidth,
         compact: true,
         showLeadingIcon: showLeadingIcons,
-        editorBuilder: (context, confirm) => _ExploreFilterEditor(
+        editorBuilder: (context, confirm) => ExploreFilterEditor(
           initial: _selection,
           zoneOnly: true,
           onUseCurrentLocation: widget.onUseCurrentLocation,
@@ -120,244 +106,8 @@ class _ExploreFiltersState extends State<ExploreFilters> {
     },
   );
 
-  void _apply(_FilterSelection value) {
+  void _apply(ExploreFilterSelection value) {
     setState(() => _selection = value);
-    widget.onApply(
-      value.kind,
-      value.species,
-      value.status,
-      value.days,
-      value.lat,
-      value.lon,
-      value.radius,
-    );
+    widget.onApply(value);
   }
-}
-
-class _FilterSelection {
-  const _FilterSelection({
-    this.kind = ExploreKind.all,
-    this.species = ExploreSpecies.all,
-    this.status = ExploreStatus.active,
-    this.days = 0,
-    this.radius = 15000,
-    this.lat,
-    this.lon,
-    this.label = '',
-  });
-  final ExploreKind kind;
-  final ExploreSpecies species;
-  final ExploreStatus status;
-  final int days, radius;
-  final double? lat, lon;
-  final String label;
-}
-
-class _ExploreFilterEditor extends StatefulWidget {
-  const _ExploreFilterEditor({
-    required this.initial,
-    required this.onConfirm,
-    this.zoneOnly = false,
-    this.locationSearchBuilder,
-    this.onUseCurrentLocation,
-  });
-  final bool zoneOnly;
-  final LocationSearchBuilder? locationSearchBuilder;
-  final VoidCallback? onUseCurrentLocation;
-  final ValueChanged<_FilterSelection> onConfirm;
-  final _FilterSelection initial;
-  @override
-  State<_ExploreFilterEditor> createState() => _ExploreFilterEditorState();
-}
-
-class _ExploreFilterEditorState extends State<_ExploreFilterEditor> {
-  late ExploreKind _kind = widget.initial.kind;
-  late ExploreSpecies _species = widget.initial.species;
-  late ExploreStatus _status = widget.initial.status;
-  late int _days = widget.initial.days, _radius = widget.initial.radius;
-  int _shake = 0;
-  late String _label = widget.initial.label;
-  late double? _lat = widget.initial.lat, _lon = widget.initial.lon;
-  bool _invalid = false, _submitted = false;
-  FilterChoice<T> option<T>(T value, String label) =>
-      FilterChoice(value, label);
-  @override
-  Widget build(BuildContext context) => ConfirmationToastHost(
-    confirmed: _invalid,
-    isError: true,
-    noticeId: _shake,
-    message: 'Selecciona una ubicación en el mapa para filtrar por distancia.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (!widget.zoneOnly) ...[
-          FilterChoiceGroup<ExploreKind>(
-            label: 'Tipo',
-            value: _kind,
-            options: [
-              option(ExploreKind.all, 'Todos'),
-              option(ExploreKind.lost, 'Perdidas'),
-              option(ExploreKind.found, 'Encontradas'),
-              option(ExploreKind.sighting, 'Avistamientos'),
-            ],
-            onChanged: !_submitted ? (v) => setState(() => _kind = v) : null,
-          ),
-          const SizedBox(height: 12),
-          FilterChoiceGroup<ExploreSpecies>(
-            label: 'Especie',
-            value: _species,
-            options: [
-              option(ExploreSpecies.all, 'Todas'),
-              option(ExploreSpecies.dog, 'Perro'),
-              option(ExploreSpecies.cat, 'Gato'),
-              option(ExploreSpecies.other, 'Otra especie'),
-            ],
-            onChanged: !_submitted ? (v) => setState(() => _species = v) : null,
-          ),
-          const SizedBox(height: 12),
-          FilterChoiceGroup<ExploreStatus>(
-            label: 'Estado',
-            value: _status,
-            options: [
-              option(ExploreStatus.active, 'Abiertos'),
-              option(ExploreStatus.resolved, 'Resueltos'),
-              option(ExploreStatus.all, 'Todos'),
-            ],
-            onChanged: !_submitted ? (v) => setState(() => _status = v) : null,
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Solo ves los casos resueltos de tu cuenta.',
-            style: TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
-          ),
-          const SizedBox(height: 20),
-          FilterChoiceGroup<int>(
-            label: 'Fecha del suceso',
-            value: _days,
-            options: [
-              option(0, 'Cualquier fecha'),
-              option(1, 'Últimas 24 horas'),
-              option(7, 'Últimos 7 días'),
-              option(30, 'Últimos 30 días'),
-              option(90, 'Últimos 90 días'),
-            ],
-            onChanged: !_submitted ? (v) => setState(() => _days = v) : null,
-          ),
-        ],
-        if (widget.zoneOnly) ...[
-          const Text(
-            'Ubicación de búsqueda',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          if (widget.onUseCurrentLocation != null)
-            TextButton.icon(
-              onPressed: _submitted ? null : widget.onUseCurrentLocation,
-              icon: const Icon(Icons.my_location_rounded),
-              label: const Text('Usar mi ubicación actual'),
-            ),
-          const SizedBox(height: 16),
-          if (widget.locationSearchBuilder != null)
-            widget.locationSearchBuilder!(
-              _label,
-              (place) => setState(() {
-                _lat = place.latitude;
-                _lon = place.longitude;
-                _label = place.label;
-                _invalid = false;
-              }),
-            ),
-          const SizedBox(height: 12),
-          Text(
-            'Radio: ${(_radius / 1000).round()} km',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          Slider(
-            value: (_radius / 1000).clamp(1, 50).toDouble(),
-            min: 1,
-            max: 50,
-            divisions: 49,
-            label: '${(_radius / 1000).round()} km',
-            semanticFormatterCallback: (value) =>
-                'Radio de búsqueda de ${value.round()} kilómetros',
-            onChanged: _submitted
-                ? null
-                : (value) => setState(() => _radius = value.round() * 1000),
-          ),
-          if (_label.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Centro: $_label',
-                style: const TextStyle(fontSize: 14, color: Color(0xFF6E6E73)),
-              ),
-            ),
-          const Text(
-            'Selecciona un lugar o toca el mapa para ajustar el centro. El círculo muestra el radio de búsqueda.',
-          ),
-          const SizedBox(height: 12),
-          ShakeField(
-            errorId: _shake,
-            hasError: _invalid,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: _invalid
-                      ? const Color(0xFFB53F48)
-                      : Colors.transparent,
-                  width: 3.5,
-                ),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: IgnorePointer(
-                ignoring: _submitted,
-                child: ZoneMapPicker(
-                  latitude: _lat,
-                  longitude: _lon,
-                  radiusMeters: _radius,
-                  fitRadius: true,
-                  onSelect: (lat, lon) => setState(() {
-                    _lat = lat;
-                    _lon = lon;
-                    _label = 'Punto elegido en el mapa';
-                    _invalid = false;
-                  }),
-                ),
-              ),
-            ),
-          ),
-        ],
-        const SizedBox(height: 16),
-        FilledButton(
-          style: primaryActionButtonStyle(context),
-          onPressed: _submitted
-              ? null
-              : () {
-                  if (_lat == null || _lon == null) {
-                    setState(() {
-                      _invalid = true;
-                      _shake++;
-                    });
-                    return;
-                  }
-                  setState(() => _submitted = true);
-                  widget.onConfirm(
-                    _FilterSelection(
-                      kind: _kind,
-                      species: _species,
-                      status: _status,
-                      days: _days,
-                      radius: _radius,
-                      lat: _lat,
-                      lon: _lon,
-                      label: _label,
-                    ),
-                  );
-                },
-          child: Text(
-            widget.zoneOnly ? 'Aplicar ubicación' : 'Aplicar filtros',
-          ),
-        ),
-      ],
-    ),
-  );
 }

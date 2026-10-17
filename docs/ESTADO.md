@@ -1,5 +1,95 @@
 # Estado del proyecto
 
+## Preparación Dokploy desde GitHub —17 de octubre de2026
+
+Por petición del usuario se prepara apps/public-web para su VDS/Dokploy, conservando
+el trabajo local de HU-09 en feature/public-qr-case-web. Dockerfile multietapa con
+runtime no root/puerto5173, .dockerignore con entradas permitidas y healthcheck
+Node sin curl. GitHub Actions amplía validación con build/smoke del contenedor
+sin credenciales reales ni despliegue. [Guía exacta](../apps/public-web/DOKPLOY.md)
+para Application/proveedor GitHub, rama, Dockerfile/contexto, Environment,
+DNS/HTTPS, health, Auto Deploy y límites del proxy. Usuario completa Environment.
+
+Docker CLI instalado pero daemon Docker Desktop Linux no disponible; build/arranque
+de imagen local no verificados, CI remoto pendiente. Se valida arranque Node con
+el bootstrap real y probe de salud sin Supabase: **10 pruebas Node aprobadas**
+en build/dokploy-web-tests.log, incluido ese recorrido. /health es liveness, no evidencia
+de RPC/Storage. Pendientes: publicar la rama, configurar panel/DNS/secretos, aplicar
+SQL022/023 según estado real y comprobar caso real/cierre/revocación. Sin commit,
+push, acceso a Dokploy, despliegue ni cambio de PUBLIC_CASE_WEB_READY.
+
+## HU-09: ficha pública QR —16 de octubre de2026
+
+Incremento local en **feature/public-qr-case-web**, desde3db6de6 con árbol inicial
+limpio. Consulta sin app/cuenta en apps/public-web, dominio acordado
+https://entrehuellas.kormind.com y ruta /c/<token64hex>. Activo: fotos procesadas,
+rasgos/campos públicos, fecha/zona aproximada, compartir/copia y actualización.
+Cerrado: estado/fecha real sin exponer ficha privada; inexistente/revocado/eliminado:
+mismo neutral. Consulta cada60s visible/al volver a pestaña y manual; sin prometer
+tiempo real ni retirar copias ya descargadas.
+
+Cliente DOM con ViewModel/casos de uso/repositorios y servidor HTTP Node de lectura;
+secreto solo en servidor. SQL080–082/plan023 genera migración20261016002300_public_qr_case.sql,
+patch023 y run_all sin reescribir migraciones anteriores. read_qr_case solo
+service_role; revocación solo autor, idempotente. Fotos por índice con revalidación
+después de descargar; navegador no recibe UUID privados/paths Storage ni URLs
+firmadas. Sin ampliar grants anónimos de tablas/Storage. Se corrigió en validación
+el uso del marcador real deletion_requested_at de pets y la invocación de fetch
+del navegador conservando su receptor global.
+
+**Validación local:**24 pruebas SQL/PostGIS aprobadas (build/qr-web-sql-tests.log);
+9 pruebas Node aprobadas (build/qr-web-node-tests.log). Chrome headless mediante
+Playwright1.62.1:390×844,1280×900 y320×350 con texto200%/movimiento reducido,
+galería, copia real, offline/reintento, cierre, revocación e inexistente, CSP y
+ausencia de desbordamiento horizontal (build/qr-web-browser.log). Capturas con
+fixtures de prueba/asset aprobado revisadas en build/ui-preview/public-web.
+Node local24.18.0; workflow nuevo usa22, aún sin ejecución remota. Flutter no se
+modificó y no se repitió su suite ni se generó APK. Dockerfile preparado, sin build.
+
+**Pendientes:** aplicar022/023 en desarrollo según estado real, configurar hosting
+Node/secreto/TLS en el dominio y comprobar Supabase/Storage reales, proxy sin caché,
+otro teléfono sin app/Safari y QR físico. PUBLIC_CASE_WEB_READY permanece false.
+Formulario HU-10.1/#36 todavía pendiente; es el siguiente incremento funcional.
+HU-09/#9 no cerrada. Sin SQL remoto, despliegue, commit/push ni cambios en GitHub.
+[Ficha](funcionalidades/ficha-publica-qr.md), [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md),
+[operación](../apps/public-web/README.md). La evidencia local no sustituye activación remota.
+
+Revisión del mapa: filtros inferiores y acceso junto al pin,16 de octubre. Se conserva pantalla/expansión de ADR-055, pero el panel contiene ExploreFilterEditor compartido con lista y Aplicar filtros. Borrador hasta confirmar (incluidos GPS/centro visual); CTA fijo si cabe, scroll con altura mínima/texto ampliado. Pin muestra etiqueta compacta de un caso/Abrir caso, reduce filtros y acomoda cámara; coincidencias se recorren en etiqueta. Aplicar retira selección y recupera panel42%. Metadatos del lugar en ExploreState conservan la cápsula de Ubicación al volver/refrescar/paginar; GPS deduplicado por generación y resultados de otra cuenta descartados. Sin SDK nuevo, SQL, permisos o persistencia adicional. Se retiran opciones de grilla añadidas para la ficha inferior que ya no tienen consumidores. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye contenido inferior/selección inicial de ADR-055. Formato y análisis global limpios (build/map-filters-final-analyze.log); suite final de353 pruebas aprobada (build/map-filters-full-tests.log),25 focalizadas y6 finales de mapa/GPS con renders (build/map-filters-focused-tests.log y build/map-filters-final-renders.log). Capturas normal/pequeña/texto2 revisadas en build/ui-preview/explore-map: screen-*.png para filtros y normal.png/small.png para etiquetas. Usan teselas neutras, sin validar cartografía real. Revisión Android pendiente; sin APK ni publicación. Trabajo previo conservado.
+
+Diagnóstico de parámetros del selector,16 de octubre: captura muestra subtitle/placement no definidos en FilterExpansion. En los archivos guardados ambos parámetros, sus campos y FilterPanelPlacement están presentes; solo existe una declaración de cada tipo y el import de ExploreFilters apunta a ella. `dart analyze lib/core/presentation/widgets/filter_expansion.dart lib/features/explore/presentation/widgets/explore_filters.dart` termina sin incidencias (build/filter-parameter-diagnostic.log). No se reproduce el error de la captura ni se modifica la API correcta. Estado desactualizado del analizador, buffers sin guardar u otra copia abierta siguen como hipótesis; reinicio del analizador/editor y confirmación visual pendientes.
+
+Mapa inmersivo de Explorar,16 de octubre: `/home/explore-map` usa entityEditorPage/OriginPageSource desde la opción Mapa y retorno glass. Mapa a todo viewport y panel inferior deslizable14/42/90%, tirador persistente/accesible y una ficha de ancho completo; nombre una sola vez, foto/estado/distancia compartidos y Ver ficha. Coincidencias recorren casos individualmente. Consulta/páginas/cursor compartidos; abrir/cerrar no consulta, volver de ficha actualiza como antes. Se retira mapSelected del estado de presentación; sin cambios de dominio/datos/SQL. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md) sustituye composición integrada de ADR-052. Formato/análisis global sin incidencias y suite final de351 pruebas aprobada (build/explore-fullscreen-map-final-analyze.log y build/explore-fullscreen-map-full-tests.log). Cuatro pruebas finales de mapa/ruta aprobadas con capturas (build/explore-fullscreen-map-route-tests.log);11 de acceso/onboarding aprobadas incluyendo la nueva ruta (build/explore-map-access-tests.log). Renders normales/pequeños con texto ampliado, insets y movimiento reducido revisados en build/ui-preview/explore-map/screen-*.png: teselas neutras, sin validar cartografía real. Revisión Android pendiente; sin APK, despliegue o publicación. Trabajo previo de carteles y demás ajustes conservado.
+
+Recarga de Mascotas y selección de Ubicación, 16 de octubre: reproducido remonte de contenido al iniciar/terminar shimmer, corregido manteniendo estable la estructura compartida de LoadingShimmer. Prueba de gesto real confirma una sola consulta adicional y misma instancia de tarjeta durante todo el ciclo; otro gesto ocupado no consulta. No se reproduce doble consulta en esa prueba. La cápsula de Ubicación ahora muestra lugar aplicado/radio, distingue GPS y Punto del mapa, conserva texto real del buscador por separado y ofrece tooltip del nombre completo. Análisis global limpio y suite completa de 350 pruebas aprobada (build/pets-location-analyze.log y build/pets-location-full-tests.log); prueba de reproducción previa fallida en build/pets-refresh-reproduction.log. Capturas normales/pequeñas con texto ampliado revisadas en build/ui-preview/explore/*-location-applied.png; 10 pruebas de render/recorrido aprobadas (build/location-summary-renders.log). Validación Android pendiente; sin APK, SQL ni publicación. Trabajo local previo conservado.
+
+Salida de selectores, 16 de octubre: refinada en ambas variantes con contracción/retirada de 8 px, fundido diferido y blur/velo coordinados en 320 ms. Apertura conservada; cierre interrumpiendo entrada captura progreso sin salto, conserva portal y respeta movimiento reducido. Análisis limpio y 19 pruebas de Explorar/arquitectura aprobadas, incluidas dos de salida durante apertura (build/filter-exit-analyze.log y build/filter-exit-tests.log). Revisión perceptual Android pendiente; sin APK ni publicación.
+
+Corrección de animación, 16 de octubre: por aclaración del usuario, Ubicación recupera la misma escala/fundido sincronizados con blur del selector principal; solo cambia el anclaje del panel. No se incorpora transición de página desde origen. Análisis limpio y 8 pruebas de Explorar aprobadas (build/filter-animation-tests.log); sin APK ni publicación.
+
+Variantes de selectores, 16 de octubre: FilterExpansion conserva `below` por defecto en Filtrar casos y añade `atOrigin` para Ubicación, con panel superpuesto desde el borde superior de su control, con la animación original de escala/fundido del selector. Centrado de etiquetas mediante espacios laterales simétricos. Cierre exterior/atrás/aplicar y scroll conservados. Análisis limpio; 17 pruebas de Explorar/arquitectura aprobadas, incluyendo posición real del panel normal/pequeño con texto ampliado. Logs build/filter-variants-analyze.log y build/filter-variants-tests.log; capturas build/ui-preview/explore. Revisión Android pendiente; sin APK ni publicación. Trabajo local previo conservado.
+
+Simplificación explícita de Ubicación, 16 de octubre: en Explorar se conserva únicamente título, ubicación actual, buscador, radio/deslizador, mapa y Aplicar. Se retira Centro y las etiquetas sintéticas del input; al elegir punto manual se limpia el texto, sin perder coordenadas. El texto explicativo del mapa ya había sido retirado en el trabajo local del usuario y se conserva su cambio. Sin modificaciones de consulta/SQL ni al trabajo de carteles. Formato y análisis sin incidencias; 12 pruebas de Explorar/buscador aprobadas (build/explore-location-panel-analyze.log y build/explore-location-panel-tests.log). Sin APK ni publicación.
+
+Diagnóstico de captura16 de octubre: casePosterRepository está declarado en AppBootstrap (constructor/campo/composición) e inyectado desde main.dart; solo existe una declaración de AppBootstrap en la app. `dart analyze lib/main.dart lib/app/bootstrap.dart` devuelve No issues found (build/poster-bootstrap-diagnostic.log). No se reproduce el getter undefined de la captura en los archivos guardados; estado desactualizado del analizador o buffers distintos siguen siendo hipótesis. Se recomienda guardar y reiniciar Dart Analysis Server en el editor; no se modifica código correcto ni se afirma resolución del diagnóstico del editor sin comprobarla.
+
+Corrección explícita del usuario16 de octubre: se retiran todas las menciones visibles del proveedor cartográfico en Explorar y en el buscador compartido de Ubicación/Ciudad, incluidos enlaces y feedback asociado. Se elimina el slot de atribución sin consumidores del mapa compartido. [ADR-054](decisiones/054-retirar-menciones-visibles-proveedor-mapas.md) sustituye la indicación de atribución visible de ADR-052/051; servicios y consultas conservados. Trabajo previo de carteles preservado. Formato/análisis sin incidencias y25 pruebas focalizadas aprobadas: build/remove-map-branding-analyze.log y build/remove-map-branding-tests.log. Escaneo de lib/features y lib/core/presentation sin menciones del proveedor; sin APK ni despliegue.
+
+## Carteles PDF y QR — HU-08.1/08.2 — 16 de octubre de 2026
+
+Por instrucción del usuario, el APK se difiere y no bloquea continuar S4. Rama nueva **feature/pet-poster-qr**, desde20576fa y árbol inicialmente limpio. Implementación local de HU-08.1/#34 y HU-08.2/#35, RF-08,37: generación de PDF A4 con foto principal pública procesada, datos mínimos y QR opaco estable; impresión/guardado mediante diálogo nativo, compartir PDF+enlace o solo enlace. Case_posters mantiene dominio/casos de uso, data/SDK/plantilla/exportación y ViewModel/estado/pantalla separados, con inyección en bootstrap/main y slots de router en fichas propias abiertas. Se conserva el feedback/reveal compartido, cancelación/reintento y bloqueo de duplicados. No se cierran historias por implementación local.
+
+El usuario indica **entrehuellas.kormind.com**. Base HTTPS configurada por defecto y en el ejemplo versionado; ruta `/c/<slug>`. GET/ comprobado devuelve404 (web tool no accesible; comprobación HTTP directa). PUBLIC_CASE_WEB_READY permanece false hasta disponer de la ficha pública HU-09; crear/exportar sin activación se bloquea antes de crear enlaces o abrir acciones nativas. No se ha publicado web, cambiado DNS/hosting ni añadido lectura anónima. El dominio indicado no se sustituye por uno inventado.
+
+SQL077–079/plan022 genera migración20261016002200_case_posters.sql, patch022 y run_all mediante scripts, sin modificar migraciones anteriores. Tabla privada sin grants de cliente; RPC autenticada valida autor/activo/no borrado/tipo raíz/foto y conserva slug por origen+caso. Snapshot explícito sin coordenadas/referencia/contacto/documentos; revisión antes de exportar detecta cambios y evita compartir un cartel obsoleto. Revocación nunca se revierte al generar. Foto principal se toma únicamente entre derivados públicos autorizados y el PDF vuelve a codificar sin metadatos. No cambia estado de casos.
+
+Dependencias resueltas con Flutter3.35.3/Dart3.9.2 sin actualizar SDK: pdf3.12.0, printing5.14.3 y share_plus11.1.0; se conservan registrantes generados. Fuentes Roboto incluidas con licencia para generar sin descargar tipografía. La prueba inicial de printing5.14.2 no resolvió con image4.10.1 y se usó5.14.3 compatible; sin downgrade de image. Configuración local/credenciales conservadas.
+
+Validación final: formato de482 archivos correcto y análisis sin incidencias (build/poster-final-analyze.log). **346 pruebas Flutter aprobadas** en build/poster-final-full-flutter-tests.log;16 focalizadas aprobadas, incluyendo7 de cartel y9 de arquitectura (build/poster-final-focused.log). **23 pruebas SQL/PostGIS aprobadas** (build/poster-sql-full-tests.log), incluidas autor/otra cuenta/anónimo, estabilidad/repetición, principal, separación de origen, revocación y cierre. Regeneración final de run_all/migración022 comprobada idéntica a fuentes. Renders UI390×844 y320×350/texto2/movimiento reducido revisados en build/ui-preview/posters; usan fixtures/servicios nativos sustituidos. git diff --check correcto.
+
+PDFs de prueba perdido/encontrado/extremo en build/poster-preview, renderizados con Poppler y revisados visualmente; una página A4 cada uno, QR de los tres decodificado a la URL de prueba exacta mediante zxing-cpp. Extracción con pdfplumber confirma80 caracteres del nombre y200 de rasgos del caso extremo sin truncar. Son artefactos de prueba con dominio reservado, no carteles para difundir casos reales. No se acredita impresión física ni escaneo desde otro teléfono.
+
+Pendientes/siguiente paso: aplicar022 en desarrollo, implementar/activar HU-09 en el dominio indicado y comprobar la lectura sin app/estado vigente/revocación. Probar impresión/Guardar PDF/compartir/cancelar con los plugins en la próxima recompilación nativa; APK no solicitado ni generado. Falta demo hosted, concurrencia multiconexión y QR físico. Sin SQL remoto, despliegue, commit/push ni cambios en GitHub en este incremento. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md), guía/configuración/índice actualizados.
+
 ## CI remoto y recorrido Android de HU-07.2 — 16 de octubre de 2026
 
 Resultado final: corrección del singular y evidencia Android publicadas en **04b3a13**. [Flutter38947608248](https://github.com/srg-cp/entrehuellas/actions/runs/38947608248) también **aprobado en Linux con339 pruebas**, formato y análisis; log en build/map-final-ci-success.log. Validación local de ese ajuste: formato correcto, análisis sin incidencias y12 pruebas de mapa/arquitectura aprobadas (build/android-review-analyze.log y build/android-review-tests.log). La app se deja abierta con sesión conservada; el bloqueo de APK descrito abajo continúa pendiente.

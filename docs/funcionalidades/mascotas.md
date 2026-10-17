@@ -1,5 +1,7 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Corrección de recarga (16 octubre): se reprodujo pérdida de estado al activar/desactivar el shimmer compartido, porque alternaba la estructura que envuelve las tarjetas. LoadingShimmer mantiene ahora estable el árbol y solo cambia pintura/semántica/bloqueo cuando corresponde. Una prueba del gesto real confirma una sola consulta adicional, bloqueo de otro gesto durante trabajo y la misma instancia de tarjeta antes/durante/después, sin skeleton de recarga. No se encontró duplicación de consultas en esa prueba; revisión en dispositivo pendiente. Sin cambios de repositorios, permisos ni SQL.
+
 Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva selección de lista, giro, retirada y movimiento reducido. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.
 
 Refinamiento del gesto: icono de recarga sigue el jalón, gira durante actualización real y retorna al terminar/cancelar, con movimiento reducido respetado. Conserva lista Activas/Archivadas y shimmer. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.

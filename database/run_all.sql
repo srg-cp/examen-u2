@@ -2254,4 +2254,150 @@ end $$;
 revoke all on function public.list_saved_cases(jsonb,integer) from public,anon,authenticated;
 grant execute on function public.list_saved_cases(jsonb,integer) to authenticated;
 
+-- Source: database/tables/077_case_public_links.sql | normalized SHA256: 27958e29ed2158ffdbb89791e9fcd8e47459fc8714dfe54f39510a1db9fb6605
+-- HU-08 / RF-08,37. Opaque stable references; no public table access.
+create table if not exists public.case_public_links (
+ case_source text not null check(case_source in ('lost','found')),
+ case_id uuid not null,
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ public_slug text not null unique default replace(gen_random_uuid()::text,'-','')||replace(gen_random_uuid()::text,'-',''),
+ created_at timestamptz not null default clock_timestamp(),
+ revoked_at timestamptz,
+ primary key(case_source,case_id),
+ constraint case_public_slug_shape check(public_slug ~ '^[0-9a-f]{64}$')
+);
+alter table public.case_public_links enable row level security;
+revoke all on table public.case_public_links from public,anon,authenticated;
+
+-- Source: database/functions/078_prepare_case_poster.sql | normalized SHA256: 853f8052282ec0b4249ff146fedf34dc825a2815f86949d6ed624e9bcd0c75fd
+create or replace function public.prepare_case_poster(p_source text,p_id uuid)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='3s' set statement_timeout='8s' as $$
+declare v_actor uuid:=auth.uid();v_owner uuid;v_status text;v_deleted timestamptz;v_kind text;
+ v_data jsonb;v_slug text;v_revoked timestamptz;v_projection jsonb;
+begin
+ if v_actor is null then raise exception using errcode='42501',message='poster_unauthorized'; end if;
+ if p_source is null or p_source not in ('lost','found') or p_id is null then
+  raise exception using errcode='22023',message='poster_invalid'; end if;
+ if p_source='lost' then
+  select owner_id,status,deleted_at into v_owner,v_status,v_deleted from public.lost_cases where id=p_id for share;
+  v_kind='own_loss';
+ else
+  select owner_id,status,deleted_at,report_kind into v_owner,v_status,v_deleted,v_kind
+   from public.found_cases where id=p_id for share;
+ end if;
+ if v_owner is distinct from v_actor then raise exception using errcode='42501',message='poster_unauthorized'; end if;
+ if v_deleted is not null or v_status<>'active' or v_kind not in ('own_loss','possible_loss','legacy_found') then
+  raise exception using errcode='23514',message='poster_case_unavailable'; end if;
+ if p_source='lost' then select r into v_data from public.read_recovery_pet_case(p_id) r;
+ else select r into v_data from public.read_recovery_report(p_id) r; end if;
+ if v_data is null or jsonb_array_length(v_data->'photos')=0 then
+  raise exception using errcode='23514',message='poster_photo_unavailable'; end if;
+ insert into public.case_public_links(case_source,case_id,owner_id) values(p_source,p_id,v_actor)
+  on conflict(case_source,case_id) do nothing;
+ select public_slug,revoked_at into v_slug,v_revoked from public.case_public_links
+  where case_source=p_source and case_id=p_id and owner_id=v_actor;
+ if v_slug is null or v_revoked is not null then raise exception using errcode='42501',message='poster_link_unavailable'; end if;
+ -- Deliberately excludes coordinates, private reference, owner, custody and SDK URLs.
+ v_projection=jsonb_build_object('source',p_source,'id',p_id,'public_slug',v_slug,'report_kind',v_kind,
+  'name',coalesce(v_data->>'pet_name',''),'species',v_data->>'species','species_detail',v_data->>'species_detail',
+  'size',v_data->>'size','sex',v_data->>'sex','traits',v_data->>'traits','occurred_at',v_data->'occurred_at',
+  'photo_path',v_data->'photos'->0->>'path');
+ return v_projection||jsonb_build_object('revision',md5(v_projection::text));
+end $$;
+
+-- Owner capability for legacy independent found cases, without exposing identity.
+create or replace function public.read_recovery_report(p_id uuid)
+returns setof jsonb language sql stable security definer set search_path='' as $$
+ select to_jsonb(r)||jsonb_build_object('status',case when c.status='active' and c.report_kind in ('sighting','with_reporter') and not (
+ exists(select 1 from public.lost_cases target where target.id=c.target_lost_case_id and target.status='active' and target.deleted_at is null)
+ or exists(select 1 from public.found_cases target where target.id=c.target_community_case_id and target.report_kind='possible_loss' and target.status='active' and target.deleted_at is null))
+ then 'resolved' else c.status end,'report_kind',c.report_kind,'target_id',coalesce(c.target_lost_case_id,c.target_community_case_id),
+ 'community_target',c.target_community_case_id is not null,
+ 'can_resolve',coalesce(c.owner_id=auth.uid() and c.report_kind='possible_loss' and c.status='active',false),
+ 'can_generate_poster',coalesce(c.owner_id=auth.uid() and c.report_kind in ('possible_loss','legacy_found') and c.status='active',false))
+ from public.read_public_found_case(p_id) r join public.found_cases c on c.id=r.id
+ where c.report_kind in ('legacy_found','possible_loss') or c.owner_id=auth.uid()
+ or (c.target_lost_case_id is not null and exists(select 1 from public.read_public_lost_case(c.target_lost_case_id)))
+ or (c.target_community_case_id is not null and exists(select 1 from public.read_public_found_case(c.target_community_case_id)));
+$$;
+
+-- Source: database/grants/079_case_poster_permissions.sql | normalized SHA256: d88d4cede0244f1ce4b014c5106f381a04b4a8c3ce525e9db4710a4646e44865
+revoke all on function public.prepare_case_poster(text,uuid) from public,anon,authenticated;
+grant execute on function public.prepare_case_poster(text,uuid) to authenticated;
+
+-- Source: database/functions/080_read_qr_case.sql | normalized SHA256: 9938f12ad1238d7a00cba5c83b768d92e3493eefd6df5629481111c126916c9e
+-- HU-09 / RF-09. Server-only resolver. photo_objects must NEVER reach a browser.
+create or replace function public.read_qr_case(p_slug text)
+returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='5s' as $$
+declare v_link public.case_public_links; v_lost public.lost_cases; v_found public.found_cases;
+ v_photos jsonb; v_payload jsonb; v_closed_at timestamptz;
+begin
+ if p_slug is null or p_slug !~ '^[0-9a-f]{64}$' then return jsonb_build_object('state','unavailable'); end if;
+ select * into v_link from public.case_public_links where public_slug=p_slug and revoked_at is null;
+ if not found then return jsonb_build_object('state','unavailable'); end if;
+ if v_link.case_source='lost' then
+  select * into v_lost from public.lost_cases where id=v_link.case_id and owner_id=v_link.owner_id and deleted_at is null;
+  if not found or not exists(select 1 from public.pets where id=v_lost.pet_id and owner_id=v_link.owner_id and deletion_requested_at is null) then
+   return jsonb_build_object('state','unavailable'); end if;
+  if v_lost.status='resolved' then
+   select created_at into v_closed_at from public.case_events where case_id=v_lost.id and event_type='resolved';
+   return jsonb_build_object('state','closed','resolution','resolved','closed_at',v_closed_at);
+  end if;
+  if v_lost.status<>'active' then return jsonb_build_object('state','unavailable'); end if;
+  select coalesce(jsonb_agg(jsonb_build_object('bucket','pet-photo-renditions','path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg')
+   order by ph.is_primary desc,ph.created_at,ph.id),'[]'::jsonb) into v_photos
+   from public.pet_photos ph where ph.id=any(v_lost.photo_ids) and ph.pet_id=v_lost.pet_id and ph.owner_id=v_link.owner_id
+   and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null
+   and exists(select 1 from storage.objects o where o.bucket_id='pet-photo-renditions'
+    and o.name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg'
+    and o.metadata->>'mimetype'='image/jpeg' and (o.metadata->>'size')::bigint between 1 and 2097152);
+  v_payload=jsonb_build_object('kind','lost','name',v_lost.pet_name,'species',v_lost.species,'species_detail',v_lost.species_detail,
+   'size',v_lost.size,'sex',v_lost.sex,'traits',v_lost.traits,'occurred_at',v_lost.occurred_at,
+   'area',jsonb_build_object('latitude',round(v_lost.public_latitude::numeric,2),'longitude',round(v_lost.public_longitude::numeric,2)));
+ else
+  select * into v_found from public.found_cases where id=v_link.case_id and owner_id=v_link.owner_id and deleted_at is null
+   and report_kind in ('possible_loss','legacy_found');
+  if not found then return jsonb_build_object('state','unavailable'); end if;
+  if v_found.status='resolved' then
+   select created_at into v_closed_at from public.found_case_events where case_id=v_found.id and event_type='resolved';
+   return jsonb_build_object('state','closed','resolution','resolved','closed_at',v_closed_at);
+  end if;
+  if v_found.status<>'active' then return jsonb_build_object('state','unavailable'); end if;
+  select coalesce(jsonb_agg(jsonb_build_object('bucket','found-photo-renditions','path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg')
+   order by ph.created_at,ph.id),'[]'::jsonb) into v_photos
+   from public.found_case_photos ph where ph.id=any(v_found.photo_ids) and ph.case_id=v_found.id and ph.owner_id=v_link.owner_id
+   and ph.status='ready' and ph.processed_at is not null and ph.content_hash is not null
+   and exists(select 1 from storage.objects o where o.bucket_id='found-photo-renditions'
+    and o.name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+    and o.metadata->>'mimetype'='image/jpeg' and (o.metadata->>'size')::bigint between 1 and 2097152);
+  v_payload=jsonb_build_object('kind',case when v_found.report_kind='possible_loss' then 'lost' else 'found' end,
+   'name','','species',v_found.species,'species_detail',v_found.species_detail,'size',v_found.size,'sex',v_found.sex,
+   'traits',v_found.traits,'occurred_at',v_found.occurred_at,
+   'area',jsonb_build_object('latitude',round(v_found.public_latitude::numeric,2),'longitude',round(v_found.public_longitude::numeric,2)));
+ end if;
+ if jsonb_array_length(v_photos)=0 then return jsonb_build_object('state','unavailable'); end if;
+ return v_payload||jsonb_build_object('state','active','photo_objects',v_photos);
+end $$;
+
+-- Source: database/functions/081_revoke_case_public_link.sql | normalized SHA256: baee4fdb1c32311a73692d9e97931384cd2f31c5cb9175137f0e534c3ca0c05b
+create or replace function public.revoke_case_public_link(p_source text,p_id uuid)
+returns void language plpgsql security definer set search_path='' set lock_timeout='3s' as $$
+declare v_actor uuid:=auth.uid(); v_owner uuid;
+begin
+ if v_actor is null then raise exception using errcode='42501',message='link_unauthorized'; end if;
+ if p_source='lost' then select owner_id into v_owner from public.lost_cases where id=p_id for share;
+ elsif p_source='found' then select owner_id into v_owner from public.found_cases where id=p_id and report_kind in ('possible_loss','legacy_found') for share;
+ end if;
+ if v_owner is distinct from v_actor then raise exception using errcode='42501',message='link_unauthorized'; end if;
+ update public.case_public_links set revoked_at=coalesce(revoked_at,clock_timestamp())
+ where case_source=p_source and case_id=p_id and owner_id=v_actor;
+end $$;
+
+-- Source: database/grants/082_qr_case_permissions.sql | normalized SHA256: 7dfc2c9911fb763843c6c6dfaf407d7c3a1399c07c17cdc134008209a6b79622
+revoke all on function public.read_qr_case(text) from public,anon,authenticated;
+grant execute on function public.read_qr_case(text) to service_role;
+revoke all on function public.revoke_case_public_link(text,uuid) from public,anon;
+grant execute on function public.revoke_case_public_link(text,uuid) to authenticated;
+-- Links and photo paths remain private; no new table grants or Storage policies.
+
 commit;

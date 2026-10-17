@@ -68,22 +68,33 @@ class _LoadingShimmerState extends State<LoadingShimmer>
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.isLoading) return widget.child;
+    // Keep the same ancestors in both states: inserting wrappers on refresh
+    // remounts cards/photos and restarts their local state twice per operation.
     final painted = ClipRRect(
       borderRadius: BorderRadius.circular(widget.radius),
+      clipBehavior: widget.isLoading ? Clip.antiAlias : Clip.none,
       child: CustomPaint(
-        foregroundPainter: _ShimmerPainter(_controller, widget.highlight),
-        child: Opacity(opacity: widget.isAction ? .72 : 1, child: widget.child),
+        foregroundPainter: widget.isLoading
+            ? _ShimmerPainter(_controller, widget.highlight)
+            : null,
+        child: Opacity(
+          opacity: widget.isLoading && widget.isAction ? .72 : 1,
+          child: widget.child,
+        ),
       ),
     );
     return Semantics(
-      button: widget.isAction,
-      enabled: widget.isAction ? false : null,
-      liveRegion: true,
-      label: widget.loadingLabel,
-      child: widget.isAction
-          ? ExcludeSemantics(child: IgnorePointer(child: painted))
-          : painted,
+      button: widget.isLoading && widget.isAction ? true : null,
+      enabled: widget.isLoading && widget.isAction ? false : null,
+      liveRegion: widget.isLoading,
+      label: widget.isLoading ? widget.loadingLabel : null,
+      child: ExcludeSemantics(
+        excluding: widget.isLoading && widget.isAction,
+        child: IgnorePointer(
+          ignoring: widget.isLoading && widget.isAction,
+          child: painted,
+        ),
+      ),
     );
   }
 }

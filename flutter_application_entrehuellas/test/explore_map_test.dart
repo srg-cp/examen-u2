@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -7,10 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_application_entrehuellas/app/navigation/entity_editor_page.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_page_transition.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_filter_editor.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/state/explore_filter_selection.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_section.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/screens/explore_map_screen.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
-import 'package:flutter_application_entrehuellas/features/explore/domain/entities/explore_page.dart';
 import 'package:flutter_application_entrehuellas/features/explore/domain/entities/explore_query.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/view_models/explore_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_case_map.dart';
@@ -44,84 +49,186 @@ void main() {
         );
   });
 
-  test(
-    'View changes preserve exact query/pages without new requests; map survives retries and filters',
-    () async {
-      final repo = SearchFake();
-      final container = ProviderContainer(
-        overrides: [
-          exploreRepositoryProvider.overrideWithValue(repo),
-          currentLocationRepositoryProvider.overrideWithValue(
-            const FakeCurrentLocation(),
+  for (final reduced in [false, true]) {
+    testWidgets(
+      'Map opens from its option, shares results, opens detail and returns; reduced=$reduced',
+      (tester) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = reduced
+            ? const Size(320, 350)
+            : const Size(390, 844);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+        final repo = SearchFake();
+        await tester.runAsync(loadFonts);
+        final boundary = GlobalKey();
+        final tileBytes = await tester.runAsync(_neutralTile);
+        OriginPageSource? source;
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (_, _) => const Scaffold(
+                body: SingleChildScrollView(child: ExploreSection()),
+              ),
+              routes: [
+                GoRoute(
+                  path: 'explore-map',
+                  pageBuilder: (context, state) {
+                    source = state.extra as OriginPageSource;
+                    return entityEditorPage(
+                      context: context,
+                      key: state.pageKey,
+                      source: state.extra,
+                      child: ExploreMapScreen(
+                        createTileProvider: () => _MemoryTiles(tileBytes!),
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'cases/:id',
+                  builder: (context, state) => Scaffold(
+                    body: TextButton(
+                      onPressed: () => context.pop(),
+                      child: Text(
+                        'Volver al mapa ${state.pathParameters['id']}',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+        addTearDown(router.dispose);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              exploreRepositoryProvider.overrideWithValue(repo),
+              currentLocationRepositoryProvider.overrideWithValue(
+                const FakeCurrentLocation(),
+              ),
+              exploreSessionProvider.overrideWith(
+                (_) => Stream.value(const AuthSession(userId: 'a')),
+              ),
+            ],
+            child: MaterialApp.router(
+              theme: AppTheme.light,
+              routerConfig: router,
+              builder: (context, child) => RepaintBoundary(
+                key: boundary,
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    disableAnimations: reduced,
+                    textScaler: TextScaler.linear(reduced ? 2 : 1),
+                    padding: const EdgeInsets.only(top: 24, bottom: 24),
+                  ),
+                  child: child!,
+                ),
+              ),
+            ),
           ),
-          exploreSessionProvider.overrideWith(
-            (_) => Stream.value(const AuthSession(userId: 'a')),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-      final subscription = container.listen(
-        exploreViewModelProvider,
-        (_, _) {},
-      );
-      addTearDown(subscription.close);
-      final initial = await container.read(exploreViewModelProvider.future);
-      final vm = container.read(exploreViewModelProvider.notifier);
-      vm.selectMap(true);
-      var state = container.read(exploreViewModelProvider).requireValue;
-      expect(state.mapSelected, true);
-      expect(state.query, same(initial.query));
-      expect(state.items.map((e) => e.key), initial.items.map((e) => e.key));
-      expect(state.cursor, initial.cursor);
-      expect(repo.calls, hasLength(1));
-      repo.fail = true;
-      await vm.more();
-      expect(
-        container.read(exploreViewModelProvider).requireValue.mapSelected,
-        true,
-      );
-      repo.fail = false;
-      repo.pending = Completer<ExplorePage>();
-      final loading = vm.more();
-      vm.selectMap(false);
-      expect(
-        container.read(exploreViewModelProvider).requireValue.mapSelected,
-        true,
-      );
-      repo.pending!.complete(
-        ExplorePage(items: [item('one', fromPet: false), item('two')]),
-      );
-      await loading;
-      state = container.read(exploreViewModelProvider).requireValue;
-      expect(state.items.map((e) => e.key), [
-        'lost:one',
-        'found:one',
-        'lost:two',
-      ]);
-      vm.selectMap(false);
-      expect(
-        container.read(exploreViewModelProvider).requireValue.items,
-        state.items,
-      );
-      expect(repo.calls, hasLength(3));
-      vm.selectMap(true);
-      repo.pending = null;
-      await vm.apply(
-        kind: ExploreKind.found,
-        species: ExploreSpecies.cat,
-        status: ExploreStatus.active,
-        days: 7,
-        latitude: -12.1,
-        longitude: -77.1,
-        radiusMeters: 1000,
-      );
-      state = container.read(exploreViewModelProvider).requireValue;
-      expect(state.mapSelected, true);
-      expect(state.query.kind, ExploreKind.found);
-      expect(state.query.radiusMeters, 1000);
-      expect(repo.calls.last.$3, isNull);
-    },
-  );
+        );
+        await tester.pumpAndSettle();
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(ExploreSection)),
+        );
+        final initial = container.read(exploreViewModelProvider).requireValue;
+        await tester.ensureVisible(find.text('Mapa'));
+        await tester.pumpAndSettle();
+        final option = find
+            .ancestor(of: find.text('Mapa'), matching: find.byType(InkWell))
+            .first;
+        final bounds = tester.getRect(option);
+        await tester.tap(find.text('Mapa'));
+        await tester.pumpAndSettle();
+        expect(find.byType(ExploreMapScreen), findsOneWidget);
+        expect(source!.bounds, bounds);
+        expect(
+          container.read(exploreViewModelProvider).requireValue.query,
+          same(initial.query),
+        );
+        expect(repo.calls, hasLength(1));
+        expect(
+          container.read(exploreViewModelProvider).requireValue.items,
+          same(initial.items),
+        );
+        expect(
+          container.read(exploreViewModelProvider).requireValue.cursor,
+          initial.cursor,
+        );
+        if (const bool.fromEnvironment('CAPTURE_EXPLORE_MAP')) {
+          await tester.runAsync(() async {
+            final raster =
+                await (boundary.currentContext!.findRenderObject()
+                        as RenderRepaintBoundary)
+                    .toImage();
+            final bytes = await raster.toByteData(
+              format: ui.ImageByteFormat.png,
+            );
+            final dir = Directory('build/ui-preview/explore-map')
+              ..createSync(recursive: true);
+            File(
+              '${dir.path}/screen-${reduced ? 'small' : 'normal'}.png',
+            ).writeAsBytesSync(bytes!.buffer.asUint8List());
+            raster.dispose();
+          });
+        }
+        final sheet = tester.widget<DraggableScrollableSheet>(
+          find.byType(DraggableScrollableSheet),
+        );
+        final before = sheet.controller!.size;
+        await tester.drag(
+          find.bySemanticsLabel('Desliza para ampliar o reducir los filtros'),
+          Offset(0, -tester.view.physicalSize.height * .5),
+        );
+        await tester.pumpAndSettle();
+        expect(sheet.controller!.size, greaterThan(before));
+        expect(find.text('Abrir caso'), findsNothing);
+        await Scrollable.ensureVisible(
+          tester.element(find.text('Perdidas')),
+          alignment: .5,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Perdidas'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, hasLength(1));
+        await tester.tap(find.text('Aplicar filtros'));
+        await tester.pumpAndSettle();
+        expect(repo.calls, hasLength(2));
+        expect(repo.calls.last.$2.kind, ExploreKind.lost);
+        final applied = container
+            .read(exploreViewModelProvider)
+            .requireValue
+            .query;
+        sheet.controller!.jumpTo(.14);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Seleccionar caso'));
+        await tester.pumpAndSettle();
+        expect(find.text('Abrir caso'), findsOneWidget);
+        await tester.tap(find.text('Abrir caso'));
+        await tester.pumpAndSettle();
+        expect(find.text('Volver al mapa one'), findsOneWidget);
+        await tester.tap(find.text('Volver al mapa one'));
+        await tester.pumpAndSettle();
+        expect(find.byType(ExploreMapScreen), findsOneWidget);
+        expect(repo.calls, hasLength(3));
+        await tester.tap(find.byTooltip('Volver a Explorar'));
+        await tester.pumpAndSettle();
+        expect(find.byType(ExploreMapScreen), findsNothing);
+        expect(find.text('Explorar'), findsOneWidget);
+        expect(repo.calls, hasLength(3));
+        expect(
+          container.read(exploreViewModelProvider).requireValue.query,
+          same(applied),
+        );
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
 
   for (final small in [false, true]) {
     testWidgets(
@@ -171,13 +278,20 @@ void main() {
                   key: boundary,
                   child: ColoredBox(
                     color: Colors.white,
-                    child: SingleChildScrollView(
-                      child: ExploreCaseMap(
-                        items: items,
-                        query: query,
-                        createTileProvider: () => _MemoryTiles(tileBytes),
-                        onOpen: (value, _) => opened.add(value.key),
-                      ),
+                    child: ExploreCaseMap(
+                      items: items,
+                      query: query,
+                      createTileProvider: () => _MemoryTiles(tileBytes),
+                      filterBuilder: (_, scroll, handle, _) =>
+                          ExploreFilterEditor(
+                            initial: ExploreFilterSelection.fromQuery(query),
+                            allFilters: true,
+                            showMap: false,
+                            scrollController: scroll,
+                            headerSliver: handle,
+                            onConfirm: (_) {},
+                          ),
+                      onOpen: (value, _) => opened.add(value.key),
                     ),
                   ),
                 ),
@@ -193,16 +307,37 @@ void main() {
         expect(picker.markers, hasLength(1));
         expect(picker.markers.single.point.latitude, items.first.latitude);
         expect(picker.markers.single.point.longitude, items.first.longitude);
+        expect(
+          tester.getSize(find.byType(FlutterMap)),
+          tester.view.physicalSize,
+        );
         await tester.ensureVisible(find.byTooltip('Ver 2 casos'));
         await tester.tap(find.byTooltip('Ver 2 casos'));
         await tester.pumpAndSettle();
+        final sheet = tester.widget<DraggableScrollableSheet>(
+          find.byType(DraggableScrollableSheet),
+        );
+        expect(sheet.controller!.size, closeTo(.14, .01));
         for (final name in ['Luna', 'Sol']) {
-          await tester.ensureVisible(find.text(name));
+          if (name == 'Sol') {
+            await Scrollable.ensureVisible(
+              tester.element(find.byTooltip('Caso siguiente')),
+              alignment: .5,
+            );
+            await tester.pumpAndSettle();
+            await tester.tap(find.byTooltip('Caso siguiente'));
+            await tester.pumpAndSettle();
+            expect(find.text('Luna'), findsNothing);
+          } else {
+            expect(find.text('Sol'), findsNothing);
+          }
+          expect(find.text(name), findsOneWidget);
+          expect(find.text('Abrir caso'), findsOneWidget);
           await tester.pumpAndSettle();
-          await tester.tap(find.text(name));
+          await tester.tap(find.text('Abrir caso'));
         }
         expect(opened, ['lost:same', 'found:same']);
-        await tester.ensureVisible(find.byType(FlutterMap));
+        sheet.controller!.jumpTo(.14);
         await tester.pumpAndSettle();
         if (const bool.fromEnvironment('CAPTURE_EXPLORE_MAP')) {
           await tester.runAsync(() async {
@@ -224,7 +359,9 @@ void main() {
         final center = MapController.of(
           tester.element(find.byType(TileLayer)),
         ).camera.center;
-        await tester.drag(find.byType(FlutterMap), const Offset(60, 0));
+        sheet.controller!.jumpTo(.14);
+        await tester.pumpAndSettle();
+        await tester.dragFrom(const Offset(100, 80), const Offset(60, 0));
         await tester.pumpAndSettle();
         expect(
           MapController.of(
@@ -240,4 +377,17 @@ void main() {
       },
     );
   }
+}
+
+Future<Uint8List> _neutralTile() async {
+  final recorder = ui.PictureRecorder();
+  Canvas(recorder).drawColor(const Color(0xFFF5F5F7), BlendMode.src);
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(256, 256);
+  final bytes = (await image.toByteData(
+    format: ui.ImageByteFormat.png,
+  ))!.buffer.asUint8List();
+  image.dispose();
+  picture.dispose();
+  return bytes;
 }

@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'selection_pill_surface.dart';
 import 'loading_shimmer.dart';
 
+enum FilterPanelPlacement { below, atOrigin }
+
 /// Anchored filter disclosure that preserves the surrounding content layout.
 class FilterExpansion<T> extends StatefulWidget {
   const FilterExpansion({
     required this.label,
+    this.subtitle,
     required this.editorBuilder,
     required this.onApply,
     this.enabled = true,
@@ -18,9 +21,11 @@ class FilterExpansion<T> extends StatefulWidget {
     this.alignPanelToEnd = false,
     this.compact = false,
     this.showLeadingIcon = true,
+    this.placement = FilterPanelPlacement.below,
     super.key,
   });
   final String label;
+  final String? subtitle;
   final Widget Function(BuildContext, ValueChanged<T>) editorBuilder;
   final ValueChanged<T> onApply;
   final bool enabled, applying;
@@ -28,6 +33,7 @@ class FilterExpansion<T> extends StatefulWidget {
   final double? panelWidth;
   final bool alignPanelToEnd;
   final bool compact, showLeadingIcon;
+  final FilterPanelPlacement placement;
   @override
   State<FilterExpansion<T>> createState() => _FilterExpansionState<T>();
 }
@@ -40,7 +46,7 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
   late final _motion = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 420),
-    reverseDuration: const Duration(milliseconds: 280),
+    reverseDuration: const Duration(milliseconds: 320),
   );
   late final _progress = CurvedAnimation(
     parent: _motion,
@@ -49,9 +55,20 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
   );
   bool _open = false;
   bool _closing = false;
+  double _closeStart = 1, _closeMotionStart = 1;
+
+  double get _exitFraction => !_closing || _closeMotionStart == 0
+      ? 0
+      : (1 - _motion.value / _closeMotionStart).clamp(0.0, 1.0);
+
+  double get _surfaceProgress => _closing
+      ? _closeStart * (1 - Curves.easeInOutCubic.transform(_exitFraction))
+      : _progress.value;
 
   Future<void> _close() async {
     if (!_open || _closing) return;
+    _closeStart = _progress.value;
+    _closeMotionStart = _motion.value;
     setState(() => _closing = true);
     FocusScope.of(context).unfocus();
     if (MediaQuery.disableAnimationsOf(context)) {
@@ -123,12 +140,49 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
           child: AnimatedBuilder(
             animation: _progress,
             builder: (context, child) {
-              final progress = _progress.value;
+              final progress = _surfaceProgress;
               final foreground = Color.lerp(
                 SelectionPillSurface.selected,
                 Colors.white,
                 progress,
               )!;
+              final title = Text(
+                widget.label,
+                maxLines: widget.subtitle == null ? null : 1,
+                overflow: widget.subtitle == null
+                    ? null
+                    : TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: foreground,
+                ),
+              );
+              final label = widget.subtitle == null
+                  ? title
+                  : Tooltip(
+                      message: '${widget.label} · ${widget.subtitle}',
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          title,
+                          Text(
+                            widget.subtitle!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, color: foreground),
+                          ),
+                        ],
+                      ),
+                    );
+              final arrow = Transform.rotate(
+                angle: -pi * progress,
+                child: Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: widget.compact ? 18 : 24,
+                  color: foreground,
+                ),
+              );
               return SelectionPillSurface(
                 child: Material(
                   // Follow the shared timeline without a second implicit animation.
@@ -153,36 +207,33 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                           horizontal: widget.compact ? 8 : 16,
                           vertical: 12,
                         ),
-                        child: Row(
-                          children: [
-                            if (widget.showLeadingIcon) ...[
-                              Icon(
-                                widget.icon,
-                                size: widget.compact ? 18 : 20,
-                                color: foreground,
+                        child: !widget.showLeadingIcon
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  label,
+                                  const SizedBox(height: 4),
+                                  arrow,
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  if (widget.showLeadingIcon) ...[
+                                    SizedBox(
+                                      width: widget.compact ? 18 : 24,
+                                      child: Icon(
+                                        widget.icon,
+                                        size: widget.compact ? 18 : 20,
+                                        color: foreground,
+                                      ),
+                                    ),
+                                    SizedBox(width: widget.compact ? 6 : 10),
+                                  ],
+                                  Expanded(child: label),
+                                  SizedBox(width: widget.compact ? 6 : 10),
+                                  arrow,
+                                ],
                               ),
-                              SizedBox(width: widget.compact ? 6 : 10),
-                            ],
-                            Expanded(
-                              child: Text(
-                                widget.label,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: foreground,
-                                ),
-                              ),
-                            ),
-                            Transform.rotate(
-                              angle: -pi * progress,
-                              child: Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: widget.compact ? 18 : 24,
-                                color: foreground,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ),
@@ -203,12 +254,15 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
           Overlay.of(context).context.findRenderObject() as RenderBox;
       final origin = box.localToGlobal(Offset.zero, ancestor: overlay);
       final sourceRect = origin & box.size;
-      final bottom = sourceRect.bottom;
+      final atOrigin = widget.placement == FilterPanelPlacement.atOrigin;
       final media = MediaQuery.of(context);
+      final panelTop = atOrigin
+          ? sourceRect.top.clamp(media.padding.top + 8, constraints.maxHeight)
+          : sourceRect.bottom + 8;
       final inset = media.viewInsets.bottom > media.padding.bottom
           ? media.viewInsets.bottom
           : media.padding.bottom;
-      final height = (constraints.maxHeight - bottom - inset - 20).clamp(
+      final height = (constraints.maxHeight - panelTop - inset - 12).clamp(
         0.0,
         constraints.maxHeight,
       );
@@ -231,12 +285,28 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
           ),
         ),
         builder: (context, panel) {
-          final progress = _progress.value;
+          final progress = _surfaceProgress;
+          // Let the contraction read before fading the panel away. Capture the
+          // opening position so reversing midway never jumps to a fully open panel.
+          final contraction = _closing
+              ? _closeStart * (1 - Curves.easeInCubic.transform(_exitFraction))
+              : progress;
+          final opacity = _closing
+              ? _closeStart *
+                    (1 -
+                        const Interval(
+                          .22,
+                          1,
+                          curve: Curves.easeInCubic,
+                        ).transform(_exitFraction))
+              : progress;
           return Stack(
             children: [
               Positioned.fill(
                 child: ClipPath(
-                  clipper: _FilterBackdropClipper(sourceRect),
+                  clipper: _FilterBackdropClipper(
+                    atOrigin ? Rect.zero : sourceRect,
+                  ),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
                       sigmaX: 16 * progress,
@@ -262,22 +332,39 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                 child: CompositedTransformFollower(
                   link: _link,
                   showWhenUnlinked: false,
-                  targetAnchor: widget.alignPanelToEnd
-                      ? Alignment.bottomRight
-                      : Alignment.bottomLeft,
+                  targetAnchor: atOrigin
+                      ? (widget.alignPanelToEnd
+                            ? Alignment.topRight
+                            : Alignment.topLeft)
+                      : (widget.alignPanelToEnd
+                            ? Alignment.bottomRight
+                            : Alignment.bottomLeft),
                   followerAnchor: widget.alignPanelToEnd
                       ? Alignment.topRight
                       : Alignment.topLeft,
-                  offset: const Offset(0, 8),
+                  offset: Offset(0, atOrigin ? panelTop - sourceRect.top : 8),
                   child: IgnorePointer(
                     ignoring: _closing,
                     child: Opacity(
-                      opacity: progress,
-                      child: Transform.scale(
-                        alignment: Alignment.topCenter,
-                        scaleX: .94 + .06 * progress,
-                        scaleY: .86 + .14 * progress,
-                        child: panel,
+                      opacity: opacity,
+                      child: Transform.translate(
+                        offset: Offset(
+                          0,
+                          _closing
+                              ? -8 *
+                                    (1 -
+                                        contraction /
+                                            (_closeStart == 0
+                                                ? 1
+                                                : _closeStart))
+                              : 0,
+                        ),
+                        child: Transform.scale(
+                          alignment: Alignment.topCenter,
+                          scaleX: .94 + .06 * contraction,
+                          scaleY: .86 + .14 * contraction,
+                          child: panel,
+                        ),
                       ),
                     ),
                   ),

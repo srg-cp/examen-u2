@@ -8,6 +8,8 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
+| [Ficha pública QR](ficha-publica-qr.md) | apps/public-web | HU-09; RF-09; issue #9; consulta local, hosting/HU-10 pendientes |
+| [Carteles PDF y QR](carteles-qr.md) | case_posters | HU-08.1/08.2; RF-08,37; issues #34/#35; implementación local, activación pendiente |
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación del usuario16/10/2026 de HU-07/RF-13; sin issue asignado; local |
 | [Acceso y recuperación](acceso.md) | auth | HU-01; RF-01,34; issue #1 y subtareas |
@@ -33,8 +35,9 @@ Las sesiones y permisos se comprueban también en servidor; la UI no sustituye
 RLS, grants ni restricciones. Al cambiar de cuenta se descartan resultados
 tardíos y datos privados de la identidad anterior.
 
-Mapa de resultados de Explorar, cartel/QR y avistamientos desde web,
-bandeja y entrega real de alertas siguen en los sprints posteriores de
+Mapa de Explorar, carteles/QR y lectura web tienen implementación local;
+activación y evidencia se detallan en sus fichas. Avistamientos desde web,
+bandeja y entrega real de alertas siguen pendientes según
 [GUIA_MVP](../GUIA_MVP.md). Las preferencias guardadas no envían avisos.
 
 Para cada incremento, actualizar su ficha, enlazar nuevas fichas aquí y

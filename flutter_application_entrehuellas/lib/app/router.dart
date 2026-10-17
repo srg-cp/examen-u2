@@ -1,4 +1,7 @@
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/explore/presentation/screens/explore_map_screen.dart';
+import '../features/case_posters/presentation/screens/case_poster_screen.dart';
+import '../features/case_posters/domain/entities/case_poster.dart';
 import '../features/places/presentation/widgets/place_search_fields.dart';
 import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
@@ -108,6 +111,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-cases' ||
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
+              state.uri.path == '/home/explore-map' ||
+              state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
@@ -211,6 +216,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'explore-map',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ExploreMapScreen(
+                locationSearchBuilder: (label, onSelect) =>
+                    PlaceSearchFields(initialLabel: label, onSelect: onSelect),
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'my-reports',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -256,6 +273,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: FoundDetailScreen(
                 id: state.pathParameters['id']!,
+                posterAction: TextButton.icon(
+                  onPressed: () => context.push(
+                    '/home/posters/found/${state.pathParameters['id']}',
+                  ),
+                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  label: const Text('Crear cartel con QR'),
+                ),
                 savedAction: SaveCaseButton(
                   target: SavedCaseRef(
                     source: SavedCaseSource.found,
@@ -312,6 +336,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: CaseDetailScreen(
                 id: state.pathParameters['id']!,
+                posterAction: TextButton.icon(
+                  onPressed: () => context.push(
+                    '/home/posters/lost/${state.pathParameters['id']}',
+                  ),
+                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  label: const Text('Crear cartel con QR'),
+                ),
                 savedAction: SaveCaseButton(
                   target: SavedCaseRef(
                     source: SavedCaseSource.lost,
@@ -338,6 +369,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
               child: const AlertPreferencesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'posters/:source/:id',
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source'])
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: CasePosterScreen(
+                target: PosterCase(
+                  PosterSource.values.byName(state.pathParameters['source']!),
+                  state.pathParameters['id']!,
+                ),
+              ),
             ),
           ),
           GoRoute(

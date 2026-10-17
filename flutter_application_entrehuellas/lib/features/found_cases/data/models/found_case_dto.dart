@@ -32,6 +32,7 @@ class FoundCaseDto {
         (row['target_community_case_id'] != null),
     status: row['status'] as String,
     canResolve: row['can_resolve'] as bool? ?? false,
+    canGeneratePoster: row['can_generate_poster'] as bool? ?? false,
     occurredAt: DateTime.parse(row['occurred_at'] as String),
     latitude: (row['latitude'] as num).toDouble(),
     longitude: (row['longitude'] as num).toDouble(),

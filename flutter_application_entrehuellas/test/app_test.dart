@@ -139,7 +139,12 @@ void main() {
       await mount(tester);
       expect(find.text('Iniciar sesión'), findsOneWidget);
       expect(find.byType(BackButton), findsNothing);
-      for (final path in ['/home', '/onboarding', '/unknown?code=private']) {
+      for (final path in [
+        '/home',
+        '/home/explore-map',
+        '/onboarding',
+        '/unknown?code=private',
+      ]) {
         container.read(routerProvider).go(path);
         await tester.pumpAndSettle();
         expect(find.text('Iniciar sesión'), findsOneWidget);
@@ -152,6 +157,8 @@ void main() {
     (tester) async {
       await mount(tester);
       auth.emit(const AuthSession(userId: 'one'));
+      await tester.pumpAndSettle();
+      container.read(routerProvider).go('/home/explore-map');
       await tester.pumpAndSettle();
       expect(find.text('Cada huella'), findsOneWidget);
       expect(find.text('Omitir'), findsNothing);
