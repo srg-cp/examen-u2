@@ -7,7 +7,7 @@ Trazabilidad: HU-09 / RF-09 / issue #9, S4; depende del contrato de carteles022.
 
 El visitante necesita leer el QR sin Flutter ni cuenta. La RLS de filas no basta
 para ocultar columnas y las rutas de fotos contienen UUID privados. Se crea
-`apps/public-web`: cliente HTML/CSS/ES modules y adaptador HTTP Node22 de lectura,
+`apps/platform`: cliente HTML/CSS/ES modules y adaptador HTTP Node22 de lectura,
 sin librerías de producción ni una API general nueva. Supabase conserva reglas,
 persistencia y autorización. Se mantiene Android y su ubicación existente.
 

@@ -1,5 +1,14 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Web,17/10/2026:** por decisión del usuario se adopta Vue/Nuxt/TypeScript
+para una única aplicación web con módulos públicos, usuarios y administración.
+Los roles no se resuelven solo en navegación: cada operación debe autorizarlos
+en backend. La separación dominio/data/presentation también aplica a TypeScript;
+dominio sin Vue/Nuxt/SDK, composición por petición y estado SSR sin singleton de
+usuario. SSR público solo serializa proyecciones permitidas. Flutter permanece
+en móvil. Sin rutas vacías de administración ni separación de proyectos por rol.
+[ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
+
 **Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
 
 Estado: norma del proyecto. Fecha: 7 de octubre de 2026, America/Lima.
@@ -25,7 +34,7 @@ Las instrucciones explícitas del usuario prevalecen. Ante discrepancias documen
 | Estado inmutable y flujo en una dirección | La UI envía acciones al ViewModel y recibe nuevos estados; no modifica entidades o datos compartidos. |
 | SOLID | Las responsabilidades, contratos y sustituciones deben poder explicarse y probarse. |
 
-Stack acordado: Flutter, Riverpod, go_router y Supabase. Android primero; la app existente permanece en `flutter_application_entrehuellas`. La web pública QR forma parte del sistema y conserva sus propios límites de acceso. No se añaden ASP.NET Core, SignalR, Redis o workers de IA sin una nueva decisión arquitectónica registrada.
+Stack acordado: Flutter, Riverpod, go_router y Supabase. Android primero; la app existente permanece en `apps/mobile`. La web pública QR forma parte del sistema y conserva sus propios límites de acceso. No se añaden ASP.NET Core, SignalR, Redis o workers de IA sin una nueva decisión arquitectónica registrada.
 
 ## 2. Organización por funcionalidad
 
@@ -161,7 +170,7 @@ Antes de considerar completo un cambio de código, comprobar los puntos que le c
 - La configuración pública está separada de secretos y las migraciones/políticas necesarias están versionadas.
 - La documentación de estado registra resultados, limitaciones y siguiente paso. No se acepta una excepción arquitectónica silenciosa.
 
-Comandos desde `flutter_application_entrehuellas`:
+Comandos desde `apps/mobile`:
 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test

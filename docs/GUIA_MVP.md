@@ -56,7 +56,12 @@ Los seis sprints son una secuencia de entregas. Si se conserva la duración de d
 
 ## 4. Chat 00: proyecto y estructura
 
-La app existente se conserva en `flutter_application_entrehuellas`, según la decisión del 6 de octubre de 2026. Esa carpeta reemplaza la ubicación propuesta `apps/mobile`. La estructura utiliza `presentation`, `domain` y `data` por funcionalidad, con MVVM y Riverpod. La base de navegación y configuración está implementada; consultar [ESTADO.md](ESTADO.md) para validación real y [CONFIGURACION.md](CONFIGURACION.md) para comandos y deep links. La sección anterior conserva el estado histórico de la preparación.
+Por decisión del17 de octubre de2026, la aplicación Flutter existente se traslada
+a `apps/mobile` y la web se ubica en `apps/platform`. Sustituye la ubicación de
+Flutter en la raíz acordada el6 de octubre, sin recrear proyectos ni cambiar
+identificadores. Se conservan presentation/domain/data por funcionalidad, MVVM
+y Riverpod en móvil. [ADR-059](decisiones/059-directorios-apps-platform-mobile.md),
+[ESTADO](ESTADO.md) y [CONFIGURACION](CONFIGURACION.md) conservan validación y comandos.
 
 Orden de trabajo:
 
@@ -69,7 +74,7 @@ La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISE
 1. Leer `AGENTS.md` y los documentos; comprobar Git y conservar los archivos existentes.
 2. Completar el entorno Android. En Android Studio, abrir SDK Manager y revisar SDK Tools: instalar **Android SDK Command-line Tools**, comprobar Platform-Tools, Build-Tools y una plataforma compatible. El usuario revisa los términos con `flutter doctor --android-licenses`. Volver a ejecutar `flutter doctor` y detectar un teléfono o emulador. [Configuración Android oficial](https://docs.flutter.dev/platform-integration/android/setup).
 3. Elegir una versión de Flutter y dependencias compatibles. La instalada es un punto de partida; cualquier actualización se evalúa y documenta.
-4. Conservar la app existente en `flutter_application_entrehuellas` y organizar `lib/app`, `lib/core` y funcionalidades con `presentation`, `domain` y `data`. Revisar el identificador Android provisional antes de distribuir.
+4. Conservar la app existente en `apps/mobile` y organizar `lib/app`, `lib/core` y funcionalidades con `presentation`, `domain` y `data`. Revisar el identificador Android provisional antes de distribuir.
 5. Incorporar inicialmente Riverpod, go_router y supabase_flutter. Añadir Drift/SQLite cuando se implemente el almacenamiento local. Cada paquete debe resolver una necesidad concreta.
 6. Preparar configuración con ejemplos sin credenciales. Verificar la app con una pantalla inicial y estado explícito de configuración si Supabase aún no existe.
 7. Crear CI con formato, análisis y pruebas pertinentes. Documentar los comandos y fijar la versión de Flutter usada por CI.
@@ -78,7 +83,7 @@ La base de Inicio y Acceso incorpora la dirección visual de [DISENO_UI.md](DISE
 La app ya existe: no ejecutar `flutter create` sobre ella. Para trabajar desde la raíz:
 
 ```powershell
-Set-Location flutter_application_entrehuellas
+Set-Location apps/mobile
 flutter pub get --enforce-lockfile
 ```
 
@@ -94,7 +99,7 @@ Lee AGENTS.md, docs/ARQUITECTURA.md, docs/ESTADO.md y la sección 4 de docs/GUIA
 
 El repositorio es https://github.com/srg-cp/entrehuellas. Origin y la rama main ya fueron configurados; compruébalos sin volver a clonar encima de la carpeta.
 
-Continúa sobre la app Flutter existente en flutter_application_entrehuellas. Lee docs/REGLAS_ARQUITECTURA.md y conserva las capas presentation, domain y data por funcionalidad, MVVM, Riverpod, casos de uso, repositorios, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos, el deep link entrehuellas://login-callback/ y CI para formato, análisis y pruebas pertinentes.
+Continúa sobre la app Flutter existente en apps/mobile. Lee docs/REGLAS_ARQUITECTURA.md y conserva las capas presentation, domain y data por funcionalidad, MVVM, Riverpod, casos de uso, repositorios, go_router y supabase_flutter. Mantén Supabase como backend del MVP. Prepara configuración de ejemplo sin secretos, el deep link entrehuellas://login-callback/ y CI para formato, análisis y pruebas pertinentes.
 
 Revisa Flutter y Android. Ya se detectaron Command-line Tools y licencias pendientes. Ayúdame a resolver los pasos que requieran mi intervención mientras avanzas con lo independiente. Registra la versión de SDK y el identificador Android elegidos.
 
@@ -113,6 +118,11 @@ la existencia de una ficha no implica cierre de la HU ni ampliación del MVP.
 Se conserva la numeración original para relacionar implementación, informe académico y pruebas. El chat 00 prepara la base técnica que el plan original situaba dentro de S1.
 
 ### S1 - Acceso y cuenta
+
+- Ampliación autorizada el17 de octubre de2026 de **HU-01 / RF-01,34 / issue #1**:
+  acceso con Facebook además de correo/Google, conservando sesión y onboarding
+  por cuenta. Código local y [guía de activación](LOGIN_FACEBOOK.md); Meta/Auth
+  y prueba Android pendientes, sin cierre automático de historia.
 
 - Dirección visual obligatoria: [REGLAS_UI_UX.md](REGLAS_UI_UX.md), basada en acceso/cuenta/OTP/contraseña aprobados. Retirado Inicio anterior; destino provisional conserva bienvenida y cierre real, sin ampliar funcionalidades.
 
@@ -171,6 +181,12 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+17/10/2026: usuario adopta una sola web Vue/Nuxt/TypeScript para público,
+usuarios y administración por roles, conservando Flutter móvil. Primer incremento
+en feature/vue-nuxt-web migra consulta QR a Vue/SSR con mismos contratos y URLs;
+no amplía este paso a login/admin/HU-10 ni modifica la rama de landing en curso.
+No hay nueva migración SQL. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
+
 Incremento16 de octubre, feature/public-qr-case-web: HU-09/RF-09/#9 implementa
 consulta web ligera y contrato privado de resolución/fotos, plan023. Estados
 activo/cerrado/neutral, galería, compartir/copia y actualización real. Falta
@@ -181,7 +197,7 @@ no se cierra la historia. PUBLIC_CASE_WEB_READY sigue false. Sin despliegue/APK.
 Incremento16 de octubre: por instrucción del usuario se deja la generación de APK para más adelante y se inicia feature/pet-poster-qr, HU-08.1/#34 y HU-08.2/#35. Cartel A4 público, QR opaco estable, impresión/guardado y compartir PDF/enlace; fuente077–079/plan022. El usuario indica dominio entrehuellas.kormind.com; la generación se activa solo después de aplicar022 y disponer de HU-09 en ese dominio. La raíz responde404 al comprobarla; no se entrega ni despliega web en HU-08. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md). Sin ampliación a push/offline/moderación ni cierre automático de historias.
 
 - **HU-08 / RF-08,37:** cartel PDF legible, QR y compartir. Se puede generar en Flutter para el MVP; conservar enlace estable y permitir reintento de la generación.
-- **HU-09 / RF-09:** crear `apps/public-web` cuando haga falta; web ligera que abre el QR y muestra estado sin instalar la app. Token revocado no revela identidad privada.
+- **HU-09 / RF-09:** crear `apps/platform` cuando haga falta; web ligera que abre el QR y muestra estado sin instalar la app. Token revocado no revela identidad privada.
 - **HU-10 / RF-11:** avistamiento desde web/app con hora del evento y punto manual, foto opcional; rechazo de fecha futura y deduplicación del envío.
 - El flujo público tiene permisos acotados y validación de abuso en servidor. Acordar hosting y URL estable antes de imprimir un QR que se usará fuera de pruebas.
 - **Demo:** escanear en un segundo teléfono sin app y reportar; comprobar la persistencia y la separación de campos públicos/privados.
@@ -189,7 +205,7 @@ Incremento16 de octubre: por instrucción del usuario se deja la generación de 
 Prompt:
 
 ```text
-Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web pública ligera en apps/public-web. El visitante debe consultar y reportar sin instalar Flutter. Implementa tokens revocables, punto manual, hora observada, permisos públicos limitados, controles de abuso y reintentos idempotentes. Prepara el resultado para revisar y documenta la configuración/hosting pendiente antes de publicar. Verifica el recorrido con otro teléfono y actualiza el estado.
+Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web pública ligera en apps/platform. El visitante debe consultar y reportar sin instalar Flutter. Implementa tokens revocables, punto manual, hora observada, permisos públicos limitados, controles de abuso y reintentos idempotentes. Prepara el resultado para revisar y documenta la configuración/hosting pendiente antes de publicar. Verifica el recorrido con otro teléfono y actualiza el estado.
 ```
 
 ### S5 - Seguimiento, alertas y cierre
@@ -277,7 +293,7 @@ Siguiente paso concreto:
 
 Una historia está terminada cuando sus criterios están verificados, los permisos y errores pertinentes están cubiertos, los cambios de datos están versionados y se puede demostrar el resultado. Una interfaz con datos simulados se identifica como tal; no equivale al flujo integrado.
 
-Para trabajos de implementación con Flutter, ejecutar según corresponda desde `flutter_application_entrehuellas`:
+Para trabajos de implementación con Flutter, ejecutar según corresponda desde `apps/mobile`:
 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test

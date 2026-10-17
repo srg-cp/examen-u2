@@ -1,5 +1,14 @@
 # Ficha pública QR
 
+Migración17/10/2026 en feature/vue-nuxt-web: Vue/Nuxt/TypeScript sustituye
+la vista DOM y HTTP manual, manteniendo proyección, /c/<token>, API y fotos.
+Primera lectura SSR con entidad permitida e hidratación sin segunda consulta;
+componentes Vue compartidos, nonce CSP y estado por petición. Sin SQL nuevo.
+Usuario confirma022/023 aplicados y recorrido QR funcionando en versión previa;
+la migración Vue sigue local hasta publicación/redeploy. [ADR-058](../decisiones/058-web-unica-vue-nuxt-y-roles.md),
+[guía Vue](../../apps/platform/DESARROLLO.md). Landing, login/admin web e integración
+HU-10 siguen fuera de este incremento.
+
 HU-09 / RF-09 / issue #9. Incremento local del16 de octubre de2026 en
 `feature/public-qr-case-web`. Consulta implementada; historia abierta por
 integración HU-10.1 y validación/activación remota pendientes.
@@ -36,14 +45,14 @@ confirmados la retiran. Copias descargadas/impresas no se revocan retroactivamen
 
 ## Dependencias y activación
 
-Preparación Dokploy17/10/2026: [guía GitHub→VDS](../../apps/public-web/DOKPLOY.md),
+Preparación Dokploy17/10/2026: [guía GitHub→VDS](../../apps/platform/DOKPLOY.md),
 Dockerfile multietapa/runtime no root, contexto permitido por .dockerignore,
 healthcheck y CI de build/arranque sin secretos reales. El usuario completará
 Environment. No configura automáticamente su panel, DNS, SQL ni publica la rama.
 
 Node22+, Supabase001–023 y pipeline de rendiciones; secreto solo servidor,
 HTTPS en el dominio elegido y proxy sin caché ni logs de tokens. Límites por
-IP/concurrencia por proceso. [README](../../apps/public-web/README.md),
+IP/concurrencia por proceso. [README](../../apps/platform/README.md),
 [ADR-057](../decisiones/057-ficha-qr-web-y-proxy-privado.md).
 PUBLIC_CASE_WEB_READY sigue false hasta comprobar hosting/lectura real.
 

@@ -1,0 +1,1 @@
+<template><div class="skeleton" aria-label="Consultando caso" aria-busy="true"><div class="shape hero-shape" /><div class="shape title-shape" /><div class="shape line-shape" /><div class="shape line-shape short" /></div></template>

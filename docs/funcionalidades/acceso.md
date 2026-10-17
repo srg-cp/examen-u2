@@ -4,7 +4,7 @@ Módulo: `auth`. Trazabilidad: HU-01 / RF-01,34; [issue #1 y subtareas](../backl
 
 ## Qué hace y cómo se usa
 
-El acceso comienza en login. Permite entrar con correo/contraseña o Google,
+El acceso comienza en login. Permite entrar con correo/contraseña, Google o Facebook,
 crear cuenta, confirmar el correo con código de seis dígitos y recuperar la
 contraseña. Crear cuenta solicita nombre, correo, contraseña y confirmación.
 Si Auth exige confirmación, el usuario introduce el código del correo; una
@@ -19,11 +19,11 @@ El reenvío de códigos tiene espera de60s en cliente y límites de servidor.
 
 Se valida correo, longitud mínima de contraseña y coincidencia de confirmación.
 No se recortan espacios de contraseñas ni se conservan contraseñas en providers.
-Abrir Google no confirma acceso: se espera una sesión de Supabase Auth.
+Abrir Google o Facebook no confirma acceso: se espera una sesión de Supabase Auth.
 El SDK gestiona PKCE y el callback móvil configurado; las rutas privadas requieren
 sesión y onboarding completo. La recuperación tiene su propio destino protegido.
 
-Los errores se muestran en el contexto del formulario, sin mensajes internos
+Los errores se muestran en el toast superior compartido, sin mensajes internos
 del SDK. Durante una solicitud real el botón conserva su etiqueta con shimmer
 y bloquea envíos duplicados. La cuenta no se considera autenticada por mostrar
 un éxito de registro ni por iniciar el navegador de OAuth.
@@ -39,6 +39,19 @@ Las pruebas y demos acreditadas constan en [ESTADO](../ESTADO.md); entrega de
 correo, caducidad, OAuth y reentrada deben comprobarse en el entorno real.
 Exportación/baja de cuenta del alcance general de HU-01 no se dan por entregadas
 por estos recorridos. Activación: [CONFIGURACION](../CONFIGURACION.md).
+
+Facebook (17 de octubre de 2026): implementación local sobre el mismo caso de
+uso, repositorio y callback móvil. Configuración Meta/App ID/App Secret en Auth,
+modo de pruebas/publicación y recorrido de validación en
+[LOGIN_FACEBOOK](../LOGIN_FACEBOOK.md). No hay secreto nuevo en Flutter ni
+migración SQL. Activación remota y acceso real con Facebook pendientes;
+la implementación no cierra HU-01.
+
+Ajuste visual solicitado el17 de octubre: Facebook usa azul #0866FF e icono
+de24px para igualar la presencia visual del asset Google de20px (el glifo
+Material incorpora margen interior). Ambos botones sociales comparten altura
+mínima50px y padding vertical10px; conservan crecimiento con texto ampliado,
+área táctil, shimmer y comportamiento de acceso.
 
 
 ## Área inferior del scroll — 10 de octubre de 2026

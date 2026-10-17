@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Web17/10/2026: componentes Vue compartidos (WebShell, ActionButton, TopToast,
+ContentSkeleton) y CaseGallery sustituyen la vista DOM manual del QR. Conservar
+composición y colores aprobados, cover→stagger solo al entrar/cambiar etapa,
+refresh sin remonte de fotos y movimiento reducido. HTML SSR e hidratación
+no deben duplicar consulta ni revelar campos privados. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
+
 Web pública QR,16 octubre: la ficha ligera de HU-09 comparte marca y tokens
 aprobados, jerarquía/áreas táctiles, botones glass de galería, cover→stagger,
 skeleton, shimmer sobre contenido conservado y toast superior en componentes

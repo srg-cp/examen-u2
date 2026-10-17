@@ -1,15 +1,33 @@
 # Configuración y validación de la app
 
+Ubicaciones17 octubre: ejecutar Flutter desde apps/mobile y Nuxt desde
+apps/platform. F5 raíz apunta a apps/mobile y conserva config/supabase.local.json;
+los valores locales se trasladaron sin cambios. Dokploy debe usar contexto
+apps/platform y Dockerfile apps/platform/Dockerfile al desplegar esta revisión.
+
+Vue/Nuxt17 octubre: Node24.15+ recomendado; npm ci en apps/platform y
+npm run dev para desarrollo. No instalar Nuxt/Vue globalmente. Typecheck,
+unitarias, build y pruebas de producción documentados en
+[DESARROLLO.md](../apps/platform/DESARROLLO.md). Dokploy conserva variables,
+contexto, stage y puerto; el comando de imagen ahora ejecuta .output de Nitro.
+Publicar la rama nueva antes de redeploy. Usuario confirma022/023 aplicados y
+generación/lectura QR operativas en la versión anterior; no se reejecuta SQL.
+
+Facebook,17 de octubre: botón preparado en login sobre Supabase OAuth y retorno
+móvil existente. Activar Meta y el servicio Auth de Dokploy según
+[LOGIN_FACEBOOK.md](LOGIN_FACEBOOK.md), con callback HTTPS exacto y secreto
+solo en servidor. Sin configuración remota ni demo Android acreditadas.
+
 Dokploy17 octubre: preparación para Application desde GitHub, Dockerfile
-apps/public-web/Dockerfile, contexto apps/public-web y puerto interno5173.
+apps/platform/Dockerfile, contexto apps/platform y puerto interno5173.
 Campos, Environment, DNS/TLS, Auto Deploy y comprobaciones en
-[DOKPLOY.md](../apps/public-web/DOKPLOY.md). El usuario añade secretos en el panel;
+[DOKPLOY.md](../apps/platform/DOKPLOY.md). El usuario añade secretos en el panel;
 no se incorporan a Git/build. Healthcheck es de proceso, no valida Supabase.
 
-Web QR16 octubre: consulta HU-09 implementada localmente en apps/public-web.
+Web QR16 octubre: consulta HU-09 implementada localmente en apps/platform.
 Aplicar [023](../database/patchs/023_patch_public_qr_case.sql) tras022 en desarrollo;
 hosting Node22 con secreto servidor/TLS, sin caché/logs de tokens. Pasos en
-[README](../apps/public-web/README.md). No se ha desplegado; PUBLIC_CASE_WEB_READY
+[README](../apps/platform/README.md). No se ha desplegado; PUBLIC_CASE_WEB_READY
 sigue false y formulario HU-10.1 pendiente. Actualiza el pendiente de implementación
 de la nota histórica de carteles siguiente.
 
@@ -21,12 +39,12 @@ Actualización posterior: el usuario confirma aplicado el patch020. No equivale 
 
 Casos guardados,16 de octubre: aplicar020 después de001–019 en desarrollo. [Patch020](../database/patchs/020_patch_saved_cases.sql)/migración20261016002000_saved_cases.sql derivados de070–073/plan020 con Build-SavedCasesPatch/Build-RunAll. Activar cliente y RPC juntos: sin contrato el marcador informa error de consulta, sin simular guardado. Sin claves/SDK/variables nuevos. Sin SQL remoto ni pruebas ejecutadas por petición del usuario; validar permisos/concurrencia/repetición antes de desplegar. [Ficha](funcionalidades/casos-guardados.md).
 
-Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar los comandos desde `flutter_application_entrehuellas`. Se mantienen el nombre del paquete y las plataformas existentes. Android conserva el identificador provisional `com.example.flutter_application_entrehuellas`; revisarlo antes de distribuir.
+Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar los comandos desde `apps/mobile`. Se mantienen el nombre del paquete y las plataformas existentes. Android conserva el identificador provisional `com.example.flutter_application_entrehuellas`; revisarlo antes de distribuir.
 
 ## Arranque
 
 ```powershell
-Set-Location flutter_application_entrehuellas
+Set-Location apps/mobile
 flutter pub get --enforce-lockfile
 flutter run -d chrome
 ```
@@ -183,7 +201,7 @@ El formulario Perfil consulta y modifica solamente nombre visible y ciudad. Camp
 Para verificar permisos/persistencia con dos cuentas dedicadas de desarrollo:
 
 1. Copiar `config/profile_test.local.example.json` a `config/profile_test.local.json` dentro de la app. El destino queda ignorado por Git. Completar URL/clave publicable y los cuatro valores de las dos cuentas confirmadas de prueba; no compartir contraseñas por chat ni versionarlas.
-2. Ejecutar desde `flutter_application_entrehuellas`:
+2. Ejecutar desde `apps/mobile`:
 
 ```powershell
 flutter test --no-pub tool/check_profile_remote_test.dart --dart-define-from-file=config/profile_test.local.json
@@ -207,7 +225,7 @@ Demo necesaria: A selecciona JPG/PNG y confirma foto/correo; reiniciar y consult
 
 ### Selector no abre después de Hot Restart
 
-Comprobación del 8 de octubre: el APK instalado en emulator-5554 no contiene ImagePickerPlugin aunque el registrante del proyecto lo declare. Detener la ejecución Flutter anterior y abrir una terminal externa o el IDE en flutter_application_entrehuellas, después ejecutar:
+Comprobación del 8 de octubre: el APK instalado en emulator-5554 no contiene ImagePickerPlugin aunque el registrante del proyecto lo declare. Detener la ejecución Flutter anterior y abrir una terminal externa o el IDE en apps/mobile, después ejecutar:
 
 ```powershell
 flutter run --dart-define-from-file=config/supabase.local.json -d emulator-5554

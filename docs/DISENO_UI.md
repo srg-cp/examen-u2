@@ -1,5 +1,12 @@
 # Diseño de la interfaz: implementación y revisión
 
+Web Vue17/10/2026: app/components comparte WebShell/ActionButton/TopToast/
+ContentSkeleton; app/features/case_reader contiene pantalla y galería Vue.
+app/assets/main.css conserva los tokens y geometría de la ficha anterior.
+Revisión mediante build SSR y Chrome real, incluyendo hidratación, CSP, errores
+y 320px con texto200%. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md),
+[guía Vue](../apps/platform/DESARROLLO.md).
+
 Revisión del mapa (16 octubre): se sustituye la ficha inferior por ExploreFilterEditor combinado dentro del panel deslizable; sin mapa embebido duplicado. Botón Aplicar filtros fijo al pie cuando cabe; con panel mínimo pasa al scroll para no recortar texto/acciones. Pin sin selección inicial; al pulsar se reduce panel y aparece una etiqueta junto al punto con nombre/Abrir caso, superficie compartida y anterior/siguiente solo si hay coincidencias. Cámara acomoda la etiqueta; pan no consulta. Campos de lista y mapa comparten implementación y metadatos de lugar por cuenta. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md).
 
 Mapa de Explorar (16 octubre): opción Mapa navega a pantalla propia desde sus límites reales con entityEditorPage/OriginPageTransition. Sin cabecera ni navegación de Home sobre el mapa; GlassNavigationButton flotante. DraggableScrollableSheet 14/42/90% con tirador persistente, nombre/Ver ficha, coordenadas aproximadas y PublicCaseGrid de una columna/foto2:1. Un caso visible; anterior/siguiente solo para coincidencias. Padding de cámara evita centrar la búsqueda bajo el panel. Sin entrada repetida por pan/selección/refresh. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md).
@@ -42,7 +49,7 @@ La norma obligatoria es [REGLAS_UI_UX.md](REGLAS_UI_UX.md). Su referencia son la
 
 ## Componentes de referencia
 
-Rutas relativas a `flutter_application_entrehuellas/lib`:
+Rutas relativas a `apps/mobile/lib`:
 
 | Responsabilidad | Fuente |
 | --- | --- |

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="flutter_application_entrehuellas/assets/branding/app_icon.png" alt="Icono de Entre Huellas" width="136" />
+  <img src="apps/mobile/assets/branding/app_icon.png" alt="Icono de Entre Huellas" width="136" />
   <h1>Entre Huellas</h1>
   <p><strong>Cada huella puede ayudar a volver a casa.</strong></p>
   <p>Proyecto grupal de recuperación colaborativa de mascotas · MVP con prioridad Android</p>
@@ -32,6 +32,15 @@ Explorar, la web pública QR y la entrega real de alertas tienen trabajo pendien
 
 ## 🚀 Primeros pasos
 
+Las aplicaciones se organizan en dos directorios:
+
+- [apps/mobile](apps/mobile/README.md): Flutter para Android y futuras plataformas móviles.
+- [apps/platform](apps/platform/README.md): Vue/Nuxt/TypeScript para la plataforma web.
+
+Base de datos, funciones y documentación permanecen en database, supabase y docs.
+Para desarrollar la web, seguir [la guía Vue](apps/platform/DESARROLLO.md);
+los pasos siguientes corresponden a Flutter. Véase [ADR-059](docs/decisiones/059-directorios-apps-platform-mobile.md).
+
 Esta guía está dirigida a los integrantes del equipo que van a ejecutar o desarrollar la app desde el código fuente.
 
 ### 1. Preparar el equipo
@@ -62,17 +71,17 @@ Con acceso al repositorio:
 ```powershell
 git clone https://github.com/srg-cp/entrehuellas.git
 Set-Location entrehuellas
-Set-Location flutter_application_entrehuellas
+Set-Location apps/mobile
 flutter pub get --enforce-lockfile
 ```
 
-La app se conserva en **`flutter_application_entrehuellas`**. No hay que regenerarla ni trasladarla. Si ya tienes una copia, utiliza esa copia y revisa sus cambios antes de actualizarla.
+La app se conserva en **`apps/mobile`**. No hay que regenerarla ni trasladarla. Si ya tienes una copia, utiliza esa copia y revisa sus cambios antes de actualizarla.
 
 <a id="configuracion-local"></a>
 
 ## 🔑 Archivo de configuración
 
-**La plantilla que necesitas ya está incluida:** [supabase.local.example.json](flutter_application_entrehuellas/config/supabase.local.example.json).
+**La plantilla que necesitas ya está incluida:** [supabase.local.example.json](apps/mobile/config/supabase.local.example.json).
 
 Desde la carpeta de la app, cópiala una sola vez:
 
@@ -96,7 +105,7 @@ No necesitas acceso administrativo a Supabase para ejecutar la app. Usa una cuen
 
 ## ▶️ Ejecutar la app
 
-Desde `flutter_application_entrehuellas`, con el emulador o teléfono disponible:
+Desde `apps/mobile`, con el emulador o teléfono disponible:
 
 ```powershell
 flutter run --dart-define-from-file=config/supabase.local.json
@@ -172,7 +181,7 @@ El [workflow Flutter](.github/workflows/flutter.yml) define formato, análisis y
 
 ```text
 entrehuellas/
-├── flutter_application_entrehuellas/   App Flutter existente
+├── apps/mobile/   App Flutter existente
 │   ├── config/                        Plantillas de configuración
 │   ├── lib/app/                       Bootstrap, aplicación y router
 │   ├── lib/core/                      Configuración y componentes compartidos
