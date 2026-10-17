@@ -135,7 +135,7 @@ Como visitante, quiero abrir el QR o enlace de un caso desde mi navegador para c
 - #5.
 - #6.
 
-Implementar primero el contrato de ficha/token/estado y apps/public-web. Coordinar después el enlace al formulario con #36 y comprobar resolución/bloqueo con #13; estas son verificaciones de integración, no prerrequisitos circulares para empezar la ficha. Hosting y URL estable deben acordarse antes de publicación/impresión de uso real.
+Implementar primero el contrato de ficha/token/estado y apps/platform. Coordinar después el enlace al formulario con #36 y comprobar resolución/bloqueo con #13; estas son verificaciones de integración, no prerrequisitos circulares para empezar la ficha. Hosting y URL estable deben acordarse antes de publicación/impresión de uso real.
 
 **Validación específica**
 

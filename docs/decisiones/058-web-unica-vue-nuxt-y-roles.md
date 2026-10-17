@@ -28,7 +28,7 @@ de componentes Vue. App/plugins compone por petición, sin singleton de identida
 Pantallas no importan infraestructura; server no importa presentation.
 Compartidos reales: marca, botones, toast y skeleton, sin frameworks de UI nuevos.
 
-Se conserva apps/public-web y su contexto Docker para no cambiar configuración
+Se conserva apps/platform y su contexto Docker para no cambiar configuración
 del usuario por mover carpetas. Nitro reemplaza el servidor manual. Node24 LTS
 para CI/contenedor. Variables Supabase existentes exclusivamente en server,
 sin NUXT_PUBLIC ni claves embebidas durante build. SSR serializa solo proyección

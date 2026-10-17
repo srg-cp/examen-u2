@@ -1,9 +1,9 @@
 # Configuración y validación de la app
 
-Vue/Nuxt17 octubre: Node24.15+ recomendado; npm ci en apps/public-web y
+Vue/Nuxt17 octubre: Node24.15+ recomendado; npm ci en apps/platform y
 npm run dev para desarrollo. No instalar Nuxt/Vue globalmente. Typecheck,
 unitarias, build y pruebas de producción documentados en
-[DESARROLLO.md](../apps/public-web/DESARROLLO.md). Dokploy conserva variables,
+[DESARROLLO.md](../apps/platform/DESARROLLO.md). Dokploy conserva variables,
 contexto, stage y puerto; el comando de imagen ahora ejecuta .output de Nitro.
 Publicar la rama nueva antes de redeploy. Usuario confirma022/023 aplicados y
 generación/lectura QR operativas en la versión anterior; no se reejecuta SQL.
@@ -14,15 +14,15 @@ móvil existente. Activar Meta y el servicio Auth de Dokploy según
 solo en servidor. Sin configuración remota ni demo Android acreditadas.
 
 Dokploy17 octubre: preparación para Application desde GitHub, Dockerfile
-apps/public-web/Dockerfile, contexto apps/public-web y puerto interno5173.
+apps/platform/Dockerfile, contexto apps/platform y puerto interno5173.
 Campos, Environment, DNS/TLS, Auto Deploy y comprobaciones en
-[DOKPLOY.md](../apps/public-web/DOKPLOY.md). El usuario añade secretos en el panel;
+[DOKPLOY.md](../apps/platform/DOKPLOY.md). El usuario añade secretos en el panel;
 no se incorporan a Git/build. Healthcheck es de proceso, no valida Supabase.
 
-Web QR16 octubre: consulta HU-09 implementada localmente en apps/public-web.
+Web QR16 octubre: consulta HU-09 implementada localmente en apps/platform.
 Aplicar [023](../database/patchs/023_patch_public_qr_case.sql) tras022 en desarrollo;
 hosting Node22 con secreto servidor/TLS, sin caché/logs de tokens. Pasos en
-[README](../apps/public-web/README.md). No se ha desplegado; PUBLIC_CASE_WEB_READY
+[README](../apps/platform/README.md). No se ha desplegado; PUBLIC_CASE_WEB_READY
 sigue false y formulario HU-10.1 pendiente. Actualiza el pendiente de implementación
 de la nota histórica de carteles siguiente.
 

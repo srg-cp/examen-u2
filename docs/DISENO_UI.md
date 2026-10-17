@@ -5,7 +5,7 @@ ContentSkeleton; app/features/case_reader contiene pantalla y galería Vue.
 app/assets/main.css conserva los tokens y geometría de la ficha anterior.
 Revisión mediante build SSR y Chrome real, incluyendo hidratación, CSP, errores
 y 320px con texto200%. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md),
-[guía Vue](../apps/public-web/DESARROLLO.md).
+[guía Vue](../apps/platform/DESARROLLO.md).
 
 Revisión del mapa (16 octubre): se sustituye la ficha inferior por ExploreFilterEditor combinado dentro del panel deslizable; sin mapa embebido duplicado. Botón Aplicar filtros fijo al pie cuando cabe; con panel mínimo pasa al scroll para no recortar texto/acciones. Pin sin selección inicial; al pulsar se reduce panel y aparece una etiqueta junto al punto con nombre/Abrir caso, superficie compartida y anterior/siguiente solo si hay coincidencias. Cámara acomoda la etiqueta; pan no consulta. Campos de lista y mapa comparten implementación y metadatos de lugar por cuenta. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md).
 

@@ -1,5 +1,10 @@
 # Despliegue GitHub → Dokploy → entrehuellas.kormind.com
 
+Movimiento17/10/2026: al publicar esta revisión, cambiar Dockerfile Path a
+apps/platform/Dockerfile, Docker Context Path a apps/platform y Watch Paths a
+apps/platform/**. Mantener dominio, stage runtime, puerto5173 y Environment.
+Los campos de la tabla siguiente ya reflejan estas rutas nuevas.
+
 Preparado el17 de octubre de2026. Dokploy construye la imagen del repositorio
 y ejecuta el servidor; los secretos se añaden en su panel. No se necesita
 registry, Docker Compose, volúmenes ni compilar Flutter.
@@ -31,10 +36,10 @@ Guardar la configuración siguiente:
 | Branch | feature/vue-nuxt-web, una vez publicada |
 | Build Path | / |
 | Build Type | Dockerfile |
-| Dockerfile Path | apps/public-web/Dockerfile |
-| Docker Context Path | apps/public-web |
+| Dockerfile Path | apps/platform/Dockerfile |
+| Docker Context Path | apps/platform |
 | Docker Build Stage | runtime |
-| Watch Paths, si se activa Auto Deploy | apps/public-web/** |
+| Watch Paths, si se activa Auto Deploy | apps/platform/** |
 
 Las rutas Dockerfile/contexto anteriores parten del checkout raíz (Build Path /).
 No seleccionar Static ni Publish Directory. La imagen ya construye y arranca
@@ -120,7 +125,7 @@ Flutter cuando corresponda. No se cambia ahora. Formulario HU-10.1 aún pendient
 ## 6. Próximos cambios desde GitHub
 
 Después del primer despliegue correcto se puede activar **Auto Deploy** en la
-Application con Watch Paths apps/public-web/**. El proveedor GitHub puede disparar
+Application con Watch Paths apps/platform/**. El proveedor GitHub puede disparar
 el despliegue con los push de la rama elegida, según la
 [documentación de Dokploy](https://docs.dokploy.com/docs/core/auto-deploy).
 No hace falta un token Dokploy en GitHub Actions para este recorrido. Auto Deploy

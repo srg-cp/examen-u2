@@ -192,7 +192,7 @@ no se cierra la historia. PUBLIC_CASE_WEB_READY sigue false. Sin despliegue/APK.
 Incremento16 de octubre: por instrucción del usuario se deja la generación de APK para más adelante y se inicia feature/pet-poster-qr, HU-08.1/#34 y HU-08.2/#35. Cartel A4 público, QR opaco estable, impresión/guardado y compartir PDF/enlace; fuente077–079/plan022. El usuario indica dominio entrehuellas.kormind.com; la generación se activa solo después de aplicar022 y disponer de HU-09 en ese dominio. La raíz responde404 al comprobarla; no se entrega ni despliega web en HU-08. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md). Sin ampliación a push/offline/moderación ni cierre automático de historias.
 
 - **HU-08 / RF-08,37:** cartel PDF legible, QR y compartir. Se puede generar en Flutter para el MVP; conservar enlace estable y permitir reintento de la generación.
-- **HU-09 / RF-09:** crear `apps/public-web` cuando haga falta; web ligera que abre el QR y muestra estado sin instalar la app. Token revocado no revela identidad privada.
+- **HU-09 / RF-09:** crear `apps/platform` cuando haga falta; web ligera que abre el QR y muestra estado sin instalar la app. Token revocado no revela identidad privada.
 - **HU-10 / RF-11:** avistamiento desde web/app con hora del evento y punto manual, foto opcional; rechazo de fecha futura y deduplicación del envío.
 - El flujo público tiene permisos acotados y validación de abuso en servidor. Acordar hosting y URL estable antes de imprimir un QR que se usará fuera de pruebas.
 - **Demo:** escanear en un segundo teléfono sin app y reportar; comprobar la persistencia y la separación de campos públicos/privados.
@@ -200,7 +200,7 @@ Incremento16 de octubre: por instrucción del usuario se deja la generación de 
 Prompt:
 
 ```text
-Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web pública ligera en apps/public-web. El visitante debe consultar y reportar sin instalar Flutter. Implementa tokens revocables, punto manual, hora observada, permisos públicos limitados, controles de abuso y reintentos idempotentes. Prepara el resultado para revisar y documenta la configuración/hosting pendiente antes de publicar. Verifica el recorrido con otro teléfono y actualiza el estado.
+Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web pública ligera en apps/platform. El visitante debe consultar y reportar sin instalar Flutter. Implementa tokens revocables, punto manual, hora observada, permisos públicos limitados, controles de abuso y reintentos idempotentes. Prepara el resultado para revisar y documenta la configuración/hosting pendiente antes de publicar. Verifica el recorrido con otro teléfono y actualiza el estado.
 ```
 
 ### S5 - Seguimiento, alertas y cierre

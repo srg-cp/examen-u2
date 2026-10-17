@@ -1,5 +1,19 @@
 # Estado del proyecto
 
+## Organización apps: primer movimiento —17 de octubre de2026
+
+Por instrucción del usuario se renombra la web a apps/platform, con workflow
+platform.yml y referencias de operación/documentación actualizadas. Es el primer
+movimiento de ADR-059 y tendrá su propio commit. Flutter permanece en la raíz
+en este punto; el segundo movimiento lo ubicará en apps/mobile. Rama de landing
+independiente conservada. No se cambia Dokploy ni se hace push/despliegue.
+
+Validación desde apps/platform: TypeScript sin errores,9 pruebas unitarias/
+arquitectura y2 de servidor compilado aprobadas; build SSR correcto. Logs
+platform-move-{typecheck,tests,build,production}.log en el build de Flutter.
+Las rutas de Dockerfile/contexto/Watch Paths nuevas están en DOKPLOY.md y deben
+cambiarse en el panel al desplegar esta revisión. Sin cambios SQL ni APK.
+
 ## Ajuste visual de botones sociales —17 de octubre de2026
 
 Por solicitud del usuario, Facebook pasa a azul #0866FF y glifo24px para
@@ -51,7 +65,7 @@ no se declara cerrada.
 Decisión explícita del usuario: web única Vue/Nuxt/TypeScript para público,
 usuarios y administración organizada por módulos y permisos; Flutter en móvil.
 Rama nueva **feature/vue-nuxt-web** desde14b6978 con árbol limpio. Se conserva
-apps/public-web y se migra por completo su funcionalidad QR existente, sin crear
+apps/platform y se migra por completo su funcionalidad QR existente, sin crear
 pantallas vacías de login/admin ni modificar el worktree de feature/landing-page.
 La integración/conversión de esa landing y los flujos web autenticados son
 incrementos posteriores. [ADR-058](decisiones/058-web-unica-vue-nuxt-y-roles.md).
@@ -92,17 +106,17 @@ verificación independiente de políticas/Storage/concurrencia. La migración Vu
 no se ha desplegado ni probado contra sus casos reales. Docker/CI actualizado,
 sin imagen local ni workflow remoto nuevo verificados. Sin SQL nuevo, APK,
 commit/push o redeploy. Documentación de iniciación y operación actualizada:
-[DESARROLLO](../apps/public-web/DESARROLLO.md), [Dokploy](../apps/public-web/DOKPLOY.md).
+[DESARROLLO](../apps/platform/DESARROLLO.md), [Dokploy](../apps/platform/DOKPLOY.md).
 Siguiente paso: publicar/revisar migración en Dokploy y coordinar integración
 de landing; HU-10.1/formulario y aplicación web privada siguen pendientes.
 
 ## Preparación Dokploy desde GitHub —17 de octubre de2026
 
-Por petición del usuario se prepara apps/public-web para su VDS/Dokploy, conservando
+Por petición del usuario se prepara apps/platform para su VDS/Dokploy, conservando
 el trabajo local de HU-09 en feature/public-qr-case-web. Dockerfile multietapa con
 runtime no root/puerto5173, .dockerignore con entradas permitidas y healthcheck
 Node sin curl. GitHub Actions amplía validación con build/smoke del contenedor
-sin credenciales reales ni despliegue. [Guía exacta](../apps/public-web/DOKPLOY.md)
+sin credenciales reales ni despliegue. [Guía exacta](../apps/platform/DOKPLOY.md)
 para Application/proveedor GitHub, rama, Dockerfile/contexto, Environment,
 DNS/HTTPS, health, Auto Deploy y límites del proxy. Usuario completa Environment.
 
@@ -117,7 +131,7 @@ push, acceso a Dokploy, despliegue ni cambio de PUBLIC_CASE_WEB_READY.
 ## HU-09: ficha pública QR —16 de octubre de2026
 
 Incremento local en **feature/public-qr-case-web**, desde3db6de6 con árbol inicial
-limpio. Consulta sin app/cuenta en apps/public-web, dominio acordado
+limpio. Consulta sin app/cuenta en apps/platform, dominio acordado
 https://entrehuellas.kormind.com y ruta /c/<token64hex>. Activo: fotos procesadas,
 rasgos/campos públicos, fecha/zona aproximada, compartir/copia y actualización.
 Cerrado: estado/fecha real sin exponer ficha privada; inexistente/revocado/eliminado:
@@ -148,7 +162,7 @@ otro teléfono sin app/Safari y QR físico. PUBLIC_CASE_WEB_READY permanece fals
 Formulario HU-10.1/#36 todavía pendiente; es el siguiente incremento funcional.
 HU-09/#9 no cerrada. Sin SQL remoto, despliegue, commit/push ni cambios en GitHub.
 [Ficha](funcionalidades/ficha-publica-qr.md), [ADR-057](decisiones/057-ficha-qr-web-y-proxy-privado.md),
-[operación](../apps/public-web/README.md). La evidencia local no sustituye activación remota.
+[operación](../apps/platform/README.md). La evidencia local no sustituye activación remota.
 
 Revisión del mapa: filtros inferiores y acceso junto al pin,16 de octubre. Se conserva pantalla/expansión de ADR-055, pero el panel contiene ExploreFilterEditor compartido con lista y Aplicar filtros. Borrador hasta confirmar (incluidos GPS/centro visual); CTA fijo si cabe, scroll con altura mínima/texto ampliado. Pin muestra etiqueta compacta de un caso/Abrir caso, reduce filtros y acomoda cámara; coincidencias se recorren en etiqueta. Aplicar retira selección y recupera panel42%. Metadatos del lugar en ExploreState conservan la cápsula de Ubicación al volver/refrescar/paginar; GPS deduplicado por generación y resultados de otra cuenta descartados. Sin SDK nuevo, SQL, permisos o persistencia adicional. Se retiran opciones de grilla añadidas para la ficha inferior que ya no tienen consumidores. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye contenido inferior/selección inicial de ADR-055. Formato y análisis global limpios (build/map-filters-final-analyze.log); suite final de353 pruebas aprobada (build/map-filters-full-tests.log),25 focalizadas y6 finales de mapa/GPS con renders (build/map-filters-focused-tests.log y build/map-filters-final-renders.log). Capturas normal/pequeña/texto2 revisadas en build/ui-preview/explore-map: screen-*.png para filtros y normal.png/small.png para etiquetas. Usan teselas neutras, sin validar cartografía real. Revisión Android pendiente; sin APK ni publicación. Trabajo previo conservado.
 

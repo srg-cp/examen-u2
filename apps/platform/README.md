@@ -10,7 +10,7 @@ todavía no se integra aquí. La raíz conserva el estado neutral anterior.
 Guía para empezar con Vue: **[DESARROLLO.md](DESARROLLO.md)**.
 
 Despliegue en el VDS del usuario: **[guía Dokploy desde GitHub](DOKPLOY.md)**.
-Dockerfile listo para contexto apps/public-web, stage runtime y puerto5173;
+Dockerfile listo para contexto apps/platform, stage runtime y puerto5173;
 variables solo en ejecución, healthcheck incorporado y CI de contenedor preparado.
 
 Vue3, Nuxt4, TypeScript estricto y servidor Nitro. Node24.15+ recomendado

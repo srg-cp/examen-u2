@@ -6,7 +6,7 @@ admitidos. Node24.18.0 y npm11.16.0 ya están instalados en el equipo del proyec
 En VS Code, la extensión opcional **Vue - Official** proporciona ayuda con .vue;
 evitar activar simultáneamente Vetur sobre estos archivos.
 
-Desde apps/public-web:
+Desde apps/platform:
 
 ```powershell
 npm ci
