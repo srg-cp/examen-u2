@@ -1,5 +1,80 @@
 # Estado del proyecto
 
+## Avistamientos Android — HU-10.2 / RF-11 / #37 — 18/10/2026
+
+Implementación local en feature/android-sightings, creada desde
+feature/public-web-sighting conservando los cambios previos de este documento
+y avistamientos-web.md. Ficha abierta→Reportar avistamiento→La vi→fecha/hora
+real→punto manual/GPS→comentario/foto opcionales→recibo persistido→retorno.
+Cámara/galería, denegación GPS con alternativa manual, formulario conservado,
+doble envío bloqueado y orden congelada tras resultado ambiguo. Cambio de cuenta
+oculta datos anteriores y descarta respuestas tardías. No convierte estos
+registros privados en avisos públicos ni cambia la custodia anterior.
+
+Módulo móvil sightings con dominio/contratos/casos de uso, providers declarativos,
+ViewModel autoDispose, estado, pantalla, DTO y data inyectada desde bootstrap.
+Router compone destino fijo; shell/fecha/mapa/galería/toast/shake/shimmer compartidos.
+Capturas390×844 y320×350/texto2 revisadas; título breve evita partir palabras,
+scroll permite llegar a todas las acciones y recibo. Teselas neutras/fixtures,
+sin acreditar fotos, cartografía o permisos reales de Android.
+
+Nuxt incorpora ruta nativa autenticada; verifica bearer contra Supabase Auth y
+rechaza usuarios anónimos e identidad aportada por cliente. Reutiliza parser
+acotado, validación, saneamiento sharp sin EXIF y repositorio del flujo web.
+Plan025/fuentes086–087 y patch/migración generados: persistencia SQL común,
+reporter_id verificado, reintento ligado a actor, presupuestos y evidencia privada.
+Retira FK hacia enlace QR para aceptar casos sin cartel; comandos validan caso
+bajo bloqueos. RPC app solo servidor; no hay grants de cliente para tabla/evidencia.
+Web conserva revocación/vigencia QR y su contrato de recibo. ADR-065 documenta
+alternativas, retención lógica y límites de bytea.
+
+Validación local: formato de507 archivos sin cambios pendientes, análisis Flutter
+sin incidencias,18 pruebas de dominio/VM/formulario/arquitectura/navegación
+aprobadas, incluidas entrada desde ficha y retorno a custodia en ambos tamaños.
+17 pruebas web y5 pruebas del servidor compilado aprobadas: sesión inválida,
+Origin, futuro, envío nativo, pérdida de respuesta tras commit y reintento único.
+Typecheck y build Nuxt producción aprobados; build aislado en .nuxt-hu10-2-qa
+conserva servidor dev del usuario. Suite SQL completa25 pruebas aprobadas:
+roles, actor incorrecto, fecha, cierre, caso sin QR, idempotencia y repetición.
+Logs hu10-2-{format,analyze,mobile-tests,web-typecheck,web-tests,web-build,
+production,sql,full-sql}.log y renders build/ui-preview/android-sightings
+en apps/mobile/build. La evidencia HTTP usa backend fixture; SQL usa PGlite.
+
+Pendiente aplicar025 en desarrollo, actualizar servidor y probar Android con
+sesión real, GPS/cámara/galería, teselas/fotos, aislamiento hosted y concurrencia
+multiconexión.022/023/024 ya confirmados; no se solicita reaplicarlos. Sin APK
+nuevo, SQL remoto, despliegue, commit/push ni cambios de GitHub. Borrador en memoria,
+sin recuperación tras muerte de proceso/offline HU-15. Historia sin cerrar por
+evidencia local; cronología/revisión HU-11 y push permanecen pendientes.
+Siguiente paso: activar025/servidor y confirmar demo Android antes de continuar
+HU-11. Ficha Android/índice/guía/arquitectura/diseño/configuración/backlog actualizados.
+
+## Avistamientos web operativos según confirmación del usuario — 18/10/2026
+
+Tras informar que024 está aplicado y recibir los criterios de validación
+integrada, el usuario confirma «ok si esta». Se registra su confirmación de
+operación para dar por finalizado el incremento funcional HU-10.1/#36 y poder
+continuar con el siguiente. Evidencia comunicada por el usuario; no es inspección
+remota independiente ni certificación detallada de cada escenario de abuso,
+concurrencia o navegador. Sustituye el pendiente de confirmación operativa de
+la nota anterior. El ajuste de contraste del botón aprobado sigue registrado
+como pendiente visual. No se cierran issues ni se integra/publica la rama desde
+este chat. Siguiente incremento del backlog: HU-10.2/#37, avistamientos Android.
+
+## Patch024 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber aplicado024_patch_public_sightings.sql. Sustituye
+el pendiente de aplicación024 de las notas anteriores; no se vuelve a solicitar.
+Confirmación comunicada por el usuario, sin inspección SQL remota independiente.
+HU-10.1 está implementada y validada localmente; falta confirmar que la revisión
+web correspondiente esté desplegada y verificar envío/persistencia/reintento
+desde un segundo teléfono, caso cerrado/revocado y aislamiento reales.
+Se conserva el pendiente visual de contraste del primario aprobado.
+La aplicación del patch por sí sola no cierra la historia ni acredita esos
+recorridos. No se ejecutan nuevas pruebas de código por esta actualización
+documental, ni se publica/despliega o modifica Supabase desde este chat.
+Siguiente paso: validación integrada de la web con024 activo.
+
 ## Avistamientos desde QR sin cuenta — 18/10/2026
 
 HU-10.1 / RF-11 / issue #36 implementada localmente en

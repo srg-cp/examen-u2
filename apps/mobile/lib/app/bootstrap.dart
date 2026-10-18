@@ -1,4 +1,8 @@
 import 'package:http/http.dart' as http;
+import '../features/sightings/domain/repositories/sighting_repository.dart';
+import '../features/sightings/data/repositories/unavailable_sighting_repository.dart';
+import '../features/sightings/data/repositories/sighting_repository_impl.dart';
+import '../features/sightings/data/data_sources/sighting_source.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '../features/case_posters/domain/repositories/case_poster_repository.dart';
 import '../features/case_posters/data/repositories/unavailable_case_poster_repository.dart';
@@ -82,6 +86,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.sightingRepository = const UnavailableSightingRepository(),
     this.casePosterRepository = const UnavailableCasePosterRepository(),
     required this.state,
     required this.authRepository,
@@ -105,6 +110,7 @@ class AppBootstrap {
   });
 
   final StartupState state;
+  final SightingRepository sightingRepository;
   final CasePosterRepository casePosterRepository;
   final AuthRepository authRepository;
   final AccessRepository accessRepository;
@@ -147,6 +153,17 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          sightingRepository: SightingRepositoryImpl(
+            NativeSightingSource(
+              supabase.client,
+              http.Client(),
+              ImagePicker(),
+              const String.fromEnvironment(
+                'PUBLIC_CASE_WEB_URL',
+                defaultValue: 'https://entrehuellas.kormind.com',
+              ),
+            ),
+          ),
           casePosterRepository: CasePosterRepositoryImpl(
             SupabasePosterCaseSource(supabase.client),
             PdfPosterDocumentSource(

@@ -56,6 +56,31 @@ test('Public sightings are private, validated, idempotent, bounded and bound to 
   await db.exec('reset role'); await db.exec(bundle); await db.exec(bundle);
   assert.equal((await db.query('select count(*)::int n from public.public_sightings')).rows[0].n, 5);
   assert.deepEqual(Object.keys(receipt).sort(), ['id','late','receivedAt']);
+  // Android shares persistence and budgets, without requiring an existing QR.
+  await db.query("update public.lost_cases set status='active' where id=$1", [target]);
+  await db.query("delete from public.case_public_links where case_source='found'");
+  const app = (report, reporter=owner, hash='f'.repeat(64), actor='9'.repeat(64)) => db.query('select public.submit_app_sighting($1,$2,$3,$4::jsonb,$5,$6,null) receipt', ['found',target,reporter,JSON.stringify(report),hash,actor]).then(r=>r.rows[0].receipt);
+  for (const role of ['anon','authenticated']) {
+    await db.exec(`set role ${role}`);
+    await assert.rejects(app(draft(20)),/permission denied/);
+    await assert.rejects(db.query("select public.persist_sighting('found',$1,$2::jsonb,$3,$4,null,null)",[target,JSON.stringify(draft(20)),'a'.repeat(64),'b'.repeat(64)]),/permission denied/);
+    await db.exec('reset role');
+  }
+  await db.exec('set role service_role');
+  const appReceipt=await app(draft(20));assert.deepEqual(await app(draft(20)),appReceipt);
+  await assert.rejects(app(draft(20),owner,'e'.repeat(64)),/sighting_conflict/);
+  await assert.rejects(app(draft(20),owner,'f'.repeat(64),'8'.repeat(64)),/sighting_conflict/);
+  await assert.rejects(app({...draft(21),observedAt:'2100-01-01'}),/sighting_invalid/);
+  await assert.rejects(app({...draft(21),comment:'a'.repeat(501)}),/sighting_invalid/);
+  await assert.rejects(app(draft(21),null),/sighting_forbidden/);
+  await db.exec('reset role');
+  const appRow=(await db.query('select reporter_id,comment,latitude from public.public_sightings where id=$1',[draft(20).id])).rows[0];
+  assert.equal(appRow.reporter_id,owner);assert.equal(appRow.latitude,draft(20).point.latitude);
+  await db.query("update public.found_cases set status='resolved' where id=$1",[target]);await db.exec('set role service_role');
+  assert.deepEqual(await app(draft(20)),appReceipt);
+  await assert.rejects(app(draft(21)),/sighting_closed/);
+  await db.exec('reset role');await db.exec(bundle);
+  assert.equal((await db.query('select count(*)::int n from public.public_sightings')).rows[0].n,6);
 });
 
 test('QR reader is server-only, live, scoped to processed photos and neutral after revoke/delete', async(t)=>{

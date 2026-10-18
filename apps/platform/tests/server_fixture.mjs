@@ -7,12 +7,16 @@ export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 21
   let value = rawActive(); let fail = false; let reads = 0;
   const sightings = new Map(); let ambiguous = false; const sightingCalls = [];
   const backend = createServer(async (req, res) => {
+    if (req.url === '/auth/v1/user') {
+      if (req.headers.authorization !== 'Bearer '+ 'a'.repeat(30)) {res.writeHead(401);res.end();return;}
+      res.writeHead(200, {'Content-Type':'application/json'});res.end(JSON.stringify({id:'11111111-1111-4111-8111-111111111125'}));return;
+    }
     if (req.url === '/rest/v1/rpc/read_qr_case') {
       reads++; for await (const chunk of req) { /* Drain test request; never record token. */ }
       if (fail) { res.writeHead(503); res.end('PRIVATE SDK FAILURE'); return; }
       res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(value)); return;
     }
-    if (req.url === '/rest/v1/rpc/submit_public_sighting') {
+    if (req.url === '/rest/v1/rpc/submit_public_sighting' || req.url === '/rest/v1/rpc/submit_app_sighting') {
       const chunks = []; for await (const chunk of req) chunks.push(chunk);
       const input = JSON.parse(Buffer.concat(chunks).toString()); sightingCalls.push(input);
       if (value.state !== 'active') { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ message: 'sighting_closed' })); return; }

@@ -11,7 +11,8 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Identidad visual y marca](identidad-visual.md) | core branding / apps/platform | Petición17/10/2026; sin HU/issue nuevo |
 | [Landing pública](landing-page.md) | apps/platform (Vue/Nuxt) | Ampliación del usuario; integración17/10/2026; sin HU/issue nuevos |
 | [Ficha pública QR](ficha-publica-qr.md) | apps/platform (Vue/Nuxt) | HU-09; RF-09; issue #9; versión anterior operativa según usuario, migración Vue local/HU-10 pendiente |
-| [Avistamientos web](avistamientos-web.md) | apps/platform / sightings | HU-10.1; RF-11; issue #36; implementación local/024 pendiente |
+| [Avistamientos web](avistamientos-web.md) | apps/platform / sightings | HU-10.1; RF-11; issue #36;024/operación confirmados por usuario |
+| [Avistamientos Android](avistamientos-android.md) | apps/mobile / sightings y servidor Nuxt | HU-10.2; RF-11; issue #37; implementación local/025 pendiente |
 | [Carteles PDF y QR](carteles-qr.md) | case_posters | HU-08.1/08.2; RF-08,37; issues #34/#35; implementación local, activación pendiente |
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación del usuario16/10/2026 de HU-07/RF-13; sin issue asignado; local |
@@ -39,8 +40,9 @@ RLS, grants ni restricciones. Al cambiar de cuenta se descartan resultados
 tardíos y datos privados de la identidad anterior.
 
 Mapa de Explorar, carteles/QR y lectura web tienen implementación local;
-activación y evidencia se detallan en sus fichas. Avistamientos desde web,
-bandeja y entrega real de alertas siguen pendientes según
+activación y evidencia se detallan en sus fichas. Avistamientos web operativos
+según usuario; Android implementado localmente con025/demo pendiente. Bandeja
+y entrega real de alertas siguen pendientes según
 [GUIA_MVP](../GUIA_MVP.md). Las preferencias guardadas no envían avisos.
 
 Para cada incremento, actualizar su ficha, enlazar nuevas fichas aquí y

@@ -1,7 +1,25 @@
 # Avistamientos desde la web pública
 
+HU-10.2,18/10: plan025 extrae la persistencia común en persist_sighting para
+web/Android, conservando firma y recibo de submit_public_sighting y controles
+de QR. Reintentos comprueban también actor; nuevos registros app conservan
+reporter_id verificado y no requieren QR previo. No se amplía la lectura pública.
+[ADR-065](../decisiones/065-avistamientos-android-y-persistencia-compartida.md),
+[ficha Android](avistamientos-android.md).025 permanece pendiente de aplicación;
+la confirmación operativa de024/web por el usuario se conserva.
+
 HU-10.1 / RF-11 / issue #36. Implementación local en
-`feature/public-web-sighting`; historia abierta. [ADR-064](../decisiones/064-avistamientos-publicos-idempotentes.md).
+`feature/public-web-sighting`; incremento funcional finalizado según confirmación
+del usuario del18/10/2026. Estado del issue GitHub sin modificar.
+[ADR-064](../decisiones/064-avistamientos-publicos-idempotentes.md).
+
+Confirmación18/10: el usuario informa que024_patch_public_sightings.sql ya está
+aplicado. Sustituye las notas de activación024 pendiente, sin inspección remota
+independiente. Implementación local terminada; despliegue de esta revisión y
+recorrido real inicialmente por confirmar. Tras comunicar los criterios,
+el usuario responde «ok si esta»: operación confirmada por él y cierre del
+incremento funcional registrado. Sin inspección remota independiente ni evidencia
+detallada nueva de cada escenario. El ajuste visual de contraste sigue pendiente.
 
 ## Qué hace y recorrido
 
@@ -54,8 +72,9 @@ Aplicar [patch024](../../database/patchs/024_patch_public_sightings.sql) o
 [migración024](../../supabase/migrations/20261018002400_public_sightings.sql),
 generados con Build-PublicSightingsPatch/Build-RunAll. Configurar PUBLIC_WEB_ORIGIN
 con origen HTTPS exacto, sin slash final, en el servidor Nuxt; clave Supabase
-solo servidor. Recompilar para incluir sharp y Leaflet. No se ha aplicado024,
-desplegado ni modificado el entorno remoto en este incremento.
+solo servidor. Recompilar para incluir sharp y Leaflet.024 aplicado según
+confirmación del usuario, quien después confirma que ya está operativo.
+El agente no ha modificado ni inspeccionado el entorno remoto.
 
 ## Validación y pendiente
 

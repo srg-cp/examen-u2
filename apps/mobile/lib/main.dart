@@ -1,4 +1,5 @@
 import 'features/explore/providers/explore_providers.dart';
+import 'features/sightings/providers/sighting_providers.dart';
 import 'features/case_posters/providers/case_poster_providers.dart';
 import 'features/places/providers/places_providers.dart';
 import 'features/saved_cases/providers/saved_cases_providers.dart';
@@ -26,6 +27,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        sightingRepositoryProvider.overrideWithValue(
+          bootstrap.sightingRepository,
+        ),
         casePosterRepositoryProvider.overrideWithValue(
           bootstrap.casePosterRepository,
         ),

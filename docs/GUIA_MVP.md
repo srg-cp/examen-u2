@@ -191,6 +191,17 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+18/10/2026, HU-10.2 / RF-11 / issue #37: envío Android desde ficha abierta,
+fecha/hora real, comentario/foto opcionales, GPS con alternativa manual y galería
+alternativa a cámara. Destino fijo, formulario conservado y UUID/payload congelados
+ante respuesta ambigua. Servidor Nuxt verifica sesión y reutiliza el pipeline web;
+plan025 comparte persistencia/validación SQL y conserva evidencia privada sin QR
+previo. No sustituye los avisos públicos/custodia anteriores ni adelanta HU-11.
+Implementación local;025/servidor y demo autenticada pendientes. El usuario ya
+confirmó024 y funcionamiento web; no se vuelven a considerar pendientes de HU-10.1.
+[Ficha Android](funcionalidades/avistamientos-android.md),
+[ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md).
+
 18/10/2026, HU-10.1 / RF-11 / issue #36: formulario de avistamiento sin cuenta
 desde QR activo, fecha/hora y punto manual/GPS con precisión, comentario/foto
 opcionales, saneamiento servidor sin EXIF y reintento idempotente. Plan024/RPC

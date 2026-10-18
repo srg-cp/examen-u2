@@ -1,13 +1,14 @@
 import { SightingFailure } from '../../../../shared/features/sightings/domain/sighting.ts';
 import type { SightingSource } from './supabase_sighting_repository.ts';
 export class SupabaseSightingDataSource implements SightingSource {
-  constructor(private readonly config: { url: string; key: string }, private readonly fetcher: typeof fetch = fetch) {}
+  constructor(private readonly config: { url: string; key: string }, private readonly fetcher: typeof fetch = fetch,
+    private readonly rpc = 'submit_public_sighting', private readonly mapPayload: (payload: Record<string, unknown>) => Record<string, unknown> = value => value) {}
   async submit(payload: Record<string, unknown>): Promise<unknown> {
     const headers: Record<string, string> = { apikey: this.config.key, 'Content-Type': 'application/json' };
     if (this.config.key.startsWith('eyJ')) headers.Authorization = `Bearer ${this.config.key}`;
     try {
-      const response = await this.fetcher(`${this.config.url}/rest/v1/rpc/submit_public_sighting`, {
-        method: 'POST', headers, body: JSON.stringify(payload), redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(15000),
+      const response = await this.fetcher(`${this.config.url}/rest/v1/rpc/${this.rpc}`, {
+        method: 'POST', headers, body: JSON.stringify(this.mapPayload(payload)), redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(15000),
       });
       // RPC output is small. Bound responses even if the upstream proxy misbehaves.
       const reader = response.body?.getReader(); if (!reader) throw new SightingFailure('unavailable');

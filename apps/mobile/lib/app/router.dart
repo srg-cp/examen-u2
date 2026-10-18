@@ -7,6 +7,9 @@ import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
 import '../features/saved_cases/presentation/widgets/save_case_button.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
+import '../features/sightings/domain/entities/sighting.dart';
+import '../features/sightings/providers/sighting_providers.dart';
+import '../features/sightings/presentation/screens/sighting_screen.dart';
 import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
 import '../features/pets/presentation/view_models/pet_list_view_model.dart';
 import '../features/found_cases/providers/found_case_providers.dart';
@@ -113,6 +116,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
+              state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
@@ -255,6 +259,32 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ],
                 child: const FoundEditorScreen(),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'sightings/:source/:id',
+            redirect: (context, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ProviderScope(
+                overrides: [
+                  sightingTargetProvider.overrideWithValue(
+                    SightingTarget(
+                      state.pathParameters['id']!,
+                      state.pathParameters['source'] == 'found',
+                    ),
+                  ),
+                ],
+                child: const SightingScreen(),
               ),
             ),
           ),

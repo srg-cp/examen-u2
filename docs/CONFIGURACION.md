@@ -1,5 +1,30 @@
 # Configuración y validación de la app
 
+## Avistamientos Android — HU-10.2, 18/10/2026
+
+Requiere024 ya confirmado por el usuario. Aplicar solo el nuevo
+[patch025](../database/patchs/025_patch_app_sightings.sql) en desarrollo y activar
+el servidor Nuxt actualizado junto con la app. No repetir022/023/024 por este
+incremento. Generar artefactos desde raíz con
+`./database/scripts/Build-AppSightingsPatch.ps1` y `./database/scripts/Build-RunAll.ps1`.
+No editar los SQL generados ni ejecutar automáticamente escrituras remotas.
+
+Flutter conserva URL/clave publicable y sesión. `PUBLIC_CASE_WEB_URL` debe ser
+el origen HTTPS del servidor (predeterminado https://entrehuellas.kormind.com).
+La ruta `/api/app/cases/{lost|found}/{id}/sightings` recibe bearer de usuario;
+el adaptador servidor verifica con Supabase Auth y usa su configuración privada
+existente. El móvil no envía Origin de navegador. No añadir CORS permisivo,
+service_role ni claves secretas al archivo Flutter.
+
+Demo pendiente: abrir ficha activa→Reportar avistamiento→fecha/hora real→GPS
+denegado y punto manual→cámara cancelada y galería→enviar sin/con foto. Verificar
+recibo/registro privado y repetir exactamente la misma orden tras respuesta
+ambigua; comprobar que otra cuenta no lee evidencia, y que caso cerrado/no
+disponible rechaza un envío nuevo. No buscar estos registros en la lista anterior
+de avisos públicos: revisión/cronología privada se implementará en HU-11.
+No se acredita dispositivo real, permisos hosted o concurrencia multiconexión
+por pasar pruebas con fixtures. [Ficha](funcionalidades/avistamientos-android.md).
+
 Ubicaciones17 octubre: ejecutar Flutter desde apps/mobile y Nuxt desde
 apps/platform. F5 raíz apunta a apps/mobile y conserva config/supabase.local.json;
 los valores locales se trasladaron sin cambios. Dokploy debe usar contexto

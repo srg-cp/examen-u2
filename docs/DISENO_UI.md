@@ -1,5 +1,15 @@
 # Diseño de la interfaz: implementación y revisión
 
+Android18/10, HU-10.2: acción Reportar avistamiento en ficha abierta y formulario
+con título breve La vi, para no partir palabras con texto200%. Reutiliza
+CaseScreenShell, glass flotante, cover/stagger, fecha/hora independientes,
+ZoneMapPicker, AppTextField con contador500 y PhotoGalleryStrip/PhotoAddTile.
+Toast superior para validación/errores/resultados, ValidationSurface/ShakeField,
+shimmer durante trabajo real y confirmación solo tras recibo persistido.
+Renders normal/320×350 texto2 en build/ui-preview/android-sightings; mapa de
+prueba con teselas neutras. Recibo y condición tardía son datos del registro;
+sin nueva cronología ni publicación de evidencia. [ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md).
+
 Web18/10, HU-10.1: WebShell/ActionButton y lector QR adoptan ADR-063 (crema,
 Arial, marca minúscula, cápsulas con brillo/celeste). SightingForm con ancho
 máximo620, campos60px/radio24, fecha/hora adaptables, mapa300px, adjuntos con

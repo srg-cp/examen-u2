@@ -7,6 +7,19 @@ import { productionFixture } from './server_fixture.mjs';
 import { slug, photo } from './fixtures.mjs';
 import sharp from 'sharp';
 
+test('Native submission verifies bearer session, preserves retries and never requires browser Origin',async t=>{
+ const server=await productionFixture();t.after(server.close);
+ const draft={id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa25',observedAt:new Date(Date.now()-60000).toISOString(),point:{latitude:-12,longitude:-77,source:'manual',accuracy:null},comment:''};
+ const send=(token='a'.repeat(30),extra={},report=draft)=>{const body=new FormData();body.set('report',JSON.stringify(report));return fetch(`${server.origin}/api/app/cases/lost/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/sightings`,{method:'POST',headers:{Authorization:`Bearer ${token}`,...extra},body});};
+ assert.equal((await send('b'.repeat(30))).status,401);
+ assert.equal((await send('a'.repeat(30),{Origin:server.origin})).status,403);
+ assert.equal((await send('a'.repeat(30),{}, {...draft,observedAt:'2100-01-01T00:00:00.000Z'})).status,400);
+ server.ambiguous();assert.equal((await send()).status,503);assert.equal(server.sightings(),1);
+ const success=await send();assert.equal(success.status,200);assert.equal((await success.json()).id,draft.id);assert.equal(server.sightings(),1);
+ const payload=server.sightingCalls().at(-1);assert.equal(payload.p_reporter,'11111111-1111-4111-8111-111111111125');assert.equal(payload.p_source,'lost');assert.equal(payload.p_slug,undefined);
+ server.set({state:'closed'});assert.equal((await send('a'.repeat(30),{}, {...draft,id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb25'})).status,409);
+});
+
 test('Public submission accepts no session, enforces origin/validation, cleans evidence and retries after commit', async t => {
   const server = await productionFixture(); t.after(server.close);
   const draft = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', observedAt: new Date(Date.now() - 172800000).toISOString(), point: { latitude: -12.050001, longitude: -77.040001, source: 'manual', accuracy: null }, comment: 'Por el parque' };

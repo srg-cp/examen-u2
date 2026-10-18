@@ -1,5 +1,20 @@
 # Arquitectura de Entre Huellas
 
+## Avistamientos Android — 18/10/2026
+
+HU-10.2/#37 incorpora `apps/mobile/lib/features/sightings` con dominio sin SDK,
+providers declarativos, ViewModel autoDispose, estado, pantalla y data con DTO.
+Bootstrap inyecta HTTP/Supabase Auth, cámara/galería y GPS; router fija caso/origen.
+La ruta autenticada Nuxt verifica la sesión con Auth y reutiliza SubmitSighting,
+parser multipart, sharp y repositorio servidor. Plan025/fuentes086–087 extrae
+persist_sighting para compartir validación, bloqueos, presupuestos y escritura
+atómica con web; wrapper web conserva vigencia/revocación QR. Evidencia privada,
+reporter_id verificado y reintento ligado a actor, sin QR obligatorio en Android.
+Sin lectura anticipada de HU-11 ni cambios en avisos públicos/custodia existentes.
+[ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md),
+[ficha](funcionalidades/avistamientos-android.md). Activación025/servidor y demo
+Android pendientes; no se declara cierre remoto.
+
 ## Avistamientos web públicos — 18/10/2026
 
 HU-10.1/#36 en `sightings`: dominio compartido independiente con SubmitSighting/

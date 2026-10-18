@@ -42,6 +42,13 @@ class RecoveryCaseActions extends ConsumerWidget {
         children: [
           if (open)
             CollectionAddButton(
+              label: 'Reportar avistamiento',
+              route: '/home/sightings/${community ? 'found' : 'lost'}/$id',
+              icon: Icons.visibility_outlined,
+            ),
+          if (open) const SizedBox(height: 12),
+          if (open)
+            CollectionAddButton(
               label: 'La vi o la encontré',
               route: '/home/found-cases/new?case=$id&community=$community',
               icon: Icons.visibility_outlined,

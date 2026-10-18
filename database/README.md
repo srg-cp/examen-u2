@@ -1,5 +1,13 @@
 # Base de datos de Entre Huellas
 
+Avistamientos Android18/10: fuentes086–087/plan025 generan
+[migración025](../supabase/migrations/20261018002500_app_sightings.sql) y
+[patch025](patchs/025_patch_app_sightings.sql), después de024 ya confirmado por
+el usuario. Regenerar Build-AppSightingsPatch/Build-RunAll. Comando de persistencia
+común web/app, RPC app solo servidor, reporter_id verificado y evidencia privada;
+retira dependencia de QR generado sin ampliar grants de cliente. Requiere servidor
+Nuxt actualizado y demo Android antes de cerrar HU-10.2. No aplicado remotamente.
+
 Avistamientos web18/10: fuentes083–085/plan024 generan
 20261018002400_public_sightings.sql y [patch024](patchs/024_patch_public_sightings.sql).
 Después de023, RPC solo service_role y tabla sin acceso directo para clientes.
