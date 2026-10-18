@@ -1,5 +1,48 @@
 # Configuración y validación de la app
 
+## Cronología y revisión — HU-11, 18/10/2026
+
+El usuario indicó «ok ya esta» tras la entrega025; se conserva esa confirmación,
+sin inspección remota independiente. Este incremento requiere aplicar únicamente
+el nuevo [patch026](../database/patchs/026_patch_case_timeline.sql) sobre025 y
+actualizar Flutter. Regenerar con `./database/scripts/Build-CaseTimelinePatch.ps1`
+y `./database/scripts/Build-RunAll.ps1`. No editar SQL generado ni reaplicar
+incrementos anteriores confirmados.
+
+La app usa las RPC autenticadas con clave publicable/sesión; no se añade secreto
+ni se requiere cambiar Nuxt para estas lecturas/revisiones. Probar con responsable
+y usuario ajeno: ficha→Ver historial→avistamiento web/app→foto/punto privados→
+clasificar con motivo→historial. Probar recepción en orden diferente del observado,
+tardíos, dos sesiones con misma versión, respuesta perdida tras guardar y
+reintento de la misma orden. Al cerrar, lectura persiste y revisión nueva se
+rechaza. Eliminar caso/mascota oculta acceso. Concurrencia multiconexión,
+permisos hosted y Android real siguen pendientes. [Ficha](funcionalidades/cronologia-y-revision.md).
+
+## Avistamientos Android — HU-10.2, 18/10/2026
+
+Requiere024 ya confirmado por el usuario. Aplicar solo el nuevo
+[patch025](../database/patchs/025_patch_app_sightings.sql) en desarrollo y activar
+el servidor Nuxt actualizado junto con la app. No repetir022/023/024 por este
+incremento. Generar artefactos desde raíz con
+`./database/scripts/Build-AppSightingsPatch.ps1` y `./database/scripts/Build-RunAll.ps1`.
+No editar los SQL generados ni ejecutar automáticamente escrituras remotas.
+
+Flutter conserva URL/clave publicable y sesión. `PUBLIC_CASE_WEB_URL` debe ser
+el origen HTTPS del servidor (predeterminado https://entrehuellas.kormind.com).
+La ruta `/api/app/cases/{lost|found}/{id}/sightings` recibe bearer de usuario;
+el adaptador servidor verifica con Supabase Auth y usa su configuración privada
+existente. El móvil no envía Origin de navegador. No añadir CORS permisivo,
+service_role ni claves secretas al archivo Flutter.
+
+Demo pendiente: abrir ficha activa→Reportar avistamiento→fecha/hora real→GPS
+denegado y punto manual→cámara cancelada y galería→enviar sin/con foto. Verificar
+recibo/registro privado y repetir exactamente la misma orden tras respuesta
+ambigua; comprobar que otra cuenta no lee evidencia, y que caso cerrado/no
+disponible rechaza un envío nuevo. No buscar estos registros en la lista anterior
+de avisos públicos: revisión/cronología privada se implementará en HU-11.
+No se acredita dispositivo real, permisos hosted o concurrencia multiconexión
+por pasar pruebas con fixtures. [Ficha](funcionalidades/avistamientos-android.md).
+
 Ubicaciones17 octubre: ejecutar Flutter desde apps/mobile y Nuxt desde
 apps/platform. F5 raíz apunta a apps/mobile y conserva config/supabase.local.json;
 los valores locales se trasladaron sin cambios. Dokploy debe usar contexto
@@ -42,6 +85,38 @@ Casos guardados,16 de octubre: aplicar020 después de001–019 en desarrollo. [P
 Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar los comandos desde `apps/mobile`. Se mantienen el nombre del paquete y las plataformas existentes. Android conserva el identificador provisional `com.example.flutter_application_entrehuellas`; revisarlo antes de distribuir.
 
 ## Arranque
+
+### Android y VS Code después del traslado a apps/mobile
+
+Abrir la raíz actual del repositorio o directamente `apps/mobile`. Si VS Code
+estaba abierto durante el movimiento, ejecutar **Developer: Reload Window**,
+abrir `apps/mobile/lib/main.dart` y seleccionar **Entre Huellas - desarrollo local**
+en Ejecutar y depurar. Los perfiles de ambas carpetas conservan su `cwd` correcto.
+No usar **Enable android for this project**: `apps/mobile/android` ya existe.
+
+El error `No supported devices found ... emulator-5554` indica que ese dispositivo
+no está conectado en ese momento. Comprobar y arrancar el AVD existente desde
+`apps/mobile`:
+
+```powershell
+flutter emulators
+flutter emulators --launch Pixel_9a
+flutter devices
+```
+
+Esperar hasta que aparezca como Android conectado (no `offline`), seleccionarlo
+con **Flutter: Select Device** y pulsar F5. El ID del AVD (`Pixel_9a`) y el del
+dispositivo encendido (`emulator-5554` en esta comprobación) son distintos;
+usar el ID que muestre `flutter devices` para ejecutar por terminal:
+
+```powershell
+flutter run -d emulator-5554 --dart-define-from-file=config/supabase.local.json
+```
+
+Esto no exige cambiar `main.dart`, el nombre del paquete ni regenerar Android.
+Referencia: [configuración Android de Flutter](https://docs.flutter.dev/platform-integration/android/setup).
+
+### Arranque por terminal
 
 ```powershell
 Set-Location apps/mobile

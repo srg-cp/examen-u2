@@ -13,10 +13,12 @@ class FoundDetailScreen extends ConsumerWidget {
     required this.id,
     this.savedAction,
     this.posterAction,
+    this.timelineAction,
     super.key,
   });
   final Widget? savedAction;
   final Widget? posterAction;
+  final Widget? timelineAction;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,6 +62,7 @@ class FoundDetailScreen extends ConsumerWidget {
                 value: state.requireValue.value!,
                 actions: Column(
                   children: [
+                    if (timelineAction != null) timelineAction!,
                     if ((state.requireValue.value!.canGeneratePoster ||
                             state.requireValue.value!.canResolve) &&
                         posterAction != null)

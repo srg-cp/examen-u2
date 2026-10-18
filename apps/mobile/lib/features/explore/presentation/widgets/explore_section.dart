@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/collection_header.dart';
+import '../../../../core/presentation/widgets/collection_empty_state.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -67,6 +68,7 @@ class ExploreSection extends ConsumerWidget {
       const SizedBox(height: 12),
       AuthStageTransition(
         stage: 'content',
+        startCovered: true,
         builder: (play) => StaggerReveal(
           count: 1,
           play: play,
@@ -210,9 +212,10 @@ class ExploreSection extends ConsumerWidget {
                           else if (data.items.isEmpty &&
                               !data.failed &&
                               !data.refreshing)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 24),
-                              child: Text('No hay casos con estos filtros.'),
+                            const CollectionEmptyState(
+                              title: 'No encontramos casos',
+                              description:
+                                  'Prueba con otra ubicación o ajusta los filtros de búsqueda.',
                             ),
                           results,
                           if (data.failed)

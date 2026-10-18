@@ -1,5 +1,13 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Referencia de presentación web — 18/10/2026:** leer también
+[REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md). Por instrucción del usuario, la landing
+aprobada guía toda apps/platform; Flutter conserva su referencia de acceso.
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) extiende la referencia
+visual de ADR-060, sin alterar capas, autorización o privacidad. Componentes
+compartidos se extraen con reutilización real, sin dependencias de presentation
+entre funcionalidades.
+
 **Web,17/10/2026:** por decisión del usuario se adopta Vue/Nuxt/TypeScript
 para una única aplicación web con módulos públicos, usuarios y administración.
 Los roles no se resuelven solo en navegación: cada operación debe autorizarlos

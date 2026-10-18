@@ -1,4 +1,7 @@
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
+import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
+import '../features/case_timeline/presentation/screens/sighting_review_screen.dart';
 import '../features/explore/presentation/screens/explore_map_screen.dart';
 import '../features/case_posters/presentation/screens/case_poster_screen.dart';
 import '../features/case_posters/domain/entities/case_poster.dart';
@@ -7,6 +10,9 @@ import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
 import '../features/saved_cases/presentation/widgets/save_case_button.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
+import '../features/sightings/domain/entities/sighting.dart';
+import '../features/sightings/providers/sighting_providers.dart';
+import '../features/sightings/presentation/screens/sighting_screen.dart';
 import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
 import '../features/pets/presentation/view_models/pet_list_view_model.dart';
 import '../features/found_cases/providers/found_case_providers.dart';
@@ -113,6 +119,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
+              state.uri.path.startsWith('/home/sightings/') ||
+              state.uri.path.startsWith('/home/timeline/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
@@ -259,6 +267,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'sightings/:source/:id',
+            redirect: (context, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ProviderScope(
+                overrides: [
+                  sightingTargetProvider.overrideWithValue(
+                    SightingTarget(
+                      state.pathParameters['id']!,
+                      state.pathParameters['source'] == 'found',
+                    ),
+                  ),
+                ],
+                child: const SightingScreen(),
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'my-found-cases',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -273,6 +307,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: FoundDetailScreen(
                 id: state.pathParameters['id']!,
+                timelineAction: TimelineAccessButton(
+                  target: (id: state.pathParameters['id']!, community: true),
+                ),
                 posterAction: TextButton.icon(
                   onPressed: () => context.push(
                     '/home/posters/found/${state.pathParameters['id']}',
@@ -336,6 +373,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: CaseDetailScreen(
                 id: state.pathParameters['id']!,
+                timelineAction: TimelineAccessButton(
+                  target: (id: state.pathParameters['id']!, community: false),
+                ),
                 posterAction: TextButton.icon(
                   onPressed: () => context.push(
                     '/home/posters/lost/${state.pathParameters['id']}',
@@ -370,6 +410,46 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: const AlertPreferencesScreen(),
             ),
+          ),
+          GoRoute(
+            path: 'timeline/:source/:id',
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f-]{36}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: CaseTimelineScreen(
+                target: (
+                  id: state.pathParameters['id']!,
+                  community: state.pathParameters['source'] == 'found',
+                ),
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: 'sightings/:sighting',
+                pageBuilder: (context, state) => entityEditorPage(
+                  context: context,
+                  key: state.pageKey,
+                  source: state.extra,
+                  child: SightingReviewScreen(
+                    reviewKey: (
+                      target: (
+                        id: state.pathParameters['id']!,
+                        community: state.pathParameters['source'] == 'found',
+                      ),
+                      id: state.pathParameters['sighting']!,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: 'posters/:source/:id',

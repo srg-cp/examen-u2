@@ -1,5 +1,76 @@
 # Diseño de la interfaz: implementación y revisión
 
+Android18/10, HU-11: Ver historial se compone como slot en ficha, visible tras
+capacidad autorizada del servidor. Historial/Revisión usan CaseScreenShell,
+glass flotante, cover/stagger con cabecera persistente, superficies compartidas,
+mapa privado de lectura/navegación, selectores y AppTextField con contador500.
+El mapa refleja la precisión GPS registrada, sin círculo de precisión inventado
+para un punto manual. Foto solo tras Ver foto; sin descarga de imágenes en lista.
+Toast/shake/invalid, Guardar revisión con etiqueta constante/shimmer, refresco
+por gesto con contenido conservado y recuperación explícita tras conflicto.
+Clasificación, evidencia y auditoría se presentan separadas; texto aclara que
+Confirmado no garantiza posición actual ni recupera el caso. Renders en
+apps/mobile/build/ui-preview/case-timeline, normal y320×350/texto2, con fixtures.
+
+Android18/10, HU-10.2: acción Reportar avistamiento en ficha abierta y formulario
+con título breve La vi, para no partir palabras con texto200%. Reutiliza
+CaseScreenShell, glass flotante, cover/stagger, fecha/hora independientes,
+ZoneMapPicker, AppTextField con contador500 y PhotoGalleryStrip/PhotoAddTile.
+Toast superior para validación/errores/resultados, ValidationSurface/ShakeField,
+shimmer durante trabajo real y confirmación solo tras recibo persistido.
+Renders normal/320×350 texto2 en build/ui-preview/android-sightings; mapa de
+prueba con teselas neutras. Recibo y condición tardía son datos del registro;
+sin nueva cronología ni publicación de evidencia. [ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md).
+
+Web18/10, HU-10.1: WebShell/ActionButton y lector QR adoptan ADR-063 (crema,
+Arial, marca minúscula, cápsulas con brillo/celeste). SightingForm con ancho
+máximo620, campos60px/radio24, fecha/hora adaptables, mapa300px, adjuntos con
+label accesible y foco visible, toast superior y shimmer de acciones reales.
+Retorno glass52 flotante; WebShell reserva88px en cabecera para no tapar la
+marca. Cabecera persistente fuera del reveal; sin repetir al editar/contar/GPS.
+Estados inválidos/borde/shake; sin feedback bajo campos. Fotos/puntos reales
+de visitantes no aparecen en la ficha QR; se conservan instrucciones de privacidad.
+Capturas fixture en apps/mobile/build/ui-preview/public-sightings; referencia
+operativa, no certificación de mapas/fotos remotos ni auditoría AA global.
+Contraste18/10: primario/crema17.08:1, secundario/crema5.48:1 y azul/celeste5.03:1.
+La combinación heredada blanco/degradado azul falla4.5:1 (1.97–3.62:1); se
+registra para adaptación accesible de la referencia aprobada, sin afirmar AA.
+
+Web — 18/10/2026: la landing final queda aprobada por el usuario como base
+de toda la plataforma. [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) reúne tokens exactos,
+radios, tipografía, botones, espacios, variantes de color, imágenes y movimiento,
+con reglas de adaptación a formularios/listados y criterios de revisión.
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md). No se modifica UI
+en este incremento; no se declara migración visual del QR ni paneles implementados.
+
+Mapa18/10: ExploreMapPin usa SVG negro36 dentro de área táctil48; grupos añaden
+contador. Callout de ancho máximo330 con foto superior136 a ancho completo,
+nombre y fila de tamaño/raza/fecha con iconos18. Cada columna conserva ancho
+legible; texto ampliado permite scroll horizontal en la fila y vertical en la
+tarjeta, cuya altura se limita al mapa sobre el panel. Reutiliza CasePhotoView/EntityCardSurface y
+fecha compartida, skeleton de tamaño mientras consulta y toast con Reintentar
+ante error. Sin texto Abrir caso; nombre/tamaño/raza/fecha mantienen apertura
+por toque. Fecha semántica por suceso; raza ausente declarada, no inferida.
+ADR-062; no se promete captura/persistencia de raza.
+
+Vacíos18/10: CollectionEmptyState reutiliza el diseño aprobado de Mascotas
+en Mascotas/Explorar: padding vertical40, huella88 gris6E6E73, separación24,
+título20/w600/111111 centrado, separación8 y descripción16 gris centrada.
+Acción opcional con separación24/ancho máximo280, solo cuando existe una
+operación real. No mostrar vacío mientras carga o falla una consulta.
+
+Mapa18/10: DraggableScrollableSheet entre42–90%, con resistencia visual máxima
+18px bajo el mínimo y retorno240ms al soltar. Retorno glass ligado a extensión
+78–90% (fundido/retirada superior72px), restaurado al bajar; oculto sin hit-test
+ni semántica. Movimiento reducido sin traslación/rebote. Filtros sin título
+redundante; ver [ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
+Landing17/10/2026: app/features/landing de plataforma compone LandingPage,
+LandingArt/Icon/Brand/Actions y landing.css limitado a .landing-page. Recortes
+de ilustración en clases CSS fijas compatibles con CSP, no inline. Referencia:
+mockup de la rama landing, conservado al portar React→Vue. Lectores QR usan
+.reader-shell para evitar interferencia al navegar. [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web Vue17/10/2026: app/components comparte WebShell/ActionButton/TopToast/
 ContentSkeleton; app/features/case_reader contiene pantalla y galería Vue.
 app/assets/main.css conserva los tokens y geometría de la ficha anterior.
@@ -420,3 +491,27 @@ Sustituye el desplegable que empujaba la grilla. FilterPopover<T> mantiene una c
 Por corrección del usuario, se retira FilterPopover y se usa FilterExpansion<T>, sin DialogRoute ni popup. Conserva SelectionPillSurface y FilterChoiceGroup: fondo gris, selección negra e indicador adaptable. Editor dentro del scroll existente, cerrar descarta y Aplicar confirma/colapsa. Separación16 respecto a la primera fila. Cards con nombre/especie, tipo/estado en badges y sin texto redundante; nombre ausente usa especie una sola vez.
 
 Zona con Todas las zonas/Por ubicación, AppTextField de ciudad/dirección, botón Buscar ubicación con LoadingShimmer, resultados reales, atribución enlazada y mapa con centro/círculo. Slider1–50km y ZoneMapPicker.fitRadius opt-in. Sin GPS ni coordenadas numéricas visibles. Renders normales/pequeños y evidencia en ESTADO; [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+## Ilustraciones independientes de landing —17/10/2026
+
+Se sustituye el raster compuesto de ADR-060 por siete assets independientes
+imagegen con transparencia, documentados en apps/platform/LANDING_ASSETS.md.
+LandingArt mapea nombres semánticos a archivos/dimensiones nativas, sin offsets
+ni ventanas de mockup; LandingCharacterCard contiene figura, etiqueta HTML y
+trazos SVG. Gradientes/bordes/superficies/círculos/pins decorativos son CSS real.
+Se elimina del público landing-reference.png. Header/footer usan el logo oficial
+/brand.png; ningún logo generado. Conservar hero y sus cover/stagger, tiempos y
+movimiento reducido aprobados por el usuario. Composición y CSS siguen aislados
+de QR; escenas pueden reencuadrarse como ilustraciones, nunca como capturas UI.
+
+## Diversidad y marca —17/10/2026
+
+Diez PNG independientes: corgi, dálmata, gato atigrado, pastor/ragdoll, spaniel,
+mestizo/calicó, retriever/gato gris y beagle/gato blanco-negro. Pañuelos carbón,
+verde bosque, marino, burdeos, petróleo, ciruela y terracota según mascota.
+Emblema de only-black.svg estampado en blanco por imagegen dentro de la tela,
+con perspectiva/textura/pliegues; no se superpone desde CSS/SVG. LandingArt solo
+presenta PNG y LandingCharacterCard conserva figura/caption/decoración nativas.
+Fuentes oficiales actualizadas en logo se conservan; copias oficiales PNG en landing/QR/favicon y /brand.svg disponible como vector y recursos
+Flutter/launchers/splash actualizados. Animación hero aprobada conservada.
+Prompts finales/procedencia: apps/platform/LANDING_ASSETS.md.

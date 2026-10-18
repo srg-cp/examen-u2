@@ -1,5 +1,66 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Web — 18/10/2026:** el usuario aprueba la landing terminada como referencia
+para toda la plataforma web (público, usuarios y administración). Antes de cambios
+web leer [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md): consolida valores finales,
+variantes, componentes, movimiento y criterios de aceptación.
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) sustituye el
+aislamiento de referencia visual de ADR-060; el CSS sigue encapsulado y el QR se
+adaptará al intervenir sus recorridos, sin afirmar migración realizada. Flutter
+conserva la referencia de acceso vigente. Las notas anteriores de paleta son
+históricas; rige la consolidación web, manteniendo feedback global y seguridad.
+
+Vista previa del pin18/10, corrección del usuario: foto arriba a ancho completo;
+nombre y fila de tamaño/raza/fecha debajo, cada dato con su icono. Mantener los
+datos uno junto al otro; texto ampliado usa scroll horizontal de la fila y
+scroll vertical de la tarjeta, sin reducir tipografía ni recortar información.
+Sustituye la composición inicial con foto lateral; ADR-062.
+
+Mapa18/10: usar only-black.svg como símbolo negro del pin; coincidencias añaden
+contador conservando la marca. Vista previa tocable con foto principal, nombre,
+tamaño, raza si existe y fecha del suceso; sin rótulo Abrir caso. Mientras no se
+registre raza, indicar Raza no registrada, sin inferir datos. Espacio dentro del
+mapa visible, texto ampliado desplazable y navegación entre coincidencias.
+[ADR-062](decisiones/062-pines-de-marca-y-vista-previa-publica.md).
+
+Mapa18/10/2026: panel normal/mínimo42%, máximo90%; sin estado14% al tocar pines.
+Al intentar bajar del mínimo, resistencia visual hasta18px y retorno al soltar.
+Retorno glass se desvanece/retira hacia arriba al acercarse al máximo y reaparece
+al bajar; oculto sin interacción/semántica. Movimiento reducido inmediato y sin
+rebote. Sin título Filtros de búsqueda; campos/Aplicar se conservan.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md) sustituye
+esos detalles de ADR-055/056.
+
+Landing17/10: todos los botones comparten radio de cápsula999px, por instrucción
+del usuario, también en tablet/móvil. Colores y efectos conservan sus variantes.
+
+Referencia posterior17/10: los botones azules de landing usan acabado cápsula
+con degradado celeste/azul, texto blanco, brillo superior y sombra suave según
+imágenes del usuario. Sustituye primario azul plano3C537B/blanco y propuesta
+intermedia celeste/texto oscuro. Hero y secciones restauradas conservan lima.
+
+Corrección posterior17/10: oportunidad, comunidad y colaboración (4/5/6)
+recuperan su paleta original. «Una huella tuya» conserva azul por rectificación
+explícita. Esta indicación limita la actualización cromática inferior.
+
+Corrección posterior del usuario: el hero conserva su paleta original de
+gradientes vivos, botones lima/celeste y mascotas con fondos anteriores;
+la paleta azul siguiente aplica al resto de la landing.
+
+Actualización autorizada17/10/2026: la landing acompaña el nuevo logo azul.
+Botones principales azul profundo3C537B/blanco; secundarios celesteB5D5E9 con
+texto azul. Gradientes celeste/azul/lavanda, verde residual suave, crema y textos
+oscuros conservados. Sustituye la prioridad lima de la referencia histórica
+inferior; solo aplica a landing. Layout, mascotas y animaciones aprobadas siguen.
+Registro en ADR-060 y ficha de landing.
+
+Landing17/10/2026: al integrar la referencia de feature/landing-page, conservar
+su mockup institucional aprobado del11 de octubre (crema/lima/celeste/personajes).
+Es excepción deliberada para presentación, sin extender esa paleta a QR/acceso/
+móvil. Aislar CSS y mantener anclas reales, FAQ nativo, texto ampliado, movimiento
+reducido y entrada original. No inventar descargas/login/datos de producto.
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web17/10/2026: componentes Vue compartidos (WebShell, ActionButton, TopToast,
 ContentSkeleton) y CaseGallery sustituyen la vista DOM manual del QR. Conservar
 composición y colores aprobados, cover→stagger solo al entrar/cambiar etapa,
@@ -417,3 +478,14 @@ Por instrucción explícita del usuario, Filtrar casos abre un panel superpuesto
 ## Filtros integrados y zona con buscador — 15 de octubre de 2026
 
 La nueva instrucción del usuario sustituye el popup de ADR-041: desplegar filtros ahí mismo, con cápsulas compartidas. FilterExpansion en core conserva el disparador y despliega el editor dentro del scroll vertical, sin rutas modales. Cerrar descarta borrador; aplicar colapsa y confirma. Movimiento reducido monta directamente; demás entradas cover→stagger sin reinicio por edición. Separación16 entre control y cards, nombre/especie debajo y tipo/estado en badges, sin texto repetido Mascota perdida. Zona combina búsqueda explícita de ciudad/dirección, selección en mapa y slider1–50km, con carga/errores según norma. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+Corrección17/10/2026 de landing: el mockup solo sirve como referencia, nunca
+como atlas/fondo recortado de la UI. Usar las ilustraciones imagegen independientes
+y el logo oficial, con tarjetas/etiquetas/superficies Vue/CSS/SVG. La animación
+principal está aprobada y se conserva con sus tiempos y movimiento reducido.
+
+Ilustraciones17/10: por precisión del usuario, el emblema blanco se integra en
+los PNG mediante imagegen como estampado sobre la tela. Prohibido sustituirlo
+por un logo superpuesto a las mascotas desde Vue/CSS/SVG. Variar mascotas, razas,
+pelajes y colores de pañuelo, manteniendo estilo y animación hero aprobados.
+La marca de navegación/favicon usa las fuentes oficiales actualizadas de logo/.

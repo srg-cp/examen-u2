@@ -13,7 +13,10 @@ async function sources(path) {
   return files;
 }
 test('Domain and presentation boundaries keep credentials, infrastructure and SDK out of Vue/client', async () => {
-  for (const [, source] of await sources(new URL('../shared/features/case_reader/domain/', import.meta.url))) assert.doesNotMatch(source, /node:|supabase|from ['"].*(data|presentation|vue|nuxt)|fetch\(/);
+  for (const [path, source] of await sources(new URL('../shared/features/', import.meta.url))) {
+    if (path.includes('/domain/')) assert.doesNotMatch(source, /node:|supabase|from ['"].*(data|presentation|vue|nuxt)|fetch\(/);
+    if (path.includes('/presentation/')) assert.doesNotMatch(source, /from ['"].*(\/data\/|\/server\/)|navigator\.|fetch\(/);
+  }
   for (const [, source] of await sources(new URL('../app/features/', import.meta.url))) assert.doesNotMatch(source, /from ['"].*(\/data\/|\/server\/)|SUPABASE_|process\.env|\.rpc\(/);
   for (const [, source] of await sources(new URL('../app/', import.meta.url))) assert.doesNotMatch(source, /SUPABASE_SERVER_KEY|service_role|supabase_case_data_source/);
 });

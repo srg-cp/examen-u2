@@ -3,7 +3,7 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $appDirectory = Split-Path -Parent $PSScriptRoot
-$repoDirectory = Split-Path -Parent $appDirectory
+$repoDirectory = Split-Path -Parent (Split-Path -Parent $appDirectory)
 $vectorSourcePath = Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2-16.svg'
 $resourcesDirectory = Join-Path $appDirectory 'android/app/src/main/res'
 $utf8Encoding = New-Object System.Text.UTF8Encoding($false)
@@ -17,6 +17,19 @@ if ($vectorSource.svg.viewBox -ne '0 0 512 512' -or $sourcePaths.Count -ne 5 -or
     throw 'El SVG no coincide con la estructura prevista. Revisar el adaptador antes de regenerar.'
 }
 
+# Keep every shipped copy in sync with the official exports, including Nuxt.
+$rasterSourcePath = Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2@2x.png'
+foreach ($relativePath in @(
+    'apps/mobile/assets/branding/app_icon.png',
+    'apps/mobile/android/app/src/main/res/drawable-nodpi/startup_brand.png',
+    'apps/platform/public/brand.png'
+)) {
+    Copy-Item -LiteralPath $rasterSourcePath -Destination (Join-Path $repoDirectory $relativePath) -Force
+}
+Copy-Item -LiteralPath $vectorSourcePath -Destination (Join-Path $repoDirectory 'apps/platform/public/brand.svg') -Force
+Copy-Item -LiteralPath (Join-Path $repoDirectory 'logo/only-black.svg') -Destination (Join-Path $repoDirectory 'apps/mobile/assets/branding/only-black.svg') -Force
+Copy-Item -LiteralPath (Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2-256.png') -Destination (Join-Path $repoDirectory 'apps/platform/public/brand-icon.png') -Force
+
 Push-Location -LiteralPath $appDirectory
 try {
     & dart run flutter_launcher_icons
@@ -24,6 +37,13 @@ try {
 } finally {
     Pop-Location
 }
+
+# flutter_launcher_icons 0.14.4 can mistake the Swift asset flag for an icon name.
+# Preserve that unrelated Xcode boolean after regenerating icon catalogs.
+$iosProjectPath = Join-Path $appDirectory 'ios/Runner.xcodeproj/project.pbxproj'
+$iosProject = [System.IO.File]::ReadAllText($iosProjectPath)
+$fixedIosProject = $iosProject.Replace('ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;', 'ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;')
+if ($fixedIosProject -ne $iosProject) { [System.IO.File]::WriteAllText($iosProjectPath, $fixedIosProject, $utf8Encoding) }
 
 function Write-IconResource {
     param([string]$RelativePath, [string]$XmlContent)
@@ -92,4 +112,4 @@ Write-IconResource 'mipmap-anydpi-v33/ic_launcher.xml' @'
 </adaptive-icon>
 '@
 
-Write-Output 'Iconos Android clásicos, adaptativos y monocromáticos generados.'
+Write-Output 'Marca Flutter/web, splash e iconos Android clásicos/adaptativos/monocromáticos y catálogos iOS/web/Windows/macOS generados.'

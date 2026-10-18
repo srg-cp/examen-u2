@@ -1,5 +1,11 @@
 # Patches manuales de Supabase
 
+024_patch_public_sightings.sql: HU-10.1/#36, aplicar completo en desarrollo
+después de023 y junto con el servidor Nuxt actualizado. RPC autorizada solo
+service_role, tabla/evidencia privada, idempotencia y límites persistentes.
+Generado por Build-PublicSightingsPatch.ps1 desde083–085/plan024; no editar
+el artefacto ni volver a aplicar patches antiguos. Aplicación remota pendiente.
+
 `004_patch_profile_avatars.sql` configura el bucket privado y las políticas de foto de perfil sin intentar alterar la tabla administrada `storage.objects`. Sustituye la ejecución fallida de la migración 003. Comprueba que RLS ya esté habilitado y aborta si no lo está; no cambia propietarios ni roles.
 
 Pegar todo el archivo en una consulta nueva del SQL Editor del proyecto de desarrollo, con rol postgres. Quitar la selección de texto antes de Run para ejecutar la transacción completa. No ejecutar fragmentos del bloque DO. Se puede repetir y conserva las fotos existentes.

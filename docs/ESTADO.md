@@ -1,5 +1,1239 @@
 # Estado del proyecto
 
+## HU-11 operativa según confirmación del usuario — 18/10/2026
+
+Después de confirmar la aplicación026 y recibir los pasos de validación Android,
+el usuario indica «ok perfecto, ya esta». Se registra su confirmación del recorrido
+para dar por finalizado el incremento funcional HU-11.1/#38 y HU-11.2/#39:
+cronología y revisión privada de avistamientos. Sustituye el pendiente de
+confirmación operativa de las notas anteriores. Evidencia comunicada por el
+usuario, sin inspección remota independiente ni certificación detallada de todos
+los escenarios de aislamiento, concurrencia multiconexión o pérdida de respuesta.
+No se cierran issues/épica en GitHub ni se integra/publica la rama desde este chat.
+Sin nuevas pruebas de código por esta actualización documental. Siguiente
+incremento del backlog: HU-12, seguimiento y alertas/bandeja persistente.
+
+## Patch026 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch026 de cronología/revisión.
+Sustituye el pendiente de aplicación026 de las notas anteriores; no se solicita
+reaplicarlo. Confirmación comunicada, sin inspección SQL remota independiente.
+Falta actualizar/reiniciar Flutter con el código de HU-11 y validar en Android
+autenticado: ficha propia→Ver historial→avistamiento web/app→foto/punto privados→
+clasificación con motivo→auditoría persistida al volver a entrar. Comprobar
+usuario ajeno, caso cerrado y reintentos/conflictos con dos sesiones. No requiere
+actualizar Nuxt por HU-11. Sin nuevas pruebas de código por esta confirmación
+documental ni cierre de historias, despliegue o cambios de GitHub.
+
+## Detalle superpuesto trasladado al footer — 18/10/2026
+
+El usuario aclara que «última sección» significa el footer situado debajo del
+cierre. LandingSideNote se mueve exclusivamente al footer; conserva posición
+absoluta, mancha irregular, huellas SVG y Kalam local. Sin reserva de espacio
+ni modificación del contenido; z2/pointer-events none superpone el detalle sin
+interceptar enlaces. Footer usa aislamiento de apilado local. Oculto bajo1100px.
+Esta nota sustituye la ubicación en el cierre indicada anteriormente.
+Build aislado aprobado. Renders1920/1440/1100/731/390/320px comprobados sin
+overflow; comparación geométrica con/sin adorno confirma que texto y mascotas
+del footer no se desplazan. Kalam cargada; captura1440-footer-overlay revisada
+en apps/mobile/build/ui-preview/landing-paws. Superposición visual sobre la
+mascota derecha conservada según autorización del usuario. No se repite suite
+completa por el traslado; Safari/Firefox pendientes. Sin despliegue ni commit/push.
+
+## Mancha superpuesta en última sección — 18/10/2026
+
+Por corrección explícita del usuario, LandingSideNote pasa de beneficios al
+cierre. Retirado padding/min-height reservados en beneficios: el adorno es
+absoluto z2 a la derecha, sin desplazar contenido. Formas SVG con contornos
+irregulares verde/crema/durazno, huellas originales y corazones; superposición
+visual permitida, pointer-events none conserva acciones. Oculto bajo1100px.
+Kalam Regular local (SIL OFL con licencia incluida) sustituye Arial cursiva solo
+en su frase por petición manuscrita; no se afirma fuente exacta de la captura.
+Actualizados ADR-063, reglas web, manifiesto y ficha. Sin alcance funcional nuevo.
+
+Typecheck/build aislado aprobados. QA navegador completo aprobado: responsive,
+texto200%, FAQ/teclado/anclas, movimiento reducido, SSR sin JS, CSP/hidratación
+y landing→QR→landing. Renders1920/1440/1100/731/390/320px sin overflow en
+apps/mobile/build/ui-preview/landing-paws/*-closing.png. Verificación geométrica
+compara título/acciones con y sin adorno y confirma posiciones idénticas; fuente
+manuscrita cargada. Sin despliegue, commit/push ni cambios de backend. Siguiente
+paso: valoración del usuario; Safari/Firefox pendientes.
+
+## Cronología y revisión privada — HU-11.1/#38 y HU-11.2/#39 — 18/10/2026
+
+Implementación local en feature/case-timeline-review, creada desde
+feature/android-sightings con árbol limpio. El usuario indicó «ok ya esta» tras
+las instrucciones de activar025; se registra confirmación comunicada, sin
+inspección remota ni demo detallada independiente. No se solicita reaplicar025.
+Los cambios de landing/documentación surgidos en paralelo se conservan; este
+incremento no implementa UI web ni cambia el lector QR.
+
+RF-12,14: ficha propia→Ver historial→cronología→avistamiento→evidencia privada→
+clasificación/motivo→decisión persistida e historial. Publicación/recuperación
+registradas y avistamientos web/app se ordenan por hora del suceso, recepción y
+tardíos separados. Páginas estables y foto solo por consulta explícita; punto
+exacto, comentario y foto disponibles solo al responsable. Confirmado no equivale
+a ubicación actual ni a recuperación. Caso cerrado conserva lectura y bloquea
+nuevas revisiones. Avisos públicos previos de found_cases mantienen su recorrido,
+sin conversión automática ni eventos/auditoría inventados.
+
+Módulo case_timeline con dominio/casos de uso/contrato, providers declarativos,
+ViewModels autoDispose, estado, pantallas, DTO y data. SDK solo en fuente,
+composición en bootstrap/router y slots en fichas, sin UI entre funcionalidades.
+Reutiliza shells, glass, cover/stagger, surfaces, mapa, selectores, inputs,
+toast/invalid/shake y shimmer. Foto limitada visualmente a320px para conservar
+acciones accesibles; mapa de lectura/navegación usa precisión GPS registrada,
+sin precisión ficticia para manual. Renders normales/pequeños revisados.
+
+Fuentes088–090/plan026, migración y patch generados, run_all regenerado sin
+reescribir025. RPC autentican propietario en cada consulta/acción/foto; no hay
+grants directos sobre tablas ni secretos nuevos. sighting_reviews append-only
+con actor/fecha servidor, motivo, estado anterior/nuevo y versión. Útil/Dudoso/
+Rechazado/Confirmado admiten reclasificar a otra distinta en caso abierto.
+UUID estable y CAS evitan doble decisión y sobrescritura obsoleta. Respuesta
+ambigua congela la orden, conflicto exige actualizar conservando el formulario;
+la UI confirma solo tras recibo guardado. Historial paginado conserva todas las
+decisiones. Errores de permiso/cambio de cuenta ocultan datos; respuestas tardías
+y disposición no restauran evidencia anterior.
+
+Validación local: análisis Flutter limpio, formato sin cambios pendientes y28
+pruebas Flutter aprobadas (dominio, VM, DTO/fallos seguros, fotos, error de sesión
+y recuperación de misma cuenta, disposición, arquitectura y navegación desde
+ficha en ambos tamaños). Renders390×844 y320×350/texto2 con fixtures/teselas
+neutras: historial, detalle, foto, formulario y auditoría en
+apps/mobile/build/ui-preview/case-timeline. Suite SQL completa26 pruebas
+aprobadas: incluye dos usuarios/roles, evidencia privada, orden observado,
+páginas, motivos/cuatro estados, reintento original tras revisiones/cierre,
+conflicto CAS, eliminación y repetición. Tras el ajuste final de normalización
+Unicode del motivo, una ejecución conjunta se interrumpió tras9 casos aprobados
+sin aserción fallida; la comprobación final ejecutó los26 casos secuencialmente
+en procesos separados y todos aprobaron. Log del intento interrumpido conservado
+en hu11-full-sql-aborted.log. PGlite y repositorios sustituidos no
+certifican Supabase hosted ni concurrencia multiconexión. Logs
+hu11-{analyze,format,mobile-tests,sql,sql-preflight,full-sql}.log en apps/mobile/build.
+
+Pendiente aplicar026 en desarrollo y probar Flutter con Supabase real: casos
+propio/comunitario, foto y mapa privados, usuario ajeno, cierre, dos sesiones
+revisando la misma versión y respuesta perdida tras guardar. Sin APK nuevo,
+build Android, SQL remoto, despliegue, commit/push o modificaciones de GitHub.
+No hay nuevo servidor Nuxt que activar para estas lecturas/revisiones. Historias
+sin cerrar por evidencia local. Ficha/índice/ADR-066/arquitectura/guía/diseño/
+configuración/backlog actualizados. Siguiente incremento funcional HU-12,
+bandeja/alertas, después de activar y validar HU-11.
+
+## Detalle lateral derecho de comunidad — 18/10/2026
+
+Aclaración del usuario: la referencia debe ser un adorno lateral, sin sección
+nueva. LandingSideNote se integra dentro de beneficios, al costado derecho:
+190×285px, formas orgánicas salvia/durazno, frase pequeña inclinada, corazones
+SVG y LandingPawTrail con siluetas del SVG original. Reserva240px de lateral
+en escritorio≥1100px; se oculta en anchos menores para conservar el contenido
+y evitar convertirlo en un bloque. Decorativo aria-hidden, sin interacción ni
+movimiento nuevo; conserva las huellas grandes anteriores. Sin cambios de
+alcance funcional, HU/RF/issues, permisos o backend.
+
+Typecheck y build aislado aprobados. QA responsive/200%/teclado/FAQ/anclas,
+SSR sin JS, CSP/hidratación y navegación QR aprobado antes del ajuste final de
+especificidad del padding lateral. Primer intento de QA falló al decodificar
+una imagen; repetición completa aprobada. Revisión visual detectó padding
+sobrescrito y se corrigió reservando el lateral mediante selector específico.
+Build final aprobado; renders1920/1440/1100/731/390/320px revisados en
+apps/mobile/build/ui-preview/landing-paws/*-side-note.png. Comprobación geométrica
+confirma separación entre adorno y tarjetas en escritorio, sin overflow global.
+Sin despliegue ni commit/push; valoración del usuario y Safari/Firefox pendientes.
+
+## Retorno al diseño con huellas ampliadas — 18/10/2026
+
+Por petición del usuario se retira el último bloque añadido de ondas, frase y
+corazones, junto con sus estilos. Se recupera la landing anterior con las huellas
+grandes distribuidas en hero, oportunidad y cierre. Sin cambios en otros trabajos,
+sin despliegue. Comprobación de diferencias sin errores; no se repite build.
+
+## Huellas ampliadas según referencias — 18/10/2026
+
+El usuario pide huellas mayores y más distribuidas como en sus dos referencias,
+usando nuestro SVG. Sustituye el primer ajuste de pares pequeños: LandingPawTrail
+ahora distribuye cuatro siluetas de logo/only.svg por los bordes de hero,
+oportunidad y cierre (12 en escritorio, 10 en móvil). Máscaras CSS del recurso
+original, sin modificarlo, en salvia/celeste/durazno suaves con opacidad0.36;
+tamaños34–130px según posición/viewport. Sin movimiento adicional, interacción
+ni anuncios accesibles. En móvil oportunidad conserva solo dos huellas, junto
+a las mascotas y lejos del texto. No cambia alcance funcional ni HU/RF/issues.
+
+Typecheck y build aislado aprobados. QA de navegador existente aprobado:
+1440/731/390/320px, texto200%, FAQ/teclado/anclas, movimiento reducido, SSR sin
+JS, CSP/hidratación y navegación landing→QR→landing. Renders adicionales1920px
+y capturas revisadas en apps/mobile/build/ui-preview/landing-paws, sin overflow.
+No se repiten pruebas de dominio por este cambio puramente decorativo.
+Ficha/manifiesto actualizados; sin despliegue ni commit/push. Siguiente paso:
+valoración visual del usuario; Safari/Firefox pendientes.
+
+## Huellitas sutiles en la landing — 18/10/2026
+
+Solicitud visual del usuario: tres pares pequeños en hero, oportunidad y cierre,
+combinando LandingIcon/paw con `logo/only.svg`, copiado sin modificar a recursos
+públicos. Widget LandingPawTrail reutilizado, opacidad suave, proporción original,
+sin animaciones adicionales ni interacción y aria-hidden. Ajustado el par de
+oportunidad a la esquina inferior tras revisar móvil para evitar el título.
+Sin cambios de alcance, HU/RF/issues, permisos ni backend. Se conservan los
+archivos SQL locales existentes en feature/case-timeline-review.
+
+Typecheck, 17 pruebas existentes y build de producción aprobados; build aislado
+con NUXT_BUILD_DIR=.nuxt-landing-paws-qa para conservar el servidor dev existente.
+Chrome local: renders1920/1440/731/390/320px sin overflow, tres pares y SVG
+decodificado. Capturas revisadas en apps/mobile/build/ui-preview/landing-paws;
+log de build en apps/mobile/build/landing-paws-build.log. Ficha y manifiesto de
+recursos actualizados. QA de navegador existente aprobado: responsive, texto200%,
+teclado/FAQ/anclas, movimiento reducido, SSR sin JS, CSP/hidratación y navegación
+landing→QR→landing. Sin publicación, commit/push ni despliegue.
+Siguiente paso: valoración visual del usuario; Safari/Firefox no verificados.
+
+## Avistamientos Android — HU-10.2 / RF-11 / #37 — 18/10/2026
+
+Implementación local en feature/android-sightings, creada desde
+feature/public-web-sighting conservando los cambios previos de este documento
+y avistamientos-web.md. Ficha abierta→Reportar avistamiento→La vi→fecha/hora
+real→punto manual/GPS→comentario/foto opcionales→recibo persistido→retorno.
+Cámara/galería, denegación GPS con alternativa manual, formulario conservado,
+doble envío bloqueado y orden congelada tras resultado ambiguo. Cambio de cuenta
+oculta datos anteriores y descarta respuestas tardías. No convierte estos
+registros privados en avisos públicos ni cambia la custodia anterior.
+
+Módulo móvil sightings con dominio/contratos/casos de uso, providers declarativos,
+ViewModel autoDispose, estado, pantalla, DTO y data inyectada desde bootstrap.
+Router compone destino fijo; shell/fecha/mapa/galería/toast/shake/shimmer compartidos.
+Capturas390×844 y320×350/texto2 revisadas; título breve evita partir palabras,
+scroll permite llegar a todas las acciones y recibo. Teselas neutras/fixtures,
+sin acreditar fotos, cartografía o permisos reales de Android.
+
+Nuxt incorpora ruta nativa autenticada; verifica bearer contra Supabase Auth y
+rechaza usuarios anónimos e identidad aportada por cliente. Reutiliza parser
+acotado, validación, saneamiento sharp sin EXIF y repositorio del flujo web.
+Plan025/fuentes086–087 y patch/migración generados: persistencia SQL común,
+reporter_id verificado, reintento ligado a actor, presupuestos y evidencia privada.
+Retira FK hacia enlace QR para aceptar casos sin cartel; comandos validan caso
+bajo bloqueos. RPC app solo servidor; no hay grants de cliente para tabla/evidencia.
+Web conserva revocación/vigencia QR y su contrato de recibo. ADR-065 documenta
+alternativas, retención lógica y límites de bytea.
+
+Validación local: formato de507 archivos sin cambios pendientes, análisis Flutter
+sin incidencias,18 pruebas de dominio/VM/formulario/arquitectura/navegación
+aprobadas, incluidas entrada desde ficha y retorno a custodia en ambos tamaños.
+17 pruebas web y5 pruebas del servidor compilado aprobadas: sesión inválida,
+Origin, futuro, envío nativo, pérdida de respuesta tras commit y reintento único.
+Typecheck y build Nuxt producción aprobados; build aislado en .nuxt-hu10-2-qa
+conserva servidor dev del usuario. Suite SQL completa25 pruebas aprobadas:
+roles, actor incorrecto, fecha, cierre, caso sin QR, idempotencia y repetición.
+Logs hu10-2-{format,analyze,mobile-tests,web-typecheck,web-tests,web-build,
+production,sql,full-sql}.log y renders build/ui-preview/android-sightings
+en apps/mobile/build. La evidencia HTTP usa backend fixture; SQL usa PGlite.
+
+Pendiente aplicar025 en desarrollo, actualizar servidor y probar Android con
+sesión real, GPS/cámara/galería, teselas/fotos, aislamiento hosted y concurrencia
+multiconexión.022/023/024 ya confirmados; no se solicita reaplicarlos. Sin APK
+nuevo, SQL remoto, despliegue, commit/push ni cambios de GitHub. Borrador en memoria,
+sin recuperación tras muerte de proceso/offline HU-15. Historia sin cerrar por
+evidencia local; cronología/revisión HU-11 y push permanecen pendientes.
+Siguiente paso: activar025/servidor y confirmar demo Android antes de continuar
+HU-11. Ficha Android/índice/guía/arquitectura/diseño/configuración/backlog actualizados.
+
+## Avistamientos web operativos según confirmación del usuario — 18/10/2026
+
+Tras informar que024 está aplicado y recibir los criterios de validación
+integrada, el usuario confirma «ok si esta». Se registra su confirmación de
+operación para dar por finalizado el incremento funcional HU-10.1/#36 y poder
+continuar con el siguiente. Evidencia comunicada por el usuario; no es inspección
+remota independiente ni certificación detallada de cada escenario de abuso,
+concurrencia o navegador. Sustituye el pendiente de confirmación operativa de
+la nota anterior. El ajuste de contraste del botón aprobado sigue registrado
+como pendiente visual. No se cierran issues ni se integra/publica la rama desde
+este chat. Siguiente incremento del backlog: HU-10.2/#37, avistamientos Android.
+
+## Patch024 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber aplicado024_patch_public_sightings.sql. Sustituye
+el pendiente de aplicación024 de las notas anteriores; no se vuelve a solicitar.
+Confirmación comunicada por el usuario, sin inspección SQL remota independiente.
+HU-10.1 está implementada y validada localmente; falta confirmar que la revisión
+web correspondiente esté desplegada y verificar envío/persistencia/reintento
+desde un segundo teléfono, caso cerrado/revocado y aislamiento reales.
+Se conserva el pendiente visual de contraste del primario aprobado.
+La aplicación del patch por sí sola no cierra la historia ni acredita esos
+recorridos. No se ejecutan nuevas pruebas de código por esta actualización
+documental, ni se publica/despliega o modifica Supabase desde este chat.
+Siguiente paso: validación integrada de la web con024 activo.
+
+## Avistamientos desde QR sin cuenta — 18/10/2026
+
+HU-10.1 / RF-11 / issue #36 implementada localmente en
+feature/public-web-sighting, creada desde feature/vue-nuxt-web conservando
+los cambios locales previos de móvil y las normas web actualizadas en paralelo.
+Ficha activa→formulario→fecha/hora real→punto manual/GPS con origen/precisión→
+comentario/foto opcionales→recibo guardado. Sin cuenta ni instalación. No cambia
+Android HU-10.2, cronología/revisión HU-11, push u offline; historia sin cerrar.
+
+Módulo sightings con contratos/SubmitSighting/LocateSighting independientes,
+ViewModel para envíos/GPS/disposición y adaptadores HTTP/navegador/Supabase/sharp.
+Página compone lector/formulario por slot; sin imports de UI entre features.
+Plan024/fuentes083–085 y patch/migración generados: RPC solo servidor, tabla,
+punto exacto y evidencia privados; fecha no futura/tardía>24h, vigencia bajo
+bloqueo, UUID/hash estables y presupuestos persistentes por pseudónimo/caso.
+No inventa owner de found_cases ni añade evidencia al DTO QR. JPEG/PNG/WebP
+decodificados y recodificados a JPEG1280px/1MiB sin EXIF; bytea atómico evita
+cargas huérfanas, con coste/escala y evolución a Storage explícitos en ADR-064.
+
+WebShell/ActionButton/QR/formulario adoptan ADR-063: crema/Arial/azul/celeste,
+cápsulas, marca minúscula, retorno glass con espacio propio y enlace a inicio.
+Toast, invalid/Shake, campos conservados y shimmer real. Tras respuesta ambigua
+se bloquea editar y se reintenta el mismo payload. GridLayer de Leaflet usa
+imágenes de teselas normales evitando data-GIF y sin relajar nonce CSP con
+unsafe-inline/data/eval. GPS/cámara solo self; POST con origen exacto, cuerpo
+y tiempo acotados y concurrencia limitada. PUBLIC_WEB_ORIGIN documentado.
+
+Validación local: typecheck limpio,15 pruebas web (incluidas arquitectura,
+VM/GPS tardío, parser multipart acotado, fotos animadas/EXIF y normalización),
+build Nuxt producción y4 pruebas de servidor aprobadas. Navegador Chrome142
+sin cuenta: GPS denegado/manual, foto inválida/válida, fallo después de commit,
+reintento único, cierre, foco, una cabecera, sin overflow/hidratación/CSP en
+1440/731/390/320/1920 y320×350/texto200%. Renders fixture/teselas neutras en
+apps/mobile/build/ui-preview/public-sightings; móvil y texto ampliado revisados.
+Logs hu10-{typecheck,web-tests,web-build,production-tests,browser-qa,sql-tests}.log
+en apps/mobile/build. SQL focalizado aprobado: roles, invariantes, idempotencia,
+límites, cierre/revocación/ficha no disponible y repetición; suite SQL completa
+con25 pruebas aprobadas en hu10-full-sql-tests.log. Un intento previo abortó
+por memoria del equipo; el reintento con comprobaciones secuenciales completó
+sin cambiar configuración global. Sin afirmación de concurrencia hosted.
+
+Preflight Explorar:33 pruebas focalizadas aprobadas. En instalación debug
+existente, attach/hot restart con config local y sesión recuperada, consulta
+real Lima/15km con2 casos, fotos/teselas, pin→preview→ficha→retorno y arrastre
+del panel comprobados; capturas hu10-map-preview/expanded.png y XML de navegación.
+Sin nuevo APK ni arranque frío. Se deja la app y el servidor dev del usuario.
+
+Pendientes materiales: aplicar024 en desarrollo y desplegar conjuntamente web;
+022/023 ya confirmados por usuario, no se vuelven a marcar sin aplicar. Verificar
+QR con otro teléfono, GPS/cámara/Safari/Firefox, proxy/TLS real, permisos y
+concurrencia multiconexión, proveedor cartográfico y coste/volumen de evidencia.
+Motor Docker Linux local no disponible: imagen/ejecución Linux no certificadas.
+Contraste medido: texto/crema17.08:1, secundario/crema5.48:1 y azul/celeste5.03:1;
+blanco/degradado azul aprobado1.97–3.62:1 no alcanza4.5:1. Conservada la referencia
+explícita y registrado el ajuste accesible pendiente, sin certificar AA.
+
+Siguiente paso: activar024/web en desarrollo y comprobar envío desde un segundo
+teléfono antes de cerrar HU-10.1; resolver contraste del primario aprobado y
+validación restante. Ficha avistamientos-web/índice/QR/Explorar/guía/arquitectura/
+diseño/configuración/ADR-064 actualizados. Sin commit/push, SQL remoto o despliegue.
+
+## Landing aprobada y norma de UI/UX para toda la web — 18/10/2026
+
+El usuario confirma su aprobación de la landing terminada y pide documentar
+su referencia para desarrollar el sistema web. REGLAS_UI_UX_WEB.md consolida
+valores del CSS final: crema/azul/celeste/lima por variante, familia y jerarquía,
+radios, espacios, cápsulas con brillo, ilustraciones, movimiento y responsive.
+Distingue composición institucional de adaptación a formularios/listados,
+con feedback/carga global, accesibilidad y criterios de aceptación.
+
+ADR-063 extiende la referencia visual de ADR-060 a público/usuarios/administración
+en apps/platform. Actualizados normas, diseño, arquitectura, guía, instrucciones,
+guía de desarrollo y ficha/relevo de landing. El móvil conserva su referencia;
+QR y paneles no se declaran adaptados. Sin nuevas HU/RF/issues ni cierre de historias.
+
+Validación documental: valores cotejados con CSS/componentes, enlaces locales
+comprobados y git diff --check sin incidencias. No se repiten builds ni pruebas
+de app por cambio exclusivo de Markdown. Sin bloqueos documentales ni despliegue.
+Siguiente paso: aplicar la norma al siguiente incremento web autorizado y registrar
+su evidencia visual/funcional; contrastes y adaptación QR pendientes por recorrido.
+
+## Vista previa: foto arriba y datos con iconos en fila —18/10/2026
+
+Por corrección del usuario, ExploreMapPreviewContent coloca foto principal136
+a ancho completo arriba, nombre debajo y fila de tamaño/raza/fecha con iconos.
+La fila mantiene tres columnas y admite scroll horizontal con texto ampliado;
+en poca altura se recorre toda la tarjeta verticalmente. Altura preferida de
+la etiqueta adaptada; controles de coincidencias conservados fuera del scroll.
+Sin cambios de lectura pública, dominio, permisos o SQL.
+
+19 pruebas de mapa/preview/arquitectura aprobadas: nueva comprobación de foto
+por encima de los datos y mismo eje horizontal de iconos, recorrido de datos
+con texto2, apertura de ficha y mínimo del panel. Renders normales/pequeños
+regenerados y revisados en build/ui-preview/explore-map/*-preview-photo.png;
+log apps/mobile/build/map-preview-photo-top-qa.log. Formato y análisis limpios.
+ADR-062/norma UI/diseño/ficha actualizados. Sin APK ni despliegue;
+siguiente paso: revisión de composición en Android.
+
+## Pines de marca y vista previa detallada del mapa —18/10/2026
+
+Se integra copia exacta de logo/only-black.svg como pin negro mediante
+flutter_svg2.2.1; grupos conservan la marca y contador. La etiqueta seleccionada
+reutiliza CasePhotoView, EntityCardSurface, toast/shimmer y formateador de fecha:
+foto principal, nombre, tamaño, raza ausente declarada y fecha local según
+desaparición/encuentro/avistamiento, sin rótulo visible Abrir caso. Conserva
+apertura al tocar y navegación entre coincidencias. Cámara/altura ajustadas al
+mapa visible sobre el mínimo42%; datos con texto ampliado desplazables.
+
+ReadExploreCasePreview usa contratos públicos lost_cases/found_cases ya
+inyectados; ViewModel autoDispose por caso observa identidad y permite reintento.
+No consulta catálogo, mascota privada ni cambia SQL/permisos. Raza no existe
+en formularios/modelos actuales: Raza no registrada es la limitación explícita,
+sin inferencia ni afirmación de captura/persistencia implementada.
+
+35 pruebas aprobadas de preview/mapa/Explorar/borradores/arquitectura: SVG exacto,
+orígenes coincidentes, foto/tamaño, fallos seguros, reintento, identidad y gestos;
+en pequeño también valida datos accesibles y preview por encima del panel.
+Formato/análisis sin incidencias y sintaxis PowerShell válida. SVG sincronizado
+por el generador existente, sin ejecutar regeneración global de launchers.
+Logs apps/mobile/build/map-detailed-preview-final-qa.log; renders con foto fixture
+y teselas neutras revisados en build/ui-preview/explore-map/*-preview-photo.png
+y *-preview-selected.png. Sin build Android, despliegue o certificación remota.
+ADR-062/normas/diseño/arquitectura/guía/ficha/logo actualizados.
+Siguiente paso: detener y volver a ejecutar la app para incorporar dependencia
+y asset, y revisar mapa/foto/tamaño reales en Android.
+
+## Estado vacío reutilizado en Explorar y Mascotas —18/10/2026
+
+Por petición del usuario, se extrae el layout aprobado de Mis mascotas a
+core/presentation/widgets/collection_empty_state.dart. CollectionEmptyState
+compone huella/título/descripción/acción opcional con los mismos estilos y
+espaciados. Mascotas conserva sus textos Activas/Archivadas y registro; Explorar
+sustituye la línea No hay casos con estos filtros por No encontramos casos y
+una sugerencia de cambiar ubicación/filtros. Solo tras vacío confirmado: no se
+confunde con carga, fallo o ubicación faltante. Sin imports entre presentaciones
+ni cambios de consultas, dominio, permisos o SQL.
+
+30 pruebas de Explorar/carga y navegación de Mascotas/arquitectura aprobadas,
+incluidas aserciones de componente compartido y ausencia durante fallo. Formato
+y análisis sin incidencias. Renders con fuentes reales regenerados/revisados
+en apps/mobile/build/ui-preview/explore/normal-empty.png y small-empty.png;
+registro build/collection-empty-state-qa.log. Texto ampliado continúa por scroll.
+Actualizadas fichas de ambas funcionalidades, diseño y arquitectura.
+Sin build ni despliegue; siguiente paso: revisión Android del estado vacío.
+
+## Mapa: mínimo normal, resistencia y retorno glass progresivo —18/10/2026
+
+Por referencia e instrucción del usuario, panel inicial/mínimo42% y máximo90%.
+Retirado estado14%, también al seleccionar pines; cámara/etiqueta reservan ahora
+el panel normal. Intentar bajar del mínimo desplaza solo la superficie hasta18px
+con resistencia y vuelve en240ms al soltar, sin reducir la extensión real.
+Retorno glass pierde opacidad y sube en78–90%, recuperándose al bajar; oculto
+sin interacción ni semántica. Movimiento reducido inmediato/sin rebote.
+Se retira Filtros de búsqueda conservando campos/borrador/Aplicar filtros.
+
+29 pruebas aprobadas:4 del mapa con gesto real, rebote, ocultación/retorno,
+pines/ficha/consulta y tamaños normal/pequeño/texto2;25 de Explorar, borradores
+y arquitectura. Formato/análisis sin incidencias. Logs en apps/mobile/build/
+map-sheet-minimum-qa.log y map-sheet-related-qa.log. Capturas normales/expandidas
+revisadas en build/ui-preview/explore-map con teselas neutras; no acreditan
+cartografía o fluidez Android reales. Sin APK, SQL ni despliegue.
+ADR-061, normas UI, diseño, arquitectura, guía y ficha actualizados; sustituye
+el mínimo14% de ADR-055/056. Siguiente paso: revisar gesto y retorno en Android.
+
+## Desplazamiento de la barra de navegación restaurado —18/10/2026
+
+Causa reproducida en Home: ValueKey(section) en PullToRefresh desmontaba
+también LiquidNavigation y su TweenAnimationBuilder en cada selección. La
+animación existía y pasaba pruebas aisladas, pero saltaba al destino en la
+composición real. Se traslada la clave al SingleChildScrollView: el contenido
+se reinicia por sección y la barra conserva su estado y desplazamiento320ms.
+Regresiones integradas verifican misma instancia, posición inicial/intermedia,
+cambio de destino antes de terminar y movimiento reducido inmediato.
+
+Formato y análisis sin incidencias;31 pruebas de Home/Explorar/recarga de
+mascotas/arquitectura aprobadas. Evidencia local:
+apps/mobile/build/home-navigation-animation-qa.log. Sin build Android ni
+despliegue; siguiente paso: comprobar fluidez en el emulador con hot restart.
+Ficha Inicio actualizada; títulos alineados y entrada única conservados.
+
+## Títulos de Explorar y Mis mascotas alineados —18/10/2026
+
+Por corrección del usuario, se reproduce diferencia vertical4px con fuentes
+reales: CollectionHeader centraba cada texto según su acción48/56. La fila
+compartida tiene ahora altura mínima56; no añade offsets por funcionalidad ni
+duplica transiciones. Conserva cabeceras fuera del efecto, reserva del+ y una
+sola consulta/entrada de Explorar. Regresión integrada compara coordenadas
+de ambos títulos desde Inicio, durante carga/datos y90 fotogramas, en390×844
+y320×350/texto2.35 pruebas de Explorar, mascotas, Home, colecciones gestionadas
+y arquitectura aprobadas; análisis limpio. Dos regresiones repetidas para
+generar capturas normales/pequeñas, revisadas en build/ui-preview/explore/
+*-header-*.png; log apps/mobile/build/home-header-origin-renders.log;
+sin build Android ni cambios de datos/SQL. Siguiente paso: revisión en Android.
+
+## Una sola transición inicial en Explorar —18/10/2026
+
+Reproducidas dos secuencias cover/stagger anidadas: Home y ExploreSection.
+Home omite la exterior al componer Explorar real; la sección inicia su propio
+cover seguido de stagger, con cabecera fuera. No cambia etapa al resolver la
+carga. Nuevas regresiones desde Inicio verifican una sola entrada/consulta,
+identidad de shimmer estable durante90 fotogramas y movimiento reducido.
+La prueba de renders avanza fotogramas reales para completar cover y stagger,
+en lugar de saltar tiempo y capturar el segundo efecto aún en opacidad cero.
+
+36 pruebas de Explorar/Home/transiciones/arquitectura aprobadas y análisis sin
+incidencias;12 pruebas de Explorar repetidas tras reforzar la visibilidad final.
+Renders normal/pequeño con texto2 regenerados y revisados.
+Evidencia apps/mobile/build/explore-single-entrance-qa.log y
+explore-single-entrance-renders.log; sin build Android, SQL ni despliegue.
+Siguiente paso: revisión de fluidez en Android; ficha Explorar actualizada.
+
+## Cabecera estable al aparecer el+ de Mis mascotas —18/10/2026
+
+Causa: con action=null CollectionHeader devolvía solo el texto; al resolver la
+lista añadía una fila centrada con botón56 y cambiaba altura/ancho del título.
+PetsSection reserva ahora el mismo espacio sin acción durante carga/vacío,
+conservando el componente compartido y su adaptación en pantallas pequeñas.
+Pruebas nuevas reproducen el cambio de geometría previo y verifican título y
+filtros idénticos durante carga→lista→vacío en390×844 y320×350 con texto2.
+Formato, análisis sin incidencias y16 pruebas de carga/arquitectura/navegación
+aprobadas. Renders regenerados con fuentes reales y revisados en tamaño normal
+y pequeño/texto2; evidencia apps/mobile/build/pets-header-layout-qa.log y
+build/ui-preview/pets_*.png. Revisión Android pendiente. Sin cambios
+de dominio, persistencia, permisos ni alcance HU-03/RF-03; ficha actualizada.
+
+## Diagnóstico de Android tras mover Flutter a apps/mobile —18/10/2026
+
+El error de dispositivo ausente se reproduce: no había emulador ejecutándose.
+Se inicia el AVD existente Pixel_9a; ADB y flutter devices reconocen
+emulator-5554 como Android16/API36 conectado, con arranque completado.
+daemon.getSupportedPlatforms confirma Android en apps/mobile. Validados los
+cuatro perfiles F5 (raíz y carpeta móvil): cwd, main.dart y archivo local
+existentes. No se modifica main.dart ni se regenera el proyecto; se conserva
+el cambio previo del usuario en .metadata. CONFIGURACION documenta recarga de
+VS Code, selección del dispositivo y diferencia entre ID de AVD y dispositivo.
+
+La prueba de flutter run alcanza Gradle, pero el primer intento falla en la
+conexión loopback de Java. Un directorio temporal corto, limitado al proceso
+de prueba, permite avanzar; después Java se interrumpe por falta de memoria.
+El reintento con heap2GiB y dos workers solo mediante variables del proceso
+también falla: desaparece el daemon y se genera hs_err_pid29020.log; el entorno
+llega a impedir iniciar PowerShell por OutOfMemoryException. No se acredita
+compilación/instalación. Siguiente paso: liberar memoria comprometida del equipo
+y repetir F5 tras recargar la ventana del editor. flutter doctor también
+detecta Command-line Tools ausentes y estado de licencias desconocido.
+Sin cambios de producto, SQL, identificadores ni configuración global Java.
+
+## Radio de cápsula uniforme en botones de landing —17/10/2026
+
+Por instrucción del usuario, todos los botones comparten border-radius999px.
+La regla base .button centraliza el radio y se retiran valores particulares de
+cabecera/tablet/móvil; el control circular conserva su999px existente. Colores,
+sombras y tamaños conservados. Chrome1440/731/390/320 comprueba todos los botones
+con radio999px y sin overflow. Build SSR aislado en landing-all-buttons-radius-build.log;
+sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Botones azules con brillo y dog-report corregido —17/10/2026
+
+El usuario precisa botones como las referencias: cápsula azul/celeste con
+degradado vertical75BFFF→459FF6→2887EF, texto blanco, brillo superior y sombra
+suave en cabecera/cierre. Se conservan botones lima de hero y secciones4/5.
+Sustituye la propuesta intermedia de degradado celeste con texto oscuro.
+Además pide imagegen para corregir la pata extra del perro en dog-report.png.
+Edición integrada generada y copiada al recurso público:1312×1199 RGBA con
+alpha real, cuatro extremidades del perro, pañuelos/emblemas/personajes
+conservados. Ambas referencias web reciben la imagen nueva. Procedencia y
+prompt en LANDING_ASSETS.md; dimensiones nativas y CSS de encuadre intactos.
+
+Chrome1440/390/320 confirma estilos de cápsula, decodificación de ambos usos,
+bytes servidos nuevos y sin overflow. Botones y ambos usos de ilustración
+revisados en capturas locales ui-preview/glossy-buttons y report-anatomy.
+Build/QA final en landing-glossy-buttons-anatomy-*.log en apps/mobile/build.
+Sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Corrección de fondos ausentes en hero y cierre —17/10/2026
+
+El usuario detecta que ambas secciones quedaron blancas tras el ajuste anterior.
+Causa: al consolidar gradientes se retiraron por error content/position/z-index/
+inset de .aurora::before. Restauradas las cuatro propiedades compartidas;
+hero conserva gradiente original y cierre su gradiente azul. Sin otros cambios
+visuales. Las comprobaciones previas verificaban el color calculado, pero no
+que existiera una capa generada: esa evidencia no acreditaba el fondo visible.
+
+check-landing-browser.mjs verifica ahora en ambas secciones contenido generado,
+visibilidad, opacidad y dimensiones que cubren el contenedor. Build SSR aislado y
+QA Chrome1440/731/390/320/texto200%/FAQ/teclado/anclas/no-JS/CSP/hidratación/QR
+aprobados. Capturas de hero/cierre1440 y390 generadas, ambas1440 revisadas.
+Evidencia landing-aurora-fix-*.log y ui-preview/aurora-fix en apps/mobile/build.
+Sin despliegue. Siguiente paso: revisión local del usuario.
+
+## Colores anteriores en secciones4/5/6; cierre azul conservado —17/10/2026
+
+Por solicitud del usuario, oportunidad, comunidad y colaboración recuperan
+fondos, botones lima/celeste, numeración y etiquetas anteriores a la paleta azul.
+El usuario corrige durante el trabajo que «Una huella tuya» debe conservar azul;
+confirmado su gradiente y botones nuevos. Hero original, ajustes de geometría,
+márgenes/altura y retirada de pines02/03 conservados.
+Build SSR aislado aprobado. Chrome1440/390/320 verifica colores originales en
+4/5/6, cierre azul y sin overflow; capturas escritorio de4/6 revisadas.
+QA general en landing-sections-original-*.log y capturas ui-preview/sections-original
+en apps/mobile/build. Sin despliegue. Siguiente paso: valoración del usuario.
+
+## Propósito: numeración original y sin pines CSS —17/10/2026
+
+Por instrucción del usuario, 01–04 recuperan el color original heredado171918.
+Eliminados los pseudo-elementos de pin morado y trazo decorativo de las imágenes
+02/03 (art-step-found/help); PNG y encuadres conservados. Build SSR aislado
+aprobado. Chrome1440/390/320 confirma cuatro números con color original,
+pseudo-elementos ausentes y sin overflow; captura1440 revisada. QA general en
+landing-steps-cleanup-*.log y capturas ui-preview/steps-cleanup en apps/mobile/build.
+Sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Hero con sus colores anteriores —17/10/2026
+
+Por corrección del usuario, restaurados solo los colores originales de la
+primera sección: gradiente vivo, botones lima/celeste, badge, valores blancos
+y fondos de mascotas. Alturas, márgenes, recursos y movimientos conservados;
+las demás secciones y cabecera mantienen paleta azul. Reglas UI/ADR-060 actualizados.
+Build SSR aislado aprobado. Chrome1440/390/320 confirma paleta original del hero,
+azul del cierre y ausencia de overflow; captura1440 revisada. QA general de
+landing/SSR/texto200%/QR registrado en landing-hero-original-colors-*.log y
+capturas ui-preview/hero-original-colors en apps/mobile/build. Sin despliegue.
+Siguiente paso: revisión visual del usuario.
+
+## Landing: paleta acorde al nuevo logo azul —17/10/2026
+
+Tras aprobar la propuesta, el usuario autoriza ajustar suavemente los colores.
+Botones principales3C537B/blanco y secundarios celesteB5D5E9/azul; gradientes
+del hero/cierre y tarjetas con azul/celeste/lavanda, verde residual suave en
+decoraciones. Numeración y valores del hero azul profundo para legibilidad;
+iconos2C87CE, FAQ abierto celeste tenue. Crema, textos oscuros, PNG, geometría,
+pie, márgenes y animaciones conservados. Variantes semánticas de botones;
+CSS aislado de QR/móvil. Actualizadas reglas UI y ADR-060.
+
+Build SSR aislado, typecheck y9 pruebas web aprobados. QA Chrome en1440/731/
+390/320px, texto200%, teclado/FAQ/anclas, SSR/no-JS, CSP/hidratación y navegación
+landing→QR→landing aprobado. Comprobación adicional hasta1920px sin overflow.
+Contraste de acciones7.73:1 azul/blanco y5.03:1 azul/celeste, AA; capturas de
+hero escritorio/móvil, beneficios y cierre revisadas. Evidencia local:
+apps/mobile/build/landing-blue-palette-*.log y ui-preview/blue-palette.
+Sin despliegue ni cambios de producto; siguiente paso: valoración del usuario.
+
+## Nueva exportación del logo de23:30 —17/10/2026
+
+Sincronizada la última exportación del usuario mediante el generador existente:
+marca PNG/SVG web, favicon, Flutter, splash Android y catálogos de iconos
+Android/iOS/macOS/Windows/web. Gradiente sin cambios; diseño del pie conservado.
+Verificadas cinco copias idénticas a sus originales,40 PNG/ICO legibles y
+cuadrados, y respuestas HTTP200 con bytes nuevos de PNG/SVG/favicon en5173.
+Favicon revisado visualmente. Sin cambios de código ni repetición de suites
+ya aprobadas; sin nuevo build ni despliegue. Siguiente paso: revisión del usuario;
+launcher instalado requiere recompilar/reinstalar.
+
+## Pie más próximo al cierre y última exportación del logo —17/10/2026
+
+Tras aprobar el encuadre, el usuario pide reducir el margen superior del pie:
+clamp(24px,3vw,48px), antes40–88px compartidos. Texto entre mascotas, tamaños
+y altura del cierre conservados. Sincronizadas de nuevo las cinco copias PNG/SVG
+oficiales y regenerados splash/launchers Android, iOS/macOS, Windows y web/PWA
+desde las exportaciones renovadas por el usuario; fuentes intactas.
+
+Build SSR aislado aprobado, análisis Flutter sin incidencias y11 pruebas de
+arranque/arquitectura aprobadas. Chrome1920/1440/731/390/320 verifica margen
+48/43.2/24/24/24px, proporciones originales y logo servido idéntico a su fuente;
+cinco copias oficiales verificadas byte a byte. Captura1440 revisada.
+QA web y logs landing-footer-gap-logo-*; capturas ui-preview/footer-gap-logo
+en apps/mobile/build. Sin build/instalación nativa ni despliegue. Siguiente paso:
+revisión local del usuario; launcher requiere recompilar/reinstalar Android.
+
+## Pie: texto entre mascotas, ligeramente elevado —17/10/2026
+
+Aclaración del usuario: el texto debe quedar entre ambas imágenes y solo un
+poco más arriba que la referencia original. En escritorio comparte fila con
+las mascotas, centrado verticalmente con elevación20–40px; ancho36% para separar
+los enlaces de las figuras. Mascotas conservan39% y encuadre completo, cerca de
+los laterales. Móvil conserva texto arriba y figuras50% debajo. Cierre alto
+intacto. Sustituye la fila separada del contenido del ajuste anterior.
+
+Build SSR aislado aprobado. Geometría Chrome en1920/1440/731/390/320px confirma
+proporciones, texto dentro del pie y sin overflow/recorte; capturas1920/731
+revisadas. QA general: responsive/texto200%/FAQ/teclado/anclas/SSR/no-JS/CSP/
+hidratación/QR, logs landing-footer-centered-* y capturas ui-preview/footer-centered
+en apps/mobile/build. Sin despliegue; siguiente paso: valoración del usuario.
+
+## Corrección: conservar el tamaño original de mascotas del pie —17/10/2026
+
+El usuario aclara que solo fallaba el recorte del contenedor. Restaurado el
+ancho original39% por mascota en escritorio y50% en móvil. El pie reserva una
+fila natural para las ilustraciones completas y mantiene los enlaces arriba;
+el cierre superior conserva la altura ampliada solicitada. Sin editar PNG.
+Build SSR aislado aprobado; Chrome1920/1440/731/390/320px confirma proporciones
+originales, mascotas completas, texto separado y ausencia de overflow.
+Captura1440 revisada en apps/mobile/build/ui-preview/footer-original-size.
+QA general y resultados en landing-footer-original-size-*.log; sin despliegue.
+Siguiente paso: valoración visual del usuario.
+
+## Landing: mascotas completas en el pie y cierre más alto —17/10/2026
+
+Por captura e instrucción del usuario, el pie usa columnas reales: mascotas
+completas a los lados y contenido central alineado arriba. Se retiran posiciones
+negativas y el recorte del contenedor que ocultaba las cabezas; enlaces sin
+cruce con ilustraciones. En móvil, contenido arriba y mascotas en segunda fila.
+El bloque «Una huella tuya» crece a420–640px mínimos (440px móvil), con contenido
+centrado y espacio vertical amplio. Se conserva el servidor5173 y trabajo previo.
+
+Build SSR aislado y QA Chrome de landing aprobados: responsive, texto200%,
+FAQ/teclado/anclas, SSR/no-JS, CSP/hidratación y navegación QR. Comprobación
+geométrica adicional en1920/1440/731/390/320px y320 con texto ampliado: mascotas
+dentro del pie, sin superposición con texto ni overflow. Capturas de escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/footer; logs landing-footer-*
+en apps/mobile/build. git diff --check aprobado. Sin publicación ni commit.
+Siguiente paso: valoración visual del usuario.
+
+## Logo azul sincronizado en todas las aplicaciones —17/10/2026
+
+Petición del usuario tras renovar las exportaciones de logo/. Actualizadas
+copias oficiales PNG/SVG en landing/lector QR/favicon, marca Flutter y splash
+Android. Regenerados iconos Android clásicos/adaptativos/monocromáticos,
+catálogos iOS/macOS, Windows y web/PWA. Colores de composición iOS/PWA alineados
+con el gradiente azul. El generador sincroniza ahora las copias oficiales;
+fuentes del usuario conservadas. No cambia la UI ni las ilustraciones con
+estampados blancos de las variantes auxiliares que no se actualizaron.
+
+Validación local: formato488 archivos sin cambios, flutter analyze sin
+incidencias,11 pruebas Flutter de arranque/arquitectura y9 pruebas web aprobadas.
+Cinco copias idénticas byte a byte a sus fuentes;40 PNG/ICO legibles y cuadrados;
+cinco paths adaptativos con geometría/color del SVG oficial. Chrome sobre el
+servidor5173 existente muestra el PNG nuevo en cabecera/pie, sin overflow en
+1440×960 y320×640 con fuente raíz200%; capturas revisadas en
+apps/mobile/build/ui-preview/brand-update. git diff --check aprobado.
+Sin builds nativos, reinstalación ni despliegue. Siguiente paso: verificar el
+launcher al recompilar/reinstalar Android; hot reload no actualiza ese recurso.
+No implica cierre de historias ni confirmación remota. Ficha: identidad-visual.
+
+## Landing: títulos de sección uniformes e imagen de comunidad más alta —17/10/2026
+
+Por petición del usuario, todos los h2 de sección comparten el tamaño de
+«Una comunidad con un propósito»: --section-title-size con clamp(29px, 4.3vw,
+58px) y34px en móvil. Se eliminan tamaños específicos de secciones posteriores;
+el hero conserva su h1. Los títulos permiten corte de palabras en móvil con
+texto ampliado. Tarjeta de imagen de «La ayuda puede estar cerca» pasa de
+305:123 a305:160, aproximadamente30% más alta a igual ancho, con contain.
+Recursos, onda, márgenes y alineación conservados. Servidor5173 reutilizado.
+Build SSR y QA responsive/200%/no-JS/CSP/hidratación/FAQ/anclas/QR pasados.
+Igualdad de los siete títulos y proporción de tarjeta comprobadas en
+1920/1440/731/390/320px, sin overflow; capturas escritorio/móvil revisadas.
+Logs landing-heading-scale-*.log en apps/mobile/build. Sin commit/publicación;
+siguiente paso: valoración visual del usuario y ajustes que indique.
+
+## Landing: onda viajera amplia según referencias —17/10/2026
+
+El usuario precisa una curva que avance de tarjeta en tarjeta. La onda6s
+abarca ahora12 tarjetas con desfase progresivo0.5s hacia la derecha, amplitud
+adaptable24–56px. Cada grupo contiene dos series visuales de las seis tarjetas;
+las repeticiones son decorativas. Dos grupos iguales mantienen continuidad
+espacial y temporal al cerrar el loop. Recorrido horizontal duplicado y duración
+120s para conservar la velocidad previa en píxeles; botón pausa solo ese avance.
+Marcos, PNG, hero, márgenes y movimiento reducido conservados.
+Build SSR aislado y QA responsive/200%/FAQ/teclado/anclas/no-JS/CSP/hidratación/QR
+pasados. Muestreo en0/1.5/3s confirma cresta progresiva, fases iguales entre
+copias y continuidad entre tarjetas, incluida unión de grupos; velocidad
+horizontal previa comprobada. Capturas de onda revisadas. Servidor5173
+reutilizado; logs landing-traveling-wave-*.log en apps/mobile/build.
+Sin commit/publicación; siguiente paso: valoración visual del usuario.
+
+## Landing: separación entre secciones y onda más ágil —17/10/2026
+
+Por petición del usuario, separación uniforme tras propósito y entre las
+secciones restantes/pie mediante --section-gap: clamp(40px, 6vw, 88px).
+Se conserva el espacio existente entre tarjetas y tercera sección.
+Onda vertical de tarjetas acelerada de12s a6s, fases cada1s y curva suave
+cubic-bezier(0.37, 0, 0.63, 1); amplitud, dimensiones y avance horizontal60s
+conservados. Pausa solo horizontal y movimiento reducido siguen vigentes.
+Build SSR aislado y QA responsive/200%/FAQ/anclas/no-JS/CSP/hidratación/QR
+pasados. Separaciones medidas en1920/1440/731/390/320px, sin overflow;
+muestreo de onda verifica continuidad del ciclo y desplazamiento suave.
+Capturas escritorio/móvil revisadas; servidor5173 existente reutilizado.
+Logs landing-spacing-wave-build.log y landing-spacing-wave-browser.log
+en apps/mobile/build. Sin commit/publicación. Pendiente valoración visual del
+usuario; siguiente paso: continuar los ajustes que indique.
+
+## Landing: ancho unificado en todas las secciones —17/10/2026
+
+Tras aprobar la tercera sección, el usuario extiende su alineación al resto.
+El contenedor compartido `.wrap` usa ahora el ancho del hero, sin máximo1280px;
+se elimina la regla duplicada de hero/propósito. Cabecera, secciones y pie
+comparten márgenes; móvil conserva14px. Imágenes, tarjetas, altura de ventanas
+de propósito y animaciones aprobadas conservadas. Servidor5173 reutilizado.
+Build SSR aislado y QA responsive/200%/no-JS/CSP/hidratación/FAQ/anclas/QR
+pasados; diez contenedores con ancho y posición iguales en1920/1440/731/390/320px,
+sin overflow. Capturas escritorio/móvil revisadas. Evidencia local:
+apps/mobile/build/landing-sections-width-build.log y
+landing-sections-width-browser.log. Sin commit/publicación; siguiente paso:
+revisión visual del usuario y ajustes que indique, sin ampliar funcionalidades.
+
+## Landing: ancho y altura de la tercera sección —17/10/2026
+
+«Una comunidad con un propósito» comparte ahora ancho y márgenes del hero,
+sin el límite anterior de1280px. Las cuatro ventanas de ilustración pasan de
+proporción3.6:1 a3:1, un20% más altas a igual ancho. Recursos, hero, tarjetas
+y movimientos aprobados conservados; servidor5173 existente reutilizado.
+Build SSR aislado y QA de landing pasados (1440/731/390/320px, texto200%,
+FAQ/teclado/anclas, no-JS, CSP/hidratación y aislamiento QR). Además se comprobó
+igualdad de ancho/márgenes y ausencia de overflow en1440/1920/731/390/320px;
+capturas de la sección revisadas en escritorio/móvil. Evidencia local:
+apps/mobile/build/landing-purpose-build.log y landing-purpose-browser.log.
+Sin publicación ni commit. Siguiente paso: revisión del usuario y continuar
+con los ajustes que indique; no se cierran historias ni se amplía el alcance.
+
+## Relevo al siguiente chat —17/10/2026
+
+El usuario aprobó el diseño actual («ok esta perfecto») y continuará en otro
+chat. Estado vigente, decisiones visuales, límites, archivos y validación en
+[RELEVO_LANDING.md](RELEVO_LANDING.md). Leerlo antes de seguir: las notas
+cronológicas inferiores incluyen enfoques ya sustituidos. Trabajo local sin
+commit/push/despliegue; conservar cambios existentes. Siguiente paso: continuar
+con las secciones que indique el usuario, sin rehacer hero, arte ni tarjetas.
+
+## Aumento leve solo del marco —17/10/2026
+
+Petición del usuario: un poco más alto/ancho, sin cambiar mascotas. Ajustadas
+únicamente las dos dimensiones del marco: en1440px pasa de310 a325px de ancho
+y aumenta24px de alto; en móvil aumenta8px de ancho/12px de alto. Ventana,
+escala, imagen, botón y movimiento conservados. Build SSR y QA responsive/
+200 %/SSR/no-JS/QR pasados, tamaño de arte previo verificado y captura revisada.
+Registros apps/mobile/build/landing-card-small-increase-build.log y
+landing-card-small-increase-browser.log. Sin publicación ni commit.
+
+## Ancho aprobado restaurado; sin recorte interior —17/10/2026
+
+Corrección del usuario: las tarjetas tenían el ancho correcto, solo fallaba
+la ventana interior. Se restaura ancho base +12–24px, sin multiplicarlo por
+la escala del arte. La ventana mantiene el tamaño de imagen y overflow visible:
+ya no introduce un corte recto dentro de la tarjeta. Solo el marco exterior
+redondeado delimita la ilustración. Botón60/icono28, espacio y onda conservados.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, ancho310px comprobado en
+1440px, ventana interior sin clipping, pausa horizontal/onda activa y separación
+del botón. Captura revisada. Registros apps/mobile/build/landing-inner-window-
+build.log y landing-inner-window-browser.log. Sin publicación ni commit.
+
+## Ventanas ampliadas sin recortar mascotas —17/10/2026
+
+El usuario identifica el recorte en art-help-dalmatian y pide conservar las
+mascotas grandes. Se amplían ventana y marco al ancho de la imagen renderizada:
+factor1.45 para individuales y1.85 para pareja; se conserva la altura visual
+anterior. Imagen contain a tamaño de ventana, sin zoom/margen negativo interno.
+Esto sustituye la ventana estrecha anterior: las tarjetas también quedan más
+anchas para alojar completos los cuerpos/colas sin reducirlos. PNG intactos.
+
+Botón circular60px con icono28px, arriba a la derecha. Mayor separación externa
+40–72px y padding superior128–168px para bajar la fila y dejar espacio incluso
+en la cresta de la onda. Pausa horizontal/onda vertical conservadas.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados; verificados alto de arte
+conservado, ventana dentro del marco, imagen sin zoom recortado y separación
+botón/tarjetas >=16px. Captura revisada. Registros apps/mobile/build/
+landing-unclipped-frames-build.log y landing-unclipped-frames-browser.log.
+Sin publicación ni commit.
+
+## Restaurar escala de mascotas y control mayor —17/10/2026
+
+Por corrección explícita del usuario se restaura el tamaño visual previo de las
+mascotas: cover general, pareja185 % y dálmata145 %, manteniendo los marcos
+mayores. Sustituye el contain general de la pasada anterior. Control circular
+superior derecho ampliado76×76 (recupera el ancho de la cápsula original), con
+pausa solo horizontal y onda continua. PNG y animaciones conservados.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, incluido control circular
+76px y pausa horizontal con onda activa. Captura revisada. Registros
+apps/mobile/build/landing-restored-card-scale-build.log y
+landing-restored-card-scale-browser.log. Sin publicación ni commit.
+
+## Control circular arriba y mascotas sin recorte —17/10/2026
+
+Petición posterior: botón superior derecho, circular44×44, conservando pausa
+solo horizontal y onda activa. Se cambia cover por contain para todas las
+imágenes de tarjetas y se retiran los zooms185 %/145 % de pareja/dálmata que
+recortaban sus extremos. Ventanas y marcos conservados: las ilustraciones se
+ajustan completas con su proporción nativa, por lo que ocupan menos altura.
+No se alteran PNG, hero ni animaciones.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, incluidos encuadre contain
+sin márgenes de zoom, control circular superior, pausa horizontal/onda activa.
+Captura revisada. Registros apps/mobile/build/landing-card-fit-build.log y
+landing-card-fit-browser.log. Sin despliegue ni commit.
+
+## Marcos mayores y pausa horizontal independiente —17/10/2026
+
+Por petición explícita se amplían solo las tarjetas: ancho adicional12–24px
+y alto adicional48–72px respecto al marco anterior. La ventana de arte conserva
+el ancho previo145–288px (155px móvil), altura proporcional anterior y escalas
+de cada mascota; centrada abajo. No se regeneran ni amplían las ilustraciones.
+Control cápsula inferior derecha76×44 con pausa/play y nombre accesible alterno;
+pausa/reanuda exclusivamente character-track. Character-wave sigue activa al
+pausar el avance lateral. Sin pausa automática hover/foco; movimiento reducido
+del sistema se conserva y oculta el control sin función en ese modo.
+
+Build SSR y QA Chrome responsive/200 %/SSR/no-JS/FAQ/teclado/anclas/CSP/QR pasados.
+Verificado tamaño de ventana anterior, marco mayor, transform horizontal estable
+al pausar mientras cambia el vertical y reanudación horizontal. Captura revisada.
+Registros apps/mobile/build/landing-card-frame-build.log y
+landing-card-frame-browser.log. Sin despliegue ni commit.
+
+## Onda continua en las tarjetas —17/10/2026
+
+El usuario sustituye la alternancia fija por efecto de ola/gusanito suave:
+cada tarjeta oscila verticalmente en12s con seis fases desfasadas2s, mientras
+la fila avanza en horizontal con su ciclo60s. Grupos duplicados conservan fases
+y anchura para continuidad. Se retiran botón/estado de pausa y pausas hover/foco
+por petición explícita; se conserva la preferencia del sistema de movimiento
+reducido. Más separación: margen32–64px y padding72–104px por lado vertical.
+Etiquetas centradas con flex/text-align y peso400. Recursos y tamaños conservados.
+
+Build SSR y QA Chrome responsive/200 %/no-JS/FAQ/teclado/anclas/CSP/QR pasados.
+Verificados cambios reales de transform horizontal y vertical entre frames,
+seis fases distintas, continuidad de grupos y movimiento activo durante hover.
+Captura characters revisada. Registros apps/mobile/build/landing-character-wave-
+build.log y landing-character-wave-browser.log. Sin publicación.
+
+## Tarjetas escalonadas con desplazamiento horizontal —17/10/2026
+
+Por petición del usuario: mayor espacio vertical alrededor de la fila, tarjetas
+alternadas arriba/abajo y movimiento horizontal suave continuo. Se reutilizan
+dos grupos de seis tarjetas con el segundo oculto para lectores de pantalla;
+desplazamiento lineal de60s por ciclo, mismo ancho para cierre sin salto.
+Pausa/reanudar real, pausa al hover/foco y sin movimiento con prefers-reduced-motion.
+Las imágenes de la fila cargan anticipadamente para que las copias inicialmente
+fuera de pantalla no entren vacías; resto de ilustraciones conserva lazy.
+Dálmata ampliado al145 % y pareja al185 % en sus tarjetas, anclados abajo;
+no se modifica ningún PNG ni otras apariciones. Hero y animación de entrada
+conservados. Captura characters revisada: alternancia visible y tamaños equilibrados.
+
+Build SSR y QA Chrome1440/731/390/320px, texto200 %, SSR/no-JS/FAQ/teclado/anclas,
+CSP/hidratación/aislamiento QR pasados. Comprobado desplazamiento real entre frames,
+anchos equivalentes con tolerancia subpíxel, pausa/reanudación y movimiento reducido.
+Registros apps/mobile/build/landing-character-drift-build.log y
+landing-character-drift-browser.log. Sin despliegue ni commit.
+
+## Hero de primera pantalla —17/10/2026
+
+Nueva petición explícita con referencia: primera sección ocupa la pantalla,
+no un bloque compacto sobre las tarjetas. Hero usa min-height basado en100svh
+menos cabecera/margen, ancho casi completo sin límite1280 y contenido centrado
+verticalmente. Título hasta108px e ilustraciones hasta148px en escritorio;
+móvil conserva su tipografía adaptada y permite crecer con texto ampliado.
+Sin altura fija ni recorte del contenido. Marca minúscula, recursos y secuencia
+de animación conservados. Build SSR y QA Chrome 1440/731/390/320px y200 %
+pasados: imágenes/FAQ/teclado/anclas/no-JS/CSP/hidratación/aislamiento QR sin
+incidencias. Capturas desktop-top/reference revisadas. Registros en
+apps/mobile/build/landing-fullscreen-hero-build.log y
+landing-fullscreen-hero-browser.log. Sin publicación.
+
+## Hero más grande y marca en minúsculas —17/10/2026
+
+Por petición del usuario se aumenta la primera sección: título hasta78px
+(antes64), ilustraciones hasta120px (antes100) y mayor espacio vertical,
+también en tablet/móvil. LandingBrand muestra «entre huellas» en cabecera y
+footer con peso500 (antes750). Identidad gráfica conservada; no se alteran
+los textos editoriales, el QR ni animaciones. Build SSR y QA Chrome responsive
+1440/731/390/320px, texto200 %, FAQ/teclado/anclas/no-JS/aislamiento QR pasados;
+capturas desktop y móvil ampliado revisadas, sin overflow. git diff --check
+sin errores. Registros apps/mobile/build/landing-hero-size-build.log y
+landing-hero-size-browser.log. Sin despliegue.
+
+## Imágenes anteriores restauradas solo en el hero —17/10/2026
+
+Por petición del usuario se recuperan los PNG anteriores del perro y gato del
+inicio desde la copia previa a la última colección. Se guardan independientes
+como hero-dog.png y hero-cat.png (1254×1254) y se asignan exclusivamente a
+hero-dog/hero-cat. Tarjetas, footer, escenas nuevas y Volvemos ampliado conservados.
+Sin regeneración, cambio de animaciones ni filtros. La colección pasa a doce
+recursos independientes; comprobación del navegador actualizada a esa cantidad.
+Build SSR y QA responsive/200 %/no-JS/QR aprobados; captura desktop-top revisada.
+Registros en apps/mobile/build/landing-hero-restored-build.log y
+landing-hero-restored-browser.log. git diff --check sin errores. Sin despliegue.
+
+## Colección integrada desde el dálmata aprobado —17/10/2026
+
+El usuario aprobó el nuevo dálmata y pidió aplicar su estilo a las restantes
+mascotas y agrandar «Volvemos». Integrados ocho PNG nuevos con ImageGen:
+dog-curious, cat, dog-wave, corgi, tabby, dog-report, pets-home y pets-map.
+Referencias: dálmata aprobado y emblema blanco oficial. Variedad de razas,
+pelajes y pañuelos, con el emblema dentro de la ilustración. Copias directas
+RGBA sin filtros posteriores ni overlays; dimensiones nativas actualizadas.
+Dálmata aprobado y pareja original conservados. «Volvemos» amplía la pareja
+al 160 % centrada y anclada abajo. Diseño y animación principal conservados.
+
+Recursos y prompts exactos en apps/platform/LANDING_APPROVED_STYLE.md, enlazado
+desde LANDING_ASSETS.md; destino apps/platform/public/images/landing.
+Validación: revisión de las diez ilustraciones sobre fondos claro/oscuro,
+build SSR y QA Chrome 1440/731/390/320 px, texto200 %, FAQ/teclado/anclas,
+no-JS, imágenes decodificadas, sin overflow ni errores CSP/hidratación,
+aislamiento landing→QR→landing. Revisadas capturas desktop/mobile/characters.
+Registros: apps/mobile/build/landing-approved-style-build.log y
+landing-approved-style-browser.log. git diff --check sin errores. Servidor
+de desarrollo existente conservado. Sin despliegue ni commit. Implementación
+solicitada completada; no se presupone aprobación artística de las ocho nuevas.
+
+## Dálmata regenerado desde la referencia indicada —17/10/2026
+
+El usuario rechazó también `exec-e5839c84` por sombra oscura en la mejilla y
+cola insuficiente. Se generó una nueva imagen usando directamente su referencia
+`mockups/Imagen de ChatGPT 7 oct 2026, 17_03_12.png` y el emblema oficial,
+sin usar como entrada el dálmata rechazado. Recurso integrado:
+`exec-228f74fc-9ac3-428c-89de-5a5f1d1932bc.png`, 1312×1199 RGBA, sin filtros
+posteriores. Orejas negras, pañuelo naranja con emblema blanco, cola completa
+con mechones visibles. Se corrigió además el encuadre de su tarjeta: contain
+en lugar de cover para mostrar toda la ilustración, incluida la cola.
+La aprobación artística del usuario sigue pendiente; no se afirma que ImageGen
+haya reproducido al 100 % el original ni se declara terminada toda la colección.
+Validación de esta versión: build de producción y check de navegador pasados
+(`landing-dalmatian-reference-build.log` y `landing-dalmatian-reference-browser.log`
+en apps/mobile/build). Chrome: 1440/731/390/320 px y texto al 200 %, imágenes
+decodificadas, sin overflow, SSR/FAQ/teclado/anchors y navegación QR comprobados.
+Captura de tarjetas revisada: cola completa visible. Sin despliegue.
+
+## Sustitución concreta del dálmata con ImageGen —17/10/2026
+
+Se reemplazó `apps/platform/public/images/landing/dalmatian.png` por la nueva
+edición `exec-e5839c84-0e7b-46ec-8087-e9bfc66c8f4c.png`, conservada también en
+el directorio generated_images de Codex. Edición directa con ImageGen, sin
+filtros manuales de color, alfa ni desenfoque posteriores. Conserva pañuelo
+naranja, emblema blanco integrado, pose de saludo y cola con hebras definidas.
+La comparación al 100 % sobre gris muestra reducción del halo anterior y
+continuidad del pelo negro en el borde de la oreja. No se declara igualdad
+píxel a píxel con la referencia ni aprobación artística del usuario.
+
+La pareja pública conserva los píxeles originales fuera de las dos áreas de
+estampado. Los otros ocho recursos no se sustituyeron en esta pasada: sigue
+pendiente completar la revisión de toda la colección. Build de producción
+comprobado; evidencia `apps/mobile/build/landing-dalmatian-final-build.log`.
+No se publicaron cambios ni se modificó la animación principal.
+
+## Criterio vigente del usuario: variantes desde la referencia original —17/10/2026
+
+La corrección cromática posterior TAMBIÉN fue rechazada: ribete blanco sobre
+pelo negro y pérdida de detalle en la cola. No hay aprobación del dálmata ni
+del conjunto. No se han iniciado las otras ocho generaciones anunciadas ni
+se han integrado los dos candidatos nuevos. La petición visual ya es clara;
+repetir el prompt o pedir de nuevo la misma aclaración no resuelve el defecto.
+Imagegen no ha conseguido reproducir el acabado solicitado en estas pruebas.
+Se conserva la pareja con pelaje original y emblemas; el dálmata público sigue
+siendo el recurso anterior rechazado, no una corrección aprobada.
+
+Inspección de solo lectura de bordes negros del candidato: los puntos muestreados
+tienen RGB oscuros incluso en semitransparencia. Eso no demuestra por sí solo
+contaminación por un fondo blanco; no aplicar una fórmula de eliminación de
+matte sobre toda la imagen suponiendo una causa que no está acreditada. El
+rechazo artístico del usuario permanece vigente aunque esos puntos sean oscuros.
+
+El nuevo dálmata desde el master también fue rechazado por un borde anaranjado.
+El prompt arrastraba «ivory» y el sombreado/material del master; no usar marfil
+ni iluminación cálida sobre pelo blanco. El usuario exige blanco neutro sin
+tinte y detalle de fibras, conservando el emblema. Se detienen las otras ocho
+variantes; solo se prueba una corrección cromática con imagegen sobre ese
+candidato, manteniendo su groom. Ninguno de estos dos candidatos se ha integrado.
+
+El usuario vuelve a exigir imagegen guiado por hero-bienvenida.png para TODAS
+las mascotas: hebras/mechones definidos, volumen de cola y espacios transparentes
+limpios, sin difuminación, halo blanco/gris/naranja ni contorno. Mantener el
+emblema oficial estampado en tela. Se descarta usar las variantes rechazadas
+como referencia visual para nuevas generaciones. Se inicia un nuevo dálmata
+desde el original como comprobación previa del acabado; no publicar ajustes
+manuales de alfa como sustituto de esta nueva petición de generación.
+
+Estado real al recibir esa instrucción: pareja pública basada en el original
+con solo dos zonas de estampado procedentes de imagegen (20246píxeles cambiados,
+cero cambios de RGBA fuera de pañuelos y cero cambios de alfa). Dálmata público
+con ajuste local de color anterior, rechazado por halo. El candidato de limpieza
+de alfa está solo en build/landing-local-correction y NO se ha integrado. Las
+demás imágenes mantienen la pasada anterior y no se consideran aprobadas.
+La copia temporal de pareja sin logo fue reemplazada por la versión con estampados.
+
+Verificación de esa pareja y PNG anteriores: build/landing-local-web-{build,browser}.log
+(SSR y Chrome responsive aprobados). Es evidencia de integración, no de aceptación
+artística ni validación de los candidatos nuevos. Sin despliegue o commit.
+Siguiente paso: revisar la generación desde el master original y completar el
+conjunto según ese acabado. Las notas inferiores son historial de intentos.
+
+## Revisión del pelaje de landing —17 de octubre de2026
+
+**Referencia principal aclarada después:** el usuario compara la cola compacta
+del reencuentro generado con mockups/landing-mascotas-v1/hero-bienvenida.png:
+busca volumen y mechones separados, además de pelo blanco sin franja gris. Se
+abandona el enfoque de seguir suavizando las siluetas rechazadas. El original
+hero1536×1024 ya es RGBA transparente (muestras exteriores con alfa0), por lo
+que no necesita extracción de fondo. Se prueba una edición mínima con imagegen
+que solo cambia los estampados genéricos por el símbolo oficial, preservando
+el pelo original; muestra fuera del público, sin dar por corregido el dálmata.
+No se ha ejecutado la propuesta de corrección manual de color/alfa.
+
+Muestra generada1536×1024 en build/landing-approved-source-review/hero-bienvenida.png;
+alfa exterior0 comprobado y comparación de cola al100% en
+build/ui-preview/landing-approved-tail-comparison.png. Se compara fuente original,
+edición mínima solicitada para logos y reencuentro rechazado. No se afirma
+identidad de píxeles fuera del estampado. Pendiente revisión de esta nueva vía
+antes de producir variantes, sin nuevos reemplazos públicos ni build.
+
+**Corrección posterior del usuario:** también rechaza el último piloto y el
+conjunto extendido: detecta sombreado gris/oscuro alrededor del pelo blanco,
+especialmente en la oreja del dálmata. La integración y los checks descritos
+abajo no equivalen a acabado aceptado. Se detienen los reemplazos en bloque y
+se prepara una sola muestra dirigida al sombreado del pelo blanco junto a la
+silueta, manteniendo manchas negras y detalle. Referencia de problema: captura
+codex-clipboard-c22d3e04-c379-47e2-9e9c-a5756c6bfcef.png. No se altera todavía
+el conjunto público ni se repite build para una muestra fuera de ejecución.
+
+Muestra preparada con imagegen en dos ediciones: retirar la franja gris del
+material blanco y después recuperar hebras en esa silueta clara. La primera
+quedó demasiado lisa y se conserva solo como intermedio. Candidato y comparación
+de oreja al100% en build/landing-white-fur-review/dalmatian.png y
+build/ui-preview/landing-white-fur-ear.png. PNG inspeccionado, renderizado sin
+modificar píxeles con scripts; sin sustituciones públicas en esta revisión.
+Siguiente paso necesario: revisión del acabado de esta muestra por el usuario
+antes de extrapolar el tratamiento; la corrección global permanece pendiente.
+
+El usuario rechazó también esta muestra. Se detienen nuevas generaciones a ciegas.
+Diagnóstico de solo lectura: comparación del mismo PNG sobre blanco/gris/oscuro
+y muestreo RGBA nativo, sin modificar el recurso. Hay cambios de color dentro
+de las fibras de la zona blanca, además de píxeles semitransparentes; no atribuir
+todo el defecto exclusivamente a CSS o alfa. Evidencia: build/landing-edge-diagnosis.json
+y build/ui-preview/landing-edge-diagnosis.png. Se propone probar una corrección
+localizada de color/transparencia preservando las hebras existentes; requiere
+que el usuario elija ese cambio de método frente a su petición de usar imagegen.
+No se ha ejecutado tratamiento de píxeles ni modificado el conjunto público.
+
+El usuario rechazó las pasadas de contornos: mantenían perfiles/luminosidad y
+perdían detalle. Referencia prioritaria actual: mockups/landing-mascotas-v1/
+gatito-curioso.png. Se calibró primero un dálmata con hebras visibles y color
+local hasta las puntas, en vez de desenfocar su perímetro. Después se generaron
+individualmente los otros nueve PNG desde las copias previas al suavizado. Los
+diez archivos seleccionados están integrados en apps/platform/public/images/landing;
+conservan mascotas, escenas, pañuelos y emblemas blancos estampados en tejido.
+Sin cambios de UI, hero/tiempos, fuentes de marca, móvil, datos o publicación.
+
+Validación local de esta pasada: diez copias exactas de los PNG seleccionados,
+RGBA y dimensiones nativas contrastadas con landing_artwork.ts; ocho1254×1254 y
+dos1774×887,20862121bytes en total (build/landing-fur-assets.log). Revisión de
+archivos y comparación visual sobre fondos claros/oscuros; detalle nativo en
+build/ui-preview/landing-fur-pilot-detail.png, conjunto en landing-natural-edges
+y landing-natural-edges-dark. Build SSR aislado aprobado sin cerrar el servidor
+de desarrollo del usuario (build/landing-fur-web-build.log).
+
+QA Chrome aprobado en1440/731/390/320 y320 con texto200%: diez recursos
+decodificados, sin overflow ni errores CSP/hidratación/recursos; sin logos
+superpuestos, FAQ/anclas/teclado/sinJS, hero original/movimiento reducido y SPA
+landing→QR→landing conservados (build/landing-fur-web-browser.log). Capturas
+actualizadas y revisadas en build/ui-preview/landing-vue. No se repiten pruebas
+Flutter ni de negocio para una sustitución de PNG. Estas comprobaciones verifican
+integración; no equivalen a aprobación artística del usuario. Pendientes revisión
+visual final del usuario, Safari/Firefox y publicación cuando se autorice.
+Prompts/procedencia: apps/platform/LANDING_ASSETS.md. Siguiente paso: revisar esta
+versión local y conservar como referencia el pelo definido, sin perfilarlo.
+
+## Diversidad, pañuelos estampados y logo actualizado —17 de octubre de2026
+
+Petición del usuario en feature/vue-nuxt-web: más mascotas/razas/pelajes, pañuelos
+variados y only-black.svg en blanco INTEGRADO en la tela mediante imagegen,
+expresamente sin superposiciones. Se generaron corgi, dálmata y atigrado, y después
+se regeneraron los10 PNG finales con estampados blancos y colores carbón, verde,
+marino, burdeos, petróleo, ciruela y terracota. Escenas incluyen spaniel, mestizo/
+calicó, retriever/gato gris y beagle/gato blanco-negro, conservando composición y
+transparencia. Retiradas todas las capas SVG/posiciones de emblemas del intento
+inicial corregido por el usuario. LandingArt solo muestra PNG; caption/superficies/
+CTA/decoración siguen siendo Vue/CSS/SVG reales. Hero/animación/tiempos intactos.
+Prompts finales y procedencia: apps/platform/LANDING_ASSETS.md; recursos finales
+en apps/platform/public/images/landing. [Ficha](funcionalidades/identidad-visual.md).
+
+Fuentes actualizadas por el usuario en logo/ conservadas. Logo oficial propagado
+a header/footer/QR, favicon PNG256 y vector completo disponible en brand.svg;
+PNG oficial@2x en brand.png y BrandMark/BrandWordmark/StartupReveal. Navegación usa
+el PNG original para conservar la textura sin aliasing de filtros SVG a tamaño
+pequeño. Splash Android, iconos clásicos/adaptativos/monocromo, catálogos iOS/macOS,
+Windows y PWA/favicon Flutter regenerados con flutter_launcher_icons0.14.4. Se
+corrigen rutas relativas después de apps/mobile y se conserva la bandera Xcode
+Swift asset symbols ante el comportamiento del generador, sin cambiar paquetes.
+Hashes confirman copias PNG/SVG exactas y tamaños de todos los PNG en catálogos.
+No se recrean apps ni se habilita soporte funcional de plataformas futuras.
+
+Validación: Flutter analyze global sin incidencias y28 pruebas de app/acceso/
+Google/fronteras aprobadas (build/brand-refresh-{analyze,tests}.log). Harness global
+de capturas falló con MissingPluginException de path_provider/caché de flutter_map
+y búsqueda de Cerrar al avanzar un flujo; no se cambió ese harness ni se afirma
+regresión visual global aprobada (brand-refresh-renders.log). Render focalizado
+de BrandWordmark con fuente real y precarga de imagen aprobado, normal390/texto200%
+en320, en build/brand-refresh-focused-renders.log y ui-preview/brand-refresh.
+Typecheck web, build SSR aislado para conservar el dev server abierto,9 unitarias/
+fronteras y3 pruebas de producción aprobadas. QA Chrome final con10 imágenes,
+logo oficial, sin overlays ni errores CSP/hidratación/recursos/overflow, responsive
+1440/731/390/320 y texto200%, FAQ/teclado/sin JS, hero/movimiento reducido y SPA
+landing→QR→landing aprobado; regresión QR completa también aprobada. Logs
+apps/mobile/build/brand-refresh-web-{build,tests,server,browser}.log y
+brand-refresh-qr-browser.log; capturas revisadas en ui-preview/landing-vue.
+
+Sin SQL, cambios de negocio, dependencias nuevas, publicación, push o commit.
+No se compilaron APK/iOS/macOS/Windows ni se comprobó launcher instalado; iconos
+requieren recompilación/reinstalación. Pendientes Safari/Firefox, harness móvil
+global y despliegue cuando se autoricen. Siguiente paso: revisar recursos/landing
+local y publicar/reinstalar en el incremento que corresponda.
+
+## Landing: ilustraciones independientes y componentes reales —17 de octubre de2026
+
+Por instrucción del usuario, en la rama vigente feature/vue-nuxt-web y apps/platform,
+se retiran TODOS los recortes del mockup: eliminado del público landing-reference.png,
+sin atlas, offsets ni imagen de UI por debajo. Siete PNG generados individualmente
+con la herramienta integrada image_gen/habilidad imagegen: perro curioso, gato,
+saludo, reencuentro, aviso, casa y mapa; cinco1254×1254 y dos1774×887 con transparencia.
+Se conservan los originales sin reescalado artificial en public/images/landing;
+prompts/procedencia en apps/platform/LANDING_ASSETS.md. LandingArt usa recursos
+independientes/dimensiones reales y carga diferida salvo hero; LandingCharacterCard
+contiene figura/etiqueta/trazos SVG. Fondos, degradados, superficies, círculos y pins
+decorativos son CSS/SVG. Header/footer usan el logo oficial /brand.png existente.
+La animación principal aprobada conserva cover/stagger, duración/demoras y movimiento
+reducido. Textos, anclas y FAQ siguen siendo HTML; sin operaciones nuevas de producto.
+[Ficha](funcionalidades/landing-page.md) y corrección de [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
+Validación: typecheck estricto y9 pruebas unitarias/fronteras aprobados; build Nuxt
+SSR correcto y3 pruebas del servidor compilado aprobadas. El comando estándar de
+build detectó un dev server ajeno activo en5173/PID9128; no se detuvo ni se ignoró
+su lock. Se construyó mediante loadNuxt/build oficiales con buildDir separado en
+apps/mobile/build/platform-landing-nuxt, conservando la configuración del proyecto.
+Log final: apps/mobile/build/landing-generated-art-build.log. QA Chrome/Playwright
+en1440/731/390/320px y320px/texto200%: siete recursos reales, ambos logos, imágenes
+decodificadas también tras ampliar texto, anclas/FAQ/teclado/sin JS, aislamiento SPA
+landing→QR→landing, sin overflow ni errores CSP/hidratación/recursos. Verificación
+de cover-reveal0.7s y stagger-reveal/demora0.2s, sin animación con movimiento reducido.
+Log final: apps/mobile/build/landing-generated-art-browser.log. Regresión completa
+QR también aprobada: galería, copia, offline/reintento, cierre/revocación, desconocido
+y CSP con fixtures. Capturas revisadas en apps/mobile/build/ui-preview/landing-vue,
+incluidas characters.png, desktop-top.png y small-text-200.png.
+
+Sin cambios de SQL, dependencias, configuración sensible, acceso/roles ni código
+Flutter. PNG originales suman aproximadamente12.5MB y usan lazy/reutilización; no se
+ha medido transferencia móvil real ni Core Web Vitals. Pendientes: revisión del
+usuario, Safari/Firefox y publicación/redeploy cuando se autoricen. Sin commit,
+push ni despliegue; no se cierra HU-09 ni se afirma indexación/posicionamiento.
+Siguiente paso: revisar la landing local y publicar el incremento cuando corresponda.
+
+## Landing integrada en la plataforma Vue —17 de octubre de2026
+
+Por solicitud del usuario se integra en / de apps/platform el trabajo existente
+del worktree feature/landing-page (fuentes React/Next sin confirmar allí).
+Conversión a componentes Vue/TypeScript, sin cambiar ni confirmar el worktree
+original. Header/hero/personajes/propósito/pasos/comunidad/FAQ/footer conservan
+la referencia aprobada. LandingPage, Art/Icon/Brand/Actions y CSS propios de
+presentación; no se añaden dominio/repositorio vacíos ni otro runtime Next.
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md),
+[ficha](funcionalidades/landing-page.md).
+
+CSS limitado a .landing-page y QR a .reader-shell, comprobado al navegar en SPA
+en ambos sentidos. Ilustración raster autorizada copiada intacta; recortes con
+clases CSS fijas sin styles inline, sin relajar CSP. La landing se entrega en HTML
+SSR con nonce por respuesta, FAQ nativo y anclas reales, sin consultas Supabase,
+sesión, formularios, métricas inventadas ni descargas falsas. / indexable con
+metadatos/canonical; robots excluye fichas/API/app/admin, sitemap solo raíz. QR
+conserva URLs/proyección/noindex/no-store/controles de acceso y su apariencia.
+Sin SQL, dependencias, nuevas variables ni cambios Flutter.
+
+Validación final: TypeScript estricto y build correctos;9 unitarias/fronteras y
+3 pruebas del servidor compilado aprobadas. Logs landing-nuxt-{typecheck,tests,
+build,production}.log en apps/mobile/build. Browser QA Chrome/Playwright aprobado
+en1440×1000,731×1000,390×844,320×700 y texto200%: imágenes, anclas, FAQ por teclado
+y sin JS, no overflow ni errores CSP/hidratación, sin lecturas de producto,
+aislamiento SPA. Capturas revisadas en build/ui-preview/landing-vue y comparadas
+con referencia original; mantienen su composición y limitación del raster.
+Regresión QR completa también aprobada (build/landing-qr-regression-browser.log).
+
+Publicación de la migración/directorios previos confirmada por el usuario; esta
+integración nueva permanece local hasta push/redeploy. Mismo Dokploy/contexto/
+puerto/Environment. .env.local conservado; para desarrollo se documenta la opción
+--dotenv .env.local, sin exponerlo al build. Pendientes: revisión del usuario,
+Safari/Firefox, redeploy y seguimiento SEO. Sin commit/push/despliegue ni APK en
+este incremento. Login/admin web y HU-10.1/formulario siguen pendientes.
+
 ## Organización apps: segundo movimiento —17 de octubre de2026
 
 Primer commit **eb94af4**: web en apps/platform con build/11 pruebas aprobadas.

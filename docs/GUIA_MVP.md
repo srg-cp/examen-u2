@@ -156,6 +156,16 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Refinamiento18/10 de HU-07.2/RF-13/issue #33: pines de only-black.svg y vista
+previa fotográfica con tamaño/fecha mediante lectura pública por caso. Raza
+ausente en el producto se indica como no registrada; capturarla/persistirla no
+se implementa en este incremento. Sin SQL/permisos nuevos. ADR-062.
+
+Refinamiento18/10/2026 de HU-07.2/RF-13/issue #33: panel del mapa limitado a
+42–90%, resistencia visual bajo el mínimo, retorno glass retirado al expandir
+y sin título redundante. No cambia consultas, permisos ni alcance del MVP.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
 Revisión posterior16 de octubre de HU-07.2/RF-13/issue #33: el panel inferior del mapa contiene filtros en borrador y Aplicar; el caso se abre desde una etiqueta junto al pin. Reutiliza el formulario existente, conserva consulta compartida y no busca por editar/GPS/pan hasta confirmar. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye la ficha inferior de ADR-055, sin ampliar alcance ni cambiar SQL/permisos.
 
 Refinamiento autorizado16 de octubre de HU-07.2/RF-13/issue #33: Mapa abre pantalla propia mediante expansión desde su opción, mapa a todo viewport y panel inferior deslizable con una ficha de ancho completo. Consulta/páginas compartidas con lista; sin nueva operación de producto ni SQL. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md) sustituye la alternancia integrada de ADR-052. No cierra automáticamente historia ni implica publicación.
@@ -180,6 +190,38 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+18/10/2026, HU-10.2 / RF-11 / issue #37: envío Android desde ficha abierta,
+fecha/hora real, comentario/foto opcionales, GPS con alternativa manual y galería
+alternativa a cámara. Destino fijo, formulario conservado y UUID/payload congelados
+ante respuesta ambigua. Servidor Nuxt verifica sesión y reutiliza el pipeline web;
+plan025 comparte persistencia/validación SQL y conserva evidencia privada sin QR
+previo. No sustituye los avisos públicos/custodia anteriores ni adelanta HU-11.
+Implementación local;025/servidor y demo autenticada pendientes. El usuario ya
+confirmó024 y funcionamiento web; no se vuelven a considerar pendientes de HU-10.1.
+[Ficha Android](funcionalidades/avistamientos-android.md),
+[ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md).
+
+18/10/2026, HU-10.1 / RF-11 / issue #36: formulario de avistamiento sin cuenta
+desde QR activo, fecha/hora y punto manual/GPS con precisión, comentario/foto
+opcionales, saneamiento servidor sin EXIF y reintento idempotente. Plan024/RPC
+solo servidor, límites persistentes por pseudónimo/caso; evidencia y punto exacto
+privados. No crea reportero autenticado, cronología HU-11, envío móvil HU-10.2
+ni push/offline. WebShell/QR/formulario adoptan ADR-063. Implementación local;
+aplicación024, despliegue y demo con otro teléfono pendientes. [Ficha](funcionalidades/avistamientos-web.md),
+[ADR-064](decisiones/064-avistamientos-publicos-idempotentes.md).
+
+18/10/2026: el usuario aprueba la landing final y solicita que sea la referencia
+UI/UX de toda la web. [Reglas web](REGLAS_UI_UX_WEB.md) y
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) consolidan esa base
+para público/usuarios/administración. Cambio documental, sin nuevas HU/RF/issues,
+sin cierre de historias ni implementación anticipada de paneles o adaptación QR.
+
+Integración17/10/2026 solicitada por usuario: landing de feature/landing-page
+portada de React a Vue en / de apps/platform, junto a QR /c/<token>. Conserva
+referencia y controles reales; sin nuevas HU/RF/issues ni cierre de HU-09/HU-10.
+Mismo despliegue, sin SQL ni dependencia nueva. [Ficha](funcionalidades/landing-page.md),
+[ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
 
 17/10/2026: usuario adopta una sola web Vue/Nuxt/TypeScript para público,
 usuarios y administración por roles, conservando Flutter móvil. Primer incremento
@@ -209,6 +251,17 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 ```
 
 ### S5 - Seguimiento, alertas y cierre
+
+18/10/2026: HU-11.1 / RF-14 / #38 y HU-11.2 / RF-12,14 / #39 implementadas
+localmente en Android. Historial propio ordenado por hora del suceso, recepción
+y tardíos separados, foto/punto privados y clasificación con motivo/actor/fecha
+e historial paginado. RPC autorizadas, reintento idempotente y CAS; caso cerrado
+solo lectura. No equivale a ubicación actual/recuperación. Plan026 después de025
+confirmado por usuario; falta activar026 y demo autenticada/concurrencia reales.
+Avisos públicos anteriores conservan su recorrido; no se migran ni se inventan
+eventos. Sin push, offline o panel web nuevo. [Ficha](funcionalidades/cronologia-y-revision.md),
+[ADR-066](decisiones/066-cronologia-y-revision-privada.md). Historias sin cerrar
+ni acciones GitHub; siguiente incremento funcional HU-12 tras validar HU-11.
 
 - **HU-11 / RF-12,14:** revisar avistamientos, guardar actor/motivo y ordenar cronología por hora real.
 - **HU-12 / RF-17,18:** zonas/casos seguidos, selección de destinatarios, bandeja persistente y push. Persistir trabajo de notificación con mecanismo de reintento; integrar FCM mediante operación server-side.
@@ -496,3 +549,18 @@ Ajuste solicitado de HU-07.1/RF-13: panel flotante reutilizable que mantiene fij
 Por nueva instrucción, filtros desplegados dentro de Explorar sin popup. Cards eliminan texto Mascota perdida y conservan nombre/especie más badges. El usuario confirma búsqueda de ciudad/dirección, selección en mapa y radio en kilómetros. Incremento de HU-07.1/RF-13 con geocodificación de lectura Photon y selección manual alternativa, sin GPS, SQL nuevo o mapa de resultados HU-07.2. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md), ficha y ESTADO separan evidencias locales de demo autenticada.
 
 Corrección visual16 de octubre de2026 de Guardados (HU-07/RF-13): pantalla independiente desde marcador compacto, con expansión/retorno OriginPageTransition compartido y shell glass; sustituye alternancia de vistas dentro de Explorar. Sin ampliación funcional ni SQL nuevo;021/Android pendientes y sin pruebas por instrucción del usuario.
+
+## Calidad visual de landing —17/10/2026
+
+Por petición explícita se reemplazan todos los recortes del mockup por siete
+ilustraciones transparentes generadas individualmente con imagegen. Componentes
+Vue/CSS/SVG para tarjetas, etiquetas, superficies y decoración; logo oficial.
+No se cambia el stack Nuxt ni el hero aprobado, ni se implementan operaciones
+nuevas de producto. Sin HU/RF/issue nuevos ni cierre de historias. Revisión local
+según ESTADO; publicación/redeploy no incluidos.
+
+Actualización de identidad17/10: se amplía diversidad de mascotas/pelajes/pañuelos
+y se regenera el emblema blanco dentro de las ilustraciones, sin overlays.
+Logo actualizado en web/QR/favicon y recursos Flutter/nativos, sin nuevos casos
+de uso, permisos, HU/issue o ampliación funcional de plataformas futuras.
+Validación y límites registrados en ESTADO y ficha identidad-visual.

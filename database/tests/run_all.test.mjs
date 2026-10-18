@@ -6,6 +6,135 @@ import { postgis } from '@electric-sql/pglite-postgis';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
 
+test('Case timeline isolates private evidence, orders observed time, paginates and audits versioned reviews',async t=>{
+ const db=await database(t);await db.exec(bundle);
+ const owner='11111111-1111-4111-8111-111111111126',other='22222222-2222-4222-8222-222222222226';
+ const pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb26',target='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa26';
+ await db.query('insert into auth.users(id) values($1),($2)',[owner,other]);
+ await db.query("insert into public.pets(id,owner_id,name,species,size,age_months,traits) values($1,$2,'Luna','dog','small',12,'Blanca')",[pet,owner]);
+ await db.query("insert into public.lost_cases(id,owner_id,pet_id,pet_version,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,pet_name,species,size,age_months,traits,photo_ids) values($1,$2,$3,1,now(),-12,-77,'PRIVATE',-12,-77,'Luna','dog','small',12,'Blanca',array[$3]::uuid[])",[target,owner,pet]);
+ await db.query("insert into public.case_events(case_id,actor_id,event_type) values($1,$2,'published')",[target,owner]);
+ await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind) values($1,$2,'active',now(),-12,-77,'PRIVATE',-12,-77,'cat','Negra',array[$3]::uuid[],now(),'possible_loss')",[target,owner,pet]);
+ const id=n=>`cccccccc-cccc-4ccc-8ccc-${String(n).padStart(12,'0')}`;
+ for(let n=1;n<=23;n++)await db.query("insert into public.public_sightings(id,case_source,case_id,request_hash,actor_hash,observed_at,received_at,latitude,longitude,location_source,comment,is_late,evidence_jpeg) values($1,'lost',$2,repeat('a',64),repeat('b',64),$3,clock_timestamp(),-12.055123,-77.044321,'manual','PRIVATE COMMENT',true,decode('ffd8ffd9','hex'))",[id(n),target,new Date(Date.now()-(n%3+2)*86400000).toISOString()]);
+ await db.query("insert into public.public_sightings(id,case_source,case_id,request_hash,actor_hash,observed_at,latitude,longitude,location_source,comment,is_late) values($1,'found',$2,repeat('a',64),repeat('b',64),now()-interval '2 days',-12,-77,'manual','COMMUNITY',true)",[id(30),target]);
+ const claims=async user=>{await db.exec('reset role;set role authenticated');await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub:user,role:'authenticated'})]);};
+ const timeline=(source='lost',cursor=null,limit=20)=>db.query('select public.read_case_timeline($1,$2,$3,$4,$5) v',[source,target,cursor?.time??null,cursor?.key??null,limit]).then(r=>r.rows[0].v);
+ const detail=(sighting=id(1),before=null)=>db.query('select public.read_sighting_review($1,$2) v',[sighting,before]).then(r=>r.rows[0].v);
+ const command=n=>`dddddddd-dddd-4ddd-8ddd-${String(n).padStart(12,'0')}`;
+ const review=(n,version,state='useful',reason='Motivo verificable')=>db.query('select public.review_sighting($1,$2,$3,$4,$5) v',[command(n),id(1),version,state,reason]).then(r=>r.rows[0].v);
+ await db.exec('set role anon');await assert.rejects(timeline(),/permission denied/);await assert.rejects(detail(),/permission denied/);
+ await claims(other);assert.equal((await db.query("select public.can_read_case_timeline('lost',$1) v",[target])).rows[0].v,false);
+ await assert.rejects(timeline(),/timeline_forbidden/);await assert.rejects(detail(),/timeline_forbidden/);await assert.rejects(review(1,0),/timeline_forbidden/);
+ await assert.rejects(db.query('select public.read_sighting_evidence($1)',[id(1)]),/timeline_forbidden/);
+ await claims(owner);assert.equal((await db.query("select public.can_read_case_timeline('lost',$1) v",[target])).rows[0].v,true);
+ for(const table of ['sighting_reviews','public_sightings']){
+  await assert.rejects(db.query(`select * from public.${table}`),/permission denied/);
+  await assert.rejects(db.query(`delete from public.${table}`),/permission denied/);
+ }
+ let cursor=null;const events=[];do{const page=await timeline('lost',cursor,3);events.push(...page.items);cursor=page.next;}while(cursor);
+ assert.equal(events.length,24);assert.equal(new Set(events.map(e=>e.key)).size,24);
+ for(let n=1;n<events.length;n++)assert.ok(Date.parse(events[n-1].observed_at)>=Date.parse(events[n].observed_at));
+ assert.equal(events[0].kind,'published');assert.equal(events.filter(e=>e.kind==='sighting').every(e=>e.is_late&&e.received_at!==e.observed_at),true);
+ assert.equal((await timeline('found')).items.length,1);await assert.rejects(timeline('lost',null,51),/timeline_invalid/);
+ const original=await detail();assert.equal(original.comment,'PRIVATE COMMENT');assert.equal(original.latitude,-12.055123);assert.equal(original.review_state,'unreviewed');assert.equal(original.has_photo,true);
+ assert.equal((await db.query('select public.read_sighting_evidence($1) v',[id(1)])).rows[0].v,'/9j/2Q==');
+ assert.equal((await detail(id(30))).case_source,'found');
+ const first=await review(1,0);assert.equal(first.actor_id,owner);assert.equal(first.previous_state,'unreviewed');assert.equal(first.revision,1);assert.ok(first.reviewed_at);
+ assert.deepEqual(await review(1,0),first);assert.deepEqual(await review(1,0,'useful',' \tMotivo verificable \n'),first);await assert.rejects(review(1,0,'rejected'),/timeline_conflict/);
+ await assert.rejects(review(2,0,'doubtful'),/timeline_conflict/);await assert.rejects(review(2,1),/timeline_transition/);
+ for(const [state,reason] of [['bogus','ok'],['confirmed',''],['confirmed',' \t\n '],['confirmed','\u00a0\u3000'],['confirmed','x'.repeat(501)]])await assert.rejects(review(2,1,state,reason),/timeline_invalid/);
+ for(let n=2;n<=25;n++)await review(n,n-1,['useful','doubtful','rejected','confirmed'][(n-1)%4],`Motivo ${n}`);
+ const recent=await detail();assert.equal(recent.history.length,20);assert.equal(recent.revision,25);assert.equal(recent.history[0].revision,25);
+ const older=await detail(id(1),recent.next_revision);assert.equal(older.history.length,5);assert.equal(older.next_revision,null);
+ assert.equal(recent.comment,original.comment);assert.equal(recent.latitude,original.latitude);
+ assert.equal((await timeline()).items.find(e=>e.id===id(1))?.review_state,'useful');
+ await claims(other);await assert.rejects(review(1,0),/timeline_forbidden/);
+ await db.exec('reset role');await db.query("update public.lost_cases set status='resolved' where id=$1",[target]);
+ await claims(owner);assert.equal((await detail()).can_review,false);assert.deepEqual(await review(1,0),first);await assert.rejects(review(26,25,'confirmed'),/timeline_closed/);
+ await db.exec('reset role');await db.exec(bundle);await db.exec(bundle);
+ assert.equal((await db.query('select count(*)::int n from public.sighting_reviews')).rows[0].n,25);
+ await db.query('update public.lost_cases set deleted_at=clock_timestamp() where id=$1',[target]);await claims(owner);
+ await assert.rejects(detail(),/timeline_forbidden/);await assert.rejects(timeline(),/timeline_forbidden/);
+});
+
+test('Public sightings are private, validated, idempotent, bounded and bound to live QR cases', async t => {
+  const db = await database(t); await db.exec(bundle);
+  const owner = '11111111-1111-4111-8111-111111111124';
+  const pet = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb24'; const target = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa24';
+  await db.query('insert into auth.users(id) values($1)', [owner]);
+  await db.query("insert into public.pets(id,owner_id,name,species,size,age_months,traits) values($1,$2,'Luna','dog','small',12,'Blanca')", [pet, owner]);
+  await db.query("insert into public.lost_cases(id,owner_id,pet_id,pet_version,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,pet_name,species,size,age_months,traits,photo_ids) values($1,$2,$3,1,now(),-12,-77,'PRIVATE',-12,-77,'Luna','dog','small',12,'Blanca',array[$4]::uuid[])", [target, owner, pet, pet]);
+  await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind) values($1,$2,'active',now(),-12,-77,'PRIVATE',-12,-77,'cat','Negra',array[$3]::uuid[],now(),'possible_loss')", [target, owner, pet]);
+  await db.query("insert into public.pet_photos(id,pet_id,owner_id,status,processed_at,content_hash,is_primary) values($1,$1,$2,'published',now(),repeat('a',64),true)", [pet, owner]);
+  await db.query("insert into public.found_case_photos(id,case_id,owner_id,status,processed_at,content_hash) values($1,$2,$3,'ready',now(),repeat('b',64))", [pet, target, owner]);
+  for (const [bucket, parent] of [['pet-photo-renditions',pet], ['found-photo-renditions',target]]) await db.query("insert into storage.objects(id,bucket_id,name,metadata) values(gen_random_uuid(),$1,$2,'{\"mimetype\":\"image/jpeg\",\"size\":100}')", [bucket, `${owner}/${parent}/${pet}.jpg`]);
+  for (const [source, slug] of [['lost', 'a'.repeat(64)], ['found', 'b'.repeat(64)]]) await db.query('insert into public.case_public_links(case_source,case_id,owner_id,public_slug) values($1,$2,$3,$4)', [source, target, owner, slug]);
+  const draft = n => ({ id: `cccccccc-cccc-4ccc-8ccc-${String(n).padStart(12,'0')}`, observedAt: new Date(Date.now() - 48 * 3600000).toISOString(), point: { latitude: -12.055123, longitude: -77.044321, source: 'manual', accuracy: null }, comment: 'Caminaba por el parque' });
+  const submit = (report, slug = 'a'.repeat(64), hash = 'c'.repeat(64), actor = 'd'.repeat(64), photo = null) => db.query('select public.submit_public_sighting($1,$2,$3,$4,$5) value', [slug, report, hash, actor, photo]).then(r => r.rows[0].value);
+  for (const role of ['anon','authenticated']) {
+    await db.exec(`reset role;set role ${role}`);
+    await assert.rejects(submit(draft(1)), /permission denied/);
+    await assert.rejects(db.query('select * from public.public_sightings'), /permission denied/);
+    await assert.rejects(db.query("insert into public.public_sightings(id) values(gen_random_uuid())"), /permission denied/);
+  }
+  await db.exec('reset role;set role service_role');
+  const first = draft(1); const receipt = await submit(first);
+  assert.equal(receipt.id, first.id); assert.equal(receipt.late, true); assert.ok(receipt.receivedAt);
+  assert.deepEqual(await submit(first), receipt);
+  await assert.rejects(submit(first, 'a'.repeat(64), 'e'.repeat(64)), /sighting_conflict/);
+  await assert.rejects(submit(first, 'b'.repeat(64)), /sighting_conflict/);
+  for (const invalid of [{ ...draft(2), observedAt: '2100-01-01' }, { ...draft(2), point: null }, { ...draft(2), point: { latitude: 90, longitude: 0, source: 'manual', accuracy: null } }, { ...draft(2), point: { latitude: 0, longitude: 0, source: 'gps', accuracy: null } }, { ...draft(2), comment: 'a'.repeat(501) }]) await assert.rejects(submit(invalid), /sighting_invalid/);
+  await assert.rejects(submit(draft(2), 'f'.repeat(64)), /sighting_closed/);
+  await assert.rejects(submit(draft(2), 'a'.repeat(64), 'c'.repeat(64), 'd'.repeat(64), Buffer.from('fake jpg').toString('base64')), /sighting_invalid/);
+  const gps = { ...draft(2), observedAt: new Date(Date.now() - 60000).toISOString(), point: { latitude: -12.05, longitude: -77.04, source: 'gps', accuracy: 200 } };
+  assert.equal((await submit(gps, 'b'.repeat(64))).late, false);
+  for (let n = 3; n <= 5; n++) await submit(draft(n));
+  await assert.rejects(submit(draft(6)), /sighting_rate_limited/);
+  assert.deepEqual(await submit(first), receipt, 'Retries do not spend budget');
+  await db.exec('reset role');
+  assert.equal((await db.query('select count(*)::int n from public.public_sightings')).rows[0].n, 5);
+  const row = (await db.query('select * from public.public_sightings where id=$1', [first.id])).rows[0];
+  assert.equal(row.latitude, first.point.latitude); assert.equal(row.evidence_jpeg, null);
+  await db.query('update public.pet_photos set processed_at=null where id=$1', [pet]); await db.exec('set role service_role');
+  await assert.rejects(submit(draft(7), 'a'.repeat(64), 'c'.repeat(64), 'e'.repeat(64)), /sighting_closed/);
+  await db.exec('reset role'); await db.query('update public.pet_photos set processed_at=now() where id=$1', [pet]);
+  await db.query("update public.lost_cases set status='resolved' where id=$1", [target]);
+  await db.exec('set role service_role');
+  assert.deepEqual(await submit(first), receipt, 'A saved receipt remains a receipt after closing');
+  await assert.rejects(submit(draft(7), 'a'.repeat(64), 'c'.repeat(64), 'e'.repeat(64)), /sighting_closed/);
+  await db.exec('reset role'); await db.query("update public.case_public_links set revoked_at=now() where case_source='found'"); await db.exec('set role service_role');
+  await assert.rejects(submit(draft(7), 'b'.repeat(64)), /sighting_closed/);
+  await db.exec('reset role'); await db.exec(bundle); await db.exec(bundle);
+  assert.equal((await db.query('select count(*)::int n from public.public_sightings')).rows[0].n, 5);
+  assert.deepEqual(Object.keys(receipt).sort(), ['id','late','receivedAt']);
+  // Android shares persistence and budgets, without requiring an existing QR.
+  await db.query("update public.lost_cases set status='active' where id=$1", [target]);
+  await db.query("delete from public.case_public_links where case_source='found'");
+  const app = (report, reporter=owner, hash='f'.repeat(64), actor='9'.repeat(64)) => db.query('select public.submit_app_sighting($1,$2,$3,$4::jsonb,$5,$6,null) receipt', ['found',target,reporter,JSON.stringify(report),hash,actor]).then(r=>r.rows[0].receipt);
+  for (const role of ['anon','authenticated']) {
+    await db.exec(`set role ${role}`);
+    await assert.rejects(app(draft(20)),/permission denied/);
+    await assert.rejects(db.query("select public.persist_sighting('found',$1,$2::jsonb,$3,$4,null,null)",[target,JSON.stringify(draft(20)),'a'.repeat(64),'b'.repeat(64)]),/permission denied/);
+    await db.exec('reset role');
+  }
+  await db.exec('set role service_role');
+  const appReceipt=await app(draft(20));assert.deepEqual(await app(draft(20)),appReceipt);
+  await assert.rejects(app(draft(20),owner,'e'.repeat(64)),/sighting_conflict/);
+  await assert.rejects(app(draft(20),owner,'f'.repeat(64),'8'.repeat(64)),/sighting_conflict/);
+  await assert.rejects(app({...draft(21),observedAt:'2100-01-01'}),/sighting_invalid/);
+  await assert.rejects(app({...draft(21),comment:'a'.repeat(501)}),/sighting_invalid/);
+  await assert.rejects(app(draft(21),null),/sighting_forbidden/);
+  await db.exec('reset role');
+  const appRow=(await db.query('select reporter_id,comment,latitude from public.public_sightings where id=$1',[draft(20).id])).rows[0];
+  assert.equal(appRow.reporter_id,owner);assert.equal(appRow.latitude,draft(20).point.latitude);
+  await db.query("update public.found_cases set status='resolved' where id=$1",[target]);await db.exec('set role service_role');
+  assert.deepEqual(await app(draft(20)),appReceipt);
+  await assert.rejects(app(draft(21)),/sighting_closed/);
+  await db.exec('reset role');await db.exec(bundle);
+  assert.equal((await db.query('select count(*)::int n from public.public_sightings')).rows[0].n,6);
+});
+
 test('QR reader is server-only, live, scoped to processed photos and neutral after revoke/delete', async(t)=>{
  const db=await database(t);await db.exec(bundle);
  const a='11111111-1111-4111-8111-111111111199', b='22222222-2222-4222-8222-222222222299';

@@ -19,6 +19,13 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Web, referencia aprobada del 18/10/2026: antes de cambios visuales en
+  `apps/platform`, leer [REGLAS_UI_UX_WEB](docs/REGLAS_UI_UX_WEB.md).
+  La landing final guía público, usuarios y administración; adaptar escala y
+  composición a cada tarea, reutilizando componentes reales. ADR-063 extiende
+  el alcance visual de ADR-060. Las reglas de feedback/arquitectura siguen vigentes;
+  Flutter conserva su referencia de acceso. QR se adapta al intervenir sus recorridos.
+
 - Web, decisión explícita del17/10/2026: Vue + Nuxt + TypeScript en una sola
   aplicación para público, usuarios y administración, organizada por funcionalidad
   y permisos de servidor. Flutter permanece en móvil. No separar proyectos por

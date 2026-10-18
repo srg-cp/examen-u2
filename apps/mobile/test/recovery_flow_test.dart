@@ -22,6 +22,12 @@ import 'package:flutter_application_entrehuellas/features/found_cases/presentati
 import 'package:flutter_application_entrehuellas/features/found_cases/presentation/widgets/recovery_case_actions.dart';
 import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
 import 'found_cases_test.dart' show FakeFoundCases;
+import 'sightings_test.dart' show FakeSightings;
+import 'case_timeline_test.dart' show FakeTimeline;
+import 'package:flutter_application_entrehuellas/features/case_timeline/providers/case_timeline_providers.dart';
+import 'package:flutter_application_entrehuellas/features/case_timeline/presentation/screens/case_timeline_screen.dart';
+import 'package:flutter_application_entrehuellas/features/sightings/providers/sighting_providers.dart';
+import 'package:flutter_application_entrehuellas/features/sightings/presentation/screens/sighting_screen.dart';
 import 'support/fake_password_recovery.dart';
 import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
@@ -75,6 +81,8 @@ void main() {
         final pets = FakePets();
         final scope = ProviderContainer(
           overrides: [
+            sightingRepositoryProvider.overrideWithValue(FakeSightings()),
+            caseTimelineRepositoryProvider.overrideWithValue(FakeTimeline()),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),
@@ -173,6 +181,36 @@ void main() {
           findsOneWidget,
         );
         await tester.pump(const Duration(seconds: 8));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Ver historial', skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Ver historial', skipOffstage: false));
+        await tester.pumpAndSettle();
+        expect(find.byType(CaseTimelineScreen), findsOneWidget);
+        final timeline = tester.widget<CaseTimelineScreen>(
+          find.byType(CaseTimelineScreen),
+        );
+        expect(timeline.target.id, search.id);
+        expect(timeline.target.community, true);
+        router.pop();
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Reportar avistamiento', skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.text('Reportar avistamiento', skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(SightingScreen), findsOneWidget);
+        final sightingScope = ProviderScope.containerOf(
+          tester.element(find.byType(SightingScreen)),
+        );
+        expect(sightingScope.read(sightingTargetProvider).id, search.id);
+        expect(sightingScope.read(sightingTargetProvider).community, true);
+        router.pop();
         await tester.pumpAndSettle();
         await tester.ensureVisible(
           find.text('La vi o la encontré', skipOffstage: false),

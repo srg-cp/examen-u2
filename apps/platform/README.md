@@ -3,9 +3,9 @@
 Incremento17/10/2026 en feature/vue-nuxt-web. Migra HU-09/RF-09/#9 a Vue,
 conservando diseño, /c/<token>, API, fotos privadas y SQL022/023. Esta base es
 la aplicación web única acordada para público/usuarios/administración por roles.
-En este incremento solo está implementada la ficha QR; no hay login web ni panel
-administrativo ficticio. La landing tiene trabajo independiente en su rama y
-todavía no se integra aquí. La raíz conserva el estado neutral anterior.
+La raíz / integra la landing de feature/landing-page, convertida a componentes
+Vue y conservando su diseño. Las fichas siguen en /c/<token>. No hay todavía
+login web ni administración; no se añaden rutas de producto ficticias.
 
 Guía para empezar con Vue: **[DESARROLLO.md](DESARROLLO.md)**.
 
@@ -30,12 +30,17 @@ npm run build
 npm start
 ```
 
-Abrir `http://127.0.0.1:5173/c/<token-real>`; sin token válido se muestra la
-página neutral. No se crea una sesión ni se incluyen casos de demostración.
+Abrir `http://127.0.0.1:5173/` para la presentación y `/c/<token-real>` para
+una ficha; un token inválido conserva el estado neutral. No se crea una sesión
+ni se incluyen casos de demostración.
 Ejecutar `npm ci` antes del primer build. Para desarrollar: `npm run dev`;
 Nuxt carga .env local. Para validar: `npm run typecheck`, `npm test`,
 `npm run build`, `npm run test:server`. Las pruebas usan un backend HTTP de prueba
 y nunca Supabase real. El script de navegador requiere build previo.
+
+Con .env.local: `npm run dev -- --dotenv .env.local`. QA de la landing con
+`node scripts/check-landing-browser.mjs`, usando PLAYWRIGHT_MODULE y CHROME_PATH
+como en el QA de QR; resultados en apps/mobile/build/ui-preview/landing-vue.
 
 QA visual reproducible con Playwright1.62.1 instalado fuera de producción:
 
@@ -125,3 +130,9 @@ en los node_modules del runtime generado, comprobado por inventario. Nuxt es
 dependencia de desarrollo/build; la imagen final solo copia .output. El servidor
 dev no debe exponerse públicamente. Mantener seguimiento de upstream y repetir
 audit completo/runtime antes de distribuir nuevas versiones.
+
+## Recursos de la landing
+
+Se retiró el atlas del mockup: `public/images/landing` contiene siete PNG RGBA independientes generados individualmente con imagegen. Componentes Vue y CSS dibujan la UI; el logo oficial sigue siendo `/brand.png`. Consultar [prompts y procedencia](LANDING_ASSETS.md). La animación aprobada del hero se conserva. Los PNG priorizan detalle y alfa; no se ha medido rendimiento de red móvil real ni Core Web Vitals. Los recursos se cargan de forma diferida salvo hero y se reutilizan por URL. El incremento no publica ni hace redeploy.
+
+Actualización posterior de marca/diversidad17/10: diez ilustraciones con mascotas y pañuelos variados. El emblema blanco se genera dentro de la tela, usando only-black.svg como referencia; no hay capas de logos superpuestas. La marca usa /brand.png actualizado y el favicon /brand-icon.png; /brand.svg conserva el vector oficial disponible. Ver LANDING_ASSETS.md para prompts finales y procedencia. No se añaden dependencias ni se modifica el hero aprobado.

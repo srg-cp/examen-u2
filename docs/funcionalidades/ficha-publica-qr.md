@@ -1,5 +1,14 @@
 # Ficha pública QR
 
+Incremento18/10/2026: ficha activa integra el [formulario de avistamientos web](avistamientos-web.md)
+HU-10.1/#36 mediante slot compuesto en la página. WebShell/ActionButton y QR
+adoptan la referencia web ADR-063; sin import de UI de landing. Conserva lectura,
+estado/fotos compartidos y no publica la ubicación/evidencia de avistamientos.
+Nueva escritura requiere024 y redeploy; cierre/revocación se validan en servidor.
+Las notas históricas «no hay formulario/HU-10 pendiente» se sustituyen por esta
+implementación local, sin certificar activación remota.022/023 ya confirmados
+por el usuario, como consta arriba; no vuelven a solicitarse por notas antiguas.
+
 Migración17/10/2026 en feature/vue-nuxt-web: Vue/Nuxt/TypeScript sustituye
 la vista DOM y HTTP manual, manteniendo proyección, /c/<token>, API y fotos.
 Primera lectura SSR con entidad permitida e hidratación sin segunda consulta;

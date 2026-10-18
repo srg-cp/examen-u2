@@ -1,4 +1,12 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/collection_empty_state.dart';
+import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
+import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
+import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pets_section.dart';
+import 'support/fake_pets.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'support/fake_place_search.dart';
 import 'package:flutter_application_entrehuellas/features/places/providers/places_providers.dart';
 import 'package:flutter_application_entrehuellas/features/places/presentation/widgets/place_search_fields.dart';
@@ -133,6 +141,160 @@ void main() {
           null,
         );
   });
+  for (final reduced in [false, true]) {
+    testWidgets(
+      'Explore has one entrance and one initial query; reduced=$reduced',
+      (tester) async {
+        final repo = SearchFake()..pending = Completer<ExplorePage>();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              exploreRepositoryProvider.overrideWithValue(repo),
+              currentLocationRepositoryProvider.overrideWithValue(
+                const FakeCurrentLocation(),
+              ),
+              exploreSessionProvider.overrideWith(
+                (_) => Stream.value(const AuthSession(userId: 'a')),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.light,
+              home: MediaQuery(
+                data: MediaQueryData(disableAnimations: reduced),
+                child: const HomeScreen(
+                  profileAvatar: SizedBox(width: 48, height: 48),
+                  exploreContent: ExploreSection(),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Explorar'));
+        await tester.pump();
+        await tester.pump();
+        final skeleton = find.byWidgetPredicate(
+          (widget) =>
+              widget is LoadingShimmer &&
+              widget.loadingLabel == 'Consultando casos',
+        );
+        final shimmerState = tester.state(skeleton);
+        final entrances = find.ancestor(
+          of: skeleton,
+          matching: find.byWidgetPredicate(
+            (widget) => widget is AuthStageTransition && widget.enabled,
+          ),
+        );
+        expect(entrances, findsOneWidget);
+        expect(
+          find.ancestor(
+            of: skeleton,
+            matching: find.byWidgetPredicate(
+              (widget) => widget is StaggerReveal && widget.enabled,
+            ),
+          ),
+          findsOneWidget,
+        );
+        for (var frame = 0; frame < 90; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+          expect(tester.state(skeleton), same(shimmerState));
+          expect(repo.calls, hasLength(1));
+        }
+        for (final opacity in tester.widgetList<Opacity>(
+          find.ancestor(of: skeleton, matching: find.byType(Opacity)),
+        )) {
+          expect(opacity.opacity, 1);
+        }
+        repo.pending!.complete(ExplorePage(items: []));
+        await tester.pumpAndSettle();
+        expect(skeleton, findsNothing);
+        expect(find.text('No encontramos casos'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsOneWidget);
+        expect(find.text('No hay casos con estos filtros.'), findsNothing);
+        expect(repo.calls, hasLength(1));
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+  for (final small in [false, true]) {
+    testWidgets('Home section titles keep the same origin; small=$small', (
+      tester,
+    ) async {
+      tester.view.physicalSize = small
+          ? const Size(320, 350)
+          : const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.runAsync(loadFonts);
+      final pets = FakePets()..pendingList = Completer<void>();
+      final boundary = GlobalKey();
+      pets.pets['pet'] = const Pet(
+        id: 'pet',
+        ownerId: 'a',
+        version: 1,
+        fields: PetFields(name: 'Luna', species: PetSpecies.dog),
+      );
+      final repo = SearchFake()..pending = Completer<ExplorePage>();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            petRepositoryProvider.overrideWithValue(pets),
+            petSessionProvider.overrideWith(
+              (_) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+            exploreRepositoryProvider.overrideWithValue(repo),
+            currentLocationRepositoryProvider.overrideWithValue(
+              const FakeCurrentLocation(),
+            ),
+            exploreSessionProvider.overrideWith(
+              (_) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: MediaQuery(
+              data: MediaQueryData(
+                textScaler: TextScaler.linear(small ? 2 : 1),
+                disableAnimations: small,
+              ),
+              child: RepaintBoundary(
+                key: boundary,
+                child: const HomeScreen(
+                  profileAvatar: SizedBox.square(dimension: 48),
+                  exploreContent: ExploreSection(),
+                  petsContent: PetsSection(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Mis mascotas'));
+      await tester.pump();
+      await tester.pump();
+      final origin = tester.getTopLeft(find.text('Mis mascotas'));
+      pets.pendingList!.complete();
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('Mis mascotas')), origin);
+      await capture(tester, boundary, small, 'header-pets');
+      await tester.tap(find.byTooltip('Explorar'));
+      await tester.pump();
+      await tester.pump();
+      expect(tester.getTopLeft(find.text('Explorar')), origin);
+      for (var frame = 0; frame < 90; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        expect(tester.getTopLeft(find.text('Explorar')), origin);
+      }
+      repo.pending!.complete(ExplorePage(items: []));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('Explorar')), origin);
+      await capture(tester, boundary, small, 'header-explore');
+      expect(repo.calls, hasLength(1));
+      expect(tester.takeException(), isNull);
+    });
+  }
   test(
     'Search rejects partial/manual coordinates and malformed ranges before reaching data',
     () async {
@@ -516,7 +678,9 @@ void main() {
           ),
         );
         await tester.pump();
-        await tester.pump(const Duration(seconds: 2));
+        for (var frame = 0; frame < 120; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+        }
         await capture(tester, key, small, 'skeleton');
         initial.completeError(
           const ExploreFailure(ExploreFailureKind.unavailable),
@@ -524,6 +688,7 @@ void main() {
         repo.pending = null;
         await tester.pumpAndSettle();
         expect(find.text('Reintentar'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsNothing);
         await capture(tester, key, small, 'error');
         await tester.ensureVisible(find.text('Reintentar'));
         await tester.pumpAndSettle();
@@ -719,10 +884,15 @@ void main() {
         );
         await container.read(exploreViewModelProvider.notifier).refresh();
         await tester.pumpAndSettle();
-        expect(find.text('No hay casos con estos filtros.'), findsOneWidget);
-        await tester.ensureVisible(
-          find.text('No hay casos con estos filtros.'),
+        expect(find.text('No encontramos casos'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsOneWidget);
+        expect(
+          find.text(
+            'Prueba con otra ubicación o ajusta los filtros de búsqueda.',
+          ),
+          findsOneWidget,
         );
+        await tester.ensureVisible(find.text('No encontramos casos'));
         await tester.pumpAndSettle();
         await capture(tester, key, small, 'empty');
         repo.empty = false;

@@ -24,6 +24,10 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeViewModelProvider);
     final model = ref.read(homeViewModelProvider.notifier);
+    // Feature sections own their entrance; do not animate them a second time.
+    final animateContent =
+        state.section != HomeSection.pets &&
+        (state.section != HomeSection.explore || exploreContent == null);
     return Scaffold(
       backgroundColor: Colors.white,
       body: ScrollSafeArea(
@@ -32,11 +36,11 @@ class HomeScreen extends ConsumerWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: PullToRefresh(
-              key: ValueKey(state.section),
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: SingleChildScrollView(
+                      key: ValueKey(state.section),
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [
@@ -72,11 +76,11 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           AuthStageTransition(
-                            enabled: state.section != HomeSection.pets,
+                            enabled: animateContent,
                             stage: state.section,
                             startCovered: true,
                             builder: (play) => StaggerReveal(
-                              enabled: state.section != HomeSection.pets,
+                              enabled: animateContent,
                               key: ValueKey(state.section),
                               count: state.section == HomeSection.home ? 3 : 2,
                               play: play,

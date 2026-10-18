@@ -79,22 +79,7 @@ class _ExploreFilterEditorState extends State<ExploreFilterEditor> {
       FilterChoice(value, label);
   @override
   Widget build(BuildContext context) {
-    final fields = <Widget>[
-      if (widget.allFilters)
-        const Padding(
-          padding: EdgeInsets.only(bottom: 16),
-          child: Text(
-            'Filtros de búsqueda',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF111111),
-            ),
-          ),
-        ),
-      ..._fields(context),
-      ...widget.trailing,
-    ];
+    final fields = <Widget>[..._fields(context), ...widget.trailing];
     final action = LoadingShimmer(
       isLoading: _submitted || widget.applying,
       loadingLabel: 'Aplicando filtros',

@@ -1,5 +1,25 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Estado vacío compartido18/10/2026: el layout existente se extrae a
+core/presentation/widgets/collection_empty_state.dart para reutilizarlo en
+Explorar. Mascotas aporta textos Activas/Archivadas y Registrar mascota solo
+en Activas; icono, tipografías, espaciados y ancho máximo del botón se conservan.
+No importa presentación de otras funcionalidades ni cambia datos/permisos.
+
+Consistencia de cabeceras18/10/2026: CollectionHeader fija altura mínima56
+para sus filas, alineando el origen de Mis mascotas y Explorar aunque sus
+acciones tengan distinto tamaño. Mantiene la reserva del+ durante carga/vacío
+y la adaptación de texto ampliado. Regresión integrada comprueba ambas
+secciones con fuentes reales; sin cambios de persistencia o permisos.
+
+Corrección18/10/2026: la cabecera reserva desde la carga el espacio del botón+
+compacto, también cuando la lista queda vacía. Así el título y los filtros
+conservan posición/ancho al recibir mascotas o desaparecer la última; se
+mantiene la adaptación compartida a ancho pequeño y texto ampliado. El espacio
+vacío no contiene una acción ni un botón accesible. Sin cambios de datos o
+permisos. Regresión de carga→lista→vacío en390×844 y320×350/texto2 aprobada;
+revisión Android pendiente.
+
 Corrección de recarga (16 octubre): se reprodujo pérdida de estado al activar/desactivar el shimmer compartido, porque alternaba la estructura que envuelve las tarjetas. LoadingShimmer mantiene ahora estable el árbol y solo cambia pintura/semántica/bloqueo cuando corresponde. Una prueba del gesto real confirma una sola consulta adicional, bloqueo de otro gesto durante trabajo y la misma instancia de tarjeta antes/durante/después, sin skeleton de recarga. No se encontró duplicación de consultas en esa prueba; revisión en dispositivo pendiente. Sin cambios de repositorios, permisos ni SQL.
 
 Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva selección de lista, giro, retirada y movimiento reducido. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.

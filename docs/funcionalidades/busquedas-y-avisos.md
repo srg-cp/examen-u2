@@ -1,5 +1,11 @@
 # Búsquedas y avisos vinculados
 
+HU-10.2,18/10: la ficha abierta añade Reportar avistamiento mediante el módulo
+[avistamientos Android](avistamientos-android.md), con comentario/foto opcionales
+y evidencia privada. La vi o la encontré conserva el aviso público/custodia
+existente y sus reglas. Los nuevos registros privados no se convierten en
+found_cases ni se añaden a esa lista; su revisión pertenece a HU-11.
+
 Implementación local por ajuste del usuario del11 de octubre de2026; no equivale al cierre de historias. [ADR-034](../decisiones/034-busquedas-y-avisos-vinculados.md).
 
 ## Qué hace y recorrido

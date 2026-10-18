@@ -1,5 +1,30 @@
 # Base de datos de Entre Huellas
 
+Cronología/revisión18/10: fuentes088–090/plan026 generan
+[migración026](../supabase/migrations/20261018002600_case_timeline.sql) y
+[patch026](patchs/026_patch_case_timeline.sql), después de025 confirmado por
+el usuario. RPC autenticadas solo para propietario del caso, foto privada,
+cronología/historial paginados, clasificación append-only con motivo/actor/fecha,
+UUID estable y versión esperada. Sin grants directos de tablas ni cambios en QR.
+Regenerar Build-CaseTimelinePatch/Build-RunAll; aplicación remota026 pendiente.
+[Ficha](../docs/funcionalidades/cronologia-y-revision.md).
+
+Avistamientos Android18/10: fuentes086–087/plan025 generan
+[migración025](../supabase/migrations/20261018002500_app_sightings.sql) y
+[patch025](patchs/025_patch_app_sightings.sql), después de024 ya confirmado por
+el usuario. Regenerar Build-AppSightingsPatch/Build-RunAll. Comando de persistencia
+común web/app, RPC app solo servidor, reporter_id verificado y evidencia privada;
+retira dependencia de QR generado sin ampliar grants de cliente. Requiere servidor
+Nuxt actualizado y demo Android antes de cerrar HU-10.2. No aplicado remotamente.
+
+Avistamientos web18/10: fuentes083–085/plan024 generan
+20261018002400_public_sightings.sql y [patch024](patchs/024_patch_public_sightings.sql).
+Después de023, RPC solo service_role y tabla sin acceso directo para clientes.
+Fecha/punto/estado/budgets/reintento validados en transacción, evidencia JPEG
+privada bytea hasta1MiB recodificada por el servidor Nuxt. No publica datos ni
+crea un usuario anónimo. Regenerar Build-PublicSightingsPatch/Build-RunAll;
+aplicación remota pendiente. [Ficha](../docs/funcionalidades/avistamientos-web.md).
+
 Lector QR16 octubre: fuentes080–082/plan023 generan migración20261016002300_public_qr_case.sql
 y [patch023](patchs/023_patch_public_qr_case.sql), después de022. Regenerar con
 Build-PublicQrCasePatch.ps1/Build-RunAll.ps1. RPC read_qr_case solo service_role,

@@ -1,5 +1,89 @@
 # Arquitectura de Entre Huellas
 
+## Cronología y revisión privada — 18/10/2026
+
+HU-11.1/#38 y HU-11.2/#39: `features/case_timeline` contiene dominio/casos de
+uso, contrato, providers, ViewModels autoDispose, estado, pantallas, DTO y data.
+Bootstrap inyecta Supabase encapsulado; router compone slots en fichas y páginas
+de historial/revisión, sin imports de presentation entre funcionalidades.
+Plan026/fuentes088–090 añade RPC de autoridad por propietario, lectura paginada,
+foto privada y decisiones append-only con actor/motivo/fecha, UUID y CAS.
+Orden observado/recepción separado; revisiones no sustituyen evidencia ni cierran
+el caso. Lectura permitida tras cierre, nueva revisión solo abierto. No cambia
+el QR público ni añade panel web/roles ficticios. [ADR-066](decisiones/066-cronologia-y-revision-privada.md),
+[ficha](funcionalidades/cronologia-y-revision.md). Activación026/Android real
+pendientes;025 confirmado por el usuario, sin inspección remota independiente.
+
+## Avistamientos Android — 18/10/2026
+
+HU-10.2/#37 incorpora `apps/mobile/lib/features/sightings` con dominio sin SDK,
+providers declarativos, ViewModel autoDispose, estado, pantalla y data con DTO.
+Bootstrap inyecta HTTP/Supabase Auth, cámara/galería y GPS; router fija caso/origen.
+La ruta autenticada Nuxt verifica la sesión con Auth y reutiliza SubmitSighting,
+parser multipart, sharp y repositorio servidor. Plan025/fuentes086–087 extrae
+persist_sighting para compartir validación, bloqueos, presupuestos y escritura
+atómica con web; wrapper web conserva vigencia/revocación QR. Evidencia privada,
+reporter_id verificado y reintento ligado a actor, sin QR obligatorio en Android.
+Sin lectura anticipada de HU-11 ni cambios en avisos públicos/custodia existentes.
+[ADR-065](decisiones/065-avistamientos-android-y-persistencia-compartida.md),
+[ficha](funcionalidades/avistamientos-android.md). Activación025/servidor y demo
+Android pendientes; no se declara cierre remoto.
+
+## Avistamientos web públicos — 18/10/2026
+
+HU-10.1/#36 en `sightings`: dominio compartido independiente con SubmitSighting/
+LocateSighting y contratos, ViewModel con generación de GPS y payload estable,
+adaptadores HTTP/navegador y servidor Supabase/sharp separados. Plugins y
+server/utils componen dependencias por petición. La página Nuxt enlaza lector
+y formulario mediante slot, sin imports de presentation entre funcionalidades.
+Plan024 permite únicamente RPC de servidor; tabla/evidencia/punto exacto privados,
+confirmación atómica e idempotente, límites persistentes y bloqueos de vigencia.
+Bytea de hasta1MiB evita cargas huérfanas en este incremento; coste/escala y
+migración futura a Storage explícitos en [ADR-064](decisiones/064-avistamientos-publicos-idempotentes.md).
+No implementa revisión HU-11 ni cambia propietario/autorización de found_cases.
+
+Referencia visual web — 18/10/2026: por aprobación explícita del usuario,
+[REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) establece la identidad de landing para
+toda apps/platform. [ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md)
+extiende el alcance visual de ADR-060. Compartir componentes al existir uso real,
+sin imports de presentation entre funcionalidades ni cambios de dominio/permisos.
+La adaptación del QR queda para incrementos de sus recorridos; móvil conserva
+su referencia. Este cambio es documental.
+
+Mapa18/10: ReadExploreCasePreview colabora mediante contratos públicos de
+lost_cases/found_cases; providers declarativos consumen repositorios ya
+inyectados. ViewModel autoDispose por caso observa identidad; widgets consumen
+su AsyncValue y no leen SDK/repositorios. Pin SVG en presentación, foto/superficie/
+toast/shimmer/fecha reutilizados de core. Sin SQL nuevo. ADR-062.
+
+Vacíos18/10: CollectionEmptyState en core contiene exclusivamente composición
+visual (icono, título, descripción, acción opcional). PetsSection y ExploreSection
+lo consumen con textos/acciones propios y sus estados confirmados; sin imports
+entre presentaciones, consultas ni reglas de producto dentro del componente.
+
+Mapa18/10: extensión42–90% y resistencia visual quedan en ExploreCaseMap;
+ExploreMapScreen observa notificaciones de extensión para pintar/ocultar el
+retorno compartido. AnimationController/ValueNotifier se liberan con su dueño;
+sin cambios de dominio, datos, consulta o permisos.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
+Identidad17/10: diez ilustraciones con estampados blancos generados dentro del
+tejido, sin overlays; marca /brand.svg oficial actualizada y fallback PNG.
+Recursos Flutter/launchers/splash regenerados desde logo/. Sin cambios de capas,
+permisos o soporte funcional de plataformas futuras. Ver ficha identidad-visual.
+
+Recursos de landing17/10: LandingArt consume siete ilustraciones independientes
+imagegen, sin atlas del mockup; LandingCharacterCard compone figura/caption/SVG,
+CSS dibuja superficies y decoración y LandingBrand usa /brand.png oficial.
+No hay cambios de dominio/datos, stack, permisos ni SSR. Se conserva la animación
+principal aprobada. Corrección documentada en ADR-060 y ficha de landing.
+
+Landing17/10/2026: / compone LandingPage Vue en apps/platform; HTML SSR sin
+consultas de producto ni estado de usuario. app/features/landing separa pantalla,
+widgets y estilos de presentación reales; no añade dominio/repositorio vacíos.
+CSS .landing-page y lector .reader-shell aíslan ambas composiciones. Raíz indexable
+y QR/API noindex; nonce CSP conservado. [ADR-060](decisiones/060-landing-integrada-en-platform-vue.md).
+
 Web17/10/2026: decisión vigente Vue3/Nuxt4/TypeScript en apps/platform,
 una sola aplicación por módulos y permisos. Este incremento migra QR a SSR+Vue;
 landing de su rama, login web y administración aún por integrar/implementar.

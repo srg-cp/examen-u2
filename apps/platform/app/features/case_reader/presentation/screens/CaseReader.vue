@@ -11,6 +11,8 @@ const title = computed(() => active.value?.name || (active.value?.kind === 'lost
 const labels = { dog: 'Perro', cat: 'Gato', other: 'Otra especie', small: 'Pequeño', medium: 'Mediano', large: 'Grande', male: 'Macho', female: 'Hembra' };
 const dateLabel = (value: string) => new Intl.DateTimeFormat('es-PE', { dateStyle: 'long', timeZone: 'America/Lima' }).format(new Date(value));
 const shareBusy = ref(false); const copyBusy = ref(false);
+const reporting = ref(false);
+function closeReport() { reporting.value = false; refresh(); }
 const refresh = () => model.load(props.slug);
 function notifyFailure() {
   if (state.value.notice) toast.value?.show(state.value.notice === 'rate_limited' ? 'Espera un momento antes de volver a consultar.' : 'No pudimos actualizar el caso.', refresh);
@@ -33,7 +35,7 @@ async function share() {
   finally { shareBusy.value = false; }
 }
 let timer: ReturnType<typeof setInterval> | undefined;
-function visibleRefresh() { if (!document.hidden) refresh(); }
+function visibleRefresh() { if (!document.hidden && !reporting.value) refresh(); }
 function restore(event: PageTransitionEvent) { if (event.persisted) refresh(); }
 onMounted(() => {
   notifyFailure(); timer = setInterval(visibleRefresh, 60000);
@@ -45,9 +47,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <WebShell>
+  <WebShell :with-back="reporting">
     <main id="view" aria-label="Ficha pública del caso" :aria-busy="state.phase === 'loading' || state.refreshing" :class="{ refreshing: state.refreshing }">
-      <ContentSkeleton v-if="state.phase === 'loading'" />
+      <slot v-if="reporting && active" name="sighting" :active-case="active" :close="closeReport" />
+      <ContentSkeleton v-else-if="state.phase === 'loading'" />
       <article v-else-if="active" class="case reveal">
         <div class="case-heading">
           <p class="eyebrow">{{ active.kind === 'lost' ? 'Ayudemos a que vuelva a casa' : 'Una mascota espera reencontrarse' }}</p>
@@ -64,6 +67,7 @@ onBeforeUnmount(() => {
             <a class="secondary area-link" :href="`https://www.google.com/maps/search/?api=1&query=${active.area.latitude},${active.area.longitude}`" target="_blank" rel="noopener noreferrer">Ver área aproximada</a>
           </section>
           <section class="collaborate"><h2>Ayuda a que alguien le reconozca</h2><p class="muted">Compartir esta ficha puede acercar el reencuentro.</p>
+            <ActionButton variant="primary" @click="reporting = true">La vi · Reportar avistamiento</ActionButton>
             <div class="actions"><ActionButton variant="primary" :working="shareBusy" @click="share">Compartir caso</ActionButton><ActionButton :working="copyBusy" @click="copy">Copiar enlace</ActionButton></div>
           </section>
           <ActionButton variant="text-button" :working="state.refreshing" @click="refresh">Actualizar estado</ActionButton>
@@ -76,6 +80,6 @@ onBeforeUnmount(() => {
         <template v-else><h1>Este enlace no está disponible</h1><p class="description">No hay información del caso para mostrar desde este enlace.</p></template>
       </section>
     </main>
-    <TopToast ref="toast" />
+    <TopToast v-if="!reporting" ref="toast" />
   </WebShell>
 </template>

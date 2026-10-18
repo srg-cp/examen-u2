@@ -1,5 +1,65 @@
 # Explorar: lista y mapa de casos
 
+Revisión18/10 durante HU-10.1:33 pruebas focalizadas mapa/preview/Explorar/
+arquitectura aprobadas. Attach+hot restart con configuración local sobre la
+instalación Android existente: consulta Photon Lima/15km, dos casos reales,
+fotos/teselas, selección de pin→foto/tamaño/fecha→ficha→retorno y arrastre del
+panel. Evidencia apps/mobile/build/hu10-map-preview.png, hu10-map-expanded.png y
+XML de navegación; revisión visual del preview confirmada. No es APK nuevo ni
+arranque frío. Continúan permisos/volumen/concurrencia hosted y Android físico;
+no cierra HU-07 ni modifica los cambios previos de su implementación.
+
+Corrección de composición18/10: foto principal arriba a ancho completo y nombre
+debajo; tamaño, raza y fecha en una fila de tres datos con iconos. La fila se
+desplaza horizontalmente cuando el texto ampliado requiere más ancho; la tarjeta
+permite scroll vertical en poco espacio. Sin cambios de consulta o permisos.
+Regresiones verifican foto por encima de los datos y alineación de sus iconos,
+además de lectura/acceso con texto2 y panel mínimo42%. ADR-062 actualizado.
+
+Pines/vista previa18/10/2026: marca original only-black.svg en cada pin y contador
+superpuesto para coincidencias. Seleccionar abre una etiqueta tocable con foto
+principal, nombre, tamaño y fecha local del suceso; sin texto visible Abrir caso.
+La fecha distingue desaparición/encuentro/avistamiento. Raza no se registra aún:
+se informa Raza no registrada, sin inferirla. Tamaño/foto se completan consultando
+la ficha pública seleccionada mediante caso de uso/ViewModel autoDispose; no
+consulta el catálogo ni la mascota privada. Fallo usa toast con Reintentar;
+cambio de cuenta oculta resultado anterior. Datos ampliados desplazables y
+controles de coincidencias fuera del scroll; cámara reserva panel mínimo42%.
+Sin SQL/permisos nuevos. [ADR-062](../decisiones/062-pines-de-marca-y-vista-previa-publica.md).
+
+Estado vacío18/10/2026: una consulta confirmada sin resultados muestra
+CollectionEmptyState de core, extraído de Mis mascotas: misma huella88,
+título20/semibold, descripción16, centrado y espaciados. Texto: No encontramos
+casos; Prueba con otra ubicación o ajusta los filtros de búsqueda. Sustituye
+la línea No hay casos con estos filtros. Se conservan controles superiores,
+sin nueva acción duplicada. Carga, fallo y falta de ubicación siguen estados
+distintos; sin cambios de consultas/permisos. Regresión y renders normal/pequeño
+con texto2 compartidos con Mascotas; revisión Android pendiente.
+
+Mapa18/10/2026: panel inicial/mínimo42%, máximo90%. Ya no baja al14% al tocar
+pines; cámara/etiqueta reservan el panel normal. Arrastrar bajo el mínimo produce
+solo resistencia visual hasta18px y vuelve al soltar. El retorno glass se
+desvanece y sube en el tramo final de expansión, recuperándose al bajar; oculto
+no recibe acciones. Movimiento reducido evita desplazamientos/rebote. Se retira
+Filtros de búsqueda, conservando campos, borrador y Aplicar filtros. Sin cambios
+de consulta, persistencia/permisos; ver ADR-061. Gesto, pines, aplicar, detalle y
+retorno probados localmente; cartografía real/fluidez Android pendientes.
+
+Corrección posterior18/10/2026: CollectionHeader comparte altura mínima56 en
+la fila del título, independientemente de que la acción mida48 (Guardados) o56
+(añadir mascota). Elimina la diferencia vertical4px con Mis mascotas sin
+compensaciones por pantalla. Regresión integrada con fuentes reales compara
+origen de ambos textos en carga/datos y durante90 fotogramas, en390×844 y
+320×350/texto2. Conserva una sola entrada y consulta inicial.
+
+Corrección18/10/2026: Explorar controla una sola entrada cover→stagger de su
+contenido, con cabecera persistente. Home desactiva su transición exterior
+cuando compone esta sección real, evitando dos efectos simultáneos sobre el
+skeleton. La carga y su resolución no cambian la etapa. Regresión de entrada
+desde Inicio confirma una consulta inicial, misma instancia de shimmer durante
+90 fotogramas y contenido visible al terminar, con/sin movimiento reducido.
+Sin cambios de consulta, dominio, permisos o SQL; revisión Android pendiente.
+
 Revisión del mapa (16 octubre): filtros combinados en el panel inferior y confirmación explícita en Aplicar filtros, con formulario compartido con la lista. GPS, ciudad/dirección, centro visual y radio son borrador hasta aplicar; sin segundo mapa en el panel. Botón fijo si cabe y dentro del scroll al reducir altura. No hay caso seleccionado al entrar: pulsar pin reduce panel y muestra nombre/Abrir caso junto al punto; coincidencias se recorren allí de una en una. Tocar fondo retira etiqueta; aplicar otra consulta la limpia y recupera el panel42%. Se abre la ficha existente, no un cartel PDF nuevo. Texto real de lugar/nombre de centro sobreviven a refresh/paginación y actualizan Ubicación al volver a la lista, separados de datos sintéticos del input. Errores/reintentos/toast, geografía pública aproximada y cuenta protegida conservados. [ADR-056](../decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye ficha inferior/selección inicial de ADR-055. Sin SQL ni nueva persistencia; revisión Android pendiente.
 
 Validación de esta revisión: análisis global limpio y353 pruebas aprobadas, incluyendo borrador/GPS sin consulta, aplicación explícita, metadatos tras refresh/paginación, descarte por cambio de cuenta, mini etiqueta y recorrido completo de ficha/retorno. Renders finales normales/pequeños con texto ampliado y movimiento reducido revisados: build/map-filters-final-renders.log y build/ui-preview/explore-map. Teselas de prueba neutras; revisión Android/servicio real pendiente, sin APK ni publicación.

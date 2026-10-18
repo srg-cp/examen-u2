@@ -37,12 +37,16 @@ class CollectionHeader extends StatelessWidget {
           ],
         );
       }
-      return Row(
-        children: [
-          Expanded(child: heading),
-          const SizedBox(width: 12),
-          action ?? const SizedBox.square(dimension: 56),
-        ],
+      // Keep titles aligned across collections with different action sizes.
+      return ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 56),
+        child: Row(
+          children: [
+            Expanded(child: heading),
+            const SizedBox(width: 12),
+            action!,
+          ],
+        ),
       );
     },
   );

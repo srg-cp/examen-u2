@@ -32,6 +32,55 @@ class HomeAccess implements AccessRepository {
 
 void main() {
   for (final reduced in [false, true]) {
+    testWidgets(
+      'Home keeps navigation animation when switching sections; reduced=$reduced',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: MediaQuery(
+                data: MediaQueryData(disableAnimations: reduced),
+                child: const HomeScreen(
+                  profileAvatar: SizedBox.square(dimension: 48),
+                  petsContent: SizedBox(height: 100),
+                  exploreContent: SizedBox(height: 100),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final indicator = find.byKey(
+          const ValueKey('navigation-active-indicator'),
+        );
+        final animation = find.descendant(
+          of: find.byType(LiquidNavigation),
+          matching: find.byType(TweenAnimationBuilder<double>),
+        );
+        final animationState = tester.state(animation);
+        final start = tester.getRect(indicator);
+        final target = tester.getCenter(find.byTooltip('Mis mascotas')).dx;
+        await tester.tap(find.byTooltip('Mis mascotas'));
+        await tester.pump();
+        expect(tester.state(animation), same(animationState));
+        if (reduced) {
+          expect(tester.getRect(indicator).center.dx, closeTo(target, 1));
+        } else {
+          expect(tester.getRect(indicator).left, closeTo(start.left, 1));
+          await tester.pump(const Duration(milliseconds: 160));
+          final midway = tester.getRect(indicator);
+          expect(midway.left, greaterThan(start.left));
+          expect(midway.center.dx, lessThan(target));
+          await tester.tap(find.byTooltip('Explorar'));
+          await tester.pump();
+          expect(tester.getRect(indicator).left, closeTo(midway.left, 1));
+        }
+        await tester.pumpAndSettle();
+        expect(tester.state(animation), same(animationState));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('Active indicator slides and retargets; reduced=$reduced', (
       tester,
     ) async {
