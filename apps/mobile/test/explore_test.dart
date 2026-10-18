@@ -1,4 +1,8 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
+import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
+import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pets_section.dart';
+import 'support/fake_pets.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
@@ -208,6 +212,85 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+  }
+  for (final small in [false, true]) {
+    testWidgets('Home section titles keep the same origin; small=$small', (
+      tester,
+    ) async {
+      tester.view.physicalSize = small
+          ? const Size(320, 350)
+          : const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.runAsync(loadFonts);
+      final pets = FakePets()..pendingList = Completer<void>();
+      final boundary = GlobalKey();
+      pets.pets['pet'] = const Pet(
+        id: 'pet',
+        ownerId: 'a',
+        version: 1,
+        fields: PetFields(name: 'Luna', species: PetSpecies.dog),
+      );
+      final repo = SearchFake()..pending = Completer<ExplorePage>();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            petRepositoryProvider.overrideWithValue(pets),
+            petSessionProvider.overrideWith(
+              (_) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+            exploreRepositoryProvider.overrideWithValue(repo),
+            currentLocationRepositoryProvider.overrideWithValue(
+              const FakeCurrentLocation(),
+            ),
+            exploreSessionProvider.overrideWith(
+              (_) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: MediaQuery(
+              data: MediaQueryData(
+                textScaler: TextScaler.linear(small ? 2 : 1),
+                disableAnimations: small,
+              ),
+              child: RepaintBoundary(
+                key: boundary,
+                child: const HomeScreen(
+                  profileAvatar: SizedBox.square(dimension: 48),
+                  exploreContent: ExploreSection(),
+                  petsContent: PetsSection(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Mis mascotas'));
+      await tester.pump();
+      await tester.pump();
+      final origin = tester.getTopLeft(find.text('Mis mascotas'));
+      pets.pendingList!.complete();
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('Mis mascotas')), origin);
+      await capture(tester, boundary, small, 'header-pets');
+      await tester.tap(find.byTooltip('Explorar'));
+      await tester.pump();
+      await tester.pump();
+      expect(tester.getTopLeft(find.text('Explorar')), origin);
+      for (var frame = 0; frame < 90; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        expect(tester.getTopLeft(find.text('Explorar')), origin);
+      }
+      repo.pending!.complete(ExplorePage(items: []));
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('Explorar')), origin);
+      await capture(tester, boundary, small, 'header-explore');
+      expect(repo.calls, hasLength(1));
+      expect(tester.takeException(), isNull);
+    });
   }
   test(
     'Search rejects partial/manual coordinates and malformed ranges before reaching data',

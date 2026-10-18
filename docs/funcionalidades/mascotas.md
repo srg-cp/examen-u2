@@ -1,5 +1,11 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Consistencia de cabeceras18/10/2026: CollectionHeader fija altura mínima56
+para sus filas, alineando el origen de Mis mascotas y Explorar aunque sus
+acciones tengan distinto tamaño. Mantiene la reserva del+ durante carga/vacío
+y la adaptación de texto ampliado. Regresión integrada comprueba ambas
+secciones con fuentes reales; sin cambios de persistencia o permisos.
+
 Corrección18/10/2026: la cabecera reserva desde la carga el espacio del botón+
 compacto, también cuando la lista queda vacía. Así el título y los filtros
 conservan posición/ancho al recibir mascotas o desaparecer la última; se

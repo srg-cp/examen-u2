@@ -1,5 +1,19 @@
 # Estado del proyecto
 
+## Títulos de Explorar y Mis mascotas alineados —18/10/2026
+
+Por corrección del usuario, se reproduce diferencia vertical4px con fuentes
+reales: CollectionHeader centraba cada texto según su acción48/56. La fila
+compartida tiene ahora altura mínima56; no añade offsets por funcionalidad ni
+duplica transiciones. Conserva cabeceras fuera del efecto, reserva del+ y una
+sola consulta/entrada de Explorar. Regresión integrada compara coordenadas
+de ambos títulos desde Inicio, durante carga/datos y90 fotogramas, en390×844
+y320×350/texto2.35 pruebas de Explorar, mascotas, Home, colecciones gestionadas
+y arquitectura aprobadas; análisis limpio. Dos regresiones repetidas para
+generar capturas normales/pequeñas, revisadas en build/ui-preview/explore/
+*-header-*.png; log apps/mobile/build/home-header-origin-renders.log;
+sin build Android ni cambios de datos/SQL. Siguiente paso: revisión en Android.
+
 ## Una sola transición inicial en Explorar —18/10/2026
 
 Reproducidas dos secuencias cover/stagger anidadas: Home y ExploreSection.

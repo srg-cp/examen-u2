@@ -1,5 +1,12 @@
 # Explorar: lista y mapa de casos
 
+Corrección posterior18/10/2026: CollectionHeader comparte altura mínima56 en
+la fila del título, independientemente de que la acción mida48 (Guardados) o56
+(añadir mascota). Elimina la diferencia vertical4px con Mis mascotas sin
+compensaciones por pantalla. Regresión integrada con fuentes reales compara
+origen de ambos textos en carga/datos y durante90 fotogramas, en390×844 y
+320×350/texto2. Conserva una sola entrada y consulta inicial.
+
 Corrección18/10/2026: Explorar controla una sola entrada cover→stagger de su
 contenido, con cabecera persistente. Home desactiva su transición exterior
 cuando compone esta sección real, evitando dos efectos simultáneos sobre el
