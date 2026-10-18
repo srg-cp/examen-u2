@@ -12,11 +12,83 @@ import 'package:flutter_application_entrehuellas/features/pets/domain/entities/p
 import 'package:flutter_application_entrehuellas/features/pets/presentation/view_models/pet_list_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pets_section.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_skeleton.dart';
+import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pet_list_filter.dart';
 import 'app_test.dart' show FakeAuthRepository;
 import 'support/fake_pets.dart';
 
 void main() {
   for (final small in [false, true]) {
+    testWidgets(
+      'Pet header stays fixed when add button appears; small=$small',
+      (tester) async {
+        tester.view.physicalSize = small
+            ? const Size(320, 350)
+            : const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final auth = FakeAuthRepository()
+          ..current = const AuthSession(userId: 'one');
+        final pets = FakePets()..pendingList = Completer<void>();
+        pets.pets['pet'] = const Pet(
+          id: 'pet',
+          ownerId: 'one',
+          fields: PetFields(name: 'Luna', species: PetSpecies.dog),
+          version: 1,
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(auth),
+            petRepositoryProvider.overrideWithValue(pets),
+          ],
+        );
+        addTearDown(() async {
+          container.dispose();
+          await auth.controller.close();
+        });
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.light,
+              home: MediaQuery(
+                data: MediaQueryData(
+                  textScaler: TextScaler.linear(small ? 2 : 1),
+                  disableAnimations: small,
+                ),
+                child: const Scaffold(
+                  body: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: StaggerReveal(enabled: false, child: PetsSection()),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(find.byType(PetSkeleton), findsOneWidget);
+        final addButton = find.byKey(const ValueKey('pet-add-compact'));
+        expect(addButton, findsNothing);
+        final titleRect = tester.getRect(find.text('Mis mascotas'));
+        final filterRect = tester.getRect(find.byType(PetListFilter));
+        pets.pendingList!.complete();
+        pets.pendingList = null;
+        await tester.pumpAndSettle();
+        expect(addButton, findsOneWidget);
+        expect(tester.getRect(find.text('Mis mascotas')), titleRect);
+        expect(tester.getRect(find.byType(PetListFilter)), filterRect);
+        pets.pets.clear();
+        container.read(petListViewModelProvider.notifier).reload();
+        await tester.pumpAndSettle();
+        expect(addButton, findsNothing);
+        expect(find.text('Aún no tienes mascotas'), findsOneWidget);
+        expect(tester.getRect(find.text('Mis mascotas')), titleRect);
+        expect(tester.getRect(find.byType(PetListFilter)), filterRect);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets(
       'Initial skeleton becomes error then confirmed empty, without visible loading text; small=$small',
       (tester) async {

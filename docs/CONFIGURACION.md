@@ -43,6 +43,38 @@ Base del chat 00, 6 de octubre de 2026. Flutter 3.35.3 / Dart 3.9.2. Ejecutar lo
 
 ## Arranque
 
+### Android y VS Code después del traslado a apps/mobile
+
+Abrir la raíz actual del repositorio o directamente `apps/mobile`. Si VS Code
+estaba abierto durante el movimiento, ejecutar **Developer: Reload Window**,
+abrir `apps/mobile/lib/main.dart` y seleccionar **Entre Huellas - desarrollo local**
+en Ejecutar y depurar. Los perfiles de ambas carpetas conservan su `cwd` correcto.
+No usar **Enable android for this project**: `apps/mobile/android` ya existe.
+
+El error `No supported devices found ... emulator-5554` indica que ese dispositivo
+no está conectado en ese momento. Comprobar y arrancar el AVD existente desde
+`apps/mobile`:
+
+```powershell
+flutter emulators
+flutter emulators --launch Pixel_9a
+flutter devices
+```
+
+Esperar hasta que aparezca como Android conectado (no `offline`), seleccionarlo
+con **Flutter: Select Device** y pulsar F5. El ID del AVD (`Pixel_9a`) y el del
+dispositivo encendido (`emulator-5554` en esta comprobación) son distintos;
+usar el ID que muestre `flutter devices` para ejecutar por terminal:
+
+```powershell
+flutter run -d emulator-5554 --dart-define-from-file=config/supabase.local.json
+```
+
+Esto no exige cambiar `main.dart`, el nombre del paquete ni regenerar Android.
+Referencia: [configuración Android de Flutter](https://docs.flutter.dev/platform-integration/android/setup).
+
+### Arranque por terminal
+
 ```powershell
 Set-Location apps/mobile
 flutter pub get --enforce-lockfile

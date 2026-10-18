@@ -67,6 +67,7 @@ class ExploreSection extends ConsumerWidget {
       const SizedBox(height: 12),
       AuthStageTransition(
         stage: 'content',
+        startCovered: true,
         builder: (play) => StaggerReveal(
           count: 1,
           play: play,

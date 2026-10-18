@@ -1,5 +1,13 @@
 # Explorar: lista y mapa de casos
 
+Corrección18/10/2026: Explorar controla una sola entrada cover→stagger de su
+contenido, con cabecera persistente. Home desactiva su transición exterior
+cuando compone esta sección real, evitando dos efectos simultáneos sobre el
+skeleton. La carga y su resolución no cambian la etapa. Regresión de entrada
+desde Inicio confirma una consulta inicial, misma instancia de shimmer durante
+90 fotogramas y contenido visible al terminar, con/sin movimiento reducido.
+Sin cambios de consulta, dominio, permisos o SQL; revisión Android pendiente.
+
 Revisión del mapa (16 octubre): filtros combinados en el panel inferior y confirmación explícita en Aplicar filtros, con formulario compartido con la lista. GPS, ciudad/dirección, centro visual y radio son borrador hasta aplicar; sin segundo mapa en el panel. Botón fijo si cabe y dentro del scroll al reducir altura. No hay caso seleccionado al entrar: pulsar pin reduce panel y muestra nombre/Abrir caso junto al punto; coincidencias se recorren allí de una en una. Tocar fondo retira etiqueta; aplicar otra consulta la limpia y recupera el panel42%. Se abre la ficha existente, no un cartel PDF nuevo. Texto real de lugar/nombre de centro sobreviven a refresh/paginación y actualizan Ubicación al volver a la lista, separados de datos sintéticos del input. Errores/reintentos/toast, geografía pública aproximada y cuenta protegida conservados. [ADR-056](../decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye ficha inferior/selección inicial de ADR-055. Sin SQL ni nueva persistencia; revisión Android pendiente.
 
 Validación de esta revisión: análisis global limpio y353 pruebas aprobadas, incluyendo borrador/GPS sin consulta, aplicación explícita, metadatos tras refresh/paginación, descarte por cambio de cuenta, mini etiqueta y recorrido completo de ficha/retorno. Renders finales normales/pequeños con texto ampliado y movimiento reducido revisados: build/map-filters-final-renders.log y build/ui-preview/explore-map. Teselas de prueba neutras; revisión Android/servicio real pendiente, sin APK ni publicación.

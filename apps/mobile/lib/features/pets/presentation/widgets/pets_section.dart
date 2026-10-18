@@ -177,7 +177,10 @@ class _PetsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => CollectionHeader(
     title: 'Mis mascotas',
-    action: hasPets ? const PetRegistrationButton(compact: true) : null,
+    // Keep the header geometry while loading or showing the empty state.
+    action: hasPets
+        ? const PetRegistrationButton(compact: true)
+        : const SizedBox.square(dimension: 56),
   );
 }
 

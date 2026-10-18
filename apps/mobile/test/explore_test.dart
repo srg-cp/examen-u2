@@ -1,4 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'support/fake_place_search.dart';
 import 'package:flutter_application_entrehuellas/features/places/providers/places_providers.dart';
 import 'package:flutter_application_entrehuellas/features/places/presentation/widgets/place_search_fields.dart';
@@ -133,6 +136,79 @@ void main() {
           null,
         );
   });
+  for (final reduced in [false, true]) {
+    testWidgets(
+      'Explore has one entrance and one initial query; reduced=$reduced',
+      (tester) async {
+        final repo = SearchFake()..pending = Completer<ExplorePage>();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              exploreRepositoryProvider.overrideWithValue(repo),
+              currentLocationRepositoryProvider.overrideWithValue(
+                const FakeCurrentLocation(),
+              ),
+              exploreSessionProvider.overrideWith(
+                (_) => Stream.value(const AuthSession(userId: 'a')),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.light,
+              home: MediaQuery(
+                data: MediaQueryData(disableAnimations: reduced),
+                child: const HomeScreen(
+                  profileAvatar: SizedBox(width: 48, height: 48),
+                  exploreContent: ExploreSection(),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Explorar'));
+        await tester.pump();
+        await tester.pump();
+        final skeleton = find.byWidgetPredicate(
+          (widget) =>
+              widget is LoadingShimmer &&
+              widget.loadingLabel == 'Consultando casos',
+        );
+        final shimmerState = tester.state(skeleton);
+        final entrances = find.ancestor(
+          of: skeleton,
+          matching: find.byWidgetPredicate(
+            (widget) => widget is AuthStageTransition && widget.enabled,
+          ),
+        );
+        expect(entrances, findsOneWidget);
+        expect(
+          find.ancestor(
+            of: skeleton,
+            matching: find.byWidgetPredicate(
+              (widget) => widget is StaggerReveal && widget.enabled,
+            ),
+          ),
+          findsOneWidget,
+        );
+        for (var frame = 0; frame < 90; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+          expect(tester.state(skeleton), same(shimmerState));
+          expect(repo.calls, hasLength(1));
+        }
+        for (final opacity in tester.widgetList<Opacity>(
+          find.ancestor(of: skeleton, matching: find.byType(Opacity)),
+        )) {
+          expect(opacity.opacity, 1);
+        }
+        repo.pending!.complete(ExplorePage(items: []));
+        await tester.pumpAndSettle();
+        expect(skeleton, findsNothing);
+        expect(find.text('No hay casos con estos filtros.'), findsOneWidget);
+        expect(repo.calls, hasLength(1));
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   test(
     'Search rejects partial/manual coordinates and malformed ranges before reaching data',
     () async {
@@ -516,7 +592,9 @@ void main() {
           ),
         );
         await tester.pump();
-        await tester.pump(const Duration(seconds: 2));
+        for (var frame = 0; frame < 120; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+        }
         await capture(tester, key, small, 'skeleton');
         initial.completeError(
           const ExploreFailure(ExploreFailureKind.unavailable),

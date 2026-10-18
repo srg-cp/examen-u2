@@ -1,5 +1,58 @@
 # Estado del proyecto
 
+## Una sola transición inicial en Explorar —18/10/2026
+
+Reproducidas dos secuencias cover/stagger anidadas: Home y ExploreSection.
+Home omite la exterior al componer Explorar real; la sección inicia su propio
+cover seguido de stagger, con cabecera fuera. No cambia etapa al resolver la
+carga. Nuevas regresiones desde Inicio verifican una sola entrada/consulta,
+identidad de shimmer estable durante90 fotogramas y movimiento reducido.
+La prueba de renders avanza fotogramas reales para completar cover y stagger,
+en lugar de saltar tiempo y capturar el segundo efecto aún en opacidad cero.
+
+36 pruebas de Explorar/Home/transiciones/arquitectura aprobadas y análisis sin
+incidencias;12 pruebas de Explorar repetidas tras reforzar la visibilidad final.
+Renders normal/pequeño con texto2 regenerados y revisados.
+Evidencia apps/mobile/build/explore-single-entrance-qa.log y
+explore-single-entrance-renders.log; sin build Android, SQL ni despliegue.
+Siguiente paso: revisión de fluidez en Android; ficha Explorar actualizada.
+
+## Cabecera estable al aparecer el+ de Mis mascotas —18/10/2026
+
+Causa: con action=null CollectionHeader devolvía solo el texto; al resolver la
+lista añadía una fila centrada con botón56 y cambiaba altura/ancho del título.
+PetsSection reserva ahora el mismo espacio sin acción durante carga/vacío,
+conservando el componente compartido y su adaptación en pantallas pequeñas.
+Pruebas nuevas reproducen el cambio de geometría previo y verifican título y
+filtros idénticos durante carga→lista→vacío en390×844 y320×350 con texto2.
+Formato, análisis sin incidencias y16 pruebas de carga/arquitectura/navegación
+aprobadas. Renders regenerados con fuentes reales y revisados en tamaño normal
+y pequeño/texto2; evidencia apps/mobile/build/pets-header-layout-qa.log y
+build/ui-preview/pets_*.png. Revisión Android pendiente. Sin cambios
+de dominio, persistencia, permisos ni alcance HU-03/RF-03; ficha actualizada.
+
+## Diagnóstico de Android tras mover Flutter a apps/mobile —18/10/2026
+
+El error de dispositivo ausente se reproduce: no había emulador ejecutándose.
+Se inicia el AVD existente Pixel_9a; ADB y flutter devices reconocen
+emulator-5554 como Android16/API36 conectado, con arranque completado.
+daemon.getSupportedPlatforms confirma Android en apps/mobile. Validados los
+cuatro perfiles F5 (raíz y carpeta móvil): cwd, main.dart y archivo local
+existentes. No se modifica main.dart ni se regenera el proyecto; se conserva
+el cambio previo del usuario en .metadata. CONFIGURACION documenta recarga de
+VS Code, selección del dispositivo y diferencia entre ID de AVD y dispositivo.
+
+La prueba de flutter run alcanza Gradle, pero el primer intento falla en la
+conexión loopback de Java. Un directorio temporal corto, limitado al proceso
+de prueba, permite avanzar; después Java se interrumpe por falta de memoria.
+El reintento con heap2GiB y dos workers solo mediante variables del proceso
+también falla: desaparece el daemon y se genera hs_err_pid29020.log; el entorno
+llega a impedir iniciar PowerShell por OutOfMemoryException. No se acredita
+compilación/instalación. Siguiente paso: liberar memoria comprometida del equipo
+y repetir F5 tras recargar la ventana del editor. flutter doctor también
+detecta Command-line Tools ausentes y estado de licencias desconocido.
+Sin cambios de producto, SQL, identificadores ni configuración global Java.
+
 ## Radio de cápsula uniforme en botones de landing —17/10/2026
 
 Por instrucción del usuario, todos los botones comparten border-radius999px.
