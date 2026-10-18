@@ -36,11 +36,11 @@ class HomeScreen extends ConsumerWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: PullToRefresh(
-              key: ValueKey(state.section),
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: SingleChildScrollView(
+                      key: ValueKey(state.section),
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [

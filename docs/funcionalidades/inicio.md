@@ -1,8 +1,17 @@
 # Inicio y navegación
 
+Corrección18/10/2026: la clave de sección pertenece al scroll del contenido,
+no al contenedor de toda la pantalla. LiquidNavigation y su Tween conservan
+la instancia al alternar Inicio/Explorar/Mis mascotas, restaurando el
+desplazamiento320ms y el cambio de destino durante el movimiento. Movimiento
+reducido mantiene selección inmediata. Regresión integrada en Home comprueba
+identidad, posición inicial/intermedia y cambios rápidos; análisis limpio y
+31 pruebas de Home/Explorar/recarga de mascotas/arquitectura aprobadas.
+Revisión de fluidez Android pendiente; sin cambios de dominio o permisos.
+
 Refinamiento del gesto compartido: icono de recarga acompaña el descenso, gira durante refresh y retorna al finalizar/cancelar. Se mantiene inscripción por sección y navegación flotante. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.
 
-Actualización del15 de octubre: el scroll principal integra PullToRefresh con destino registrado por la sección visible, Explorar o Mis mascotas. Cada sección controla su ViewModel, sin colaboración entre presentaciones de funcionalidades. Vacío/lista corta permite jalar; estado del gesto se descarta al cambiar sección y la navegación flotante se conserva. Inicio sin consulta remota no tiene refresco ficticio. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Análisis sin incidencias, sin pruebas ejecutadas por instrucción del usuario; revisión Android pendiente.
+Actualización del15 de octubre: el scroll principal integra PullToRefresh con destino registrado por la sección visible, Explorar o Mis mascotas. Cada sección controla su ViewModel, sin colaboración entre presentaciones de funcionalidades. Vacío/lista corta permite jalar; el scroll se reinicia al cambiar sección y la navegación flotante conserva su instancia. Inicio sin consulta remota no tiene refresco ficticio. [ADR-048](../decisiones/048-actualizar-listas-al-jalar.md). Análisis sin incidencias, sin pruebas ejecutadas por instrucción del usuario; revisión Android pendiente.
 
 Ajuste del15 de octubre: texto Zona/Zonas sustituido por Ubicación/Ubicaciones y descripción de Explorar actualizada al inicio por ubicación actual/radio15km con alternativa manual. Sin cambios de rutas. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
 

@@ -1,5 +1,21 @@
 # Estado del proyecto
 
+## Desplazamiento de la barra de navegación restaurado —18/10/2026
+
+Causa reproducida en Home: ValueKey(section) en PullToRefresh desmontaba
+también LiquidNavigation y su TweenAnimationBuilder en cada selección. La
+animación existía y pasaba pruebas aisladas, pero saltaba al destino en la
+composición real. Se traslada la clave al SingleChildScrollView: el contenido
+se reinicia por sección y la barra conserva su estado y desplazamiento320ms.
+Regresiones integradas verifican misma instancia, posición inicial/intermedia,
+cambio de destino antes de terminar y movimiento reducido inmediato.
+
+Formato y análisis sin incidencias;31 pruebas de Home/Explorar/recarga de
+mascotas/arquitectura aprobadas. Evidencia local:
+apps/mobile/build/home-navigation-animation-qa.log. Sin build Android ni
+despliegue; siguiente paso: comprobar fluidez en el emulador con hot restart.
+Ficha Inicio actualizada; títulos alineados y entrada única conservados.
+
 ## Títulos de Explorar y Mis mascotas alineados —18/10/2026
 
 Por corrección del usuario, se reproduce diferencia vertical4px con fuentes
