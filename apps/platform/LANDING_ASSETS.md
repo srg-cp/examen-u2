@@ -250,3 +250,9 @@ acabado del borde: negro hasta la última hebra negra, blanco neutro hasta la
 Sin filtros posteriores. Comparado al 100 % en Chrome sobre gris. Esta
 integración no equivale a aprobación artística del conjunto.
 
+# Colección vigente: estilo del dálmata aprobado
+
+La pasada [Colección desde el dálmata aprobado](LANDING_APPROVED_STYLE.md)
+sustituye los recursos y estados de rechazo anteriores para las ocho variantes.
+El dálmata fue aprobado explícitamente por el usuario antes de esta pasada.
+

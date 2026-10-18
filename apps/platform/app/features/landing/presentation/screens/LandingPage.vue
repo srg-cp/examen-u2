@@ -5,11 +5,14 @@ import LandingIcon from '../widgets/LandingIcon.vue';
 import LandingBrand from '../widgets/LandingBrand.vue';
 import LandingActions from '../widgets/LandingActions.vue';
 import '../styles/landing.css';
+const horizontalPaused = ref(false);
 const characters = [
   { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search-corgi' },
   { title: 'Encontré', art: 'found-tabby' }, { title: 'Ayudo', art: 'help-dalmatian' },
   { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search' },
 ] as const;
+// A full wave spans twelve cards so neighboring portraits follow a broad curve.
+const waveCharacters = [...characters, ...characters];
 const benefits = [
   { icon: 'report', title: 'Información útil', text: 'Avisos claros y organizados para una búsqueda más efectiva.' },
   { icon: 'people', title: 'Comunidad cercana', text: 'Personas de tu zona unidas por la misma causa.' },
@@ -38,8 +41,14 @@ const questions = [
         <LandingActions />
         <ul class="hero-values"><li><LandingIcon name="report" />Reporta</li><li><LandingIcon name="share" />Comparte</li><li><LandingIcon name="heart" />Colabora</li></ul>
       </section>
-      <section class="character-strip" aria-label="Busco, encontré, ayudo y volvemos"><div class="character-track">
-        <LandingCharacterCard v-for="(card, index) in characters" :key="`${card.art}-${index}`" :title="card.title" :art="card.art" :decorative="index === 0 || index === 5" />
+      <section :class="['character-strip', { 'horizontal-paused': horizontalPaused }]" aria-label="Busco, encontré, ayudo y volvemos">
+        <button class="character-horizontal-toggle" type="button" :aria-pressed="horizontalPaused" :aria-label="horizontalPaused ? 'Reanudar desplazamiento horizontal' : 'Pausar desplazamiento horizontal'" :title="horizontalPaused ? 'Reanudar desplazamiento horizontal' : 'Pausar desplazamiento horizontal'" @click="horizontalPaused = !horizontalPaused">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path v-if="horizontalPaused" d="m9 6 9 6-9 6Z" fill="currentColor" /><path v-else d="M9 6v12M15 6v12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
+        </button>
+        <div class="character-track">
+          <div v-for="copy in 2" :key="copy" class="character-group" :aria-hidden="copy === 2 ? true : undefined">
+            <LandingCharacterCard v-for="(card, index) in waveCharacters" :key="`${card.art}-${index}`" :title="card.title" :art="card.art" :decorative="copy === 2 || index >= characters.length || index === 0 || index === 5" />
+          </div>
       </div></section>
       <section id="proyecto" class="purpose panel wrap" aria-labelledby="purpose-title">
         <div class="purpose-heading"><h2 id="purpose-title">Una comunidad<br>con un propósito.</h2><p>Entre Huellas es un proyecto colaborativo para conectar a personas que han perdido una mascota, a quienes la han encontrado y a quienes quieren ayudar.</p></div>

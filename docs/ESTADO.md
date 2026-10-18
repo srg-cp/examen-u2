@@ -1,5 +1,251 @@
 # Estado del proyecto
 
+## Landing: onda viajera amplia según referencias —17/10/2026
+
+El usuario precisa una curva que avance de tarjeta en tarjeta. La onda6s
+abarca ahora12 tarjetas con desfase progresivo0.5s hacia la derecha, amplitud
+adaptable24–56px. Cada grupo contiene dos series visuales de las seis tarjetas;
+las repeticiones son decorativas. Dos grupos iguales mantienen continuidad
+espacial y temporal al cerrar el loop. Recorrido horizontal duplicado y duración
+120s para conservar la velocidad previa en píxeles; botón pausa solo ese avance.
+Marcos, PNG, hero, márgenes y movimiento reducido conservados.
+Build SSR aislado y QA responsive/200%/FAQ/teclado/anclas/no-JS/CSP/hidratación/QR
+pasados. Muestreo en0/1.5/3s confirma cresta progresiva, fases iguales entre
+copias y continuidad entre tarjetas, incluida unión de grupos; velocidad
+horizontal previa comprobada. Capturas de onda revisadas. Servidor5173
+reutilizado; logs landing-traveling-wave-*.log en apps/mobile/build.
+Sin commit/publicación; siguiente paso: valoración visual del usuario.
+
+## Landing: separación entre secciones y onda más ágil —17/10/2026
+
+Por petición del usuario, separación uniforme tras propósito y entre las
+secciones restantes/pie mediante --section-gap: clamp(40px, 6vw, 88px).
+Se conserva el espacio existente entre tarjetas y tercera sección.
+Onda vertical de tarjetas acelerada de12s a6s, fases cada1s y curva suave
+cubic-bezier(0.37, 0, 0.63, 1); amplitud, dimensiones y avance horizontal60s
+conservados. Pausa solo horizontal y movimiento reducido siguen vigentes.
+Build SSR aislado y QA responsive/200%/FAQ/anclas/no-JS/CSP/hidratación/QR
+pasados. Separaciones medidas en1920/1440/731/390/320px, sin overflow;
+muestreo de onda verifica continuidad del ciclo y desplazamiento suave.
+Capturas escritorio/móvil revisadas; servidor5173 existente reutilizado.
+Logs landing-spacing-wave-build.log y landing-spacing-wave-browser.log
+en apps/mobile/build. Sin commit/publicación. Pendiente valoración visual del
+usuario; siguiente paso: continuar los ajustes que indique.
+
+## Landing: ancho unificado en todas las secciones —17/10/2026
+
+Tras aprobar la tercera sección, el usuario extiende su alineación al resto.
+El contenedor compartido `.wrap` usa ahora el ancho del hero, sin máximo1280px;
+se elimina la regla duplicada de hero/propósito. Cabecera, secciones y pie
+comparten márgenes; móvil conserva14px. Imágenes, tarjetas, altura de ventanas
+de propósito y animaciones aprobadas conservadas. Servidor5173 reutilizado.
+Build SSR aislado y QA responsive/200%/no-JS/CSP/hidratación/FAQ/anclas/QR
+pasados; diez contenedores con ancho y posición iguales en1920/1440/731/390/320px,
+sin overflow. Capturas escritorio/móvil revisadas. Evidencia local:
+apps/mobile/build/landing-sections-width-build.log y
+landing-sections-width-browser.log. Sin commit/publicación; siguiente paso:
+revisión visual del usuario y ajustes que indique, sin ampliar funcionalidades.
+
+## Landing: ancho y altura de la tercera sección —17/10/2026
+
+«Una comunidad con un propósito» comparte ahora ancho y márgenes del hero,
+sin el límite anterior de1280px. Las cuatro ventanas de ilustración pasan de
+proporción3.6:1 a3:1, un20% más altas a igual ancho. Recursos, hero, tarjetas
+y movimientos aprobados conservados; servidor5173 existente reutilizado.
+Build SSR aislado y QA de landing pasados (1440/731/390/320px, texto200%,
+FAQ/teclado/anclas, no-JS, CSP/hidratación y aislamiento QR). Además se comprobó
+igualdad de ancho/márgenes y ausencia de overflow en1440/1920/731/390/320px;
+capturas de la sección revisadas en escritorio/móvil. Evidencia local:
+apps/mobile/build/landing-purpose-build.log y landing-purpose-browser.log.
+Sin publicación ni commit. Siguiente paso: revisión del usuario y continuar
+con los ajustes que indique; no se cierran historias ni se amplía el alcance.
+
+## Relevo al siguiente chat —17/10/2026
+
+El usuario aprobó el diseño actual («ok esta perfecto») y continuará en otro
+chat. Estado vigente, decisiones visuales, límites, archivos y validación en
+[RELEVO_LANDING.md](RELEVO_LANDING.md). Leerlo antes de seguir: las notas
+cronológicas inferiores incluyen enfoques ya sustituidos. Trabajo local sin
+commit/push/despliegue; conservar cambios existentes. Siguiente paso: continuar
+con las secciones que indique el usuario, sin rehacer hero, arte ni tarjetas.
+
+## Aumento leve solo del marco —17/10/2026
+
+Petición del usuario: un poco más alto/ancho, sin cambiar mascotas. Ajustadas
+únicamente las dos dimensiones del marco: en1440px pasa de310 a325px de ancho
+y aumenta24px de alto; en móvil aumenta8px de ancho/12px de alto. Ventana,
+escala, imagen, botón y movimiento conservados. Build SSR y QA responsive/
+200 %/SSR/no-JS/QR pasados, tamaño de arte previo verificado y captura revisada.
+Registros apps/mobile/build/landing-card-small-increase-build.log y
+landing-card-small-increase-browser.log. Sin publicación ni commit.
+
+## Ancho aprobado restaurado; sin recorte interior —17/10/2026
+
+Corrección del usuario: las tarjetas tenían el ancho correcto, solo fallaba
+la ventana interior. Se restaura ancho base +12–24px, sin multiplicarlo por
+la escala del arte. La ventana mantiene el tamaño de imagen y overflow visible:
+ya no introduce un corte recto dentro de la tarjeta. Solo el marco exterior
+redondeado delimita la ilustración. Botón60/icono28, espacio y onda conservados.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, ancho310px comprobado en
+1440px, ventana interior sin clipping, pausa horizontal/onda activa y separación
+del botón. Captura revisada. Registros apps/mobile/build/landing-inner-window-
+build.log y landing-inner-window-browser.log. Sin publicación ni commit.
+
+## Ventanas ampliadas sin recortar mascotas —17/10/2026
+
+El usuario identifica el recorte en art-help-dalmatian y pide conservar las
+mascotas grandes. Se amplían ventana y marco al ancho de la imagen renderizada:
+factor1.45 para individuales y1.85 para pareja; se conserva la altura visual
+anterior. Imagen contain a tamaño de ventana, sin zoom/margen negativo interno.
+Esto sustituye la ventana estrecha anterior: las tarjetas también quedan más
+anchas para alojar completos los cuerpos/colas sin reducirlos. PNG intactos.
+
+Botón circular60px con icono28px, arriba a la derecha. Mayor separación externa
+40–72px y padding superior128–168px para bajar la fila y dejar espacio incluso
+en la cresta de la onda. Pausa horizontal/onda vertical conservadas.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados; verificados alto de arte
+conservado, ventana dentro del marco, imagen sin zoom recortado y separación
+botón/tarjetas >=16px. Captura revisada. Registros apps/mobile/build/
+landing-unclipped-frames-build.log y landing-unclipped-frames-browser.log.
+Sin publicación ni commit.
+
+## Restaurar escala de mascotas y control mayor —17/10/2026
+
+Por corrección explícita del usuario se restaura el tamaño visual previo de las
+mascotas: cover general, pareja185 % y dálmata145 %, manteniendo los marcos
+mayores. Sustituye el contain general de la pasada anterior. Control circular
+superior derecho ampliado76×76 (recupera el ancho de la cápsula original), con
+pausa solo horizontal y onda continua. PNG y animaciones conservados.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, incluido control circular
+76px y pausa horizontal con onda activa. Captura revisada. Registros
+apps/mobile/build/landing-restored-card-scale-build.log y
+landing-restored-card-scale-browser.log. Sin publicación ni commit.
+
+## Control circular arriba y mascotas sin recorte —17/10/2026
+
+Petición posterior: botón superior derecho, circular44×44, conservando pausa
+solo horizontal y onda activa. Se cambia cover por contain para todas las
+imágenes de tarjetas y se retiran los zooms185 %/145 % de pareja/dálmata que
+recortaban sus extremos. Ventanas y marcos conservados: las ilustraciones se
+ajustan completas con su proporción nativa, por lo que ocupan menos altura.
+No se alteran PNG, hero ni animaciones.
+Build SSR y QA responsive/200 %/SSR/no-JS/QR pasados, incluidos encuadre contain
+sin márgenes de zoom, control circular superior, pausa horizontal/onda activa.
+Captura revisada. Registros apps/mobile/build/landing-card-fit-build.log y
+landing-card-fit-browser.log. Sin despliegue ni commit.
+
+## Marcos mayores y pausa horizontal independiente —17/10/2026
+
+Por petición explícita se amplían solo las tarjetas: ancho adicional12–24px
+y alto adicional48–72px respecto al marco anterior. La ventana de arte conserva
+el ancho previo145–288px (155px móvil), altura proporcional anterior y escalas
+de cada mascota; centrada abajo. No se regeneran ni amplían las ilustraciones.
+Control cápsula inferior derecha76×44 con pausa/play y nombre accesible alterno;
+pausa/reanuda exclusivamente character-track. Character-wave sigue activa al
+pausar el avance lateral. Sin pausa automática hover/foco; movimiento reducido
+del sistema se conserva y oculta el control sin función en ese modo.
+
+Build SSR y QA Chrome responsive/200 %/SSR/no-JS/FAQ/teclado/anclas/CSP/QR pasados.
+Verificado tamaño de ventana anterior, marco mayor, transform horizontal estable
+al pausar mientras cambia el vertical y reanudación horizontal. Captura revisada.
+Registros apps/mobile/build/landing-card-frame-build.log y
+landing-card-frame-browser.log. Sin despliegue ni commit.
+
+## Onda continua en las tarjetas —17/10/2026
+
+El usuario sustituye la alternancia fija por efecto de ola/gusanito suave:
+cada tarjeta oscila verticalmente en12s con seis fases desfasadas2s, mientras
+la fila avanza en horizontal con su ciclo60s. Grupos duplicados conservan fases
+y anchura para continuidad. Se retiran botón/estado de pausa y pausas hover/foco
+por petición explícita; se conserva la preferencia del sistema de movimiento
+reducido. Más separación: margen32–64px y padding72–104px por lado vertical.
+Etiquetas centradas con flex/text-align y peso400. Recursos y tamaños conservados.
+
+Build SSR y QA Chrome responsive/200 %/no-JS/FAQ/teclado/anclas/CSP/QR pasados.
+Verificados cambios reales de transform horizontal y vertical entre frames,
+seis fases distintas, continuidad de grupos y movimiento activo durante hover.
+Captura characters revisada. Registros apps/mobile/build/landing-character-wave-
+build.log y landing-character-wave-browser.log. Sin publicación.
+
+## Tarjetas escalonadas con desplazamiento horizontal —17/10/2026
+
+Por petición del usuario: mayor espacio vertical alrededor de la fila, tarjetas
+alternadas arriba/abajo y movimiento horizontal suave continuo. Se reutilizan
+dos grupos de seis tarjetas con el segundo oculto para lectores de pantalla;
+desplazamiento lineal de60s por ciclo, mismo ancho para cierre sin salto.
+Pausa/reanudar real, pausa al hover/foco y sin movimiento con prefers-reduced-motion.
+Las imágenes de la fila cargan anticipadamente para que las copias inicialmente
+fuera de pantalla no entren vacías; resto de ilustraciones conserva lazy.
+Dálmata ampliado al145 % y pareja al185 % en sus tarjetas, anclados abajo;
+no se modifica ningún PNG ni otras apariciones. Hero y animación de entrada
+conservados. Captura characters revisada: alternancia visible y tamaños equilibrados.
+
+Build SSR y QA Chrome1440/731/390/320px, texto200 %, SSR/no-JS/FAQ/teclado/anclas,
+CSP/hidratación/aislamiento QR pasados. Comprobado desplazamiento real entre frames,
+anchos equivalentes con tolerancia subpíxel, pausa/reanudación y movimiento reducido.
+Registros apps/mobile/build/landing-character-drift-build.log y
+landing-character-drift-browser.log. Sin despliegue ni commit.
+
+## Hero de primera pantalla —17/10/2026
+
+Nueva petición explícita con referencia: primera sección ocupa la pantalla,
+no un bloque compacto sobre las tarjetas. Hero usa min-height basado en100svh
+menos cabecera/margen, ancho casi completo sin límite1280 y contenido centrado
+verticalmente. Título hasta108px e ilustraciones hasta148px en escritorio;
+móvil conserva su tipografía adaptada y permite crecer con texto ampliado.
+Sin altura fija ni recorte del contenido. Marca minúscula, recursos y secuencia
+de animación conservados. Build SSR y QA Chrome 1440/731/390/320px y200 %
+pasados: imágenes/FAQ/teclado/anclas/no-JS/CSP/hidratación/aislamiento QR sin
+incidencias. Capturas desktop-top/reference revisadas. Registros en
+apps/mobile/build/landing-fullscreen-hero-build.log y
+landing-fullscreen-hero-browser.log. Sin publicación.
+
+## Hero más grande y marca en minúsculas —17/10/2026
+
+Por petición del usuario se aumenta la primera sección: título hasta78px
+(antes64), ilustraciones hasta120px (antes100) y mayor espacio vertical,
+también en tablet/móvil. LandingBrand muestra «entre huellas» en cabecera y
+footer con peso500 (antes750). Identidad gráfica conservada; no se alteran
+los textos editoriales, el QR ni animaciones. Build SSR y QA Chrome responsive
+1440/731/390/320px, texto200 %, FAQ/teclado/anclas/no-JS/aislamiento QR pasados;
+capturas desktop y móvil ampliado revisadas, sin overflow. git diff --check
+sin errores. Registros apps/mobile/build/landing-hero-size-build.log y
+landing-hero-size-browser.log. Sin despliegue.
+
+## Imágenes anteriores restauradas solo en el hero —17/10/2026
+
+Por petición del usuario se recuperan los PNG anteriores del perro y gato del
+inicio desde la copia previa a la última colección. Se guardan independientes
+como hero-dog.png y hero-cat.png (1254×1254) y se asignan exclusivamente a
+hero-dog/hero-cat. Tarjetas, footer, escenas nuevas y Volvemos ampliado conservados.
+Sin regeneración, cambio de animaciones ni filtros. La colección pasa a doce
+recursos independientes; comprobación del navegador actualizada a esa cantidad.
+Build SSR y QA responsive/200 %/no-JS/QR aprobados; captura desktop-top revisada.
+Registros en apps/mobile/build/landing-hero-restored-build.log y
+landing-hero-restored-browser.log. git diff --check sin errores. Sin despliegue.
+
+## Colección integrada desde el dálmata aprobado —17/10/2026
+
+El usuario aprobó el nuevo dálmata y pidió aplicar su estilo a las restantes
+mascotas y agrandar «Volvemos». Integrados ocho PNG nuevos con ImageGen:
+dog-curious, cat, dog-wave, corgi, tabby, dog-report, pets-home y pets-map.
+Referencias: dálmata aprobado y emblema blanco oficial. Variedad de razas,
+pelajes y pañuelos, con el emblema dentro de la ilustración. Copias directas
+RGBA sin filtros posteriores ni overlays; dimensiones nativas actualizadas.
+Dálmata aprobado y pareja original conservados. «Volvemos» amplía la pareja
+al 160 % centrada y anclada abajo. Diseño y animación principal conservados.
+
+Recursos y prompts exactos en apps/platform/LANDING_APPROVED_STYLE.md, enlazado
+desde LANDING_ASSETS.md; destino apps/platform/public/images/landing.
+Validación: revisión de las diez ilustraciones sobre fondos claro/oscuro,
+build SSR y QA Chrome 1440/731/390/320 px, texto200 %, FAQ/teclado/anclas,
+no-JS, imágenes decodificadas, sin overflow ni errores CSP/hidratación,
+aislamiento landing→QR→landing. Revisadas capturas desktop/mobile/characters.
+Registros: apps/mobile/build/landing-approved-style-build.log y
+landing-approved-style-browser.log. git diff --check sin errores. Servidor
+de desarrollo existente conservado. Sin despliegue ni commit. Implementación
+solicitada completada; no se presupone aprobación artística de las ocho nuevas.
+
 ## Dálmata regenerado desde la referencia indicada —17/10/2026
 
 El usuario rechazó también `exec-e5839c84` por sombra oscura en la mejilla y
