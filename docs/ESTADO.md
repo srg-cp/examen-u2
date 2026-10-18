@@ -1,5 +1,112 @@
 # Estado del proyecto
 
+## Nueva exportación del logo de23:30 —17/10/2026
+
+Sincronizada la última exportación del usuario mediante el generador existente:
+marca PNG/SVG web, favicon, Flutter, splash Android y catálogos de iconos
+Android/iOS/macOS/Windows/web. Gradiente sin cambios; diseño del pie conservado.
+Verificadas cinco copias idénticas a sus originales,40 PNG/ICO legibles y
+cuadrados, y respuestas HTTP200 con bytes nuevos de PNG/SVG/favicon en5173.
+Favicon revisado visualmente. Sin cambios de código ni repetición de suites
+ya aprobadas; sin nuevo build ni despliegue. Siguiente paso: revisión del usuario;
+launcher instalado requiere recompilar/reinstalar.
+
+## Pie más próximo al cierre y última exportación del logo —17/10/2026
+
+Tras aprobar el encuadre, el usuario pide reducir el margen superior del pie:
+clamp(24px,3vw,48px), antes40–88px compartidos. Texto entre mascotas, tamaños
+y altura del cierre conservados. Sincronizadas de nuevo las cinco copias PNG/SVG
+oficiales y regenerados splash/launchers Android, iOS/macOS, Windows y web/PWA
+desde las exportaciones renovadas por el usuario; fuentes intactas.
+
+Build SSR aislado aprobado, análisis Flutter sin incidencias y11 pruebas de
+arranque/arquitectura aprobadas. Chrome1920/1440/731/390/320 verifica margen
+48/43.2/24/24/24px, proporciones originales y logo servido idéntico a su fuente;
+cinco copias oficiales verificadas byte a byte. Captura1440 revisada.
+QA web y logs landing-footer-gap-logo-*; capturas ui-preview/footer-gap-logo
+en apps/mobile/build. Sin build/instalación nativa ni despliegue. Siguiente paso:
+revisión local del usuario; launcher requiere recompilar/reinstalar Android.
+
+## Pie: texto entre mascotas, ligeramente elevado —17/10/2026
+
+Aclaración del usuario: el texto debe quedar entre ambas imágenes y solo un
+poco más arriba que la referencia original. En escritorio comparte fila con
+las mascotas, centrado verticalmente con elevación20–40px; ancho36% para separar
+los enlaces de las figuras. Mascotas conservan39% y encuadre completo, cerca de
+los laterales. Móvil conserva texto arriba y figuras50% debajo. Cierre alto
+intacto. Sustituye la fila separada del contenido del ajuste anterior.
+
+Build SSR aislado aprobado. Geometría Chrome en1920/1440/731/390/320px confirma
+proporciones, texto dentro del pie y sin overflow/recorte; capturas1920/731
+revisadas. QA general: responsive/texto200%/FAQ/teclado/anclas/SSR/no-JS/CSP/
+hidratación/QR, logs landing-footer-centered-* y capturas ui-preview/footer-centered
+en apps/mobile/build. Sin despliegue; siguiente paso: valoración del usuario.
+
+## Corrección: conservar el tamaño original de mascotas del pie —17/10/2026
+
+El usuario aclara que solo fallaba el recorte del contenedor. Restaurado el
+ancho original39% por mascota en escritorio y50% en móvil. El pie reserva una
+fila natural para las ilustraciones completas y mantiene los enlaces arriba;
+el cierre superior conserva la altura ampliada solicitada. Sin editar PNG.
+Build SSR aislado aprobado; Chrome1920/1440/731/390/320px confirma proporciones
+originales, mascotas completas, texto separado y ausencia de overflow.
+Captura1440 revisada en apps/mobile/build/ui-preview/footer-original-size.
+QA general y resultados en landing-footer-original-size-*.log; sin despliegue.
+Siguiente paso: valoración visual del usuario.
+
+## Landing: mascotas completas en el pie y cierre más alto —17/10/2026
+
+Por captura e instrucción del usuario, el pie usa columnas reales: mascotas
+completas a los lados y contenido central alineado arriba. Se retiran posiciones
+negativas y el recorte del contenedor que ocultaba las cabezas; enlaces sin
+cruce con ilustraciones. En móvil, contenido arriba y mascotas en segunda fila.
+El bloque «Una huella tuya» crece a420–640px mínimos (440px móvil), con contenido
+centrado y espacio vertical amplio. Se conserva el servidor5173 y trabajo previo.
+
+Build SSR aislado y QA Chrome de landing aprobados: responsive, texto200%,
+FAQ/teclado/anclas, SSR/no-JS, CSP/hidratación y navegación QR. Comprobación
+geométrica adicional en1920/1440/731/390/320px y320 con texto ampliado: mascotas
+dentro del pie, sin superposición con texto ni overflow. Capturas de escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/footer; logs landing-footer-*
+en apps/mobile/build. git diff --check aprobado. Sin publicación ni commit.
+Siguiente paso: valoración visual del usuario.
+
+## Logo azul sincronizado en todas las aplicaciones —17/10/2026
+
+Petición del usuario tras renovar las exportaciones de logo/. Actualizadas
+copias oficiales PNG/SVG en landing/lector QR/favicon, marca Flutter y splash
+Android. Regenerados iconos Android clásicos/adaptativos/monocromáticos,
+catálogos iOS/macOS, Windows y web/PWA. Colores de composición iOS/PWA alineados
+con el gradiente azul. El generador sincroniza ahora las copias oficiales;
+fuentes del usuario conservadas. No cambia la UI ni las ilustraciones con
+estampados blancos de las variantes auxiliares que no se actualizaron.
+
+Validación local: formato488 archivos sin cambios, flutter analyze sin
+incidencias,11 pruebas Flutter de arranque/arquitectura y9 pruebas web aprobadas.
+Cinco copias idénticas byte a byte a sus fuentes;40 PNG/ICO legibles y cuadrados;
+cinco paths adaptativos con geometría/color del SVG oficial. Chrome sobre el
+servidor5173 existente muestra el PNG nuevo en cabecera/pie, sin overflow en
+1440×960 y320×640 con fuente raíz200%; capturas revisadas en
+apps/mobile/build/ui-preview/brand-update. git diff --check aprobado.
+Sin builds nativos, reinstalación ni despliegue. Siguiente paso: verificar el
+launcher al recompilar/reinstalar Android; hot reload no actualiza ese recurso.
+No implica cierre de historias ni confirmación remota. Ficha: identidad-visual.
+
+## Landing: títulos de sección uniformes e imagen de comunidad más alta —17/10/2026
+
+Por petición del usuario, todos los h2 de sección comparten el tamaño de
+«Una comunidad con un propósito»: --section-title-size con clamp(29px, 4.3vw,
+58px) y34px en móvil. Se eliminan tamaños específicos de secciones posteriores;
+el hero conserva su h1. Los títulos permiten corte de palabras en móvil con
+texto ampliado. Tarjeta de imagen de «La ayuda puede estar cerca» pasa de
+305:123 a305:160, aproximadamente30% más alta a igual ancho, con contain.
+Recursos, onda, márgenes y alineación conservados. Servidor5173 reutilizado.
+Build SSR y QA responsive/200%/no-JS/CSP/hidratación/FAQ/anclas/QR pasados.
+Igualdad de los siete títulos y proporción de tarjeta comprobadas en
+1920/1440/731/390/320px, sin overflow; capturas escritorio/móvil revisadas.
+Logs landing-heading-scale-*.log en apps/mobile/build. Sin commit/publicación;
+siguiente paso: valoración visual del usuario y ajustes que indique.
+
 ## Landing: onda viajera amplia según referencias —17/10/2026
 
 El usuario precisa una curva que avance de tarjeta en tarjeta. La onda6s

@@ -1,5 +1,40 @@
 # Landing pública en la plataforma
 
+**Ajuste tras aprobación17/10:** margen superior del pie reducido a24–48px
+(3vw), conservando texto entre mascotas y encuadre/tamaños aprobados. Nueva
+exportación del logo sincronizada en landing/QR/favicon. Build y QA responsive
+en ESTADO; evidencia footer-gap-logo. Sin despliegue.
+
+**Encuadre final del pie17/10:** por aclaración del usuario, texto entre las
+mascotas en escritorio, centrado con elevación20–40px y ancho36%; imágenes39%
+sin recorte y cerca de los laterales. Sustituye el contenido en fila superior
+del ajuste anterior. Móvil conserva distribución en dos filas y figuras50%.
+Cierre alto conservado. Build/QA y capturas footer-centered en ESTADO.
+
+**Corrección posterior17/10:** el usuario solicita conservar el tamaño original
+de las mascotas del pie. Ancho39% cada una en escritorio y50% en móvil; fila
+natural completa debajo del contenido para evitar recorte y cruces. Se mantiene
+la altura ampliada del cierre. Sustituye el escalado reducido del ajuste previo.
+Build y geometría responsive aprobados; evidencia footer-original-size en ESTADO.
+
+**Pie y cierre17/10/2026:** mascotas completas en columnas laterales sin
+recorte ni superposición con enlaces. Contenido central alineado arriba; móvil
+coloca las mascotas en una segunda fila. Cierre «Una huella tuya» con altura
+mínima420–640px (440px móvil) y contenido centrado. Sin recursos ni operaciones
+nuevas. Build SSR y QA responsive/200%/FAQ/anclas/no-JS/CSP/hidratación/QR
+aprobados; geometría sin cruce/recorte verificada en1920/1440/731/390/320px
+y texto ampliado. Renders revisados; pendiente valoración del usuario,
+sin despliegue. Evidencia landing-footer-* en apps/mobile/build.
+
+**Títulos y comunidad17/10/2026:** los siete h2 de sección comparten la escala
+de propósito mediante --section-title-size (hasta58px; móvil34px), sin alterar
+el h1 del hero. Imagen de comunidad con ventana305:160 frente a305:123 anterior
+(aprox.30% más alta), conservando PNG y contain. Anchos, márgenes y onda intactos.
+Build SSR y QA responsive/200%/no-JS/CSP/hidratación/FAQ/anclas/QR pasados;
+igualdad de fuentes/proporción comprobada hasta1920px y capturas revisadas.
+Logs landing-heading-scale-*.log en apps/mobile/build. Pendiente valoración
+visual del usuario; sin publicación, cambios de datos ni cierre de historias.
+
 **Onda viajera17/10/2026:** referencias del usuario requieren una curva amplia
 que recorra las tarjetas. Ciclo6s, doce fases progresivas cada0.5s y amplitud
 24–56px. Seis personajes repetidos dos veces por grupo; copias decorativas,

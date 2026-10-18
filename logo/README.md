@@ -29,6 +29,14 @@ La validación efectivamente realizada se registra en [ESTADO.md](../docs/ESTADO
 
 ## Actualización global —17 de octubre de2026
 
+Nueva exportación azul del17/10: ejecutar `apps/mobile/tool/generate_android_icons.ps1`
+desde la raíz sincroniza también las cinco copias oficiales de marca: PNG de
+Flutter, splash Android, PNG/SVG web y favicon256. Después regenera todos los
+catálogos de iconos. `flutter_launcher_icons.yaml` y el manifiesto PWA usan los
+colores azul central/final del nuevo gradiente. Las variantes `only.svg` y
+`only-black.svg` no fueron actualizadas por el usuario en esta exportación;
+se conservan, al igual que los estampados blancos de las ilustraciones.
+
 Se mantienen intactas las fuentes actualizadas por el usuario. `only-black.svg` es la fuente geométrica del emblema monocromo usado como referencia de estampado blanco en ilustraciones; `only.svg` conserva la variante verde. La web conserva copia exacta del SVG completo en `apps/platform/public/brand.svg`; navegación usa el PNG oficial actualizado y el favicon deriva del PNG oficial256 para conservar su textura a tamaño pequeño. No se superpone el símbolo a las mascotas desde Vue/CSS: los emblemas blancos forman parte de los PNG regenerados mediante imagegen.
 
 `apps/mobile/assets/branding/app_icon.png` y el splash Android son copias del PNG@2x actualizado. El generador existente ahora regenera también iconos iOS/web/Windows/macOS, además de Android, sin cambiar paquetes ni recrear apps. La ruta de fuentes se corrigió tras mover Flutter a apps/mobile. Los recursos para plataformas futuras no equivalen a builds o distribución verificados. Véase ESTADO para evidencia y límites.

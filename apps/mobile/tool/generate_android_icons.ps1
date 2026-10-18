@@ -17,6 +17,18 @@ if ($vectorSource.svg.viewBox -ne '0 0 512 512' -or $sourcePaths.Count -ne 5 -or
     throw 'El SVG no coincide con la estructura prevista. Revisar el adaptador antes de regenerar.'
 }
 
+# Keep every shipped copy in sync with the official exports, including Nuxt.
+$rasterSourcePath = Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2@2x.png'
+foreach ($relativePath in @(
+    'apps/mobile/assets/branding/app_icon.png',
+    'apps/mobile/android/app/src/main/res/drawable-nodpi/startup_brand.png',
+    'apps/platform/public/brand.png'
+)) {
+    Copy-Item -LiteralPath $rasterSourcePath -Destination (Join-Path $repoDirectory $relativePath) -Force
+}
+Copy-Item -LiteralPath $vectorSourcePath -Destination (Join-Path $repoDirectory 'apps/platform/public/brand.svg') -Force
+Copy-Item -LiteralPath (Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2-256.png') -Destination (Join-Path $repoDirectory 'apps/platform/public/brand-icon.png') -Force
+
 Push-Location -LiteralPath $appDirectory
 try {
     & dart run flutter_launcher_icons
@@ -99,4 +111,4 @@ Write-IconResource 'mipmap-anydpi-v33/ic_launcher.xml' @'
 </adaptive-icon>
 '@
 
-Write-Output 'Iconos Android clásicos/adaptativos/monocromáticos y catálogos iOS/web/Windows/macOS generados.'
+Write-Output 'Marca Flutter/web, splash e iconos Android clásicos/adaptativos/monocromáticos y catálogos iOS/web/Windows/macOS generados.'

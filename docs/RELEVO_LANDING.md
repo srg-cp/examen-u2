@@ -19,6 +19,33 @@ actual: «ok esta perfecto». Continuar desde esta base, sin rehacerla.
 
 ## Diseño aprobado que se debe conservar
 
+- Usuario aprueba texto entre mascotas. Último ajuste17/10: solo reducir el
+ margen superior del pie a clamp(24px,3vw,48px); resto del encuadre conservado.
+ Logo renovado otra vez y sincronizado en web/móvil/splash/iconos. Evidencia
+ footer-gap-logo en ESTADO y apps/mobile/build.
+
+- Aclaración final17/10 del pie: texto ENTRE mascotas, ligeramente elevado
+ 20–40px respecto al centro vertical; ancho36%, imágenes39% completas y en
+ laterales. Sustituye la fila superior independiente de los ajustes previos.
+ Móvil conserva dos filas. Cierre alto intacto. Evidencia footer-centered.
+
+- Corrección posterior del pie17/10: conservar tamaño original de mascotas,
+ 39% del ancho cada una en escritorio,50% móvil. Contenido arriba e imágenes
+ completas en fila natural inferior. Sustituye las columnas laterales que
+ redujeron su tamaño. Cierre alto conservado; evidencia footer-original-size.
+
+- Ajuste solicitado17/10 del cierre/pie: bloque «Una huella tuya» mucho más
+  alto (mínimo420–640px;440px móvil). Pie en tres columnas, contenido arriba
+  y mascotas completas a los lados; móvil con mascotas en segunda fila.
+  Sin posiciones negativas ni contenedor que recorte cabezas. Build y QA
+  responsive/texto ampliado/SSR/QR aprobados, capturas revisadas en
+  apps/mobile/build/ui-preview/footer. Pendiente valoración visual del usuario.
+
+- Actualización de títulos17/10: todos los h2 de sección usan el tamaño de
+  propósito, variable --section-title-size: clamp(29px, 4.3vw, 58px), móvil34px.
+  Hero h1 intacto. La tarjeta de imagen de comunidad es30% más alta, proporción
+  305:160 (antes305:123). Build y QA pasados, logs landing-heading-scale-*.log
+  en apps/mobile/build; pendiente valoración visual del usuario.
 - Actualización posterior17/10: usuario aprobó ancho de propósito alineado con
   hero y ventanas de sus cuatro imágenes3:1 (antes3.6:1). Después pidió extender
   el mismo ancho a todas las secciones: `.wrap` compartido sin máximo1280px,
