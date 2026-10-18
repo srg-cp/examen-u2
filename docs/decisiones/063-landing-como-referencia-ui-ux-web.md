@@ -24,6 +24,16 @@ operativos siguen ADR-027/028: toast superior, skeleton y shimmer accesibles.
 
 ## Alternativas y consecuencias
 
+Ampliación explícita18/10/2026: el usuario pide que el detalle lateral sea una
+mancha superpuesta al footer sin desplazar contenido y corrige su tipografía.
+La frase decorativa usa Kalam Regular autoalojada con licencia SIL OFL, elegida
+por su trazo manuscrito próximo a la imagen; no se afirma identificar la fuente
+exacta de la referencia. Esta excepción es local al adorno, sin cambiar Arial
+del resto de la plataforma. Se conserva CSP font-src self y no se consulta un
+proveedor externo al visitar la landing. El adorno absoluto no reserva columnas
+ni padding y permite superposición visual por instrucción del usuario, manteniendo
+pointer-events none para no interceptar acciones. Se oculta por debajo de1100px.
+
 Mantener sistemas visuales separados para landing, usuarios y administración
 contradice la referencia común solicitada. Copiar toda la composición de landing
 a cada pantalla tampoco resuelve formularios/listados: se heredan identidad y

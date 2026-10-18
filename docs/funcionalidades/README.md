@@ -12,7 +12,8 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Landing pública](landing-page.md) | apps/platform (Vue/Nuxt) | Ampliación del usuario; integración17/10/2026; sin HU/issue nuevos |
 | [Ficha pública QR](ficha-publica-qr.md) | apps/platform (Vue/Nuxt) | HU-09; RF-09; issue #9; versión anterior operativa según usuario, migración Vue local/HU-10 pendiente |
 | [Avistamientos web](avistamientos-web.md) | apps/platform / sightings | HU-10.1; RF-11; issue #36;024/operación confirmados por usuario |
-| [Avistamientos Android](avistamientos-android.md) | apps/mobile / sightings y servidor Nuxt | HU-10.2; RF-11; issue #37; implementación local/025 pendiente |
+| [Avistamientos Android](avistamientos-android.md) | apps/mobile / sightings y servidor Nuxt | HU-10.2; RF-11; issue #37;025 confirmado por usuario, sin inspección remota |
+| [Cronología y revisión](cronologia-y-revision.md) | apps/mobile / case_timeline, RPC autenticadas | HU-11.1/11.2; RF-12,14; issues #38/#39; local/026 pendiente |
 | [Carteles PDF y QR](carteles-qr.md) | case_posters | HU-08.1/08.2; RF-08,37; issues #34/#35; implementación local, activación pendiente |
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación del usuario16/10/2026 de HU-07/RF-13; sin issue asignado; local |

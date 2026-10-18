@@ -1,5 +1,23 @@
 # Configuración y validación de la app
 
+## Cronología y revisión — HU-11, 18/10/2026
+
+El usuario indicó «ok ya esta» tras la entrega025; se conserva esa confirmación,
+sin inspección remota independiente. Este incremento requiere aplicar únicamente
+el nuevo [patch026](../database/patchs/026_patch_case_timeline.sql) sobre025 y
+actualizar Flutter. Regenerar con `./database/scripts/Build-CaseTimelinePatch.ps1`
+y `./database/scripts/Build-RunAll.ps1`. No editar SQL generado ni reaplicar
+incrementos anteriores confirmados.
+
+La app usa las RPC autenticadas con clave publicable/sesión; no se añade secreto
+ni se requiere cambiar Nuxt para estas lecturas/revisiones. Probar con responsable
+y usuario ajeno: ficha→Ver historial→avistamiento web/app→foto/punto privados→
+clasificar con motivo→historial. Probar recepción en orden diferente del observado,
+tardíos, dos sesiones con misma versión, respuesta perdida tras guardar y
+reintento de la misma orden. Al cerrar, lectura persiste y revisión nueva se
+rechaza. Eliminar caso/mascota oculta acceso. Concurrencia multiconexión,
+permisos hosted y Android real siguen pendientes. [Ficha](funcionalidades/cronologia-y-revision.md).
+
 ## Avistamientos Android — HU-10.2, 18/10/2026
 
 Requiere024 ya confirmado por el usuario. Aplicar solo el nuevo

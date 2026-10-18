@@ -1,5 +1,193 @@
 # Estado del proyecto
 
+## HU-11 operativa según confirmación del usuario — 18/10/2026
+
+Después de confirmar la aplicación026 y recibir los pasos de validación Android,
+el usuario indica «ok perfecto, ya esta». Se registra su confirmación del recorrido
+para dar por finalizado el incremento funcional HU-11.1/#38 y HU-11.2/#39:
+cronología y revisión privada de avistamientos. Sustituye el pendiente de
+confirmación operativa de las notas anteriores. Evidencia comunicada por el
+usuario, sin inspección remota independiente ni certificación detallada de todos
+los escenarios de aislamiento, concurrencia multiconexión o pérdida de respuesta.
+No se cierran issues/épica en GitHub ni se integra/publica la rama desde este chat.
+Sin nuevas pruebas de código por esta actualización documental. Siguiente
+incremento del backlog: HU-12, seguimiento y alertas/bandeja persistente.
+
+## Patch026 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch026 de cronología/revisión.
+Sustituye el pendiente de aplicación026 de las notas anteriores; no se solicita
+reaplicarlo. Confirmación comunicada, sin inspección SQL remota independiente.
+Falta actualizar/reiniciar Flutter con el código de HU-11 y validar en Android
+autenticado: ficha propia→Ver historial→avistamiento web/app→foto/punto privados→
+clasificación con motivo→auditoría persistida al volver a entrar. Comprobar
+usuario ajeno, caso cerrado y reintentos/conflictos con dos sesiones. No requiere
+actualizar Nuxt por HU-11. Sin nuevas pruebas de código por esta confirmación
+documental ni cierre de historias, despliegue o cambios de GitHub.
+
+## Detalle superpuesto trasladado al footer — 18/10/2026
+
+El usuario aclara que «última sección» significa el footer situado debajo del
+cierre. LandingSideNote se mueve exclusivamente al footer; conserva posición
+absoluta, mancha irregular, huellas SVG y Kalam local. Sin reserva de espacio
+ni modificación del contenido; z2/pointer-events none superpone el detalle sin
+interceptar enlaces. Footer usa aislamiento de apilado local. Oculto bajo1100px.
+Esta nota sustituye la ubicación en el cierre indicada anteriormente.
+Build aislado aprobado. Renders1920/1440/1100/731/390/320px comprobados sin
+overflow; comparación geométrica con/sin adorno confirma que texto y mascotas
+del footer no se desplazan. Kalam cargada; captura1440-footer-overlay revisada
+en apps/mobile/build/ui-preview/landing-paws. Superposición visual sobre la
+mascota derecha conservada según autorización del usuario. No se repite suite
+completa por el traslado; Safari/Firefox pendientes. Sin despliegue ni commit/push.
+
+## Mancha superpuesta en última sección — 18/10/2026
+
+Por corrección explícita del usuario, LandingSideNote pasa de beneficios al
+cierre. Retirado padding/min-height reservados en beneficios: el adorno es
+absoluto z2 a la derecha, sin desplazar contenido. Formas SVG con contornos
+irregulares verde/crema/durazno, huellas originales y corazones; superposición
+visual permitida, pointer-events none conserva acciones. Oculto bajo1100px.
+Kalam Regular local (SIL OFL con licencia incluida) sustituye Arial cursiva solo
+en su frase por petición manuscrita; no se afirma fuente exacta de la captura.
+Actualizados ADR-063, reglas web, manifiesto y ficha. Sin alcance funcional nuevo.
+
+Typecheck/build aislado aprobados. QA navegador completo aprobado: responsive,
+texto200%, FAQ/teclado/anclas, movimiento reducido, SSR sin JS, CSP/hidratación
+y landing→QR→landing. Renders1920/1440/1100/731/390/320px sin overflow en
+apps/mobile/build/ui-preview/landing-paws/*-closing.png. Verificación geométrica
+compara título/acciones con y sin adorno y confirma posiciones idénticas; fuente
+manuscrita cargada. Sin despliegue, commit/push ni cambios de backend. Siguiente
+paso: valoración del usuario; Safari/Firefox pendientes.
+
+## Cronología y revisión privada — HU-11.1/#38 y HU-11.2/#39 — 18/10/2026
+
+Implementación local en feature/case-timeline-review, creada desde
+feature/android-sightings con árbol limpio. El usuario indicó «ok ya esta» tras
+las instrucciones de activar025; se registra confirmación comunicada, sin
+inspección remota ni demo detallada independiente. No se solicita reaplicar025.
+Los cambios de landing/documentación surgidos en paralelo se conservan; este
+incremento no implementa UI web ni cambia el lector QR.
+
+RF-12,14: ficha propia→Ver historial→cronología→avistamiento→evidencia privada→
+clasificación/motivo→decisión persistida e historial. Publicación/recuperación
+registradas y avistamientos web/app se ordenan por hora del suceso, recepción y
+tardíos separados. Páginas estables y foto solo por consulta explícita; punto
+exacto, comentario y foto disponibles solo al responsable. Confirmado no equivale
+a ubicación actual ni a recuperación. Caso cerrado conserva lectura y bloquea
+nuevas revisiones. Avisos públicos previos de found_cases mantienen su recorrido,
+sin conversión automática ni eventos/auditoría inventados.
+
+Módulo case_timeline con dominio/casos de uso/contrato, providers declarativos,
+ViewModels autoDispose, estado, pantallas, DTO y data. SDK solo en fuente,
+composición en bootstrap/router y slots en fichas, sin UI entre funcionalidades.
+Reutiliza shells, glass, cover/stagger, surfaces, mapa, selectores, inputs,
+toast/invalid/shake y shimmer. Foto limitada visualmente a320px para conservar
+acciones accesibles; mapa de lectura/navegación usa precisión GPS registrada,
+sin precisión ficticia para manual. Renders normales/pequeños revisados.
+
+Fuentes088–090/plan026, migración y patch generados, run_all regenerado sin
+reescribir025. RPC autentican propietario en cada consulta/acción/foto; no hay
+grants directos sobre tablas ni secretos nuevos. sighting_reviews append-only
+con actor/fecha servidor, motivo, estado anterior/nuevo y versión. Útil/Dudoso/
+Rechazado/Confirmado admiten reclasificar a otra distinta en caso abierto.
+UUID estable y CAS evitan doble decisión y sobrescritura obsoleta. Respuesta
+ambigua congela la orden, conflicto exige actualizar conservando el formulario;
+la UI confirma solo tras recibo guardado. Historial paginado conserva todas las
+decisiones. Errores de permiso/cambio de cuenta ocultan datos; respuestas tardías
+y disposición no restauran evidencia anterior.
+
+Validación local: análisis Flutter limpio, formato sin cambios pendientes y28
+pruebas Flutter aprobadas (dominio, VM, DTO/fallos seguros, fotos, error de sesión
+y recuperación de misma cuenta, disposición, arquitectura y navegación desde
+ficha en ambos tamaños). Renders390×844 y320×350/texto2 con fixtures/teselas
+neutras: historial, detalle, foto, formulario y auditoría en
+apps/mobile/build/ui-preview/case-timeline. Suite SQL completa26 pruebas
+aprobadas: incluye dos usuarios/roles, evidencia privada, orden observado,
+páginas, motivos/cuatro estados, reintento original tras revisiones/cierre,
+conflicto CAS, eliminación y repetición. Tras el ajuste final de normalización
+Unicode del motivo, una ejecución conjunta se interrumpió tras9 casos aprobados
+sin aserción fallida; la comprobación final ejecutó los26 casos secuencialmente
+en procesos separados y todos aprobaron. Log del intento interrumpido conservado
+en hu11-full-sql-aborted.log. PGlite y repositorios sustituidos no
+certifican Supabase hosted ni concurrencia multiconexión. Logs
+hu11-{analyze,format,mobile-tests,sql,sql-preflight,full-sql}.log en apps/mobile/build.
+
+Pendiente aplicar026 en desarrollo y probar Flutter con Supabase real: casos
+propio/comunitario, foto y mapa privados, usuario ajeno, cierre, dos sesiones
+revisando la misma versión y respuesta perdida tras guardar. Sin APK nuevo,
+build Android, SQL remoto, despliegue, commit/push o modificaciones de GitHub.
+No hay nuevo servidor Nuxt que activar para estas lecturas/revisiones. Historias
+sin cerrar por evidencia local. Ficha/índice/ADR-066/arquitectura/guía/diseño/
+configuración/backlog actualizados. Siguiente incremento funcional HU-12,
+bandeja/alertas, después de activar y validar HU-11.
+
+## Detalle lateral derecho de comunidad — 18/10/2026
+
+Aclaración del usuario: la referencia debe ser un adorno lateral, sin sección
+nueva. LandingSideNote se integra dentro de beneficios, al costado derecho:
+190×285px, formas orgánicas salvia/durazno, frase pequeña inclinada, corazones
+SVG y LandingPawTrail con siluetas del SVG original. Reserva240px de lateral
+en escritorio≥1100px; se oculta en anchos menores para conservar el contenido
+y evitar convertirlo en un bloque. Decorativo aria-hidden, sin interacción ni
+movimiento nuevo; conserva las huellas grandes anteriores. Sin cambios de
+alcance funcional, HU/RF/issues, permisos o backend.
+
+Typecheck y build aislado aprobados. QA responsive/200%/teclado/FAQ/anclas,
+SSR sin JS, CSP/hidratación y navegación QR aprobado antes del ajuste final de
+especificidad del padding lateral. Primer intento de QA falló al decodificar
+una imagen; repetición completa aprobada. Revisión visual detectó padding
+sobrescrito y se corrigió reservando el lateral mediante selector específico.
+Build final aprobado; renders1920/1440/1100/731/390/320px revisados en
+apps/mobile/build/ui-preview/landing-paws/*-side-note.png. Comprobación geométrica
+confirma separación entre adorno y tarjetas en escritorio, sin overflow global.
+Sin despliegue ni commit/push; valoración del usuario y Safari/Firefox pendientes.
+
+## Retorno al diseño con huellas ampliadas — 18/10/2026
+
+Por petición del usuario se retira el último bloque añadido de ondas, frase y
+corazones, junto con sus estilos. Se recupera la landing anterior con las huellas
+grandes distribuidas en hero, oportunidad y cierre. Sin cambios en otros trabajos,
+sin despliegue. Comprobación de diferencias sin errores; no se repite build.
+
+## Huellas ampliadas según referencias — 18/10/2026
+
+El usuario pide huellas mayores y más distribuidas como en sus dos referencias,
+usando nuestro SVG. Sustituye el primer ajuste de pares pequeños: LandingPawTrail
+ahora distribuye cuatro siluetas de logo/only.svg por los bordes de hero,
+oportunidad y cierre (12 en escritorio, 10 en móvil). Máscaras CSS del recurso
+original, sin modificarlo, en salvia/celeste/durazno suaves con opacidad0.36;
+tamaños34–130px según posición/viewport. Sin movimiento adicional, interacción
+ni anuncios accesibles. En móvil oportunidad conserva solo dos huellas, junto
+a las mascotas y lejos del texto. No cambia alcance funcional ni HU/RF/issues.
+
+Typecheck y build aislado aprobados. QA de navegador existente aprobado:
+1440/731/390/320px, texto200%, FAQ/teclado/anclas, movimiento reducido, SSR sin
+JS, CSP/hidratación y navegación landing→QR→landing. Renders adicionales1920px
+y capturas revisadas en apps/mobile/build/ui-preview/landing-paws, sin overflow.
+No se repiten pruebas de dominio por este cambio puramente decorativo.
+Ficha/manifiesto actualizados; sin despliegue ni commit/push. Siguiente paso:
+valoración visual del usuario; Safari/Firefox pendientes.
+
+## Huellitas sutiles en la landing — 18/10/2026
+
+Solicitud visual del usuario: tres pares pequeños en hero, oportunidad y cierre,
+combinando LandingIcon/paw con `logo/only.svg`, copiado sin modificar a recursos
+públicos. Widget LandingPawTrail reutilizado, opacidad suave, proporción original,
+sin animaciones adicionales ni interacción y aria-hidden. Ajustado el par de
+oportunidad a la esquina inferior tras revisar móvil para evitar el título.
+Sin cambios de alcance, HU/RF/issues, permisos ni backend. Se conservan los
+archivos SQL locales existentes en feature/case-timeline-review.
+
+Typecheck, 17 pruebas existentes y build de producción aprobados; build aislado
+con NUXT_BUILD_DIR=.nuxt-landing-paws-qa para conservar el servidor dev existente.
+Chrome local: renders1920/1440/731/390/320px sin overflow, tres pares y SVG
+decodificado. Capturas revisadas en apps/mobile/build/ui-preview/landing-paws;
+log de build en apps/mobile/build/landing-paws-build.log. Ficha y manifiesto de
+recursos actualizados. QA de navegador existente aprobado: responsive, texto200%,
+teclado/FAQ/anclas, movimiento reducido, SSR sin JS, CSP/hidratación y navegación
+landing→QR→landing. Sin publicación, commit/push ni despliegue.
+Siguiente paso: valoración visual del usuario; Safari/Firefox no verificados.
+
 ## Avistamientos Android — HU-10.2 / RF-11 / #37 — 18/10/2026
 
 Implementación local en feature/android-sightings, creada desde

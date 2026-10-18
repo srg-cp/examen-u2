@@ -13,10 +13,12 @@ class CaseDetailScreen extends ConsumerWidget {
     this.recoveryActions,
     this.savedAction,
     this.posterAction,
+    this.timelineAction,
     super.key,
   });
   final Widget? savedAction;
   final Widget? posterAction;
+  final Widget? timelineAction;
   final String id;
   final Widget Function(PublicLostCase, VoidCallback)? recoveryActions;
   @override
@@ -61,6 +63,7 @@ class CaseDetailScreen extends ConsumerWidget {
                 value: state.requireValue.value!,
                 actions: Column(
                   children: [
+                    if (timelineAction != null) timelineAction!,
                     if (state.requireValue.value!.canResolve &&
                         posterAction != null)
                       posterAction!,

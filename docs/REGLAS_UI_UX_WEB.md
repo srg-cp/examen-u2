@@ -73,6 +73,9 @@ verificado. La landing informativa no define una paleta completa de estados.
 
 La familia real aprobada es `Arial, Helvetica, sans-serif`. No añadir otra fuente
 como parte de una nueva pantalla sin registrar el cambio de referencia.
+Por instrucción explícita posterior del18/10/2026, solo la frase del detalle
+decorativo superpuesto al footer usa Kalam Regular local (SIL OFL); la referencia
+manuscrita no se extiende a títulos, formularios ni otros textos. Véase ADR-063.
 
 | Elemento de landing | Regla real |
 | --- | --- |

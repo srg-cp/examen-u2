@@ -1,5 +1,19 @@
 # Ilustraciones independientes de la landing
 
+Detalle superpuesto del footer18/10: LandingSideNote contiene formas orgánicas
+SVG nativas y reutiliza las huellas originales. La frase usa
+`public/fonts/kalam/Kalam-Regular.ttf`, descargada sin modificar del repositorio
+oficial google/fonts, directorio ofl/kalam, junto a OFL.txt (SIL OFL1.1;
+copyright2014 Indian Type Foundry). Archivo427360bytes; fuente servida localmente,
+sin peticiones externas. Solo se aplica a la frase del adorno.
+
+Decoración18/10/2026: `public/images/landing/only.svg` es una copia sin cambios
+de `logo/only.svg` (374×354). Tras referencias del usuario, LandingPawTrail usa
+su silueta como máscara CSS en cuatro huellas por sección (dos en oportunidad
+móvil), tonos salvia/celeste/durazno, opacidad0.36 y proporción original.
+Recurso local decorativo sin animación adicional; no forma parte de los PNG
+generados. Sustituye los tres pares pequeños de la primera versión.
+
 Generadas el17 de octubre de2026 con la herramienta integrada image_gen, aplicando la habilidad imagegen. Siete llamadas independientes, una por ilustración; sin CLI/API ni credenciales. Referencia de estilo: captura de personajes facilitada por el usuario en este chat. No se utilizó esa captura como textura, fondo, atlas o recurso de la página final.
 
 Los PNG originales de generación se conservan con transparencia en `public/images/landing`. Sin escalar artificialmente ni recortar un mockup; las dimensiones finales se registran en `landing_artwork.ts`. No se promete resolución 4K ni detalle infinito. El logo no se genera: se usa el recurso oficial existente `/brand.png`, también usado por la plataforma.

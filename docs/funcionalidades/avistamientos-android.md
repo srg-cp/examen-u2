@@ -1,5 +1,12 @@
 # Avistamientos desde Android
 
+18/10, continuación HU-11: el usuario indicó «ok ya esta» después de las
+instrucciones de activación025; se registra confirmación comunicada, sin
+inspección remota independiente. Sustituye el pendiente025 de las notas
+anteriores; no exige reaplicarlo. [Cronología y revisión](cronologia-y-revision.md)
+añade lectura/clasificación privada del responsable en Android, tras activar026.
+No modifica el envío ni convierte la evidencia en aviso público.
+
 HU-10.2 / RF-11 / issue #37. Implementación local; historia sin cerrar.
 [ADR-065](../decisiones/065-avistamientos-android-y-persistencia-compartida.md).
 

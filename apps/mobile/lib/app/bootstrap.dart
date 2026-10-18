@@ -1,4 +1,7 @@
 import 'package:http/http.dart' as http;
+import '../features/case_timeline/domain/repositories/case_timeline_repository.dart';
+import '../features/case_timeline/data/repositories/case_timeline_repository_impl.dart';
+import '../features/case_timeline/data/data_sources/case_timeline_source.dart';
 import '../features/sightings/domain/repositories/sighting_repository.dart';
 import '../features/sightings/data/repositories/unavailable_sighting_repository.dart';
 import '../features/sightings/data/repositories/sighting_repository_impl.dart';
@@ -86,6 +89,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.caseTimelineRepository = const UnavailableCaseTimelineRepository(),
     this.sightingRepository = const UnavailableSightingRepository(),
     this.casePosterRepository = const UnavailableCasePosterRepository(),
     required this.state,
@@ -110,6 +114,7 @@ class AppBootstrap {
   });
 
   final StartupState state;
+  final CaseTimelineRepository caseTimelineRepository;
   final SightingRepository sightingRepository;
   final CasePosterRepository casePosterRepository;
   final AuthRepository authRepository;
@@ -153,6 +158,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          caseTimelineRepository: CaseTimelineRepositoryImpl(
+            SupabaseCaseTimelineSource(supabase.client),
+          ),
           sightingRepository: SightingRepositoryImpl(
             NativeSightingSource(
               supabase.client,

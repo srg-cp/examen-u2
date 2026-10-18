@@ -1,5 +1,58 @@
 # Landing pública en la plataforma
 
+**Ubicación corregida al footer — 18/10/2026:** el usuario aclara que el adorno
+corresponde al pie debajo del cierre. LandingSideNote se traslada al footer,
+superpuesto a la derecha sin espacio reservado, conservando mancha/huellas y
+fuente manuscrita local. Pointer-events none mantiene los enlaces operables;
+oculto bajo1100px. Build y revisión1920/1440/1100/731/390/320 aprobados sin
+overflow ni desplazamientos del contenido. Sustituye ubicaciones previas,
+sin despliegue.
+
+**Mancha sobre el cierre — 18/10/2026:** corrección explícita del usuario.
+LandingSideNote pasa de beneficios a la última sección, posición absoluta z2
+al borde derecho, sin padding/columna reservada ni modificación del layout.
+Formas SVG irregulares con tonos suaves, huellas originales y corazones.
+Frase en Kalam Regular local (SIL OFL), trazo manuscrito aproximado a la referencia;
+Arial permanece en el resto. Adorno sin eventos/animación y aria-hidden, oculto
+por debajo de1100px. Typecheck/build y QA navegador aprobados. Comprobación
+geométrica confirma título/acciones sin desplazamiento al retirar el adorno;
+fuente cargada y capturas1920/1440/1100/731/390/320 revisadas. Sin despliegue.
+
+**Detalle lateral — 18/10/2026:** por aclaración del usuario, se incorpora
+LandingSideNote dentro de beneficios, al costado derecho, sin sección adicional.
+Adorno190×285px con ondas, frase pequeña, corazones y huellas del SVG original.
+Lateral reservado240px desde1100px; oculto en tamaños inferiores para mantener
+el contenido. Sin interacción/animación y aria-hidden. Huellas grandes anteriores
+conservadas. Typecheck/build y QA de navegador aprobados; ajuste final de padding
+registrado y verificado en renders1920/1440/1100/731/390/320px, sin cruces con
+tarjetas ni overflow. Sin despliegue; valoración del usuario pendiente.
+
+**Reversión del último ajuste — 18/10/2026:** el usuario solicita recuperar
+la versión anterior. Retirados el bloque de ondas/frase/corazones y sus estilos;
+se conservan las huellas grandes descritas a continuación. Sin despliegue.
+
+**Huellas ampliadas — 18/10/2026:** ajuste posterior según dos referencias del
+usuario; sustituye los pares pequeños descritos abajo. Cuatro huellas distribuidas
+por los bordes de hero/oportunidad/cierre, todas con la silueta original de
+`logo/only.svg` mediante máscara CSS y tonos suaves salvia/celeste/durazno.
+12 en escritorio; 10 en móvil al simplificar oportunidad. Tamaños34–130px,
+sin animación/interacción y aria-hidden. Typecheck/build y QA navegador existente
+aprobados, incluidos texto200%, SSR/CSP y navegación QR. Renders1920/1440/731/
+390/320px revisados sin overflow; misma carpeta landing-paws. Sin despliegue;
+valoración del usuario y otros navegadores pendientes.
+
+**Huellitas decorativas — 18/10/2026:** por solicitud del usuario se añaden
+tres pares discretos en hero, oportunidad y cierre. LandingPawTrail combina el
+icono existente con una copia exacta de `logo/only.svg`, conservando el original,
+sin animación adicional, sin interacción y ocultos a lectores de pantalla.
+Tamaños y opacidad suaves, adaptados a móvil; no cambia datos, permisos ni alcance.
+Typecheck, 17 pruebas y build aislado aprobados. Renders Chrome de 1920, 1440,
+731, 390 y 320px sin overflow y SVG decodificado; capturas en
+`apps/mobile/build/ui-preview/landing-paws`. Sin despliegue; valoración del usuario
+y otros navegadores pendientes.
+QA de navegador existente aprobado, incluidos texto200%, FAQ/teclado/anclas,
+movimiento reducido, SSR/CSP/hidratación y navegación landing→QR→landing.
+
 **Aprobación final — 18/10/2026:** el usuario confirma que le encantó la landing
 terminada y solicita usarla como referencia para toda la web. La valoración visual
 de los últimos ajustes queda confirmada; las notas anteriores de revisión pendiente

@@ -216,6 +216,200 @@ html:has(.landing-page) {
   text-align: center;
   padding: clamp(28px, 4vw, 56px) 20px clamp(28px, 3.4vw, 48px);
 }
+/* The original brand SVG supplies every decorative silhouette. */
+.landing-page .paw-trail {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+.landing-page .paw-mark {
+  position: absolute;
+  width: clamp(64px, 7vw, 116px);
+  aspect-ratio: 374 / 354;
+  background: #a8c58c;
+  opacity: 0.36;
+  mask: url('/images/landing/only.svg') center / contain no-repeat;
+}
+.landing-page .paw-mark-sage {
+  top: 13%;
+  left: 5%;
+  transform: rotate(-23deg);
+}
+.landing-page .paw-mark-sky {
+  top: 19%;
+  right: 6%;
+  width: clamp(44px, 4.5vw, 72px);
+  background: #a5c9dc;
+  transform: rotate(22deg);
+}
+.landing-page .paw-mark-peach {
+  bottom: 9%;
+  left: 8%;
+  width: clamp(74px, 8vw, 130px);
+  background: #efb879;
+  transform: rotate(-18deg);
+}
+.landing-page .paw-mark-small {
+  bottom: 7%;
+  right: 5%;
+  width: clamp(48px, 5vw, 82px);
+  background: #a8c58c;
+  transform: rotate(26deg);
+}
+.landing-page .closing-extra-paws {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+.landing-page .closing .paw-mark-extra-1 {
+  top: 22%;
+  left: 3%;
+  width: clamp(36px, 3.5vw, 54px);
+  background: #a5c9dc;
+  transform: rotate(35deg);
+  opacity: 0.25;
+}
+.landing-page .closing .paw-mark-extra-2 {
+  top: 6%;
+  left: 38%;
+  width: clamp(30px, 3vw, 46px);
+  background: #efb879;
+  transform: rotate(-12deg);
+  opacity: 0.2;
+}
+.landing-page .closing .paw-mark-extra-3 {
+  top: 38%;
+  right: 4%;
+  width: clamp(42px, 4vw, 64px);
+  background: #a8c58c;
+  transform: rotate(-30deg);
+  opacity: 0.22;
+}
+.landing-page .closing .paw-mark-extra-4 {
+  bottom: 18%;
+  left: 32%;
+  width: clamp(28px, 2.8vw, 42px);
+  background: #a5c9dc;
+  transform: rotate(18deg);
+  opacity: 0.18;
+}
+.landing-page .closing .paw-mark-extra-5 {
+  bottom: 6%;
+  right: 34%;
+  width: clamp(34px, 3.2vw, 50px);
+  background: #efb879;
+  transform: rotate(-42deg);
+  opacity: 0.24;
+}
+.landing-page .closing .paw-mark-extra-6 {
+  top: 48%;
+  left: 18%;
+  width: clamp(26px, 2.5vw, 38px);
+  background: #a8c58c;
+  transform: rotate(8deg);
+  opacity: 0.16;
+}
+.landing-page .opportunity {
+  position: relative;
+  isolation: isolate;
+}
+.landing-page .opportunity .paw-mark-sage {
+  top: 5%;
+  left: 48%;
+}
+.landing-page .opportunity .paw-mark-peach {
+  left: 2%;
+  bottom: 3%;
+}
+@media (max-width: 600px) {
+  .landing-page .paw-mark { width: 58px; }
+  .landing-page .paw-mark-sage { top: 8%; left: 4%; }
+  .landing-page .paw-mark-sky { width: 34px; top: 19%; right: 7%; }
+  .landing-page .paw-mark-peach { width: 66px; bottom: 9%; left: 4%; }
+  .landing-page .paw-mark-small { width: 44px; right: 5%; bottom: 4%; }
+  .landing-page .opportunity .paw-mark-sage,
+  .landing-page .opportunity .paw-mark-sky { display: none; }
+  .landing-page .opportunity .paw-mark-peach { width: 50px; left: 1%; bottom: 5%; }
+  .landing-page .opportunity .paw-mark-small { width: 40px; right: 2%; bottom: 8%; }
+  .landing-page .closing .paw-mark-sage { top: 5%; left: 12%; }
+  .landing-page .closing .paw-mark-sky { top: 14%; right: 18%; }
+  .landing-page .closing .paw-mark-peach { bottom: 8%; left: 15%; }
+  .landing-page .closing .paw-mark-small { bottom: 12%; right: 12%; }
+}
+@font-face {
+  font-family: "Landing Kalam";
+  src: url('/fonts/kalam/Kalam-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+/* Paint detail floats above the footer without changing its layout. */
+.landing-page .landing-side-note { display: none; }
+@media (min-width: 1100px) {
+  .landing-page .landing-side-note {
+    display: block;
+    position: absolute;
+    isolation: isolate;
+    z-index: 0;
+    width: clamp(250px, 25vw, 370px);
+    aspect-ratio: 300 / 440;
+    right: calc(-1 * clamp(24px, 4vw, 64px) / 2);
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    user-select: none;
+  }
+  .landing-page .side-note-shapes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+  }
+  .landing-page .side-note-message {
+    position: absolute;
+    top: 31%;
+    left: 40%;
+    width: 47%;
+    font-family: "Landing Kalam", cursive;
+    font-size: clamp(18px, 1.7vw, 25px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+    text-align: center;
+    transform: rotate(-8deg);
+    color: #46565d;
+  }
+  .landing-page .landing-side-note .paw-mark-sage {
+    width: 17%;
+    top: 16%;
+    left: auto;
+    right: 17%;
+  }
+  .landing-page .landing-side-note .paw-mark-sky {
+    width: 9%;
+    top: 26%;
+    right: auto;
+    left: 24%;
+    background: #efb879;
+  }
+  .landing-page .landing-side-note .paw-mark-peach {
+    width: 23%;
+    bottom: 16%;
+    left: 42%;
+  }
+  .landing-page .landing-side-note .paw-mark-small {
+    width: 14%;
+    bottom: 12%;
+    right: 14%;
+    background: #efb879;
+  }
+}
 .landing-page .eyebrow {
   display: inline-block;
   text-transform: uppercase;
@@ -651,6 +845,7 @@ html:has(.landing-page) {
 }
 .landing-page .footer {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 39% minmax(0, 1fr) 39%;
   align-items: end;
@@ -718,6 +913,8 @@ html:has(.landing-page) {
 .landing-page .footer-cat {
   grid-column: 3;
   grid-row: 1;
+  position: relative;
+  z-index: 1;
   width: 100%;
 }
 @media (min-width: 1500px) {

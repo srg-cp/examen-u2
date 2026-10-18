@@ -1,5 +1,14 @@
 # Base de datos de Entre Huellas
 
+Cronología/revisión18/10: fuentes088–090/plan026 generan
+[migración026](../supabase/migrations/20261018002600_case_timeline.sql) y
+[patch026](patchs/026_patch_case_timeline.sql), después de025 confirmado por
+el usuario. RPC autenticadas solo para propietario del caso, foto privada,
+cronología/historial paginados, clasificación append-only con motivo/actor/fecha,
+UUID estable y versión esperada. Sin grants directos de tablas ni cambios en QR.
+Regenerar Build-CaseTimelinePatch/Build-RunAll; aplicación remota026 pendiente.
+[Ficha](../docs/funcionalidades/cronologia-y-revision.md).
+
 Avistamientos Android18/10: fuentes086–087/plan025 generan
 [migración025](../supabase/migrations/20261018002500_app_sightings.sql) y
 [patch025](patchs/025_patch_app_sightings.sql), después de024 ya confirmado por

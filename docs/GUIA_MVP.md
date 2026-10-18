@@ -252,6 +252,17 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 
 ### S5 - Seguimiento, alertas y cierre
 
+18/10/2026: HU-11.1 / RF-14 / #38 y HU-11.2 / RF-12,14 / #39 implementadas
+localmente en Android. Historial propio ordenado por hora del suceso, recepción
+y tardíos separados, foto/punto privados y clasificación con motivo/actor/fecha
+e historial paginado. RPC autorizadas, reintento idempotente y CAS; caso cerrado
+solo lectura. No equivale a ubicación actual/recuperación. Plan026 después de025
+confirmado por usuario; falta activar026 y demo autenticada/concurrencia reales.
+Avisos públicos anteriores conservan su recorrido; no se migran ni se inventan
+eventos. Sin push, offline o panel web nuevo. [Ficha](funcionalidades/cronologia-y-revision.md),
+[ADR-066](decisiones/066-cronologia-y-revision-privada.md). Historias sin cerrar
+ni acciones GitHub; siguiente incremento funcional HU-12 tras validar HU-11.
+
 - **HU-11 / RF-12,14:** revisar avistamientos, guardar actor/motivo y ordenar cronología por hora real.
 - **HU-12 / RF-17,18:** zonas/casos seguidos, selección de destinatarios, bandeja persistente y push. Persistir trabajo de notificación con mecanismo de reintento; integrar FCM mediante operación server-side.
 - **HU-13 / RF-07:** responsable autorizado cierra en una operación atómica con historial; QR actualizado y nuevas alertas de búsqueda detenidas.

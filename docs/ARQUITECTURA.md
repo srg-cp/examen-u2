@@ -1,5 +1,19 @@
 # Arquitectura de Entre Huellas
 
+## Cronología y revisión privada — 18/10/2026
+
+HU-11.1/#38 y HU-11.2/#39: `features/case_timeline` contiene dominio/casos de
+uso, contrato, providers, ViewModels autoDispose, estado, pantallas, DTO y data.
+Bootstrap inyecta Supabase encapsulado; router compone slots en fichas y páginas
+de historial/revisión, sin imports de presentation entre funcionalidades.
+Plan026/fuentes088–090 añade RPC de autoridad por propietario, lectura paginada,
+foto privada y decisiones append-only con actor/motivo/fecha, UUID y CAS.
+Orden observado/recepción separado; revisiones no sustituyen evidencia ni cierran
+el caso. Lectura permitida tras cierre, nueva revisión solo abierto. No cambia
+el QR público ni añade panel web/roles ficticios. [ADR-066](decisiones/066-cronologia-y-revision-privada.md),
+[ficha](funcionalidades/cronologia-y-revision.md). Activación026/Android real
+pendientes;025 confirmado por el usuario, sin inspección remota independiente.
+
 ## Avistamientos Android — 18/10/2026
 
 HU-10.2/#37 incorpora `apps/mobile/lib/features/sightings` con dominio sin SDK,

@@ -1,5 +1,11 @@
 # Avistamientos desde la web pública
 
+HU-11,18/10: [cronología y revisión](cronologia-y-revision.md) implementa la
+consulta privada del responsable en Android para los avistamientos web/app,
+incluida foto/punto y auditoría. Requiere026 pendiente;025 confirmado según
+«ok ya esta» del usuario, sin inspección independiente. El QR público conserva
+su proyección y no muestra evidencia privada ni revisiones.
+
 HU-10.2,18/10: plan025 extrae la persistencia común en persist_sighting para
 web/Android, conservando firma y recibo de submit_public_sighting y controles
 de QR. Reintentos comprueban también actor; nuevos registros app conservan

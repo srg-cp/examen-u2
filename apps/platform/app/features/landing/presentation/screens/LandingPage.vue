@@ -4,6 +4,8 @@ import LandingCharacterCard from '../widgets/LandingCharacterCard.vue';
 import LandingIcon from '../widgets/LandingIcon.vue';
 import LandingBrand from '../widgets/LandingBrand.vue';
 import LandingActions from '../widgets/LandingActions.vue';
+import LandingPawTrail from '../widgets/LandingPawTrail.vue';
+import LandingSideNote from '../widgets/LandingSideNote.vue';
 import '../styles/landing.css';
 const horizontalPaused = ref(false);
 const characters = [
@@ -35,6 +37,7 @@ const questions = [
     </header>
     <main id="contenido">
       <section id="inicio" class="hero wrap aurora" aria-labelledby="hero-title">
+        <LandingPawTrail />
         <p class="eyebrow">Recuperación colaborativa</p>
         <div class="hero-heading"><LandingArt name="hero-dog" class="hero-dog" /><h1 id="hero-title">Más huellas juntas.<br>Más caminos<br>de vuelta a casa.</h1><LandingArt name="hero-cat" class="hero-cat" /></div>
         <p class="hero-description">Conectamos a quienes buscan, encuentran y quieren ayudar.</p>
@@ -63,7 +66,7 @@ const questions = [
           <div class="step-copy"><span class="step-number">04</span><h3>Celebra el reencuentro</h3><p>Cada aviso puede ser el inicio<br class="desktop-break"> de un gran final.</p></div>
         </div>
       </section>
-      <section class="opportunity wrap" aria-labelledby="opportunity-title"><div class="opportunity-copy"><h2 id="opportunity-title">Un pequeño aviso.<br>Una gran oportunidad.</h2><LandingActions /></div><LandingArt name="home" label="Perrito y gatito delante de una casita" /></section>
+      <section class="opportunity wrap" aria-labelledby="opportunity-title"><LandingPawTrail /><div class="opportunity-copy"><h2 id="opportunity-title">Un pequeño aviso.<br>Una gran oportunidad.</h2><LandingActions /></div><LandingArt name="home" label="Perrito y gatito delante de una casita" /></section>
       <section id="comunidad" class="nearby wrap" aria-labelledby="nearby-title"><div><h2 id="nearby-title">La ayuda puede<br>estar cerca.</h2><p>Cada reporte compartido<br>puede sumar a la búsqueda.</p><a href="#colaborar" class="button button-primary">Conoce la comunidad</a></div><LandingArt name="map" label="Un perro y un gato buscan juntos en un mapa" /></section>
       <section id="colaborar" class="collaborate panel wrap" aria-labelledby="collaborate-title">
         <h2 id="collaborate-title">Ayudar empieza<br>con un aviso.</h2>
@@ -72,8 +75,8 @@ const questions = [
       </section>
       <section class="benefits wrap" aria-labelledby="benefits-title"><h2 id="benefits-title">Todos podemos<br>ayudar a que vuelvan.</h2><div class="benefits-grid"><article v-for="benefit in benefits" :key="benefit.title"><span class="benefit-icon"><LandingIcon :name="benefit.icon" /></span><div><h3>{{ benefit.title }}</h3><p>{{ benefit.text }}</p></div></article></div></section>
       <section id="preguntas" class="faq panel wrap" aria-labelledby="faq-title"><h2 id="faq-title">Entre Huellas<br>responde.</h2><div class="faq-list"><details v-for="([question, answer], index) in questions" :key="question" name="preguntas" :open="index === 0"><summary>{{ question }}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></summary><p>{{ answer }}</p></details></div></section>
-      <section class="closing aurora wrap" aria-labelledby="closing-title"><h2 id="closing-title">Una huella tuya <span class="inline-pet"><LandingArt name="hero-dog" /></span><br>puede acercarlos a casa.</h2><LandingActions /></section>
+      <section class="closing aurora wrap" aria-labelledby="closing-title"><LandingPawTrail /><span class="closing-extra-paws" aria-hidden="true"><span class="paw-mark paw-mark-extra-1" /><span class="paw-mark paw-mark-extra-2" /><span class="paw-mark paw-mark-extra-3" /><span class="paw-mark paw-mark-extra-4" /><span class="paw-mark paw-mark-extra-5" /><span class="paw-mark paw-mark-extra-6" /></span><h2 id="closing-title">Una huella tuya <span class="inline-pet"><LandingArt name="hero-dog" /></span><br>puede acercarlos a casa.</h2><LandingActions /></section>
     </main>
-    <footer class="footer wrap"><LandingArt name="footer-dog" class="footer-dog" /><div class="footer-content"><LandingBrand footer /><p class="development">Proyecto Android en desarrollo.</p><div class="footer-links"><div><h3>Proyecto</h3><a href="#proyecto">Qué es</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></div><div><h3>Información</h3><a href="#preguntas">Privacidad</a><a href="#proyecto">Nuestra iniciativa</a><a href="#preguntas">Etapa del proyecto</a></div><div><h3>Comunidad</h3><a href="#comunidad">Colabora</a><a href="#colaborar">Difunde</a><a href="#como-funciona">Deja tu huella</a></div></div><p class="copyright">Entre Huellas · Más caminos de vuelta a casa.</p></div><LandingArt name="footer-cat" class="footer-cat" /></footer>
+    <footer class="footer wrap"><LandingSideNote /><LandingArt name="footer-dog" class="footer-dog" /><div class="footer-content"><LandingBrand footer /><p class="development">Proyecto Android en desarrollo.</p><div class="footer-links"><div><h3>Proyecto</h3><a href="#proyecto">Qué es</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></div><div><h3>Información</h3><a href="#preguntas">Privacidad</a><a href="#proyecto">Nuestra iniciativa</a><a href="#preguntas">Etapa del proyecto</a></div><div><h3>Comunidad</h3><a href="#comunidad">Colabora</a><a href="#colaborar">Difunde</a><a href="#como-funciona">Deja tu huella</a></div></div><p class="copyright">Entre Huellas · Más caminos de vuelta a casa.</p></div><LandingArt name="footer-cat" class="footer-cat" /></footer>
   </div>
 </template>

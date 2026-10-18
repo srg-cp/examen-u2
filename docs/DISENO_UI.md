@@ -1,5 +1,17 @@
 # Diseño de la interfaz: implementación y revisión
 
+Android18/10, HU-11: Ver historial se compone como slot en ficha, visible tras
+capacidad autorizada del servidor. Historial/Revisión usan CaseScreenShell,
+glass flotante, cover/stagger con cabecera persistente, superficies compartidas,
+mapa privado de lectura/navegación, selectores y AppTextField con contador500.
+El mapa refleja la precisión GPS registrada, sin círculo de precisión inventado
+para un punto manual. Foto solo tras Ver foto; sin descarga de imágenes en lista.
+Toast/shake/invalid, Guardar revisión con etiqueta constante/shimmer, refresco
+por gesto con contenido conservado y recuperación explícita tras conflicto.
+Clasificación, evidencia y auditoría se presentan separadas; texto aclara que
+Confirmado no garantiza posición actual ni recupera el caso. Renders en
+apps/mobile/build/ui-preview/case-timeline, normal y320×350/texto2, con fixtures.
+
 Android18/10, HU-10.2: acción Reportar avistamiento en ficha abierta y formulario
 con título breve La vi, para no partir palabras con texto200%. Reutiliza
 CaseScreenShell, glass flotante, cover/stagger, fecha/hora independientes,
