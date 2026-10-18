@@ -1,5 +1,46 @@
 # Landing pública en la plataforma
 
+**Radio unificado17/10:** todos los botones de landing comparten cápsula999px,
+incluidos secundarios/lima y tamaños tablet/móvil. Se conserva estilo cromático
+de cada acción y control circular. Validación responsive y build en ESTADO.
+
+**Botones/ilustración17/10:** por referencias del usuario, acciones azules de
+cabecera/cierre ahora son cápsulas con brillo superior, degradado azul/celeste,
+texto blanco y sombra. Botones lima aprobados conservados. dog-report.png
+recreado con imagegen para eliminar la pata extra del perro, preservando PNG
+transparente1312×1199, personajes y emblemas; actualizado en ambos usos. Evidencia
+glossy-buttons/report-anatomy, procedencia en LANDING_ASSETS y validación en ESTADO.
+
+**Corrección de fondos17/10:** restaurada la generación y cobertura de la capa
+.aurora::before eliminada accidentalmente al consolidar colores. Hero original
+y cierre azul vuelven a pintarse. QA navegador ahora comprueba que las capas
+existan y cubran ambas secciones, además del gradiente. Build/QA aprobados y
+capturas revisadas; evidencia aurora-fix en ESTADO. Sin despliegue.
+
+**Corrección4/5/6 del17/10:** oportunidad, comunidad y colaboración restauran
+sus colores de fondos/botones/números/etiquetas originales. Por rectificación
+explícita, «Una huella tuya» conserva la paleta azul nueva. Geometría y recursos
+intactos; sin reintroducir pines02/03. Build/QA en ESTADO, evidencia sections-original.
+
+**Propósito17/10:** numeración01–04 con color original171918 por solicitud del
+usuario. Retirados los pines CSS morados y decoración asociada de pasos02/03;
+PNG/fondos/encuadres conservados. Build y QA responsive en ESTADO, evidencia
+steps-cleanup. Sin publicación.
+
+**Corrección posterior17/10:** el hero vuelve a la paleta original completa,
+incluidos gradiente, botones, badge, valores y fondos de mascotas. El resto
+conserva la paleta azul nueva; geometría y animación intactas. Build/QA y
+renders hero-original-colors en ESTADO. Sin publicación.
+
+**Paleta azul autorizada17/10:** primario3C537B/blanco, secundarioB5D5E9/azul,
+acentos2C87CE; fondos celeste/azul/lavanda y verde suave residual. Se conserva
+crema, mascotas, geometría y movimientos aprobados. Variables compartidas en
+landing.css; botones primary/secondary por función. Cambios solo de presentación,
+sin operaciones, permisos o rutas nuevas. Regla/decisión actualizadas en UI/ADR-060.
+Build, tipos,9 pruebas y QA responsive/200%/SSR/QR aprobados; contrastes de
+acciones AA, capturas revisadas y valoración del usuario pendiente. Evidencia
+blue-palette en ESTADO. No publicado.
+
 **Ajuste tras aprobación17/10:** margen superior del pie reducido a24–48px
 (3vw), conservando texto entre mascotas y encuadre/tamaños aprobados. Nueva
 exportación del logo sincronizada en landing/QR/favicon. Build y QA responsive

@@ -31,7 +31,7 @@ const questions = [
     <header class="header wrap">
       <LandingBrand />
       <nav aria-label="Navegación principal"><a href="#proyecto">Proyecto</a><a href="#como-funciona">Cómo funciona</a><a href="#comunidad">Comunidad</a><a href="#preguntas">Preguntas</a></nav>
-      <a class="button lime header-cta" href="#proyecto">Conoce el proyecto</a>
+      <a class="button button-primary header-cta" href="#proyecto">Conoce el proyecto</a>
     </header>
     <main id="contenido">
       <section id="inicio" class="hero wrap aurora" aria-labelledby="hero-title">
@@ -64,7 +64,7 @@ const questions = [
         </div>
       </section>
       <section class="opportunity wrap" aria-labelledby="opportunity-title"><div class="opportunity-copy"><h2 id="opportunity-title">Un pequeño aviso.<br>Una gran oportunidad.</h2><LandingActions /></div><LandingArt name="home" label="Perrito y gatito delante de una casita" /></section>
-      <section id="comunidad" class="nearby wrap" aria-labelledby="nearby-title"><div><h2 id="nearby-title">La ayuda puede<br>estar cerca.</h2><p>Cada reporte compartido<br>puede sumar a la búsqueda.</p><a href="#colaborar" class="button lime">Conoce la comunidad</a></div><LandingArt name="map" label="Un perro y un gato buscan juntos en un mapa" /></section>
+      <section id="comunidad" class="nearby wrap" aria-labelledby="nearby-title"><div><h2 id="nearby-title">La ayuda puede<br>estar cerca.</h2><p>Cada reporte compartido<br>puede sumar a la búsqueda.</p><a href="#colaborar" class="button button-primary">Conoce la comunidad</a></div><LandingArt name="map" label="Un perro y un gato buscan juntos en un mapa" /></section>
       <section id="colaborar" class="collaborate panel wrap" aria-labelledby="collaborate-title">
         <h2 id="collaborate-title">Ayudar empieza<br>con un aviso.</h2>
         <svg class="connection" viewBox="0 0 600 50" fill="none" aria-hidden="true"><path d="M60 5Q300 65 540 5" stroke="#a7effb" stroke-width="1.5" /><path d="m291 28 9 15 9-15" fill="#63e1f6" /></svg>

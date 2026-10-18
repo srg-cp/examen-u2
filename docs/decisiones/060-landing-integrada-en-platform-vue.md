@@ -37,6 +37,28 @@ acordado entrehuellas.kormind.com, sin crear enlaces o contactos inventados.
 
 ## Consecuencias y validación
 
+Referencia de botones posterior17/10: primarios azules de cabecera/cierre usan
+cápsula, gradiente celeste/azul con blanco, brillo y sombra según capturas del
+usuario. Sustituye el azul plano anterior. dog-report.png se corrige mediante
+imagegen para retirar una extremidad extra, preservando transparencia y
+dimensiones. Sin cambios de layout, arquitectura o permisos.
+
+Corrección posterior17/10: secciones4/5/6 recuperan sus colores originales de
+fondos/botones/números/etiquetas. Por rectificación explícita durante el trabajo,
+«Una huella tuya» conserva la nueva paleta azul; geometría y recursos intactos.
+
+Excepción posterior solicitada: el hero restaura sus colores originales,
+incluidos gradiente, botones, badge, valores y fondos de mascotas. Se conserva
+su geometría/entrada y la nueva paleta azul en las demás secciones.
+
+Actualización visual autorizada17/10/2026 tras cambiar el logo: landing conserva
+composición, crema, mascotas, geometría y animación, pero prioriza azul3C537B,
+acento2C87CE y celesteB5D5E9. Botones principales azul/blanco; secundarios
+celeste/azul. Gradientes con celeste/azul/lavanda y verde residual suave.
+Sustituye la prioridad lima anterior solo en landing; CSS aislado de QR/móvil.
+Variantes de botón usan nombres semánticos button-primary/button-secondary.
+Validar contraste de acciones, responsive/texto ampliado y navegación QR.
+
 FAQ nativo usable sin JavaScript y con teclado; anclas reales, sin botones de
 descarga/registro falsos ni cifras de producto inventadas. Desarrollo Android
 se informa conforme a la landing original. Login web/admin/HU-10 siguen pendientes.

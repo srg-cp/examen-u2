@@ -34,6 +34,25 @@ try {
     assert.equal(await page.locator('.character-label').count(), 24);
     assert.equal(await page.locator('.character-group').first().locator('.character:not([aria-hidden="true"])').count(), 4, 'The four distinct messages remain exposed; visual repetitions are decorative');
     assert.equal(await page.locator('.brand img[src="/brand.png"]').count(), 2);
+    // A gradient declaration alone does not generate or size the painted layer.
+    for (const selector of ['.hero', '.closing']) {
+      const layer = await page.locator(selector).evaluate(el => {
+        const style = getComputedStyle(el, '::before');
+        return {
+          content: style.content, display: style.display,
+          visibility: style.visibility, opacity: Number(style.opacity),
+          width: parseFloat(style.width), height: parseFloat(style.height),
+          expectedWidth: el.clientWidth, expectedHeight: el.clientHeight,
+          background: style.backgroundImage,
+        };
+      });
+      assert.ok(layer.content !== 'none' && layer.content !== 'normal', `${name}: ${selector} background must be generated`);
+      assert.notEqual(layer.display, 'none');
+      assert.notEqual(layer.visibility, 'hidden');
+      assert.ok(layer.opacity > 0 && layer.width > 0 && layer.height > 0);
+      assert.ok(Math.abs(layer.width - layer.expectedWidth) < 1 && Math.abs(layer.height - layer.expectedHeight) < 1, `${name}: ${selector} gradient must cover the section`);
+      assert.ok(layer.background.includes('radial-gradient('));
+    }
     assert.equal(await page.locator('img[src*="landing-reference"]').count(), 0);
     assert.equal(await page.locator('.bandana-layer, .art svg image').count(), 0, 'Emblems must be generated into the artwork, not overlaid');
     for (const breed of ['corgi','dalmatian','tabby']) assert.ok(artwork.some(img => img.src.includes(breed)), 'Diverse pets must be present');

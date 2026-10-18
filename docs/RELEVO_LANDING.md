@@ -19,6 +19,40 @@ actual: «ok esta perfecto». Continuar desde esta base, sin rehacerla.
 
 ## Diseño aprobado que se debe conservar
 
+- Radio de todos los botones999px, incluidos secundarios/lima y responsive,
+ por instrucción posterior del usuario17/10. Regla centralizada en .button.
+
+- Último ajuste17/10: botones azules de cabecera/cierre como referencias del
+ usuario: cápsula999px, degradado75BFFF/459FF6/2887EF, blanco, brillo y sombra.
+ dog-report.png corregido mediante imagegen para retirar quinta pata; mismo
+ tamaño1312×1199 y transparencia. Evidencia glossy-buttons/report-anatomy.
+
+- Corrección17/10 de fondos blancos: .aurora::before requiere content vacío,
+ posición absoluta, z-index:-1 e inset:0. Conservar esta base compartida al
+ modificar gradientes; hero original y cierre azul. QA ahora verifica generación
+ y dimensiones reales de ambas capas. Evidencia aurora-fix en ESTADO.
+
+- Última corrección17/10: secciones4/5/6 (oportunidad/comunidad/colaboración)
+ recuperan colores originales. «Una huella tuya» CONSERVA azul por rectificación
+ explícita del usuario. Hero original, geometría y retirada de pines02/03 intactos.
+ Evidencia sections-original en ESTADO.
+
+- Propósito17/10: 01–04 conservan color original171918; usuario solicita quitar
+ pines CSS morados de imágenes02/03. Eliminados ::before/::after respectivos;
+ no reintroducir overlays. PNG y encuadres intactos. Evidencia steps-cleanup.
+
+- Última corrección17/10: HERO con paleta original (gradiente vivo, botones
+ lima/celeste, badge, valores blancos y fondos de mascotas). Demás secciones
+ y cabecera conservan azul nuevo. Layout/animación intactos. Evidencia
+ hero-original-colors en ESTADO; sustituye la paleta azul del hero.
+
+- Paleta azul autorizada17/10: botones principales3C537B/blanco, secundarios
+ celesteB5D5E9/azul; fondos azul/celeste/lavanda, verde residual suave. Crema,
+ mascotas, geometría, pie y animaciones intactos. Clases de botón ahora
+ button-primary/button-secondary. Sustituye la prioridad lima histórica.
+ Build/tipos/9 pruebas/QA aprobados; evidencia blue-palette en ESTADO.
+ Pendiente valoración visual del usuario; servidor5173 reutilizado.
+
 - Usuario aprueba texto entre mascotas. Último ajuste17/10: solo reducir el
  margen superior del pie a clamp(24px,3vw,48px); resto del encuadre conservado.
  Logo renovado otra vez y sincronizado en web/móvil/splash/iconos. Evidencia

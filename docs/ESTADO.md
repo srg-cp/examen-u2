@@ -1,5 +1,100 @@
 # Estado del proyecto
 
+## Radio de cápsula uniforme en botones de landing —17/10/2026
+
+Por instrucción del usuario, todos los botones comparten border-radius999px.
+La regla base .button centraliza el radio y se retiran valores particulares de
+cabecera/tablet/móvil; el control circular conserva su999px existente. Colores,
+sombras y tamaños conservados. Chrome1440/731/390/320 comprueba todos los botones
+con radio999px y sin overflow. Build SSR aislado en landing-all-buttons-radius-build.log;
+sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Botones azules con brillo y dog-report corregido —17/10/2026
+
+El usuario precisa botones como las referencias: cápsula azul/celeste con
+degradado vertical75BFFF→459FF6→2887EF, texto blanco, brillo superior y sombra
+suave en cabecera/cierre. Se conservan botones lima de hero y secciones4/5.
+Sustituye la propuesta intermedia de degradado celeste con texto oscuro.
+Además pide imagegen para corregir la pata extra del perro en dog-report.png.
+Edición integrada generada y copiada al recurso público:1312×1199 RGBA con
+alpha real, cuatro extremidades del perro, pañuelos/emblemas/personajes
+conservados. Ambas referencias web reciben la imagen nueva. Procedencia y
+prompt en LANDING_ASSETS.md; dimensiones nativas y CSS de encuadre intactos.
+
+Chrome1440/390/320 confirma estilos de cápsula, decodificación de ambos usos,
+bytes servidos nuevos y sin overflow. Botones y ambos usos de ilustración
+revisados en capturas locales ui-preview/glossy-buttons y report-anatomy.
+Build/QA final en landing-glossy-buttons-anatomy-*.log en apps/mobile/build.
+Sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Corrección de fondos ausentes en hero y cierre —17/10/2026
+
+El usuario detecta que ambas secciones quedaron blancas tras el ajuste anterior.
+Causa: al consolidar gradientes se retiraron por error content/position/z-index/
+inset de .aurora::before. Restauradas las cuatro propiedades compartidas;
+hero conserva gradiente original y cierre su gradiente azul. Sin otros cambios
+visuales. Las comprobaciones previas verificaban el color calculado, pero no
+que existiera una capa generada: esa evidencia no acreditaba el fondo visible.
+
+check-landing-browser.mjs verifica ahora en ambas secciones contenido generado,
+visibilidad, opacidad y dimensiones que cubren el contenedor. Build SSR aislado y
+QA Chrome1440/731/390/320/texto200%/FAQ/teclado/anclas/no-JS/CSP/hidratación/QR
+aprobados. Capturas de hero/cierre1440 y390 generadas, ambas1440 revisadas.
+Evidencia landing-aurora-fix-*.log y ui-preview/aurora-fix en apps/mobile/build.
+Sin despliegue. Siguiente paso: revisión local del usuario.
+
+## Colores anteriores en secciones4/5/6; cierre azul conservado —17/10/2026
+
+Por solicitud del usuario, oportunidad, comunidad y colaboración recuperan
+fondos, botones lima/celeste, numeración y etiquetas anteriores a la paleta azul.
+El usuario corrige durante el trabajo que «Una huella tuya» debe conservar azul;
+confirmado su gradiente y botones nuevos. Hero original, ajustes de geometría,
+márgenes/altura y retirada de pines02/03 conservados.
+Build SSR aislado aprobado. Chrome1440/390/320 verifica colores originales en
+4/5/6, cierre azul y sin overflow; capturas escritorio de4/6 revisadas.
+QA general en landing-sections-original-*.log y capturas ui-preview/sections-original
+en apps/mobile/build. Sin despliegue. Siguiente paso: valoración del usuario.
+
+## Propósito: numeración original y sin pines CSS —17/10/2026
+
+Por instrucción del usuario, 01–04 recuperan el color original heredado171918.
+Eliminados los pseudo-elementos de pin morado y trazo decorativo de las imágenes
+02/03 (art-step-found/help); PNG y encuadres conservados. Build SSR aislado
+aprobado. Chrome1440/390/320 confirma cuatro números con color original,
+pseudo-elementos ausentes y sin overflow; captura1440 revisada. QA general en
+landing-steps-cleanup-*.log y capturas ui-preview/steps-cleanup en apps/mobile/build.
+Sin despliegue. Siguiente paso: valoración visual del usuario.
+
+## Hero con sus colores anteriores —17/10/2026
+
+Por corrección del usuario, restaurados solo los colores originales de la
+primera sección: gradiente vivo, botones lima/celeste, badge, valores blancos
+y fondos de mascotas. Alturas, márgenes, recursos y movimientos conservados;
+las demás secciones y cabecera mantienen paleta azul. Reglas UI/ADR-060 actualizados.
+Build SSR aislado aprobado. Chrome1440/390/320 confirma paleta original del hero,
+azul del cierre y ausencia de overflow; captura1440 revisada. QA general de
+landing/SSR/texto200%/QR registrado en landing-hero-original-colors-*.log y
+capturas ui-preview/hero-original-colors en apps/mobile/build. Sin despliegue.
+Siguiente paso: revisión visual del usuario.
+
+## Landing: paleta acorde al nuevo logo azul —17/10/2026
+
+Tras aprobar la propuesta, el usuario autoriza ajustar suavemente los colores.
+Botones principales3C537B/blanco y secundarios celesteB5D5E9/azul; gradientes
+del hero/cierre y tarjetas con azul/celeste/lavanda, verde residual suave en
+decoraciones. Numeración y valores del hero azul profundo para legibilidad;
+iconos2C87CE, FAQ abierto celeste tenue. Crema, textos oscuros, PNG, geometría,
+pie, márgenes y animaciones conservados. Variantes semánticas de botones;
+CSS aislado de QR/móvil. Actualizadas reglas UI y ADR-060.
+
+Build SSR aislado, typecheck y9 pruebas web aprobados. QA Chrome en1440/731/
+390/320px, texto200%, teclado/FAQ/anclas, SSR/no-JS, CSP/hidratación y navegación
+landing→QR→landing aprobado. Comprobación adicional hasta1920px sin overflow.
+Contraste de acciones7.73:1 azul/blanco y5.03:1 azul/celeste, AA; capturas de
+hero escritorio/móvil, beneficios y cierre revisadas. Evidencia local:
+apps/mobile/build/landing-blue-palette-*.log y ui-preview/blue-palette.
+Sin despliegue ni cambios de producto; siguiente paso: valoración del usuario.
+
 ## Nueva exportación del logo de23:30 —17/10/2026
 
 Sincronizada la última exportación del usuario mediante el generador existente:

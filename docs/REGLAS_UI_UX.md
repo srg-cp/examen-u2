@@ -1,5 +1,28 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Landing17/10: todos los botones comparten radio de cápsula999px, por instrucción
+del usuario, también en tablet/móvil. Colores y efectos conservan sus variantes.
+
+Referencia posterior17/10: los botones azules de landing usan acabado cápsula
+con degradado celeste/azul, texto blanco, brillo superior y sombra suave según
+imágenes del usuario. Sustituye primario azul plano3C537B/blanco y propuesta
+intermedia celeste/texto oscuro. Hero y secciones restauradas conservan lima.
+
+Corrección posterior17/10: oportunidad, comunidad y colaboración (4/5/6)
+recuperan su paleta original. «Una huella tuya» conserva azul por rectificación
+explícita. Esta indicación limita la actualización cromática inferior.
+
+Corrección posterior del usuario: el hero conserva su paleta original de
+gradientes vivos, botones lima/celeste y mascotas con fondos anteriores;
+la paleta azul siguiente aplica al resto de la landing.
+
+Actualización autorizada17/10/2026: la landing acompaña el nuevo logo azul.
+Botones principales azul profundo3C537B/blanco; secundarios celesteB5D5E9 con
+texto azul. Gradientes celeste/azul/lavanda, verde residual suave, crema y textos
+oscuros conservados. Sustituye la prioridad lima de la referencia histórica
+inferior; solo aplica a landing. Layout, mascotas y animaciones aprobadas siguen.
+Registro en ADR-060 y ficha de landing.
+
 Landing17/10/2026: al integrar la referencia de feature/landing-page, conservar
 su mockup institucional aprobado del11 de octubre (crema/lima/celeste/personajes).
 Es excepción deliberada para presentación, sin extender esa paleta a QR/acceso/

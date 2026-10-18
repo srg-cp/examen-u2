@@ -252,6 +252,18 @@ integración no equivale a aprobación artística del conjunto.
 
 # Colección vigente: estilo del dálmata aprobado
 
+## Corrección anatómica de dog-report —17/10/2026
+
+Por solicitud del usuario se sustituye dog-report.png mediante imagegen integrado
+(edición precise-object-edit del recurso anterior). Fuente generada:
+exec-151f282c-8705-43ac-9f3d-e720e9b41e4d.png, conservada en generated_images de
+Codex y copiada al recurso público. PNG1312×1199 con alpha real, dimensiones
+previas conservadas. Se pidió retirar la pata delantera extra bajo la pata que
+sostiene el papel: exactamente una delantera levantada, otra apoyada y dos
+traseras sentadas. Conservar spaniel, gata calicó, papel, pañuelos petróleo y
+terracota, emblemas blancos, pelaje/expresiones y composición, sin fondo añadido.
+Revisión visual de anatomía y ambos usos web en ESTADO. Sin filtros posteriores.
+
 La pasada [Colección desde el dálmata aprobado](LANDING_APPROVED_STYLE.md)
 sustituye los recursos y estados de rechazo anteriores para las ocho variantes.
 El dálmata fue aprobado explícitamente por el usuario antes de esta pasada.
