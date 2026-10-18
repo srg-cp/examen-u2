@@ -511,3 +511,9 @@ Vue/CSS/SVG para tarjetas, etiquetas, superficies y decoración; logo oficial.
 No se cambia el stack Nuxt ni el hero aprobado, ni se implementan operaciones
 nuevas de producto. Sin HU/RF/issue nuevos ni cierre de historias. Revisión local
 según ESTADO; publicación/redeploy no incluidos.
+
+Actualización de identidad17/10: se amplía diversidad de mascotas/pelajes/pañuelos
+y se regenera el emblema blanco dentro de las ilustraciones, sin overlays.
+Logo actualizado en web/QR/favicon y recursos Flutter/nativos, sin nuevos casos
+de uso, permisos, HU/issue o ampliación funcional de plataformas futuras.
+Validación y límites registrados en ESTADO y ficha identidad-visual.

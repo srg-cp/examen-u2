@@ -1313,6 +1313,9 @@ html:has(.landing-page) {
 }
 .landing-page .character .art { position:absolute; inset:14% 0 0; width:100%; aspect-ratio:auto; }
 .landing-page .character .art img { object-fit:cover; object-position:50% 100%; }
+.landing-page .character .art-return img,
+.landing-page .character .art-help-dalmatian img { object-fit:contain; }
+.landing-page .character .art-return img { width:160%; max-width:none; margin-left:-30%; }
 .landing-page .character-label { box-shadow:0 1px 0 #ffffffb3; }
 .landing-page .step-art { aspect-ratio: 3.6 / 1; isolation:isolate; background:linear-gradient(165deg,#8acbff,#d1f1ee 58%,#fff5a5); }
 .landing-page .step-art img { width:65%; margin-inline:auto; object-fit:contain; object-position:50% 30%; }

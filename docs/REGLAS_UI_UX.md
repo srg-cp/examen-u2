@@ -429,3 +429,9 @@ Corrección17/10/2026 de landing: el mockup solo sirve como referencia, nunca
 como atlas/fondo recortado de la UI. Usar las ilustraciones imagegen independientes
 y el logo oficial, con tarjetas/etiquetas/superficies Vue/CSS/SVG. La animación
 principal está aprobada y se conserva con sus tiempos y movimiento reducido.
+
+Ilustraciones17/10: por precisión del usuario, el emblema blanco se integra en
+los PNG mediante imagegen como estampado sobre la tela. Prohibido sustituirlo
+por un logo superpuesto a las mascotas desde Vue/CSS/SVG. Variar mascotas, razas,
+pelajes y colores de pañuelo, manteniendo estilo y animación hero aprobados.
+La marca de navegación/favicon usa las fuentes oficiales actualizadas de logo/.

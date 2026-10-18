@@ -1,5 +1,10 @@
 # Arquitectura de Entre Huellas
 
+Identidad17/10: diez ilustraciones con estampados blancos generados dentro del
+tejido, sin overlays; marca /brand.svg oficial actualizada y fallback PNG.
+Recursos Flutter/launchers/splash regenerados desde logo/. Sin cambios de capas,
+permisos o soporte funcional de plataformas futuras. Ver ficha identidad-visual.
+
 Recursos de landing17/10: LandingArt consume siete ilustraciones independientes
 imagegen, sin atlas del mockup; LandingCharacterCard compone figura/caption/SVG,
 CSS dibuja superficies y decoración y LandingBrand usa /brand.png oficial.

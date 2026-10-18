@@ -134,3 +134,5 @@ audit completo/runtime antes de distribuir nuevas versiones.
 ## Recursos de la landing
 
 Se retiró el atlas del mockup: `public/images/landing` contiene siete PNG RGBA independientes generados individualmente con imagegen. Componentes Vue y CSS dibujan la UI; el logo oficial sigue siendo `/brand.png`. Consultar [prompts y procedencia](LANDING_ASSETS.md). La animación aprobada del hero se conserva. Los PNG priorizan detalle y alfa; no se ha medido rendimiento de red móvil real ni Core Web Vitals. Los recursos se cargan de forma diferida salvo hero y se reutilizan por URL. El incremento no publica ni hace redeploy.
+
+Actualización posterior de marca/diversidad17/10: diez ilustraciones con mascotas y pañuelos variados. El emblema blanco se genera dentro de la tela, usando only-black.svg como referencia; no hay capas de logos superpuestas. La marca usa /brand.png actualizado y el favicon /brand-icon.png; /brand.svg conserva el vector oficial disponible. Ver LANDING_ASSETS.md para prompts finales y procedencia. No se añaden dependencias ni se modifica el hero aprobado.

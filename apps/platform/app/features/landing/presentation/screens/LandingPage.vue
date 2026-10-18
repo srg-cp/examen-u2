@@ -6,8 +6,8 @@ import LandingBrand from '../widgets/LandingBrand.vue';
 import LandingActions from '../widgets/LandingActions.vue';
 import '../styles/landing.css';
 const characters = [
-  { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search' },
-  { title: 'Encontré', art: 'found' }, { title: 'Ayudo', art: 'help' },
+  { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search-corgi' },
+  { title: 'Encontré', art: 'found-tabby' }, { title: 'Ayudo', art: 'help-dalmatian' },
   { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search' },
 ] as const;
 const benefits = [

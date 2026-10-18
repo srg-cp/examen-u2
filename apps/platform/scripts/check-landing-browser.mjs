@@ -30,10 +30,12 @@ try {
     const artwork = await page.locator('.art img').evaluateAll(images => images.map(img => ({ src: img.getAttribute('src'), width: img.naturalWidth, height: img.naturalHeight })));
     assert.ok(artwork.length >= 17);
     assert.ok(artwork.every(img => img.src.startsWith('/images/landing/') && img.width >= 1024 && img.height >= 800), 'Independent high-resolution artwork required everywhere');
-    assert.equal(new Set(artwork.map(img => img.src)).size, 7);
+    assert.equal(new Set(artwork.map(img => img.src)).size, 10);
     assert.equal(await page.locator('.character-label').count(), 6);
     assert.equal(await page.locator('.brand img[src="/brand.png"]').count(), 2);
     assert.equal(await page.locator('img[src*="landing-reference"]').count(), 0);
+    assert.equal(await page.locator('.bandana-layer, .art svg image').count(), 0, 'Emblems must be generated into the artwork, not overlaid');
+    for (const breed of ['corgi','dalmatian','tabby']) assert.ok(artwork.some(img => img.src.includes(breed)), 'Diverse pets must be present');
     assert.equal(await page.locator('.hero').evaluate(el => getComputedStyle(el).animationName), 'none');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${name}: overflow`);
     const broken = await page.locator('a[href^="#"]').evaluateAll(links => links.filter(a => !document.getElementById(a.getAttribute('href').slice(1))).map(a => a.getAttribute('href')));
@@ -48,7 +50,7 @@ try {
     await page.waitForFunction(() => location.hash === '#comunidad');
     assert.equal(await page.locator('#comunidad').evaluate(el => Math.abs(el.getBoundingClientRect().top) < 100), true);
     assert.deepEqual(errors, []); assert.equal(server.reads(), 0);
-    results.push(`${name}: HTML, native FAQ/keyboard, anchors, 7 independent illustrations, official logo, native cards, image decode, no overflow, no inline styles/CSP/hydration errors`);
+    results.push(`${name}: HTML, native FAQ/keyboard, anchors, 10 independent illustrations with printed white emblems, official logo, native cards, image decode, no overflow, no inline styles/CSP/hydration errors`);
     await page.close();
   }
   const animated = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

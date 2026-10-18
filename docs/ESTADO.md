@@ -1,5 +1,207 @@
 # Estado del proyecto
 
+## Dálmata regenerado desde la referencia indicada —17/10/2026
+
+El usuario rechazó también `exec-e5839c84` por sombra oscura en la mejilla y
+cola insuficiente. Se generó una nueva imagen usando directamente su referencia
+`mockups/Imagen de ChatGPT 7 oct 2026, 17_03_12.png` y el emblema oficial,
+sin usar como entrada el dálmata rechazado. Recurso integrado:
+`exec-228f74fc-9ac3-428c-89de-5a5f1d1932bc.png`, 1312×1199 RGBA, sin filtros
+posteriores. Orejas negras, pañuelo naranja con emblema blanco, cola completa
+con mechones visibles. Se corrigió además el encuadre de su tarjeta: contain
+en lugar de cover para mostrar toda la ilustración, incluida la cola.
+La aprobación artística del usuario sigue pendiente; no se afirma que ImageGen
+haya reproducido al 100 % el original ni se declara terminada toda la colección.
+Validación de esta versión: build de producción y check de navegador pasados
+(`landing-dalmatian-reference-build.log` y `landing-dalmatian-reference-browser.log`
+en apps/mobile/build). Chrome: 1440/731/390/320 px y texto al 200 %, imágenes
+decodificadas, sin overflow, SSR/FAQ/teclado/anchors y navegación QR comprobados.
+Captura de tarjetas revisada: cola completa visible. Sin despliegue.
+
+## Sustitución concreta del dálmata con ImageGen —17/10/2026
+
+Se reemplazó `apps/platform/public/images/landing/dalmatian.png` por la nueva
+edición `exec-e5839c84-0e7b-46ec-8087-e9bfc66c8f4c.png`, conservada también en
+el directorio generated_images de Codex. Edición directa con ImageGen, sin
+filtros manuales de color, alfa ni desenfoque posteriores. Conserva pañuelo
+naranja, emblema blanco integrado, pose de saludo y cola con hebras definidas.
+La comparación al 100 % sobre gris muestra reducción del halo anterior y
+continuidad del pelo negro en el borde de la oreja. No se declara igualdad
+píxel a píxel con la referencia ni aprobación artística del usuario.
+
+La pareja pública conserva los píxeles originales fuera de las dos áreas de
+estampado. Los otros ocho recursos no se sustituyeron en esta pasada: sigue
+pendiente completar la revisión de toda la colección. Build de producción
+comprobado; evidencia `apps/mobile/build/landing-dalmatian-final-build.log`.
+No se publicaron cambios ni se modificó la animación principal.
+
+## Criterio vigente del usuario: variantes desde la referencia original —17/10/2026
+
+La corrección cromática posterior TAMBIÉN fue rechazada: ribete blanco sobre
+pelo negro y pérdida de detalle en la cola. No hay aprobación del dálmata ni
+del conjunto. No se han iniciado las otras ocho generaciones anunciadas ni
+se han integrado los dos candidatos nuevos. La petición visual ya es clara;
+repetir el prompt o pedir de nuevo la misma aclaración no resuelve el defecto.
+Imagegen no ha conseguido reproducir el acabado solicitado en estas pruebas.
+Se conserva la pareja con pelaje original y emblemas; el dálmata público sigue
+siendo el recurso anterior rechazado, no una corrección aprobada.
+
+Inspección de solo lectura de bordes negros del candidato: los puntos muestreados
+tienen RGB oscuros incluso en semitransparencia. Eso no demuestra por sí solo
+contaminación por un fondo blanco; no aplicar una fórmula de eliminación de
+matte sobre toda la imagen suponiendo una causa que no está acreditada. El
+rechazo artístico del usuario permanece vigente aunque esos puntos sean oscuros.
+
+El nuevo dálmata desde el master también fue rechazado por un borde anaranjado.
+El prompt arrastraba «ivory» y el sombreado/material del master; no usar marfil
+ni iluminación cálida sobre pelo blanco. El usuario exige blanco neutro sin
+tinte y detalle de fibras, conservando el emblema. Se detienen las otras ocho
+variantes; solo se prueba una corrección cromática con imagegen sobre ese
+candidato, manteniendo su groom. Ninguno de estos dos candidatos se ha integrado.
+
+El usuario vuelve a exigir imagegen guiado por hero-bienvenida.png para TODAS
+las mascotas: hebras/mechones definidos, volumen de cola y espacios transparentes
+limpios, sin difuminación, halo blanco/gris/naranja ni contorno. Mantener el
+emblema oficial estampado en tela. Se descarta usar las variantes rechazadas
+como referencia visual para nuevas generaciones. Se inicia un nuevo dálmata
+desde el original como comprobación previa del acabado; no publicar ajustes
+manuales de alfa como sustituto de esta nueva petición de generación.
+
+Estado real al recibir esa instrucción: pareja pública basada en el original
+con solo dos zonas de estampado procedentes de imagegen (20246píxeles cambiados,
+cero cambios de RGBA fuera de pañuelos y cero cambios de alfa). Dálmata público
+con ajuste local de color anterior, rechazado por halo. El candidato de limpieza
+de alfa está solo en build/landing-local-correction y NO se ha integrado. Las
+demás imágenes mantienen la pasada anterior y no se consideran aprobadas.
+La copia temporal de pareja sin logo fue reemplazada por la versión con estampados.
+
+Verificación de esa pareja y PNG anteriores: build/landing-local-web-{build,browser}.log
+(SSR y Chrome responsive aprobados). Es evidencia de integración, no de aceptación
+artística ni validación de los candidatos nuevos. Sin despliegue o commit.
+Siguiente paso: revisar la generación desde el master original y completar el
+conjunto según ese acabado. Las notas inferiores son historial de intentos.
+
+## Revisión del pelaje de landing —17 de octubre de2026
+
+**Referencia principal aclarada después:** el usuario compara la cola compacta
+del reencuentro generado con mockups/landing-mascotas-v1/hero-bienvenida.png:
+busca volumen y mechones separados, además de pelo blanco sin franja gris. Se
+abandona el enfoque de seguir suavizando las siluetas rechazadas. El original
+hero1536×1024 ya es RGBA transparente (muestras exteriores con alfa0), por lo
+que no necesita extracción de fondo. Se prueba una edición mínima con imagegen
+que solo cambia los estampados genéricos por el símbolo oficial, preservando
+el pelo original; muestra fuera del público, sin dar por corregido el dálmata.
+No se ha ejecutado la propuesta de corrección manual de color/alfa.
+
+Muestra generada1536×1024 en build/landing-approved-source-review/hero-bienvenida.png;
+alfa exterior0 comprobado y comparación de cola al100% en
+build/ui-preview/landing-approved-tail-comparison.png. Se compara fuente original,
+edición mínima solicitada para logos y reencuentro rechazado. No se afirma
+identidad de píxeles fuera del estampado. Pendiente revisión de esta nueva vía
+antes de producir variantes, sin nuevos reemplazos públicos ni build.
+
+**Corrección posterior del usuario:** también rechaza el último piloto y el
+conjunto extendido: detecta sombreado gris/oscuro alrededor del pelo blanco,
+especialmente en la oreja del dálmata. La integración y los checks descritos
+abajo no equivalen a acabado aceptado. Se detienen los reemplazos en bloque y
+se prepara una sola muestra dirigida al sombreado del pelo blanco junto a la
+silueta, manteniendo manchas negras y detalle. Referencia de problema: captura
+codex-clipboard-c22d3e04-c379-47e2-9e9c-a5756c6bfcef.png. No se altera todavía
+el conjunto público ni se repite build para una muestra fuera de ejecución.
+
+Muestra preparada con imagegen en dos ediciones: retirar la franja gris del
+material blanco y después recuperar hebras en esa silueta clara. La primera
+quedó demasiado lisa y se conserva solo como intermedio. Candidato y comparación
+de oreja al100% en build/landing-white-fur-review/dalmatian.png y
+build/ui-preview/landing-white-fur-ear.png. PNG inspeccionado, renderizado sin
+modificar píxeles con scripts; sin sustituciones públicas en esta revisión.
+Siguiente paso necesario: revisión del acabado de esta muestra por el usuario
+antes de extrapolar el tratamiento; la corrección global permanece pendiente.
+
+El usuario rechazó también esta muestra. Se detienen nuevas generaciones a ciegas.
+Diagnóstico de solo lectura: comparación del mismo PNG sobre blanco/gris/oscuro
+y muestreo RGBA nativo, sin modificar el recurso. Hay cambios de color dentro
+de las fibras de la zona blanca, además de píxeles semitransparentes; no atribuir
+todo el defecto exclusivamente a CSS o alfa. Evidencia: build/landing-edge-diagnosis.json
+y build/ui-preview/landing-edge-diagnosis.png. Se propone probar una corrección
+localizada de color/transparencia preservando las hebras existentes; requiere
+que el usuario elija ese cambio de método frente a su petición de usar imagegen.
+No se ha ejecutado tratamiento de píxeles ni modificado el conjunto público.
+
+El usuario rechazó las pasadas de contornos: mantenían perfiles/luminosidad y
+perdían detalle. Referencia prioritaria actual: mockups/landing-mascotas-v1/
+gatito-curioso.png. Se calibró primero un dálmata con hebras visibles y color
+local hasta las puntas, en vez de desenfocar su perímetro. Después se generaron
+individualmente los otros nueve PNG desde las copias previas al suavizado. Los
+diez archivos seleccionados están integrados en apps/platform/public/images/landing;
+conservan mascotas, escenas, pañuelos y emblemas blancos estampados en tejido.
+Sin cambios de UI, hero/tiempos, fuentes de marca, móvil, datos o publicación.
+
+Validación local de esta pasada: diez copias exactas de los PNG seleccionados,
+RGBA y dimensiones nativas contrastadas con landing_artwork.ts; ocho1254×1254 y
+dos1774×887,20862121bytes en total (build/landing-fur-assets.log). Revisión de
+archivos y comparación visual sobre fondos claros/oscuros; detalle nativo en
+build/ui-preview/landing-fur-pilot-detail.png, conjunto en landing-natural-edges
+y landing-natural-edges-dark. Build SSR aislado aprobado sin cerrar el servidor
+de desarrollo del usuario (build/landing-fur-web-build.log).
+
+QA Chrome aprobado en1440/731/390/320 y320 con texto200%: diez recursos
+decodificados, sin overflow ni errores CSP/hidratación/recursos; sin logos
+superpuestos, FAQ/anclas/teclado/sinJS, hero original/movimiento reducido y SPA
+landing→QR→landing conservados (build/landing-fur-web-browser.log). Capturas
+actualizadas y revisadas en build/ui-preview/landing-vue. No se repiten pruebas
+Flutter ni de negocio para una sustitución de PNG. Estas comprobaciones verifican
+integración; no equivalen a aprobación artística del usuario. Pendientes revisión
+visual final del usuario, Safari/Firefox y publicación cuando se autorice.
+Prompts/procedencia: apps/platform/LANDING_ASSETS.md. Siguiente paso: revisar esta
+versión local y conservar como referencia el pelo definido, sin perfilarlo.
+
+## Diversidad, pañuelos estampados y logo actualizado —17 de octubre de2026
+
+Petición del usuario en feature/vue-nuxt-web: más mascotas/razas/pelajes, pañuelos
+variados y only-black.svg en blanco INTEGRADO en la tela mediante imagegen,
+expresamente sin superposiciones. Se generaron corgi, dálmata y atigrado, y después
+se regeneraron los10 PNG finales con estampados blancos y colores carbón, verde,
+marino, burdeos, petróleo, ciruela y terracota. Escenas incluyen spaniel, mestizo/
+calicó, retriever/gato gris y beagle/gato blanco-negro, conservando composición y
+transparencia. Retiradas todas las capas SVG/posiciones de emblemas del intento
+inicial corregido por el usuario. LandingArt solo muestra PNG; caption/superficies/
+CTA/decoración siguen siendo Vue/CSS/SVG reales. Hero/animación/tiempos intactos.
+Prompts finales y procedencia: apps/platform/LANDING_ASSETS.md; recursos finales
+en apps/platform/public/images/landing. [Ficha](funcionalidades/identidad-visual.md).
+
+Fuentes actualizadas por el usuario en logo/ conservadas. Logo oficial propagado
+a header/footer/QR, favicon PNG256 y vector completo disponible en brand.svg;
+PNG oficial@2x en brand.png y BrandMark/BrandWordmark/StartupReveal. Navegación usa
+el PNG original para conservar la textura sin aliasing de filtros SVG a tamaño
+pequeño. Splash Android, iconos clásicos/adaptativos/monocromo, catálogos iOS/macOS,
+Windows y PWA/favicon Flutter regenerados con flutter_launcher_icons0.14.4. Se
+corrigen rutas relativas después de apps/mobile y se conserva la bandera Xcode
+Swift asset symbols ante el comportamiento del generador, sin cambiar paquetes.
+Hashes confirman copias PNG/SVG exactas y tamaños de todos los PNG en catálogos.
+No se recrean apps ni se habilita soporte funcional de plataformas futuras.
+
+Validación: Flutter analyze global sin incidencias y28 pruebas de app/acceso/
+Google/fronteras aprobadas (build/brand-refresh-{analyze,tests}.log). Harness global
+de capturas falló con MissingPluginException de path_provider/caché de flutter_map
+y búsqueda de Cerrar al avanzar un flujo; no se cambió ese harness ni se afirma
+regresión visual global aprobada (brand-refresh-renders.log). Render focalizado
+de BrandWordmark con fuente real y precarga de imagen aprobado, normal390/texto200%
+en320, en build/brand-refresh-focused-renders.log y ui-preview/brand-refresh.
+Typecheck web, build SSR aislado para conservar el dev server abierto,9 unitarias/
+fronteras y3 pruebas de producción aprobadas. QA Chrome final con10 imágenes,
+logo oficial, sin overlays ni errores CSP/hidratación/recursos/overflow, responsive
+1440/731/390/320 y texto200%, FAQ/teclado/sin JS, hero/movimiento reducido y SPA
+landing→QR→landing aprobado; regresión QR completa también aprobada. Logs
+apps/mobile/build/brand-refresh-web-{build,tests,server,browser}.log y
+brand-refresh-qr-browser.log; capturas revisadas en ui-preview/landing-vue.
+
+Sin SQL, cambios de negocio, dependencias nuevas, publicación, push o commit.
+No se compilaron APK/iOS/macOS/Windows ni se comprobó launcher instalado; iconos
+requieren recompilación/reinstalación. Pendientes Safari/Firefox, harness móvil
+global y despliegue cuando se autoricen. Siguiente paso: revisar recursos/landing
+local y publicar/reinstalar en el incremento que corresponda.
+
 ## Landing: ilustraciones independientes y componentes reales —17 de octubre de2026
 
 Por instrucción del usuario, en la rama vigente feature/vue-nuxt-web y apps/platform,

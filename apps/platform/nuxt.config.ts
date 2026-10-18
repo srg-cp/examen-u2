@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'es' },
       title: 'Entre Huellas',
       meta: [{ name: 'referrer', content: 'no-referrer' }],
-      link: [{ rel: 'icon', href: '/brand.png', type: 'image/png' }],
+      link: [{ rel: 'icon', href: '/brand-icon.png', type: 'image/png' }],
     },
   },
 });

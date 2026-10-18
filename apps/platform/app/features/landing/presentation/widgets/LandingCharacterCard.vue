@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LandingArt from './LandingArt.vue';
-defineProps<{ title: string; art: 'search' | 'found' | 'help' | 'return'; decorative?: boolean }>();
+defineProps<{ title: string; art: 'search' | 'found' | 'help' | 'return' | 'search-corgi' | 'found-tabby' | 'help-dalmatian'; decorative?: boolean }>();
 </script>
 <template>
   <figure class="character" :aria-hidden="decorative ? true : undefined">

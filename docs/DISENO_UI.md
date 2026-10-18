@@ -438,3 +438,15 @@ Se elimina del público landing-reference.png. Header/footer usan el logo oficia
 /brand.png; ningún logo generado. Conservar hero y sus cover/stagger, tiempos y
 movimiento reducido aprobados por el usuario. Composición y CSS siguen aislados
 de QR; escenas pueden reencuadrarse como ilustraciones, nunca como capturas UI.
+
+## Diversidad y marca —17/10/2026
+
+Diez PNG independientes: corgi, dálmata, gato atigrado, pastor/ragdoll, spaniel,
+mestizo/calicó, retriever/gato gris y beagle/gato blanco-negro. Pañuelos carbón,
+verde bosque, marino, burdeos, petróleo, ciruela y terracota según mascota.
+Emblema de only-black.svg estampado en blanco por imagegen dentro de la tela,
+con perspectiva/textura/pliegues; no se superpone desde CSS/SVG. LandingArt solo
+presenta PNG y LandingCharacterCard conserva figura/caption/decoración nativas.
+Fuentes oficiales actualizadas en logo se conservan; copias oficiales PNG en landing/QR/favicon y /brand.svg disponible como vector y recursos
+Flutter/launchers/splash actualizados. Animación hero aprobada conservada.
+Prompts finales/procedencia: apps/platform/LANDING_ASSETS.md.

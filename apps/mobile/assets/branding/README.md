@@ -1,7 +1,9 @@
 # Recursos de marca
 
-`app_icon.png` procede del PNG original entregado en `logo/`.
+Los originales oficiales están en `logo/`. La actualización del17 de octubre de2026 se propaga a BrandMark/BrandWordmark/StartupReveal mediante `app_icon.png`, copia exacta de `Logo EntreHuellas 512 vector inner v2@2x.png`. No se modifica el símbolo ni se cambian identificadores de paquetes. La marca tipográfica sigue siendo texto de la app.
 
-`google_g.png` es el símbolo de Google para el botón de acceso, obtenido del recurso oficial https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_128dp.png (128 × 128). Se incluye como asset local y se muestra sin deformación; no se descarga durante el login.
+El recurso Android `drawable-nodpi/startup_brand.png` usa el mismo original. Los iconos de launcher clásicos/adaptativos/monocromáticos y los catálogos iOS/macOS, favicon/PWA Flutter y Windows se regeneran mediante `tool/generate_android_icons.ps1`, con `flutter_launcher_icons.yaml`. Desde apps/mobile ejecutar `./tool/generate_android_icons.ps1`. Las rutas al directorio logo usan ../../ tras la organización apps/mobile. Se conservan formas/colores SVG en Android; los filtros no soportados por VectorDrawable no se convierten. iOS recibe iconos sin alfa. El script preserva la bandera Xcode de Swift asset symbols ante el comportamiento de flutter_launcher_icons0.14.4.
 
-La marca del login se compone en `BrandWordmark` reutilizando `BrandMark` con `app_icon.png`, copia exacta de `logo/Logo EntreHuellas 512 vector inner v2@2x.png`, y el texto Entre Huellas. El símbolo verde original reemplaza la huella genérica de Material. La tipografía actual es sans serif del sistema.
+Generar estos archivos no acredita compilación, instalación ni soporte completo en las plataformas futuras; Android sigue siendo la prioridad del MVP. Las comprobaciones efectivas se registran en docs/ESTADO.md.
+
+`google_g.png` sigue siendo el símbolo oficial de Google para el botón de acceso, independiente de la marca Entre Huellas. No se reemplaza por el nuevo logo.

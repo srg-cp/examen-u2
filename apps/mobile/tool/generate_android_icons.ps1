@@ -3,7 +3,7 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $appDirectory = Split-Path -Parent $PSScriptRoot
-$repoDirectory = Split-Path -Parent $appDirectory
+$repoDirectory = Split-Path -Parent (Split-Path -Parent $appDirectory)
 $vectorSourcePath = Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2-16.svg'
 $resourcesDirectory = Join-Path $appDirectory 'android/app/src/main/res'
 $utf8Encoding = New-Object System.Text.UTF8Encoding($false)
@@ -24,6 +24,13 @@ try {
 } finally {
     Pop-Location
 }
+
+# flutter_launcher_icons 0.14.4 can mistake the Swift asset flag for an icon name.
+# Preserve that unrelated Xcode boolean after regenerating icon catalogs.
+$iosProjectPath = Join-Path $appDirectory 'ios/Runner.xcodeproj/project.pbxproj'
+$iosProject = [System.IO.File]::ReadAllText($iosProjectPath)
+$fixedIosProject = $iosProject.Replace('ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;', 'ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;')
+if ($fixedIosProject -ne $iosProject) { [System.IO.File]::WriteAllText($iosProjectPath, $fixedIosProject, $utf8Encoding) }
 
 function Write-IconResource {
     param([string]$RelativePath, [string]$XmlContent)
@@ -92,4 +99,4 @@ Write-IconResource 'mipmap-anydpi-v33/ic_launcher.xml' @'
 </adaptive-icon>
 '@
 
-Write-Output 'Iconos Android clásicos, adaptativos y monocromáticos generados.'
+Write-Output 'Iconos Android clásicos/adaptativos/monocromáticos y catálogos iOS/web/Windows/macOS generados.'
