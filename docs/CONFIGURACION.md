@@ -1,5 +1,62 @@
 # Configuración y validación de la app
 
+## Seguimiento y alertas — HU-12, 18/10/2026
+
+026 y [patch027](../database/patchs/027_patch_notifications.sql) ya confirmados
+por el usuario; no reaplicarlos. Confirmación comunicada, sin inspección remota
+independiente. Actualizar Flutter. Regeneración de artefactos:
+Build-NotificationsPatch.ps1 y Build-RunAll.ps1. No repetir025/026/027 ni ejecutar
+run_all como sustituto del patch.
+No requiere cambiar Nuxt: las escrituras existentes activan los triggers nuevos.
+
+Seguimiento/bandeja funcionan con sesión Supabase y clave publicable, sin Firebase.
+Abrir campana → preferencias → activar recepción/tipos/canales, seguir zona propia
+o caso y generar un evento nuevo con otra cuenta o desde QR. Instalar no genera
+alertas retroactivas. Leer, reiniciar, paginar y abrir caso con permisos actuales.
+No confundir Guardados con seguimiento ni asumir que una zona existente se sigue.
+
+Para push Android, registrar en Firebase el identificador existente
+`com.example.flutter_application_entrehuellas` (no renombrarlo). Descargar su
+google-services.json a apps/mobile/android/app/google-services.json, ignorado
+por Git. El plugin Google Services4.4.4 se aplica solo cuando existe ese archivo.
+Su configuración nativa permite recibir con app terminada; conservarla junto
+con los cuatro valores públicos de compilación del mismo proyecto:
+
+| Define Flutter | Valor del proyecto Android Firebase |
+| --- | --- |
+| FIREBASE_API_KEY | API key pública del proyecto/app |
+| FIREBASE_APP_ID | App ID Firebase Android, no el package name |
+| FIREBASE_MESSAGING_SENDER_ID | Número de proyecto / sender ID |
+| FIREBASE_PROJECT_ID | ID del proyecto Firebase |
+
+Añadirlos al mecanismo local de dart-defines existente, conservando los de
+Supabase/web. Sin los cuatro valores, Firebase no se activa; el botón informa
+indisponibilidad y la bandeja sigue operativa. Nunca colocar private_key,
+service_role o JSON de cuenta de servicio en esos defines ni en google-services.json.
+Dependencias fijadas firebase_core4.0.0/firebase_messaging16.0.0 para el contrato
+de registration token HTTP v1; no migrar a FID/APIs de v17 implícitamente.
+Referencia: [configuración Android oficial](https://firebase.google.com/docs/android/setup)
+y [FCM Flutter](https://firebase.google.com/docs/cloud-messaging/flutter/get-started).
+
+Activar FCM HTTP v1 y configurar secrets/desplegar Edge notification-delivery
+según [su README](../supabase/functions/notification-delivery/README.md).
+Configurar un planificador de servidor una vez por minuto con secreto seguro;
+sin planificador no se envía la cola automáticamente. Nada de esto está
+desplegado/programado por este incremento. La autorización actual cubre código
+y validación local; no modifica recursos remotos ni claves del usuario.
+
+Demo pendiente: dos usuarios y dos sesiones; no consultar/marcar bandeja ajena;
+seguir/dejar de seguir, pausar/tipos/canales, zona fuera/dentro de radio;
+FCM caído → alerta guardada → restaurar proveedor → reintento sin duplicar
+bandeja; token UNREGISTERED y token renovado; cierre antes del reintento;
+permiso denegado/aceptado, app abierta/en segundo plano/terminada, login al tocar
+aviso, cambio de cuenta y logout offline. Se acepta repetición del push tras acuse
+perdido; no se acredita entrega solo con estado sent.
+
+Intentos locales de APK debug (normal y preferencia IPv4) bloqueados por Gradle:
+`java.io.IOException: Unable to establish loopback connection` antes de compilar.
+No hay APK nuevo acreditado; compilar y ejecutar Android sigue pendiente.
+
 ## Cronología y revisión — HU-11, 18/10/2026
 
 El usuario indicó «ok ya esta» tras la entrega025; se conserva esa confirmación,

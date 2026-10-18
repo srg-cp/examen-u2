@@ -1,5 +1,10 @@
 # Patches manuales de Supabase
 
+027_patch_notifications.sql: HU-12.1/#40,12.2/#41,12.3/#42. Generado por
+Build-NotificationsPatch.ps1 desde plan027/fuentes091–095. Requiere026 confirmado.
+Aplicar solo027 completo en desarrollo; sin backfill ni secrets/cron.
+Activación hosted/Firebase/Edge/planificador pendientes. Véase CONFIGURACION.
+
 024_patch_public_sightings.sql: HU-10.1/#36, aplicar completo en desarrollo
 después de023 y junto con el servidor Nuxt actualizado. RPC autorizada solo
 service_role, tabla/evidencia privada, idempotencia y límites persistentes.

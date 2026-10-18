@@ -252,6 +252,17 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 
 ### S5 - Seguimiento, alertas y cierre
 
+18/10/2026: después de la confirmación operativa de HU-11 registrada en ESTADO,
+se implementa localmente HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42: seguimiento
+explícito separado de Guardados, zonas propias, destinatarios en servidor,
+bandeja paginada/leído y outbox transaccional con Edge FCM HTTP v1 y reintentos.
+Plan027; no se reaplica026 confirmado. Configuración Firebase, planificador,
+activación027, entrega y concurrencia hosted/Android pendientes; sin cierre
+de historias por evidencia local. [Ficha](funcionalidades/seguimiento-y-alertas.md),
+[ADR-067](decisiones/067-seguimiento-bandeja-y-push.md). Las notas de activación026
+pendiente inmediatamente inferiores describen la entrega anterior, sustituida
+por la confirmación más reciente del usuario en ESTADO.
+
 18/10/2026: HU-11.1 / RF-14 / #38 y HU-11.2 / RF-12,14 / #39 implementadas
 localmente en Android. Historial propio ordenado por hora del suceso, recepción
 y tardíos separados, foto/punto privados y clasificación con motivo/actor/fecha

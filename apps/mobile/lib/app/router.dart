@@ -1,3 +1,6 @@
+import '../features/notifications/presentation/screens/inbox_screen.dart';
+import '../features/notifications/presentation/widgets/enable_push_button.dart';
+import '../features/notifications/presentation/widgets/follow_target_button.dart';
 import '../features/explore/presentation/widgets/explore_section.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
 import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
@@ -117,6 +120,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-cases' ||
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
+              state.uri.path == '/home/notifications' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
@@ -206,6 +210,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => HomeScreen(
+          onAlerts: () => context.push('/home/notifications'),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),
           exploreContent: ExploreSection(
@@ -214,6 +219,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ),
         routes: [
+          GoRoute(
+            path: 'notifications',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: const InboxScreen(pushAction: EnablePushButton()),
+            ),
+          ),
           GoRoute(
             path: 'saved-cases',
             pageBuilder: (context, state) => entityEditorPage(
@@ -307,6 +321,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: FoundDetailScreen(
                 id: state.pathParameters['id']!,
+                followAction: FollowTargetButton(
+                  target: (kind: 'found', id: state.pathParameters['id']!),
+                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
@@ -373,6 +390,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: CaseDetailScreen(
                 id: state.pathParameters['id']!,
+                followAction: FollowTargetButton(
+                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: false),
                 ),
@@ -539,7 +559,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'interest-zones',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
-              child: const InterestZonesScreen(),
+              child: InterestZonesScreen(
+                followActionBuilder: (id) =>
+                    FollowTargetButton(target: (kind: 'zone', id: id)),
+              ),
             ),
           ),
         ],

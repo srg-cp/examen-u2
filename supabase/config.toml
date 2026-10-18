@@ -1,5 +1,10 @@
 project_id = "entrehuellas"
 
+[functions.notification-delivery]
+# Machine-to-machine secret checked by the handler; no user-triggered dispatch.
+verify_jwt = false
+entrypoint = "./functions/notification-delivery/index.ts"
+
 [functions.pet-photo-process]
 # Auth.getUser validates every session before any data or processing operation.
 verify_jwt = false

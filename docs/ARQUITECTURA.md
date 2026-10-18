@@ -1,5 +1,20 @@
 # Arquitectura de Entre Huellas
 
+## Seguimiento, bandeja y push — 18/10/2026
+
+HU-12.1/#40,12.2/#41,12.3/#42: módulo notifications de apps/mobile con dominio,
+casos de uso concretos, providers declarativos, ViewModels/estado/widgets y
+fuentes Supabase/Firebase detrás de repositorios. App compone slots de fichas,
+zonas y campana; main activa el observador de push con servicios de bootstrap.
+Sin imports de presentation/data entre funcionalidades. Login/onboarding
+preceden apertura de bandeja desde push; nunca autorización por payload.
+Plan027/fuentes091–095: suscripciones CAS/órdenes, notificaciones privadas,
+outbox/leases y triggers atómicos. RPC de cliente autenticadas; claim/finish
+solo service_role. Edge notification-delivery usa HTTP v1/OAuth y secreto
+de planificador, con payload neutro, tag estable, TTL60s y fallos seguros.
+Sin Redis, servidor nuevo o cambio en Nuxt. Activación remota, Firebase y cron
+pendientes; [ADR-067](decisiones/067-seguimiento-bandeja-y-push.md).
+
 ## Cronología y revisión privada — 18/10/2026
 
 HU-11.1/#38 y HU-11.2/#39: `features/case_timeline` contiene dominio/casos de

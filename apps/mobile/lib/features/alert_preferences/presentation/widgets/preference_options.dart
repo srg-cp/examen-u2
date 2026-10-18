@@ -110,7 +110,7 @@ class PreferenceOptions extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Guardaremos tu selección. La recepción en la bandeja y el teléfono se habilitará cuando estén disponibles las alertas.',
+                'Sigue casos o zonas para recibir novedades según esta selección. Los avisos del teléfono requieren permiso; si falla el envío, puedes consultarlos en Alertas.',
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.4,

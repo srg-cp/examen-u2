@@ -1,3 +1,11 @@
+import '../features/notifications/domain/repositories/notification_repository.dart';
+import '../features/notifications/domain/repositories/push_repository.dart';
+import '../features/notifications/data/repositories/push_repository_impl.dart';
+import '../features/notifications/data/repositories/unavailable_push_repository.dart';
+import '../features/notifications/data/data_sources/firebase_push_source.dart';
+import '../features/notifications/data/repositories/unavailable_notification_repository.dart';
+import '../features/notifications/data/repositories/notification_repository_impl.dart';
+import '../features/notifications/data/data_sources/supabase_notification_source.dart';
 import 'package:http/http.dart' as http;
 import '../features/case_timeline/domain/repositories/case_timeline_repository.dart';
 import '../features/case_timeline/data/repositories/case_timeline_repository_impl.dart';
@@ -89,6 +97,8 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.notificationRepository = const UnavailableNotificationRepository(),
+    this.pushRepository = const UnavailablePushRepository(),
     this.caseTimelineRepository = const UnavailableCaseTimelineRepository(),
     this.sightingRepository = const UnavailableSightingRepository(),
     this.casePosterRepository = const UnavailableCasePosterRepository(),
@@ -114,6 +124,8 @@ class AppBootstrap {
   });
 
   final StartupState state;
+  final NotificationRepository notificationRepository;
+  final PushRepository pushRepository;
   final CaseTimelineRepository caseTimelineRepository;
   final SightingRepository sightingRepository;
   final CasePosterRepository casePosterRepository;
@@ -185,6 +197,16 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
               defaultValue: 'https://entrehuellas.kormind.com',
             ),
             publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
+          ),
+          notificationRepository: NotificationRepositoryImpl(
+            SupabaseNotificationSource(supabase.client),
+          ),
+          pushRepository: PushRepositoryImpl(
+            FirebasePushSource(
+              supportedPlatform:
+                  !kIsWeb && defaultTargetPlatform == TargetPlatform.android,
+            ),
+            SupabaseNotificationSource(supabase.client),
           ),
           savedCasesRepository: SavedCasesRepositoryImpl(
             SupabaseSavedCasesDataSource(supabase.client),

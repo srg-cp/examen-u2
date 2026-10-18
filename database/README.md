@@ -1,5 +1,15 @@
 # Base de datos de Entre Huellas
 
+HU-12,18/10: fuentes091–095/plan027 generan
+[migración027](../supabase/migrations/20261018002700_notifications.sql) y
+[patch027](patchs/027_patch_notifications.sql). Requiere026, confirmado por usuario.
+Build-NotificationsPatch/Build-RunAll; sin reescribir migraciones previas.
+Suscripciones/órdenes privadas CAS e idempotencia, bandeja paginada/leído y
+outbox transaccional por evento/destinatario. Triggers sin backfill, destinatarios
+según preferencias y zona pública aproximada; leases/reintentos solo servidor.
+RLS sin grants directos; Edge y planificador requieren configuración operativa
+separada. SQL hosted no aplicado; [ficha](../docs/funcionalidades/seguimiento-y-alertas.md).
+
 Cronología/revisión18/10: fuentes088–090/plan026 generan
 [migración026](../supabase/migrations/20261018002600_case_timeline.sql) y
 [patch026](patchs/026_patch_case_timeline.sql), después de025 confirmado por

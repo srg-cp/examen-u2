@@ -1,5 +1,80 @@
 # Estado del proyecto
 
+## Patch027 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch027 de seguimiento/alertas.
+Sustituye el pendiente de aplicación027 en las notas anteriores; no se solicita
+reaplicarlo. Confirmación comunicada, sin inspección SQL remota independiente.
+Pendiente actualizar/reiniciar Flutter y validar seguimiento/bandeja con sesión
+real y un evento nuevo. Para completar push faltan configuración Firebase
+Android, secrets/despliegue Edge notification-delivery y planificador seguro,
+seguido de demo Android/FCM y reintentos. El bloqueo de build Gradle documentado
+no se ha vuelto a comprobar. Sin pruebas nuevas por esta actualización
+documental, ni cierre de historias, despliegue o cambios de GitHub.
+
+## Seguimiento y alertas — HU-12.1/#40,12.2/#41,12.3/#42 — 18/10/2026
+
+Implementación local en feature/following-notifications, creada desde
+feature/case-timeline-review con árbol limpio. Se respeta026 y HU-11 ya
+confirmados por el usuario; no se pide reaplicarlos. Sin cambios de Nuxt.
+
+Fichas→Seguir/Dejar de seguir; zonas propias→seguimiento explícito; campana
+Inicio→bandeja paginada→Marcar leída/Abrir caso; preferencias existentes y
+registro voluntario del teléfono. Guardados sigue siendo independiente.
+Contratos/casos de uso de dominio, providers declarativos, ViewModels, estado,
+DTO/repositorios/fuentes de notifications; composición mediante slots de app,
+sin imports de UI/data entre funcionalidades. Reutiliza shell/reveal/glass,
+superficies/toast/skeleton/shimmer, refresh con datos conservados e identidad
+protegida. Órdenes de seguimiento UUID/CAS con recibo original en reintentos;
+doble envío bloqueado y resultados tardíos descartados. Registro/borrado de
+tokens serializados para evitar carrera entre logout y cambio de cuenta.
+
+Plan027/fuentes091–095, migración y patch generados, run_all ampliado sin
+reescribir migraciones aplicadas. Tablas privadas/RLS sin grants directos.
+Destinatarios por seguimiento/preferencias y distancia a zona pública aproximada,
+sin GPS continuo. Eventos nuevos de publicación, avistamientos web/app,
+avisos vinculados, revisión y cierre guardan alerta/outbox atómicamente;
+deduplicación por evento/cuenta y sin backfill. Lectura por cuenta y destino
+con autorización actual; avisos sin evidencia/comentarios/coordenadas privados.
+
+Edge notification-delivery preparada con secreto de máquina, FCM HTTP v1/OAuth
+solo servidor, claim/lease/expiración, revalidación de caso/preferencias/seguimiento,
+backoff y tokens inválidos. Push neutro abre bandeja tras login/onboarding.
+La bandeja permanece si falla el proveedor. Aceptación no acredita llegada;
+respuesta perdida puede repetir push/tag estable, sin duplicar la bandeja.
+Cierre posterior a claim/aceptación no retira mensajes en tránsito; TTL60s.
+App sin configuración Firebase mantiene bandeja/seguimiento operativos.
+
+Validación local:23 pruebas finales Flutter (dominio, repositorio/DTO, ViewModels,
+reintento ambiguo/conflicto, cuenta/sesión/disposición, retiro de token, UI,
+navegación desde campana/push con y sin sesión y9 comprobaciones arquitectónicas)
+aprobadas.40 regresiones Flutter previas aprobadas. Renders390×844 y320×350
+con texto2 revisados en apps/mobile/build/ui-preview/notifications; scroll permite
+alcanzar lectura/acciones. Fixtures locales, sin acreditar permisos/token reales.
+Suite SQL existente26/26 y4 nuevos escenarios SQL/PostGIS aprobados; cubren
+cuentas/grants, CAS/replay, destinatarios/radios/tipos/pausa, páginas/leído,
+deduplicación, outbox/leases/vencimiento, fallos/tokens y cancelación tras cierre
+o cambios de preferencias/suscripción.6 pruebas servidor con proveedor/OAuth
+simulados aprobadas y Deno check de Edge aprobado.
+
+Primer intento de suite Flutter completa en paralelo abortó tras79 pruebas
+por Out of memory de Dart VM; log hu12-full-mobile.log conservado. Repetición
+secuencial completa:403 pruebas aprobadas (hu12-full-mobile-sequential.log).
+Las23 comprobaciones específicas/arquitectónicas se ejecutaron también sobre
+los ajustes finales y aprobaron. Análisis final limpio y formato comprobado.
+Dos intentos de APK debug (normal/IPv4) fallaron antes de compilar por Gradle:
+java.io.IOException: Unable to establish loopback connection. No APK nuevo
+acreditado. Logs hu12-{final-tests,mobile-tests,sql,full-sql,push-tests,edge-check,
+analyze-final,format-final,android-build,android-ipv4}.log en apps/mobile/build.
+
+Pendiente aplicar027 en desarrollo, actualizar Flutter, configurar Firebase
+(JSON nativo/defines públicos del mismo proyecto), secrets Edge y planificador
+servidor; probar Android/Supabase/FCM reales, app terminada, permisos, dos sesiones
+concurrentes y logout offline. No hay despliegue, SQL remoto, cron activo,
+commit/push ni modificaciones de GitHub. Historias abiertas por activación/demo
+pendientes. Siguiente paso: activar y validar HU-12 antes de continuar HU-13.
+Ficha/índice/ADR-067/arquitectura/guía/configuración/backlog actualizados.
+
 ## HU-11 operativa según confirmación del usuario — 18/10/2026
 
 Después de confirmar la aplicación026 y recibir los pasos de validación Android,

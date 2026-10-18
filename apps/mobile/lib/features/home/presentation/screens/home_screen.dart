@@ -15,11 +15,13 @@ class HomeScreen extends ConsumerWidget {
     required this.profileAvatar,
     this.petsContent,
     this.exploreContent,
+    this.onAlerts,
     super.key,
   });
   final Widget profileAvatar;
   final Widget? petsContent;
   final Widget? exploreContent;
+  final VoidCallback? onAlerts;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeViewModelProvider);
@@ -59,12 +61,7 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 IconButton(
                                   tooltip: 'Alertas',
-                                  onPressed: () => showHomeInfo(
-                                    context,
-                                    title: 'Alertas',
-                                    description:
-                                        'Las novedades de tus casos y ubicaciones estarán aquí. Las alertas aún no están disponibles.',
-                                  ),
+                                  onPressed: onAlerts,
                                   icon: const Icon(
                                     Icons.notifications_none_rounded,
                                     color: Color(0xFF6E6E73),

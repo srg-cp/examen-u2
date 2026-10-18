@@ -11,9 +11,11 @@ Desde Perfil se configura si recibir alertas, qué tipos interesan y qué canale
 se prefieren. Los tipos son mascotas perdidas, encontradas y novedades de casos;
 los canales son dentro de la app y push. Pausar conserva las elecciones.
 
-Estas elecciones se guardan por cuenta. Todavía no crean avisos, envían push,
-registran tokens de dispositivo ni solicitan permisos Android. La bandeja y
-entrega corresponden a HU-12, después de disponer de casos.
+Estas elecciones se guardan por cuenta. HU-12 consume sus valores en servidor
+para seleccionar destinatarios y revalidar reintentos. Seguimiento/bandeja y
+registro de teléfono se implementan en notifications; esta pantalla no pide
+permiso ni maneja SDK de Firebase. Activación027/Firebase pendiente, sin afirmar
+entrega real. [Ficha de alertas](seguimiento-y-alertas.md).
 
 ## Reglas, estado y persistencia
 

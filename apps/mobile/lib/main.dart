@@ -1,3 +1,4 @@
+import 'features/notifications/providers/notification_providers.dart';
 import 'features/explore/providers/explore_providers.dart';
 import 'features/case_timeline/providers/case_timeline_providers.dart';
 import 'features/sightings/providers/sighting_providers.dart';
@@ -28,6 +29,10 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        notificationRepositoryProvider.overrideWithValue(
+          bootstrap.notificationRepository,
+        ),
+        pushRepositoryProvider.overrideWithValue(bootstrap.pushRepository),
         caseTimelineRepositoryProvider.overrideWithValue(
           bootstrap.caseTimelineRepository,
         ),
@@ -84,7 +89,7 @@ Future<void> main() async {
           bootstrap.onboardingRepository,
         ),
       ],
-      child: const EntreHuellasApp(),
+      child: const EntreHuellasApp(observeNotifications: true),
     ),
   );
 }
