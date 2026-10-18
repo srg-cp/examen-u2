@@ -1,5 +1,10 @@
 # Preferencias de alertas por cuenta
 
+18/10/2026, instrucción del usuario: FCM/Firebase pospuestos (ADR-068).
+Las preferencias de recepción/tipos/bandeja siguen operativas; la elección
+de teléfono solo guarda la preferencia futura, con explicación explícita.
+No registra token, no pide permiso ni activa un proveedor en este incremento.
+
 Ajuste del15 de octubre: etiquetas Zona/Zonas se denominan Ubicación/Ubicaciones; contratos y preferencias persistidas conservados. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
 
 Módulo: `alert_preferences`. HU-02.2 / RF-02,16;

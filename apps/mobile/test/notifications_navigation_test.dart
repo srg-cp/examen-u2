@@ -20,6 +20,7 @@ import 'support/fake_password_recovery.dart';
 import 'support/fake_profile.dart';
 
 class _Push implements PushRepository {
+  int watches = 0;
   final signals = StreamController<PushSignal>.broadcast();
   final owners = <String?>[];
   @override
@@ -30,10 +31,56 @@ class _Push implements PushRepository {
   }
 
   @override
-  Stream<PushSignal> watch() => signals.stream;
+  Stream<PushSignal> watch() {
+    watches++;
+    return signals.stream;
+  }
 }
 
 void main() {
+  testWidgets('Current app opens inbox without activating deferred push', (
+    tester,
+  ) async {
+    final auth = FakeAuthRepository()
+      ..current = const AuthSession(userId: 'one');
+    final onboarding = FakeOnboarding(auth)..completed.add('one');
+    final push = _Push();
+    final c = ProviderContainer(
+      overrides: [
+        startupStateProvider.overrideWithValue(
+          const StartupState(StartupStatus.ready),
+        ),
+        authRepositoryProvider.overrideWithValue(auth),
+        onboardingRepositoryProvider.overrideWithValue(onboarding),
+        passwordRecoveryRepositoryProvider.overrideWithValue(
+          FakePasswordRecovery(),
+        ),
+        profileRepositoryProvider.overrideWithValue(FakeProfile()),
+        notificationRepositoryProvider.overrideWithValue(FakeNotifications()),
+        pushRepositoryProvider.overrideWithValue(push),
+      ],
+    );
+    addTearDown(() async {
+      c.dispose();
+      await auth.controller.close();
+      await push.signals.close();
+    });
+    await tester.pumpWidget(
+      UncontrolledProviderScope(container: c, child: const EntreHuellasApp()),
+    );
+    await tester.pumpAndSettle();
+    expect(push.owners, isEmpty);
+    expect(push.watches, 0);
+    await tester.tap(find.byTooltip('Alertas'));
+    await tester.pumpAndSettle();
+    expect(find.byType(InboxScreen), findsOneWidget);
+    expect(find.text('Activar avisos en este teléfono'), findsNothing);
+    expect(push.owners, isEmpty);
+    expect(push.watches, 0);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+  });
   for (final authenticated in [false, true]) {
     testWidgets(
       'Push waits for authentication and opens only the current inbox; authenticated=$authenticated',

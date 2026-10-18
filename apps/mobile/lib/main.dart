@@ -1,3 +1,4 @@
+import 'features/case_closure/providers/case_closure_providers.dart';
 import 'features/notifications/providers/notification_providers.dart';
 import 'features/explore/providers/explore_providers.dart';
 import 'features/case_timeline/providers/case_timeline_providers.dart';
@@ -29,6 +30,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        caseClosureRepositoryProvider.overrideWithValue(bootstrap.caseClosureRepository),
         notificationRepositoryProvider.overrideWithValue(
           bootstrap.notificationRepository,
         ),
@@ -89,7 +91,7 @@ Future<void> main() async {
           bootstrap.onboardingRepository,
         ),
       ],
-      child: const EntreHuellasApp(observeNotifications: true),
+      child: const EntreHuellasApp(),
     ),
   );
 }

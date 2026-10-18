@@ -1,5 +1,6 @@
+import '../features/case_closure/presentation/screens/case_closure_screen.dart';
+import '../features/explore/presentation/view_models/explore_view_model.dart';
 import '../features/notifications/presentation/screens/inbox_screen.dart';
-import '../features/notifications/presentation/widgets/enable_push_button.dart';
 import '../features/notifications/presentation/widgets/follow_target_button.dart';
 import '../features/explore/presentation/widgets/explore_section.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
@@ -225,7 +226,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               context: context,
               key: state.pageKey,
               source: state.extra,
-              child: const InboxScreen(pushAction: EnablePushButton()),
+              child: const InboxScreen(),
             ),
           ),
           GoRoute(
@@ -429,6 +430,25 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
               child: const AlertPreferencesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'closure/:source/:id',
+            redirect: (_, state) => !['lost', 'found'].contains(state.pathParameters['source']) || !RegExp(r'^[0-9a-f-]{36}$').hasMatch(state.pathParameters['id'] ?? '') ? '/home' : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context, key: state.pageKey, source: state.extra,
+              child: CaseClosureScreen(
+                target: (id: state.pathParameters['id']!, community: state.pathParameters['source'] == 'found'),
+                onSaved: () {
+                  ref.invalidate(publicCaseViewModelProvider);
+                  ref.invalidate(publicFoundViewModelProvider);
+                  ref.invalidate(myCasesViewModelProvider);
+                  ref.invalidate(myFoundCasesViewModelProvider);
+                  ref.invalidate(petListViewModelProvider);
+                  ref.invalidate(petDetailViewModelProvider);
+                  ref.invalidate(exploreViewModelProvider);
+                },
+              ),
             ),
           ),
           GoRoute(

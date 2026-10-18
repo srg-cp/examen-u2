@@ -252,6 +252,14 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 
 ### S5 - Seguimiento, alertas y cierre
 
+**Alcance vigente por instrucción del usuario18/10/2026:** FCM e implementación
+Firebase quedan pospuestos (HU-12.3/#42). El incremento activo HU-12 comprende
+HU-12.1/#40 y HU-12.2/#41, seguimiento/bandeja con Supabase.027 ya aplicado
+según usuario; no se reaplica. Sin configuración Firebase, registro de teléfono,
+despliegue Edge ni cron de push. La activación inmediata descrita en las notas,
+lista y prompt anteriores de planificación queda sustituida por
+[ADR-068](decisiones/068-posponer-fcm-firebase.md). No cerrar HU-12.3 por este recorte.
+
 18/10/2026: después de la confirmación operativa de HU-11 registrada en ESTADO,
 se implementa localmente HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42: seguimiento
 explícito separado de Guardados, zonas propias, destinatarios en servidor,
@@ -275,14 +283,14 @@ eventos. Sin push, offline o panel web nuevo. [Ficha](funcionalidades/cronologia
 ni acciones GitHub; siguiente incremento funcional HU-12 tras validar HU-11.
 
 - **HU-11 / RF-12,14:** revisar avistamientos, guardar actor/motivo y ordenar cronología por hora real.
-- **HU-12 / RF-17,18:** zonas/casos seguidos, selección de destinatarios, bandeja persistente y push. Persistir trabajo de notificación con mecanismo de reintento; integrar FCM mediante operación server-side.
+- **HU-12 / RF-17,18:** alcance activo HU-12.1/12.2: zonas/casos seguidos, destinatarios y bandeja persistente con Supabase. HU-12.3 (push/FCM/Firebase) pospuesta por el usuario, ADR-068; conservar el outbox027 aplicado sin activar entregas.
 - **HU-13 / RF-07:** responsable autorizado cierra en una operación atómica con historial; QR actualizado y nuevas alertas de búsqueda detenidas.
-- **Demo:** dejar fallar el push y encontrar la alerta en bandeja; cerrar, reabrir QR y comprobar que un usuario ajeno no puede cerrar.
+- **Demo activa:** generar un evento nuevo, consultar/marcar leída en bandeja, verificar seguimiento/preferencias y aislamiento entre cuentas; cerrar, reabrir QR y comprobar que un usuario ajeno no puede cerrar. Demo FCM diferida junto con HU-12.3.
 
 Prompt:
 
 ```text
-Implementa S5: HU-11 a HU-13 de docs/GUIA_MVP.md. Agrega revisión/cronología, bandeja persistente, FCM y cierre autorizado. Guarda las alertas y su trabajo de envío antes del push, con reintentos y deduplicación. Valida estados en Supabase y actualiza el QR al resolver. Prueba fallo del proveedor, usuario no autorizado y cierre concurrente. Actualiza docs/ESTADO.md.
+Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md. Revisión/cronología, seguimiento, bandeja persistente y cierre autorizado con Supabase. Mantén las alertas deduplicadas y el outbox027 existente inactivo. FCM, Firebase y HU-12.3 quedan pospuestos por el usuario (ADR-068); no configurar otro proveedor ni desplegar el emisor. Valida permisos, reintentos y cierre concurrente, y actualiza QR/ESTADO.
 ```
 
 ### S6 - Moderación, offline y validación

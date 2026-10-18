@@ -15,7 +15,6 @@ import 'package:flutter_application_entrehuellas/features/notifications/presenta
 import 'package:flutter_application_entrehuellas/features/notifications/presentation/view_models/inbox_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/notifications/presentation/screens/inbox_screen.dart';
 import 'package:flutter_application_entrehuellas/features/notifications/presentation/widgets/follow_target_button.dart';
-import 'package:flutter_application_entrehuellas/features/notifications/presentation/widgets/enable_push_button.dart';
 import 'package:flutter_application_entrehuellas/features/notifications/data/repositories/unavailable_push_repository.dart';
 import 'package:flutter_application_entrehuellas/features/notifications/data/data_sources/notification_source.dart';
 import 'package:flutter_application_entrehuellas/features/notifications/data/models/notification_dto.dart';
@@ -419,7 +418,7 @@ void main() {
                 ).copyWith(textScaler: TextScaler.linear(small ? 2 : 1)),
                 child: child!,
               ),
-              home: const InboxScreen(pushAction: EnablePushButton()),
+              home: const InboxScreen(),
             ),
           ),
         ),

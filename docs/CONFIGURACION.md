@@ -2,6 +2,13 @@
 
 ## Seguimiento y alertas — HU-12, 18/10/2026
 
+**Actualización vigente:** el usuario pospone FCM/Firebase. Solo se activa y valida
+seguimiento/bandeja con Supabase. El cliente ya no incluye SDK/plugin Firebase,
+no observa push ni ofrece registrar el teléfono. No configurar Firebase,
+secrets, Edge notification-delivery ni planificador para el incremento actual.
+Las instrucciones Firebase/FCM que siguen se conservan como referencia diferida,
+no como pasos pendientes para validar HU-12.1/12.2. Véase ADR-068.
+
 026 y [patch027](../database/patchs/027_patch_notifications.sql) ya confirmados
 por el usuario; no reaplicarlos. Confirmación comunicada, sin inspección remota
 independiente. Actualizar Flutter. Regeneración de artefactos:

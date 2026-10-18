@@ -1,5 +1,39 @@
 # Estado del proyecto
 
+## FCM/Firebase pospuestos por el usuario — 18/10/2026
+
+Por instrucción explícita, HU-12.3/#42 queda pospuesta y fuera del incremento
+activo. HU-12.1/#40 y HU-12.2/#41 continúan como seguimiento y bandeja con
+Supabase. Sustituye el requisito de activar Firebase/Edge/cron de las notas
+anteriores; HU-12 completa no se declara cerrada. ADR-068 registra el recorte.
+
+Retirados SDK firebase_core/firebase_messaging, adaptador Firebase, plugin Google
+Services y permiso/metadata Android. Pub get actualizó lock y registrants sin
+Firebase. Bootstrap conserva contrato no disponible y main no observa push;
+campana abre bandeja sin registro del teléfono. La preferencia de teléfono de
+HU-02 se conserva como elección futura guardada con texto explícito de pendiente,
+sin pedir permisos ni registrar tokens. No se introduce un proveedor alternativo.
+
+027 permanece aplicado según confirmación del usuario: sin modificación,
+reaplicación ni reversión de su SQL. Se conservan suscripciones/bandeja/outbox,
+contratos genéricos y emisor preparado, inactivos; quitada la entrada del emisor
+en config.toml. No configurar secrets, desplegar esa carpeta (tampoco por deploy
+global) ni programar entregas ahora. Los trabajos pendientes no se despachan.
+
+Validación de este ajuste: flutter pub get aprobado, análisis limpio y formato
+de6 archivos comprobado.30 pruebas Flutter aprobadas: seguimiento/bandeja,
+preferencias, navegación y arquitectura; incluye recorrido real de campana
+que confirma ausencia de observación/registro push. Renders390×844/320×350
+texto2 regenerados y revisados en build/ui-preview/notifications. Sin nuevos
+tests SQL, despliegue, cambios remotos, APK o comprobación de Gradle; no cambia
+el esquema aplicado. Logs hu12-defer-fcm-{pub,format,analyze,tests}.log en
+apps/mobile/build. Se preserva trabajo paralelo ajeno de case_closure/plan028.
+
+Siguiente paso del alcance activo: reiniciar/actualizar Flutter y confirmar
+seguimiento→evento nuevo→bandeja→leída/reentrada con Supabase real y dos cuentas.
+FCM no bloquea esa validación ni continuar HU-13 tras confirmarla. Guía,
+configuración, fichas/índice, arquitectura y backlog actualizados.
+
 ## Patch027 aplicado según confirmación del usuario — 18/10/2026
 
 El usuario confirma haber ejecutado el patch027 de seguimiento/alertas.

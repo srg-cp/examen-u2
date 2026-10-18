@@ -8,7 +8,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Seguimiento y alertas](seguimiento-y-alertas.md) | notifications / SQL / Edge FCM | HU-12.1/12.2/12.3; RF-16,17,18; issues #40/#41/#42; local,027/Firebase pendientes |
+| [Seguimiento y alertas](seguimiento-y-alertas.md) | notifications / SQL Supabase | HU-12.1/12.2; RF-16,17,18; issues #40/#41;027 confirmado, demo pendiente. HU-12.3/#42 FCM/Firebase pospuesta (ADR-068) |
 | [Identidad visual y marca](identidad-visual.md) | core branding / apps/platform | Petición17/10/2026; sin HU/issue nuevo |
 | [Landing pública](landing-page.md) | apps/platform (Vue/Nuxt) | Ampliación del usuario; integración17/10/2026; sin HU/issue nuevos |
 | [Ficha pública QR](ficha-publica-qr.md) | apps/platform (Vue/Nuxt) | HU-09; RF-09; issue #9; versión anterior operativa según usuario, migración Vue local/HU-10 pendiente |
@@ -44,9 +44,9 @@ tardíos y datos privados de la identidad anterior.
 Mapa de Explorar, carteles/QR y lectura web tienen implementación local;
 activación y evidencia se detallan en sus fichas. Avistamientos web operativos
 según usuario; Android implementado localmente con025/demo pendiente. Bandeja
-y entrega real de alertas tienen implementación local HU-12; activación027,
-Firebase/planificador y demo hosted pendientes según
-[GUIA_MVP](../GUIA_MVP.md). Las preferencias se consumen al activar ese incremento.
+y seguimiento/bandeja tienen implementación local HU-12.1/12.2 con027 confirmado
+por el usuario; demo hosted pendiente. FCM/Firebase y HU-12.3 quedan pospuestos
+por instrucción del usuario (ADR-068), fuera de la activación actual.
 
 Para cada incremento, actualizar su ficha, enlazar nuevas fichas aquí y
 registrar en ESTADO la validación real y lo pendiente. Los motivos técnicos van

@@ -2,15 +2,22 @@
 
 HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42; RF-16,17,18. Implementación local
 Android/SQL/Edge.027 aplicado según confirmación del usuario; historias abiertas,
-demo real y activación de push pendientes, sin inspección remota independiente.
+demo real pendiente, sin inspección remota independiente.
+
+**Alcance vigente:** HU-12.3/#42 (FCM/Firebase) pospuesta por el usuario18/10/2026.
+Se entrega seguimiento/bandeja con Supabase, sin SDK/plugin Firebase, permisos
+push ni botón para registrar el teléfono. La preferencia anterior de teléfono
+solo guarda una elección futura y lo indica expresamente. Contratos genéricos,
+emisor y outbox preparados permanecen inactivos; no se activa Edge ni cron.
+Las descripciones push inferiores son referencia diferida, no capacidad activa.
+[ADR-068](../decisiones/068-posponer-fcm-firebase.md).
 
 ## Qué hace y recorrido
 
 - Ficha disponible → Seguir caso / Dejar de seguir. Separado del marcador Guardados.
 - Perfil → Ubicaciones de interés → Seguir zona / Dejar de seguir, sobre zonas reales.
 - Campana de Inicio → Alertas → bandeja paginada → Marcar leída / Abrir caso.
-- Desde Alertas se abren preferencias existentes y Activar avisos en este teléfono.
-- Un push abre la bandeja después de login/onboarding; no omite autorización.
+- Desde Alertas se abren preferencias existentes; las novedades se consultan en la bandeja.
 
 ## Reglas, campos y persistencia
 
@@ -51,8 +58,8 @@ perdido, sin duplicar bandeja, con tag estable y TTL60s. Detalle en ADR-067.
 ## Dependencias y activación
 
 HU-02 zonas/preferencias y HU-05/06/10/11;026 ya confirmado por usuario.
-027 ya aplicado según usuario; actualizar Flutter y activar Edge/planificador
-según [CONFIGURACION](../CONFIGURACION.md). Configuración Firebase local no incluida.
+027 ya aplicado según usuario; actualizar Flutter y validar seguimiento/bandeja
+según [CONFIGURACION](../CONFIGURACION.md). Firebase/Edge/planificador fuera del alcance activo.
 No requiere actualizar Nuxt para crear avisos: triggers cubren las escrituras
 web/app existentes. Flutter sin Firebase configurado conserva bandeja/seguimiento.
 

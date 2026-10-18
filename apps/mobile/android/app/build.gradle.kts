@@ -5,12 +5,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Native resources are required for FCM while Android starts a terminated app.
-// Keep unconfigured development builds available without inventing a Firebase project.
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-}
-
 android {
     namespace = "com.example.flutter_application_entrehuellas"
     compileSdk = flutter.compileSdkVersion

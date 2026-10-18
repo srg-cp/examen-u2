@@ -1,5 +1,16 @@
 # Arquitectura de Entre Huellas
 
+## Alcance activo de alertas — 18/10/2026, ADR-068
+
+Por instrucción del usuario se pospone HU-12.3/#42 y la implementación Firebase.
+Cliente sin firebase_core/firebase_messaging, adaptador Firebase ni plugin Google
+Services; bootstrap conserva PushRepository no disponible y main no observa push.
+La campana abre InboxScreen sin registro de teléfono. HU-12.1/12.2 siguen con
+Supabase;027 aplicado se conserva sin reescribir SQL. Contratos genéricos/emisor
+preparado quedan inactivos y fuera de entrega; config.toml no declara el emisor.
+Las notas de integración FCM inferiores describen el trabajo anterior, sustituido
+por [ADR-068](decisiones/068-posponer-fcm-firebase.md). Sin nuevo proveedor o servidor.
+
 ## Seguimiento, bandeja y push — 18/10/2026
 
 HU-12.1/#40,12.2/#41,12.3/#42: módulo notifications de apps/mobile con dominio,

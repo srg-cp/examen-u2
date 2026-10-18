@@ -1,5 +1,11 @@
 # notification-delivery
 
+**POSPUESTA por instrucción del usuario18/10/2026 (ADR-068).** Código preparado
+inactivo, fuera de la entrega actual. No desplegar (tampoco mediante deploy
+global), configurar secrets ni programar cron ahora. Se retiró su entrada de
+supabase/config.toml. Los pasos inferiores son referencia para una eventual
+reactivación autorizada;027 aplicado y la bandeja con Supabase se conservan.
+
 HU-12.3/#42 / RF-17,18. Despliegue y activación pendientes. Requiere patch027.
 
 La Edge Function procesa hasta3 trabajos ya persistidos por invocación POST.

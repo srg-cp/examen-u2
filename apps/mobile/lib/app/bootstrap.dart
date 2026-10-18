@@ -1,8 +1,9 @@
+import '../features/case_closure/domain/repositories/case_closure_repository.dart';
+import '../features/case_closure/data/repositories/case_closure_repository_impl.dart';
+import '../features/case_closure/data/data_sources/case_closure_source.dart';
 import '../features/notifications/domain/repositories/notification_repository.dart';
 import '../features/notifications/domain/repositories/push_repository.dart';
-import '../features/notifications/data/repositories/push_repository_impl.dart';
 import '../features/notifications/data/repositories/unavailable_push_repository.dart';
-import '../features/notifications/data/data_sources/firebase_push_source.dart';
 import '../features/notifications/data/repositories/unavailable_notification_repository.dart';
 import '../features/notifications/data/repositories/notification_repository_impl.dart';
 import '../features/notifications/data/data_sources/supabase_notification_source.dart';
@@ -97,6 +98,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.caseClosureRepository = const UnavailableCaseClosureRepository(),
     this.notificationRepository = const UnavailableNotificationRepository(),
     this.pushRepository = const UnavailablePushRepository(),
     this.caseTimelineRepository = const UnavailableCaseTimelineRepository(),
@@ -123,6 +125,7 @@ class AppBootstrap {
     this.foundCaseRepository = const UnavailableFoundCaseRepository(),
   });
 
+  final CaseClosureRepository caseClosureRepository;
   final StartupState state;
   final NotificationRepository notificationRepository;
   final PushRepository pushRepository;
@@ -170,6 +173,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          caseClosureRepository: CaseClosureRepositoryImpl(SupabaseCaseClosureSource(supabase.client)),
           caseTimelineRepository: CaseTimelineRepositoryImpl(
             SupabaseCaseTimelineSource(supabase.client),
           ),
@@ -199,13 +203,6 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
             publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
           ),
           notificationRepository: NotificationRepositoryImpl(
-            SupabaseNotificationSource(supabase.client),
-          ),
-          pushRepository: PushRepositoryImpl(
-            FirebasePushSource(
-              supportedPlatform:
-                  !kIsWeb && defaultTargetPlatform == TargetPlatform.android,
-            ),
             SupabaseNotificationSource(supabase.client),
           ),
           savedCasesRepository: SavedCasesRepositoryImpl(
