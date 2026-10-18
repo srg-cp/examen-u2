@@ -1,4 +1,6 @@
 import 'dart:math' as math;
+import 'explore_map_pin.dart';
+import 'explore_map_case_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -24,6 +26,7 @@ class ExploreCaseMap extends StatefulWidget {
     required this.onOpen,
     required this.filterBuilder,
     this.createTileProvider,
+    this.previewBuilder,
     super.key,
   });
   final List<ExploreCase> items;
@@ -31,11 +34,35 @@ class ExploreCaseMap extends StatefulWidget {
   final void Function(ExploreCase, BuildContext)? onOpen;
   final MapFilterBuilder filterBuilder;
   final TileProvider Function()? createTileProvider;
+  final Widget Function(ExploreCase)? previewBuilder;
   @override
   State<ExploreCaseMap> createState() => _ExploreCaseMapState();
 }
 
-class _ExploreCaseMapState extends State<ExploreCaseMap> {
+class _ExploreCaseMapState extends State<ExploreCaseMap>
+    with SingleTickerProviderStateMixin {
+  late final _pullOffset = AnimationController.unbounded(vsync: this);
+
+  bool _handleScroll(ScrollNotification notification) {
+    if (MediaQuery.disableAnimationsOf(context)) return false;
+    if (notification is OverscrollNotification &&
+        notification.dragDetails != null &&
+        notification.overscroll < 0 &&
+        _sheet.isAttached &&
+        _sheet.size <= .4201) {
+      _pullOffset.stop();
+      _pullOffset.value = (_pullOffset.value - notification.overscroll * .2)
+          .clamp(0.0, 18.0);
+    } else if (notification is ScrollEndNotification && _pullOffset.value > 0) {
+      _pullOffset.animateTo(
+        0,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+      );
+    }
+    return false;
+  }
+
   final _sheet = DraggableScrollableController();
   final _map = MapController();
   (double, double)? _selected;
@@ -68,6 +95,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
 
   @override
   void dispose() {
+    _pullOffset.dispose();
     _sheet.dispose();
     _map.dispose();
     super.dispose();
@@ -86,14 +114,12 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
     final index = foundIndex < 0 ? 0 : foundIndex;
     final item = selected.isEmpty ? null : selected[index];
     final media = MediaQuery.of(context);
-    final bubbleHeight =
-        math.max(
-          72.0,
-          media.textScaler.scale(14) * 1.2 +
-              media.textScaler.scale(12) * 1.2 +
-              20,
-        ) +
-        (selected.length > 1 ? 48 : 0);
+    double previewHeight(int count) => math.min(
+      math.max(256.0, 136 + media.textScaler.scale(12) * 5 + 56) +
+          (count > 1 ? 48 : 0),
+      math.max(120.0, media.size.height * .58 - media.padding.top - 88),
+    );
+    final bubbleHeight = previewHeight(selected.length);
     return LayoutBuilder(
       builder: (context, constraints) {
         void select((double, double) point, List<ExploreCase> values) {
@@ -101,23 +127,20 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
             _selected = point;
             _selectedCaseKey = values.first.key;
           });
-          _moveSheet(.14);
-          final height =
-              math.max(
-                72.0,
-                media.textScaler.scale(14) * 1.2 +
-                    media.textScaler.scale(12) * 1.2 +
-                    20,
-              ) +
-              (values.length > 1 ? 48 : 0);
+          _moveSheet(.42);
           _map.fitCamera(
             CameraFit.coordinates(
               coordinates: [LatLng(point.$1, point.$2)],
               padding: EdgeInsets.fromLTRB(
                 24,
-                media.padding.top + 72,
+                media.padding.top + 24,
                 24,
-                constraints.maxHeight * .14 + height + 32,
+                math.min(
+                  constraints.maxHeight - media.padding.top - 24,
+                  constraints.maxHeight * .42 +
+                      previewHeight(values.length) +
+                      32,
+                ),
               ),
               maxZoom: _map.camera.zoom,
             ),
@@ -161,31 +184,15 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
                           label: entry.value.length == 1
                               ? '${entry.value.single.name.isEmpty ? 'Sin nombre' : entry.value.single.name}. Seleccionar caso en ubicación aproximada'
                               : 'Ver ${entry.value.length} casos en esta ubicación aproximada',
-                          child: IconButton.filled(
-                            tooltip: entry.value.length == 1
+                          child: Tooltip(
+                            message: entry.value.length == 1
                                 ? 'Seleccionar caso'
                                 : 'Ver ${entry.value.length} casos',
-                            style: IconButton.styleFrom(
-                              backgroundColor: entry.key == _selected
-                                  ? const Color(0xFF111111)
-                                  : Colors.white,
-                              foregroundColor: entry.key == _selected
-                                  ? Colors.white
-                                  : const Color(0xFF111111),
-                              side: const BorderSide(color: Color(0xFF111111)),
+                            child: ExploreMapPin(
+                              count: entry.value.length,
+                              selected: entry.key == _selected,
+                              onTap: () => select(entry.key, entry.value),
                             ),
-                            onPressed: () => select(entry.key, entry.value),
-                            icon: entry.value.length == 1
-                                ? const Icon(Icons.pets_outlined)
-                                : Text(
-                                    '${entry.value.length}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: entry.key == _selected
-                                          ? Colors.white
-                                          : const Color(0xFF111111),
-                                    ),
-                                  ),
                           ),
                         ),
                       ),
@@ -193,7 +200,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
                       Marker(
                         key: ValueKey(('callout', item.key)),
                         point: LatLng(item.latitude, item.longitude),
-                        width: math.min(280, constraints.maxWidth - 32),
+                        width: math.min(330, constraints.maxWidth - 32),
                         height: bubbleHeight + 32,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
@@ -215,58 +222,11 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
                                             ? null
                                             : () =>
                                                   widget.onOpen!(item, source),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      item.name.isEmpty
-                                                          ? 'Sin nombre'
-                                                          : item.name,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        height: 1.2,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: Color(
-                                                          0xFF111111,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const Text(
-                                                      'Abrir caso',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        height: 1.2,
-                                                        color: Color(
-                                                          0xFF6E6E73,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              const Icon(
-                                                Icons.arrow_forward_rounded,
-                                                size: 22,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                        child:
+                                            widget.previewBuilder?.call(item) ??
+                                            ExploreMapPreviewContent(
+                                              item: item,
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -330,35 +290,46 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
             DraggableScrollableSheet(
               controller: _sheet,
               initialChildSize: .42,
-              minChildSize: .14,
+              minChildSize: .42,
               maxChildSize: .9,
               snap: !media.disableAnimations,
-              snapSizes: const [.14, .42, .9],
+              snapSizes: const [.42, .9],
               shouldCloseOnMinExtent: false,
-              builder: (context, scroll) => Material(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(28),
+              builder: (context, scroll) => AnimatedBuilder(
+                animation: _pullOffset,
+                builder: (context, child) => Transform.translate(
+                  offset: Offset(0, _pullOffset.value),
+                  child: child,
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: widget.filterBuilder(
-                  context,
-                  scroll,
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _MapSheetHandle(
-                      onExpand: () => _moveSheet(.9),
-                      onCollapse: () => _moveSheet(.14),
+                child: Material(
+                  key: const ValueKey('map-filters-surface'),
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(28),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: _handleScroll,
+                    child: widget.filterBuilder(
+                      context,
+                      scroll,
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _MapSheetHandle(
+                          onExpand: () => _moveSheet(.9),
+                          onCollapse: () => _moveSheet(.42),
+                        ),
+                      ),
+                      widget.query.latitude == null ||
+                              widget.query.longitude == null
+                          ? null
+                          : () => SearchPlace(
+                              label: '',
+                              latitude: _map.camera.center.latitude,
+                              longitude: _map.camera.center.longitude,
+                            ),
                     ),
                   ),
-                  widget.query.latitude == null ||
-                          widget.query.longitude == null
-                      ? null
-                      : () => SearchPlace(
-                          label: '',
-                          latitude: _map.camera.center.latitude,
-                          longitude: _map.camera.center.longitude,
-                        ),
                 ),
               ),
             ),

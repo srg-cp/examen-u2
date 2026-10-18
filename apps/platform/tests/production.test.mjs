@@ -5,6 +5,33 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { productionFixture } from './server_fixture.mjs';
 import { slug, photo } from './fixtures.mjs';
+import sharp from 'sharp';
+
+test('Public submission accepts no session, enforces origin/validation, cleans evidence and retries after commit', async t => {
+  const server = await productionFixture(); t.after(server.close);
+  const draft = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', observedAt: new Date(Date.now() - 172800000).toISOString(), point: { latitude: -12.050001, longitude: -77.040001, source: 'manual', accuracy: null }, comment: 'Por el parque' };
+  const image = await sharp({ create: { width: 40, height: 40, channels: 3, background: '#aaa' } }).withExif({ IFD0: { Artist: 'PRIVATE CAMERA' } }).jpeg().toBuffer();
+  const send = (value, origin = server.origin, evidence = null) => {
+    const body = new FormData(); body.set('report', JSON.stringify(value));
+    if (evidence) body.set('photo', new Blob([evidence], { type: 'image/jpeg' }), 'private.jpg');
+    return fetch(`${server.origin}/api/c/${slug}/sightings`, { method: 'POST', headers: origin ? { Origin: origin } : {}, body });
+  };
+  assert.equal((await send(draft, null)).status, 403); assert.equal((await send(draft, 'https://attacker.example')).status, 403);
+  assert.equal((await send({ ...draft, observedAt: '2100-01-01T00:00:00.000Z' })).status, 400);
+  assert.equal((await send({ ...draft, point: null })).status, 400);
+  assert.equal((await send(draft, server.origin, Buffer.from('fake photo'))).status, 422);
+  assert.equal(server.sightings(), 0);
+  server.ambiguous(); const failed = await send(draft, server.origin, image);
+  assert.equal(failed.status, 503); assert.doesNotMatch(await failed.text(), /PRIVATE/); assert.equal(server.sightings(), 1);
+  const success = await send(draft, server.origin, image); assert.equal(success.status, 200); const receipt = await success.json();
+  assert.deepEqual(Object.keys(receipt).sort(), ['id','late','receivedAt']); assert.equal(receipt.late, true); assert.equal(server.sightings(), 1);
+  assert.equal((await send({ ...draft, comment: 'different payload' }, server.origin, image)).status, 409);
+  const payload = server.sightingCalls().at(-2); const bytes = Buffer.from(payload.p_evidence, 'base64');
+  assert.equal((await sharp(bytes).metadata()).exif, undefined); assert.match(payload.p_actor_hash, /^[0-9a-f]{64}$/); assert.doesNotMatch(JSON.stringify(receipt), /latitude|longitude|actor_hash/);
+  server.set({ state: 'closed', resolution: 'resolved' });
+  assert.equal((await send({ ...draft, id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' })).status, 409);
+  assert.equal(server.sightings(), 1);
+});
 test('Landing SSR is public, works without product requests and keeps crawler policy separate from QR', async t => {
   const server = await productionFixture(); t.after(server.close);
   const response = await fetch(server.origin + '/'); const html = await response.text();

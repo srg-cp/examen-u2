@@ -1,5 +1,169 @@
 # Estado del proyecto
 
+## Avistamientos desde QR sin cuenta — 18/10/2026
+
+HU-10.1 / RF-11 / issue #36 implementada localmente en
+feature/public-web-sighting, creada desde feature/vue-nuxt-web conservando
+los cambios locales previos de móvil y las normas web actualizadas en paralelo.
+Ficha activa→formulario→fecha/hora real→punto manual/GPS con origen/precisión→
+comentario/foto opcionales→recibo guardado. Sin cuenta ni instalación. No cambia
+Android HU-10.2, cronología/revisión HU-11, push u offline; historia sin cerrar.
+
+Módulo sightings con contratos/SubmitSighting/LocateSighting independientes,
+ViewModel para envíos/GPS/disposición y adaptadores HTTP/navegador/Supabase/sharp.
+Página compone lector/formulario por slot; sin imports de UI entre features.
+Plan024/fuentes083–085 y patch/migración generados: RPC solo servidor, tabla,
+punto exacto y evidencia privados; fecha no futura/tardía>24h, vigencia bajo
+bloqueo, UUID/hash estables y presupuestos persistentes por pseudónimo/caso.
+No inventa owner de found_cases ni añade evidencia al DTO QR. JPEG/PNG/WebP
+decodificados y recodificados a JPEG1280px/1MiB sin EXIF; bytea atómico evita
+cargas huérfanas, con coste/escala y evolución a Storage explícitos en ADR-064.
+
+WebShell/ActionButton/QR/formulario adoptan ADR-063: crema/Arial/azul/celeste,
+cápsulas, marca minúscula, retorno glass con espacio propio y enlace a inicio.
+Toast, invalid/Shake, campos conservados y shimmer real. Tras respuesta ambigua
+se bloquea editar y se reintenta el mismo payload. GridLayer de Leaflet usa
+imágenes de teselas normales evitando data-GIF y sin relajar nonce CSP con
+unsafe-inline/data/eval. GPS/cámara solo self; POST con origen exacto, cuerpo
+y tiempo acotados y concurrencia limitada. PUBLIC_WEB_ORIGIN documentado.
+
+Validación local: typecheck limpio,15 pruebas web (incluidas arquitectura,
+VM/GPS tardío, parser multipart acotado, fotos animadas/EXIF y normalización),
+build Nuxt producción y4 pruebas de servidor aprobadas. Navegador Chrome142
+sin cuenta: GPS denegado/manual, foto inválida/válida, fallo después de commit,
+reintento único, cierre, foco, una cabecera, sin overflow/hidratación/CSP en
+1440/731/390/320/1920 y320×350/texto200%. Renders fixture/teselas neutras en
+apps/mobile/build/ui-preview/public-sightings; móvil y texto ampliado revisados.
+Logs hu10-{typecheck,web-tests,web-build,production-tests,browser-qa,sql-tests}.log
+en apps/mobile/build. SQL focalizado aprobado: roles, invariantes, idempotencia,
+límites, cierre/revocación/ficha no disponible y repetición; suite SQL completa
+con25 pruebas aprobadas en hu10-full-sql-tests.log. Un intento previo abortó
+por memoria del equipo; el reintento con comprobaciones secuenciales completó
+sin cambiar configuración global. Sin afirmación de concurrencia hosted.
+
+Preflight Explorar:33 pruebas focalizadas aprobadas. En instalación debug
+existente, attach/hot restart con config local y sesión recuperada, consulta
+real Lima/15km con2 casos, fotos/teselas, pin→preview→ficha→retorno y arrastre
+del panel comprobados; capturas hu10-map-preview/expanded.png y XML de navegación.
+Sin nuevo APK ni arranque frío. Se deja la app y el servidor dev del usuario.
+
+Pendientes materiales: aplicar024 en desarrollo y desplegar conjuntamente web;
+022/023 ya confirmados por usuario, no se vuelven a marcar sin aplicar. Verificar
+QR con otro teléfono, GPS/cámara/Safari/Firefox, proxy/TLS real, permisos y
+concurrencia multiconexión, proveedor cartográfico y coste/volumen de evidencia.
+Motor Docker Linux local no disponible: imagen/ejecución Linux no certificadas.
+Contraste medido: texto/crema17.08:1, secundario/crema5.48:1 y azul/celeste5.03:1;
+blanco/degradado azul aprobado1.97–3.62:1 no alcanza4.5:1. Conservada la referencia
+explícita y registrado el ajuste accesible pendiente, sin certificar AA.
+
+Siguiente paso: activar024/web en desarrollo y comprobar envío desde un segundo
+teléfono antes de cerrar HU-10.1; resolver contraste del primario aprobado y
+validación restante. Ficha avistamientos-web/índice/QR/Explorar/guía/arquitectura/
+diseño/configuración/ADR-064 actualizados. Sin commit/push, SQL remoto o despliegue.
+
+## Landing aprobada y norma de UI/UX para toda la web — 18/10/2026
+
+El usuario confirma su aprobación de la landing terminada y pide documentar
+su referencia para desarrollar el sistema web. REGLAS_UI_UX_WEB.md consolida
+valores del CSS final: crema/azul/celeste/lima por variante, familia y jerarquía,
+radios, espacios, cápsulas con brillo, ilustraciones, movimiento y responsive.
+Distingue composición institucional de adaptación a formularios/listados,
+con feedback/carga global, accesibilidad y criterios de aceptación.
+
+ADR-063 extiende la referencia visual de ADR-060 a público/usuarios/administración
+en apps/platform. Actualizados normas, diseño, arquitectura, guía, instrucciones,
+guía de desarrollo y ficha/relevo de landing. El móvil conserva su referencia;
+QR y paneles no se declaran adaptados. Sin nuevas HU/RF/issues ni cierre de historias.
+
+Validación documental: valores cotejados con CSS/componentes, enlaces locales
+comprobados y git diff --check sin incidencias. No se repiten builds ni pruebas
+de app por cambio exclusivo de Markdown. Sin bloqueos documentales ni despliegue.
+Siguiente paso: aplicar la norma al siguiente incremento web autorizado y registrar
+su evidencia visual/funcional; contrastes y adaptación QR pendientes por recorrido.
+
+## Vista previa: foto arriba y datos con iconos en fila —18/10/2026
+
+Por corrección del usuario, ExploreMapPreviewContent coloca foto principal136
+a ancho completo arriba, nombre debajo y fila de tamaño/raza/fecha con iconos.
+La fila mantiene tres columnas y admite scroll horizontal con texto ampliado;
+en poca altura se recorre toda la tarjeta verticalmente. Altura preferida de
+la etiqueta adaptada; controles de coincidencias conservados fuera del scroll.
+Sin cambios de lectura pública, dominio, permisos o SQL.
+
+19 pruebas de mapa/preview/arquitectura aprobadas: nueva comprobación de foto
+por encima de los datos y mismo eje horizontal de iconos, recorrido de datos
+con texto2, apertura de ficha y mínimo del panel. Renders normales/pequeños
+regenerados y revisados en build/ui-preview/explore-map/*-preview-photo.png;
+log apps/mobile/build/map-preview-photo-top-qa.log. Formato y análisis limpios.
+ADR-062/norma UI/diseño/ficha actualizados. Sin APK ni despliegue;
+siguiente paso: revisión de composición en Android.
+
+## Pines de marca y vista previa detallada del mapa —18/10/2026
+
+Se integra copia exacta de logo/only-black.svg como pin negro mediante
+flutter_svg2.2.1; grupos conservan la marca y contador. La etiqueta seleccionada
+reutiliza CasePhotoView, EntityCardSurface, toast/shimmer y formateador de fecha:
+foto principal, nombre, tamaño, raza ausente declarada y fecha local según
+desaparición/encuentro/avistamiento, sin rótulo visible Abrir caso. Conserva
+apertura al tocar y navegación entre coincidencias. Cámara/altura ajustadas al
+mapa visible sobre el mínimo42%; datos con texto ampliado desplazables.
+
+ReadExploreCasePreview usa contratos públicos lost_cases/found_cases ya
+inyectados; ViewModel autoDispose por caso observa identidad y permite reintento.
+No consulta catálogo, mascota privada ni cambia SQL/permisos. Raza no existe
+en formularios/modelos actuales: Raza no registrada es la limitación explícita,
+sin inferencia ni afirmación de captura/persistencia implementada.
+
+35 pruebas aprobadas de preview/mapa/Explorar/borradores/arquitectura: SVG exacto,
+orígenes coincidentes, foto/tamaño, fallos seguros, reintento, identidad y gestos;
+en pequeño también valida datos accesibles y preview por encima del panel.
+Formato/análisis sin incidencias y sintaxis PowerShell válida. SVG sincronizado
+por el generador existente, sin ejecutar regeneración global de launchers.
+Logs apps/mobile/build/map-detailed-preview-final-qa.log; renders con foto fixture
+y teselas neutras revisados en build/ui-preview/explore-map/*-preview-photo.png
+y *-preview-selected.png. Sin build Android, despliegue o certificación remota.
+ADR-062/normas/diseño/arquitectura/guía/ficha/logo actualizados.
+Siguiente paso: detener y volver a ejecutar la app para incorporar dependencia
+y asset, y revisar mapa/foto/tamaño reales en Android.
+
+## Estado vacío reutilizado en Explorar y Mascotas —18/10/2026
+
+Por petición del usuario, se extrae el layout aprobado de Mis mascotas a
+core/presentation/widgets/collection_empty_state.dart. CollectionEmptyState
+compone huella/título/descripción/acción opcional con los mismos estilos y
+espaciados. Mascotas conserva sus textos Activas/Archivadas y registro; Explorar
+sustituye la línea No hay casos con estos filtros por No encontramos casos y
+una sugerencia de cambiar ubicación/filtros. Solo tras vacío confirmado: no se
+confunde con carga, fallo o ubicación faltante. Sin imports entre presentaciones
+ni cambios de consultas, dominio, permisos o SQL.
+
+30 pruebas de Explorar/carga y navegación de Mascotas/arquitectura aprobadas,
+incluidas aserciones de componente compartido y ausencia durante fallo. Formato
+y análisis sin incidencias. Renders con fuentes reales regenerados/revisados
+en apps/mobile/build/ui-preview/explore/normal-empty.png y small-empty.png;
+registro build/collection-empty-state-qa.log. Texto ampliado continúa por scroll.
+Actualizadas fichas de ambas funcionalidades, diseño y arquitectura.
+Sin build ni despliegue; siguiente paso: revisión Android del estado vacío.
+
+## Mapa: mínimo normal, resistencia y retorno glass progresivo —18/10/2026
+
+Por referencia e instrucción del usuario, panel inicial/mínimo42% y máximo90%.
+Retirado estado14%, también al seleccionar pines; cámara/etiqueta reservan ahora
+el panel normal. Intentar bajar del mínimo desplaza solo la superficie hasta18px
+con resistencia y vuelve en240ms al soltar, sin reducir la extensión real.
+Retorno glass pierde opacidad y sube en78–90%, recuperándose al bajar; oculto
+sin interacción ni semántica. Movimiento reducido inmediato/sin rebote.
+Se retira Filtros de búsqueda conservando campos/borrador/Aplicar filtros.
+
+29 pruebas aprobadas:4 del mapa con gesto real, rebote, ocultación/retorno,
+pines/ficha/consulta y tamaños normal/pequeño/texto2;25 de Explorar, borradores
+y arquitectura. Formato/análisis sin incidencias. Logs en apps/mobile/build/
+map-sheet-minimum-qa.log y map-sheet-related-qa.log. Capturas normales/expandidas
+revisadas en build/ui-preview/explore-map con teselas neutras; no acreditan
+cartografía o fluidez Android reales. Sin APK, SQL ni despliegue.
+ADR-061, normas UI, diseño, arquitectura, guía y ficha actualizados; sustituye
+el mínimo14% de ADR-055/056. Siguiente paso: revisar gesto y retorno en Android.
+
 ## Desplazamiento de la barra de navegación restaurado —18/10/2026
 
 Causa reproducida en Home: ValueKey(section) en PullToRefresh desmontaba

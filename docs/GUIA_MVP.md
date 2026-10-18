@@ -156,6 +156,16 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Refinamiento18/10 de HU-07.2/RF-13/issue #33: pines de only-black.svg y vista
+previa fotográfica con tamaño/fecha mediante lectura pública por caso. Raza
+ausente en el producto se indica como no registrada; capturarla/persistirla no
+se implementa en este incremento. Sin SQL/permisos nuevos. ADR-062.
+
+Refinamiento18/10/2026 de HU-07.2/RF-13/issue #33: panel del mapa limitado a
+42–90%, resistencia visual bajo el mínimo, retorno glass retirado al expandir
+y sin título redundante. No cambia consultas, permisos ni alcance del MVP.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
 Revisión posterior16 de octubre de HU-07.2/RF-13/issue #33: el panel inferior del mapa contiene filtros en borrador y Aplicar; el caso se abre desde una etiqueta junto al pin. Reutiliza el formulario existente, conserva consulta compartida y no busca por editar/GPS/pan hasta confirmar. [ADR-056](decisiones/056-mapa-filtros-inferiores-y-acceso-en-pin.md) sustituye la ficha inferior de ADR-055, sin ampliar alcance ni cambiar SQL/permisos.
 
 Refinamiento autorizado16 de octubre de HU-07.2/RF-13/issue #33: Mapa abre pantalla propia mediante expansión desde su opción, mapa a todo viewport y panel inferior deslizable con una ficha de ancho completo. Consulta/páginas compartidas con lista; sin nueva operación de producto ni SQL. [ADR-055](decisiones/055-explorar-mapa-inmersivo-y-panel-deslizable.md) sustituye la alternancia integrada de ADR-052. No cierra automáticamente historia ni implica publicación.
@@ -180,6 +190,21 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+18/10/2026, HU-10.1 / RF-11 / issue #36: formulario de avistamiento sin cuenta
+desde QR activo, fecha/hora y punto manual/GPS con precisión, comentario/foto
+opcionales, saneamiento servidor sin EXIF y reintento idempotente. Plan024/RPC
+solo servidor, límites persistentes por pseudónimo/caso; evidencia y punto exacto
+privados. No crea reportero autenticado, cronología HU-11, envío móvil HU-10.2
+ni push/offline. WebShell/QR/formulario adoptan ADR-063. Implementación local;
+aplicación024, despliegue y demo con otro teléfono pendientes. [Ficha](funcionalidades/avistamientos-web.md),
+[ADR-064](decisiones/064-avistamientos-publicos-idempotentes.md).
+
+18/10/2026: el usuario aprueba la landing final y solicita que sea la referencia
+UI/UX de toda la web. [Reglas web](REGLAS_UI_UX_WEB.md) y
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) consolidan esa base
+para público/usuarios/administración. Cambio documental, sin nuevas HU/RF/issues,
+sin cierre de historias ni implementación anticipada de paneles o adaptación QR.
 
 Integración17/10/2026 solicitada por usuario: landing de feature/landing-page
 portada de React a Vue en / de apps/platform, junto a QR /c/<token>. Conserva

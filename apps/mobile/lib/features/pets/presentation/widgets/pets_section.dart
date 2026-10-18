@@ -1,4 +1,5 @@
 import '../../../../core/presentation/widgets/collection_header.dart';
+import '../../../../core/presentation/widgets/collection_empty_state.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -189,39 +190,13 @@ class _PetsEmptyState extends StatelessWidget {
   final bool archived;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 40),
-    child: Column(
-      children: [
-        const ExcludeSemantics(
-          child: Icon(Icons.pets_outlined, size: 88, color: Color(0xFF6E6E73)),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          archived ? 'No tienes mascotas archivadas' : 'Aún no tienes mascotas',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111111),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          archived
-              ? 'Las mascotas que archives aparecerán aquí. Podrás consultar su ficha y restaurarlas.'
-              : 'Registra a tu mascota para tener su información a mano.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: Color(0xFF6E6E73)),
-        ),
-        if (!archived) ...[
-          const SizedBox(height: 24),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 280),
-            child: const PetRegistrationButton(),
-          ),
-        ],
-      ],
-    ),
+  Widget build(BuildContext context) => CollectionEmptyState(
+    title: archived
+        ? 'No tienes mascotas archivadas'
+        : 'Aún no tienes mascotas',
+    description: archived
+        ? 'Las mascotas que archives aparecerán aquí. Podrás consultar su ficha y restaurarlas.'
+        : 'Registra a tu mascota para tener su información a mano.',
+    action: archived ? null : const PetRegistrationButton(),
   );
 }

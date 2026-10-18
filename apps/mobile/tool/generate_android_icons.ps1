@@ -27,6 +27,7 @@ foreach ($relativePath in @(
     Copy-Item -LiteralPath $rasterSourcePath -Destination (Join-Path $repoDirectory $relativePath) -Force
 }
 Copy-Item -LiteralPath $vectorSourcePath -Destination (Join-Path $repoDirectory 'apps/platform/public/brand.svg') -Force
+Copy-Item -LiteralPath (Join-Path $repoDirectory 'logo/only-black.svg') -Destination (Join-Path $repoDirectory 'apps/mobile/assets/branding/only-black.svg') -Force
 Copy-Item -LiteralPath (Join-Path $repoDirectory 'logo/Logo EntreHuellas 512 vector inner v2-256.png') -Destination (Join-Path $repoDirectory 'apps/platform/public/brand-icon.png') -Force
 
 Push-Location -LiteralPath $appDirectory

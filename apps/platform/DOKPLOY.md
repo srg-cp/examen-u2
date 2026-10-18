@@ -1,5 +1,17 @@
 # Despliegue GitHub → Dokploy → entrehuellas.kormind.com
 
+HU-10.1,18/10: la rama local `feature/public-web-sighting` incorpora POST de
+avistamientos, sharp/Leaflet y migración024. No se ha publicado/desplegado.
+Antes de activarlo: aplicar024 después de023 y añadir
+`PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com` sin slash final; mantener
+SUPABASE_SERVER_KEY únicamente en Environment de servidor. Usar la rama/revisión
+que se publique tras autorización, sin cambiar automáticamente el despliegue
+operativo indicado en las instrucciones históricas siguientes.
+Revisar cuerpos multipart hasta9MiB, timeout de recepción15s, IP del proxy
+en TRUSTED_PROXY_IPS, TLS y límites compartidos SQL. Docker debe incluir la
+dependencia nativa sharp para Linux; los checks locales Windows no certifican
+esa imagen. SQL y web deben activarse juntos para confirmar envíos.
+
 Landing integrada17/10/2026: / muestra la presentación institucional, sin consultas
 Supabase; /c/<token> conserva las fichas y requiere backend configurado. Mismo
 contexto/puerto/Environment; basta publicar esta revisión y redeploy. Raíz indexable,

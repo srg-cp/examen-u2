@@ -1,5 +1,43 @@
 # Arquitectura de Entre Huellas
 
+## Avistamientos web públicos — 18/10/2026
+
+HU-10.1/#36 en `sightings`: dominio compartido independiente con SubmitSighting/
+LocateSighting y contratos, ViewModel con generación de GPS y payload estable,
+adaptadores HTTP/navegador y servidor Supabase/sharp separados. Plugins y
+server/utils componen dependencias por petición. La página Nuxt enlaza lector
+y formulario mediante slot, sin imports de presentation entre funcionalidades.
+Plan024 permite únicamente RPC de servidor; tabla/evidencia/punto exacto privados,
+confirmación atómica e idempotente, límites persistentes y bloqueos de vigencia.
+Bytea de hasta1MiB evita cargas huérfanas en este incremento; coste/escala y
+migración futura a Storage explícitos en [ADR-064](decisiones/064-avistamientos-publicos-idempotentes.md).
+No implementa revisión HU-11 ni cambia propietario/autorización de found_cases.
+
+Referencia visual web — 18/10/2026: por aprobación explícita del usuario,
+[REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) establece la identidad de landing para
+toda apps/platform. [ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md)
+extiende el alcance visual de ADR-060. Compartir componentes al existir uso real,
+sin imports de presentation entre funcionalidades ni cambios de dominio/permisos.
+La adaptación del QR queda para incrementos de sus recorridos; móvil conserva
+su referencia. Este cambio es documental.
+
+Mapa18/10: ReadExploreCasePreview colabora mediante contratos públicos de
+lost_cases/found_cases; providers declarativos consumen repositorios ya
+inyectados. ViewModel autoDispose por caso observa identidad; widgets consumen
+su AsyncValue y no leen SDK/repositorios. Pin SVG en presentación, foto/superficie/
+toast/shimmer/fecha reutilizados de core. Sin SQL nuevo. ADR-062.
+
+Vacíos18/10: CollectionEmptyState en core contiene exclusivamente composición
+visual (icono, título, descripción, acción opcional). PetsSection y ExploreSection
+lo consumen con textos/acciones propios y sus estados confirmados; sin imports
+entre presentaciones, consultas ni reglas de producto dentro del componente.
+
+Mapa18/10: extensión42–90% y resistencia visual quedan en ExploreCaseMap;
+ExploreMapScreen observa notificaciones de extensión para pintar/ocultar el
+retorno compartido. AnimationController/ValueNotifier se liberan con su dueño;
+sin cambios de dominio, datos, consulta o permisos.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
 Identidad17/10: diez ilustraciones con estampados blancos generados dentro del
 tejido, sin overlays; marca /brand.svg oficial actualizada y fallback PNG.
 Recursos Flutter/launchers/splash regenerados desde logo/. Sin cambios de capas,

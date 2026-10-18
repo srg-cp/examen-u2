@@ -1,5 +1,13 @@
 # Base de datos de Entre Huellas
 
+Avistamientos web18/10: fuentes083–085/plan024 generan
+20261018002400_public_sightings.sql y [patch024](patchs/024_patch_public_sightings.sql).
+Después de023, RPC solo service_role y tabla sin acceso directo para clientes.
+Fecha/punto/estado/budgets/reintento validados en transacción, evidencia JPEG
+privada bytea hasta1MiB recodificada por el servidor Nuxt. No publica datos ni
+crea un usuario anónimo. Regenerar Build-PublicSightingsPatch/Build-RunAll;
+aplicación remota pendiente. [Ficha](../docs/funcionalidades/avistamientos-web.md).
+
 Lector QR16 octubre: fuentes080–082/plan023 generan migración20261016002300_public_qr_case.sql
 y [patch023](patchs/023_patch_public_qr_case.sql), después de022. Regenerar con
 Build-PublicQrCasePatch.ps1/Build-RunAll.ps1. RPC read_qr_case solo service_role,

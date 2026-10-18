@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-17',
   devtools: { enabled: false },
-  buildDir: '.nuxt',
+  buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   ssr: true,
   css: ['~/assets/main.css'],
   typescript: { strict: true },

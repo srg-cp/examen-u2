@@ -1,5 +1,48 @@
 # Diseño de la interfaz: implementación y revisión
 
+Web18/10, HU-10.1: WebShell/ActionButton y lector QR adoptan ADR-063 (crema,
+Arial, marca minúscula, cápsulas con brillo/celeste). SightingForm con ancho
+máximo620, campos60px/radio24, fecha/hora adaptables, mapa300px, adjuntos con
+label accesible y foco visible, toast superior y shimmer de acciones reales.
+Retorno glass52 flotante; WebShell reserva88px en cabecera para no tapar la
+marca. Cabecera persistente fuera del reveal; sin repetir al editar/contar/GPS.
+Estados inválidos/borde/shake; sin feedback bajo campos. Fotos/puntos reales
+de visitantes no aparecen en la ficha QR; se conservan instrucciones de privacidad.
+Capturas fixture en apps/mobile/build/ui-preview/public-sightings; referencia
+operativa, no certificación de mapas/fotos remotos ni auditoría AA global.
+Contraste18/10: primario/crema17.08:1, secundario/crema5.48:1 y azul/celeste5.03:1.
+La combinación heredada blanco/degradado azul falla4.5:1 (1.97–3.62:1); se
+registra para adaptación accesible de la referencia aprobada, sin afirmar AA.
+
+Web — 18/10/2026: la landing final queda aprobada por el usuario como base
+de toda la plataforma. [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) reúne tokens exactos,
+radios, tipografía, botones, espacios, variantes de color, imágenes y movimiento,
+con reglas de adaptación a formularios/listados y criterios de revisión.
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md). No se modifica UI
+en este incremento; no se declara migración visual del QR ni paneles implementados.
+
+Mapa18/10: ExploreMapPin usa SVG negro36 dentro de área táctil48; grupos añaden
+contador. Callout de ancho máximo330 con foto superior136 a ancho completo,
+nombre y fila de tamaño/raza/fecha con iconos18. Cada columna conserva ancho
+legible; texto ampliado permite scroll horizontal en la fila y vertical en la
+tarjeta, cuya altura se limita al mapa sobre el panel. Reutiliza CasePhotoView/EntityCardSurface y
+fecha compartida, skeleton de tamaño mientras consulta y toast con Reintentar
+ante error. Sin texto Abrir caso; nombre/tamaño/raza/fecha mantienen apertura
+por toque. Fecha semántica por suceso; raza ausente declarada, no inferida.
+ADR-062; no se promete captura/persistencia de raza.
+
+Vacíos18/10: CollectionEmptyState reutiliza el diseño aprobado de Mascotas
+en Mascotas/Explorar: padding vertical40, huella88 gris6E6E73, separación24,
+título20/w600/111111 centrado, separación8 y descripción16 gris centrada.
+Acción opcional con separación24/ancho máximo280, solo cuando existe una
+operación real. No mostrar vacío mientras carga o falla una consulta.
+
+Mapa18/10: DraggableScrollableSheet entre42–90%, con resistencia visual máxima
+18px bajo el mínimo y retorno240ms al soltar. Retorno glass ligado a extensión
+78–90% (fundido/retirada superior72px), restaurado al bajar; oculto sin hit-test
+ni semántica. Movimiento reducido sin traslación/rebote. Filtros sin título
+redundante; ver [ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md).
+
 Landing17/10/2026: app/features/landing de plataforma compone LandingPage,
 LandingArt/Icon/Brand/Actions y landing.css limitado a .landing-page. Recortes
 de ilustración en clases CSS fijas compatibles con CSP, no inline. Referencia:

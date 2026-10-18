@@ -1,4 +1,5 @@
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/collection_empty_state.dart';
 import 'dart:async';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'package:flutter/material.dart';
@@ -83,6 +84,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(addButton, findsNothing);
         expect(find.text('Aún no tienes mascotas'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsOneWidget);
         expect(tester.getRect(find.text('Mis mascotas')), titleRect);
         expect(tester.getRect(find.byType(PetListFilter)), filterRect);
         expect(tester.takeException(), isNull);

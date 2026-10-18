@@ -1,0 +1,61 @@
+// Local fixtures only; no service credentials or production writes.
+import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import sharp from 'sharp';
+import { productionFixture } from '../tests/server_fixture.mjs';
+import { slug, rawActive } from '../tests/fixtures.mjs';
+const runtime = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const { chromium } = runtime.default || runtime;
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true });
+const output = new URL('../../mobile/build/ui-preview/public-sightings/', import.meta.url);
+await mkdir(output, { recursive: true });
+const image = await sharp({ create: { width: 800, height: 600, channels: 3, background: '#b5d5e9' } }).withExif({ IFD0: { Artist: 'PRIVATE TEST CAMERA' } }).jpeg().toBuffer();
+const tile = await sharp({ create: { width: 256, height: 256, channels: 3, background: '#edf5fa' } }).png().toBuffer();
+const server = await productionFixture(image);
+try {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', timezoneId: 'America/Lima' });
+  const page = await context.newPage(); page.setDefaultTimeout(15000); const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(message.text())) errors.push(message.text()); });
+  await context.route('https://tile.openstreetmap.org/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tile }));
+  const open = async () => { await page.goto(`${server.origin}/c/${slug}`); await page.getByRole('button', { name: 'La vi · Reportar avistamiento' }).click(); await page.getByRole('heading', { name: '¿Dónde le viste?' }).waitFor(); await page.getByRole('button', { name: 'Usar centro del mapa' }).waitFor(); };
+  const send = () => page.getByRole('button', { name: 'Enviar avistamiento', exact: true });
+  const fill = async () => { await page.getByLabel('Fecha', { exact: true }).fill('2026-01-01'); await page.getByLabel('Hora', { exact: true }).fill('10:30'); await page.getByRole('button', { name: 'Usar centro del mapa' }).click(); await page.getByLabel('Comentario (opcional)').fill('Caminaba por el parque'); };
+  const noOverflow = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+  console.log('Opening sighting form'); await open(); await send().click(); await page.getByRole('alert').getByText(/Revisa la fecha/).waitFor();
+  assert.equal(await page.getByLabel('Fecha', { exact: true }).getAttribute('aria-invalid'), 'true');
+  console.log('Validation and denied GPS'); await page.getByRole('button', { name: 'Usar mi ubicación actual' }).click(); await page.getByRole('alert').getByText(/No pudimos obtener tu ubicación/).waitFor();
+  console.log('Manual point and photo'); await fill();
+  await page.locator('input[type=file]').first().setInputFiles({ name: 'bad.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('not an image') });
+  console.log('Submitting invalid photo'); await send().click(); await page.getByRole('alert').getByText(/No pudimos preparar la foto/).waitFor();
+  assert.equal(server.sightings(), 0); await page.getByRole('button', { name: 'Quitar foto' }).click();
+  await page.locator('input[type=file]').first().setInputFiles({ name: 'camera.jpg', mimeType: 'image/jpeg', buffer: image });
+  console.log('Ambiguous retry'); server.ambiguous(); await send().click(); await page.getByRole('alert').getByText(/No pudimos confirmar/).waitFor();
+  assert.equal(server.sightings(), 1); assert.equal(await page.getByLabel('Comentario (opcional)').isDisabled(), true);
+  await page.getByRole('button', { name: 'Reintentar envío', exact: true }).click();
+  await page.getByRole('heading', { name: 'Avistamiento guardado', exact: true }).waitFor(); assert.equal(server.sightings(), 1);
+  assert.equal((await sharp(Buffer.from(server.sightingCalls().at(-1).p_evidence, 'base64')).metadata()).exif, undefined);
+  await page.screenshot({ path: fileURLToPath(new URL('confirmation-390.png', output)), fullPage: true });
+  await page.getByRole('button', { name: 'Volver al caso' }).click();
+  for (const [name, width, height, enlarged] of [['desktop',1440,1000,false],['tablet',731,1000,false],['mobile',390,844,false],['small',320,700,false],['wide',1920,1000,false],['small-text',320,350,true]]) {
+    console.log(`Responsive ${name}`);
+    await page.setViewportSize({ width, height }); await page.evaluate(() => { document.documentElement.style.fontSize = '100%'; }); await open();
+    if (enlarged) await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    await fill(); await noOverflow();
+    assert.equal(await page.getByRole('heading', { level: 1 }).count(), 1);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: fileURLToPath(new URL(`form-${name}.png`, output)), fullPage: true, animations: 'disabled' });
+    await page.getByLabel('Fecha', { exact: true }).focus(); assert.equal(await page.getByLabel('Fecha', { exact: true }).evaluate(el => el === document.activeElement), true);
+  }
+  server.set({ state: 'closed', resolution: 'resolved', closed_at: null });
+  await send().click(); await page.getByRole('alert').getByText(/ya no admite avistamientos/).waitFor();
+  assert.equal(await send().isDisabled(), true); assert.equal(server.sightings(), 1);
+  await page.getByRole('button', { name: 'Volver a la ficha' }).click(); await page.getByRole('heading', { name: 'Este caso ya fue cerrado' }).waitFor();
+  assert.equal(await page.getByRole('button', { name: 'La vi · Reportar avistamiento' }).count(), 0);
+  server.set(rawActive()); await page.goto(server.origin); assert.ok(await page.getByRole('heading', { level: 1 }).count());
+  assert.deepEqual(errors, []);
+  await context.close();
+  console.log('Sighting browser QA passed: no session, manual point/GPS denied, invalid photo, sanitized EXIF, ambiguous retry once, closed case, 1440/731/390/320/1920 and 200% text, focus, CSP/hydration, landing return. Fixtures and neutral tiles only.');
+} catch (error) { console.error(error); throw error; }
+finally { await browser.close(); await server.close(); }

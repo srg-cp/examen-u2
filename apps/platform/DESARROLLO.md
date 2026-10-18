@@ -1,5 +1,11 @@
 # Tu primera ejecución en Vue/Nuxt
 
+Antes de implementar o revisar UI web, leer
+[REGLAS_UI_UX_WEB](../../docs/REGLAS_UI_UX_WEB.md): la landing final aprobada el
+18/10/2026 es la base visual común para público, usuarios y administración.
+Conservar fronteras arquitectónicas y adaptar componentes con uso real;
+la adopción documental no significa que el QR ya esté migrado visualmente.
+
 No instalar Vue/Nuxt globalmente. Sus versiones y las dependencias están fijadas
 en package.json/package-lock.json. Node24.15+ recomendado; ver engines para rangos
 admitidos. Node24.18.0 y npm11.16.0 ya están instalados en el equipo del proyecto.
@@ -47,6 +53,19 @@ servidor de lectura y renderizado público. Elegimos Nuxt para una web con conte
 público, QR y zonas privadas futuras. No cambia Flutter ni las políticas SQL.
 
 ## Validación y producción
+
+HU-10.1: aplicar024 en desarrollo después de023 antes de probar envíos reales.
+PUBLIC_WEB_ORIGIN limita POST al origen exacto: `https://entrehuellas.kormind.com`
+en producción, o el origen local del dev server si no se configura. No terminar
+con slash. Navegador no recibe clave de servidor ni rutas/evidencia privada.
+Ver [avistamientos web](../../docs/funcionalidades/avistamientos-web.md).
+
+`scripts/check-sightings-browser.mjs` ejecuta navegador con backend/teselas
+fixture. Requiere PLAYWRIGHT_MODULE (ruta absoluta al módulo) y CHROME_PATH.
+Produce capturas en apps/mobile/build/ui-preview/public-sightings y no realiza
+escrituras remotas. El build aislado acepta NUXT_BUILD_DIR; por ejemplo
+`.nuxt-hu10-qa` con NUXT_IGNORE_LOCK=1 evita compartir artefactos con el dev server.
+Se excluyen estos directorios de Git. No detener el servidor del usuario para QA.
 
 ```powershell
 npm run typecheck

@@ -1,5 +1,11 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Estado vacío compartido18/10/2026: el layout existente se extrae a
+core/presentation/widgets/collection_empty_state.dart para reutilizarlo en
+Explorar. Mascotas aporta textos Activas/Archivadas y Registrar mascota solo
+en Activas; icono, tipografías, espaciados y ancho máximo del botón se conservan.
+No importa presentación de otras funcionalidades ni cambia datos/permisos.
+
 Consistencia de cabeceras18/10/2026: CollectionHeader fija altura mínima56
 para sus filas, alineando el origen de Mis mascotas y Explorar aunque sus
 acciones tengan distinto tamaño. Mantiene la reserva del+ durante carga/vacío

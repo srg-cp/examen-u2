@@ -23,6 +23,7 @@ local.properties
 node_modules/
 dist/
 .nuxt/
+.nuxt-*/
 .output/
 
 # Estado local de Supabase

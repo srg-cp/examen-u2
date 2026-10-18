@@ -1,5 +1,11 @@
 # Icono de Entre Huellas
 
+Mapa18/10/2026: only-black.svg también es la fuente del símbolo de los pines.
+apps/mobile/assets/branding/only-black.svg conserva bytes idénticos; el script
+generate_android_icons.ps1 la sincroniza junto a las demás copias. flutter_svg
+2.2.1 renderiza el vector en Flutter, sin editar sus paths ni recolorearlo.
+La prueba explore_case_preview_test.dart verifica igualdad con el original.
+
 Originales exportados desde Figma. Se conservan aquí como fuentes de diseño.
 
 - `Logo EntreHuellas 512 vector inner v2@2x.png`: 1024 × 1024, fuente de los iconos Android clásicos. Conserva textura y sombras del diseño.

@@ -1,5 +1,36 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Web — 18/10/2026:** el usuario aprueba la landing terminada como referencia
+para toda la plataforma web (público, usuarios y administración). Antes de cambios
+web leer [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md): consolida valores finales,
+variantes, componentes, movimiento y criterios de aceptación.
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) sustituye el
+aislamiento de referencia visual de ADR-060; el CSS sigue encapsulado y el QR se
+adaptará al intervenir sus recorridos, sin afirmar migración realizada. Flutter
+conserva la referencia de acceso vigente. Las notas anteriores de paleta son
+históricas; rige la consolidación web, manteniendo feedback global y seguridad.
+
+Vista previa del pin18/10, corrección del usuario: foto arriba a ancho completo;
+nombre y fila de tamaño/raza/fecha debajo, cada dato con su icono. Mantener los
+datos uno junto al otro; texto ampliado usa scroll horizontal de la fila y
+scroll vertical de la tarjeta, sin reducir tipografía ni recortar información.
+Sustituye la composición inicial con foto lateral; ADR-062.
+
+Mapa18/10: usar only-black.svg como símbolo negro del pin; coincidencias añaden
+contador conservando la marca. Vista previa tocable con foto principal, nombre,
+tamaño, raza si existe y fecha del suceso; sin rótulo Abrir caso. Mientras no se
+registre raza, indicar Raza no registrada, sin inferir datos. Espacio dentro del
+mapa visible, texto ampliado desplazable y navegación entre coincidencias.
+[ADR-062](decisiones/062-pines-de-marca-y-vista-previa-publica.md).
+
+Mapa18/10/2026: panel normal/mínimo42%, máximo90%; sin estado14% al tocar pines.
+Al intentar bajar del mínimo, resistencia visual hasta18px y retorno al soltar.
+Retorno glass se desvanece/retira hacia arriba al acercarse al máximo y reaparece
+al bajar; oculto sin interacción/semántica. Movimiento reducido inmediato y sin
+rebote. Sin título Filtros de búsqueda; campos/Aplicar se conservan.
+[ADR-061](decisiones/061-mapa-altura-minima-y-retorno-progresivo.md) sustituye
+esos detalles de ADR-055/056.
+
 Landing17/10: todos los botones comparten radio de cápsula999px, por instrucción
 del usuario, también en tablet/móvil. Colores y efectos conservan sus variantes.
 

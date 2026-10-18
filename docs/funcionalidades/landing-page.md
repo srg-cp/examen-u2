@@ -1,5 +1,13 @@
 # Landing pública en la plataforma
 
+**Aprobación final — 18/10/2026:** el usuario confirma que le encantó la landing
+terminada y solicita usarla como referencia para toda la web. La valoración visual
+de los últimos ajustes queda confirmada; las notas anteriores de revisión pendiente
+son históricas. [REGLAS_UI_UX_WEB](../REGLAS_UI_UX_WEB.md) consolida la norma y
+[ADR-063](../decisiones/063-landing-como-referencia-ui-ux-web.md) extiende el alcance
+visual. Este incremento solo modifica Markdown; no despliega ni adapta todavía
+el QR. Próximo paso: aplicar la norma en el siguiente recorrido web autorizado.
+
 **Radio unificado17/10:** todos los botones de landing comparten cápsula999px,
 incluidos secundarios/lima y tamaños tablet/móvil. Se conserva estilo cromático
 de cada acción y control circular. Validación responsive y build en ESTADO.

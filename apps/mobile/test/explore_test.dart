@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/collection_empty_state.dart';
 import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
 import 'package:flutter_application_entrehuellas/features/pets/presentation/widgets/pets_section.dart';
@@ -207,7 +208,9 @@ void main() {
         repo.pending!.complete(ExplorePage(items: []));
         await tester.pumpAndSettle();
         expect(skeleton, findsNothing);
-        expect(find.text('No hay casos con estos filtros.'), findsOneWidget);
+        expect(find.text('No encontramos casos'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsOneWidget);
+        expect(find.text('No hay casos con estos filtros.'), findsNothing);
         expect(repo.calls, hasLength(1));
         expect(tester.takeException(), isNull);
       },
@@ -685,6 +688,7 @@ void main() {
         repo.pending = null;
         await tester.pumpAndSettle();
         expect(find.text('Reintentar'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsNothing);
         await capture(tester, key, small, 'error');
         await tester.ensureVisible(find.text('Reintentar'));
         await tester.pumpAndSettle();
@@ -880,10 +884,15 @@ void main() {
         );
         await container.read(exploreViewModelProvider.notifier).refresh();
         await tester.pumpAndSettle();
-        expect(find.text('No hay casos con estos filtros.'), findsOneWidget);
-        await tester.ensureVisible(
-          find.text('No hay casos con estos filtros.'),
+        expect(find.text('No encontramos casos'), findsOneWidget);
+        expect(find.byType(CollectionEmptyState), findsOneWidget);
+        expect(
+          find.text(
+            'Prueba con otra ubicación o ajusta los filtros de búsqueda.',
+          ),
+          findsOneWidget,
         );
+        await tester.ensureVisible(find.text('No encontramos casos'));
         await tester.pumpAndSettle();
         await capture(tester, key, small, 'empty');
         repo.empty = false;

@@ -1,5 +1,12 @@
 # Relevo para continuar el diseño de la landing
 
+**Relevo actualizado — 18/10/2026:** el usuario aprueba la landing final,
+incluidos los últimos retoques, y la adopta como referencia de toda la web.
+Las menciones anteriores de valoración pendiente quedan resueltas por esta
+aprobación. Antes de continuar leer [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) y
+[ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md). No hay publicación
+ni migración visual del QR en este incremento documental.
+
 Actualizado el 17/10/2026, America/Lima. El usuario acaba de aprobar el estado
 actual: «ok esta perfecto». Continuar desde esta base, sin rehacerla.
 
