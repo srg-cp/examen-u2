@@ -1,5 +1,7 @@
 # Avistamientos desde la web pública
 
+**Seguimiento actualizado:** HU-10.1/#36 aceptada explícitamente por el usuario el18/10/2026; Done y issue cerrado en GitHub, verificado por API. Código integrado en main mediante PR60 y CI aprobado. Se conservan la evidencia comunicada de operación y los límites de inspección independiente; los pendientes visuales o pruebas ampliadas anteriores no se afirman ejecutados por esta aceptación.
+
 HU-11,18/10: [cronología y revisión](cronologia-y-revision.md) implementa la
 consulta privada del responsable en Android para los avistamientos web/app,
 incluida foto/punto y auditoría. Requiere026 pendiente;025 confirmado según

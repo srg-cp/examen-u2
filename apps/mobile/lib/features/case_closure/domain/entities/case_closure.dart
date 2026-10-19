@@ -8,13 +8,25 @@ class ClosureFailure implements Exception {
 }
 
 class ClosureCommand {
-  const ClosureCommand({required this.id, required this.target, required this.reason, required this.evidence});
+  const ClosureCommand({
+    required this.id,
+    required this.target,
+    required this.reason,
+    required this.evidence,
+  });
   final String id, reason, evidence;
   final ClosureTarget target;
 }
 
 class ClosureReceipt {
-  const ClosureReceipt({required this.commandId, required this.target, required this.actor, required this.closedAt, required this.reason, this.evidence});
+  const ClosureReceipt({
+    required this.commandId,
+    required this.target,
+    required this.actor,
+    required this.closedAt,
+    required this.reason,
+    this.evidence,
+  });
   final String commandId, actor, reason;
   final ClosureTarget target;
   final DateTime closedAt;

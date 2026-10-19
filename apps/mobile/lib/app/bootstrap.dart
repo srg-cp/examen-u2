@@ -173,7 +173,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
-          caseClosureRepository: CaseClosureRepositoryImpl(SupabaseCaseClosureSource(supabase.client)),
+          caseClosureRepository: CaseClosureRepositoryImpl(
+            SupabaseCaseClosureSource(supabase.client),
+          ),
           caseTimelineRepository: CaseTimelineRepositoryImpl(
             SupabaseCaseTimelineSource(supabase.client),
           ),

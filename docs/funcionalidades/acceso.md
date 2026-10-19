@@ -1,5 +1,7 @@
 # Acceso y recuperación de contraseña
 
+**Auditoría de seguimiento18/10:** #17/#18/#20/#22 en Done: registro, login correo, sesión y recuperación entregados e integrados; se corrigen los motivos genéricos de implementación local/sin PR. #19 Google permanece In progress por retorno OAuth Android abierto/cerrado sin evidencia concreta. Su callback público18/10 ya es correcto; no reiterar el arreglo de ruta duplicada del7/10. Facebook sigue con activación propia pendiente y no se da por entregado por esta auditoría.
+
 Módulo: `auth`. Trazabilidad: HU-01 / RF-01,34; [issue #1 y subtareas](../backlog/001-HU-01.md).
 
 ## Qué hace y cómo se usa

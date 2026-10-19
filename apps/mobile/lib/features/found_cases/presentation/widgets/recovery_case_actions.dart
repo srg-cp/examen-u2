@@ -56,8 +56,15 @@ class RecoveryCaseActions extends ConsumerWidget {
               label: 'Ya fue recuperada',
               icon: Icons.check_circle_outline,
               route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+              onReturn: onChanged,
             ),
           ],
+          if (!open)
+            CollectionAddButton(
+              label: 'Ver recuperación',
+              icon: Icons.check_circle_outline,
+              route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+            ),
           const SizedBox(height: 20),
           const Text(
             'Avisos de esta búsqueda',

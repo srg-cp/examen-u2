@@ -1,5 +1,7 @@
 # Seguimiento y alertas
 
+**Auditoría de seguimiento18/10:** HU-12/#12 y #40/#41 siguen In progress:027 confirmado, implementación local probada, pero main todavía no contiene notifications y falta demo del evento/bandeja actual. FCM/Firebase #42 sigue pospuesto; no es el bloqueo de preferencias ni de bandeja.
+
 HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42; RF-16,17,18. Implementación local
 Android/SQL/Edge.027 aplicado según confirmación del usuario; historias abiertas,
 demo real pendiente, sin inspección remota independiente.

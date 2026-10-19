@@ -1,4 +1,5 @@
 import '../features/case_closure/presentation/screens/case_closure_screen.dart';
+import '../features/found_cases/presentation/view_models/found_read_view_model.dart';
 import '../features/explore/presentation/view_models/explore_view_model.dart';
 import '../features/notifications/presentation/screens/inbox_screen.dart';
 import '../features/notifications/presentation/widgets/follow_target_button.dart';
@@ -126,6 +127,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
+              state.uri.path.startsWith('/home/closure/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
@@ -434,11 +436,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'closure/:source/:id',
-            redirect: (_, state) => !['lost', 'found'].contains(state.pathParameters['source']) || !RegExp(r'^[0-9a-f-]{36}$').hasMatch(state.pathParameters['id'] ?? '') ? '/home' : null,
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f-]{36}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
             pageBuilder: (context, state) => entityEditorPage(
-              context: context, key: state.pageKey, source: state.extra,
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
               child: CaseClosureScreen(
-                target: (id: state.pathParameters['id']!, community: state.pathParameters['source'] == 'found'),
+                target: (
+                  id: state.pathParameters['id']!,
+                  community: state.pathParameters['source'] == 'found',
+                ),
                 onSaved: () {
                   ref.invalidate(publicCaseViewModelProvider);
                   ref.invalidate(publicFoundViewModelProvider);
@@ -446,7 +459,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ref.invalidate(myFoundCasesViewModelProvider);
                   ref.invalidate(petListViewModelProvider);
                   ref.invalidate(petDetailViewModelProvider);
-                  ref.invalidate(exploreViewModelProvider);
+                  ref.read(exploreViewModelProvider.notifier).refresh();
                 },
               ),
             ),

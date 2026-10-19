@@ -1,5 +1,11 @@
 # Base de datos de Entre Huellas
 
+HU-13,18/10: fuentes096–098/plan028 generan migración028 y
+[patch028](patchs/028_patch_case_closure.sql), después de027 confirmado por usuario.
+Recibo privado/RLS, cierre atómico autorizado e idempotente con auditoría,
+contador y cancelación de difusión pendiente. Build-CaseClosurePatch/Build-RunAll;
+SQL remoto028 pendiente. FCM sigue pospuesto por ADR-068.
+
 HU-12,18/10: fuentes091–095/plan027 generan
 [migración027](../supabase/migrations/20261018002700_notifications.sql) y
 [patch027](patchs/027_patch_notifications.sql). Requiere026, confirmado por usuario.

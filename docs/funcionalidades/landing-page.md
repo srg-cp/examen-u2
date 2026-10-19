@@ -1,5 +1,13 @@
 # Landing pública en la plataforma
 
+**Distribución irregular solicitada — 18/10/2026:** se sustituye la alineación y el tamaño uniforme por huellas con tamaños, alturas, separaciones y giros diferentes, sobre el crema exterior. Diez en escritorio y cuatro en móvil. Build Nuxt y revisión Chrome en 1920/1440/731/390/320px (320 con texto al 200%) aprobados: tamaños y posiciones distintos, sin invadir el panel ni producir overflow o errores de página. Capturas closing-paws actualizadas. Sin despliegue; pendiente revisión del usuario.
+
+## Huellitas del cierre sobre fondo crema — 18/10/2026
+
+Por petición del usuario, las huellas de «Una huella tuya puede acercarlos a casa» pasan al fondo amarillento exterior. Un contenedor de presentación reserva bandas superior/inferior; el panel aurora conserva título y acciones. Diez huellas en escritorio y cuatro en móvil, decorativas y sin eventos.
+
+Validación local: typecheck,17 pruebas y build Nuxt aprobados. Chrome en1920/1440/731/390/320px (320 con texto200%): huellas fuera del panel, sin overflow ni errores de página; capturas de escritorio/móvil revisadas en apps/mobile/build/ui-preview/closing-paws-*.png. Sin despliegue. Siguiente paso: revisión del usuario.
+
 **Ubicación corregida al footer — 18/10/2026:** el usuario aclara que el adorno
 corresponde al pie debajo del cierre. LandingSideNote se traslada al footer,
 superpuesto a la derecha sin espacio reservado, conservando mancha/huellas y

@@ -1,5 +1,7 @@
 # Cronología y revisión de avistamientos
 
+**Seguimiento actualizado:** HU-11.1/#38 y HU-11.2/#39 aceptadas explícitamente por el usuario el18/10/2026; ambas y la épica #11 están en Done y cerradas en GitHub, verificado por API. Código integrado en main mediante PR60 y CI aprobado. La aceptación funcional sustituye el pendiente de aceptación de las notas anteriores; no se presenta como inspección remota independiente de cada escenario.
+
 Confirmación operativa18/10: tras aplicar026 y recibir los pasos de validación
 Android, el usuario confirma «ok perfecto, ya esta». Incremento funcional
 HU-11.1/#38 y HU-11.2/#39 finalizado según su comunicación. Sustituye el pendiente

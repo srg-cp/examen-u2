@@ -1,5 +1,29 @@
 # Configuración y validación de la app
 
+**Google, auditoría18/10:** el authorize público devuelve302 a Google con
+redirect_uri https://entrehuellas-supabase.kormind.com/auth/v1/callback,
+sin duplicación. El diagnóstico de ruta duplicada del7/10 es histórico; no
+repetir su corrección en un servidor que ya responde así. Falta demostrar el
+retorno Android abierto/cerrado; esta consulta no autentica una cuenta ni
+valida credenciales OAuth. Sin cambios de servidor ni tokens impresos.
+
+## Cierre y recuperación — HU-13, patch028
+
+027 ya aplicado según confirmación del usuario. Ejecutar **todo**
+[028_patch_case_closure.sql](../database/patchs/028_patch_case_closure.sql) en
+Supabase de desarrollo y actualizar/reiniciar Flutter. No reaplicar027 ni
+reescribir migraciones anteriores. No requiere desplegar Nuxt: el QR existente
+consulta el estado cerrado. No se configura Firebase/FCM/Edge/cron (ADR-068).
+
+Validar con responsable y cuenta ajena; dos sesiones cierran el mismo caso,
+reintento tras respuesta perdida conserva recibo/motivo/fecha, mismo QR muestra
+cierre sin datos privados, web/app rechazan nuevos avistamientos y las consultas
+activas/resueltas se actualizan. Comprobar historial/bandeja y publicar otro
+episodio de la mascota sin reabrir el anterior. Ver
+[ficha](funcionalidades/cierre-y-recuperacion.md) y [estado](ESTADO.md) para
+pruebas y limitaciones: Gradle aún bloquea el APK por conexión loopback.
+
+
 ## Seguimiento y alertas — HU-12, 18/10/2026
 
 **Actualización vigente:** el usuario pospone FCM/Firebase. Solo se activa y valida

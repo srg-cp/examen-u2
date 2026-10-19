@@ -1,5 +1,10 @@
 # Registro, edición y ciclo de vida de mascotas
 
+**Seguimiento18/10:** HU-03/#3 y HU-03.1/#28, HU-03.2/#29 en Done y cerradas
+en GitHub tras corregir la clasificación cuestionada por el usuario. Registro,
+consulta y edición con fotos implementados e integrados; las notas históricas de
+fotos/patch no describen trabajo faltante actual. Sin pruebas nuevas por este ajuste.
+
 Estado vacío compartido18/10/2026: el layout existente se extrae a
 core/presentation/widgets/collection_empty_state.dart para reutilizarlo en
 Explorar. Mascotas aporta textos Activas/Archivadas y Registrar mascota solo

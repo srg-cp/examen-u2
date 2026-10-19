@@ -30,7 +30,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
-        caseClosureRepositoryProvider.overrideWithValue(bootstrap.caseClosureRepository),
+        caseClosureRepositoryProvider.overrideWithValue(
+          bootstrap.caseClosureRepository,
+        ),
         notificationRepositoryProvider.overrideWithValue(
           bootstrap.notificationRepository,
         ),

@@ -1,6 +1,11 @@
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
 import 'dart:io';
+import 'case_closure_test.dart' show FakeClosure;
+import 'package:flutter_application_entrehuellas/features/case_closure/domain/entities/case_closure.dart';
+import 'package:flutter_application_entrehuellas/features/case_closure/providers/case_closure_providers.dart';
+import 'package:flutter_application_entrehuellas/features/case_closure/presentation/screens/case_closure_screen.dart';
+import 'package:flutter_application_entrehuellas/features/case_closure/presentation/view_models/case_closure_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,6 +53,20 @@ PublicFoundCase projection(FoundCaseDraft d, {bool owner = false}) =>
       canResolve: owner,
     );
 
+class FlowClosure extends FakeClosure {
+  FlowClosure(this.reports);
+  final FakeFoundCases reports;
+  @override
+  Future<ClosureReceipt> close(String owner, ClosureCommand command) async {
+    await reports.resolveSearch(
+      owner,
+      command.target.id,
+      command.target.community,
+    );
+    return super.close(owner, command);
+  }
+}
+
 void main() {
   setUpAll(
     () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -78,9 +97,11 @@ void main() {
         final auth = FakeAuthRepository()
           ..current = const AuthSession(userId: 'one');
         final reports = FakeFoundCases();
+        final closures = FlowClosure(reports);
         final pets = FakePets();
         final scope = ProviderContainer(
           overrides: [
+            caseClosureRepositoryProvider.overrideWithValue(closures),
             sightingRepositoryProvider.overrideWithValue(FakeSightings()),
             caseTimelineRepositoryProvider.overrideWithValue(FakeTimeline()),
             startupStateProvider.overrideWithValue(
@@ -263,13 +284,27 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Ya fue recuperada', skipOffstage: false));
         await tester.pumpAndSettle();
+        expect(find.byType(CaseClosureScreen), findsOneWidget);
+        final closeTarget = (id: search.id, community: true);
+        scope
+            .read(caseClosureViewModelProvider(closeTarget).notifier)
+            .edit(reason: 'Regresó a casa');
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Confirmar recuperación'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Confirmar recuperación'));
+        await tester.pumpAndSettle();
         expect(find.text('¿Confirmar recuperación?'), findsOneWidget);
         await tester.ensureVisible(find.text('Confirmar'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Confirmar'));
         await tester.pumpAndSettle();
         expect(reports.resolvedSearches, [search.id]);
+        expect(closures.attempts.single.target, closeTarget);
+        expect(find.text('Búsqueda finalizada'), findsOneWidget);
         expect(reports.publicCase!.status, 'resolved');
+        router.pop();
+        await tester.pumpAndSettle();
         expect(
           find.text('La vi o la encontré', skipOffstage: false),
           findsNothing,

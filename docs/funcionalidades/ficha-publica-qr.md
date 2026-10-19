@@ -1,5 +1,7 @@
 # Ficha pública QR
 
+**Auditoría de seguimiento18/10:** HU-09/#9 en Done:022/023 y generación/lectura QR confirmadas; migración Vue integrada y avistamientos web posteriores aceptados. El lector pendiente de desplegar es una nota histórica. Impresión/escaneo físicos y exportación nativa conservan sus criterios en HU-08/#34/#35.
+
 Incremento18/10/2026: ficha activa integra el [formulario de avistamientos web](avistamientos-web.md)
 HU-10.1/#36 mediante slot compuesto en la página. WebShell/ActionButton y QR
 adoptan la referencia web ADR-063; sin import de UI de landing. Conserva lectura,

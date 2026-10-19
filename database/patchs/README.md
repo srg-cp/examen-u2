@@ -1,5 +1,11 @@
 # Patches manuales de Supabase
 
+HU-13: ejecutar completo [028_patch_case_closure.sql](028_patch_case_closure.sql)
+después de027 ya confirmado, sin reaplicarlo. Actualizar Flutter; el QR Nuxt
+existente reconoce el cierre sin despliegue nuevo. Generar con
+Build-CaseClosurePatch.ps1/Build-RunAll.ps1. Pendiente aplicación en desarrollo
+y demo Android/Supabase; no activar FCM/Edge/cron (ADR-068).
+
 027_patch_notifications.sql: HU-12.1/#40,12.2/#41,12.3/#42. Generado por
 Build-NotificationsPatch.ps1 desde plan027/fuentes091–095. Requiere026 confirmado.
 Aplicar solo027 completo en desarrollo; sin backfill ni secrets/cron.

@@ -252,6 +252,16 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 
 ### S5 - Seguimiento, alertas y cierre
 
+18/10/2026: HU-13/#13 implementada localmente: cierre por responsable con
+actor/fecha/motivo/evidencia testimonial opcional privados, recibo estable,
+transacción con historial/contador/cancelación de difusión pendiente y consulta
+desde ficha resuelta. QR existente y rechazo de avistamientos consumen estado
+vigente; episodio nuevo conserva el anterior. Plan028 después de027 confirmado;
+no cerrar historia antes de activar y validar Android/Supabase reales. FCM
+continúa pospuesto (ADR-068). [Ficha](funcionalidades/cierre-y-recuperacion.md),
+[ADR-069](decisiones/069-cierre-recuperacion-auditado.md).
+
+
 **Alcance vigente por instrucción del usuario18/10/2026:** FCM e implementación
 Firebase quedan pospuestos (HU-12.3/#42). El incremento activo HU-12 comprende
 HU-12.1/#40 y HU-12.2/#41, seguimiento/bandeja con Supabase.027 ya aplicado

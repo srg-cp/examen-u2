@@ -1,5 +1,169 @@
 # Estado del proyecto
 
+## Auditoría ampliada de tarjetas en progreso — 18/10/2026
+
+Por solicitud del usuario se revisaron las29 In progress, además del inventario
+de51 elementos. Se detectaron motivos no reconciliados: integración en main
+pendiente pese a PR fusionadas, cámara/principal/miniaturas todavía no
+implementadas pese a PR54, o Android nunca revisado pese al recorrido real
+del16/10. Se contrastó el árbol remoto main7367c5f y las PR53–60, pruebas
+existentes/CI y confirmaciones de010/011,012/WASM/guardado,022/023/QR y025.
+
+20 tarjetas más pasan a Done: #2/#4/#5/#6/#7/#9/#10/#17/#18/#20/#21/#22/
+#23/#26/#27/#30/#31/#32/#33/#37. Se actualizaron29 cuerpos y las51 fichas
+locales con Status/etiqueta/estado remoto;27 Done y cerrados,9 In progress,
+2 Ready,13 Backlog,0 In review;24 issues abiertos. Verificación API de los51
+sin desajustes. La clasificación refleja entrega integrada y evidencia posterior;
+no se inventan demos o inspecciones nuevas de permisos hosted.
+
+Pendientes específicos conservados: #1 por Google/baja/exportación; #19 por
+retorno OAuth Android abierto/cerrado; #8/#34/#35 por impresión/escaneo físico
+y hojas nativas guardar/compartir; #12/#40/#41 por integración de notifications
+y demo actual; #13 por integración de case_closure,028 y demo. Árbol main contiene
+0 fuentes de notifications y case_closure; no confundir pruebas locales412
+aprobadas con esas integraciones. FCM sigue pospuesto. Ready #14/#43 sin iniciar.
+
+Única red de producto nueva: consulta pública Google authorize sin seguir
+redirecciones/login, HTTP302 a accounts.google.com con redirect_uri correcto
+https://entrehuellas-supabase.kormind.com/auth/v1/callback. El antiguo fallo por
+ruta duplicada no es actual. No se imprimen códigos/estado/tokens/client_id ni
+se considera esa consulta una sesión OAuth completa.
+
+Matriz en docs/backlog/AUDITORIA_2026-10-18.md; índice/fichas funcionales y
+configuración coherentes con los motivos vigentes, historial conservado. JSON
+antes/después, árbol main, plan/auditoría en apps/mobile/build/backlog-audit*.json
+y backlog-audit-20261018. Sin pruebas de aplicación nuevas, SQL, despliegue,
+cambio de prioridad/estimación/dependencias, commit/push o inicio de moderación.
+Validación documental y git diff --check. Siguiente: integrar/validar HU-12/13;
+resolver recorridos concretos retenidos o iniciar la denuncia preparada #43.
+
+
+## Corrección de clasificación HU-03 — 18/10/2026
+
+El usuario cuestiona HU-03 en In progress porque la considera ya terminada.
+Revisión detecta motivos históricos de9/10 (fotos no implementadas/patch de
+mascotas pendiente) mantenidos sin reconciliar con integración y avances
+posteriores. Registro, consulta y edición con fotos están implementados e
+integrados (PR53/54 fusionadas); pruebas de mascotas/fotos y regresión412
+Flutter ya acreditadas. Se corrige HU-03/#3 y sus derivadas #28/#29 a Done.
+No se atribuye al usuario una nueva demo detallada ni al agente nuevas pruebas
+o inspección hosted; se corrige el seguimiento a partir de la revisión solicitada.
+
+Verificados por API los51 elementos y etiquetas:7 Done,29 In progress,2 Ready,
+13 Backlog,0 In review;44 issues abiertos/7 cerrados. #3/#28/#29 quedaron
+cerrados tras moverlos a Done. Índice/fichas y ficha/índice funcional actualizados,
+conservando el historial anterior. git diff --check sin errores. Sin código,
+pruebas nuevas, SQL, despliegue ni commit/push. Los otros recorridos no pasan
+a Done por arrastre; HU-12/13 conservan activación/aceptación pendientes y FCM
+sigue pospuesto.
+
+
+## Backlog de GitHub sincronizado por autorización del usuario — 18/10/2026
+
+Consultados los51 elementos de Projects3, campos/status, cuerpos/etiquetas/estado
+de issues y PR integradas. El usuario acepta explícitamente «Darlos por
+aceptados y moverlos a Done» para HU-10.1 y HU-11: #36/#38/#39 y épica #11
+pasan a Done; después se verifican los cuatro issues cerrados en GitHub. Se
+comprobaron integración por PR60 y CI remoto Flutter/SQL/reader/photos aprobado.
+No se atribuye inspección remota independiente a la aceptación comunicada.
+
+Resultado:4 Done,32 In progress,2 Ready,13 Backlog y0 In review.21 tarjetas
+cambian de estado;22 cuerpos actualizados con motivo/evidencia, incluido #42
+FCM pospuesto. Se verificó por API el Status nativo y una sola etiqueta status:*
+coincidente en los51 elementos;47 issues abiertos/4 cerrados. HU-12.1/#40 y
+HU-12.2/#41 siguen In progress (027 confirmado, demo pendiente), HU-13/#13
+In progress (028/demo pendientes); no se aceptan automáticamente los otros
+recorridos. HU-14.1/#43 y su épica #14 Ready por criterios/dependencias disponibles.
+FCM/Firebase #42 permanece Backlog/pospuesto (ADR-068); offline/cuenta/métricas
+y needs:refinement de #44/#51 se conservan. Sin estimaciones nuevas.
+
+Índice y51 fichas locales sincronizados; se conserva instantánea histórica
+anterior. Actualizados los seguimientos de cronología y avistamientos web y el
+índice funcional. Verificación documental y git diff --check; sin cambios de
+código ni pruebas nuevas de app por esta sincronización. Capturas JSON de antes/
+después, plan aplicado y auditoría en apps/mobile/build/backlog-sync-20261018
+y backlog-{project,issues}-{before,after}.json, sin credenciales. Sin SQL,
+despliegue, commit/push ni implementación de moderación. Siguiente paso operativo:
+activar/verificar HU-13 y la bandeja; HU-14.1 está preparada como siguiente historia.
+
+
+## Cierre y recuperación — HU-13 / RF-07, issue #13 — 18/10/2026
+
+Implementación local en feature/case-recovery, creada conservando el trabajo
+existente de HU-12. Se preservan cambios paralelos de landing y la decisión
+ADR-068: FCM/Firebase pospuestos, sin activar emisor/cron.027 ya confirmado;
+028 pendiente. Historia implementada localmente, sin cierre remoto de issue.
+
+Ficha propia activa→Ya fue recuperada→Cierre→motivo/evidencia testimonial
+opcional (texto500 por campo)→confirmación explícita→recibo persistido.
+Ver recuperación desde ficha resuelta; registros anteriores sin datos inventados.
+Módulo case_closure con dominio/casos de uso/contrato, DTO/fuente/repositorio,
+providers declarativos y ViewModel autoDispose; inyección bootstrap/main y ruta
+compuesta en app. Reutiliza shell/glass/cover/stagger/input/contador/toast/shake/
+skeleton/shimmer. Título Cierre evita partir palabras en320px/texto2. Recibo como
+etapa discreta; edición/carga no reinician reveal. Refresco conserva contenido y
+Explorar conserva filtros al actualizar tras cierre.
+
+Fuentes096–098/plan028, migración/patch generados con los scripts versionados;
+run_all regenerado sin editar SQL aplicado. Tabla privada/RLS sin grants
+cliente/servicio; lectura/escritura autentican responsable. Orden UUID congelada
+ante respuesta ambigua; repetición devuelve recibo original, conflicto/cierre
+exige consultar estado. Consulta fallida conserva borrador/reintento. Cambio/
+error de cuenta y disposición descartan respuestas tardías y ocultan datos.
+Salida con borrador o resultado ambiguo pide confirmación.
+
+Transacción bloquea mascota→caso, registra actor/fecha servidor/motivo/nota,
+actualiza estado/contador e historial y cancela pendientes/leases de difusión de
+búsqueda. Contador inconsistente falla y revierte, sin corregirlo silenciosamente.
+Bandeja y notificación de cierre se conservan. RPC anterior conserva contrato y
+permisos, delegando las acciones nuevas, sin backfill de cierres históricos.
+QR previo conserva slug y refleja cierre neutro/fecha, sin motivo/nota; web/app
+rechazan nuevos avistamientos, responsables pueden crear otro episodio con otro
+UUID conservando el anterior. No cambia Nuxt ni amplía visibilidad de resueltos.
+Push en tránsito no puede retirarse; FCM permanece pospuesto/inactivo.
+
+Validación local:18 comprobaciones Flutter finales aprobadas (dominio, DTO/fallos
+seguros, ViewModel, orden ambigua/doble envío, conflicto/consulta fallida,
+cuenta/error de sesión/disposición, UI en390×844/320×350 texto2 y navegación
+real desde ficha comunitaria, más9 reglas arquitectónicas). Renders revisados en
+apps/mobile/build/ui-preview/case-closure; campos/acciones y recibo accesibles por
+scroll. Análisis final limpio y formato de16 archivos comprobado. Primera suite
+Flutter completa:410 aprobadas/2 fallos por el acceso a la ruta nueva desde la
+redirección raíz; corregido y regresiones específicas aprobadas. Repetición
+completa final con concurrencia2:412 pruebas aprobadas, sin fallos.
+
+SQL/PostGIS:26 regresiones existentes y4 HU-12 aprobadas;4 escenarios HU-13
+aprobados sobre la versión final (y escenario de rollback/mapa reforzado repetido).
+Incluyen permisos/columnas privadas, reintentos/conflicto, repetición del bundle,
+QR previo antes/después, rechazo web/app, historial/contador, episodio nuevo,
+cancelación de lease, rollback ante fallo y contador inválido, solicitudes
+competidoras encoladas y proyecciones activas/resueltas. npm test incorpora las
+tres suites con concurrencia1. PGlite es una conexión; no certifica concurrencia
+hosted multiconexión.17 pruebas de regresión Nuxt aprobadas sin cambios web propios.
+
+APK debug intentado: vuelve a fallar antes de compilar por Gradle,
+java.io.IOException: Unable to establish loopback connection. Sin APK nuevo.
+Logs hu13-{generation,format-final,analyze-final,final-tests,full-mobile,
+full-mobile-final,sql-final,sql-preflight-final,full-sql,platform-tests,
+android-build}.log en apps/mobile/build. Fallos intermedios de pruebas fueron
+corregidos; la evidencia final se distingue de las ejecuciones iniciales.
+
+Pendiente ejecutar028 completo en desarrollo y actualizar Flutter; demo con
+Supabase real, dos cuentas/sesiones, cierre concurrente y respuesta perdida,
+QR ya emitido, rechazo de nuevos avisos, mapa/historial/bandeja y otro episodio.
+Sin SQL remoto, despliegue ni acciones GitHub desde este trabajo. No se reactiva
+FCM. Ficha/índice/ADR-069/arquitectura/diseño/guía/configuración/backlog actualizados.
+Siguiente paso: activar/verificar HU-13; después HU-14, moderación.
+
+
+**Distribución irregular solicitada — 18/10/2026:** se sustituye la alineación y el tamaño uniforme por huellas con tamaños, alturas, separaciones y giros diferentes, sobre el crema exterior. Diez en escritorio y cuatro en móvil. Build Nuxt y revisión Chrome en 1920/1440/731/390/320px (320 con texto al 200%) aprobados: tamaños y posiciones distintos, sin invadir el panel ni producir overflow o errores de página. Capturas closing-paws actualizadas. Sin despliegue; pendiente revisión del usuario.
+
+## Huellitas del cierre sobre fondo crema — 18/10/2026
+
+Por petición del usuario, las huellas de «Una huella tuya puede acercarlos a casa» pasan al fondo amarillento exterior. Un contenedor de presentación reserva bandas superior/inferior; el panel aurora conserva título y acciones. Diez huellas en escritorio y cuatro en móvil, decorativas y sin eventos.
+
+Validación local: typecheck,17 pruebas y build Nuxt aprobados. Chrome en1920/1440/731/390/320px (320 con texto200%): huellas fuera del panel, sin overflow ni errores de página; capturas de escritorio/móvil revisadas en apps/mobile/build/ui-preview/closing-paws-*.png. Sin despliegue. Siguiente paso: revisión del usuario.
+
 ## FCM/Firebase pospuestos por el usuario — 18/10/2026
 
 Por instrucción explícita, HU-12.3/#42 queda pospuesta y fuera del incremento
@@ -2958,7 +3122,6 @@ Por solicitud del usuario se generó con imagegen un mockup de página completa 
 
 Nueva revisión visual solicitada por el usuario para aproximar distribución/formato de su referencia: hero centrado, tarjetas de personajes con poses y alturas distintas, bloques alternados, degradados aurora y cierre con mascotas grandes. [Mockup y prompt](../mockups/landing-concepto-v2/README.md), generado con imagegen, conservando v1. Revisión visual completada; banner emocional interpretado en dos columnas. Pendiente aprobación del concepto y eventual maquetación con textos/enlaces reales, responsive y accesibilidad. Solo imagen conceptual: sin código, despliegue, funciones nuevas ni cierre de HU.
 
-
 ## Búsquedas propias/comunitarias y avisos vinculados — 11 de octubre de 2026
 
 Implementado el modelo autorizado por el usuario: Mascota perdida permite Mi mascota u Otra mascota posiblemente perdida, sin crear una ficha propia para la segunda. Mascota encontrada registra La vi o La encontré y está conmigo sobre una búsqueda abierta; desde la ficha se preselecciona su destino. Fotos opcionales en avisos, obligatorias en búsquedas comunitarias. Avisos consultables desde la búsqueda y sin cierre automático. Solo el autor confirma Ya fue recuperada; servidor actualiza estado/historial y contador de mascota de forma atómica e idempotente. Registros anteriores conservados como legacy_found, sin reinterpretación. UI reutiliza campos, efectos, toast, skeleton/shimmer y navegación compartidos; títulos breves y secuencia stagger ajustados a los campos reales.
@@ -3033,7 +3196,6 @@ Validación local: formato de los dos archivos Dart correcto, flutter analyze --
 Actualizado README raíz con icono existente, badges informativos de stack/estado, requisitos fijados en el workflow, clonación, dependencias, enlace a la plantilla config/supabase.local.example.json, creación del archivo local y ejecución Android/VS Code. Los valores del entorno se compartirán internamente por el responsable; solo configuración pública en el cliente, sin secretos en Git. Aclarada la validez OTP de ejemplo y la diferencia entre configuración cliente y activación del backend. Añadidos flujo de ramas/PR, fronteras por funcionalidad, comprobaciones, mapa del repositorio y enlaces de documentación. Retiradas afirmaciones antiguas de README sobre acceso y onboarding omitible; no cambia el alcance funcional ni se cierra ninguna historia.
 
 Validación documental: referencias locales, anclas internas, bloques de código, JSON de ejemplo con valores Supabase vacíos y exclusión Git del archivo local comprobados; git diff --check correcto. No se ejecutaron pruebas Flutter ni builds por tratarse de documentación; render de GitHub y disponibilidad remota de badges no comprobados. No se modificaron credenciales, configuración ni fichas funcionales en este incremento. Trabajo local previo conservado. Siguiente paso: revisar el README en GitHub cuando se autorice su publicación; sin commit, push ni despliegue en esta tarea.
-
 
 ## Explorar: lista filtrada y paginada — 15 de octubre de 2026
 

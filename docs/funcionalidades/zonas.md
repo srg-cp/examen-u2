@@ -1,5 +1,7 @@
 # Ubicaciones de interés privadas
 
+**Auditoría de seguimiento18/10:** HU-02.1/#26 y épica #2 en Done: implementación integrada,010 confirmado y evidencia posterior. No se conserva integración en main como pendiente. El seguimiento de ubicaciones corresponde a HU-12 y no bloquea esta entrega de configuración.
+
 18/10/2026: HU-12 añade Seguir zona/Dejar de seguir por slot compuesto en router,
 sin importar presentation de notifications. Zona existente no se sigue de forma
 automática. Eliminada deja de seleccionar destinatarios; preferencias siguen

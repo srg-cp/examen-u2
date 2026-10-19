@@ -1,5 +1,13 @@
 # Arquitectura de Entre Huellas
 
+HU-13 (18/10): case_closure añade dominio/casos de uso/repositorio, DTO/fuente
+Supabase, providers declarativos y ViewModel autoDispose. App compone ruta desde
+fichas y actualiza consultas; sin imports de presentation/data entre módulos.
+SQL096–098/plan028 guarda recibo privado y cierra con historial/contador/outbox
+en transacción, RPC autorizadas y UUID estable. QR conserva proyección neutra.
+Compatibilidad con resolución anterior sin backfill. [ADR-069](decisiones/069-cierre-recuperacion-auditado.md).
+FCM/Firebase siguen pospuestos por ADR-068.
+
 ## Alcance activo de alertas — 18/10/2026, ADR-068
 
 Por instrucción del usuario se pospone HU-12.3/#42 y la implementación Firebase.

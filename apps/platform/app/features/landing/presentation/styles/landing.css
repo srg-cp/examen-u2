@@ -258,6 +258,14 @@ html:has(.landing-page) {
   background: #a8c58c;
   transform: rotate(26deg);
 }
+/* Footprints belong to the cream surround, outside the aurora panel. */
+.landing-page .closing-scene {
+  --paw-band: clamp(88px, 8vw, 124px);
+  position: relative;
+  isolation: isolate;
+  padding-block: var(--paw-band);
+}
+.landing-page .closing-scene .closing { margin-top: 0; }
 .landing-page .closing-extra-paws {
   position: absolute;
   inset: 0;
@@ -265,53 +273,43 @@ html:has(.landing-page) {
   pointer-events: none;
   user-select: none;
 }
-.landing-page .closing .paw-mark-extra-1 {
-  top: 22%;
-  left: 3%;
-  width: clamp(36px, 3.5vw, 54px);
-  background: #a5c9dc;
-  transform: rotate(35deg);
-  opacity: 0.25;
+.landing-page .closing-scene .paw-mark { bottom: auto; }
+.landing-page .closing-scene .paw-mark-sage {
+  width: clamp(44px, 5.2vw, 78px); top: 10px; left: 5%; transform: rotate(-31deg);
 }
-.landing-page .closing .paw-mark-extra-2 {
-  top: 6%;
-  left: 38%;
-  width: clamp(30px, 3vw, 46px);
-  background: #efb879;
-  transform: rotate(-12deg);
-  opacity: 0.2;
+.landing-page .closing-scene .paw-mark-sky {
+  width: clamp(20px, 2vw, 31px); top: 51px; left: 42%; right: auto; transform: rotate(48deg);
 }
-.landing-page .closing .paw-mark-extra-3 {
-  top: 38%;
-  right: 4%;
-  width: clamp(42px, 4vw, 64px);
-  background: #a8c58c;
-  transform: rotate(-30deg);
-  opacity: 0.22;
+.landing-page .closing-scene .paw-mark-peach {
+  width: clamp(32px, 4.3vw, 65px); top: auto; bottom: 14px; left: 12%; transform: rotate(17deg);
 }
-.landing-page .closing .paw-mark-extra-4 {
-  bottom: 18%;
-  left: 32%;
-  width: clamp(28px, 2.8vw, 42px);
-  background: #a5c9dc;
-  transform: rotate(18deg);
-  opacity: 0.18;
+.landing-page .closing-scene .paw-mark-small {
+  width: clamp(21px, 2.2vw, 34px); top: auto; bottom: 49px; right: 6%; transform: rotate(-54deg);
 }
-.landing-page .closing .paw-mark-extra-5 {
-  bottom: 6%;
-  right: 34%;
-  width: clamp(34px, 3.2vw, 50px);
-  background: #efb879;
-  transform: rotate(-42deg);
-  opacity: 0.24;
+.landing-page .closing-scene .paw-mark-extra-1 {
+  width: clamp(24px, 2.6vw, 40px); top: 36px; left: 24%; transform: rotate(71deg); background: #a5c9dc;
 }
-.landing-page .closing .paw-mark-extra-6 {
-  top: 48%;
-  left: 18%;
-  width: clamp(26px, 2.5vw, 38px);
-  background: #a8c58c;
-  transform: rotate(8deg);
-  opacity: 0.16;
+.landing-page .closing-scene .paw-mark-extra-2 {
+  width: clamp(36px, 4.6vw, 70px); top: 16px; left: 62%; transform: rotate(-14deg); background: #efb879;
+}
+.landing-page .closing-scene .paw-mark-extra-3 {
+  width: clamp(18px, 1.6vw, 25px); top: 54px; right: 9%; transform: rotate(-76deg);
+}
+.landing-page .closing-scene .paw-mark-extra-4 {
+  width: clamp(17px, 1.7vw, 26px); top: auto; bottom: 55px; left: 33%; transform: rotate(36deg); background: #a5c9dc;
+}
+.landing-page .closing-scene .paw-mark-extra-5 {
+  width: clamp(40px, 5vw, 76px); top: auto; bottom: 9px; right: 39%; transform: rotate(-37deg); background: #efb879;
+}
+.landing-page .closing-scene .paw-mark-extra-6 {
+  width: clamp(26px, 3vw, 46px); top: auto; bottom: 36px; right: 22%; transform: rotate(102deg);
+}
+@media (max-width: 600px) {
+  .landing-page .closing-scene .closing-extra-paws { display: none; }
+  .landing-page .closing-scene .paw-mark-sage { width: 43px; top: 12px; left: 6%; }
+  .landing-page .closing-scene .paw-mark-sky { width: 23px; top: 48px; left: auto; right: 18%; }
+  .landing-page .closing-scene .paw-mark-peach { width: 34px; bottom: 12px; left: 23%; }
+  .landing-page .closing-scene .paw-mark-small { width: 20px; bottom: 50px; right: 7%; }
 }
 .landing-page .opportunity {
   position: relative;
@@ -335,10 +333,6 @@ html:has(.landing-page) {
   .landing-page .opportunity .paw-mark-sky { display: none; }
   .landing-page .opportunity .paw-mark-peach { width: 50px; left: 1%; bottom: 5%; }
   .landing-page .opportunity .paw-mark-small { width: 40px; right: 2%; bottom: 8%; }
-  .landing-page .closing .paw-mark-sage { top: 5%; left: 12%; }
-  .landing-page .closing .paw-mark-sky { top: 14%; right: 18%; }
-  .landing-page .closing .paw-mark-peach { bottom: 8%; left: 15%; }
-  .landing-page .closing .paw-mark-small { bottom: 12%; right: 12%; }
 }
 @font-face {
   font-family: "Landing Kalam";

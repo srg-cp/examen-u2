@@ -12,8 +12,8 @@ end $$;
 create or replace function public.close_recovery_case(p_command uuid,p_source text,p_case uuid,p_reason text,p_evidence_note text default null)
 returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
 declare v_status text;v_old public.case_closures;v_new public.case_closures;v_pet uuid;
- v_reason text:=btrim(p_reason,E' \t\n\r\f\v'||chr(160)||chr(12288));
- v_note text:=nullif(btrim(p_evidence_note,E' \t\n\r\f\v'||chr(160)||chr(12288)),'');
+ v_reason text:=public.pet_trim(p_reason);
+ v_note text:=nullif(public.pet_trim(p_evidence_note),'');
 begin
  if auth.uid() is null then raise exception using errcode='42501',message='closure_forbidden';end if;
  if p_command is null or p_source is null or p_source not in ('lost','found') or p_case is null
@@ -43,7 +43,7 @@ begin
  values(p_command,p_source,p_case,auth.uid(),v_reason,v_note) returning * into v_new;
  if p_source='lost' then
   update public.lost_cases set status='resolved' where id=p_case;
-  update public.pets set active_case_count=greatest(0,active_case_count-1),version=version+1,updated_at=clock_timestamp() where id=v_pet;
+  update public.pets set active_case_count=active_case_count-1,version=version+1,updated_at=clock_timestamp() where id=v_pet;
   insert into public.case_events(case_id,actor_id,event_type,created_at) values(p_case,auth.uid(),'resolved',v_new.closed_at);
  else
   update public.found_cases set status='resolved' where id=p_case;
@@ -61,13 +61,13 @@ end $$;
 -- Existing closures are preserved without fabricated receipts or backfill.
 create or replace function public.resolve_recovery_search(p_id uuid,p_community boolean)
 returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
-declare v_source text;v_status text;
+declare v_source text;
 begin
  if p_community is null then raise exception using errcode='42501',message='case_unauthorized';end if;
  v_source=case when p_community then 'found' else 'lost' end;
- v_status=public.authorized_timeline_case(v_source,p_id);
- if p_community and not exists(select 1 from public.found_cases where id=p_id and report_kind='possible_loss') then
-  raise exception using errcode='42501',message='case_unauthorized';end if;
- if v_status='resolved' then return;end if;
  perform public.close_recovery_case(gen_random_uuid(),v_source,p_id,'Recuperación confirmada por el responsable',null);
+exception
+ when insufficient_privilege then raise exception using errcode='42501',message='case_unauthorized';
+ when serialization_failure then
+  if sqlerrm<>'closure_closed' then raise;end if;
 end $$;

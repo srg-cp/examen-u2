@@ -1,5 +1,7 @@
 # Preferencias de alertas por cuenta
 
+**Auditoría de seguimiento18/10:** HU-02.2/#27 y épica #2 en Done: configuración por cuenta integrada,011 confirmado y validación HU-02 registrada. FCM es HU-12.3 pospuesta y no bloquea estas preferencias.027 ya está confirmado; seguimiento/bandeja conservan integración/demo propias pendientes.
+
 18/10/2026, instrucción del usuario: FCM/Firebase pospuestos (ADR-068).
 Las preferencias de recepción/tipos/bandeja siguen operativas; la elección
 de teléfono solo guarda la preferencia futura, con explicación explícita.
@@ -19,7 +21,7 @@ los canales son dentro de la app y push. Pausar conserva las elecciones.
 Estas elecciones se guardan por cuenta. HU-12 consume sus valores en servidor
 para seleccionar destinatarios y revalidar reintentos. Seguimiento/bandeja y
 registro de teléfono se implementan en notifications; esta pantalla no pide
-permiso ni maneja SDK de Firebase. Activación027/Firebase pendiente, sin afirmar
+permiso ni maneja SDK de Firebase. 027 confirmado y FCM pospuesto (ADR-068), sin afirmar
 entrega real. [Ficha de alertas](seguimiento-y-alertas.md).
 
 ## Reglas, estado y persistencia

@@ -1,5 +1,12 @@
 # Diseño de la interfaz: implementación y revisión
 
+Android18/10, HU-13: Ya fue recuperada abre Cierre con la transición del
+botón compartido. CaseScreenShell mantiene glass/cabecera y cover/stagger; motivo
+y evidencia testimonial opcional usan AppTextField/contador500, toast/invalid/
+shake, skeleton y shimmer. Confirmación explícita antes de escribir; recibo
+privado después y Ver recuperación desde ficha resuelta. Renders normal390×844
+y pequeño320×350/texto2 revisados en build/ui-preview/case-closure.
+
 Android18/10, HU-11: Ver historial se compone como slot en ficha, visible tras
 capacidad autorizada del servidor. Historial/Revisión usan CaseScreenShell,
 glass flotante, cover/stagger con cabecera persistente, superficies compartidas,
