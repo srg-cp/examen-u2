@@ -1,5 +1,18 @@
 # Arquitectura de Entre Huellas
 
+## Política global de navegación y acceso —19/10/2026
+
+route_policy.ts registra todas las páginas y comparte clasificación/regla de
+etapa entre session-entry (previo al HTML) y access.global (previo al montaje).
+Reemplaza account-access/guest-access/moderation-access y sus referencias por
+página. ReadManagementAccess valida el permiso de moderación también antes de
+renderizar/montar. Landing/QR/legales y fallback conservan acceso público.
+pages:extend rechaza rutas/alias sin política y el test arquitectónico contrasta
+el inventario de páginas. Puente antiguo conserva destinos internos registrados;
+APIs mantienen autorización independiente, sin datos privados SSR ni singleton.
+[ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye la selección
+de guards por ruta descrita en las notas históricas siguientes.
+
 ## Redirección del acceso antes de renderizar —19/10/2026
 
 Corrección posterior del mismo19/10: session-entry también intercepta /inicio

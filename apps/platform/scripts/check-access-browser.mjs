@@ -71,10 +71,11 @@ try {
  await page.route('**/api/access/session', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' }));
  await page.reload(); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).waitFor(); assert.equal(await page.getByText('moderador@example.test', { exact: true }).count(), 0);
  await page.unroute('**/api/access/session'); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click(); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
- let expiring = true;
+ let expiresAt;
  await page.route('**/api/access/session', async route => {
-  if (!expiring) return route.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"unauthenticated"}' });
-  expiring = false; const response = await route.fetch(), body = await response.json(); await route.fulfill({ response, json: { ...body, expiresAt: Date.now() + 350 } });
+  expiresAt ??= Date.now() + 1000;
+  if (Date.now() >= expiresAt) return route.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"unauthenticated"}' });
+  const response = await route.fetch(), body = await response.json(); await route.fulfill({ response, json: { ...body, expiresAt } });
  });
  await page.reload(); await page.waitForURL('**/iniciar-sesion?reason=expired'); await page.getByRole('alert').filter({ hasText: 'La sesión expiró' }).waitFor();
  await page.unroute('**/api/access/session'); await context.clearCookies(); await other.close();

@@ -1,5 +1,10 @@
 # Landing pública en la plataforma
 
+El enlace de acceso usa NavigationLink compartido: feedback inmediato con
+shimmer/aria-busy durante la comprobación y navegación, conservando texto/href
+y bloqueando clics repetidos. La latencia real de sesión permanece; no se monta
+login intermedio ni se adelanta autorización. Véase ficha de acceso/ESTADO.
+
 Regla ratificada19/10: marca arriba a la izquierda como landing, con color y
 medidas compartidos; conservar posición desde SSR hasta hidratación/recarga,
 sin saltos. [Norma completa](../REGLAS_UI_UX_WEB.md) y ADR-077.

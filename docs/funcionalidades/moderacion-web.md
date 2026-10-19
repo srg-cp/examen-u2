@@ -1,5 +1,16 @@
 # Revisión y moderación de denuncias en la web
 
+## Política de acceso global —19/10/2026
+
+Moderación usa la misma política global de todas las páginas, con permiso de
+revisión comprobado antes de renderizar en servidor y montar en navegación
+cliente. Se retira moderation-access y su excepción de hidratación. Sin sesión
+no aparece shell/skeleton de moderación; sin permiso se dirige a /inicio con
+toast de denegación; onboarding pendiente va a /bienvenida. Las APIs mantienen
+su comprobación por operación, sin herencia de roles ni autoasignación.
+[ADR-079](../decisiones/079-politica-global-de-acceso-web.md), evidencia local en
+ESTADO. Fallos de backend conservan reintento; sin SQL ni despliegue nuevo.
+
 ## Marca compartida con landing —19/10/2026
 
 Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños

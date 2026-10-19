@@ -1,5 +1,109 @@
 # Estado del proyecto
 
+## Navegación con feedback inmediato durante la comprobación —19/10/2026
+
+El usuario detecta que Iniciar sesión parece no responder desde landing mientras
+el middleware global espera la API y resuelve /inicio. Vue Router mantiene la
+página actual hasta resolver el destino; faltaba feedback de trabajo en el enlace.
+NavigationLink compartido conserva href, texto, clases y navegación nativa,
+muestra el shimmer existente con aria-busy inmediatamente y bloquea clic repetido
+hasta resolver navegación/redirecciones. finally limpia al terminar/fallar;
+movimiento reducido usa brillo estático. Landing, cuenta, acceso, legales y
+moderación reutilizan el componente. No elimina la latencia del backend ni
+introduce caché de sesión/permisos o una pantalla intermedia. Marca sin cambios.
+
+Validación: typecheck, build y43 pruebas unitarias/arquitectura aprobadas.
+Chrome de política global aprobado con respuesta retenida: feedback visible
+antes de responder, mismo texto, doble clic sin consulta adicional y llegada a
+/inicio sin login intermedio. Recorre inventario SSR/SPA, cookie anterior, permisos,
+logout, conexión503, enlace externo y sin JS; sin errores CSP/hidratación.
+Suite Chrome de acceso completa aprobada también: onboarding, permisos,
+caducidad, pestañas, OAuth fixture y responsive/texto200% sin overflow.
+Sin SQL, Flutter, variables ni despliegue. Backend fixture; siguiente paso:
+revisar la respuesta visual al clic en la sesión real del usuario.
+
+## Puente de acceso bloqueado al llegar desde otro sitio —19/10/2026
+
+La captura del usuario muestra JSON forbidden en /api/access/entry al entrar a
+/inicio. Causa reproducida: Fetch Metadata conserva cross-site a través de las
+redirecciones y el filtro general API rechazaba el puente. Las pruebas previas
+cubrían navegación directa/SPA pero no un enlace desde otro sitio.
+security permite exclusivamente GET/HEAD navigate/document en ese endpoint de
+redirección interna, sin relajar cookies Strict ni autorización. Fetch/XHR,
+iframes, escrituras y otras API conservan rechazo cross-site. ADR-079 y ficha
+de acceso actualizados. No cambia la política global de las páginas.
+
+Validación: typecheck y build aprobados;19 pruebas de servidor aprobadas, con
+headers reales mediante HTTP (Node fetch sobrescribe Sec-Fetch-Mode). Chrome
+recorre un enlace desde un origen externo antes del inventario completo SSR/SPA:
+llega al login sin forbidden, sin pantallas privadas/skeleton y sin errores
+CSP/hidratación. Sin SQL, Flutter, variables ni despliegue. Backend fixture;
+siguiente paso: volver a abrir /inicio en el navegador del usuario.
+
+## Política global de acceso en todas las rutas —19/10/2026
+
+Por corrección explícita del usuario, el acceso se aplica a toda la navegación
+mediante route_policy compartida, session-entry de servidor y access.global.
+Se retiran account-access, guest-access y moderation-access y su selección desde
+las páginas. Toda página/alias debe declarar su política: pages:extend rechaza
+omisiones en Nuxt y la comprobación arquitectónica contrasta el inventario real.
+Clasificación única de públicas, acceso, cuenta, onboarding y revisión con permiso.
+Sin sesión no se renderiza/monta ninguna ruta protegida ni su skeleton antes
+del login; el permiso de moderación también se consulta antes del HTML/montaje.
+Landing, legales, QR, redirecciones antiguas y fallback mantienen acceso público.
+Las APIs conservan autorización por operación y SSR no publica datos privados.
+Puente de cookie antigua conserva únicamente destinos de cuenta registrados,
+sin aceptar retornos externos. Backend fallido mantiene los reintentos existentes.
+[ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye los guards
+particulares de ADR-078; AGENTS, reglas, arquitectura y fichas actualizados.
+Sin ampliación del MVP ni cierre de HU-01/HU-14.3.
+
+Validación local: typecheck y build aislado aprobados;43 pruebas unitarias y
+arquitectónicas y18 de servidor de producción aprobadas. El test de inventario
+comprueba rechazo de una página sin política. Servidor recorre todas las rutas
+registradas y comprueba permisos, onboarding, revocación y destinos del puente.
+Chrome check-session-entry-browser recorre el inventario completo SSR/SPA,
+observando ausencia de montajes privados tras logout y de moderación sin permiso;
+incluye aliases, QR, legales, cookies anteriores, fallo503/reintento y acceso sin JS.
+Suites Chrome completas de acceso y moderación aprobadas: operaciones/evidencia,
+reintentos ambiguos, revocación, pestañas/caducidad, onboarding, OAuth fixture,
+responsive y texto200%, sin overflow ni errores CSP/hidratación.
+
+Sin bloqueos locales ni cambios de SQL/Flutter/configuración remota/despliegue.
+Evidencia con backend fixture; siguiente paso: revisión del usuario con su sesión
+real y, si se autoriza, despliegue del conjunto. No confirma el entorno publicado.
+
+## Inicio y bienvenida sin skeleton al entrar sin sesión —19/10/2026
+
+El usuario detecta el caso omitido por la corrección anterior: /inicio todavía
+montaba AccountScreen y su skeleton antes de comprobar sesión en onMounted.
+session-entry ahora intercepta /inicio y /bienvenida antes de renderizar;
+account-access comprueba mediante ViewModel/caso de uso antes del montaje SPA.
+Tras logout, ambas rutas llegan al formulario sin mostrar shell/skeleton de
+cuenta. Una sesión válida también redirige según onboarding antes de renderizar
+una ruta incorrecta. No se publican perfiles/tokens en HTML ni se cambia la
+autorización de las APIs. ADR-078 y ficha de acceso actualizadas, sin ampliar HU.
+
+La recuperación de cookies antiguas mantiene su reintento ante fallo de backend:
+entry=unavailable permite únicamente el shell vacío de /inicio para evitar
+bucles al volver al puente; nunca concede sesión ni acceso a datos.
+
+Validación local: tipos y build aislado .nuxt-session-entry aprobados;42 pruebas
+unitarias/arquitectura y17 de servidor aprobadas. Chrome comprueba ausencia de
+montaje de AccountScreen/skeleton tras logout en /inicio y /bienvenida, apertura
+directa, recarga y navegación SPA, además de cookie antigua/fallo503/reintento,
+onboarding y login previo sin regresión. Sin errores CSP/hidratación.
+La simulación de caducidad de check-access-browser usa un vencimiento temporal
+real compartido por las consultas, en lugar de invalidar tras una sola lectura:
+la comprobación previa y la pantalla pueden consultar la misma sesión válida.
+Suite completa check-access-browser aprobada tras ese ajuste: caducidad,
+logout entre pestañas, onboarding/reintento, permisos, OAuth fixture y responsive
+con texto200%, sin overflow, errores CSP ni desajustes de hidratación.
+
+Sin SQL, Flutter, variables nuevas ni despliegue. Evidencia con backend fixture;
+pendiente comprobar la sesión real del usuario. Siguiente paso: revisar ambas
+rutas tras cerrar sesión en el navegador del usuario.
+
 ## Acceso web sin login intermedio —19/10/2026
 
 Por solicitud del usuario, /iniciar-sesion comprueba sesión en servidor y

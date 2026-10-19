@@ -102,6 +102,13 @@ público, QR y zonas privadas futuras. No cambia Flutter ni las políticas SQL.
 
 ## Validación y producción
 
+ADR-079: todas las páginas usan shared/routing/route_policy.ts y el middleware
+global de acceso. Registrar allí cualquier página o alias nuevo: pages:extend
+rechaza omisiones en preparación/build y architecture.test.mjs compara el
+inventario real. No seleccionar middleware de acceso desde una página.
+check-session-entry-browser.mjs recorre todo el inventario SSR/SPA, incluidas
+públicas, QR, aliases y moderación con/sin permiso; observa montajes privados.
+
 Entrada sin login intermedio (ADR-078): `scripts/check-session-entry-browser.mjs`
 usa PLAYWRIGHT_MODULE/CHROME_PATH y build vigente con backend fixture. Comprueba
 SSR/SPA, onboarding, migración real de cookie /api a /, ausencia de montaje del

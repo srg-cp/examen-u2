@@ -21,9 +21,13 @@ export default defineEventHandler(event => {
     `default-src 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`);
   const nativeSubmission = event.method === 'POST' && /^\/api\/app\/cases\/(lost|found)\/[0-9a-f-]{36}\/sightings$/.test(path);
   const oauthCallback = event.method==='GET' && path==='/api/moderation/oauth/callback';
+  // Redirects keep the initiating site's Fetch Metadata. The entry bridge is
+  // navigation-only and returns fixed internal redirects, never account data.
+  const accountEntryNavigation = ['GET', 'HEAD'].includes(event.method) && path === '/api/access/entry' &&
+    getHeader(event, 'sec-fetch-mode') === 'navigate' && getHeader(event, 'sec-fetch-dest') === 'document';
   const moderationPath = path.startsWith('/api/moderation/') || path.startsWith('/api/access/');
   const moderationWrite = event.method === 'POST' && ['/api/access/login','/api/access/logout','/api/access/onboarding','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path);
-  if (moderationPath && !oauthCallback && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
+  if (moderationPath && !oauthCallback && !accountEntryNavigation && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
   const submission = moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
   if (event.method !== 'GET' && event.method !== 'HEAD' && !submission) {
     setHeader(event, 'Allow', 'GET, HEAD'); setResponseStatus(event, 405); return { error: 'method_not_allowed' };

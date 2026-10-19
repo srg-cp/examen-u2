@@ -1,5 +1,14 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Acceso global a todas las rutas web —19/10/2026:** política compartida única
+para servidor y middleware cliente global; sin guards elegidos por pantalla.
+Clasificar cada página/alias como pública, acceso, cuenta, onboarding o permiso
+implementado. Build y comprobación arquitectónica rechazan páginas sin política.
+Validar antes del HTML/montaje para evitar pantallas/skeletons de rutas que no
+corresponden. Públicas/QR/legales conservan anonimato y APIs autorizan cada
+operación. [ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye
+los guards particulares descritos en las notas anteriores de ADR-078.
+
 **Entrada web con sesión activa —19/10/2026:** /iniciar-sesion valida en servidor
 antes de renderizar y redirige al destino de cuenta/onboarding. Cookie HttpOnly
 cifrada con path /, transición de cookies anteriores sin exponer credenciales

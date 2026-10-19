@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { posix } from 'node:path';
 import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts';
 import { configuration } from '../server/infrastructure/config.ts';
+import { routePolicies, routeAccess, sessionRedirect, accountDestination, assertRegisteredRoutes } from '../shared/routing/route_policy.ts';
 async function sources(path) {
   const files = [];
   for (const item of await readdir(path, { withFileTypes: true })) {
@@ -13,6 +14,34 @@ async function sources(path) {
   }
   return files;
 }
+
+test('All pages share the global access policy; new pages cannot bypass registration', async () => {
+  const pages = await sources(new URL('../app/pages/', import.meta.url));
+  const patterns = pages.map(([path, source]) => {
+    assert.doesNotMatch(source, /middleware\s*:/, 'Page must use the global access guard: ' + path);
+    return '/' + path.split('/app/pages/')[1].replace(/\.vue$/, '').replace(/\[\.\.\.(\w+)\]/g, ':$1(.*)*').replace(/\[(\w+)\]/g, ':$1').replace(/(^|\/)index$/, '');
+  });
+  assert.deepEqual(patterns.sort(), Object.keys(routePolicies).sort());
+  assertRegisteredRoutes(patterns);
+  assert.throws(() => assertRegisteredRoutes(['/nueva-pagina']), /Define the access policy/);
+  assertRegisteredRoutes(['/c/:slug()', '/:path(.*)*']);
+  assert.equal(routeAccess('/moderacion/'), 'reviewer');
+  assert.equal(routeAccess('/c/token'), 'public');
+  assert.equal(routeAccess('/no-existe'), 'public');
+  const extended = { ...routePolicies, '/mascotas/:id': 'account', '/revision/:id': 'reviewer' };
+  assert.equal(routeAccess('/mascotas/123', extended), 'account');
+  assert.equal(routeAccess('/revision/123/', extended), 'reviewer');
+  assert.equal(routeAccess('/mascotas/123/otra', extended), 'public');
+  assert.equal(sessionRedirect('reviewer', false), '/bienvenida');
+  assert.equal(sessionRedirect('reviewer', true), null);
+  assert.equal(sessionRedirect('public', false), null);
+  for (const value of ['https://untrusted.example', '//untrusted.example', '/no-existe', '/terminos', '/moderacion?next=x']) assert.equal(accountDestination(value), null);
+  assert.equal(accountDestination('/moderacion'), '/moderacion');
+  const global = await readFile(new URL('../app/middleware/access.global.ts', import.meta.url), 'utf8');
+  assert.match(global, /routeAccess/);
+  const config = await readFile(new URL('../nuxt.config.ts', import.meta.url), 'utf8');
+  assert.match(config, /pages:extend/); assert.match(config, /assertRegisteredRoutes/);
+});
 
 test('Web reveal has no legacy painted cover utility or per-screen reveal classes', async () => {
   const css = await readFile(new URL('../app/assets/main.css', import.meta.url), 'utf8');

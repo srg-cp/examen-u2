@@ -66,7 +66,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); password.value = ''; cha
       <SocialSignInButton provider="google" :working="state.busy && state.socialProvider==='google'" :disabled="state.busy || state.checking || !!state.session" @choose="social" />
       <SocialSignInButton provider="facebook" :working="state.busy && state.socialProvider==='facebook'" :disabled="state.busy || state.checking || !!state.session" @choose="social" />
     </form>
-    <p class="login-legal stagger-reveal-item" v-stagger-reveal="revealStyle(3)">Al iniciar sesión, aceptas nuestros <NuxtLink to="/terminos">Términos de servicio</NuxtLink> y reconoces haber leído nuestra <NuxtLink to="/privacidad">Política de privacidad</NuxtLink>.</p>
+    <p class="login-legal stagger-reveal-item" v-stagger-reveal="revealStyle(3)">Al iniciar sesión, aceptas nuestros <NavigationLink to="/terminos">Términos de servicio</NavigationLink> y reconoces haber leído nuestra <NavigationLink to="/privacidad">Política de privacidad</NavigationLink>.</p>
   </main>
   </div>
 </template>

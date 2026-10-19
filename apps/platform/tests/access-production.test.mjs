@@ -1,11 +1,72 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { moderationFixture, ordinary, moderator } from './moderation_fixture.mjs';
+import { routePolicies } from '../shared/routing/route_policy.ts';
+import { request } from 'node:http';
 const cookieOf = r => r.headers.getSetCookie().find(c => c.startsWith('eh_access=') && !c.startsWith('eh_access=;'))?.split(';')[0];
 const post = (s, path, body = {}, cookie = '', actor = ordinary, origin = s.origin) => fetch(s.origin + '/api/access/' + path, {
  method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', Cookie: cookie, 'X-Account-Actor': actor }, body: JSON.stringify(body),
 });
 const login = (s, email = 'ordinario@example.test') => post(s, 'login', { email, password: 'test-fixture-password' });
+
+test('External document navigation reaches login through the entry bridge while cross-site API calls remain denied', async t => {
+ const s = await moderationFixture(); t.after(s.close);
+ const headers = { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' };
+ // Node fetch overwrites Sec-Fetch-Mode with cors; use raw HTTP to reproduce
+ // browser navigation metadata exactly (also exercised in real Chrome).
+ const navigate = path => new Promise((resolve, reject) => {
+  const req = request(s.origin + path, { headers }, res => {
+   const chunks = []; res.on('data', chunk => chunks.push(chunk));
+   res.on('end', () => resolve({ status: res.statusCode, location: res.headers.location, body: Buffer.concat(chunks).toString() }));
+  }); req.on('error', reject); req.end();
+ });
+ const r = await navigate('/api/access/entry?destination=%2Finicio');
+ assert.equal(r.status, 302); assert.equal(r.location, '/iniciar-sesion?entry=checked');
+ const initial = await navigate('/inicio'); assert.equal(initial.status, 302);
+ const bridge = await navigate(initial.location); assert.equal(bridge.status, 302);
+ const page = await navigate(bridge.location); assert.equal(page.status, 200); assert.match(page.body, /Inicia sesión/);
+ for (const path of ['/api/access/session', '/api/access/management', '/api/moderation/session']) {
+  assert.equal((await fetch(s.origin + path, { headers })).status, 403, path);
+ }
+ for (const extra of [{}, { 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty' }, { 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'iframe' }]) {
+  assert.equal((await fetch(s.origin + '/api/access/entry', { headers: { 'Sec-Fetch-Site': 'cross-site', ...extra }, redirect: 'manual' })).status, 403);
+ }
+ assert.equal((await post(s, 'login', { email: 'ordinario@example.test', password: 'test-fixture-password' }, '', ordinary, 'https://untrusted.example')).status, 403);
+});
+
+test('Every registered route applies the common policy on SSR, including public pages, redirects, QR and reviewer permissions', async t => {
+ const s = await moderationFixture(); t.after(s.close);
+ for (const [pattern, access] of Object.entries(routePolicies)) {
+  const path = pattern.replace(':slug', 'a'.repeat(64)).replace(':path(.*)*', 'no-existe');
+  const r = await fetch(s.origin + path, { redirect: 'manual' });
+  if (access === 'public') {
+   assert.equal(r.status, ['/login', '/terms', '/privacy'].includes(path) ? 308 : 200, path);
+  } else {
+   assert.equal(r.status, 302, path);
+   assert.doesNotMatch(await r.text(), /account-layout|moderation-screen|skeleton/, path);
+   const form = await fetch(s.origin + path);
+   assert.equal(new URL(form.url).pathname, '/iniciar-sesion', path);
+  }
+  assert.match(r.headers.get('cache-control'), /no-store/, path);
+ }
+ const ordinaryCookie = cookieOf(await login(s));
+ const denied = await fetch(s.origin + '/moderacion', { headers: { Cookie: ordinaryCookie }, redirect: 'manual' });
+ assert.equal(denied.status, 302); assert.equal(denied.headers.get('location'), '/inicio?reason=forbidden');
+ assert.doesNotMatch(await denied.text(), /moderation-screen|skeleton|PRIVATE_REPORT_REASON/);
+ s.setOnboarding(ordinary, false);
+ const pending = await fetch(s.origin + '/moderacion', { headers: { Cookie: ordinaryCookie }, redirect: 'manual' });
+ assert.equal(pending.headers.get('location'), '/bienvenida');
+ const reviewerCookie = cookieOf(await login(s, 'moderador@example.test'));
+ const reviewer = await fetch(s.origin + '/moderacion', { headers: { Cookie: reviewerCookie }, redirect: 'manual' });
+ assert.equal(reviewer.status, 200); assert.doesNotMatch(await reviewer.text(), /PRIVATE_REPORT_REASON|mmmmmmmm/);
+ const migrated = await fetch(s.origin + '/api/access/entry?destination=%2Fmoderacion', { headers: { Cookie: reviewerCookie }, redirect: 'manual' });
+ assert.equal(migrated.headers.get('location'), '/moderacion');
+ const external = await fetch(s.origin + '/api/access/entry?destination=https://untrusted.example', { headers: { Cookie: reviewerCookie }, redirect: 'manual' });
+ assert.equal(external.headers.get('location'), '/inicio');
+ s.revoke(true);
+ const revoked = await fetch(s.origin + '/moderacion', { headers: { Cookie: reviewerCookie }, redirect: 'manual' });
+ assert.equal(revoked.headers.get('location'), '/inicio?reason=forbidden');
+});
 test('Ordinary users enter a general session; private account data stays out of SSR and moderation remains denied', async t => {
  const s = await moderationFixture(); t.after(s.close);
  const r = await login(s); assert.equal(r.status, 200); const cookie = cookieOf(r), session = await r.json(); assert.equal(session.actor, ordinary); assert.equal(session.profile.city, 'Lima');

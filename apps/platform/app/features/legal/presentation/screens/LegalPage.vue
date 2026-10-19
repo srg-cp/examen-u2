@@ -13,7 +13,7 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacidad',label:'Política
       <div class="legal-document">
         <nav class="legal-toolbar" aria-label="Navegación del documento">
           <GlassNavigationButton label="Volver al inicio de sesión" @navigate="navigateTo('/iniciar-sesion')" />
-          <NuxtLink class="legal-switch" :to="other.to"><span>{{other.label}}</span><LegalIcon name="arrow-right" /></NuxtLink>
+          <NavigationLink class="legal-switch" :to="other.to"><span>{{other.label}}</span><LegalIcon name="arrow-right" /></NavigationLink>
         </nav>
         <header class="legal-heading">
           <h1>{{document.title}}</h1>
@@ -30,7 +30,7 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacidad',label:'Política
         </article>
         <footer class="legal-footer">
           <p>© 2026 Entre Huellas. Todos los derechos reservados.</p>
-          <div><a href="mailto:sergiotlv51@gmail.com">Contactar</a><span aria-hidden="true">·</span><NuxtLink :to="other.to">{{other.label}}</NuxtLink><span aria-hidden="true">·</span><NuxtLink to="/iniciar-sesion">Inicio de sesión</NuxtLink></div>
+          <div><a href="mailto:sergiotlv51@gmail.com">Contactar</a><span aria-hidden="true">·</span><NavigationLink :to="other.to">{{other.label}}</NavigationLink><span aria-hidden="true">·</span><NavigationLink to="/iniciar-sesion">Inicio de sesión</NavigationLink></div>
         </footer>
       </div>
     </main>

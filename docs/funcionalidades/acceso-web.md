@@ -1,5 +1,44 @@
 # Acceso web
 
+## Feedback inmediato al navegar —19/10/2026
+
+La comprobación global de sesión es asíncrona: Vue Router conserva la página
+actual hasta conocer el destino autorizado. El clic de landing no mostraba
+trabajo y parecía ignorado. NavigationLink compartido conserva href y texto,
+activa aria-busy/shimmer inmediatamente y bloquea doble clic mientras espera
+la navegación completa (incluidas redirecciones). finally libera el estado ante
+cancelación/fallo; enlaces modificados/nueva pestaña y navegación sin JS conservan
+comportamiento nativo. Landing, acceso, cuenta, legales y moderación reutilizan
+el componente. No elimina la latencia del backend, no introduce una pantalla
+intermedia ni caché de identidad o permisos. Movimiento reducido: brillo estático.
+Prueba con respuesta retenida comprueba feedback antes de responder y rechazo
+de doble clic; resultados en ESTADO.
+
+## Entrada desde otro sitio sin JSON forbidden —19/10/2026
+
+Corregido el filtro que bloqueaba el puente /api/access/entry cuando una
+navegación externa conservaba Sec-Fetch-Site cross-site tras redirigir desde
+/inicio. Solo se permite GET/HEAD navigate/document a ese endpoint de redirección
+interna. Fetch/XHR, iframe, escrituras y demás APIs mantienen bloqueo; cookie
+Strict y autorización intactas. Regresión con headers y enlace externo Chrome;
+sin cambios de variables, SQL o despliegue. Detalle en ADR-079 y ESTADO.
+
+## Comprobación global para todas las rutas —19/10/2026
+
+La navegación completa usa route_policy y access.global/session-entry, con una
+sola regla de etapa compartida; se retiran los guards particulares y su selección
+por página. Incluye moderación con permiso validado antes del HTML/montaje.
+Landing, legales, QR, aliases y fallback público mantienen su recorrido anónimo.
+Toda página/alias nueva debe declarar política: build/test detectan omisiones.
+Sin sesión no se monta ninguna ruta protegida ni su skeleton antes del login;
+con sesión se permite el destino autorizado para su etapa, sin forzar /inicio
+en cada navegación. APIs conservan permisos por operación, cifrado/HttpOnly y
+reintentos de ADR-078. Puente de cookie antigua conserva destinos registrados
+y descarta externos. [ADR-079](../decisiones/079-politica-global-de-acceso-web.md)
+sustituye los guards individuales citados en las notas históricas siguientes.
+Validación de inventario completo SSR/SPA, permisos y errores en ESTADO;
+sin SQL, Flutter, variables nuevas ni despliegue. Cuentas remotas pendientes.
+
 ## Inicio/bienvenida después de cerrar sesión —19/10/2026
 
 Corregido el caso que quedaba pendiente: entrar a /inicio sin sesión montaba su

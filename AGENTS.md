@@ -19,6 +19,15 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Por instrucción explícita del usuario del19/10/2026, el acceso y la etapa de
+  cuenta se comprueban globalmente en todas las rutas web, antes de renderizar
+  en servidor y montar en navegación cliente. Usar la política única compartida
+  de ADR-079; no añadir guards por pantalla. Toda página/alias nueva declara su
+  política y el build/comprobaciones rechazan omisiones. Públicas, QR y legales
+  conservan acceso anónimo; rutas protegidas no muestran shell/skeleton antes
+  del login sin sesión. Permisos por operación y reintento ante fallo de backend
+  se mantienen. Véase [ADR-079](docs/decisiones/079-politica-global-de-acceso-web.md).
+
 - Marca web: reutilizar SiteBrand/SiteHeader de la landing en todos los
   recorridos, con su posición, color #171918, tipografía y tamaños adaptables,
   incluidos login/onboarding. Cabecera fuera del stagger; no crear variantes

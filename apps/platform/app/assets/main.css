@@ -36,8 +36,10 @@ body { margin: 0; min-width: 240px; }
 .reader-shell .actions { display: grid; gap: 12px; margin: 24px 0 16px; }
 .reader-shell .collaborate { margin-bottom: 12px; }
 .reader-shell .text-button { padding: 14px 10px; border: 0; border-radius: 999px; min-height: 48px; color: #3c537b; background: none; text-decoration: underline; text-underline-offset: 4px; }
-.reader-shell .working, .reader-shell .refreshing { position: relative; overflow: hidden; }
-.reader-shell .working::after, .reader-shell .refreshing::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, #ffffff66 50%, transparent 80%); pointer-events: none; animation: sheen 1.4s linear infinite; }
+.reader-shell .working, .reader-shell .refreshing, .navigation-link.working { position: relative; overflow: hidden; }
+.reader-shell .working::after, .reader-shell .refreshing::after, .navigation-link.working::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, #ffffff66 50%, transparent 80%); pointer-events: none; animation: sheen 1.4s linear infinite; }
+.navigation-link.working { cursor: progress; }
+@media(prefers-reduced-motion: reduce) { .navigation-link.working::after { animation: none; transform: none; opacity: .45; } }
 .reader-shell .neutral { max-width: 520px; padding: 44px 0 80px; min-height: 54vh; }
 .reader-shell .neutral h1 { font-size: clamp(2.2rem, 5vw, 3rem); }
 .reader-shell .description { color: #6e6e73; font-size: 1.125rem; }
