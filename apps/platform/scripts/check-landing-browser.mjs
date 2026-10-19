@@ -33,7 +33,7 @@ try {
     assert.equal(new Set(artwork.map(img => img.src)).size, 12);
     assert.equal(await page.locator('.character-label').count(), 24);
     assert.equal(await page.locator('.character-group').first().locator('.character:not([aria-hidden="true"])').count(), 4, 'The four distinct messages remain exposed; visual repetitions are decorative');
-    assert.equal(await page.locator('.brand img[src="/brand.png"]').count(), 2);
+    assert.equal(await page.locator('.brand img[src="/brand.png"], .site-brand img[src="/brand.png"]').count(), 2);
     // A gradient declaration alone does not generate or size the painted layer.
     for (const selector of ['.hero', '.closing']) {
       const layer = await page.locator(selector).evaluate(el => {

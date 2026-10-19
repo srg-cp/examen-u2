@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LegalPage from '../features/legal/presentation/screens/LegalPage.vue';
-useHead({title:'Política de privacidad · Entre Huellas'});
+const route = useRoute();
+await navigateTo({ path: '/privacidad', query: route.query, hash: route.hash }, { redirectCode: 308, replace: true });
 </script>
-<template><LegalPage kind="privacy" /></template>
+<template><span /></template>

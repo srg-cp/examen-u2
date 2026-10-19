@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { test } from 'node:test';
+import { posix } from 'node:path';
 import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts';
 import { configuration } from '../server/infrastructure/config.ts';
 async function sources(path) {
@@ -12,6 +13,14 @@ async function sources(path) {
   }
   return files;
 }
+
+test('Web reveal has no legacy painted cover utility or per-screen reveal classes', async () => {
+  const css = await readFile(new URL('../app/assets/main.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /\.reveal\b|@keyframes\s+(?:cover|arrive)\s*\{/);
+  for (const [path, source] of await sources(new URL('../app/features/', import.meta.url))) {
+    assert.doesNotMatch(source, /class="[^"]*(?<![\w-])reveal(?![\w-])/, path);
+  }
+});
 test('Domain and presentation boundaries keep credentials, infrastructure and SDK out of Vue/client', async () => {
   for (const [path, source] of await sources(new URL('../shared/features/', import.meta.url))) {
     if (path.includes('/domain/')) assert.doesNotMatch(source, /node:|supabase|from ['"].*(data|presentation|vue|nuxt)|fetch\(/);
@@ -39,5 +48,21 @@ test('Administrative UI remains exclusive to platform, with no Flutter administr
   assert.match(page, /ModerationScreen/);
   for (const [path, source] of await sources(new URL('../server/features/moderation/', import.meta.url))) {
     assert.doesNotMatch(source, /\/presentation\/|from ['"].*(?:vue|nuxt)/, path);
+  }
+});
+
+test('Features collaborate through domain contracts without importing another feature data or presentation', async () => {
+  for (const root of ['../shared/features/', '../app/features/', '../server/features/']) {
+    for (const [path, source] of await sources(new URL(root, import.meta.url))) {
+      const feature = path.match(/\/features\/([^/]+)\//)?.[1];
+      for (const [, specifier] of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)) {
+        const target = specifier.startsWith('.') ? posix.normalize(posix.dirname(path) + '/' + specifier) : specifier;
+        const dependency = target.match(/(?:^|\/)features\/([^/]+)\/(data|presentation)\//);
+        if (dependency) assert.equal(dependency[1], feature, path + ' imports ' + specifier);
+      }
+    }
+  }
+  for (const [path, source] of await sources(new URL('../app/components/', import.meta.url))) {
+    assert.doesNotMatch(source, /from\s+['"][^'"]*features\//, path);
   }
 });

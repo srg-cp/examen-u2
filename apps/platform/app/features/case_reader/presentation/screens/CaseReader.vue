@@ -51,7 +51,7 @@ onBeforeUnmount(() => {
     <main id="view" aria-label="Ficha pública del caso" :aria-busy="state.phase === 'loading' || state.refreshing" :class="{ refreshing: state.refreshing }">
       <slot v-if="reporting && active" name="sighting" :active-case="active" :close="closeReport" />
       <ContentSkeleton v-else-if="state.phase === 'loading'" />
-      <article v-else-if="active" class="case reveal">
+      <StaggerReveal as="article" v-else-if="active" class="case">
         <div class="case-heading">
           <p class="eyebrow">{{ active.kind === 'lost' ? 'Ayudemos a que vuelva a casa' : 'Una mascota espera reencontrarse' }}</p>
           <h1>{{ title }}</h1>
@@ -72,13 +72,13 @@ onBeforeUnmount(() => {
           </section>
           <ActionButton variant="text-button" :working="state.refreshing" @click="refresh">Actualizar estado</ActionButton>
         </div>
-      </article>
-      <section v-else class="neutral reveal">
+      </StaggerReveal>
+      <StaggerReveal as="section" v-else class="neutral">
         <p class="eyebrow">Entre Huellas</p>
         <template v-if="state.value?.state === 'closed'"><h1>Este caso ya fue cerrado</h1><p class="description">La búsqueda ya no está activa y no admite nuevos avistamientos.</p><p v-if="state.value.closedAt" class="muted">Cierre registrado el {{ dateLabel(state.value.closedAt) }}.</p></template>
         <template v-else-if="state.phase === 'error'"><h1>Consulta el caso</h1><ActionButton variant="primary" @click="refresh">Reintentar</ActionButton></template>
         <template v-else><h1>Este enlace no está disponible</h1><p class="description">No hay información del caso para mostrar desde este enlace.</p></template>
-      </section>
+      </StaggerReveal>
     </main>
     <TopToast v-if="!reporting" ref="toast" />
   </WebShell>

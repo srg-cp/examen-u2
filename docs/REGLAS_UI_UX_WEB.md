@@ -1,10 +1,94 @@
 # Entre Huellas: reglas de UI y UX web
 
+## Regla obligatoria de ubicación y estabilidad de marca
+
+El logo oficial y el texto «entre huellas» se colocan juntos, en una línea,
+en la cabecera superior izquierda de la web, con la posición y los márgenes
+adaptables de la landing aprobada. Se aplica a landing, login, onboarding,
+inicio, gestión, QR y documentos legales. En móvil permanecen arriba.
+
+La marca queda fuera de formularios, columnas centradas, skeletons y efectos
+de entrada. Conserva posición y dimensiones desde el primer render SSR,
+durante hidratación, recarga y cambios de etapa: no bajar, recentrar ni reajustar
+la marca al terminar de cargar. No implica una cabecera fija durante el scroll.
+Las acciones y botones de retorno deben acomodarse sin desplazarla ni taparla.
+
+Reutilizar SiteBrand/SiteHeader. Color del texto #171918; Arial/Helvetica/sans-serif,
+peso500, tracking−.05em, interlineado.9 y separación7px entre logo y texto.
+Texto clamp(16px,1.9vw,25px), logo clamp(25px,3.3vw,42px); hasta600px,
+texto20px y logo30px, conservando proporción. No heredar fuentes/tamaños del cuerpo.
+
+La composición de landing sigue gobernada por landing.css y el layout general
+de las demás cabeceras por site-brand.css dentro de reader-shell. No introducir
+reglas competidoras cuyo orden cambie entre SSR y cliente. Al modificar marca o
+cabecera, comprobar paridad contra landing y estabilidad desde el primer frame
+hasta después de hidratar y recargar, en escritorio/tablet/móvil y texto ampliado.
+
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+**Marca unificada —19/10/2026:** SiteBrand/SiteHeader comparten la marca real
+de landing en acceso, onboarding, inicio, gestión, QR y legales. Color#171918,
+Arial500, gap7px, tracking−.05em/line-height.9; texto clamp(16px,1.9vw,25px),
+logo clamp(25px,3.3vw,42px), móvil<=600px texto20px/logo30px. Misma posición
+superior izquierda y márgenes de landing, fuera del stagger; sin heredar fuente
+de onboarding/legales. Sustituye logo52px de bienvenida y marca grande del login.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+**Posición de marca —19/10/2026:** logo oficial + texto «entre huellas» en
+la cabecera superior izquierda, con la posición, alineación y márgenes de la
+landing; onboarding es la referencia aplicada. En responsive permanece arriba.
+Fuera de formularios/columnas de contenido, stagger y skeletons; estable entre
+etapas. Aplica a todos los recorridos web, incluido acceso y gestión. Sustituye
+las posiciones previas de marca dentro del contenido; no exige cabecera fija.
+[ADR-076](decisiones/076-posicion-unificada-marca-web.md).
+
+
+**Reveal web —19/10/2026:** prohibida la cobertura opaca/crema antes del stagger.
+Usar StaggerReveal compartido para grupos generales; login/onboarding conservan
+sus parámetros de useStaggerReveal. Sin .reveal ni arreglos por pantalla.
+Cabeceras fuera del efecto, sin repetición por edición/refresh, movimiento
+reducido inmediato y QR legible sin JS. Landing conserva clip-path aprobado.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
 Estado: norma para el desarrollo web. Aprobada por el usuario el 18 de octubre
 de 2026, America/Lima, tomando la landing terminada como referencia.
 Consolidada el 19/10/2026 con los fondos, stagger del login, toast y controles legales aprobados.
 
 ## 1. Referencia y alcance
+
+Onboarding19/10: por instrucción expresa, /bienvenida toma la composición de
+sader-panel con PNG y textos originales del móvil de Entre Huellas. Columna448px
+con logo oficial y texto entre huellas en cabecera al inicio de página,
+alineados al borde como landing, fuera de la columna de pasos y del stagger,
+también en responsive.
+Por corrección posterior del usuario, solo avanzar con Continuar/Comenzar:
+sin botón Anterior ni tres puntos visibles; conservar anuncio accesible del paso.
+Alineación a la izquierda, Inter local, título48px/600 y descripción18px/500;
+por ampliación posterior solicitada, ilustración al ancho completo de columna
+(hasta448px base en escritorio, ancho disponible en móvil), sin recorte ni
+alterar PNG/proporción. Sustituye el límite anterior288px.
+botón carbón mínimo48px con radio18px base, flecha20px. Es excepción local a la
+fuente Arial y cápsula generales. Cuatro grupos de useStaggerReveal550ms/90ms,
+offset56px, salida invertida antes de cambiar paso; sin .reveal/cobertura crema.
+Mantener scroll con texto ampliado, movimiento reducido sin esperas y guardado
+con shimmer visible/error/reintento. Sin copiar configuración de apariencia.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+
+Acceso general19/10: /iniciar-sesion conduce a /bienvenida (tres pasos sin
+Omitir hasta completar por cuenta) o /inicio. Inicio muestra datos reales de
+cuenta y herramientas de gestión solo al confirmar permisos. Mantener navegación
+de usuario separada de la tarea de revisión y retorno a Entre Huellas; ningún
+enlace a funciones pendientes. Administradores/revisores también pueden usar las
+funciones normales. [ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+
+Por instrucción del19/10/2026, las rutas de navegación visibles se escriben en
+español, minúsculas y guiones, sin tildes ni ñ. Seguir
+[ADR-072](decisiones/072-rutas-web-en-espanol.md): al migrar, mantener
+redirecciones desde rutas antiguas y parámetros necesarios del recorrido.
+Raíz / y QR /c/:token conservados; endpoints internos, callbacks OAuth y
+deep links mantienen sus contratos. Login y legales ya migrados; otros recorridos
+aplican la regla al implementarse.
 
 Por instrucción explícita del usuario del18/10/2026, la administración y
 moderación son exclusivas de esta plataforma web. No hay equivalente
@@ -30,7 +114,8 @@ Esta norma no afirma que los componentes actuales del lector QR ya tengan estos
 estilos. Se adaptarán al intervenir cada recorrido, con revisión de regresión.
 La implementación vigente de acceso web separado y moderación se documenta en
 [Acceso web](funcionalidades/acceso-web.md) y [Moderación](funcionalidades/moderacion-web.md);
-esta guía no declara implementado un panel general de usuario.
+el incremento actual entrega inicio de cuenta, sin declarar paridad completa de
+funciones de usuario entre web y móvil.
 
 ## 2. Fuentes reales de la referencia
 
@@ -112,6 +197,8 @@ verificado. La landing informativa no define una paleta completa de estados.
 La familia general aprobada es `Arial, Helvetica, sans-serif`. Por instrucción
 posterior del18/10/2026, únicamente /terms y /privacy usan DM Sans local,
 como sader-panel; la excepción incluye títulos, cuerpo y metadatos legales.
+Por instrucción posterior del19/10/2026, /bienvenida usa Inter variable local
+como el onboarding de sader-panel, limitado a esa ruta (ADR-074).
 Login, landing y moderación conservan la familia general. No añadir otra fuente
 como parte de una nueva pantalla sin registrar el cambio de referencia.
 Por instrucción explícita posterior del18/10/2026, solo la frase del detalle
@@ -129,9 +216,10 @@ manuscrita no se extiende a títulos, formularios ni otros textos. Véase ADR-06
 | Botón | Peso `600`, tracking `-0.035em`. |
 | Marca visible | «entre huellas», minúsculas y peso `500`. |
 
-La página /login adapta el acceso móvil y la composición de sader-panel por
-solicitud posterior del usuario: marca grande en dos líneas, formulario sin
-tarjeta exterior, campos suaves con iconos y control Mostrar/Ocultar contraseña.
+La página /iniciar-sesion conserva la composición del formulario aprobada:
+sin tarjeta exterior, campos suaves con iconos y control Mostrar/Ocultar
+contraseña. Por ADR-077, la marca se comparte con landing en cabecera superior,
+fuera del formulario; ya no se usa la marca grande en dos líneas.
 Mantiene Arial; no adopta la fuente de sader-panel ni la de Flutter.
 WebShell minimal retira cabecera/footer institucionales duplicados en ese
 recorrido y mantiene el salto al contenido. Columna de hasta488px incluyendo
@@ -176,6 +264,8 @@ ilustraciones con enlaces. Esto no obliga a poner ese pie en cada panel privado.
 
 Todos los botones siguen la forma cápsula `border-radius: 999px`, incluidos
 secundarios y variantes responsive; los controles solo de icono son circulares.
+Excepción expresa19/10: onboarding /bienvenida usa el botón de la referencia
+sader-panel, radio calc(.625rem + 8px),18px a tamaño base, según ADR-074.
 
 | Variante | Apariencia aprobada |
 | --- | --- |

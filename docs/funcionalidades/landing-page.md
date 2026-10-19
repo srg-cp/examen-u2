@@ -1,5 +1,35 @@
 # Landing pública en la plataforma
 
+Regla ratificada19/10: marca arriba a la izquierda como landing, con color y
+medidas compartidos; conservar posición desde SSR hasta hidratación/recarga,
+sin saltos. [Norma completa](../REGLAS_UI_UX_WEB.md) y ADR-077.
+
+## Corrección del salto de cabecera al recargar —19/10/2026
+
+La hoja de cabecera compartida deja de declarar layout para .landing-page.
+Landing conserva su composición aprobada y la marca compartida; se elimina
+la competencia align-items:flex-start/center con igual especificidad que
+movía la marca3px durante hidratación. QA registra fotogramas de entrada y
+recarga en1440/731/390/320, producción y dev; evidencia final en ESTADO.
+Sin cambios de contenido, navegación o despliegue.
+
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Enlaces de acceso y documentos reales —19/10/2026
+
+La acción de cabecera Iniciar sesión conduce a /iniciar-sesion; el footer enlaza
+a /privacidad y /terminos. Composición/ilustraciones y demás acciones conservadas.
+No se prometen operaciones de mascotas/reportes aún pendientes en web.
+[Ficha de acceso](acceso-web.md) y
+[ADR-073](../decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+Sin persistencia/permisos nuevos; navegación landing→login verificada con fixture.
+Sin despliegue.
+
 ## Consolidación de reglas UI/UX web — 18/10/2026
 
 Se consolida REGLAS_UI_UX_WEB con fondo general blanco/celeste, fondo exterior

@@ -1,5 +1,20 @@
 # Avistamientos desde la web pública
 
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Reveal compartido —19/10/2026
+
+Sustituida la utilidad .reveal por StaggerReveal/useStaggerReveal sin capa crema.
+Conserva HTML/acciones, no repite entrada por edición/refresh; movimiento reducido
+inmediato. QR conserva lectura SSR sin JS. Sin cambios de datos/permisos.
+[ADR-075](../decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md); evidencia local en ESTADO,
+sin despliegue ni nuevo cierre de historia.
+
 **Seguimiento actualizado:** HU-10.1/#36 aceptada explícitamente por el usuario el18/10/2026; Done y issue cerrado en GitHub, verificado por API. Código integrado en main mediante PR60 y CI aprobado. Se conservan la evidencia comunicada de operación y los límites de inspección independiente; los pendientes visuales o pruebas ampliadas anteriores no se afirman ejecutados por esta aceptación.
 
 HU-11,18/10: [cronología y revisión](cronologia-y-revision.md) implementa la

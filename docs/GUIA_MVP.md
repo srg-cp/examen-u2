@@ -1,5 +1,42 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Corrección compartida del reveal web —19/10/2026
+
+Corrección transversal de presentación en inicio, moderación, QR y avistamientos.
+Elimina la capa crema global, reutiliza el stagger aprobado y conserva contratos
+y alcance de las historias existentes. Sin nueva HU/issue ni cierre adicional.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Corrección visual de onboarding web —19/10/2026
+
+El usuario solicita composición/transición del onboarding de su sader-panel con
+ilustraciones/contenido de móvil Entre Huellas. Incremento visual HU-01/RF-01,34
+web; sin nueva HU/issue ni backend. Conserva tres pasos sin Omitir, cuenta
+compartida y RPC existente.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md)
+y [ficha](funcionalidades/acceso-web.md).
+
+## Acceso general e inicio web de usuario —19/10/2026
+
+El usuario aclara que platform debe ofrecer funciones de usuario junto con móvil,
+aprueba login común y espacios de gestión por permisos y autoriza proceder.
+Incremento de HU-01/RF-01,34 en web; conserva HU-14.3/RF-22,33 / issue #45.
+Entrega acceso de cuenta, bienvenida de tres pasos compartida por cuenta, inicio
+con perfil real/cierre y acceso autorizado a revisión. Rutas de acceso/legal
+migradas según ADR-072. [ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md)
+registra alcance y límites; [ficha](funcionalidades/acceso-web.md).
+No entrega todavía Explorar/mascotas/reportes/avisos/perfil editable ni
+registro/recuperación web o administración. Sin SQL, asignación de roles,
+Flutter, despliegue ni cierre de historias. Próximo incremento propuesto: Explorar web.
+
+## Convención de rutas web —19/10/2026
+
+El usuario aprueba rutas visibles en español, minúsculas y guiones, sin tildes
+ni ñ. [ADR-072](decisiones/072-rutas-web-en-espanol.md) registra nomenclatura,
+excepciones API/QR/integraciones y redirecciones compatibles al migrar.
+Incremento documental: no entrega nuevas pantallas ni migra las rutas actuales,
+no amplía historias ni crea HU/RF/issues. Aplicar en próximos recorridos web.
+
 ## Documentos legales del acceso —18/10/2026
 
 El usuario solicita animación del icono, orbe en login y enlaces de términos/

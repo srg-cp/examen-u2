@@ -1,5 +1,44 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Marca de cabecera compartida —19/10/2026
+
+SiteBrand/SiteHeader sustituyen las marcas independientes: misma posición,
+color#171918, Arial500, gap7px y tamaños adaptables de landing. Incluye login
+y onboarding; cabecera fuera del efecto, login conserva cuatro grupos de cuerpo.
+QA compara medidas/render contra landing en1440/731/390/320 y texto200%,
+y exige posición/dimensiones constantes desde SSR hasta hidratar y recargar.
+La marca va arriba a la izquierda, fuera de cargas/entradas; acciones y retorno
+se acomodan sin desplazarla. No añadir reglas CSS competidoras por orden de carga.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+## Posición de la marca web —19/10/2026
+
+Logo oficial junto a «entre huellas», arriba a la izquierda, con posición y
+márgenes de landing/onboarding. Mantener arriba en responsive y fuera del
+stagger, skeletons y columna del formulario. Revisar alineación, texto ampliado
+y estabilidad entre etapas; reutilizar cabecera/marca al adaptar recorridos.
+[ADR-076](decisiones/076-posicion-unificada-marca-web.md).
+
+
+## Reveal compartido web —19/10/2026
+
+No pintar cobertura crema antes de revelar. StaggerReveal usa el composable
+aprobado:850ms/90ms, blur18px y desplazamiento28px; cabecera persistente.
+Login/onboarding conservan sus grupos y parámetros. Probar fotogramas reales,
+movimiento reducido, contenido actualizado y QR sin JavaScript.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Onboarding web con referencia de Sader —19/10/2026
+
+OnboardingFlow de access: columna448px, izquierda, Inter local, título48/600,
+descripción18/500 y botones carbón/radio18px base/mínimo48px/flecha20px.
+PNG/textos/saltos originales de onboarding móvil. Stagger compartido550ms/90ms,
+offset56px, salida invertida antes de cambiar paso, press400ms y entrada doble rAF.
+Sin .reveal ni cobertura crema; orbe strong persistente, movimiento reducido sin
+esperas. Guardado con shimmer visible y error/reintento conservando tercer paso.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+
 ## Referencia web consolidada —19/10/2026
 
 Las [reglas web](REGLAS_UI_UX_WEB.md) contienen los valores vigentes. Las notas
@@ -8,7 +47,7 @@ fechadas anteriores son el historial; no recuperar sus medidas sustituidas.
 | Componente | Implementación vigente |
 | --- | --- |
 | Stagger de login | useStaggerReveal + vStaggerReveal; transiciones originales de sader-panel, doble rAF, will-change persistente,850ms/90ms, blur18px/offset−28px; CSSOM compatible con CSP. |
-| Icono de login | Entrada en wrapper exterior, hover1.05 interior; no reinicia al editar. |
+| Marca de cabecera | SiteBrand/SiteHeader compartidos con landing, fuera del stagger; misma posición, color y escala responsive (ADR-077). |
 | TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X, cierre al tocar, entrada180ms. |
 | Retorno legal |36×36px, chevrón16px, circular glass/blur22px; variante local en LegalPage. |
 | Enlace legal derecho | Mínimo36px, padding8/12px, radio calc(.625rem + 8px), texto14px/500/línea20px, flecha16px. |

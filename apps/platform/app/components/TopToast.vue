@@ -9,7 +9,7 @@ function show(text: string, action: (() => void) | null = null, error = true) {
   timer = setTimeout(close, 6500);
 }
 function retryAndClose() { const action = retry.value; close(); action?.(); }
-onBeforeUnmount(close); defineExpose({ show });
+onBeforeUnmount(close); defineExpose({ show, close });
 </script>
 <template>
   <aside id="notice" :key="noticeId" class="notice" :class="{ 'notice-danger': danger }" :hidden="!visible" :role="danger ? 'alert' : 'status'" @click="close">

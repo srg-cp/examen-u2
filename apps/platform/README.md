@@ -1,5 +1,19 @@
 # Web Entre Huellas — Vue + Nuxt + TypeScript
 
+## Acceso general e inicio de cuenta —19/10/2026
+
+/iniciar-sesion admite cuentas existentes por correo/Google/Facebook sin rol
+de revisión. /bienvenida aplica tres pasos por cuenta con RPC existente;
+/inicio muestra perfil real/cierre y acceso a gestión según permiso.
+/login, /terms y /privacy redirigen a /iniciar-sesion, /terminos y /privacidad.
+Callback OAuth y /c/<token> conservados. Reutiliza SUPABASE_URL,
+SUPABASE_PUBLISHABLE_KEY, MODERATION_SESSION_SECRET y PUBLIC_WEB_ORIGIN.
+El secreto de nombre histórico cifra también la sesión general, solo servidor.
+Máximo1h sin refresh token. Sin paridad web/móvil completa ni administración.
+[Alcance y activación](../../docs/funcionalidades/acceso-web.md).
+Esta actualización sustituye la ausencia de login descrita en la nota histórica
+del17/10 siguiente; las fichas de funcionalidades registran el alcance vigente.
+
 ## Moderación de denuncias
 
 /moderacion incorpora HU-14.3: acceso de revisores, cola, evidencia y decisiones

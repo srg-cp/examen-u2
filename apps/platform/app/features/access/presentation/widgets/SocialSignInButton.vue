@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SocialProvider } from '#shared/features/moderation/domain/social_access';
+import type { SocialProvider } from '#shared/features/access/domain/access';
 defineProps<{provider:SocialProvider;working:boolean;disabled:boolean}>();
 const emit=defineEmits<{choose:[provider:SocialProvider]}>();
 </script>

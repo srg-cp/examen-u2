@@ -1,5 +1,28 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Marca web compartida —19/10/2026:** usar posición, color y medidas reales
+de landing con SiteBrand/SiteHeader, también en login/onboarding y responsive.
+Cuerpo de pantallas/móvil conserva su referencia.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+**Marca web —19/10/2026:** logo/texto en cabecera superior izquierda como
+landing y onboarding, también en responsive; fuera del contenido y sus efectos.
+Referencia móvil conservada. [ADR-076](decisiones/076-posicion-unificada-marca-web.md).
+
+
+**Corrección web —19/10/2026:** la norma cover→stagger se sustituye en entradas
+generales de apps/platform por StaggerReveal/useStaggerReveal sin capa opaca.
+No altera Flutter ni el clip-path aprobado de landing. Preservar cabeceras,
+movimiento reducido y lectura SSR del QR sin JavaScript.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+**Onboarding web19/10:** /bienvenida adopta sader-panel por solicitud expresa,
+con imágenes/textos de móvil; excepción local a Arial/cápsula/cover globales.
+Inter, salida→entrada sin cobertura crema y movimiento reducido según
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+No modifica la presentación móvil ni las demás rutas web.
+
 **Consolidación web —19/10/2026:** las medidas vigentes están en
 [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md). Estas correcciones prevalecen sobre
 las notas anteriores de los mismos recorridos, sin modificar Flutter:

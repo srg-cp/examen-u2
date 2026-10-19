@@ -4,9 +4,11 @@ import { ModerationSource } from '../features/moderation/data/moderation_source'
 import { ServerModerationRepository } from '../features/moderation/data/server_moderation_repository';
 import { moderationConfiguration,openSession,sealSession } from '../infrastructure/moderation_session';
 import { configuration } from '../infrastructure/config';
+import { openAccountSession } from '../infrastructure/account_session';
 const cookieName='eh_moderation';
 export function moderation(event:H3Event,bind=true){
-  const config=moderationConfiguration(process.env),session=openSession(getCookie(event,cookieName),config.sessionSecret);
+  const config=moderationConfiguration(process.env),general=getCookie(event,'eh_access');
+  const session=general?openAccountSession(general,config.sessionSecret):openSession(getCookie(event,cookieName),config.sessionSecret);
   if(bind && (!session || getHeader(event,'x-moderation-actor')!==session.actor))throw new ModerationFailure('unauthenticated');
   const repository=new ServerModerationRepository(new ModerationSource(config),session);
   return {repository,access:new AccessModeration(repository),reports:new ReviewReports(repository),decision:new DecideReport(repository),
@@ -16,7 +18,7 @@ export function moderation(event:H3Event,bind=true){
 export async function readModerationSession(event:H3Event){
   // No cookie means no session, independently of backend availability/configuration.
   // A supplied cookie still follows full decryption, Auth and role validation.
-  if(!getCookie(event,cookieName))throw new ModerationFailure('unauthenticated');
+  if(!getCookie(event,cookieName)&&!getCookie(event,'eh_access'))throw new ModerationFailure('unauthenticated');
   return moderation(event,false).access.session();
 }
 export function clearModerationCookie(event:H3Event){deleteCookie(event,cookieName,{path:'/api/moderation',httpOnly:true,sameSite:'strict',secure:process.env.PUBLIC_WEB_ORIGIN?.startsWith('https://')===true});}

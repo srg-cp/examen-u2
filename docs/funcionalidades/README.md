@@ -1,5 +1,15 @@
 # Funcionalidades de Entre Huellas
 
+Corrección19/10: reveal compartido sin cobertura opaca en [acceso](acceso-web.md),
+[moderación](moderacion-web.md), [QR](ficha-publica-qr.md) y
+[avistamientos web](avistamientos-web.md). ADR-075; evidencia local en ESTADO.
+
+Actualización19/10: [Acceso web](acceso-web.md) admite cuentas válidas sin rol de
+revisión, con bienvenida por cuenta e inicio real de cuenta. Moderación conserva
+permisos por operación y acceso desde gestión autorizada. /iniciar-sesion,
+/terminos y /privacidad son canónicas, con redirecciones antiguas.
+No se entrega paridad completa web/móvil ni administración; sin despliegue.
+
 Confirmación posterior18/10:030 aplicado por usuario. Moderación web conserva
 configuración/rol/login y demo real por verificar; no reaplicar030.
 
@@ -40,8 +50,8 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Documentos legales web](documentos-legales.md) | apps/platform | /terms y /privacy; ampliación explícita18/10, sin HU/issue nuevo |
-| [Acceso web](acceso-web.md) | apps/platform | /login separado; HU-14.3 / issue #45; validación local, demo remota pendiente |
+| [Documentos legales web](documentos-legales.md) | apps/platform | /terminos y /privacidad, con redirecciones antiguas; sin HU/issue nuevo |
+| [Acceso web](acceso-web.md) | apps/platform | /iniciar-sesion, /bienvenida y /inicio; HU-01/RF-01,34 en web; conserva HU-14.3 / issue #45; demo real pendiente |
 | [Revisión y moderación web](moderacion-web.md) | apps/platform / SQL Supabase | HU-14.3; RF-22,33; issue #45;030/configuración/demo pendientes |
 | [Denuncias de contenido](denuncias-contenido.md) | content_reports / SQL Supabase | HU-14.1; RF-22; issue #43;029 confirmado; demo/integración pendientes |
 | [Cierre y recuperación](cierre-y-recuperacion.md) | case_closure / SQL Supabase | HU-13; RF-07; issue #13; 028 confirmado aplicado; demo/integración pendientes |

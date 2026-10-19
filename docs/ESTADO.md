@@ -1,5 +1,361 @@
 # Estado del proyecto
 
+## Acceso web sin login intermedio —19/10/2026
+
+Por solicitud del usuario, /iniciar-sesion comprueba sesión en servidor y
+responde302 a /inicio o /bienvenida antes de generar HTML de login. Navegación
+cliente espera al ViewModel antes de montar. Sin formulario ni skeleton de
+acceso intermedio; la carga de datos del destino conserva su comportamiento.
+eh_access HttpOnly/cifrada pasa a path /; /api/access/entry recupera las cookies
+anteriores /api con validación real, sin renovar el vencimiento. El salto anónimo
+termina con entry=checked (sin autoridad), retirado por cliente conservando reason.
+El cierre elimina ambos paths. Cookie inválida se limpia; fallos de backend
+conservan sesión y van a /inicio con su reintento existente.
+[ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md),
+[ficha](funcionalidades/acceso-web.md). Misma HU-01/RF-01,34, sin cierre de historia.
+
+Validación local: typecheck aprobado,42 pruebas unitarias/arquitectura y16 de
+servidor de producción aprobadas; build Nuxt aprobado con directorio aislado
+.nuxt-session-entry para conservar el dev server del usuario en5173.
+Chrome check-session-entry-browser confirma ausencia de montaje de login en
+SSR/SPA y recuperación de cookie /api, destinos por onboarding, sesión sin JS,
+logout/recarga y sin errores CSP/hidratación. check-access-browser completo
+aprobado: acceso ordinario/revisor, onboarding persistido/reintento, revocación,
+logout entre pestañas, expiración, fallos de conexión/gestión, OAuth fixture y
+responsive1920/1440/731/390/320 con texto200% sin overflow.
+
+Sin bloqueos locales. Backend fixture: no acredita cuentas/configuración remotas.
+Sin SQL, Flutter, cambios de entorno, publicación ni despliegue.
+Siguiente paso: comprobar la entrada con la sesión real del usuario; para la web
+publicada requiere desplegar estos cambios mediante autorización correspondiente.
+
+## Regla ratificada: ubicación y estabilidad de marca —19/10/2026
+
+El usuario solicita registrar como norma el resultado corregido de landing.
+REGLAS_UI_UX_WEB precisa ubicación superior izquierda, márgenes responsive,
+logo y texto en línea, color/fuente/medidas de referencia y estabilidad desde
+SSR hasta hidratación/recarga; fuera de contenido, skeletons y stagger.
+AGENTS, ADR-077 y guía de diseño refuerzan la misma condición; las acciones
+se acomodan sin mover o tapar la marca. Actualización documental: no cambia
+código ni repite pruebas de aplicación. Enlaces locales/diff comprobados;
+la evidencia de navegador del incremento anterior sigue registrada debajo.
+Siguiente paso: exigir estas comprobaciones al modificar cualquier cabecera.
+
+## Landing: cabecera estable durante recarga e hidratación —19/10/2026
+
+El usuario detecta un descenso leve tras cargar. Se reproduce en build de
+producción y servidor dev5173: logo y texto pasan de y8px a y11px en1440px.
+CSS compartido y landing declaran align-items distintos con igual especificidad;
+el orden de hojas cambia durante hidratación. Las pruebas previas solo comparaban
+el estado final y no detectaron esta regresión introducida al compartir cabecera.
+
+Se retiran los selectores de layout .landing-page .site-header de la hoja
+compartida: la composición de la cabecera landing queda gobernada por su CSS
+aprobado, sin regla competidora. SiteBrand/SiteHeader y las medidas/color comunes
+se conservan; reader-shell conserva su layout de cabecera. Sin cambios de
+negocio ni datos. Nueva prueba captura fotogramas desde SSR hasta hidratación
+y recarga completa, comparando marca, altura de cabecera y origen del hero.
+Falla antes con el desplazamiento8→11px y pasa tras corregirlo. Build y
+Chrome aprobados: primer render, hidratación y recarga estable en1440/731/390/320,
+tanto producción como dev5173. También pasan paridad de marca entre pantallas
+y suite completa de landing (responsive/texto200%, SPA, SSR/no-JS y CSP).
+Sin despliegue. Siguiente paso: revisión del usuario en su navegador.
+
+## Marca web alineada con landing —19/10/2026
+
+El usuario señala que registrar ADR-076 no corrigió diferencias reales.
+Se implementan SiteBrand/SiteHeader compartidos por landing, login, onboarding,
+inicio, moderación, QR/avistamientos y legales. Coinciden posición, color, fuente,
+peso, espaciados y tamaños adaptables con landing; se retiran marcas por
+funcionalidad. Login lleva marca arriba y conserva cuatro grupos de contenido.
+Legales conserva scroll interior; retorno glass se ubica bajo cabecera cuando
+hay withBack. Móvil/autenticación/roles/datos conservados. ADR-077/normas/fichas
+actualizados. Typecheck/build,42 pruebas unitarias/dependencias y14 de servidor
+pasan. Chrome compara posición/color/fuente/peso/espaciado/interlineado/logo
+contra landing en1440/731/390/320 y texto200%, sin overflow. Suites de acceso,
+login recargado (cuatro grupos), onboarding, moderación, legales y landing pasan,
+incluyendo SSR/no-JS, navegación y CSP/hidratación. Capturas revisadas en
+apps/mobile/build/ui-preview/web-brand (fixtures); sin sesión real del usuario.
+Al retirar reglas antiguas se detectó y restauró la grilla móvil de Inicio;
+la comparación posterior y QA responsive confirman el resultado final.
+Sin despliegue. Siguiente paso: revisión visual local del usuario.
+
+
+## Regla de posición del logo web —19/10/2026
+
+El usuario pide formalizar logo + texto «entre huellas» en la misma posición
+superior de landing y onboarding, también en responsive. ADR-076 y normas
+UI/AGENTS/diseño/arquitectura registran cabecera superior izquierda, márgenes
+de referencia, fuera de contenido/stagger/skeleton y estable entre etapas.
+Incluye acceso y gestión; no cambia móvil. Incremento documental, sin cambios
+de código ni afirmación de adaptación global. Validación: enlaces y diff.
+Siguiente paso: aplicar/revisar esta norma al adaptar las cabeceras existentes.
+
+
+## Corrección definitiva del bloque gris en Inicio —19/10/2026
+
+El ajuste anterior solo cambió la forma del skeleton; seguía mostrándolo y no
+resolvió la petición. Se elimina ManagementSkeleton y sus estilos/import.
+La comprobación de acceso opcional a gestión no monta ni reserva un panel de
+carga bajo las tarjetas. Inicio muestra contenido real; gestión se añade solo
+con permiso confirmado. aria-busy anuncia la consulta sin bloque visual.
+El skeleton inicial de sesión conserva su función mientras no hay cuenta leída.
+
+Si la consulta falla, el toast y la acción real de reintento permanecen. Durante
+el reintento se conserva el botón con LoadingShimmer, bloqueando doble envío;
+el ViewModel limpia managementFailed al confirmar, sin sustituirlo por un panel.
+No cambian SQL, permisos, sesión, móvil ni autorización de cada API.
+
+La nueva regresión Chrome falla con el build anterior al detectar cinco nodos
+de placeholder. Ahora exige cero nodos grises durante todos los fotogramas con
+las tarjetas montadas, tanto al iniciar sesión como al recargar /inicio, con
+la respuesta de permisos retenida, y verifica320px/texto200% y movimiento reducido.
+Typecheck/build y42 pruebas unitarias/dependencias pasan. Chrome verifica
+entrada y recarga con respuesta retenida sin placeholders en los fotogramas;
+captura revisada shared-stagger/reload-management-pending.png. Suite completa
+de acceso Chrome aprobada: cuentas normales/revisor, roles, revocación, errores
+y reintentos, responsive y texto200%, sin errores CSP/hidratación.
+Sin uso de credenciales reales ni despliegue. Siguiente paso: revisión local.
+
+## Inicio: skeleton de permisos con forma y entrada correctas —19/10/2026
+
+El bloque gris bajo las tarjetas era ContentSkeleton de checkingManagement:
+reutilizaba una silueta de ficha con foto300px y se montaba fuera del stagger,
+por lo que aparecía antes de las tarjetas todavía transparentes. Se sustituye
+por ManagementSkeleton de access: resumen de líneas/acción dentro de un panel,
+con las formas shimmer compartidas, semántica de consulta y sin texto de carga.
+Carga, gestión autorizada y reintento forman parte de la grilla/reveal de Inicio;
+el panel ocupa ambas columnas y usa su separación24px, sin margen duplicado.
+No cambia consultas, permisos ni ViewModel; una cuenta sin rol retira el panel
+al confirmar la consulta. Sin demora artificial, ocultar carga o bloquear Inicio.
+
+Validación: typecheck/build y Chrome con permisos retenidos deliberadamente:
+panel menor200px en escritorio, después de las tarjetas en el stagger, separación
+real24px,320px/texto200% sin overflow y retiro al confirmar sin ocultar tarjetas.
+Suite completa de acceso en Chrome aprobada (cuentas, roles, reintentos,
+onboarding,1920/1440/731/390/320 y texto200%, sin fallos CSP/hidratación). Capturas
+locales shared-stagger/management-loading*.png con fixture. Sin cuenta real,
+SQL, Flutter ni despliegue. Siguiente paso: revisión visual local del usuario.
+
+## Reveal web: eliminación de la cobertura crema compartida —19/10/2026
+
+El rectángulo reportado en /inicio procedía de .reveal::before en main.css:
+una capa #fffbeF animada antes del contenido. Se retiran la utilidad global,
+el pseudo-elemento y los keyframes cover/arrive. Ocho grupos de inicio,
+moderación, ficha QR y formulario/confirmación de avistamientos pasan al
+componente StaggerReveal, que reutiliza useStaggerReveal sin pintar coberturas.
+Login/onboarding conservan los parámetros aprobados del mismo composable.
+
+El componente conserva etiquetas HTML y eventos, captura los hijos de cada
+entrada y no reproduce el efecto por edición/refresh. Movimiento reducido
+inmediato; hoja externa noscript permite leer el QR SSR sin JavaScript bajo
+la CSP existente. Sin cambios de negocio, servidor, SQL, permisos ni Flutter.
+ADR-075 actualiza normas, arquitectura y fichas afectadas. Guardia automática
+impide recuperar .reveal y la utilidad antigua.
+
+Validación local: typecheck y build completos;41 pruebas unitarias/dependencias
+y14 de servidor pasan. Chrome: fotogramas reales del inicio sin pseudo-capa,
+stagger/resize/texto200%/movimiento reducido, QR activo/neutro sin JS; suites
+completas de acceso, onboarding, moderación, avistamientos y lector QR pasan,
+incluyendo formularios, galería, actualización sin replay, reintentos y CSP.
+La primera captura de fotogramas terminaba antes del estado final: se amplió
+su ventana. La prueba antigua del lector esperaba cerrar un toast que el
+reintento ya cierra; se corrigió la aserción al comportamiento compartido actual.
+Captura revisada en apps/mobile/build/ui-preview/shared-stagger/home.png con
+cuenta fixture. No se utilizaron credenciales ni sesión real del usuario.
+
+Siguiente paso: revisión del usuario en su navegador local. Sin despliegue,
+commit ni nuevo cierre de historia.
+
+## Onboarding: imágenes mayores y corrección de finalización204 —19/10/2026
+
+El usuario pide ampliar ilustraciones y reporta toast de error al terminar.
+La imagen pasa de máximo288px a todo el ancho de columna (448px base escritorio,
+ancho disponible móvil), conservando PNG/proporción y cabecera superior.
+
+Se reproduce defecto de AccountSource: el éxito HTTP204 sin contenido de una RPC
+void se trataba como unavailable por exigir body/getReader. Se acepta204 solo
+para complete_onboarding; estados de error se clasifican antes de leer cuerpo.
+Repositorio/VM siguen leyendo perfil real y exigiendo onboarding_completed_at
+antes de confirmar navegación. Sin éxito optimista, cambios SQL o permisos.
+La fixture anterior200/null no cubría este caso; ahora devuelve204. Dos nuevas
+regresiones fallan antes y pasan tras la corrección. Esto explica un guardado
+potencialmente confirmado seguido de toast erróneo; no se capturó la petición de
+la sesión real del usuario ni se usaron sus credenciales.
+
+Validación:40 pruebas unitarias/dependencias, typecheck/build, servidor construido
+y Chrome de onboarding/acceso con fixture204. Se comprueba ancho real de imagen,
+recorridos completos de guardado/reintento, responsive y texto200% sin overflow.
+Ficha y regla visual actualizadas. Sin Flutter, cambios remotos o despliegue.
+Siguiente paso: confirmar con la cuenta real; si ya quedó guardado, recargar
+consulta el perfil y dirige a inicio sin repetir onboarding.
+
+## Marca del onboarding en cabecera de página —19/10/2026
+
+El usuario aclara que logo/texto van bien arriba como en landing, también en
+responsive. La marca pasa de OnboardingFlow a la cabecera de AccountScreen,
+fuera de la columna centrada de pasos, con márgenes/padding de landing.
+La cabecera permanece en el flujo superior de la página; el cuerpo ocupa
+el espacio restante, sin superposición ni altura extra de viewport.
+Conserva logo52px, texto, transiciones, avance único y guardado existentes.
+ADR-074/regla web/ficha actualizados. Sin SQL, Flutter, permisos o despliegue.
+
+Validación: typecheck/build y QA Chrome de onboarding con fixture, posición
+superior/alineación de marca entre pasos y en1440/390/320×350/320 texto200%,
+sin overflow/CSP/hidratación. Capturas en build/ui-preview/web-onboarding de móvil.
+Pendiente revisión visual del usuario.
+
+## Onboarding: marca superior y avance único —19/10/2026
+
+Por solicitud del usuario se retiran Anterior y los tres puntos visibles de
+/bienvenida. Se añade logo oficial52px y texto entre huellas sobre la ilustración,
+fuera del stagger, persistentes entre pasos. Continúa con Continuar/Comenzar;
+anuncio accesible del paso sin indicador visual. Sin cambios a las tres etapas,
+imágenes/textos móviles, sesión, RPC, permisos o Flutter. Se conserva guardado
+con shimmer/error/reintento y movimiento reducido; sin despliegue.
+ADR-074, regla web y ficha de acceso actualizadas.
+
+Validación: typecheck/build y QA Chrome con fixture para onboarding/acceso,
+incluidos ausencia de controles retirados, marca estable, avance/guardado,
+movimiento reducido, desmontaje y320px/texto200%. Capturas en
+apps/mobile/build/ui-preview/web-onboarding; revisión visual del usuario pendiente.
+
+## Onboarding web con referencia de sader-panel —19/10/2026
+
+Por corrección del usuario se sustituye la presentación provisional de /bienvenida.
+La clase global .reveal generaba el rectángulo crema y lo repetía al cambiar paso;
+se retira solo de onboarding. OnboardingFlow reutiliza useStaggerReveal:
+cuatro grupos550ms/90ms, blur18px/offset56px, salida inferior en orden invertido,
+cambio tras820ms y nueva entrada; press400ms y bloqueo de clics repetidos.
+Orbe strong continuo, movimiento reducido sin efectos/esperas, incluso al
+cambiar preferencia durante salida. Timers/listeners/callbacks se limpian al salir.
+El guardado mantiene contenido/shimmer visible y solo sale tras confirmación;
+error conserva tercer paso y reintento sin repetir entrada.
+
+Composición de WelcomeStep de sader-panel: ancho448px, izquierda, Inter local,
+título48/600, descripción18/500 y botón carbón/radio18px base/mínimo48px/flecha20px.
+Móvil alineado abajo con margen60px; escritorio centrado. Se conservan tres pasos,
+textos/saltos y PNG móviles originales, copiados byte a byte en public/images/
+onboarding. Sin cabecera/footer extra ni configuración de apariencia de Sader.
+Inter con OFL local; no peticiones a Google al navegar. AccountViewModel,
+complete_onboarding, sesión, permisos y Flutter sin cambios.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md) registra
+excepciones locales a Arial/cápsula/cover; reglas/guía/ficha/recursos actualizados.
+
+Validación: typecheck/build y38 pruebas unitarias/dependencias aprobados;14 de
+servidor construido aprobadas. Chrome fixture de onboarding comprueba tiempos/
+estilos reales, salida/entrada/anterior/siguiente/doble clic, imágenes idénticas,
+guardado visible/error/reintento, movimiento reducido/cambio en salida y desmontaje.
+Regresión de acceso/OAuth/roles/sesión aprobada. Capturas1440/390/320×350/320 con
+texto200% revisadas, sin overflow/CSP/hidratación. Renders en
+apps/mobile/build/ui-preview/web-onboarding. La revisión ampliada detecta el
+skip-link asomando por ocultación fija−100px: se oculta ahora por su propia
+altura, conserva foco/teclado y se comprueba con texto200%.
+Verificados36 enlaces documentales nuevos/actualizados y git diff --check.
+
+Sin SQL, configuración remota, despliegue o cierre de historia. Pendiente revisión
+visual del usuario y comprobación con su cuenta real; las pruebas fixture no
+certifican proveedores ni entorno remoto.
+
+## Acceso general web, bienvenida e inicio de cuenta —19/10/2026
+
+Por autorización del usuario se separa autenticación general de moderación.
+/iniciar-sesion admite cuenta válida por correo/Google/Facebook sin exigir rol;
+/bienvenida aplica tres pasos sin Omitir y guarda complete_onboarding por cuenta,
+compartido con móvil. /inicio consulta nombre/correo/ciudad reales y permite
+cerrar sesión; gestión solo al confirmar permiso. /moderacion conserva control
+por operación y retorno a inicio; quitar rol no bloquea uso normal.
+Landing conecta acceso y legales; /login, /terms y /privacy redirigen308 a
+/iniciar-sesion, /terminos y /privacidad con parámetros conservados.
+
+access contiene dominio/casos de uso, DTO/repositorios/fuente REST/ViewModel y
+pantallas propios. Sesión general HttpOnly/cifrada/path /api, máximo1h sin refresh,
+secreto servidor existente; SSR sin datos privados. PKCE conserva callback/API
+anteriores y crea sesión general. Onboarding/gestión validan identidad esperada.
+Se retiran adaptadores sociales anteriores de moderación. Prueba de dependencias
+ampliada para impedir imports de data/presentation entre funcionalidades.
+[ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md) registra
+la decisión y alcance; reglas/guía/configuración/fichas actualizadas.
+
+Validación local: typecheck y build Nuxt aprobados;38 pruebas unitarias/arquitectura
+y14 de servidor construido. Chrome con fixtures: cuenta normal/revisora,
+onboarding con reintento/persistencia, permisos revocados conservando cuenta,
+cierre entre pestañas, expiración, errores/reintentos, OAuth Google/Facebook,
+destinos fijos y redirecciones; sin errores CSP/hidratación. Se corrigió el
+desajuste detectado al redirigir una visita SSR antes del montaje.
+QA de moderación completo (evidencia, decisiones/reintentos/restauración,
+cancelación), legales/SSR sin JS y stagger aprobado. Inicio/bienvenida/acceso
+en1920/1440/731/390/320 con texto200% sin overflow; capturas revisadas en
+apps/mobile/build/ui-preview/web-access. Sin SQL nuevo ni cambios Flutter.
+QA adicional de landing y toast aprobado;25 enlaces Markdown nuevos/actualizados
+verificados y git diff --check aprobado. Revisión final añade regresión para
+descartar cierre de sesión recibido tras disposición; total38+14 pruebas.
+
+Límites: inicio es consulta de cuenta; Explorar/mascotas/reportes/avisos/perfil
+editable, registro/recuperación web y administración siguen pendientes. Sin datos
+simulados ni rutas vacías; no se afirma paridad completa. Pruebas fixture no
+certifican cuentas/proveedores/allowlist/HTTPS reales. No se asignan roles,
+configura Auth remoto, despliega ni cierra historias.
+Siguiente paso: validar acceso real del usuario en5173 y entregar un siguiente
+recorrido completo de usuario (Explorar web propuesto).
+
+## Regla de rutas web en español —19/10/2026
+
+Por instrucción del usuario se registra ADR-072: navegación visible en español,
+minúsculas y guiones, sin tildes ni ñ; código/SQL/endpoints internos pueden seguir
+en inglés. Mantener raíz / y contrato QR /c/:token; callbacks OAuth y deep links
+no se renombran por esta regla. Al migrar /login, /terms y /privacy, conservar
+redirecciones hacia /iniciar-sesion, /terminos y /privacidad con parámetros
+necesarios del flujo y destinos internos seguros.
+
+AGENTS, reglas de arquitectura/UI web, arquitectura, guía y fichas de acceso/legal
+enlazan la decisión. Cambio exclusivamente documental: rutas actuales, permisos
+y despliegue conservan su estado. Verificación de enlaces nuevos, coherencia
+con páginas existentes y git diff --check; sin build/pruebas de aplicación.
+Siguiente paso: aplicar la convención en próximos incrementos y migrar rutas
+existentes con pruebas de navegación/retornos; no crear páginas vacías.
+
+## Acceso local: puerto real y salida a proveedores —19/10/2026
+
+Capturas del usuario identifican http://127.0.0.1:3000/login. Se reproduce
+OAuth start403/invalid_request desde ese origen; el mismo proceso acepta5173
+y genera callback5173. Al actualizar .env.local, Nuxt se reinicia y pasa a
+escuchar5173, acorde con el comando dev del proyecto. Se deja
+PUBLIC_WEB_ORIGIN=http://127.0.0.1:5173 y se verifica la instancia en ese puerto:
+Google/Facebook start200, callback5173; las URLs generadas llegan a Supabase
+y reciben302 hacia accounts.google.com y www.facebook.com respectivamente.
+No se introducen IDs/secretos de proveedores en Nuxt: pertenecen al servicio
+Supabase Auth autohospedado. La habilitación y redirección no demuestran la
+validez completa de credenciales ni allowlist de retorno tras autenticarse.
+
+El aviso de credenciales de la captura es forbidden de moderación; puede proceder
+del control de rol o del rechazo de origen (ambos403), por lo que la captura sola
+no confirma contraseña válida ni rol faltante. No se asignan permisos ni se
+prueba con credenciales del usuario. Sin cambios de código, SQL o despliegue.
+Siguiente paso: abrir5173 y comprobar recorrido real de proveedor/retorno con
+cuenta autorizada. El503 publicado documentado abajo es una observación separada.
+
+## Diagnóstico de acceso web —19/10/2026
+
+El usuario informa «No pudimos conectar». Comprobación del dominio publicado:
+GET /login devuelve200 y GET /api/moderation/session sin cookie devuelve401
+(esperado); POST /api/moderation/oauth/start con origen correcto, JSON válido y
+Google devuelve503/unavailable. Esta última ruta no contacta al proveedor ni a
+Supabase: apunta a configuración de acceso ausente/inválida en el proceso
+publicado. Pendiente inspeccionar variables/logs de Dokploy; sin acceso a su
+configuración no se confirma la variable concreta. No se modifica el despliegue.
+
+En .env.local se detecta el origen de producción usado para pruebas HTTP locales:
+el POST local devuelve403/invalid_request. Se corrige solo PUBLIC_WEB_ORIGIN a
+http://127.0.0.1:5173, conservando credenciales. Verificación con runtime construido
+existente y entorno explícito: inicio Google/Facebook200, callback local, cookie
+HttpOnly sin Secure sobre HTTP; origen externo sigue403. Lectura pública de Auth
+con la clave local devuelve200 y proveedores email/Google/Facebook habilitados.
+Esto no acredita login con cuenta real, callback autorizado remotamente ni rol.
+Sin cambios de código, SQL, autenticación remota o nuevo build. Guía local y ficha
+actualizadas; git diff --check aprobado. Siguiente paso: revisar configuración
+del servicio publicado y verificar acceso completo con una cuenta autorizada.
+
 ## Reglas UI/UX consolidadas —19/10/2026
 
 Por solicitud del usuario, se consolidan REGLAS_UI_UX_WEB, REGLAS_UI_UX y

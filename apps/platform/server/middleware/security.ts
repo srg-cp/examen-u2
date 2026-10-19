@@ -21,8 +21,8 @@ export default defineEventHandler(event => {
     `default-src 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`);
   const nativeSubmission = event.method === 'POST' && /^\/api\/app\/cases\/(lost|found)\/[0-9a-f-]{36}\/sightings$/.test(path);
   const oauthCallback = event.method==='GET' && path==='/api/moderation/oauth/callback';
-  const moderationPath = path.startsWith('/api/moderation/');
-  const moderationWrite = event.method === 'POST' && ['/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path);
+  const moderationPath = path.startsWith('/api/moderation/') || path.startsWith('/api/access/');
+  const moderationWrite = event.method === 'POST' && ['/api/access/login','/api/access/logout','/api/access/onboarding','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path);
   if (moderationPath && !oauthCallback && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
   const submission = moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
   if (event.method !== 'GET' && event.method !== 'HEAD' && !submission) {
@@ -35,7 +35,7 @@ export default defineEventHandler(event => {
       (nativeSubmission && (!/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(getHeader(event, 'authorization') || '') || getHeader(event, 'origin')))) {
       setResponseStatus(event, 403); return { error: 'invalid_request' };
     }
-    if (!(moderationWrite ? moderationLimiter : writeLimiter).allow(peer) || (['/api/moderation/login','/api/moderation/oauth/start'].includes(path) && !loginLimiter.allow(peer))) { setHeader(event, 'Retry-After', 60); setResponseStatus(event, 429); return { error: 'rate_limited' }; }
+    if (!(moderationWrite ? moderationLimiter : writeLimiter).allow(peer) || (['/api/access/login','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start'].includes(path) && !loginLimiter.allow(peer))) { setHeader(event, 'Retry-After', 60); setResponseStatus(event, 429); return { error: 'rate_limited' }; }
     if (writes >= 4) { setResponseStatus(event, 503); return { error: 'unavailable' }; }
     writes++; let released = false;
     const releaseWrite = () => { if (!released) { released = true; writes--; } };

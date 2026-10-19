@@ -1,5 +1,25 @@
 # Configuración y validación de la app
 
+## Acceso general web —19/10/2026
+
+El acceso canónico /iniciar-sesion ya no exige permiso de revisión. Reutiliza
+SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, MODERATION_SESSION_SECRET y
+PUBLIC_WEB_ORIGIN exacto. MODERATION_SESSION_SECRET conserva su nombre histórico
+y cifra también eh_access con namespace independiente; no es un secreto OAuth.
+En local usar http://127.0.0.1:5173 y el mismo puerto del proceso.
+En producción configurar las variables en el servicio, nunca NUXT_PUBLIC.
+
+Sin SQL nuevo: Auth/profiles/RLS y complete_onboarding existentes. Bienvenida
+compartida por cuenta con móvil. Revisión mantiene require_content_reviewer
+por operación; no se asignan roles automáticamente. Cuenta general no implica
+permiso administrativo. eh_access HttpOnly/path /api/SameSite Strict/Secure HTTPS,
+máximo1h sin refresh token; al vencer se vuelve al acceso.
+Los secretos de Google/Facebook siguen en Supabase Auth autohospedado.
+Conservar callback /api/moderation/oauth/callback en la allowlist web existente;
+no cambia por traducir login/legal. /login, /terms y /privacy redirigen308.
+[Alcance y evidencia local](funcionalidades/acceso-web.md).
+Pendiente demo con cuentas/proveedores y cookies HTTPS reales; sin despliegue.
+
 ## Moderación web — HU-14.3, patch030
 
 Administración/moderación exclusivamente en apps/platform por instrucción del

@@ -71,5 +71,6 @@ export class ModerationViewModel {
     } catch(error) { if (generation === this.generation) { if (error instanceof ModerationFailure && error.kind === 'invalid') this.emit({frozen:null}); this.failure(error); } }
   }
   clear() { ++this.generation; this.emit({...initial(),stage:'login'}); }
+  invalidate() { ++this.generation; this.emit(initial()); }
   dispose() { this.disposed=true; ++this.generation; this.listeners.clear(); this.state=initial(); }
 }

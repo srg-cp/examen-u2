@@ -1,5 +1,74 @@
 # Arquitectura de Entre Huellas
 
+## Redirección del acceso antes de renderizar —19/10/2026
+
+session-entry valida eh_access mediante AccessAccount/Auth/perfil y responde302
+a /inicio o /bienvenida antes del HTML de login. Cookie cifrada HttpOnly/path /
+sustituye path /api; /api/access/entry recupera sesiones anteriores y termina
+el salto anónimo mediante un marcador sin autoridad. guest-access valida antes
+de montar en navegación cliente. Sin datos privados SSR ni singleton de cuenta;
+cierre limpia ambos paths y las APIs conservan autorización. Fallos de backend
+mantienen sesión y reintento en /inicio. [ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md)
+sustituye los detalles anteriores de path/comprobación al montar de ADR-073.
+
+## Implementación de marca web común —19/10/2026
+
+SiteBrand/SiteHeader en componentes compartidos, CSS único site-brand.css.
+Landing y funcionalidades los componen sin importar UI de otras features.
+Fuente/color/medidas explícitas, cabecera fuera de contenido/animaciones,
+retorno glass debajo de la marca. Sin cambios de dominio o móvil.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+## Marca web en cabecera —19/10/2026
+
+Norma de presentación ADR-076: logo/texto arriba a la izquierda como landing
+y onboarding, en todos los recorridos web y responsive, fuera del cuerpo y
+sus animaciones/cargas. Reutilizar cabecera/marca; sin cambios de dominio,
+permisos o móvil. [Decisión](decisiones/076-posicion-unificada-marca-web.md).
+
+
+## Entrada web sin cobertura opaca —19/10/2026
+
+StaggerReveal compone el composable compartido, aplica estilos mediante CSSOM
+y conserva div/article/section/form originales. Sustituye ocho grupos legados
+de inicio/moderación/QR/avistamientos; se elimina .reveal del CSS global.
+Solo anima hijos de la entrada, sin replay por edición/refresh. Hoja noscript
+externa mantiene QR legible sin JavaScript con CSP vigente.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Presentación de bienvenida web —19/10/2026
+
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md) registra
+OnboardingFlow como widget de access, separado del inicio de cuenta.
+Adapta composición/Inter/botones y salida→entrada de sader-panel con PNG/textos
+idénticos a onboarding móvil. Sin .reveal ni cobertura crema; cuatro grupos
+del stagger compartido, timers cancelables y movimiento reducido. La confirmación
+de guardado precede a la salida final. ViewModel/RPC/sesión/permisos sin cambios.
+
+## Acceso general web e inicio de cuenta —19/10/2026
+
+[ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md) separa
+access de moderation. /iniciar-sesion admite cuentas válidas, /bienvenida aplica
+los tres pasos hasta completar la RPC por cuenta y /inicio consulta datos reales
+del perfil con JWT/RLS. El permiso de revisión se consulta aparte y se vuelve a
+comprobar en cada API de moderación. Sin él, la cuenta conserva uso normal.
+Gestión exclusiva web; sin rol administrativo nuevo ni paridad completa todavía.
+Sesión general HttpOnly/cifrada/path /api, secreto servidor existente y
+vencimiento máximo1h sin refresh token. SSR sin datos privados.
+/login, /terms y /privacy redirigen308 a sus equivalentes españoles; callback
+OAuth/API/QR conservados. Sin cambios SQL ni Flutter.
+
+## Convención de rutas web —19/10/2026
+
+La navegación visible usa español, minúsculas y guiones, sin tildes ni ñ.
+[ADR-072](decisiones/072-rutas-web-en-espanol.md) fija nombres objetivo y
+transición compatible: /login→/iniciar-sesion, /terms→/terminos y
+/privacy→/privacidad, con redirecciones y parámetros necesarios al migrar.
+La raíz / y QR /c/:token se conservan; código, SQL y endpoints internos pueden
+seguir en inglés. Callbacks OAuth/deep links no se renombran por esta regla.
+Login y legales migrados por ADR-073; las rutas anteriores conservan redirecciones.
+
 ## Acceso web separado —18/10
 
 /login separa el formulario de /moderacion. AccessViewModel de presentación

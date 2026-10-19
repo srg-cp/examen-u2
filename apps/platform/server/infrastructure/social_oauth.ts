@@ -1,7 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import { ModerationFailure } from '../../shared/features/moderation/domain/moderation.ts';
-import { socialProvider } from '../../shared/features/moderation/domain/social_access.ts';
-import type { SocialProvider } from '../../shared/features/moderation/domain/social_access';
+import { AccessFailure, socialProvider } from '../../shared/features/access/domain/access.ts';
+import type { SocialProvider } from '../../shared/features/access/domain/access';
 export const oauthCookie = 'eh_oauth';
 export const oauthCookiePath = '/api/moderation/oauth';
 type Flow = { state: string; verifier: string; provider: SocialProvider; expiresAt: number };
@@ -23,7 +22,7 @@ export function openOAuthFlow(cookie: string | undefined, state: unknown, secret
     if(typeof flow.state!=='string' || flow.state.length!==state.length || !timingSafeEqual(Buffer.from(flow.state),Buffer.from(state)) ||
       !/^[A-Za-z0-9_-]{64}$/.test(flow.verifier) || !Number.isFinite(flow.expiresAt) || flow.expiresAt<=Date.now() || flow.expiresAt>Date.now()+600001)throw Error();
     socialProvider(flow.provider);return flow;
-  } catch { throw new ModerationFailure('unauthenticated'); }
+  } catch { throw new AccessFailure('unauthenticated'); }
 }
 export function authorizeSocialUrl(backend: string, origin: string, flow: Flow) {
   const callback=new URL('/api/moderation/oauth/callback',origin);callback.searchParams.set('flow',flow.state);

@@ -45,13 +45,13 @@ test('Google and Facebook PKCE callback protect state, replay, origin and review
  };
  for(const provider of ['google','facebook']){
   const {callback,cookie}=await exchange(provider);
-  const noCookie=await fetch(callback,{redirect:'manual',headers:{'Sec-Fetch-Site':'cross-site'}});assert.equal(noCookie.headers.get('location'),'/login?reason=oauth-failed');
-  const wrong=new URL(callback);wrong.searchParams.set('flow','x'.repeat(43));const forged=await fetch(wrong,{redirect:'manual',headers:{Cookie:cookie}});assert.equal(forged.headers.get('location'),'/login?reason=oauth-failed');
-  const result=await fetch(callback,{redirect:'manual',headers:{Cookie:cookie,'Sec-Fetch-Site':'cross-site'}});assert.equal(result.status,303);assert.equal(result.headers.get('location'),'/moderacion');const session=result.headers.getSetCookie().find(c=>c.startsWith('eh_moderation=')&&!c.startsWith('eh_moderation=;'));assert.match(session,/HttpOnly/);assert.match(session,/SameSite=Strict/i);assert.doesNotMatch(session,/mmmmmmmm/);
+  const noCookie=await fetch(callback,{redirect:'manual',headers:{'Sec-Fetch-Site':'cross-site'}});assert.equal(noCookie.headers.get('location'),'/iniciar-sesion?reason=oauth-failed');
+  const wrong=new URL(callback);wrong.searchParams.set('flow','x'.repeat(43));const forged=await fetch(wrong,{redirect:'manual',headers:{Cookie:cookie}});assert.equal(forged.headers.get('location'),'/iniciar-sesion?reason=oauth-failed');
+  const result=await fetch(callback,{redirect:'manual',headers:{Cookie:cookie,'Sec-Fetch-Site':'cross-site'}});assert.equal(result.status,303);assert.equal(result.headers.get('location'),'/inicio');const session=result.headers.getSetCookie().find(c=>c.startsWith('eh_access=')&&!c.startsWith('eh_access=;'));assert.match(session,/HttpOnly/);assert.match(session,/SameSite=Strict/i);assert.doesNotMatch(session,/mmmmmmmm/);
   const check=await fetch(server.origin+'/api/moderation/session',{headers:{Cookie:session.split(';')[0]}});assert.equal(check.status,200);
-  const replay=await fetch(callback,{redirect:'manual',headers:{Cookie:cookie}});assert.equal(replay.headers.get('location'),'/login?reason=oauth-failed');
+  const replay=await fetch(callback,{redirect:'manual',headers:{Cookie:cookie}});assert.equal(replay.headers.get('location'),'/iniciar-sesion?reason=oauth-failed');
  }
- server.oauthDenied(true);let flow=await exchange('google');const forbidden=await fetch(flow.callback,{redirect:'manual',headers:{Cookie:flow.cookie}});assert.equal(forbidden.headers.get('location'),'/login?reason=forbidden');assert.ok(!forbidden.headers.getSetCookie().some(c=>/^eh_moderation=[^;]/.test(c)));
- server.oauthDenied(false);server.oauthCancelled(true);flow=await exchange('facebook');const cancel=await fetch(flow.callback,{redirect:'manual',headers:{Cookie:flow.cookie}});assert.equal(cancel.headers.get('location'),'/login?reason=oauth-cancelled');
+ server.oauthDenied(true);let flow=await exchange('google');const forbidden=await fetch(flow.callback,{redirect:'manual',headers:{Cookie:flow.cookie}});assert.equal(forbidden.headers.get('location'),'/inicio');const ordinaryCookie=forbidden.headers.getSetCookie().find(c=>c.startsWith('eh_access=')&&!c.startsWith('eh_access=;')).split(';')[0];assert.equal((await fetch(server.origin+'/api/moderation/session',{headers:{Cookie:ordinaryCookie}})).status,403);assert.equal((await fetch(server.origin+'/api/access/session',{headers:{Cookie:ordinaryCookie}})).status,200);
+ server.oauthDenied(false);server.oauthCancelled(true);flow=await exchange('facebook');const cancel=await fetch(flow.callback,{redirect:'manual',headers:{Cookie:flow.cookie}});assert.equal(cancel.headers.get('location'),'/iniciar-sesion?reason=oauth-cancelled');
  assert.equal((await fetch(server.origin+'/api/moderation/session',{headers:{'Sec-Fetch-Site':'cross-site'}})).status,403);
 });

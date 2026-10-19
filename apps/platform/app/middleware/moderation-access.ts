@@ -1,16 +1,21 @@
 export default defineNuxtRouteMiddleware(async () => {
-  // The API cookie is scoped to /api/moderation. SSR renders a public skeleton;
-  // browser validation uses that cookie without exposing it to JavaScript.
+  // Both sessions are checked through same-origin APIs; no private SSR payload.
   if (import.meta.server) return;
-  const app = useNuxtApp();
-  // On a direct visit, the screen checks after mounting to preserve SSR hydration.
-  if (app.isHydrating && app.payload.serverRendered) return;
-  const model = app.$accessModel();
+  const nuxt = useNuxtApp();
+  // On direct SSR visits, the mounted screen validates before loading private data.
+  if (nuxt.isHydrating && nuxt.payload.serverRendered) return;
+  const app = useNuxtApp(), account = app.$accessModel();
   try {
-    await model.checkSession();
-    if (model.state.session) return;
-    if (!model.state.failure) return navigateTo('/login', { replace: true });
-    if (model.state.failure.kind === 'forbidden') return navigateTo('/login?reason=forbidden', { replace: true });
-    // A network/server failure is retriable, never proof of missing access.
-  } finally { model.dispose(); }
+    await account.checkSession();
+    if (!account.state.session) return navigateTo(account.state.failure ? '/inicio' : '/iniciar-sesion', { replace: true });
+    if (!account.state.session.profile.onboardingCompleted) return navigateTo('/bienvenida', { replace: true });
+  } finally { account.dispose(); }
+  const reviewer = app.$reviewerAccessModel();
+  try {
+    await reviewer.checkSession();
+    if (reviewer.state.session) return;
+    if (!reviewer.state.failure) return navigateTo('/iniciar-sesion', { replace: true });
+    if (reviewer.state.failure.kind === 'forbidden') return navigateTo('/inicio?reason=forbidden', { replace: true });
+    // A transient reviewer failure is retriable in the moderation screen.
+  } finally { reviewer.dispose(); }
 });

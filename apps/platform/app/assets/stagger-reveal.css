@@ -1,4 +1,6 @@
-.reader-shell .stagger-reveal-item{
+.reader-shell .stagger-reveal-group{position:relative}
+.reader-shell .stagger-reveal-item,
+.reader-shell .stagger-reveal-group:not(.stagger-reveal-ready)>*{
   opacity:0;
   filter:blur(18px);
   transform:translateY(-28px);
@@ -7,7 +9,8 @@
 /* The source effect is static when reduced motion is requested. Inline hidden
    styles must also be overridden, not only transitions. */
 @media(prefers-reduced-motion:reduce){
-  .reader-shell .stagger-reveal-item{
+  .reader-shell .stagger-reveal-item,
+  .reader-shell .stagger-reveal-group>*{
     transition:none!important;
     opacity:1!important;
     filter:none!important;

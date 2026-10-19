@@ -8,7 +8,7 @@ const output=new URL('../../mobile/build/ui-preview/web-toast/',import.meta.url)
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(m.text()))errors.push(m.text());});
- await page.goto(server.origin+'/login',{waitUntil:'networkidle'});
+ await page.goto(server.origin+'/iniciar-sesion',{waitUntil:'networkidle'});
  const submit=page.locator('.login-submit'),toast=page.locator('#notice');
  await submit.click();await toast.waitFor({state:'visible'});await page.waitForTimeout(220);
  assert.equal(await toast.getAttribute('role'),'alert');
@@ -23,7 +23,7 @@ try{
   await page.screenshot({path:fileURLToPath(new URL('error-'+width+'.png',output)),fullPage:true});
   await page.locator('#notice-close').click();
  }
- await page.emulateMedia({reducedMotion:'reduce'});await page.goto(server.origin+'/login?reason=signed-out',{waitUntil:'networkidle'});await toast.waitFor({state:'visible'});
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto(server.origin+'/iniciar-sesion?reason=signed-out',{waitUntil:'networkidle'});await toast.waitFor({state:'visible'});
  assert.equal(await toast.getAttribute('role'),'status');assert.equal(await toast.locator('.notice-icon').evaluate(el=>getComputedStyle(el).color),'rgb(17, 17, 17)');assert.equal(await toast.evaluate(el=>el.getAnimations().length),0);
  await page.screenshot({path:fileURLToPath(new URL('success-reduced-motion.png',output)),fullPage:true});
  await toast.waitFor({state:'hidden',timeout:8000});

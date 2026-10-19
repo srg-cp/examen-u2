@@ -1,5 +1,30 @@
 # Términos de servicio y política de privacidad web
 
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Rutas españolas implementadas —19/10/2026
+
+/terminos y /privacidad son canónicas; /terms y /privacy conservan redirecciones308
+con query. Enlaces cruzados y retorno apuntan al acceso /iniciar-sesion.
+Sin cambios de texto, diseño, persistencia o permisos. QA Chrome de enlaces,
+retorno, SSR sin JS y responsive/texto200% aprobado con fixture.
+[ADR-073](../decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+Sustituye el estado pendiente de la nota siguiente; sin despliegue.
+
+## Convención de rutas aprobada —19/10/2026
+
+[ADR-072](../decisiones/072-rutas-web-en-espanol.md) fija /terminos y /privacidad
+como rutas canónicas objetivo. /terms y /privacy siguen implementadas: al migrar,
+conservar redirecciones y actualizar enlaces cruzados y retorno al acceso.
+Sin cambios de contenido, persistencia, permisos o activación. Validación de
+navegación directa, enlaces y SSR pendiente para esa migración; este incremento
+solo registra la regla y no requiere build/pruebas de aplicación.
+
 ## Retorno legal compacto —19/10/2026
 
 Por solicitud del usuario, el botón izquierdo de /terms y /privacy pasa a

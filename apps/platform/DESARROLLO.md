@@ -1,5 +1,21 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## Acceso general —19/10/2026
+
+Abrir /iniciar-sesion: cuenta válida → /bienvenida o /inicio sin exigir rol.
+Perfil y complete_onboarding usan datos/permisos compartidos con móvil.
+Gestión aparece al confirmar permiso y se valida de nuevo en cada operación.
+Sin registro web ni administración todavía. URLs antiguas de login/legal
+redirigen308. MODERATION_SESSION_SECRET cifra también eh_access
+(HttpOnly/path /api, máximo1h sin refresh token), siempre en servidor.
+Secretos de Google/Facebook pertenecen a Supabase Auth; mantener callback web
+en su allowlist. Origen exacto del navegador según configuración siguiente.
+
+QA fixture: node scripts/check-login-browser.mjs incluye bienvenida/inicio,
+roles/OAuth/cierre entre pestañas. Los scripts de moderación, legales y stagger
+siguen disponibles; requieren build y Playwright/Chrome como indica README.
+No usan cuentas reales ni hacen despliegues.
+
 ## Incremento HU-14.3: administración solo web
 
 /moderacion utiliza acceso real y roles de servidor, sin equivalente Flutter.
@@ -47,6 +63,22 @@ Si utilizas .env.local, iniciar con `npm run dev -- --dotenv .env.local` para
 seleccionarlo explícitamente. No renombrar ni sobrescribir ese archivo. En Dokploy
 siguen usándose las variables del contenedor; .env.local no entra en la imagen.
 
+Para este servidor local, configurar `PUBLIC_WEB_ORIGIN=http://127.0.0.1:5173`
+y abrir ese mismo origen (localhost es un origen distinto). No copiar aquí el
+dominio HTTPS de producción: los POST se rechazarían por origen y las cookies
+se configurarían para HTTPS. Reiniciar el proceso después de cambiar el entorno.
+
+Si el acceso muestra «No pudimos conectar», revisar el estado HTTP de
+`/api/moderation/oauth/start`: un 403 con `invalid_request` puede indicar origen
+incorrecto. Un 503 con `unavailable`, enviando JSON válido y un proveedor admitido,
+apunta a configuración del acceso ausente o inválida en ese proceso servidor;
+esta ruta genera la URL sin contactar a Google/Facebook ni a Supabase.
+Comprobar `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (publicable/anon),
+`MODERATION_SESSION_SECRET` (mínimo32 caracteres) y `PUBLIC_WEB_ORIGIN`.
+En producción se configuran en el servicio Dokploy y requieren reiniciar o
+redesplegar con autorización; tenerlas en .env.local no configura el contenedor.
+No mostrar valores secretos en capturas, logs o documentación.
+
 ## Qué estás programando
 
 Un archivo .vue puede contener `<script setup lang="ts">` para estado/acciones,
@@ -69,6 +101,12 @@ servidor de lectura y renderizado público. Elegimos Nuxt para una web con conte
 público, QR y zonas privadas futuras. No cambia Flutter ni las políticas SQL.
 
 ## Validación y producción
+
+Entrada sin login intermedio (ADR-078): `scripts/check-session-entry-browser.mjs`
+usa PLAYWRIGHT_MODULE/CHROME_PATH y build vigente con backend fixture. Comprueba
+SSR/SPA, onboarding, migración real de cookie /api a /, ausencia de montaje del
+login con sesión, redirección sin JavaScript y cierre/recarga. eh_access ahora
+usa path / para la validación SSR; el cierre limpia también el alcance anterior.
 
 HU-10.1: aplicar024 en desarrollo después de023 antes de probar envíos reales.
 PUBLIC_WEB_ORIGIN limita POST al origen exacto: `https://entrehuellas.kormind.com`
