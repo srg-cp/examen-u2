@@ -1,9 +1,9 @@
 # Cierre y recuperación
 
-**Auditoría de seguimiento18/10:** HU-13/#13 sigue In progress: pruebas locales412 aprobadas, pero main aún no contiene case_closure y028 no está confirmado aplicado. Pendiente integración/activación/demo real; no se pide reaplicar027.
+**Actualización18/10:** el usuario confirma028 aplicado y autoriza pasar a HU-14.1. No se solicita reaplicarlo. Demo real/integración sin nueva evidencia; Firebase/FCM fuera del alcance.
 
 HU-13 / RF-07; issue #13. Implementado localmente en `case_closure` sobre el
-cierre anticipado de HU-05/06. Historia abierta;028 y demo remota pendientes.
+cierre anticipado de HU-05/06. Historia abierta;028 confirmado por el usuario, demo remota pendiente.
 
 ## Qué hace y recorrido
 
@@ -47,8 +47,7 @@ ambiguo solicita confirmación. No hay borrador durable offline nuevo (HU-15).
 
 ## Dependencias y activación
 
-Requiere027 ya confirmado por usuario; no reaplicarlo. Ejecutar todo
-`database/patchs/028_patch_case_closure.sql` en desarrollo y actualizar Flutter.
+Requiere027 ya confirmado por usuario; no reaplicarlo. 028 ya aplicado según confirmación del usuario; no reaplicarlo. Actualizar Flutter.
 No requiere cambios ni despliegue Nuxt para consumir el estado cerrado del QR.
 FCM/Firebase siguen pospuestos según ADR-068; no activar emisor ni cron. Si en el
 futuro se activa push, los mensajes ya en tránsito no pueden retirarse; se

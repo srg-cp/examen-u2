@@ -15,12 +15,14 @@ class FoundDetailScreen extends ConsumerWidget {
     this.posterAction,
     this.timelineAction,
     this.followAction,
+    this.reportAction,
     super.key,
   });
   final Widget? savedAction;
   final Widget? posterAction;
   final Widget? timelineAction;
   final Widget? followAction;
+  final Widget? reportAction;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,6 +73,7 @@ class FoundDetailScreen extends ConsumerWidget {
                         ].contains(state.requireValue.value!.reportKind))
                       followAction!,
                     if (timelineAction != null) timelineAction!,
+                    if (reportAction != null) reportAction!,
                     if ((state.requireValue.value!.canGeneratePoster ||
                             state.requireValue.value!.canResolve) &&
                         posterAction != null)

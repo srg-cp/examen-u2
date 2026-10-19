@@ -1,6 +1,11 @@
 # ADR-069: cierre de recuperación con recibo privado
 
-Fecha: 18/10/2026. Estado: implementada localmente, activación pendiente.
+Actualización18/10:028 aplicado según confirmación expresa del usuario, sin
+inspección remota independiente. Se autoriza avanzar a HU-14.1; la demo real
+permanece sin evidencia nueva. Firebase/FCM está fuera del alcance.
+
+
+Fecha: 18/10/2026. Estado: implementada localmente, 028 confirmado aplicado, demo real pendiente.
 Trazabilidad: HU-13 / RF-07; issue #13 independiente del número de historia.
 
 ## Decisión
@@ -59,4 +64,4 @@ Flutter de dominio/DTO/ViewModel, sesión/disposición, reintento/conflicto y UI
 normal/pequeña con texto2; navegación real comunitaria incluida en regresión.
 PGlite serializa una conexión: no certifica contención multiconexión hosted.
 Evidencia definitiva, build y pendientes en ESTADO. No se cierra la historia
-hasta aplicar028 y realizar demo con Supabase/Android reales.
+hasta contar con integración y demo con Supabase/Android reales.

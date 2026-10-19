@@ -1,3 +1,5 @@
+import '../features/content_reports/presentation/screens/content_report_screen.dart';
+import '../features/content_reports/presentation/widgets/report_content_button.dart';
 import '../features/case_closure/presentation/screens/case_closure_screen.dart';
 import '../features/found_cases/presentation/view_models/found_read_view_model.dart';
 import '../features/explore/presentation/view_models/explore_view_model.dart';
@@ -127,6 +129,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
+              state.uri.path.startsWith('/home/denounce/') ||
               state.uri.path.startsWith('/home/closure/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
@@ -323,6 +326,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
+                reportAction: ReportContentButton(
+                  target: (kind: 'found', id: state.pathParameters['id']!),
+                ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(
                   target: (kind: 'found', id: state.pathParameters['id']!),
@@ -392,6 +398,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
+                reportAction: ReportContentButton(
+                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(
                   target: (kind: 'lost', id: state.pathParameters['id']!),
@@ -432,6 +441,31 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
               child: const AlertPreferencesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'denounce/:kind/:id',
+            redirect: (_, state) =>
+                ![
+                      'lost',
+                      'found',
+                      'sighting',
+                    ].contains(state.pathParameters['kind']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ContentReportScreen(
+                target: (
+                  kind: state.pathParameters['kind']!,
+                  id: state.pathParameters['id']!,
+                ),
+              ),
             ),
           ),
           GoRoute(
@@ -492,6 +526,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                   key: state.pageKey,
                   source: state.extra,
                   child: SightingReviewScreen(
+                    reportAction: ReportContentButton(
+                      target: (
+                        kind: 'sighting',
+                        id: state.pathParameters['sighting']!,
+                      ),
+                    ),
                     reviewKey: (
                       target: (
                         id: state.pathParameters['id']!,

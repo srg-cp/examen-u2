@@ -1,5 +1,14 @@
 # Base de datos de Entre Huellas
 
+HU-14.1/#43: fuentes099–101/plan029, migración20261018002900_content_reports.sql
+y patch029 generados mediante Build-ContentReportsPatch.ps1/Build-RunAll.ps1.
+Denuncias privadas, recursos autorizados, recibo estable y revisor asignado por
+servidor; sin ocultamiento/cierre automático.028 ya aplicado según usuario;
+no modificar/reaplicar sus fuentes.029/validación remota pendientes.
+[Ficha](../docs/funcionalidades/denuncias-contenido.md),
+[ADR-070](../docs/decisiones/070-denuncias-privadas-idempotentes.md).
+
+
 HU-13,18/10: fuentes096–098/plan028 generan migración028 y
 [patch028](patchs/028_patch_case_closure.sql), después de027 confirmado por usuario.
 Recibo privado/RLS, cierre atómico autorizado e idempotente con auditoría,

@@ -1,5 +1,11 @@
 # Funcionalidades de Entre Huellas
 
+Actualización18/10: el usuario confirma028 aplicado y autoriza continuar HU-14.1.
+[Denuncias de contenido](denuncias-contenido.md) implementada localmente;029/demo
+pendientes. Firebase/FCM fuera del alcance; no bloquea la entrega. Estado remoto
+del tablero conservado como última instantánea, sin nuevas acciones GitHub.
+
+
 Auditoría ampliada18/10:27 Done,9 In progress,2 Ready y13 Backlog. Se
 corrigieron20 tarjetas más tras contrastar integración/pruebas/confirmaciones.
 [Motivo vigente por historia](../backlog/AUDITORIA_2026-10-18.md); las notas
@@ -21,7 +27,8 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Cierre y recuperación](cierre-y-recuperacion.md) | case_closure / SQL Supabase | HU-13; RF-07; issue #13; implementación local,028/demo pendientes |
+| [Denuncias de contenido](denuncias-contenido.md) | content_reports / SQL Supabase | HU-14.1; RF-22; issue #43; implementación local,029/demo pendientes |
+| [Cierre y recuperación](cierre-y-recuperacion.md) | case_closure / SQL Supabase | HU-13; RF-07; issue #13; 028 confirmado aplicado; demo/integración pendientes |
 | [Seguimiento y alertas](seguimiento-y-alertas.md) | notifications / SQL Supabase | HU-12.1/12.2; RF-16,17,18; issues #40/#41;027 confirmado, demo pendiente. HU-12.3/#42 FCM/Firebase pospuesta (ADR-068) |
 | [Identidad visual y marca](identidad-visual.md) | core branding / apps/platform | Petición17/10/2026; sin HU/issue nuevo |
 | [Landing pública](landing-page.md) | apps/platform (Vue/Nuxt) | Ampliación del usuario; integración17/10/2026; sin HU/issue nuevos |
@@ -42,7 +49,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Preferencias de alertas](preferencias-alertas.md) | alert_preferences | HU-02.2; RF-02,16; issue #27 y épica #2;011/HU-02 confirmados; Done |
 | [Casos perdidos](casos-perdidos.md) | lost_cases | HU-05; RF-05; issue #5; entrega integrada; Done |
 | [Avisos y reportes anteriores](casos-encontrados.md) | found_cases | HU-06; RF-06; issue #6; alcance ADR-034 integrado; Done |
-| [Búsquedas y avisos vinculados](busquedas-y-avisos.md) | lost_cases / found_cases | HU-05/06 Done; partes HU-10; cierre nuevo HU-13 pendiente integración/028/demo; ADR-034 |
+| [Búsquedas y avisos vinculados](busquedas-y-avisos.md) | lost_cases / found_cases | HU-05/06 Done; partes HU-10; cierre nuevo HU-13 028 confirmado; integración/demo pendientes; ADR-034 |
 | [Explorar: lista y mapa filtrados](explorar.md) | explore | HU-07.1/07.2; RF-13; issues #32/#33 y épica #7; integración/Android real; Done |
 | [Mis reportes](mis-reportes.md) | found_cases / dominio lost_cases | HU-05/06; consulta unificada; ADR-036 |
 

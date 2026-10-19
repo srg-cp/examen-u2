@@ -1,5 +1,14 @@
 # Arquitectura de Entre Huellas
 
+HU-14.1/#43 (18/10): content_reports separa dominio/caso de uso/contrato,
+DTO/fuente/repositorio, providers declarativos y presentación autoDispose. App
+compone accesos desde fichas/revisión mediante slots. SQL099–101/plan029 persiste
+denuncias privadas con UUID estable y autorización por recurso; lectura solo
+denunciante/revisor asignado en servidor, sin autoasignación ni cambios operativos
+automáticos. [ADR-070](decisiones/070-denuncias-privadas-idempotentes.md).028
+confirmado aplicado por usuario. Firebase/FCM fuera del alcance.
+
+
 HU-13 (18/10): case_closure añade dominio/casos de uso/repositorio, DTO/fuente
 Supabase, providers declarativos y ViewModel autoDispose. App compone ruta desde
 fichas y actualiza consultas; sin imports de presentation/data entre módulos.

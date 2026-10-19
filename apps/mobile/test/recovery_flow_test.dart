@@ -1,6 +1,10 @@
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
 import 'dart:io';
+import 'content_reports_test.dart' show FakeReports;
+import 'package:flutter_application_entrehuellas/features/content_reports/providers/content_report_providers.dart';
+import 'package:flutter_application_entrehuellas/features/content_reports/presentation/screens/content_report_screen.dart';
+import 'package:flutter_application_entrehuellas/features/content_reports/presentation/view_models/content_report_view_model.dart';
 import 'case_closure_test.dart' show FakeClosure;
 import 'package:flutter_application_entrehuellas/features/case_closure/domain/entities/case_closure.dart';
 import 'package:flutter_application_entrehuellas/features/case_closure/providers/case_closure_providers.dart';
@@ -101,6 +105,7 @@ void main() {
         final pets = FakePets();
         final scope = ProviderContainer(
           overrides: [
+            contentReportRepositoryProvider.overrideWithValue(FakeReports()),
             caseClosureRepositoryProvider.overrideWithValue(closures),
             sightingRepositoryProvider.overrideWithValue(FakeSightings()),
             caseTimelineRepositoryProvider.overrideWithValue(FakeTimeline()),
@@ -215,6 +220,26 @@ void main() {
         );
         expect(timeline.target.id, search.id);
         expect(timeline.target.community, true);
+        router.pop();
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.text('Denunciar contenido', skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Denunciar contenido', skipOffstage: false));
+        await tester.pumpAndSettle();
+        expect(find.byType(ContentReportScreen), findsOneWidget);
+        final reportScreen = tester.widget<ContentReportScreen>(
+          find.byType(ContentReportScreen),
+        );
+        expect(reportScreen.target, (kind: 'found', id: search.id));
+        final reportModel = scope.read(
+          contentReportViewModelProvider(reportScreen.target).notifier,
+        );
+        reportModel.edit(reason: 'Publicación que requiere revisión');
+        expect(await reportModel.submit(), true);
+        await tester.pumpAndSettle();
+        expect(find.text('Denuncia registrada'), findsOneWidget);
         router.pop();
         await tester.pumpAndSettle();
         await tester.ensureVisible(

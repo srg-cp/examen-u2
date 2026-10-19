@@ -1,5 +1,12 @@
 # Backlog de Entre Huellas
 
+**Avance local posterior18/10:**028 confirmado aplicado; el usuario autoriza
+HU-14.1/#43, implementada localmente en feature/content-reports, pendiente029/demo.
+[Denuncias](../funcionalidades/denuncias-contenido.md). Tabla y estados remotos
+inferiores conservan la última instantánea API; sin sincronización GitHub nueva.
+Firebase/FCM fuera del alcance, sin considerarlo bloqueo de las historias activas.
+
+
 Sincronización auditada: **18 de octubre de 2026**, America/Lima.
 [Tablero](https://github.com/users/srg-cp/projects/3) · [Issues](https://github.com/srg-cp/entrehuellas/issues) · [Auditoría y evidencia](AUDITORIA_2026-10-18.md).
 

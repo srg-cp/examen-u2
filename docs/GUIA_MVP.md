@@ -1,5 +1,12 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+**Avance18/10:** usuario confirma028 aplicado y autoriza HU-14.1/#43 de S6.
+Denuncia Android/SQL implementada localmente, pendiente029/demo/integración.
+[Alcance y validación](funcionalidades/denuncias-contenido.md). Firebase/FCM está
+fuera del alcance activo; no se condiciona este avance a su activación.
+Las referencias históricas a028 pendiente quedan sustituidas por la confirmación.
+
+
 **Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
 
 Fecha: 4 de octubre de 2026. Repositorio: https://github.com/srg-cp/entrehuellas.

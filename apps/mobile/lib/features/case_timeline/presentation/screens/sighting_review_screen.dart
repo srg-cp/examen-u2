@@ -26,10 +26,12 @@ class SightingReviewScreen extends ConsumerStatefulWidget {
   const SightingReviewScreen({
     required this.reviewKey,
     this.createTileProvider,
+    this.reportAction,
     super.key,
   });
   final ReviewKey reviewKey;
   final TileProvider Function()? createTileProvider;
+  final Widget? reportAction;
   @override
   ConsumerState<SightingReviewScreen> createState() =>
       _SightingReviewScreenState();
@@ -179,6 +181,7 @@ class _SightingReviewScreenState extends ConsumerState<SightingReviewScreen> {
               ),
               const SizedBox(height: 12),
               Text(d.comment.isEmpty ? 'Sin comentario' : d.comment),
+              if (widget.reportAction != null) widget.reportAction!,
               const SizedBox(height: 16),
               ZoneMapPicker(
                 latitude: d.latitude,

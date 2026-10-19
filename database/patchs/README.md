@@ -1,5 +1,12 @@
 # Patches manuales de Supabase
 
+**Actualización18/10:**028 confirmado aplicado por el usuario, sin reaplicarlo.
+Nuevo incremento HU-14.1: [029_patch_content_reports.sql](029_patch_content_reports.sql)
+completo después de028 y Flutter actualizado. Generado desde099–101/plan029;
+029 pendiente en desarrollo. No requiere Firebase/FCM ni despliegue Nuxt.
+La indicación inferior de028 pendiente es anterior a esta confirmación.
+
+
 HU-13: ejecutar completo [028_patch_case_closure.sql](028_patch_case_closure.sql)
 después de027 ya confirmado, sin reaplicarlo. Actualizar Flutter; el QR Nuxt
 existente reconoce el cierre sin despliegue nuevo. Generar con

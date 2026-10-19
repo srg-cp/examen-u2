@@ -1,5 +1,70 @@
 # Estado del proyecto
 
+## Denuncias de contenido — HU-14.1 / RF-22, issue #43 — 18/10/2026
+
+El usuario confirma028 aplicado y autoriza pasar al siguiente incremento. Se
+registra la confirmación sin nueva inspección remota ni exigir reaplicarlo.
+Firebase/FCM queda fuera del alcance activo y de sus criterios de avance;
+no es bloqueo ni tarea pendiente de esta entrega. ADR-068 sigue vigente.
+La demo real de HU-13 no se inventa ni se considera acreditada por aplicar SQL.
+
+Implementación local en feature/content-reports, conservando el trabajo existente.
+Durante el trabajo se observa el commit externo afe4831 con las pruebas/auditoría
+previas; no se hizo commit/push/PR, merge, despliegue ni cambio GitHub aquí.
+Se conservan los estados remotos como última instantánea, sin cierre de historias.
+
+Fichas de casos perdidos/búsquedas comunitarias/avisos/reportes anteriores y
+revisión privada de avistamiento → Denunciar contenido → motivo obligatorio500
+caracteres Unicode/evidencia escrita opcional1000 → Enviar denuncia → recibo
+persistido con actor/fecha servidor/referencia. Sin adjuntos nuevos, ocultamiento,
+bloqueo, decisión automática, apelación ni paneles/guards vacíos. La denuncia no
+altera estado del caso, contador, historial de recuperación ni revisión del aviso.
+
+Módulo content_reports con dominio/caso de uso/contrato, DTO/fuente/repositorio,
+providers declarativos y estado/ViewModel autoDispose. Bootstrap/main inyectan
+implementaciones; app/router compone slots en fichas/revisión. Shell/glass,
+transición desde botón compartido, cover/stagger, inputs/contadores, toast/shake,
+skeleton/shimmer reutilizados. Cabecera estable; edición no reinicia entrada.
+Recibo solo tras confirmación remota; doble envío bloqueado. Respuesta ambigua
+congela orden/contenido para repetir el mismo UUID; conflicto bloquea cambios.
+Cambio/error de sesión/disposición descarta respuestas tardías y oculta datos;
+recuperación de la misma cuenta permite empezar limpio. Salida con borrador o
+resultado ambiguo pide confirmación. Borrador durable offline corresponde a HU-15.
+
+SQL099–101/plan029, migración y patch generados; run_all regenerado con los scripts
+versionados, sin cambiar SQL028 aplicado. RLS/tablas sin grants directos de
+cliente/servicio. RPC autoriza visibilidad mediante proyecciones existentes y
+acceso privado a cronología para avistamientos; UUID serializado/replay/conflicto.
+Recibo repetible tras retirar el recurso, nuevo envío exige visibilidad vigente.
+Lectura de denuncia solo por su denunciante o revisor asignado por servidor;
+registro privado de revisores sin autoasignación ni usuarios predeterminados.
+No se expone evidencia al autor denunciado por el mero hecho de ser autor.
+
+Validación Flutter: análisis final sin incidencias, formato de570 archivos sin
+cambios.18 pruebas dirigidas aprobadas:7 del módulo,9 de arquitectura y2 recorridos
+reales normal/pequeño que ahora incluyen entrar desde ficha comunitaria, guardar
+recibo y retornar. Suite Flutter completa con concurrencia2:419 pruebas aprobadas.
+Renders390×844/320×350 texto2 revisados en build/ui-preview/content-reports;
+campos/acciones/recibo accesibles por scroll. Son fixtures, no demo Android hosted.
+
+Tres escenarios SQL nuevos aprobados: permisos/Unicode/replay/conflicto y recurso
+retirado, lectura privada/revisor/revocación/escalada, avistamiento autorizado y
+solicitudes encoladas sin duplicado; incluyen repetición del bundle y ciclo de
+vida operativo intacto. Regresión SQL completa:37 pruebas aprobadas,0 fallos (npm test).
+PGlite usa una conexión,
+no certifica contención hosted multiconexión. Sin cambios web ni build APK nuevo.
+
+Logs hu14-{generation,analyze-final,format-final,tests-final,full-mobile,sql,
+full-sql}.log en apps/mobile/build. Análisis inicial tuvo4 avisos de estilo,
+corregidos; verificación final limpia. Actualizados ADR-070, ficha/índice,
+arquitectura/diseño/configuración/guía y backlog local. No se da HU-14 completa.
+
+Pendiente aplicar029 completo en desarrollo y actualizar Flutter; demo con
+Supabase real para denunciante, autor, usuario ajeno y revisor asignado/revocado,
+pérdida de respuesta y concurrencia multiconexión. Después continuar moderación
+según las siguientes historias; bloqueo HU-14.2 conserva refinamiento pendiente.
+
+
 ## Auditoría ampliada de tarjetas en progreso — 18/10/2026
 
 Por solicitud del usuario se revisaron las29 In progress, además del inventario

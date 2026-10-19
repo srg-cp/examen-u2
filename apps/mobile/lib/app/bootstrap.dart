@@ -1,3 +1,6 @@
+import '../features/content_reports/domain/repositories/content_report_repository.dart';
+import '../features/content_reports/data/repositories/content_report_repository_impl.dart';
+import '../features/content_reports/data/data_sources/content_report_source.dart';
 import '../features/case_closure/domain/repositories/case_closure_repository.dart';
 import '../features/case_closure/data/repositories/case_closure_repository_impl.dart';
 import '../features/case_closure/data/data_sources/case_closure_source.dart';
@@ -98,6 +101,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.contentReportRepository = const UnavailableContentReportRepository(),
     this.caseClosureRepository = const UnavailableCaseClosureRepository(),
     this.notificationRepository = const UnavailableNotificationRepository(),
     this.pushRepository = const UnavailablePushRepository(),
@@ -126,6 +130,7 @@ class AppBootstrap {
   });
 
   final CaseClosureRepository caseClosureRepository;
+  final ContentReportRepository contentReportRepository;
   final StartupState state;
   final NotificationRepository notificationRepository;
   final PushRepository pushRepository;
@@ -173,6 +178,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          contentReportRepository: ContentReportRepositoryImpl(
+            SupabaseContentReportSource(supabase.client),
+          ),
           caseClosureRepository: CaseClosureRepositoryImpl(
             SupabaseCaseClosureSource(supabase.client),
           ),

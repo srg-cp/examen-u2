@@ -1,5 +1,17 @@
 # Configuración y validación de la app
 
+## Denuncias de contenido — HU-14.1, patch029
+
+028 aplicado según confirmación del usuario; no reaplicarlo. Para este incremento
+aplicar completo [029_patch_content_reports.sql](../database/patchs/029_patch_content_reports.sql)
+en desarrollo y actualizar Flutter.029 aún no aplicado ni verificado remotamente.
+No requiere Nuxt ni Firebase/FCM. No hay revisores predeterminados: la asignación
+en content_report_reviewers es una operación privilegiada de servidor, nunca
+metadatos de cuenta ni una acción cliente. Demo real debe probar denunciante,
+autor ajeno y revisor/revocación; la tabla de roles no tiene acceso directo cliente.
+Las notas antiguas de028 pendiente inferiores quedan sustituidas por esta confirmación.
+
+
 **Google, auditoría18/10:** el authorize público devuelve302 a Google con
 redirect_uri https://entrehuellas-supabase.kormind.com/auth/v1/callback,
 sin duplicación. El diagnóstico de ruta duplicada del7/10 es histórico; no

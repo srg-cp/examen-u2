@@ -1,5 +1,12 @@
 # Diseño de la interfaz: implementación y revisión
 
+Android18/10, HU-14.1: Denunciar contenido abre Denuncia desde fichas y revisión
+privada con transición desde el botón compartido. Shell/glass/cover/stagger,
+inputs/contadores500 y1000, toast/invalid/shake, skeleton/shimmer. Recibo tras
+persistencia; salida con borrador/ambigüedad confirmada. Renders390×844 y
+320×350/texto2 en apps/mobile/build/ui-preview/content-reports, revisados.
+
+
 Android18/10, HU-13: Ya fue recuperada abre Cierre con la transición del
 botón compartido. CaseScreenShell mantiene glass/cabecera y cover/stagger; motivo
 y evidencia testimonial opcional usan AppTextField/contador500, toast/invalid/
