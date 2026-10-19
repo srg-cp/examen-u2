@@ -1,5 +1,90 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Referencia web consolidada —19/10/2026
+
+Las [reglas web](REGLAS_UI_UX_WEB.md) contienen los valores vigentes. Las notas
+fechadas anteriores son el historial; no recuperar sus medidas sustituidas.
+
+| Componente | Implementación vigente |
+| --- | --- |
+| Stagger de login | useStaggerReveal + vStaggerReveal; transiciones originales de sader-panel, doble rAF, will-change persistente,850ms/90ms, blur18px/offset−28px; CSSOM compatible con CSP. |
+| Icono de login | Entrada en wrapper exterior, hover1.05 interior; no reinicia al editar. |
+| TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X, cierre al tocar, entrada180ms. |
+| Retorno legal |36×36px, chevrón16px, circular glass/blur22px; variante local en LegalPage. |
+| Enlace legal derecho | Mínimo36px, padding8/12px, radio calc(.625rem + 8px), texto14px/500/línea20px, flecha16px. |
+| Fuente legal | DM Sans local, solo /terms y /privacy. |
+
+Conservar movimiento reducido, foco/tooltip, cierre y reintento del toast,
+limpieza al desmontar y lectura sin recortes con texto ampliado. El retorno
+compartido fuera de legales mantiene52px/icono28px. La paleta y el orbe vigentes
+se conservan. ESTADO y las fichas de acceso/documentos legales registran el QA.
+
+## DM Sans legal y glass corregido —18/10
+
+/terms y /privacy usan DM Sans variable local, incluido título/cuerpo/metadatos.
+Reloj/anuncio Material Symbols Outlined filled a16px; retorno Material Rounded
+chevron16px dentro de glass36px/blur22px en legales (actualizado19/10). Sustituye glyph tipográfico y dibujos
+aproximados. Login conserva Arial. Font/iconos/licencias en platform/ASSETS_UI;
+QA responsive y de moderación en ESTADO/ficha legal.
+
+## Documentos legales: composición sader-panel —18/10
+
+Referencia vigente: barra dentro del documento, retorno glass original en flujo,
+link cruzado/flecha, título centrado y fecha/anuncio con iconos locales. DM Sans
+con h145/h232/cuerpo16, ancho896px/padding24–48. Orbe medium fijo detrás del
+viewport de lectura con scroll propio, sin atenuación vertical. Sin índice extra
+ni cover del artículo. Capturas login-legal y resultados en ESTADO/ficha legal.
+
+## Entrada de login sin destello amarillo —18/10
+
+Referencia vigente: sader-panel850ms/90ms, blur18→0, translateY(-28)→0 y
+opacidad0→1 para icono/nombre/título/lema/formulario/legales. Sin .reveal ni
+cover crema solo en login. Sustituye entrada previa700ms del icono. Capturas
+de recarga inicio/mitad/final en build/ui-preview/login-reload; datos/sesión
+y edición no reinician la entrada. Reglas web y ficha acceso-web actualizadas.
+
+## Login y documentos legales —18/10
+
+AmbientPageShell compartido: orbe strong en login y soft en /terms y /privacy.
+Icono con entrada/hover como referencia sader-panel, sin reinicio por edición
+y estático con movimiento reducido. Enlaces legales bajo el formulario; lectura
+con índice, retorno glass, navegación cruzada y correo confirmado. Arial
+conservada. Ficha documentos-legales y ESTADO registran QA y límites.
+
+## Login: formulario estable y acceso social —18/10
+
+Formulario visible desde SSR, sin sustitución por skeleton al consultar sesión;
+controles bloqueados durante esa consulta, sin shimmer por deshabilitación.
+Retirado el texto de cuentas autorizadas. Separador y botones Google/Facebook
+con iconos locales, cápsula blanca/borde suave, altura mínima60 y texto1rem.
+Shimmer solo en el proveedor solicitado durante trabajo real; errores/cancelación
+al toast superior. Arial y composición móvil conservados. Capturas web-login
+actualizadas en escritorio/móvil/texto200%; detalle en ficha acceso-web.
+
+## Login web —18/10, referencia móvil y sader-panel
+
+Por solicitud posterior del usuario: composición centrada sin tarjeta exterior,
+marca grande/nombre en dos líneas, campos suaves con iconos y control de
+contraseña. Arial de web conservada. WebShell minimal, fondo blanco/celeste/cream
+y resplandor soft; botón carbón como en móvil. LoginInput reutilizado en ambos
+campos, radio22px/alto mínimo76px, etiquetas flotantes, foco y toast/invalid/shake.
+Capturas aprobadas localmente en apps/mobile/build/ui-preview/web-login, incluido
+320px/texto200%. Detalle, permisos y límites en ficha acceso-web.
+
+## Moderación web —18/10
+
+Solo apps/platform, sin equivalente administrativo Flutter. /moderacion reutiliza
+WebShell (variante ancha alineada), ActionButton (envío semántico), TopToast y
+ContentSkeleton con etiqueta accesible por recorrido. GlassNavigationButton
+web compartido para retorno flotante; ConfirmationDialog nativo modal con foco,
+Escape y cancelación para decisiones/salida. Crema/Arial/celeste y cápsulas de
+la landing; paneles de trabajo, dos columnas desde850px, una columna pequeña.
+Cabecera fuera del reveal; edición/refresh no reinician entrada. Motivo con
+contador500, inválido/shake/toast y shimmer real con etiqueta estable.
+Capturas de validación en apps/mobile/build/ui-preview/moderation-web; resultados
+finales en ESTADO. [Ficha](funcionalidades/moderacion-web.md).
+
+
 Android18/10, HU-14.1: Denunciar contenido abre Denuncia desde fichas y revisión
 privada con transición desde el botón compartido. Shell/glass/cover/stagger,
 inputs/contadores500 y1000, toast/invalid/shake, skeleton/shimmer. Recibo tras

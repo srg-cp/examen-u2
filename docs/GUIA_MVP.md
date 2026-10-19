@@ -1,5 +1,37 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Documentos legales del acceso —18/10/2026
+
+El usuario solicita animación del icono, orbe en login y enlaces de términos/
+privacidad. /terms y /privacy públicas, con correo y responsable confirmados;
+ampliación autorizada del acceso, sin nueva HU/issue ni funciones administrativas
+por arrastre. Sin SQL/móvil/despliegue. Ver ficha documentos-legales y ESTADO.
+
+## Ampliación autorizada de acceso web social —18/10/2026
+
+El usuario solicita Google/Facebook como en móvil, retirar texto de cuentas
+autorizadas y revisar skeleton. Implementación de /login dentro del incremento
+HU-14.3 / issue #45; no crea una HU/issue nuevo ni cierra historia automáticamente.
+PKCE y permisos en servidor, sin cambios SQL/móvil. Configuración de proveedores,
+allowlist web y demo real pendientes; [ficha](funcionalidades/acceso-web.md).
+
+## Separación del login web —18/10/2026
+
+Petición explícita del usuario: /login separado y redirecciones de /moderacion,
+login, logout y expiración. Incremento de acceso de HU-14.3 / issue #45, sin
+registro ni nuevos roles/HU, sin SQL ni cambio de alcance móvil.
+[Ficha de acceso](funcionalidades/acceso-web.md) y ESTADO separan QA fixture
+de validación remota pendiente.030 ya confirmado por usuario.
+
+**Incremento18/10 HU-14.3/#45:** usuario autoriza moderación exclusivamente en
+apps/platform; móvil conserva denuncia de usuario, sin administración. Se
+implementa cola/revisión/decisión con auditoría y visibilidad independiente del
+estado del caso.029 ya aplicado según usuario;030/configuración/demo pendientes.
+HU-14.2 bloqueo y HU-14.4 apelación no se entregan por arrastre. FCM fuera del
+alcance. [Ficha](funcionalidades/moderacion-web.md),
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md).
+
+
 **Avance18/10:** usuario confirma028 aplicado y autoriza HU-14.1/#43 de S6.
 Denuncia Android/SQL implementada localmente, pendiente029/demo/integración.
 [Alcance y validación](funcionalidades/denuncias-contenido.md). Firebase/FCM está

@@ -1,8 +1,21 @@
 # Funcionalidades de Entre Huellas
 
+Confirmación posterior18/10:030 aplicado por usuario. Moderación web conserva
+configuración/rol/login y demo real por verificar; no reaplicar030.
+
+
+Moderación18/10: administración exclusivamente web por instrucción del usuario.
+[Revisión y moderación](moderacion-web.md), HU-14.3/#45 implementada localmente;
+030/configuración/demo pendientes. No se incorpora administración a Flutter.
+
+
+Actualización posterior18/10:029 aplicado según confirmación del usuario.
+HU-14.1 conserva validación real/integración pendientes; no reaplicar029.
+
+
 Actualización18/10: el usuario confirma028 aplicado y autoriza continuar HU-14.1.
-[Denuncias de contenido](denuncias-contenido.md) implementada localmente;029/demo
-pendientes. Firebase/FCM fuera del alcance; no bloquea la entrega. Estado remoto
+[Denuncias de contenido](denuncias-contenido.md) implementada localmente;029 confirmado, demo
+pendiente. Firebase/FCM fuera del alcance; no bloquea la entrega. Estado remoto
 del tablero conservado como última instantánea, sin nuevas acciones GitHub.
 
 
@@ -27,7 +40,10 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Denuncias de contenido](denuncias-contenido.md) | content_reports / SQL Supabase | HU-14.1; RF-22; issue #43; implementación local,029/demo pendientes |
+| [Documentos legales web](documentos-legales.md) | apps/platform | /terms y /privacy; ampliación explícita18/10, sin HU/issue nuevo |
+| [Acceso web](acceso-web.md) | apps/platform | /login separado; HU-14.3 / issue #45; validación local, demo remota pendiente |
+| [Revisión y moderación web](moderacion-web.md) | apps/platform / SQL Supabase | HU-14.3; RF-22,33; issue #45;030/configuración/demo pendientes |
+| [Denuncias de contenido](denuncias-contenido.md) | content_reports / SQL Supabase | HU-14.1; RF-22; issue #43;029 confirmado; demo/integración pendientes |
 | [Cierre y recuperación](cierre-y-recuperacion.md) | case_closure / SQL Supabase | HU-13; RF-07; issue #13; 028 confirmado aplicado; demo/integración pendientes |
 | [Seguimiento y alertas](seguimiento-y-alertas.md) | notifications / SQL Supabase | HU-12.1/12.2; RF-16,17,18; issues #40/#41;027 confirmado, demo pendiente. HU-12.3/#42 FCM/Firebase pospuesta (ADR-068) |
 | [Identidad visual y marca](identidad-visual.md) | core branding / apps/platform | Petición17/10/2026; sin HU/issue nuevo |

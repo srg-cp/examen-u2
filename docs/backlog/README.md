@@ -1,5 +1,11 @@
 # Backlog de Entre Huellas
 
+**Avance posterior18/10:** HU-14.3/#45 implementada localmente en platform,
+con030/configuración/demo/integración pendientes. Administración exclusivamente
+web; Flutter conserva denuncia del usuario. Estados remotos/tablas inferiores
+son la última instantánea, sin nuevas acciones GitHub en este incremento.
+
+
 **Avance local posterior18/10:**028 confirmado aplicado; el usuario autoriza
 HU-14.1/#43, implementada localmente en feature/content-reports, pendiente029/demo.
 [Denuncias](../funcionalidades/denuncias-contenido.md). Tabla y estados remotos

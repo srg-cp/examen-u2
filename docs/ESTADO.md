@@ -1,5 +1,533 @@
 # Estado del proyecto
 
+## Reglas UI/UX consolidadas —19/10/2026
+
+Por solicitud del usuario, se consolidan REGLAS_UI_UX_WEB, REGLAS_UI_UX y
+DISENO_UI con los valores finales del login, toast sin negrita y controles
+legales compactos. Se corrigen referencias vigentes a flecha20px/retorno52px
+que ya no correspondían a la barra legal y se retiran notas sueltas duplicadas.
+Se distingue el retorno legal36px/icono16px del compartido52px/icono28px,
+y el texto400 del toast web del peso600 de su referencia móvil.
+Validación documental y git diff --check; sin cambios de código ni nuevos
+builds/pruebas. Siguiente paso: usar esta referencia en futuros cambios visuales.
+
+## Retorno legal compacto —19/10/2026
+
+Por solicitud del usuario, el botón izquierdo de /terms y /privacy pasa a
+36×36px e icono16px, emparejado con la altura normal del enlace derecho.
+Mantiene diseño circular glass y navegación al login. Override local en
+LegalPage: GlassNavigationButton conserva su tamaño en otros recorridos.
+Chrome local confirma36px/icono16px, radio50%, blur22px y retorno real
+al login en ambas rutas. Sin overflow a320px/texto200%; git diff --check
+aprobado. Sin build para este ajuste CSS. Siguiente paso: revisión visual.
+
+## Proporciones del botón legal —19/10/2026
+
+La comparación con sader-panel confirma que no bastaba cambiar el radio:
+el botón derecho tenía mínimo48px y padding12/16px. Ahora usa mínimo36px,
+padding8/12px, fuente14px/500 con línea20px e icono16px, como su Button
+(h-9, py-2 y has-svg:px-3). Conserva radio18px y colores de Entre Huellas.
+Altura flexible para texto ampliado y ajuste de líneas. Chrome local confirma
+36px, padding8/12px, radio18px, fuente14px/500 e icono16px en ambas rutas.
+Sin overflow a320px con texto200%; git diff --check aprobado. Sin build
+para este ajuste CSS. Siguiente paso: revisión visual del usuario.
+
+## Radio del enlace legal superior —18/10/2026
+
+Por solicitud del usuario, el botón derecho compartido de /terms y /privacy
+usa calc(.625rem + 8px), equivalente a rounded-2xl de sader-panel
+(--radius .625rem + 8px):18px a tamaño base. Sustituye16px.
+Verificación CSS y git diff --check; sin cambios de contenido o navegación.
+Siguiente paso: revisión visual del usuario.
+
+## Texto del toast sin negrita —18/10/2026
+
+Por solicitud del usuario, TopToast cambia el peso de600 a400.
+Regla web y ficha de acceso actualizadas. Verificación del CSS y
+git diff --check aprobados; sin ejecutar build para este ajuste de peso.
+Siguiente paso: revisión visual del usuario.
+
+## Toast web alineado con móvil —18/10/2026
+
+Por solicitud del usuario, TopToast compartido reproduce ConfirmationToastHost
+móvil: cápsula #F5F5F7 al90%, borde blanco70%, radio28px, blur18px y sombra
+#24282A al10% desplazada6px/blur20px. Ancho ajustado al mensaje hasta360px,
+márgenes laterales24px y safe-area superior+12px, mínimo48px, padding16/8px.
+Icono Material Rounded oficial20px dentro de círculo neutro32px; error_outline
+en #B53F48 para error y check #111111 para confirmación. Texto14px/600,
+fuente heredada de la página. Sin X: tocar el aviso o activar su botón mediante
+teclado lo cierra. Reintentar sigue siendo acción independiente, cierra primero
+y ejecuta su callback. Entrada fade lineal y slide easeOutCubic de180ms;
+movimiento reducido estático. Mensajes extensos/texto ampliado pueden hacer
+scroll vertical dentro del límite30svh/220px, sin recorte de contenido.
+
+Conserva API show, roles alert/status, expiración web6500ms y limpieza al
+desmontar; no se altera autenticación, stagger, orbe ni código Flutter.
+La adaptación se comparte con los recorridos que ya consumen TopToast.
+
+Validación: typecheck/build aprobados. QA Chrome del toast confirma cápsula,
+blur/iconos/colores, estados alert/status, cierre al tocar y por teclado,
+expiración y movimiento reducido;1440/390/320px con texto200% sin overflow,
+CSP ni errores de hidratación. Capturas escritorio/móvil revisadas en
+apps/mobile/build/ui-preview/web-toast. QA completo de login y moderación
+aprobado con backend fixture. git diff --check aprobado. Siguiente paso:
+valoración visual del usuario; OAuth remoto conserva su configuración pendiente.
+
+## Stagger del login portado desde sader-panel —18/10/2026
+
+El usuario solicita copiar el mecanismo completo, no solo sus parámetros.
+Se reemplazan los keyframes del login por useStaggerReveal compartido, adaptado
+a Vue: transiciones originales, doble rAF, will-change persistente, opciones de
+entrada/salida y limpieza. Icono con entrada exterior y hover interior separados.
+Se conserva Arial, formulario, orbe y comportamiento de sesión.
+
+vStaggerReveal aplica estilos por CSSOM para cumplir la CSP de platform;
+clase SSR inicial equivalente y movimiento reducido estático. Sin cambios de
+seguridad, autenticación, Flutter ni despliegue.
+
+Validación: typecheck y build aprobados. QA Chrome de producción confirma
+transiciones CSS reales,850ms/90ms, will-change persistente, posición final
+estable, hover aislado, sin reinicio al editar; recarga normal y movimiento
+reducido,390/320px y texto200%, sin overflow/CSP/hidratación. Capturas escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/login-reload. QA completo de
+login y login/legal también aprobado, incluidos accesos sociales con backend
+fixture. git diff --check aprobado. Siguiente paso: valoración visual del usuario;
+la activación OAuth real sigue pendiente de configuración.
+
+
+## DM Sans legal e iconos Material reales —18/10/2026
+
+Por corrección del usuario, el retorno web deja de representar el chevrón
+mediante el carácter ‹. GlassNavigationButton usa AppIcon con el SVG oficial
+Material Symbols Rounded chevron_left de28px; círculo52px, transparencia,
+gradiente/reflejos interiores y blur22px alineados con GlassSurface móvil.
+No se alteran posición local en barra legal, tooltips, foco ni navegación.
+
+Fecha y anuncio dejan de usar dibujos outline aproximados: se incluyen
+Material Symbols Outlined FILL1/optical20 schedule y campaign, los mismos
+usados por sader-panel a16px. AppIcon reutiliza sus trazados locales; no se
+carga una fuente de iconos ni se consulta Google al navegar. Flecha cruzada
+conserva su trazo existente. Licencia Apache2 incluida.
+
+El usuario amplía explícitamente la instrucción de fuente: solo /terms y
+/privacy adoptan DM Sans, la familia confirmada en layout de sader-panel.
+Fuente variable100–1000, subconjunto latino con acentos, WOFF2 local/preload
+y OFL adjunta. Se aplica a toda la shell legal, incluidos metadatos y títulos;
+login, landing y moderación conservan sus familias previas. Esta indicación
+sustituye la conservación de Arial en legales, sin cambiar el resto de la web.
+Escala45/32/16px, texto/contacto, orbe y layout previos conservados.
+
+Validación: typecheck/build aprobados. QA Chrome de legal/login verifica
+DM Sans computada y fuente disponible, iconos sólidos locales, retorno SVG28px
+sin carácter de texto, glass blur22px, posiciones/scroll/orbe y responsive
+1440/390/320 con texto200%; sin overflow/CSP/hidratación. Capturas escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/login-legal. QA moderación
+aprobado tras corregir selector obsoleto de la etiqueta del botón de acceso;
+se conserva la etiqueta actual Iniciar Sesión. QA completo de login también
+aprobado, incluida su familia Arial y los flujos OAuth simulados. Sin cambios SQL/Flutter,
+autenticación, envío de correos o despliegue. Siguiente paso: valoración visual
+del usuario; OAuth real mantiene su activación/configuración pendiente.
+
+## Diseño legal alineado con sader-panel —18/10/2026
+
+Por corrección explícita del usuario, /terms y /privacy adoptan la composición
+de sader-panel: viewport de lectura con scroll propio, documento máximo896px,
+padding24/48px, barra superior dentro del documento, enlace al otro documento,
+título centrado con degradado y metadatos de fecha/anuncio con iconos SVG locales.
+Se retiran el logo/descripción e índice adicionales de la variante anterior.
+
+GlassNavigationButton conserva su círculo/glass/chevrón y52px; solo en la
+barra legal su posición pasa de fixed a static, alineada con el documento.
+No cambia el componente global ni los otros recorridos. Escala tomada de CSS
+real de sader-panel (incluidos overrides markdown): h1 45px, h2 32px, cuerpo16px/
+interlineado24px, metadatos14px y footer12px. Se conserva Arial por la instrucción
+anterior del usuario; no se importa DM Sans. Texto ampliado mantiene ajuste
+natural de línea sin recorte ni reducción de fuente.
+
+El orbe de las páginas legales usa medium0.5, fijo al viewport sin máscara
+vertical; su luz permanece durante el scroll del documento. Fondo blanco/celeste
+y capa backdrop-blur10px con desvanecimiento en bordes como referencia. El texto
+es estático, sin cover/reveal de la versión anterior; login/landing y contenido
+legal/contacto/fecha conservados. Sin cambios de sesión, permisos, SQL o Flutter.
+
+Validación local: typecheck y build aprobados. Chrome comprueba título45px,
+encabezados32px/cuerpo16px, tres iconos, retorno dentro de la barra con posición
+static y orbe fixed sin máscara vertical. Movimiento del orbe comprobado con
+frames distintos y opacidad0.5; conserva posición al desplazar el contenedor.
+Enlaces/retorno/contacto, SSR sin JS y1440/390/320 con texto200% aprobados, sin
+overflow ni errores CSP/hidratación. Capturas de escritorio, móvil y lectura
+desplazada revisadas en apps/mobile/build/ui-preview/login-legal.
+Git diff --check aprobado. Sin despliegue; siguiente paso: valoración del usuario.
+
+## Recarga de login sin destello crema —18/10/2026
+
+El usuario detecta un destello amarillo al recargar. Causa comprobada:
+.login-form usaba .reveal y su pseudo-elemento de cobertura #FFFBEF del
+componente global. Se retira esa clase solo del login; no se modifica el
+reveal global ni las páginas legales/QR/landing.
+
+Por solicitud expresa, /login adopta la entrada de useStaggerReveal de
+sader-panel: opacidad0→1, blur18→0px, translateY(-28px)→0,850ms y curva
+cubic-bezier(.22,1,.36,1). Seis grupos con separación90ms: icono, nombre,
+título, lema, formulario y enlaces legales. Reutiliza keyframes arrive existentes,
+sin capa pintada; sustituye entrada previa del icono700ms/12px/escala. Hover del
+icono1.05 y orbe se conservan. Cabecera entra una sola vez por esta instrucción,
+y permanece estable durante sesión/edición; no se remonta ni se repite entrada.
+Movimiento reducido muestra todos los grupos estáticos desde el inicio.
+
+Validación: typecheck/build y QA Chrome de carga/recarga aprobados. Comprobados
+valores de seis grupos, ausencia de pseudo-elemento en inicio/mitad/final,
+capturas de recarga y ausencia de reinicio al editar.390/320px con texto200%,
+sin overflow/errores CSP/hidratación. QA login/legal previo aprobado: orbe/hover,
+links/retorno/SSR sin JS y1440/390/320. Capturas en
+apps/mobile/build/ui-preview/login-reload revisadas. git diff --check aprobado.
+Sin cambios de autenticación, SQL, Flutter o despliegue. Siguiente paso:
+valoración visual del usuario; OAuth real conserva su configuración pendiente.
+
+## Icono, orbe y documentos legales del login —18/10/2026
+
+Por solicitud del usuario se adapta la entrada del icono y hover1.05 de
+sader-panel: animación de aparición700ms, hover/foco300ms y movimiento reducido
+estático. Editar campos o comprobar sesión no repite la entrada. El orbe ya
+existente en login pasa a strong0.62, con colores celestes y sin radial fijo que
+oculte su movimiento. AmbientPageShell reutiliza fondo y BackgroundGlowOrb en
+login y documentos legales; landing conserva sus estilos e intensidad.
+
+/login añade enlaces reales a /terms y /privacy. Documentos públicos SSR,
+composición compartida LegalPage sin dominio/ViewModel vacíos, índice con anclas,
+retorno glass al login, enlaces cruzados y mailto al contacto. El usuario confirma
+sergiotlv51@gmail.com y korMind cuando sea necesario identificar al responsable.
+Contenido redactado como documentos del servicio, sin referencias a MVP/borrador,
+sin inventar domicilio, razón social completa o plazos de conservación. Se usa
+korMind en identificación y privacidad; el resto mantiene Entre Huellas.
+
+No se crea registro de aceptación/consentimiento ni se modifican cookies, roles
+o datos de autenticación. Sin cambios SQL/Flutter, envío de correos o despliegue.
+Validación: typecheck,30 pruebas y build Nuxt aprobados. Chrome de producción
+con fixtures: entrada/hover del icono, orbe animado, ausencia de reinicio al editar,
+movimiento reducido estático; enlaces, retorno glass, anclas y mailto correctos;
+SSR sin JavaScript en documentos. Renders1440/390/320 con texto200%, sin overflow
+ni errores CSP/hidratación. Se corrigió ajuste de títulos largos para permitir
+lectura con texto ampliado. Capturas revisadas en
+apps/mobile/build/ui-preview/login-legal. QA completo de login previo también
+aprobado, incluidos Google/Facebook fixture. git diff --check aprobado.
+Siguiente paso: valoración visual del usuario; OAuth real sigue pendiente de
+configuración. No se publica ni despliega.
+
+## Login estable y Google/Facebook web — 18/10/2026
+
+Se retira el skeleton que sustituía el formulario al comprobar sesión. /login
+renderiza el formulario estático desde SSR, mantiene el mismo árbol durante la
+consulta y deshabilita envíos con aria-busy hasta terminar, sin shimmer por simple
+deshabilitación. La entrada no se repite por comprobación o edición. Se elimina
+el texto «Acceso para cuentas autorizadas…». Skeleton de datos de moderación
+permanece; este formulario no muestra datos remotos.
+
+Se añaden Continúa con Google/Facebook y separador «o continúa con» siguiendo
+móvil, con SocialSignInButton compartido por ambos proveedores e iconos locales.
+StartSocialSignIn/CompleteSocialSignIn expresan operaciones de dominio,
+HttpSocialSignInRepository y fuente Supabase encapsulan HTTP; AccessViewModel
+coordina busy/proveedor, toast y descarte tardío. Plugin compone dependencias.
+
+OAuth servidor PKCE: POST same-origin /api/moderation/oauth/start, redirect a
+Supabase y retorno GET /api/moderation/oauth/callback?flow=…&code=…. Cookie de
+flujo AES-GCM/HttpOnly/SameSite Lax, scope /api/moderation/oauth,600s, state aleatorio
+y verifier privado; código se intercambia solo en servidor. Callback limpia cookie
+de flujo y valida estado/expiración antes de intercambiar. Auth/rol se verifican
+antes de guardar la cookie de moderación, que conserva SameSite Strict y scope
+/api/moderation. No tokens/verifier en payload cliente ni localStorage, ni roles automáticos.
+Solo GET callback admite navegación cross-site; las otras API mantienen bloqueo,
+protección de origen y límites. Retorno fijo, sin open redirect. Supabase consume
+el código una sola vez; pruebas de replay incluidas.
+
+Validación local: typecheck,30 pruebas unitarias/arquitectura, build y8 pruebas
+de servidor aprobados. Chrome fixture: ambos proveedores recorren inicio/retorno
+y cierre, más flujos previos; formulario SSR sin skeleton/texto retirado. Renders
+1920/1440/731/390/320 y texto200% sin overflow/CSP/hidratación; capturas escritorio
+y pequeña revisadas en apps/mobile/build/ui-preview/web-login.
+
+Pendiente configuración local (clave publicable, secreto y PUBLIC_WEB_ORIGIN),
+habilitación Google/Facebook y allowlist de callback web en Supabase, y demo con
+cuentas reales. Proveedores móviles no implican URL web autorizada. Sin cambios
+remotos, SQL, Flutter, despliegue o cierre de historia. Siguiente paso: configurar
+y verificar la autenticación real; no reaplicar030.
+
+## Login inspirado en acceso móvil y sader-panel — 18/10/2026
+
+Por petición del usuario, /login toma la composición del acceso móvil y la
+columna concentrada de sader-panel, manteniendo Arial/Helvetica/sans-serif.
+Marca oficial grande con nombre en dos líneas, título y lema; formulario directo
+sin tarjeta exterior ni cabecera/footer institucional duplicados. WebShell
+incorpora variante minimal y conserva el enlace de salto accesible.
+
+LoginInput se reutiliza en correo/contraseña: superficie #F5F5F7, radio22px,
+iconos de correo/candado, etiquetas flotantes persistentes y control accesible
+Mostrar/Ocultar contraseña. Botón Entrar carbón #111111 y texto blanco como
+en móvil, cápsula64px; es variante de login autorizada por esta solicitud.
+Fondo blanco/celeste/cream y BackgroundGlowOrb soft conservados. Cabecera fuera
+del reveal; edición y visibilidad no reinician entrada; movimiento reducido
+respetado. No se copian acciones sociales/registro/recuperación que no tengan
+implementación web en este alcance. Autenticación, roles y redirecciones iguales.
+
+Validación: typecheck,27 pruebas y build aprobados. QA Chrome de login con
+fixtures aprobado (autenticación/roles/redirects/logout/caducidad/reintento),
+además de Arial, ausencia de tarjeta y mostrar/ocultar sin perder el valor.
+Renders1920/1440/731/390/320, texto200% en320, sin overflow ni errores
+CSP/hidratación. Capturas escritorio/móvil/pequeña revisadas en
+apps/mobile/build/ui-preview/web-login. Configuración remota/cuenta revisora
+y otros navegadores pendientes; sin despliegue ni cambios SQL/Flutter.
+Siguiente paso: valoración visual del usuario y acceso real tras configurar servidor.
+
+## Corrección de consulta anónima de sesión — 18/10/2026
+
+La captura del usuario muestra aviso al abrir /login. Diagnóstico local: GET
+/api/moderation/session sin cookie devolvía503 porque se validaba configuración
+antes de reconocer ausencia de sesión. .env.local tiene SUPABASE_URL pero faltan
+SUPABASE_PUBLISHABLE_KEY, MODERATION_SESSION_SECRET y PUBLIC_WEB_ORIGIN.
+Solo se inspeccionó presencia de variables, sin mostrar ni modificar secretos.
+
+readModerationSession devuelve401 si no hay cookie antes de componer backend.
+Con cookie presente conserva descifrado/Auth/rol y errores reales; login sigue
+fallando cerrado si la configuración está incompleta. No se ocultan fallos503
+ni se otorgan permisos. Configuración de acceso real sigue pendiente.
+
+Validación: typecheck/build y7 pruebas de servidor de producción aprobados,
+incluida regresión sin configuración (sesión anónima401, cookie suministrada503,
+login503). Nuxt dev5173 comprobado: sesión sin cookie401, formulario visible sin
+toast de conexión y /moderacion redirige a /login. git diff --check aprobado.
+Sin cambios de variables, SQL o despliegue. Siguiente paso: configurar servidor
+local y comprobar acceso con cuenta revisora real.
+
+## Login web separado y redirecciones — 18/10/2026
+
+Por autorización del usuario se crea /login como página separada; /moderacion
+ya no contiene formulario. LoginScreen/AccessViewModel consumen AccessModeration
+y el repositorio HTTP existentes, sin consultar la cola desde el login.
+Instancias por consumidor, sin estado privado singleton. Usa WebShell,
+BackgroundGlowOrb soft, ActionButton, TopToast y ContentSkeleton, con referencia
+visual web vigente, campos accesibles, shake/invalid y shimmer de trabajo real.
+
+Sin sesión, /moderacion redirige a /login; al entrar o visitar /login con sesión
+autorizada se vuelve a /moderacion. Destino fijo, sin aceptar URLs de retorno
+arbitrarias. Rol denegado se anuncia por toast sin acceder al panel. Expiración,
+logout y cambios entre pestañas limpian datos y llevan al acceso cuando procede.
+Fallo de red/servidor permite reintento, sin tratarlo como ausencia de sesión.
+
+La cookie conserva alcance /api/moderation, HttpOnly/cifrado/SameSite y permiso
+por operación en servidor. La primera visita SSR sirve shell/skeleton público,
+y la redirección se ejecuta tras montar en navegador; el middleware protege
+navegaciones cliente posteriores. No se afirma redirección HTTP3xx en SSR.
+Sin registro, roles nuevos, panel de usuario, cambios SQL/Flutter o despliegue.
+
+Validación local: typecheck,27 pruebas unitarias/arquitectura, build Nuxt y
+6 pruebas de servidor de producción aprobados. Chrome con backend fixture:
+login, validación, denegación de rol, Enter, destino fijo, sesión existente,
+logout entre pestañas, recuperación503 y caducidad. QA moderación aprobado
+(cola/evidencia/decisiones/reintentos/revocación); sin errores CSP/hidratación.
+Renders1920/1440/731/390/320 y texto200% en320, sin overflow; escritorio y
+tamaño pequeño revisados en apps/mobile/build/ui-preview/web-login.
+Pendiente acceso con cuentas/configuración remotas reales y otros navegadores.
+030 confirmado previamente por usuario; no reaplicarlo. Sin publicación/GitHub.
+Siguiente paso: revisión visual del usuario y demo con cuenta revisora real.
+
+## Consolidación de reglas UI/UX web — 18/10/2026
+
+Se consolida REGLAS_UI_UX_WEB con fondo general blanco/celeste, fondo exterior
+del carrusel blanco/cream, paneles #F3F2EE, footer cream y contrato de
+BackgroundGlowOrb (intensidades, tokens, capas, movimiento/CSP). Texto secundario
+y oportunidad reflejan los retoques locales del usuario. Se integra la información
+en paleta/movimiento/aceptación y se retira el apéndice duplicado. REGLAS_UI_UX
+enlaza la consolidación vigente.
+
+Cambio exclusivo de Markdown, sin cambios de app, alcance o permisos.
+Validación: enlaces locales, concordancia con CSS/componente y git diff --check.
+No se repiten builds ni pruebas de app por esta edición.
+Siguiente paso: aplicar estas reglas en futuros incrementos web.
+
+## Corrección: fondo exterior del carrusel blanco/cream — 18/10/2026
+
+El usuario aclara con captura que el ajuste corresponde al fondo detrás del
+carrusel de mascotas. Se revierte el cambio equivocado de .purpose, que conserva
+el panel #F3F2EE. Una capa decorativa de .character-strip mezcla blanco predominante
+y cream tenue con bordes difuminados sobre el fondo celeste animado. Mantiene
+mascotas, tarjetas, espacios, controles y animaciones sin cambios.
+
+Validación Chrome local1440/390/320px, etiquetas200% en320: fondo computado
+correcto y panel original restaurado, sin overflow ni errores de página. Captura
+de escritorio revisada en apps/mobile/build/ui-preview/landing-carousel-cream.
+Sin build nuevo ni despliegue. Siguiente paso: valoración visual del usuario.
+
+## Patch030 confirmado y consulta sobre acceso web —18/10/2026
+
+El usuario confirma haber ejecutado030. Aplicación registrada según confirmación,
+sin inspección SQL remota nueva; no pedir reaplicarlo. La captura local de
+/moderacion muestra el formulario de acceso sin error visible: es la etapa
+esperada cuando no hay sesión web autenticada vigente. Sesión móvil no equivale
+a sesión del navegador; ejecutar SQL no inicia sesión ni asigna revisores.
+La captura acredita render del acceso, no login/rol ni demo completa de backend.
+Pendientes de validar: variables de Nuxt, cuenta revisora asignada en servidor,
+login y recorrido real. No se infiere que esos pasos ya estén hechos ni que
+fallen. Sin pruebas nuevas de app/SQL, despliegue o acciones GitHub. Documentación
+de activación/ficha/backlog actualizada; git diff --check aprobado.
+
+
+## Resplandor animado reutilizable de landing — 18/10/2026
+
+Por petición del usuario se adapta el efecto de sader-panel como componente Vue
+compartido BackgroundGlowOrb, sin dependencias de React ni del otro proyecto.
+Dos orbes celestes, halo y grano SVG local; movimiento CSS17/11/16s y entrada
+por opacidad. intensity acepta soft/medium/strong; los colores se personalizan
+con --glow-color y --glow-secondary desde CSS, sin atributos style ni relajar CSP.
+El contenedor consumidor aporta posición relativa y orden de capas.
+
+Landing lo monta una vez, en intensidad soft, detrás del contenido. Sigue el
+viewport mediante sticky y se desvanece hacia el footer cream mediante máscara
+exclusiva de landing. Decorativo, aria-hidden, sin eventos ni datos; movimiento
+reducido lo deja estático y visible. No afecta otras rutas ni sus permisos.
+
+Validación local: typecheck,25 pruebas y build Nuxt aprobados. Chrome de
+producción en1920/1440/731/390px y320px con texto200%: desplazamiento real de
+orbes, seguimiento del scroll, máscara del footer, modo reducido sin animaciones,
+FAQ operable y ausencia de overflow/errores CSP/hidratación. QA existente de landing
+aprobado: teclado/anclas/ilustraciones, SSR/FAQ sin JS y navegación landing→QR→landing.
+Capturas de escritorio/móvil y footer revisadas en
+apps/mobile/build/ui-preview/landing-glow. Sin despliegue; pendiente valoración
+del usuario y comprobación en otros navegadores.
+Siguiente paso: revisión visual del usuario; reutilizar el componente al intervenir
+otro recorrido autorizado.
+
+## Fondo blanco/celeste de landing — 18/10/2026
+
+Por petición del usuario, el fondo general cambia del radial crema a blanco con
+celeste difuminado lateral y transición gradual al cream existente del footer.
+Se conservan los retoques locales previos de texto, paneles y oportunidad.
+Solo presentación CSS; sin cambios funcionales ni despliegue.
+
+Validación local: Chrome sobre Nuxt dev existente en5173, renders1440/390px
+y320px con textos al200%, sin overflow horizontal ni errores de página.
+Captura de escritorio revisada; evidencia en
+apps/mobile/build/ui-preview/landing-background. No se ejecutó build de producción
+para este ajuste de fondo. Siguiente paso: valoración visual del usuario.
+
+## Moderación exclusiva de platform — HU-14.3 / RF-22,33, issue #45 —18/10/2026
+
+El usuario autoriza continuar y exige administración exclusivamente web. Se
+actualizan AGENTS, reglas de arquitectura/UI web/móvil, ADR-071, guía, ficha/
+índice, arquitectura/diseño/configuración, backlog y documentos de platform/SQL.
+Flutter conserva denuncia de usuario: sin cambios de lib/test móvil ni nuevos
+menús, pantallas, guards o acciones administrativas.029 ya confirmado aplicado;
+no se solicita reaplicarlo. Firebase/FCM fuera del alcance y de la aceptación.
+
+Implementación local en feature/platform-moderation, conservando cambios previos
+de documentación de029. Se preserva cambio paralelo ajeno en el degradado de
+landing.css, sin atribuirlo a moderación. No se hizo commit/push/PR/merge,
+publicación, SQL remoto, asignación de roles ni cambios de GitHub. No se declara
+HU-14 completa ni issue cerrado por esta entrega local.
+
+/moderacion → acceso con cuenta existente autorizada → cola paginada20 de
+pendientes/resueltas → revisión privada de motivo/evidencia y contenido → foto
+primaria procesada bajo petición → ocultar/restaurar/resolver sin cambiar
+visibilidad con motivo obligatorio500 → confirmación explícita → recibo guardado.
+Consulta de estado e historial de últimas20 decisiones, completo conservado en
+SQL. No se entregan suspensión de cuentas, bloqueo, apelación ni métricas.
+
+Dominio TypeScript/contratos/casos de uso, DTO y repositorios cliente/servidor,
+fuentes Auth/RPC/Storage encapsuladas, ViewModel y presentación separados. API
+comprueba Auth/rol en cada operación y SQL vuelve a autorizar. Sin secretos,
+tokens, paths de Storage, identidad del denunciante o coordenadas privadas en
+cliente/payload SSR. HTML inicial solo shell/skeleton; estado privado por
+instancia, sin singleton de sesión. Se asigna rol desde servidor, sin alta
+ficticia/autorización por navegación ni revisores predeterminados.
+
+Cookie de acceso HttpOnly cifrada/autenticada AES-256-GCM, SameSite Strict,
+Secure con HTTPS, máximo1h/sin refresh token; origen exacto y límites de cuerpo/
+tiempo/tasa. Logout local de sesión web, sin cerrar sesiones Android. Datos
+ligados a identidad esperada, cambios entre pestañas/expiración/falta de rol/
+disposición limpian estado y descartan respuestas tardías. Nuevas variables de
+servidor SUPABASE_PUBLISHABLE_KEY/MODERATION_SESSION_SECRET; configuración de
+lector QR permanece. La landing/QR no dependen de acceso administrativo.
+
+Plan030/fuentes102–105/migración/patch generados, sin cambiar SQL029 aplicado.
+Visibilidad separada del ciclo operativo, tablas privadas/RLS sin grants directos,
+decisiones append-only y accesos auditados a cola/detalle/evidencia/decisión.
+Versiones de denuncia y recurso, UUID estable y serialización entre denuncias
+del mismo recurso: replay no duplica, conflicto no borra decisiones. Lecturas
+privilegiadas de la RPC de029 también auditadas. Rol bloqueado durante operación.
+Pérdida de respuesta congela orden/contenido y habilita reintento idéntico;
+consulta fallida tras conflicto conserva borrador. Salida/cancelación confirmada.
+
+Ocultamiento excluye público/Explorar/guardados/QR/permisos de fotos y se hereda
+a avisos vinculados/avistamientos; revisión ordinaria no muestra avistamientos
+ocultos. Nuevos avisos/avistamientos rechazados en búsquedas ocultas. No cambia
+status del caso, contador de mascota ni historial de recuperación. Restauración
+no revierte retiro/cierre ni ocultamiento de la búsqueda vinculada. Bytes/URLs
+firmadas ya emitidos conservan límites de vigencia previos, sin prometer retirada
+retroactiva. Proxy de foto autoriza/audita antes de obtener bytes.
+
+UI con referencia aprobada de landing: crema/Arial/cápsulas, WebShell ancho
+alineado, retorno glass flotante, ActionButton/TopToast/ContentSkeleton compartidos.
+ConfirmationDialog nativo con foco/Escape/cancelación. Decisiones en radios con
+etiquetas completas y área táctil, contador500, invalid/shake, shimmer/etiqueta
+estable. Skeleton inicial y refresh con contenido conservado. Cabecera fuera del
+reveal; no repetir por edición. Movimiento reducido y navegación por teclado.
+
+Validación final web: typecheck y build Nuxt aprobados;25 pruebas de dominio,
+DTO, repositorio/fuente, sesión cifrada, ViewModel, arquitectura y exclusividad
+administrativa web aprobadas;6 pruebas de producción Nuxt aprobadas, incluyendo
+SSR sin evidencia, Auth/rol, Origin/cookie/CSRF, proxy y reintento tras commit.
+Chrome con fixture: acceso denegado/correcto y Enter, cola/revisión/foto, respuesta
+perdida/replay único, restauración, cancelación de salida, revocación, teclado,
+movimiento reducido y retorno landing/QR sin errores CSP/hidratación. Capturas
+1440/731/390/320/1920 y320 texto200% revisadas, sin overflow ni acciones cortadas;
+apps/mobile/build/ui-preview/moderation-web. No son demo hosted ni prueba Safari/
+Firefox. Build/Chrome avisan de exports obsoleto de @vue/shared (DEP0155); no falla
+la validación ni se cambian versiones por este incremento.
+
+SQL: regresión completa40/40 aprobada con la implementación final. Después se
+añadió un cuarto escenario de moderación para paginación22 recursos, herencia
+de ocultamiento y decisiones competidoras: suite final de moderación4/4 aprobada
+(incluye los3 casos ya presentes en la regresión completa). Cubre también rol/
+revocación, auditoría, CAS entre denuncias, replay, grants, QR/fotos/público,
+contador/estado intactos y repetición de run_all. PGlite usa una conexión y
+encola solicitudes: no certifica contención hosted multiconexión. No se repite
+Flutter419 ni APK porque no cambia código móvil. Comprobación de ausencia de
+rutas administrativas Flutter incorporada a las pruebas de arquitectura web.
+
+Durante QA se corrigió invocación de fetch nativo del navegador (ahora con
+regresión), nombre accesible de la decisión y etiqueta durante primer envío.
+Se sustituyó select por radios para evitar recortar opciones con texto200%.
+Generación inicial bloqueada por archivos Windows al reescribir patches previos
+idénticos; Build-RunAll ahora valida migraciones anteriores sin reescribirlos y
+sigue generando030/bundle con los scripts versionados. Generación y repetición
+SQL posteriores aprobadas; los generadores específicos de patch se mantienen.
+
+Logs hu143-{generation,typecheck-final,platform-tests-final,build-final,
+server-tests-final,browser-final,full-sql,sql-final}.log en apps/mobile/build.
+Ficha/ADR/configuración distinguen evidencia local y confirmación remota.
+Pendiente aplicar030 en desarrollo, configurar variables/asignar revisor en
+servidor, actualizar Nuxt y demo real con revisor/cuenta ordinaria/revocación,
+QR/lista/mapa y conflicto multiconexión. Despliegue/integración según autorización
+posterior. Siguiente paso operativo: activar/validar esta entrega web; bloqueo/
+apelación conservan sus historias y refinamiento, sin adelantar otro incremento.
+
+
+## Patch029 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch029 de HU-14.1. Se registra como
+aplicado, sin inspección SQL remota independiente; no solicitar reaplicarlo.
+Sustituye las referencias anteriores a029 pendiente. No se ejecutaron pruebas
+nuevas de aplicación, SQL remoto, despliegue ni acciones GitHub por esta nota.
+
+Siguiente: actualizar/reiniciar Flutter, abrir una ficha disponible, denunciar
+con motivo/evidencia opcional y comprobar el recibo y que el caso sigue con el
+mismo estado. Validación real ampliada de permisos/reintentos sigue sin evidencia
+nueva. Integración en main no verificada aquí; rama local feature/content-reports.
+Después corresponde HU-14.3/#45: cola de revisión y moderación con motivo,
+permisos y auditoría. HU-14.2/#44 conserva refinamiento pendiente sobre qué
+interacciones bloquea. Firebase/FCM fuera del alcance y sin bloquear el avance.
+Validación documental: git diff --check.
+
+
 ## Denuncias de contenido — HU-14.1 / RF-22, issue #43 — 18/10/2026
 
 El usuario confirma028 aplicado y autoriza pasar al siguiente incremento. Se

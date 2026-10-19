@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BackgroundGlowOrb from '~/components/BackgroundGlowOrb.vue';
 import LandingArt from '../widgets/LandingArt.vue';
 import LandingCharacterCard from '../widgets/LandingCharacterCard.vue';
 import LandingIcon from '../widgets/LandingIcon.vue';
@@ -29,6 +30,7 @@ const questions = [
 </script>
 <template>
   <div class="landing-page">
+    <BackgroundGlowOrb class="landing-ambient-glow" intensity="soft" />
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <header class="header wrap">
       <LandingBrand />

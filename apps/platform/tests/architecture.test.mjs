@@ -31,3 +31,13 @@ test('Server-only configuration accepts existing Dokploy names and rejects brows
   assert.equal(configuration({ SUPABASE_URL: 'https://backend.example.test', SUPABASE_SERVER_KEY: 'sb_secret_test-placeholder-key' }).url, 'https://backend.example.test');
   for (const env of [{}, { SUPABASE_URL: 'http://public.example.test', SUPABASE_SERVER_KEY: 'sb_secret_test-placeholder-key' }, { SUPABASE_URL: 'https://backend.example.test', SUPABASE_SERVER_KEY: 'sb_publishable_not-server-key' }]) assert.throws(() => configuration(env));
 });
+
+test('Administrative UI remains exclusive to platform, with no Flutter administrative route', async () => {
+  const mobileRouter = await readFile(new URL('../../mobile/lib/app/router.dart', import.meta.url), 'utf8');
+  assert.doesNotMatch(mobileRouter, /path:\s*['"](?:admin|moderacion|moderation)(?:\/|['"])/);
+  const page = await readFile(new URL('../app/pages/moderacion.vue', import.meta.url), 'utf8');
+  assert.match(page, /ModerationScreen/);
+  for (const [path, source] of await sources(new URL('../server/features/moderation/', import.meta.url))) {
+    assert.doesNotMatch(source, /\/presentation\/|from ['"].*(?:vue|nuxt)/, path);
+  }
+});

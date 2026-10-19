@@ -3,10 +3,11 @@ import { once } from 'node:events';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { rawActive } from './fixtures.mjs';
-export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 217])) {
+export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 217]), options = {}) {
   let value = rawActive(); let fail = false; let reads = 0;
   const sightings = new Map(); let ambiguous = false; const sightingCalls = [];
   const backend = createServer(async (req, res) => {
+    if (options.handle && await options.handle(req, res)) return;
     if (req.url === '/auth/v1/user') {
       if (req.headers.authorization !== 'Bearer '+ 'a'.repeat(30)) {res.writeHead(401);res.end();return;}
       res.writeHead(200, {'Content-Type':'application/json'});res.end(JSON.stringify({id:'11111111-1111-4111-8111-111111111125'}));return;
@@ -33,7 +34,7 @@ export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 21
   const reservation = createServer(); reservation.listen(0, '127.0.0.1'); await once(reservation, 'listening');
   const port = reservation.address().port; await new Promise(resolve => reservation.close(resolve));
   const env = { ...process.env, HOST: '127.0.0.1', PORT: String(port), NITRO_HOST: '127.0.0.1', NITRO_PORT: String(port), NODE_ENV: 'production',
-    SUPABASE_URL: `http://127.0.0.1:${backend.address().port}`, SUPABASE_SERVER_KEY: 'sb_secret_test-private-canary', TRUSTED_PROXY_IPS: '', PUBLIC_WEB_ORIGIN: `http://127.0.0.1:${port}` };
+    SUPABASE_URL: `http://127.0.0.1:${backend.address().port}`, SUPABASE_SERVER_KEY: 'sb_secret_test-private-canary', TRUSTED_PROXY_IPS: '', PUBLIC_WEB_ORIGIN: `http://127.0.0.1:${port}`, ...(options.env || {}) };
   const child = spawn(process.execPath, ['.output/server/index.mjs'], { cwd: fileURLToPath(new URL('../', import.meta.url)), env, stdio: ['ignore', 'pipe', 'pipe'] });
   let logs = ''; child.stderr.on('data', b => { logs += b; });
   const close = async () => {

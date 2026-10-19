@@ -1,5 +1,16 @@
 # Web Entre Huellas — Vue + Nuxt + TypeScript
 
+## Moderación de denuncias
+
+/moderacion incorpora HU-14.3: acceso de revisores, cola, evidencia y decisiones
+con motivo/auditoría. Exclusivamente web; móvil conserva denuncia del usuario.
+Requiere patch030 (029 ya confirmado), cuenta existente con contraseña, rol
+asignado en servidor, SUPABASE_PUBLISHABLE_KEY y MODERATION_SESSION_SECRET.
+No exponer variables de servidor en NUXT_PUBLIC ni en el cliente. La landing/QR
+siguen siendo públicos. [Configuración](../../docs/CONFIGURACION.md),
+[ficha](../../docs/funcionalidades/moderacion-web.md).
+
+
 Incremento17/10/2026 en feature/vue-nuxt-web. Migra HU-09/RF-09/#9 a Vue,
 conservando diseño, /c/<token>, API, fotos privadas y SQL022/023. Esta base es
 la aplicación web única acordada para público/usuarios/administración por roles.

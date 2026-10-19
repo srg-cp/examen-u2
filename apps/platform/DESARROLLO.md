@@ -1,5 +1,21 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## Incremento HU-14.3: administración solo web
+
+/moderacion utiliza acceso real y roles de servidor, sin equivalente Flutter.
+Añadir las variables nuevas de .env.example a tu entorno local existente, sin
+sobrescribirlo: SUPABASE_PUBLISHABLE_KEY y MODERATION_SESSION_SECRET aleatorio
+(mínimo32 caracteres). PUBLIC_WEB_ORIGIN debe coincidir exactamente con el
+origen del navegador. Aplicar030 completo y asignar cuenta revisora explícita
+según CONFIGURACION;029 ya está confirmado y no se reaplica. No guardar claves
+reales en archivos versionados. Cookie Secure con HTTPS, HttpOnly/SameSite Strict;
+expira como máximo en una hora, sin refresh token.
+
+QA: npm test incluye moderación/arquitectura; npm run test:server incluye acceso,
+CSRF/cookie/SSR/proxy/reintentos con fixture. scripts/check-moderation-browser.mjs
+requiere PLAYWRIGHT_MODULE/CHROME_PATH y build actual. No realiza cambios remotos.
+
+
 Antes de implementar o revisar UI web, leer
 [REGLAS_UI_UX_WEB](../../docs/REGLAS_UI_UX_WEB.md): la landing final aprobada el
 18/10/2026 es la base visual común para público, usuarios y administración.
@@ -84,3 +100,17 @@ en backend además de los guards de navegación.
 Dokploy conserva contexto, puerto y variables; necesita los nuevos archivos y
 package-lock publicados en la rama elegida. [Pasos](DOKPLOY.md). Esta migración
 no realiza push ni redeploy automático sobre la web ya operativa.
+
+## Login separado
+
+/login es el acceso para cuentas revisoras existentes. /moderacion sin sesión
+redirige después de hidratar; cookie API/permiso servidor conservados. No existe
+registro web ni asignación automática de rol. check-login-browser.mjs valida
+redirecciones, roles, caducidad, pestañas, reintento y responsive con fixtures;
+requiere PLAYWRIGHT_MODULE/CHROME_PATH y build vigente, igual que moderación.
+
+Google/Facebook: POST /api/moderation/oauth/start y GET callback PKCE en servidor.
+Misma configuración de moderación, más allowlist web en Supabase según
+docs/CONFIGURACION. check-login-browser.mjs recorre ambos proveedores mediante
+fixture, sin contactar Google/Facebook reales. Formulario estable, sin skeleton
+inicial ni texto de cuentas autorizadas.

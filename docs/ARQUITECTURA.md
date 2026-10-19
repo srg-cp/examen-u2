@@ -1,5 +1,27 @@
 # Arquitectura de Entre Huellas
 
+## Acceso web separado —18/10
+
+/login separa el formulario de /moderacion. AccessViewModel de presentación
+consume AccessModeration; plugin compone repositorio/caso de uso por instancia.
+Middleware cliente y pantalla inicial consultan sesión sin exponer cookie ni
+serializar datos privados en SSR; permisos por operación en servidor vigentes.
+[Ficha de acceso](funcionalidades/acceso-web.md), ADR-071 actualizado.
+
+## Moderación exclusiva de platform — HU-14.3,18/10
+
+Por instrucción expresa, administración solo en apps/platform; sin pantallas,
+menús, guards o acciones administrativas Flutter. /moderacion ofrece acceso,
+cola, evidencia y decisión real. Dominio/contratos/casos de uso TypeScript,
+repositorios HTTP/servidor y DTO separados; ViewModel y componentes compartidos.
+Sesión web HttpOnly cifrada, rol comprobado en Auth/RPC por operación, SSR sin
+contenido privado y operaciones same-origin. SQL102–105/plan030 conserva
+visibilidad separada del ciclo de vida, decisiones append-only/CAS y accesos
+auditados; proyecciones públicas/QR/fotos excluyen ocultos.029 confirmado.
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md),
+[ficha](funcionalidades/moderacion-web.md).030/configuración/demo pendientes.
+
+
 HU-14.1/#43 (18/10): content_reports separa dominio/caso de uso/contrato,
 DTO/fuente/repositorio, providers declarativos y presentación autoDispose. App
 compone accesos desde fichas/revisión mediante slots. SQL099–101/plan029 persiste

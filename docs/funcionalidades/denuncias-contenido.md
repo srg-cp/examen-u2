@@ -1,5 +1,11 @@
 # Denunciar contenido
 
+**Continuación HU-14.3:** la revisión/decisión por moderadores se implementa solo
+en la [plataforma web](moderacion-web.md). El móvil conserva este flujo de
+usuario, sin administración.030 añade auditoría a lecturas privilegiadas y
+visibilidad independiente, sin reescribir029 confirmado aplicado.
+
+
 HU-14.1 / RF-22; issue #43. Implementación Android/SQL en
 `feature/content-reports`. No equivale a cierre remoto de la historia.
 
@@ -48,8 +54,8 @@ Reintentar tras recuperar la sesión vuelve a un estado limpio.
 ## Dependencias y activación
 
 028 aplicado según confirmación expresa del usuario, sin inspección remota nueva.
-Aplicar completo `database/patchs/029_patch_content_reports.sql` en desarrollo y
-actualizar Flutter. No hay cambios Nuxt ni despliegue web necesario. Firebase/FCM
+029 aplicado según confirmación expresa del usuario; no reaplicarlo.
+Actualizar/reiniciar Flutter. No hay cambios Nuxt ni despliegue web necesario. Firebase/FCM
 está fuera del alcance y no bloquea esta entrega. No hay commit/push/PR/despliegue
 por este incremento. Moderación, bloqueo, apelación y cola administrativa son
 historias posteriores; no existen guards/pantallas vacíos para ellas.
@@ -63,6 +69,6 @@ prueba permisos, Unicode, replay/conflicto, revisor/revocación, recurso retirad
 ausencia de cambios operativos y repetición del bundle. Resultado:419 pruebas Flutter y37 SQL aprobadas; análisis limpio, formato
 sin cambios. Logs y límites en ESTADO.
 
-Pendiente029 y demo Android/Supabase real con denunciante, autor, usuario ajeno y
+029 confirmado aplicado; pendiente demo Android/Supabase real con denunciante, autor, usuario ajeno y
 revisor asignado desde servidor; pérdida de respuesta y contención multiconexión.
 PGlite no certifica concurrencia hosted. No se declara HU-14 completa.

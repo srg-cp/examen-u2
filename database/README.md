@@ -1,5 +1,14 @@
 # Base de datos de Entre Huellas
 
+HU-14.3/#45: fuentes102–105/plan030, migración y patch030 generados mediante
+Build-ModerationPatch/Build-RunAll. RLS/grants privados, rol por operación,
+visibilidad independiente, decisiones CAS/UUID y accesos auditados.029 confirmado
+aplicado; no reaplicarlo ni modificarlo.030/configuración/demo pendientes.
+Build-RunAll valida migraciones previas sin reescribir sus patches manuales;
+los generadores específicos de patch siguen disponibles. Se evita el bloqueo
+Windows por reescrituras idénticas observado al generar. [ADR-071](../docs/decisiones/071-moderacion-exclusiva-platform.md).
+
+
 HU-14.1/#43: fuentes099–101/plan029, migración20261018002900_content_reports.sql
 y patch029 generados mediante Build-ContentReportsPatch.ps1/Build-RunAll.ps1.
 Denuncias privadas, recursos autorizados, recibo estable y revisor asignado por

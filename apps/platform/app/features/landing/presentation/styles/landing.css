@@ -1,7 +1,7 @@
 .landing-page {
   --cream: #fffbef;
   --ink: #171918;
-  --muted: #656861;
+  --muted: #787774;
   --brand-blue: #3c537b;
   --brand-accent: #2c87ce;
   --brand-sky: #b5d5e9;
@@ -18,13 +18,20 @@ html:has(.landing-page) {
   scroll-padding-top: 24px;
 }
 .landing-page {
+  position: relative;
+  isolation: isolate;
   margin: 0;
   background:
-    radial-gradient(ellipse at 50% 20%, #fffdf8 0, transparent 60%),
-    var(--cream);
+    radial-gradient(ellipse at 0% 12%, #dceaffd9 0, transparent 45%),
+    radial-gradient(ellipse at 100% 40%, #e7f3ffb3 0, transparent 45%),
+    linear-gradient(180deg, #fafdff 0%, #ffffff 65%, #fffdf7 84%, var(--cream) 100%);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+.landing-page .landing-ambient-glow {
+  z-index: -1;
+  mask-image: linear-gradient(#000 0% 70%, transparent 92%);
 }
 .landing-page a {
   color: inherit;
@@ -474,12 +481,21 @@ html:has(.landing-page) {
   user-select: none;
 }
 .landing-page .character-strip {
+  isolation: isolate;
   --character-gap: clamp(10px, 1.4vw, 20px);
   --character-wave-height: clamp(24px, 4vw, 56px);
   position: relative;
   overflow: hidden;
   margin: clamp(40px, 5vw, 72px) 0;
   padding: clamp(128px, 11vw, 168px) 0 clamp(72px, 7vw, 104px);
+}
+.landing-page .character-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #ffffff00 0%, #fffffff2 16%, #fffdf8f5 55%, #fffbefe6 84%, #fffbef00 100%);
 }
 .landing-page .character-track {
   display: flex;
@@ -574,7 +590,7 @@ html:has(.landing-page) {
   width: 100%;
 }
 .landing-page .panel {
-  background: #fff;
+  background: #f3f2ee;
   border-radius: var(--radius);
 }
 .landing-page .purpose {
@@ -637,7 +653,7 @@ html:has(.landing-page) {
   display: grid;
   grid-template-columns: 45% 55%;
   align-items: center;
-  background: linear-gradient(#80cbfa 0%, #a3e2f0 46%, #fff4a2 100%);
+  background: linear-gradient(#80cbfa 0%, #a3e2f0 46%, #ccd2e39e 100%);
 }
 .landing-page .opportunity-copy {
   padding: 20px 0 20px 25px;

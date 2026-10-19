@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Administración solo web —18/10/2026:** por instrucción expresa del usuario,
+administración/moderación viven exclusivamente en `apps/platform`. Flutter
+conserva operaciones de usuario como denunciar; no incorpora pantallas, menús,
+guards ni acciones administrativas. Roles y decisiones se validan en servidor
+en cada operación. Véase [ADR-071](decisiones/071-moderacion-exclusiva-platform.md).
+
 **Referencia de presentación web — 18/10/2026:** leer también
 [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md). Por instrucción del usuario, la landing
 aprobada guía toda apps/platform; Flutter conserva su referencia de acceso.

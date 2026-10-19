@@ -1,5 +1,69 @@
 # Landing pública en la plataforma
 
+## Consolidación de reglas UI/UX web — 18/10/2026
+
+Se consolida REGLAS_UI_UX_WEB con fondo general blanco/celeste, fondo exterior
+del carrusel blanco/cream, paneles #F3F2EE, footer cream y contrato de
+BackgroundGlowOrb (intensidades, tokens, capas, movimiento/CSP). Texto secundario
+y oportunidad reflejan los retoques locales del usuario. Se integra la información
+en paleta/movimiento/aceptación y se retira el apéndice duplicado. REGLAS_UI_UX
+enlaza la consolidación vigente.
+
+Cambio exclusivo de Markdown, sin cambios de app, alcance o permisos.
+Validación: enlaces locales, concordancia con CSS/componente y git diff --check.
+No se repiten builds ni pruebas de app por esta edición.
+Siguiente paso: aplicar estas reglas en futuros incrementos web.
+
+## Corrección: fondo exterior del carrusel blanco/cream — 18/10/2026
+
+El usuario aclara con captura que el ajuste corresponde al fondo detrás del
+carrusel de mascotas. Se revierte el cambio equivocado de .purpose, que conserva
+el panel #F3F2EE. Una capa decorativa de .character-strip mezcla blanco predominante
+y cream tenue con bordes difuminados sobre el fondo celeste animado. Mantiene
+mascotas, tarjetas, espacios, controles y animaciones sin cambios.
+
+Validación Chrome local1440/390/320px, etiquetas200% en320: fondo computado
+correcto y panel original restaurado, sin overflow ni errores de página. Captura
+de escritorio revisada en apps/mobile/build/ui-preview/landing-carousel-cream.
+Sin build nuevo ni despliegue. Siguiente paso: valoración visual del usuario.
+
+## Resplandor de fondo compartido — 18/10/2026
+
+Por petición del usuario se adapta el efecto de sader-panel como componente Vue
+compartido BackgroundGlowOrb, sin dependencias de React ni del otro proyecto.
+Dos orbes celestes, halo y grano SVG local; movimiento CSS17/11/16s y entrada
+por opacidad. intensity acepta soft/medium/strong; los colores se personalizan
+con --glow-color y --glow-secondary desde CSS, sin atributos style ni relajar CSP.
+El contenedor consumidor aporta posición relativa y orden de capas.
+
+Landing lo monta una vez, en intensidad soft, detrás del contenido. Sigue el
+viewport mediante sticky y se desvanece hacia el footer cream mediante máscara
+exclusiva de landing. Decorativo, aria-hidden, sin eventos ni datos; movimiento
+reducido lo deja estático y visible. No afecta otras rutas ni sus permisos.
+
+Sin nuevas HU/RF/issues ni cambios de alcance funcional, persistencia o activación.
+
+Validación local: typecheck,25 pruebas y build Nuxt aprobados. Chrome de
+producción en1920/1440/731/390px y320px con texto200%: desplazamiento real de
+orbes, seguimiento del scroll, máscara del footer, modo reducido sin animaciones,
+FAQ operable y ausencia de overflow/errores CSP/hidratación. QA existente de landing
+aprobado: teclado/anclas/ilustraciones, SSR/FAQ sin JS y navegación landing→QR→landing.
+Capturas de escritorio/móvil y footer revisadas en
+apps/mobile/build/ui-preview/landing-glow. Sin despliegue; pendiente valoración
+del usuario y comprobación en otros navegadores.
+
+## Fondo blanco y celeste, footer cream — 18/10/2026
+
+El usuario solicita una base blanca con celeste suave como su referencia.
+Dos radiales laterales sobre un degradado blanco terminan en --cream (#FFFBEF) al pie; la transición acompaña la altura real de la página.
+Se mantienen los colores locales previos, composición y recorridos. Sin cambios
+en persistencia, permisos, activación ni HU/RF/issues.
+
+Chrome local1440/390/320px, este último con textos al200%: fondo computado
+correcto, sin overflow ni errores de página. Captura de escritorio revisada en
+apps/mobile/build/ui-preview/landing-background. Build de producción no ejecutado;
+sin despliegue y valoración del usuario pendiente.
+
 **Distribución irregular solicitada — 18/10/2026:** se sustituye la alineación y el tamaño uniforme por huellas con tamaños, alturas, separaciones y giros diferentes, sobre el crema exterior. Diez en escritorio y cuatro en móvil. Build Nuxt y revisión Chrome en 1920/1440/731/390/320px (320 con texto al 200%) aprobados: tamaños y posiciones distintos, sin invadir el panel ni producir overflow o errores de página. Capturas closing-paws actualizadas. Sin despliegue; pendiente revisión del usuario.
 
 ## Huellitas del cierre sobre fondo crema — 18/10/2026

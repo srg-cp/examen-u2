@@ -1,5 +1,66 @@
 # Configuración y validación de la app
 
+## Moderación web — HU-14.3, patch030
+
+Administración/moderación exclusivamente en apps/platform por instrucción del
+usuario. Flutter no tiene paneles, menús ni acciones administrativas.029 ya
+aplicado según confirmación del usuario;030 también confirmado aplicado.
+Sin inspección SQL remota independiente; no reaplicar029/030.
+
+1. [030_patch_content_moderation.sql](../database/patchs/030_patch_content_moderation.sql)
+   ya ejecutado según confirmación del usuario; no reaplicarlo.
+2. Configurar en el servidor Nuxt SUPABASE_PUBLISHABLE_KEY (clave publicable o
+   anon heredada) y MODERATION_SESSION_SECRET aleatorio de al menos32 caracteres.
+   Debe ser idéntico entre réplicas; rotarlo invalida cookies anteriores. Nunca
+   usar NUXT_PUBLIC ni guardar secretos en el repositorio. Mantener SUPABASE_URL,
+   SUPABASE_SERVER_KEY y PUBLIC_WEB_ORIGIN (origen exacto, HTTPS en producción).
+3. Elegir una cuenta existente con correo/contraseña y asignarle permiso desde
+   una sesión SQL privilegiada del servidor. No hay revisor por defecto ni
+   autoasignación desde móvil/web. Sustituir UUID_DE_LA_CUENTA por su UUID real:
+
+```sql
+begin;
+insert into public.content_report_reviewers(user_id)
+select id from auth.users where id='UUID_DE_LA_CUENTA'::uuid
+on conflict(user_id) do nothing;
+commit;
+```
+
+Para revocar, desde el mismo entorno privilegiado:
+
+```sql
+delete from public.content_report_reviewers
+where user_id='UUID_DE_LA_CUENTA'::uuid;
+```
+
+No ejecutar estos ejemplos con el placeholder; no se han ejecutado en remoto.
+La asignación es un dato operativo; esquema/grants/RPC están versionados en030.
+No usar service_role para decisiones: el servidor ejecuta RPC con JWT del revisor.
+La clave secreta existente solo se usa en QR/proxy de foto tras autorizar/auditar.
+
+4. Actualizar Nuxt local; publicación y redeploy requieren autorización de la
+   tarea de despliegue. Abrir /moderacion, entrar con la cuenta revisora y probar
+   cola → detalle → foto bajo petición → motivo → decisión → recibo → consulta
+   actualizada. Las cuentas sin rol reciben denegación, sin datos privados.
+5. Verificar QR/lista/mapa/guardados sin contenido oculto, estado operativo del
+   caso intacto, restauración y revocación del revisor. Probar dos revisores
+   compitiendo sobre la misma versión y reintento tras respuesta perdida.
+
+La sesión usa cookie HttpOnly cifrada/autenticada, SameSite Strict y Secure en
+HTTPS; máximo1h, sin refresh token. Se pide nuevo login al expirar. Logout es de
+esta sesión web, sin cerrar sesiones Android. No se serializa evidencia en SSR.
+Los JWT emitidos conservan su vencimiento; revocar el rol bloquea nuevas
+operaciones aun con cookie válida. No se afirma revocación retroactiva de bytes
+ya descargados ni de URLs firmadas previamente emitidas. Firebase/FCM fuera del
+alcance. [Ficha](funcionalidades/moderacion-web.md),
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md).
+
+
+**Confirmación posterior18/10:** el usuario ya ejecutó029. No reaplicarlo.
+Actualizar/reiniciar Flutter y validar Denunciar contenido → recibo persistido.
+Las indicaciones inferiores de029 pendiente quedan sustituidas por esta nota.
+
+
 ## Denuncias de contenido — HU-14.1, patch029
 
 028 aplicado según confirmación del usuario; no reaplicarlo. Para este incremento
@@ -543,3 +604,28 @@ El servidor demo no acepta lang=es; se omite esa opción y conserva nombres loca
 
 
 Comprobación adicional con cliente Dart real: el endpoint inicial respondió403 al cliente sin identificar. PhotonPlaceDataSource envía ahora User-Agent legítimo EntreHuellas/0.1 con el enlace del proyecto, sin suplantación de navegador. Con esa cabecera, la fuente/repositorio/caso de uso devolvieron5 resultados válidos para Miraflores Lima Peru. Repetir en Android y en cualquier endpoint sustituido; no usar la prueba de escritorio como garantía del servidor demo.
+
+## Login social web — Google y Facebook
+
+La web usa los proveedores habilitados en el mismo Supabase que móvil; registrar
+la redirección web adicional. Completar SUPABASE_PUBLISHABLE_KEY,
+MODERATION_SESSION_SECRET (mínimo32 caracteres aleatorios privados) y
+PUBLIC_WEB_ORIGIN con el origen exacto, por ejemplo http://127.0.0.1:5173 para
+desarrollo o https://entrehuellas.kormind.com para producción. Guardar localmente
+en .env.local y configurar servidor/Dokploy, nunca cliente/NUXT_PUBLIC.
+
+En Auth URL Configuration autorizar únicamente los callback de los entornos
+usados: <PUBLIC_WEB_ORIGIN>/api/moderation/oauth/callback?flow=* (la parte flow
+es aleatoria por intento; usar el patrón acotado de redirect URLs de Supabase).
+Validar que el patrón admita la query flow sin permitir hosts externos.
+Google/Facebook se configuran en el Dashboard del proveedor/Supabase con sus
+credenciales existentes; no copiar client secrets a esta app. El callback del
+proveedor hacia Supabase sigue siendo el de ese backend, no el callback Nuxt.
+Probar consentimiento/cancelación y retorno web con una cuenta revisora real.
+
+No registrar códigos/verifiers/tokens ni query de callback en logs del proxy.
+La cookie temporal eh_oauth es HttpOnly/Lax, dura10min y contiene estado/verifier
+cifrados; solo el intento más reciente del navegador es válido. La cookie final
+conserva Strict/HttpOnly. OAuth puede crear/vincular identidades según Auth, pero
+los permisos administrativos siempre se asignan desde servidor.
+Activación no realizada en esta tarea; pruebas con proveedores simulados.

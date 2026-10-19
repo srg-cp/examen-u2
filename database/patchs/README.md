@@ -1,5 +1,20 @@
 # Patches manuales de Supabase
 
+**Confirmación posterior18/10:**030 aplicado por el usuario, sin inspección
+remota nueva. No reaplicar030. Continúan los pasos de configuración/acceso/rol
+y validación real de moderación web descritos en CONFIGURACION.
+
+
+**Moderación web18/10:** [030_patch_content_moderation.sql](030_patch_content_moderation.sql)
+completo después de029 confirmado aplicado, sin reaplicar029.030 pendiente en
+desarrollo. Requiere Nuxt actualizado, variables de sesión/acceso y revisor
+asignado desde servidor; no añade administración Flutter. Ver CONFIGURACION.
+
+
+**Confirmación posterior18/10:**029 aplicado por el usuario, sin inspección
+remota nueva. No reaplicar028 ni029. Pendiente actualizar Flutter y demo real.
+
+
 **Actualización18/10:**028 confirmado aplicado por el usuario, sin reaplicarlo.
 Nuevo incremento HU-14.1: [029_patch_content_reports.sql](029_patch_content_reports.sql)
 completo después de028 y Flutter actualizado. Generado desde099–101/plan029;
