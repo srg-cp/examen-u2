@@ -1,5 +1,38 @@
 # Patches manuales de Supabase
 
+**Confirmación posterior18/10:**030 aplicado por el usuario, sin inspección
+remota nueva. No reaplicar030. Continúan los pasos de configuración/acceso/rol
+y validación real de moderación web descritos en CONFIGURACION.
+
+
+**Moderación web18/10:** [030_patch_content_moderation.sql](030_patch_content_moderation.sql)
+completo después de029 confirmado aplicado, sin reaplicar029.030 pendiente en
+desarrollo. Requiere Nuxt actualizado, variables de sesión/acceso y revisor
+asignado desde servidor; no añade administración Flutter. Ver CONFIGURACION.
+
+
+**Confirmación posterior18/10:**029 aplicado por el usuario, sin inspección
+remota nueva. No reaplicar028 ni029. Pendiente actualizar Flutter y demo real.
+
+
+**Actualización18/10:**028 confirmado aplicado por el usuario, sin reaplicarlo.
+Nuevo incremento HU-14.1: [029_patch_content_reports.sql](029_patch_content_reports.sql)
+completo después de028 y Flutter actualizado. Generado desde099–101/plan029;
+029 pendiente en desarrollo. No requiere Firebase/FCM ni despliegue Nuxt.
+La indicación inferior de028 pendiente es anterior a esta confirmación.
+
+
+HU-13: ejecutar completo [028_patch_case_closure.sql](028_patch_case_closure.sql)
+después de027 ya confirmado, sin reaplicarlo. Actualizar Flutter; el QR Nuxt
+existente reconoce el cierre sin despliegue nuevo. Generar con
+Build-CaseClosurePatch.ps1/Build-RunAll.ps1. Pendiente aplicación en desarrollo
+y demo Android/Supabase; no activar FCM/Edge/cron (ADR-068).
+
+027_patch_notifications.sql: HU-12.1/#40,12.2/#41,12.3/#42. Generado por
+Build-NotificationsPatch.ps1 desde plan027/fuentes091–095. Requiere026 confirmado.
+Aplicar solo027 completo en desarrollo; sin backfill ni secrets/cron.
+Activación hosted/Firebase/Edge/planificador pendientes. Véase CONFIGURACION.
+
 024_patch_public_sightings.sql: HU-10.1/#36, aplicar completo en desarrollo
 después de023 y junto con el servidor Nuxt actualizado. RPC autorizada solo
 service_role, tabla/evidencia privada, idempotencia y límites persistentes.

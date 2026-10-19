@@ -104,13 +104,13 @@ class PreferenceOptions extends ConsumerWidget {
               ),
               toggle(
                 'Notificaciones del teléfono',
-                'Preferencia para recibir avisos fuera de la app.',
+                'Solo guarda tu preferencia. El envío al teléfono está pendiente.',
                 choices.push,
                 (value) => vm.edit(push: value),
               ),
               const SizedBox(height: 12),
               const Text(
-                'Guardaremos tu selección. La recepción en la bandeja y el teléfono se habilitará cuando estén disponibles las alertas.',
+                'Sigue casos o zonas para recibir novedades en Alertas. Los avisos al teléfono quedan pendientes; por ahora se utiliza la bandeja de la app.',
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.4,

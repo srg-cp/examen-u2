@@ -3,10 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/collection_add_button.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
-import '../../../../core/presentation/widgets/confirm_action_dialog.dart';
 import '../../../../core/presentation/widgets/skeleton_form_fields.dart';
-import '../../../../core/presentation/widgets/loading_shimmer.dart';
-import '../../../../core/presentation/widgets/primary_action_button_style.dart';
 import '../../../../core/presentation/widgets/entity_card_content.dart';
 import '../../../../core/presentation/widgets/entity_card_surface.dart';
 import '../view_models/recovery_case_view_model.dart';
@@ -55,33 +52,19 @@ class RecoveryCaseActions extends ConsumerWidget {
             ),
           if (open && canResolve) ...[
             const SizedBox(height: 12),
-            LoadingShimmer(
-              isLoading: value?.busy == true,
-              loadingLabel: 'Confirmando recuperación',
-              child: FilledButton(
-                style: primaryActionButtonStyle(
-                  context,
-                  isLoading: value?.busy == true,
-                ),
-                onPressed: value == null || value.busy
-                    ? null
-                    : () async {
-                        final confirmed = await confirmActionDialog(
-                          context,
-                          title: '¿Confirmar recuperación?',
-                          description:
-                              'Confirma que esta mascota ya fue recuperada. Se cerrará su búsqueda y dejará de aceptar avisos.',
-                          action: 'Confirmar',
-                        );
-                        if (!confirmed || !context.mounted) return;
-                        if (await model.resolve() && context.mounted) {
-                          onChanged();
-                        }
-                      },
-                child: const Text('Ya fue recuperada'),
-              ),
+            CollectionAddButton(
+              label: 'Ya fue recuperada',
+              icon: Icons.check_circle_outline,
+              route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+              onReturn: onChanged,
             ),
           ],
+          if (!open)
+            CollectionAddButton(
+              label: 'Ver recuperación',
+              icon: Icons.check_circle_outline,
+              route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+            ),
           const SizedBox(height: 20),
           const Text(
             'Avisos de esta búsqueda',

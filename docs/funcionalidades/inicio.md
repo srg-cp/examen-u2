@@ -1,5 +1,9 @@
 # Inicio y navegación
 
+18/10/2026: la campana Alertas abre la bandeja persistente HU-12, sustituyendo
+el aviso de indisponibilidad. Callback compuesto en router; HomeScreen no
+importa presentación de notifications. [Ficha](seguimiento-y-alertas.md).
+
 Corrección18/10/2026: la clave de sección pertenece al scroll del contenido,
 no al contenedor de toda la pantalla. LiquidNavigation y su Tween conservan
 la instancia al alternar Inicio/Explorar/Mis mascotas, restaurando el

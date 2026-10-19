@@ -1,5 +1,7 @@
 # Avistamientos desde Android
 
+**Auditoría de seguimiento18/10:** HU-10.2/#37 y épica #10 en Done: implementación integrada en PR60,025 confirmado tras la entrega, persistencia compartida con web y HU-11 posterior operativo. Pruebas existentes/CI aprobadas. No se inventa una prueba remota nueva durante el cambio de seguimiento.
+
 18/10, continuación HU-11: el usuario indicó «ok ya esta» después de las
 instrucciones de activación025; se registra confirmación comunicada, sin
 inspección remota independiente. Sustituye el pendiente025 de las notas

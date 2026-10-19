@@ -1,5 +1,7 @@
 # Carteles PDF y QR
 
+**Auditoría de seguimiento18/10:** HU-08/#8 y #34/#35 siguen In progress por criterios concretos: impresión/escaneo físico y guardar/compartir/cancelar mediante hojas nativas Android. Generación/lector022/023 ya están confirmados; no mantener la web no disponible como bloqueo genérico.
+
 Actualización16 octubre: [lector público HU-09](ficha-publica-qr.md) implementado
 localmente; falta aplicar023 y publicar/comprobar Node/TLS en el dominio acordado.
 PUBLIC_CASE_WEB_READY sigue false. No se habilitan carteles reales por la sola

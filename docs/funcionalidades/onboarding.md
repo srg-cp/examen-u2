@@ -1,5 +1,7 @@
 # Onboarding por cuenta
 
+**Auditoría de seguimiento18/10:** HU-01.5/#21 en Done: tres etapas sin Omitir, RPC/persistencia por cuenta y reintento implementados e integrados; pruebas existentes aprobadas. No se ejecuta una nueva finalización de cuenta por este cambio de seguimiento.
+
 Módulo: `onboarding`. Decisión: [ADR-004](../decisiones/004-onboarding-por-cuenta.md).
 
 ## Qué hace y cómo se usa

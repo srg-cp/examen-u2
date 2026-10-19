@@ -1,5 +1,871 @@
 # Estado del proyecto
 
+## Reglas UI/UX consolidadas —19/10/2026
+
+Por solicitud del usuario, se consolidan REGLAS_UI_UX_WEB, REGLAS_UI_UX y
+DISENO_UI con los valores finales del login, toast sin negrita y controles
+legales compactos. Se corrigen referencias vigentes a flecha20px/retorno52px
+que ya no correspondían a la barra legal y se retiran notas sueltas duplicadas.
+Se distingue el retorno legal36px/icono16px del compartido52px/icono28px,
+y el texto400 del toast web del peso600 de su referencia móvil.
+Validación documental y git diff --check; sin cambios de código ni nuevos
+builds/pruebas. Siguiente paso: usar esta referencia en futuros cambios visuales.
+
+## Retorno legal compacto —19/10/2026
+
+Por solicitud del usuario, el botón izquierdo de /terms y /privacy pasa a
+36×36px e icono16px, emparejado con la altura normal del enlace derecho.
+Mantiene diseño circular glass y navegación al login. Override local en
+LegalPage: GlassNavigationButton conserva su tamaño en otros recorridos.
+Chrome local confirma36px/icono16px, radio50%, blur22px y retorno real
+al login en ambas rutas. Sin overflow a320px/texto200%; git diff --check
+aprobado. Sin build para este ajuste CSS. Siguiente paso: revisión visual.
+
+## Proporciones del botón legal —19/10/2026
+
+La comparación con sader-panel confirma que no bastaba cambiar el radio:
+el botón derecho tenía mínimo48px y padding12/16px. Ahora usa mínimo36px,
+padding8/12px, fuente14px/500 con línea20px e icono16px, como su Button
+(h-9, py-2 y has-svg:px-3). Conserva radio18px y colores de Entre Huellas.
+Altura flexible para texto ampliado y ajuste de líneas. Chrome local confirma
+36px, padding8/12px, radio18px, fuente14px/500 e icono16px en ambas rutas.
+Sin overflow a320px con texto200%; git diff --check aprobado. Sin build
+para este ajuste CSS. Siguiente paso: revisión visual del usuario.
+
+## Radio del enlace legal superior —18/10/2026
+
+Por solicitud del usuario, el botón derecho compartido de /terms y /privacy
+usa calc(.625rem + 8px), equivalente a rounded-2xl de sader-panel
+(--radius .625rem + 8px):18px a tamaño base. Sustituye16px.
+Verificación CSS y git diff --check; sin cambios de contenido o navegación.
+Siguiente paso: revisión visual del usuario.
+
+## Texto del toast sin negrita —18/10/2026
+
+Por solicitud del usuario, TopToast cambia el peso de600 a400.
+Regla web y ficha de acceso actualizadas. Verificación del CSS y
+git diff --check aprobados; sin ejecutar build para este ajuste de peso.
+Siguiente paso: revisión visual del usuario.
+
+## Toast web alineado con móvil —18/10/2026
+
+Por solicitud del usuario, TopToast compartido reproduce ConfirmationToastHost
+móvil: cápsula #F5F5F7 al90%, borde blanco70%, radio28px, blur18px y sombra
+#24282A al10% desplazada6px/blur20px. Ancho ajustado al mensaje hasta360px,
+márgenes laterales24px y safe-area superior+12px, mínimo48px, padding16/8px.
+Icono Material Rounded oficial20px dentro de círculo neutro32px; error_outline
+en #B53F48 para error y check #111111 para confirmación. Texto14px/600,
+fuente heredada de la página. Sin X: tocar el aviso o activar su botón mediante
+teclado lo cierra. Reintentar sigue siendo acción independiente, cierra primero
+y ejecuta su callback. Entrada fade lineal y slide easeOutCubic de180ms;
+movimiento reducido estático. Mensajes extensos/texto ampliado pueden hacer
+scroll vertical dentro del límite30svh/220px, sin recorte de contenido.
+
+Conserva API show, roles alert/status, expiración web6500ms y limpieza al
+desmontar; no se altera autenticación, stagger, orbe ni código Flutter.
+La adaptación se comparte con los recorridos que ya consumen TopToast.
+
+Validación: typecheck/build aprobados. QA Chrome del toast confirma cápsula,
+blur/iconos/colores, estados alert/status, cierre al tocar y por teclado,
+expiración y movimiento reducido;1440/390/320px con texto200% sin overflow,
+CSP ni errores de hidratación. Capturas escritorio/móvil revisadas en
+apps/mobile/build/ui-preview/web-toast. QA completo de login y moderación
+aprobado con backend fixture. git diff --check aprobado. Siguiente paso:
+valoración visual del usuario; OAuth remoto conserva su configuración pendiente.
+
+## Stagger del login portado desde sader-panel —18/10/2026
+
+El usuario solicita copiar el mecanismo completo, no solo sus parámetros.
+Se reemplazan los keyframes del login por useStaggerReveal compartido, adaptado
+a Vue: transiciones originales, doble rAF, will-change persistente, opciones de
+entrada/salida y limpieza. Icono con entrada exterior y hover interior separados.
+Se conserva Arial, formulario, orbe y comportamiento de sesión.
+
+vStaggerReveal aplica estilos por CSSOM para cumplir la CSP de platform;
+clase SSR inicial equivalente y movimiento reducido estático. Sin cambios de
+seguridad, autenticación, Flutter ni despliegue.
+
+Validación: typecheck y build aprobados. QA Chrome de producción confirma
+transiciones CSS reales,850ms/90ms, will-change persistente, posición final
+estable, hover aislado, sin reinicio al editar; recarga normal y movimiento
+reducido,390/320px y texto200%, sin overflow/CSP/hidratación. Capturas escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/login-reload. QA completo de
+login y login/legal también aprobado, incluidos accesos sociales con backend
+fixture. git diff --check aprobado. Siguiente paso: valoración visual del usuario;
+la activación OAuth real sigue pendiente de configuración.
+
+
+## DM Sans legal e iconos Material reales —18/10/2026
+
+Por corrección del usuario, el retorno web deja de representar el chevrón
+mediante el carácter ‹. GlassNavigationButton usa AppIcon con el SVG oficial
+Material Symbols Rounded chevron_left de28px; círculo52px, transparencia,
+gradiente/reflejos interiores y blur22px alineados con GlassSurface móvil.
+No se alteran posición local en barra legal, tooltips, foco ni navegación.
+
+Fecha y anuncio dejan de usar dibujos outline aproximados: se incluyen
+Material Symbols Outlined FILL1/optical20 schedule y campaign, los mismos
+usados por sader-panel a16px. AppIcon reutiliza sus trazados locales; no se
+carga una fuente de iconos ni se consulta Google al navegar. Flecha cruzada
+conserva su trazo existente. Licencia Apache2 incluida.
+
+El usuario amplía explícitamente la instrucción de fuente: solo /terms y
+/privacy adoptan DM Sans, la familia confirmada en layout de sader-panel.
+Fuente variable100–1000, subconjunto latino con acentos, WOFF2 local/preload
+y OFL adjunta. Se aplica a toda la shell legal, incluidos metadatos y títulos;
+login, landing y moderación conservan sus familias previas. Esta indicación
+sustituye la conservación de Arial en legales, sin cambiar el resto de la web.
+Escala45/32/16px, texto/contacto, orbe y layout previos conservados.
+
+Validación: typecheck/build aprobados. QA Chrome de legal/login verifica
+DM Sans computada y fuente disponible, iconos sólidos locales, retorno SVG28px
+sin carácter de texto, glass blur22px, posiciones/scroll/orbe y responsive
+1440/390/320 con texto200%; sin overflow/CSP/hidratación. Capturas escritorio
+y móvil revisadas en apps/mobile/build/ui-preview/login-legal. QA moderación
+aprobado tras corregir selector obsoleto de la etiqueta del botón de acceso;
+se conserva la etiqueta actual Iniciar Sesión. QA completo de login también
+aprobado, incluida su familia Arial y los flujos OAuth simulados. Sin cambios SQL/Flutter,
+autenticación, envío de correos o despliegue. Siguiente paso: valoración visual
+del usuario; OAuth real mantiene su activación/configuración pendiente.
+
+## Diseño legal alineado con sader-panel —18/10/2026
+
+Por corrección explícita del usuario, /terms y /privacy adoptan la composición
+de sader-panel: viewport de lectura con scroll propio, documento máximo896px,
+padding24/48px, barra superior dentro del documento, enlace al otro documento,
+título centrado con degradado y metadatos de fecha/anuncio con iconos SVG locales.
+Se retiran el logo/descripción e índice adicionales de la variante anterior.
+
+GlassNavigationButton conserva su círculo/glass/chevrón y52px; solo en la
+barra legal su posición pasa de fixed a static, alineada con el documento.
+No cambia el componente global ni los otros recorridos. Escala tomada de CSS
+real de sader-panel (incluidos overrides markdown): h1 45px, h2 32px, cuerpo16px/
+interlineado24px, metadatos14px y footer12px. Se conserva Arial por la instrucción
+anterior del usuario; no se importa DM Sans. Texto ampliado mantiene ajuste
+natural de línea sin recorte ni reducción de fuente.
+
+El orbe de las páginas legales usa medium0.5, fijo al viewport sin máscara
+vertical; su luz permanece durante el scroll del documento. Fondo blanco/celeste
+y capa backdrop-blur10px con desvanecimiento en bordes como referencia. El texto
+es estático, sin cover/reveal de la versión anterior; login/landing y contenido
+legal/contacto/fecha conservados. Sin cambios de sesión, permisos, SQL o Flutter.
+
+Validación local: typecheck y build aprobados. Chrome comprueba título45px,
+encabezados32px/cuerpo16px, tres iconos, retorno dentro de la barra con posición
+static y orbe fixed sin máscara vertical. Movimiento del orbe comprobado con
+frames distintos y opacidad0.5; conserva posición al desplazar el contenedor.
+Enlaces/retorno/contacto, SSR sin JS y1440/390/320 con texto200% aprobados, sin
+overflow ni errores CSP/hidratación. Capturas de escritorio, móvil y lectura
+desplazada revisadas en apps/mobile/build/ui-preview/login-legal.
+Git diff --check aprobado. Sin despliegue; siguiente paso: valoración del usuario.
+
+## Recarga de login sin destello crema —18/10/2026
+
+El usuario detecta un destello amarillo al recargar. Causa comprobada:
+.login-form usaba .reveal y su pseudo-elemento de cobertura #FFFBEF del
+componente global. Se retira esa clase solo del login; no se modifica el
+reveal global ni las páginas legales/QR/landing.
+
+Por solicitud expresa, /login adopta la entrada de useStaggerReveal de
+sader-panel: opacidad0→1, blur18→0px, translateY(-28px)→0,850ms y curva
+cubic-bezier(.22,1,.36,1). Seis grupos con separación90ms: icono, nombre,
+título, lema, formulario y enlaces legales. Reutiliza keyframes arrive existentes,
+sin capa pintada; sustituye entrada previa del icono700ms/12px/escala. Hover del
+icono1.05 y orbe se conservan. Cabecera entra una sola vez por esta instrucción,
+y permanece estable durante sesión/edición; no se remonta ni se repite entrada.
+Movimiento reducido muestra todos los grupos estáticos desde el inicio.
+
+Validación: typecheck/build y QA Chrome de carga/recarga aprobados. Comprobados
+valores de seis grupos, ausencia de pseudo-elemento en inicio/mitad/final,
+capturas de recarga y ausencia de reinicio al editar.390/320px con texto200%,
+sin overflow/errores CSP/hidratación. QA login/legal previo aprobado: orbe/hover,
+links/retorno/SSR sin JS y1440/390/320. Capturas en
+apps/mobile/build/ui-preview/login-reload revisadas. git diff --check aprobado.
+Sin cambios de autenticación, SQL, Flutter o despliegue. Siguiente paso:
+valoración visual del usuario; OAuth real conserva su configuración pendiente.
+
+## Icono, orbe y documentos legales del login —18/10/2026
+
+Por solicitud del usuario se adapta la entrada del icono y hover1.05 de
+sader-panel: animación de aparición700ms, hover/foco300ms y movimiento reducido
+estático. Editar campos o comprobar sesión no repite la entrada. El orbe ya
+existente en login pasa a strong0.62, con colores celestes y sin radial fijo que
+oculte su movimiento. AmbientPageShell reutiliza fondo y BackgroundGlowOrb en
+login y documentos legales; landing conserva sus estilos e intensidad.
+
+/login añade enlaces reales a /terms y /privacy. Documentos públicos SSR,
+composición compartida LegalPage sin dominio/ViewModel vacíos, índice con anclas,
+retorno glass al login, enlaces cruzados y mailto al contacto. El usuario confirma
+sergiotlv51@gmail.com y korMind cuando sea necesario identificar al responsable.
+Contenido redactado como documentos del servicio, sin referencias a MVP/borrador,
+sin inventar domicilio, razón social completa o plazos de conservación. Se usa
+korMind en identificación y privacidad; el resto mantiene Entre Huellas.
+
+No se crea registro de aceptación/consentimiento ni se modifican cookies, roles
+o datos de autenticación. Sin cambios SQL/Flutter, envío de correos o despliegue.
+Validación: typecheck,30 pruebas y build Nuxt aprobados. Chrome de producción
+con fixtures: entrada/hover del icono, orbe animado, ausencia de reinicio al editar,
+movimiento reducido estático; enlaces, retorno glass, anclas y mailto correctos;
+SSR sin JavaScript en documentos. Renders1440/390/320 con texto200%, sin overflow
+ni errores CSP/hidratación. Se corrigió ajuste de títulos largos para permitir
+lectura con texto ampliado. Capturas revisadas en
+apps/mobile/build/ui-preview/login-legal. QA completo de login previo también
+aprobado, incluidos Google/Facebook fixture. git diff --check aprobado.
+Siguiente paso: valoración visual del usuario; OAuth real sigue pendiente de
+configuración. No se publica ni despliega.
+
+## Login estable y Google/Facebook web — 18/10/2026
+
+Se retira el skeleton que sustituía el formulario al comprobar sesión. /login
+renderiza el formulario estático desde SSR, mantiene el mismo árbol durante la
+consulta y deshabilita envíos con aria-busy hasta terminar, sin shimmer por simple
+deshabilitación. La entrada no se repite por comprobación o edición. Se elimina
+el texto «Acceso para cuentas autorizadas…». Skeleton de datos de moderación
+permanece; este formulario no muestra datos remotos.
+
+Se añaden Continúa con Google/Facebook y separador «o continúa con» siguiendo
+móvil, con SocialSignInButton compartido por ambos proveedores e iconos locales.
+StartSocialSignIn/CompleteSocialSignIn expresan operaciones de dominio,
+HttpSocialSignInRepository y fuente Supabase encapsulan HTTP; AccessViewModel
+coordina busy/proveedor, toast y descarte tardío. Plugin compone dependencias.
+
+OAuth servidor PKCE: POST same-origin /api/moderation/oauth/start, redirect a
+Supabase y retorno GET /api/moderation/oauth/callback?flow=…&code=…. Cookie de
+flujo AES-GCM/HttpOnly/SameSite Lax, scope /api/moderation/oauth,600s, state aleatorio
+y verifier privado; código se intercambia solo en servidor. Callback limpia cookie
+de flujo y valida estado/expiración antes de intercambiar. Auth/rol se verifican
+antes de guardar la cookie de moderación, que conserva SameSite Strict y scope
+/api/moderation. No tokens/verifier en payload cliente ni localStorage, ni roles automáticos.
+Solo GET callback admite navegación cross-site; las otras API mantienen bloqueo,
+protección de origen y límites. Retorno fijo, sin open redirect. Supabase consume
+el código una sola vez; pruebas de replay incluidas.
+
+Validación local: typecheck,30 pruebas unitarias/arquitectura, build y8 pruebas
+de servidor aprobados. Chrome fixture: ambos proveedores recorren inicio/retorno
+y cierre, más flujos previos; formulario SSR sin skeleton/texto retirado. Renders
+1920/1440/731/390/320 y texto200% sin overflow/CSP/hidratación; capturas escritorio
+y pequeña revisadas en apps/mobile/build/ui-preview/web-login.
+
+Pendiente configuración local (clave publicable, secreto y PUBLIC_WEB_ORIGIN),
+habilitación Google/Facebook y allowlist de callback web en Supabase, y demo con
+cuentas reales. Proveedores móviles no implican URL web autorizada. Sin cambios
+remotos, SQL, Flutter, despliegue o cierre de historia. Siguiente paso: configurar
+y verificar la autenticación real; no reaplicar030.
+
+## Login inspirado en acceso móvil y sader-panel — 18/10/2026
+
+Por petición del usuario, /login toma la composición del acceso móvil y la
+columna concentrada de sader-panel, manteniendo Arial/Helvetica/sans-serif.
+Marca oficial grande con nombre en dos líneas, título y lema; formulario directo
+sin tarjeta exterior ni cabecera/footer institucional duplicados. WebShell
+incorpora variante minimal y conserva el enlace de salto accesible.
+
+LoginInput se reutiliza en correo/contraseña: superficie #F5F5F7, radio22px,
+iconos de correo/candado, etiquetas flotantes persistentes y control accesible
+Mostrar/Ocultar contraseña. Botón Entrar carbón #111111 y texto blanco como
+en móvil, cápsula64px; es variante de login autorizada por esta solicitud.
+Fondo blanco/celeste/cream y BackgroundGlowOrb soft conservados. Cabecera fuera
+del reveal; edición y visibilidad no reinician entrada; movimiento reducido
+respetado. No se copian acciones sociales/registro/recuperación que no tengan
+implementación web en este alcance. Autenticación, roles y redirecciones iguales.
+
+Validación: typecheck,27 pruebas y build aprobados. QA Chrome de login con
+fixtures aprobado (autenticación/roles/redirects/logout/caducidad/reintento),
+además de Arial, ausencia de tarjeta y mostrar/ocultar sin perder el valor.
+Renders1920/1440/731/390/320, texto200% en320, sin overflow ni errores
+CSP/hidratación. Capturas escritorio/móvil/pequeña revisadas en
+apps/mobile/build/ui-preview/web-login. Configuración remota/cuenta revisora
+y otros navegadores pendientes; sin despliegue ni cambios SQL/Flutter.
+Siguiente paso: valoración visual del usuario y acceso real tras configurar servidor.
+
+## Corrección de consulta anónima de sesión — 18/10/2026
+
+La captura del usuario muestra aviso al abrir /login. Diagnóstico local: GET
+/api/moderation/session sin cookie devolvía503 porque se validaba configuración
+antes de reconocer ausencia de sesión. .env.local tiene SUPABASE_URL pero faltan
+SUPABASE_PUBLISHABLE_KEY, MODERATION_SESSION_SECRET y PUBLIC_WEB_ORIGIN.
+Solo se inspeccionó presencia de variables, sin mostrar ni modificar secretos.
+
+readModerationSession devuelve401 si no hay cookie antes de componer backend.
+Con cookie presente conserva descifrado/Auth/rol y errores reales; login sigue
+fallando cerrado si la configuración está incompleta. No se ocultan fallos503
+ni se otorgan permisos. Configuración de acceso real sigue pendiente.
+
+Validación: typecheck/build y7 pruebas de servidor de producción aprobados,
+incluida regresión sin configuración (sesión anónima401, cookie suministrada503,
+login503). Nuxt dev5173 comprobado: sesión sin cookie401, formulario visible sin
+toast de conexión y /moderacion redirige a /login. git diff --check aprobado.
+Sin cambios de variables, SQL o despliegue. Siguiente paso: configurar servidor
+local y comprobar acceso con cuenta revisora real.
+
+## Login web separado y redirecciones — 18/10/2026
+
+Por autorización del usuario se crea /login como página separada; /moderacion
+ya no contiene formulario. LoginScreen/AccessViewModel consumen AccessModeration
+y el repositorio HTTP existentes, sin consultar la cola desde el login.
+Instancias por consumidor, sin estado privado singleton. Usa WebShell,
+BackgroundGlowOrb soft, ActionButton, TopToast y ContentSkeleton, con referencia
+visual web vigente, campos accesibles, shake/invalid y shimmer de trabajo real.
+
+Sin sesión, /moderacion redirige a /login; al entrar o visitar /login con sesión
+autorizada se vuelve a /moderacion. Destino fijo, sin aceptar URLs de retorno
+arbitrarias. Rol denegado se anuncia por toast sin acceder al panel. Expiración,
+logout y cambios entre pestañas limpian datos y llevan al acceso cuando procede.
+Fallo de red/servidor permite reintento, sin tratarlo como ausencia de sesión.
+
+La cookie conserva alcance /api/moderation, HttpOnly/cifrado/SameSite y permiso
+por operación en servidor. La primera visita SSR sirve shell/skeleton público,
+y la redirección se ejecuta tras montar en navegador; el middleware protege
+navegaciones cliente posteriores. No se afirma redirección HTTP3xx en SSR.
+Sin registro, roles nuevos, panel de usuario, cambios SQL/Flutter o despliegue.
+
+Validación local: typecheck,27 pruebas unitarias/arquitectura, build Nuxt y
+6 pruebas de servidor de producción aprobados. Chrome con backend fixture:
+login, validación, denegación de rol, Enter, destino fijo, sesión existente,
+logout entre pestañas, recuperación503 y caducidad. QA moderación aprobado
+(cola/evidencia/decisiones/reintentos/revocación); sin errores CSP/hidratación.
+Renders1920/1440/731/390/320 y texto200% en320, sin overflow; escritorio y
+tamaño pequeño revisados en apps/mobile/build/ui-preview/web-login.
+Pendiente acceso con cuentas/configuración remotas reales y otros navegadores.
+030 confirmado previamente por usuario; no reaplicarlo. Sin publicación/GitHub.
+Siguiente paso: revisión visual del usuario y demo con cuenta revisora real.
+
+## Consolidación de reglas UI/UX web — 18/10/2026
+
+Se consolida REGLAS_UI_UX_WEB con fondo general blanco/celeste, fondo exterior
+del carrusel blanco/cream, paneles #F3F2EE, footer cream y contrato de
+BackgroundGlowOrb (intensidades, tokens, capas, movimiento/CSP). Texto secundario
+y oportunidad reflejan los retoques locales del usuario. Se integra la información
+en paleta/movimiento/aceptación y se retira el apéndice duplicado. REGLAS_UI_UX
+enlaza la consolidación vigente.
+
+Cambio exclusivo de Markdown, sin cambios de app, alcance o permisos.
+Validación: enlaces locales, concordancia con CSS/componente y git diff --check.
+No se repiten builds ni pruebas de app por esta edición.
+Siguiente paso: aplicar estas reglas en futuros incrementos web.
+
+## Corrección: fondo exterior del carrusel blanco/cream — 18/10/2026
+
+El usuario aclara con captura que el ajuste corresponde al fondo detrás del
+carrusel de mascotas. Se revierte el cambio equivocado de .purpose, que conserva
+el panel #F3F2EE. Una capa decorativa de .character-strip mezcla blanco predominante
+y cream tenue con bordes difuminados sobre el fondo celeste animado. Mantiene
+mascotas, tarjetas, espacios, controles y animaciones sin cambios.
+
+Validación Chrome local1440/390/320px, etiquetas200% en320: fondo computado
+correcto y panel original restaurado, sin overflow ni errores de página. Captura
+de escritorio revisada en apps/mobile/build/ui-preview/landing-carousel-cream.
+Sin build nuevo ni despliegue. Siguiente paso: valoración visual del usuario.
+
+## Patch030 confirmado y consulta sobre acceso web —18/10/2026
+
+El usuario confirma haber ejecutado030. Aplicación registrada según confirmación,
+sin inspección SQL remota nueva; no pedir reaplicarlo. La captura local de
+/moderacion muestra el formulario de acceso sin error visible: es la etapa
+esperada cuando no hay sesión web autenticada vigente. Sesión móvil no equivale
+a sesión del navegador; ejecutar SQL no inicia sesión ni asigna revisores.
+La captura acredita render del acceso, no login/rol ni demo completa de backend.
+Pendientes de validar: variables de Nuxt, cuenta revisora asignada en servidor,
+login y recorrido real. No se infiere que esos pasos ya estén hechos ni que
+fallen. Sin pruebas nuevas de app/SQL, despliegue o acciones GitHub. Documentación
+de activación/ficha/backlog actualizada; git diff --check aprobado.
+
+
+## Resplandor animado reutilizable de landing — 18/10/2026
+
+Por petición del usuario se adapta el efecto de sader-panel como componente Vue
+compartido BackgroundGlowOrb, sin dependencias de React ni del otro proyecto.
+Dos orbes celestes, halo y grano SVG local; movimiento CSS17/11/16s y entrada
+por opacidad. intensity acepta soft/medium/strong; los colores se personalizan
+con --glow-color y --glow-secondary desde CSS, sin atributos style ni relajar CSP.
+El contenedor consumidor aporta posición relativa y orden de capas.
+
+Landing lo monta una vez, en intensidad soft, detrás del contenido. Sigue el
+viewport mediante sticky y se desvanece hacia el footer cream mediante máscara
+exclusiva de landing. Decorativo, aria-hidden, sin eventos ni datos; movimiento
+reducido lo deja estático y visible. No afecta otras rutas ni sus permisos.
+
+Validación local: typecheck,25 pruebas y build Nuxt aprobados. Chrome de
+producción en1920/1440/731/390px y320px con texto200%: desplazamiento real de
+orbes, seguimiento del scroll, máscara del footer, modo reducido sin animaciones,
+FAQ operable y ausencia de overflow/errores CSP/hidratación. QA existente de landing
+aprobado: teclado/anclas/ilustraciones, SSR/FAQ sin JS y navegación landing→QR→landing.
+Capturas de escritorio/móvil y footer revisadas en
+apps/mobile/build/ui-preview/landing-glow. Sin despliegue; pendiente valoración
+del usuario y comprobación en otros navegadores.
+Siguiente paso: revisión visual del usuario; reutilizar el componente al intervenir
+otro recorrido autorizado.
+
+## Fondo blanco/celeste de landing — 18/10/2026
+
+Por petición del usuario, el fondo general cambia del radial crema a blanco con
+celeste difuminado lateral y transición gradual al cream existente del footer.
+Se conservan los retoques locales previos de texto, paneles y oportunidad.
+Solo presentación CSS; sin cambios funcionales ni despliegue.
+
+Validación local: Chrome sobre Nuxt dev existente en5173, renders1440/390px
+y320px con textos al200%, sin overflow horizontal ni errores de página.
+Captura de escritorio revisada; evidencia en
+apps/mobile/build/ui-preview/landing-background. No se ejecutó build de producción
+para este ajuste de fondo. Siguiente paso: valoración visual del usuario.
+
+## Moderación exclusiva de platform — HU-14.3 / RF-22,33, issue #45 —18/10/2026
+
+El usuario autoriza continuar y exige administración exclusivamente web. Se
+actualizan AGENTS, reglas de arquitectura/UI web/móvil, ADR-071, guía, ficha/
+índice, arquitectura/diseño/configuración, backlog y documentos de platform/SQL.
+Flutter conserva denuncia de usuario: sin cambios de lib/test móvil ni nuevos
+menús, pantallas, guards o acciones administrativas.029 ya confirmado aplicado;
+no se solicita reaplicarlo. Firebase/FCM fuera del alcance y de la aceptación.
+
+Implementación local en feature/platform-moderation, conservando cambios previos
+de documentación de029. Se preserva cambio paralelo ajeno en el degradado de
+landing.css, sin atribuirlo a moderación. No se hizo commit/push/PR/merge,
+publicación, SQL remoto, asignación de roles ni cambios de GitHub. No se declara
+HU-14 completa ni issue cerrado por esta entrega local.
+
+/moderacion → acceso con cuenta existente autorizada → cola paginada20 de
+pendientes/resueltas → revisión privada de motivo/evidencia y contenido → foto
+primaria procesada bajo petición → ocultar/restaurar/resolver sin cambiar
+visibilidad con motivo obligatorio500 → confirmación explícita → recibo guardado.
+Consulta de estado e historial de últimas20 decisiones, completo conservado en
+SQL. No se entregan suspensión de cuentas, bloqueo, apelación ni métricas.
+
+Dominio TypeScript/contratos/casos de uso, DTO y repositorios cliente/servidor,
+fuentes Auth/RPC/Storage encapsuladas, ViewModel y presentación separados. API
+comprueba Auth/rol en cada operación y SQL vuelve a autorizar. Sin secretos,
+tokens, paths de Storage, identidad del denunciante o coordenadas privadas en
+cliente/payload SSR. HTML inicial solo shell/skeleton; estado privado por
+instancia, sin singleton de sesión. Se asigna rol desde servidor, sin alta
+ficticia/autorización por navegación ni revisores predeterminados.
+
+Cookie de acceso HttpOnly cifrada/autenticada AES-256-GCM, SameSite Strict,
+Secure con HTTPS, máximo1h/sin refresh token; origen exacto y límites de cuerpo/
+tiempo/tasa. Logout local de sesión web, sin cerrar sesiones Android. Datos
+ligados a identidad esperada, cambios entre pestañas/expiración/falta de rol/
+disposición limpian estado y descartan respuestas tardías. Nuevas variables de
+servidor SUPABASE_PUBLISHABLE_KEY/MODERATION_SESSION_SECRET; configuración de
+lector QR permanece. La landing/QR no dependen de acceso administrativo.
+
+Plan030/fuentes102–105/migración/patch generados, sin cambiar SQL029 aplicado.
+Visibilidad separada del ciclo operativo, tablas privadas/RLS sin grants directos,
+decisiones append-only y accesos auditados a cola/detalle/evidencia/decisión.
+Versiones de denuncia y recurso, UUID estable y serialización entre denuncias
+del mismo recurso: replay no duplica, conflicto no borra decisiones. Lecturas
+privilegiadas de la RPC de029 también auditadas. Rol bloqueado durante operación.
+Pérdida de respuesta congela orden/contenido y habilita reintento idéntico;
+consulta fallida tras conflicto conserva borrador. Salida/cancelación confirmada.
+
+Ocultamiento excluye público/Explorar/guardados/QR/permisos de fotos y se hereda
+a avisos vinculados/avistamientos; revisión ordinaria no muestra avistamientos
+ocultos. Nuevos avisos/avistamientos rechazados en búsquedas ocultas. No cambia
+status del caso, contador de mascota ni historial de recuperación. Restauración
+no revierte retiro/cierre ni ocultamiento de la búsqueda vinculada. Bytes/URLs
+firmadas ya emitidos conservan límites de vigencia previos, sin prometer retirada
+retroactiva. Proxy de foto autoriza/audita antes de obtener bytes.
+
+UI con referencia aprobada de landing: crema/Arial/cápsulas, WebShell ancho
+alineado, retorno glass flotante, ActionButton/TopToast/ContentSkeleton compartidos.
+ConfirmationDialog nativo con foco/Escape/cancelación. Decisiones en radios con
+etiquetas completas y área táctil, contador500, invalid/shake, shimmer/etiqueta
+estable. Skeleton inicial y refresh con contenido conservado. Cabecera fuera del
+reveal; no repetir por edición. Movimiento reducido y navegación por teclado.
+
+Validación final web: typecheck y build Nuxt aprobados;25 pruebas de dominio,
+DTO, repositorio/fuente, sesión cifrada, ViewModel, arquitectura y exclusividad
+administrativa web aprobadas;6 pruebas de producción Nuxt aprobadas, incluyendo
+SSR sin evidencia, Auth/rol, Origin/cookie/CSRF, proxy y reintento tras commit.
+Chrome con fixture: acceso denegado/correcto y Enter, cola/revisión/foto, respuesta
+perdida/replay único, restauración, cancelación de salida, revocación, teclado,
+movimiento reducido y retorno landing/QR sin errores CSP/hidratación. Capturas
+1440/731/390/320/1920 y320 texto200% revisadas, sin overflow ni acciones cortadas;
+apps/mobile/build/ui-preview/moderation-web. No son demo hosted ni prueba Safari/
+Firefox. Build/Chrome avisan de exports obsoleto de @vue/shared (DEP0155); no falla
+la validación ni se cambian versiones por este incremento.
+
+SQL: regresión completa40/40 aprobada con la implementación final. Después se
+añadió un cuarto escenario de moderación para paginación22 recursos, herencia
+de ocultamiento y decisiones competidoras: suite final de moderación4/4 aprobada
+(incluye los3 casos ya presentes en la regresión completa). Cubre también rol/
+revocación, auditoría, CAS entre denuncias, replay, grants, QR/fotos/público,
+contador/estado intactos y repetición de run_all. PGlite usa una conexión y
+encola solicitudes: no certifica contención hosted multiconexión. No se repite
+Flutter419 ni APK porque no cambia código móvil. Comprobación de ausencia de
+rutas administrativas Flutter incorporada a las pruebas de arquitectura web.
+
+Durante QA se corrigió invocación de fetch nativo del navegador (ahora con
+regresión), nombre accesible de la decisión y etiqueta durante primer envío.
+Se sustituyó select por radios para evitar recortar opciones con texto200%.
+Generación inicial bloqueada por archivos Windows al reescribir patches previos
+idénticos; Build-RunAll ahora valida migraciones anteriores sin reescribirlos y
+sigue generando030/bundle con los scripts versionados. Generación y repetición
+SQL posteriores aprobadas; los generadores específicos de patch se mantienen.
+
+Logs hu143-{generation,typecheck-final,platform-tests-final,build-final,
+server-tests-final,browser-final,full-sql,sql-final}.log en apps/mobile/build.
+Ficha/ADR/configuración distinguen evidencia local y confirmación remota.
+Pendiente aplicar030 en desarrollo, configurar variables/asignar revisor en
+servidor, actualizar Nuxt y demo real con revisor/cuenta ordinaria/revocación,
+QR/lista/mapa y conflicto multiconexión. Despliegue/integración según autorización
+posterior. Siguiente paso operativo: activar/validar esta entrega web; bloqueo/
+apelación conservan sus historias y refinamiento, sin adelantar otro incremento.
+
+
+## Patch029 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch029 de HU-14.1. Se registra como
+aplicado, sin inspección SQL remota independiente; no solicitar reaplicarlo.
+Sustituye las referencias anteriores a029 pendiente. No se ejecutaron pruebas
+nuevas de aplicación, SQL remoto, despliegue ni acciones GitHub por esta nota.
+
+Siguiente: actualizar/reiniciar Flutter, abrir una ficha disponible, denunciar
+con motivo/evidencia opcional y comprobar el recibo y que el caso sigue con el
+mismo estado. Validación real ampliada de permisos/reintentos sigue sin evidencia
+nueva. Integración en main no verificada aquí; rama local feature/content-reports.
+Después corresponde HU-14.3/#45: cola de revisión y moderación con motivo,
+permisos y auditoría. HU-14.2/#44 conserva refinamiento pendiente sobre qué
+interacciones bloquea. Firebase/FCM fuera del alcance y sin bloquear el avance.
+Validación documental: git diff --check.
+
+
+## Denuncias de contenido — HU-14.1 / RF-22, issue #43 — 18/10/2026
+
+El usuario confirma028 aplicado y autoriza pasar al siguiente incremento. Se
+registra la confirmación sin nueva inspección remota ni exigir reaplicarlo.
+Firebase/FCM queda fuera del alcance activo y de sus criterios de avance;
+no es bloqueo ni tarea pendiente de esta entrega. ADR-068 sigue vigente.
+La demo real de HU-13 no se inventa ni se considera acreditada por aplicar SQL.
+
+Implementación local en feature/content-reports, conservando el trabajo existente.
+Durante el trabajo se observa el commit externo afe4831 con las pruebas/auditoría
+previas; no se hizo commit/push/PR, merge, despliegue ni cambio GitHub aquí.
+Se conservan los estados remotos como última instantánea, sin cierre de historias.
+
+Fichas de casos perdidos/búsquedas comunitarias/avisos/reportes anteriores y
+revisión privada de avistamiento → Denunciar contenido → motivo obligatorio500
+caracteres Unicode/evidencia escrita opcional1000 → Enviar denuncia → recibo
+persistido con actor/fecha servidor/referencia. Sin adjuntos nuevos, ocultamiento,
+bloqueo, decisión automática, apelación ni paneles/guards vacíos. La denuncia no
+altera estado del caso, contador, historial de recuperación ni revisión del aviso.
+
+Módulo content_reports con dominio/caso de uso/contrato, DTO/fuente/repositorio,
+providers declarativos y estado/ViewModel autoDispose. Bootstrap/main inyectan
+implementaciones; app/router compone slots en fichas/revisión. Shell/glass,
+transición desde botón compartido, cover/stagger, inputs/contadores, toast/shake,
+skeleton/shimmer reutilizados. Cabecera estable; edición no reinicia entrada.
+Recibo solo tras confirmación remota; doble envío bloqueado. Respuesta ambigua
+congela orden/contenido para repetir el mismo UUID; conflicto bloquea cambios.
+Cambio/error de sesión/disposición descarta respuestas tardías y oculta datos;
+recuperación de la misma cuenta permite empezar limpio. Salida con borrador o
+resultado ambiguo pide confirmación. Borrador durable offline corresponde a HU-15.
+
+SQL099–101/plan029, migración y patch generados; run_all regenerado con los scripts
+versionados, sin cambiar SQL028 aplicado. RLS/tablas sin grants directos de
+cliente/servicio. RPC autoriza visibilidad mediante proyecciones existentes y
+acceso privado a cronología para avistamientos; UUID serializado/replay/conflicto.
+Recibo repetible tras retirar el recurso, nuevo envío exige visibilidad vigente.
+Lectura de denuncia solo por su denunciante o revisor asignado por servidor;
+registro privado de revisores sin autoasignación ni usuarios predeterminados.
+No se expone evidencia al autor denunciado por el mero hecho de ser autor.
+
+Validación Flutter: análisis final sin incidencias, formato de570 archivos sin
+cambios.18 pruebas dirigidas aprobadas:7 del módulo,9 de arquitectura y2 recorridos
+reales normal/pequeño que ahora incluyen entrar desde ficha comunitaria, guardar
+recibo y retornar. Suite Flutter completa con concurrencia2:419 pruebas aprobadas.
+Renders390×844/320×350 texto2 revisados en build/ui-preview/content-reports;
+campos/acciones/recibo accesibles por scroll. Son fixtures, no demo Android hosted.
+
+Tres escenarios SQL nuevos aprobados: permisos/Unicode/replay/conflicto y recurso
+retirado, lectura privada/revisor/revocación/escalada, avistamiento autorizado y
+solicitudes encoladas sin duplicado; incluyen repetición del bundle y ciclo de
+vida operativo intacto. Regresión SQL completa:37 pruebas aprobadas,0 fallos (npm test).
+PGlite usa una conexión,
+no certifica contención hosted multiconexión. Sin cambios web ni build APK nuevo.
+
+Logs hu14-{generation,analyze-final,format-final,tests-final,full-mobile,sql,
+full-sql}.log en apps/mobile/build. Análisis inicial tuvo4 avisos de estilo,
+corregidos; verificación final limpia. Actualizados ADR-070, ficha/índice,
+arquitectura/diseño/configuración/guía y backlog local. No se da HU-14 completa.
+
+Pendiente aplicar029 completo en desarrollo y actualizar Flutter; demo con
+Supabase real para denunciante, autor, usuario ajeno y revisor asignado/revocado,
+pérdida de respuesta y concurrencia multiconexión. Después continuar moderación
+según las siguientes historias; bloqueo HU-14.2 conserva refinamiento pendiente.
+
+
+## Auditoría ampliada de tarjetas en progreso — 18/10/2026
+
+Por solicitud del usuario se revisaron las29 In progress, además del inventario
+de51 elementos. Se detectaron motivos no reconciliados: integración en main
+pendiente pese a PR fusionadas, cámara/principal/miniaturas todavía no
+implementadas pese a PR54, o Android nunca revisado pese al recorrido real
+del16/10. Se contrastó el árbol remoto main7367c5f y las PR53–60, pruebas
+existentes/CI y confirmaciones de010/011,012/WASM/guardado,022/023/QR y025.
+
+20 tarjetas más pasan a Done: #2/#4/#5/#6/#7/#9/#10/#17/#18/#20/#21/#22/
+#23/#26/#27/#30/#31/#32/#33/#37. Se actualizaron29 cuerpos y las51 fichas
+locales con Status/etiqueta/estado remoto;27 Done y cerrados,9 In progress,
+2 Ready,13 Backlog,0 In review;24 issues abiertos. Verificación API de los51
+sin desajustes. La clasificación refleja entrega integrada y evidencia posterior;
+no se inventan demos o inspecciones nuevas de permisos hosted.
+
+Pendientes específicos conservados: #1 por Google/baja/exportación; #19 por
+retorno OAuth Android abierto/cerrado; #8/#34/#35 por impresión/escaneo físico
+y hojas nativas guardar/compartir; #12/#40/#41 por integración de notifications
+y demo actual; #13 por integración de case_closure,028 y demo. Árbol main contiene
+0 fuentes de notifications y case_closure; no confundir pruebas locales412
+aprobadas con esas integraciones. FCM sigue pospuesto. Ready #14/#43 sin iniciar.
+
+Única red de producto nueva: consulta pública Google authorize sin seguir
+redirecciones/login, HTTP302 a accounts.google.com con redirect_uri correcto
+https://entrehuellas-supabase.kormind.com/auth/v1/callback. El antiguo fallo por
+ruta duplicada no es actual. No se imprimen códigos/estado/tokens/client_id ni
+se considera esa consulta una sesión OAuth completa.
+
+Matriz en docs/backlog/AUDITORIA_2026-10-18.md; índice/fichas funcionales y
+configuración coherentes con los motivos vigentes, historial conservado. JSON
+antes/después, árbol main, plan/auditoría en apps/mobile/build/backlog-audit*.json
+y backlog-audit-20261018. Sin pruebas de aplicación nuevas, SQL, despliegue,
+cambio de prioridad/estimación/dependencias, commit/push o inicio de moderación.
+Validación documental y git diff --check. Siguiente: integrar/validar HU-12/13;
+resolver recorridos concretos retenidos o iniciar la denuncia preparada #43.
+
+
+## Corrección de clasificación HU-03 — 18/10/2026
+
+El usuario cuestiona HU-03 en In progress porque la considera ya terminada.
+Revisión detecta motivos históricos de9/10 (fotos no implementadas/patch de
+mascotas pendiente) mantenidos sin reconciliar con integración y avances
+posteriores. Registro, consulta y edición con fotos están implementados e
+integrados (PR53/54 fusionadas); pruebas de mascotas/fotos y regresión412
+Flutter ya acreditadas. Se corrige HU-03/#3 y sus derivadas #28/#29 a Done.
+No se atribuye al usuario una nueva demo detallada ni al agente nuevas pruebas
+o inspección hosted; se corrige el seguimiento a partir de la revisión solicitada.
+
+Verificados por API los51 elementos y etiquetas:7 Done,29 In progress,2 Ready,
+13 Backlog,0 In review;44 issues abiertos/7 cerrados. #3/#28/#29 quedaron
+cerrados tras moverlos a Done. Índice/fichas y ficha/índice funcional actualizados,
+conservando el historial anterior. git diff --check sin errores. Sin código,
+pruebas nuevas, SQL, despliegue ni commit/push. Los otros recorridos no pasan
+a Done por arrastre; HU-12/13 conservan activación/aceptación pendientes y FCM
+sigue pospuesto.
+
+
+## Backlog de GitHub sincronizado por autorización del usuario — 18/10/2026
+
+Consultados los51 elementos de Projects3, campos/status, cuerpos/etiquetas/estado
+de issues y PR integradas. El usuario acepta explícitamente «Darlos por
+aceptados y moverlos a Done» para HU-10.1 y HU-11: #36/#38/#39 y épica #11
+pasan a Done; después se verifican los cuatro issues cerrados en GitHub. Se
+comprobaron integración por PR60 y CI remoto Flutter/SQL/reader/photos aprobado.
+No se atribuye inspección remota independiente a la aceptación comunicada.
+
+Resultado:4 Done,32 In progress,2 Ready,13 Backlog y0 In review.21 tarjetas
+cambian de estado;22 cuerpos actualizados con motivo/evidencia, incluido #42
+FCM pospuesto. Se verificó por API el Status nativo y una sola etiqueta status:*
+coincidente en los51 elementos;47 issues abiertos/4 cerrados. HU-12.1/#40 y
+HU-12.2/#41 siguen In progress (027 confirmado, demo pendiente), HU-13/#13
+In progress (028/demo pendientes); no se aceptan automáticamente los otros
+recorridos. HU-14.1/#43 y su épica #14 Ready por criterios/dependencias disponibles.
+FCM/Firebase #42 permanece Backlog/pospuesto (ADR-068); offline/cuenta/métricas
+y needs:refinement de #44/#51 se conservan. Sin estimaciones nuevas.
+
+Índice y51 fichas locales sincronizados; se conserva instantánea histórica
+anterior. Actualizados los seguimientos de cronología y avistamientos web y el
+índice funcional. Verificación documental y git diff --check; sin cambios de
+código ni pruebas nuevas de app por esta sincronización. Capturas JSON de antes/
+después, plan aplicado y auditoría en apps/mobile/build/backlog-sync-20261018
+y backlog-{project,issues}-{before,after}.json, sin credenciales. Sin SQL,
+despliegue, commit/push ni implementación de moderación. Siguiente paso operativo:
+activar/verificar HU-13 y la bandeja; HU-14.1 está preparada como siguiente historia.
+
+
+## Cierre y recuperación — HU-13 / RF-07, issue #13 — 18/10/2026
+
+Implementación local en feature/case-recovery, creada conservando el trabajo
+existente de HU-12. Se preservan cambios paralelos de landing y la decisión
+ADR-068: FCM/Firebase pospuestos, sin activar emisor/cron.027 ya confirmado;
+028 pendiente. Historia implementada localmente, sin cierre remoto de issue.
+
+Ficha propia activa→Ya fue recuperada→Cierre→motivo/evidencia testimonial
+opcional (texto500 por campo)→confirmación explícita→recibo persistido.
+Ver recuperación desde ficha resuelta; registros anteriores sin datos inventados.
+Módulo case_closure con dominio/casos de uso/contrato, DTO/fuente/repositorio,
+providers declarativos y ViewModel autoDispose; inyección bootstrap/main y ruta
+compuesta en app. Reutiliza shell/glass/cover/stagger/input/contador/toast/shake/
+skeleton/shimmer. Título Cierre evita partir palabras en320px/texto2. Recibo como
+etapa discreta; edición/carga no reinician reveal. Refresco conserva contenido y
+Explorar conserva filtros al actualizar tras cierre.
+
+Fuentes096–098/plan028, migración/patch generados con los scripts versionados;
+run_all regenerado sin editar SQL aplicado. Tabla privada/RLS sin grants
+cliente/servicio; lectura/escritura autentican responsable. Orden UUID congelada
+ante respuesta ambigua; repetición devuelve recibo original, conflicto/cierre
+exige consultar estado. Consulta fallida conserva borrador/reintento. Cambio/
+error de cuenta y disposición descartan respuestas tardías y ocultan datos.
+Salida con borrador o resultado ambiguo pide confirmación.
+
+Transacción bloquea mascota→caso, registra actor/fecha servidor/motivo/nota,
+actualiza estado/contador e historial y cancela pendientes/leases de difusión de
+búsqueda. Contador inconsistente falla y revierte, sin corregirlo silenciosamente.
+Bandeja y notificación de cierre se conservan. RPC anterior conserva contrato y
+permisos, delegando las acciones nuevas, sin backfill de cierres históricos.
+QR previo conserva slug y refleja cierre neutro/fecha, sin motivo/nota; web/app
+rechazan nuevos avistamientos, responsables pueden crear otro episodio con otro
+UUID conservando el anterior. No cambia Nuxt ni amplía visibilidad de resueltos.
+Push en tránsito no puede retirarse; FCM permanece pospuesto/inactivo.
+
+Validación local:18 comprobaciones Flutter finales aprobadas (dominio, DTO/fallos
+seguros, ViewModel, orden ambigua/doble envío, conflicto/consulta fallida,
+cuenta/error de sesión/disposición, UI en390×844/320×350 texto2 y navegación
+real desde ficha comunitaria, más9 reglas arquitectónicas). Renders revisados en
+apps/mobile/build/ui-preview/case-closure; campos/acciones y recibo accesibles por
+scroll. Análisis final limpio y formato de16 archivos comprobado. Primera suite
+Flutter completa:410 aprobadas/2 fallos por el acceso a la ruta nueva desde la
+redirección raíz; corregido y regresiones específicas aprobadas. Repetición
+completa final con concurrencia2:412 pruebas aprobadas, sin fallos.
+
+SQL/PostGIS:26 regresiones existentes y4 HU-12 aprobadas;4 escenarios HU-13
+aprobados sobre la versión final (y escenario de rollback/mapa reforzado repetido).
+Incluyen permisos/columnas privadas, reintentos/conflicto, repetición del bundle,
+QR previo antes/después, rechazo web/app, historial/contador, episodio nuevo,
+cancelación de lease, rollback ante fallo y contador inválido, solicitudes
+competidoras encoladas y proyecciones activas/resueltas. npm test incorpora las
+tres suites con concurrencia1. PGlite es una conexión; no certifica concurrencia
+hosted multiconexión.17 pruebas de regresión Nuxt aprobadas sin cambios web propios.
+
+APK debug intentado: vuelve a fallar antes de compilar por Gradle,
+java.io.IOException: Unable to establish loopback connection. Sin APK nuevo.
+Logs hu13-{generation,format-final,analyze-final,final-tests,full-mobile,
+full-mobile-final,sql-final,sql-preflight-final,full-sql,platform-tests,
+android-build}.log en apps/mobile/build. Fallos intermedios de pruebas fueron
+corregidos; la evidencia final se distingue de las ejecuciones iniciales.
+
+Pendiente ejecutar028 completo en desarrollo y actualizar Flutter; demo con
+Supabase real, dos cuentas/sesiones, cierre concurrente y respuesta perdida,
+QR ya emitido, rechazo de nuevos avisos, mapa/historial/bandeja y otro episodio.
+Sin SQL remoto, despliegue ni acciones GitHub desde este trabajo. No se reactiva
+FCM. Ficha/índice/ADR-069/arquitectura/diseño/guía/configuración/backlog actualizados.
+Siguiente paso: activar/verificar HU-13; después HU-14, moderación.
+
+
+**Distribución irregular solicitada — 18/10/2026:** se sustituye la alineación y el tamaño uniforme por huellas con tamaños, alturas, separaciones y giros diferentes, sobre el crema exterior. Diez en escritorio y cuatro en móvil. Build Nuxt y revisión Chrome en 1920/1440/731/390/320px (320 con texto al 200%) aprobados: tamaños y posiciones distintos, sin invadir el panel ni producir overflow o errores de página. Capturas closing-paws actualizadas. Sin despliegue; pendiente revisión del usuario.
+
+## Huellitas del cierre sobre fondo crema — 18/10/2026
+
+Por petición del usuario, las huellas de «Una huella tuya puede acercarlos a casa» pasan al fondo amarillento exterior. Un contenedor de presentación reserva bandas superior/inferior; el panel aurora conserva título y acciones. Diez huellas en escritorio y cuatro en móvil, decorativas y sin eventos.
+
+Validación local: typecheck,17 pruebas y build Nuxt aprobados. Chrome en1920/1440/731/390/320px (320 con texto200%): huellas fuera del panel, sin overflow ni errores de página; capturas de escritorio/móvil revisadas en apps/mobile/build/ui-preview/closing-paws-*.png. Sin despliegue. Siguiente paso: revisión del usuario.
+
+## FCM/Firebase pospuestos por el usuario — 18/10/2026
+
+Por instrucción explícita, HU-12.3/#42 queda pospuesta y fuera del incremento
+activo. HU-12.1/#40 y HU-12.2/#41 continúan como seguimiento y bandeja con
+Supabase. Sustituye el requisito de activar Firebase/Edge/cron de las notas
+anteriores; HU-12 completa no se declara cerrada. ADR-068 registra el recorte.
+
+Retirados SDK firebase_core/firebase_messaging, adaptador Firebase, plugin Google
+Services y permiso/metadata Android. Pub get actualizó lock y registrants sin
+Firebase. Bootstrap conserva contrato no disponible y main no observa push;
+campana abre bandeja sin registro del teléfono. La preferencia de teléfono de
+HU-02 se conserva como elección futura guardada con texto explícito de pendiente,
+sin pedir permisos ni registrar tokens. No se introduce un proveedor alternativo.
+
+027 permanece aplicado según confirmación del usuario: sin modificación,
+reaplicación ni reversión de su SQL. Se conservan suscripciones/bandeja/outbox,
+contratos genéricos y emisor preparado, inactivos; quitada la entrada del emisor
+en config.toml. No configurar secrets, desplegar esa carpeta (tampoco por deploy
+global) ni programar entregas ahora. Los trabajos pendientes no se despachan.
+
+Validación de este ajuste: flutter pub get aprobado, análisis limpio y formato
+de6 archivos comprobado.30 pruebas Flutter aprobadas: seguimiento/bandeja,
+preferencias, navegación y arquitectura; incluye recorrido real de campana
+que confirma ausencia de observación/registro push. Renders390×844/320×350
+texto2 regenerados y revisados en build/ui-preview/notifications. Sin nuevos
+tests SQL, despliegue, cambios remotos, APK o comprobación de Gradle; no cambia
+el esquema aplicado. Logs hu12-defer-fcm-{pub,format,analyze,tests}.log en
+apps/mobile/build. Se preserva trabajo paralelo ajeno de case_closure/plan028.
+
+Siguiente paso del alcance activo: reiniciar/actualizar Flutter y confirmar
+seguimiento→evento nuevo→bandeja→leída/reentrada con Supabase real y dos cuentas.
+FCM no bloquea esa validación ni continuar HU-13 tras confirmarla. Guía,
+configuración, fichas/índice, arquitectura y backlog actualizados.
+
+## Patch027 aplicado según confirmación del usuario — 18/10/2026
+
+El usuario confirma haber ejecutado el patch027 de seguimiento/alertas.
+Sustituye el pendiente de aplicación027 en las notas anteriores; no se solicita
+reaplicarlo. Confirmación comunicada, sin inspección SQL remota independiente.
+Pendiente actualizar/reiniciar Flutter y validar seguimiento/bandeja con sesión
+real y un evento nuevo. Para completar push faltan configuración Firebase
+Android, secrets/despliegue Edge notification-delivery y planificador seguro,
+seguido de demo Android/FCM y reintentos. El bloqueo de build Gradle documentado
+no se ha vuelto a comprobar. Sin pruebas nuevas por esta actualización
+documental, ni cierre de historias, despliegue o cambios de GitHub.
+
+## Seguimiento y alertas — HU-12.1/#40,12.2/#41,12.3/#42 — 18/10/2026
+
+Implementación local en feature/following-notifications, creada desde
+feature/case-timeline-review con árbol limpio. Se respeta026 y HU-11 ya
+confirmados por el usuario; no se pide reaplicarlos. Sin cambios de Nuxt.
+
+Fichas→Seguir/Dejar de seguir; zonas propias→seguimiento explícito; campana
+Inicio→bandeja paginada→Marcar leída/Abrir caso; preferencias existentes y
+registro voluntario del teléfono. Guardados sigue siendo independiente.
+Contratos/casos de uso de dominio, providers declarativos, ViewModels, estado,
+DTO/repositorios/fuentes de notifications; composición mediante slots de app,
+sin imports de UI/data entre funcionalidades. Reutiliza shell/reveal/glass,
+superficies/toast/skeleton/shimmer, refresh con datos conservados e identidad
+protegida. Órdenes de seguimiento UUID/CAS con recibo original en reintentos;
+doble envío bloqueado y resultados tardíos descartados. Registro/borrado de
+tokens serializados para evitar carrera entre logout y cambio de cuenta.
+
+Plan027/fuentes091–095, migración y patch generados, run_all ampliado sin
+reescribir migraciones aplicadas. Tablas privadas/RLS sin grants directos.
+Destinatarios por seguimiento/preferencias y distancia a zona pública aproximada,
+sin GPS continuo. Eventos nuevos de publicación, avistamientos web/app,
+avisos vinculados, revisión y cierre guardan alerta/outbox atómicamente;
+deduplicación por evento/cuenta y sin backfill. Lectura por cuenta y destino
+con autorización actual; avisos sin evidencia/comentarios/coordenadas privados.
+
+Edge notification-delivery preparada con secreto de máquina, FCM HTTP v1/OAuth
+solo servidor, claim/lease/expiración, revalidación de caso/preferencias/seguimiento,
+backoff y tokens inválidos. Push neutro abre bandeja tras login/onboarding.
+La bandeja permanece si falla el proveedor. Aceptación no acredita llegada;
+respuesta perdida puede repetir push/tag estable, sin duplicar la bandeja.
+Cierre posterior a claim/aceptación no retira mensajes en tránsito; TTL60s.
+App sin configuración Firebase mantiene bandeja/seguimiento operativos.
+
+Validación local:23 pruebas finales Flutter (dominio, repositorio/DTO, ViewModels,
+reintento ambiguo/conflicto, cuenta/sesión/disposición, retiro de token, UI,
+navegación desde campana/push con y sin sesión y9 comprobaciones arquitectónicas)
+aprobadas.40 regresiones Flutter previas aprobadas. Renders390×844 y320×350
+con texto2 revisados en apps/mobile/build/ui-preview/notifications; scroll permite
+alcanzar lectura/acciones. Fixtures locales, sin acreditar permisos/token reales.
+Suite SQL existente26/26 y4 nuevos escenarios SQL/PostGIS aprobados; cubren
+cuentas/grants, CAS/replay, destinatarios/radios/tipos/pausa, páginas/leído,
+deduplicación, outbox/leases/vencimiento, fallos/tokens y cancelación tras cierre
+o cambios de preferencias/suscripción.6 pruebas servidor con proveedor/OAuth
+simulados aprobadas y Deno check de Edge aprobado.
+
+Primer intento de suite Flutter completa en paralelo abortó tras79 pruebas
+por Out of memory de Dart VM; log hu12-full-mobile.log conservado. Repetición
+secuencial completa:403 pruebas aprobadas (hu12-full-mobile-sequential.log).
+Las23 comprobaciones específicas/arquitectónicas se ejecutaron también sobre
+los ajustes finales y aprobaron. Análisis final limpio y formato comprobado.
+Dos intentos de APK debug (normal/IPv4) fallaron antes de compilar por Gradle:
+java.io.IOException: Unable to establish loopback connection. No APK nuevo
+acreditado. Logs hu12-{final-tests,mobile-tests,sql,full-sql,push-tests,edge-check,
+analyze-final,format-final,android-build,android-ipv4}.log en apps/mobile/build.
+
+Pendiente aplicar027 en desarrollo, actualizar Flutter, configurar Firebase
+(JSON nativo/defines públicos del mismo proyecto), secrets Edge y planificador
+servidor; probar Android/Supabase/FCM reales, app terminada, permisos, dos sesiones
+concurrentes y logout offline. No hay despliegue, SQL remoto, cron activo,
+commit/push ni modificaciones de GitHub. Historias abiertas por activación/demo
+pendientes. Siguiente paso: activar y validar HU-12 antes de continuar HU-13.
+Ficha/índice/ADR-067/arquitectura/guía/configuración/backlog actualizados.
+
 ## HU-11 operativa según confirmación del usuario — 18/10/2026
 
 Después de confirmar la aplicación026 y recibir los pasos de validación Android,
@@ -2849,7 +3715,6 @@ Por solicitud del usuario se generó con imagegen un mockup de página completa 
 
 Nueva revisión visual solicitada por el usuario para aproximar distribución/formato de su referencia: hero centrado, tarjetas de personajes con poses y alturas distintas, bloques alternados, degradados aurora y cierre con mascotas grandes. [Mockup y prompt](../mockups/landing-concepto-v2/README.md), generado con imagegen, conservando v1. Revisión visual completada; banner emocional interpretado en dos columnas. Pendiente aprobación del concepto y eventual maquetación con textos/enlaces reales, responsive y accesibilidad. Solo imagen conceptual: sin código, despliegue, funciones nuevas ni cierre de HU.
 
-
 ## Búsquedas propias/comunitarias y avisos vinculados — 11 de octubre de 2026
 
 Implementado el modelo autorizado por el usuario: Mascota perdida permite Mi mascota u Otra mascota posiblemente perdida, sin crear una ficha propia para la segunda. Mascota encontrada registra La vi o La encontré y está conmigo sobre una búsqueda abierta; desde la ficha se preselecciona su destino. Fotos opcionales en avisos, obligatorias en búsquedas comunitarias. Avisos consultables desde la búsqueda y sin cierre automático. Solo el autor confirma Ya fue recuperada; servidor actualiza estado/historial y contador de mascota de forma atómica e idempotente. Registros anteriores conservados como legacy_found, sin reinterpretación. UI reutiliza campos, efectos, toast, skeleton/shimmer y navegación compartidos; títulos breves y secuencia stagger ajustados a los campos reales.
@@ -2924,7 +3789,6 @@ Validación local: formato de los dos archivos Dart correcto, flutter analyze --
 Actualizado README raíz con icono existente, badges informativos de stack/estado, requisitos fijados en el workflow, clonación, dependencias, enlace a la plantilla config/supabase.local.example.json, creación del archivo local y ejecución Android/VS Code. Los valores del entorno se compartirán internamente por el responsable; solo configuración pública en el cliente, sin secretos en Git. Aclarada la validez OTP de ejemplo y la diferencia entre configuración cliente y activación del backend. Añadidos flujo de ramas/PR, fronteras por funcionalidad, comprobaciones, mapa del repositorio y enlaces de documentación. Retiradas afirmaciones antiguas de README sobre acceso y onboarding omitible; no cambia el alcance funcional ni se cierra ninguna historia.
 
 Validación documental: referencias locales, anclas internas, bloques de código, JSON de ejemplo con valores Supabase vacíos y exclusión Git del archivo local comprobados; git diff --check correcto. No se ejecutaron pruebas Flutter ni builds por tratarse de documentación; render de GitHub y disponibilidad remota de badges no comprobados. No se modificaron credenciales, configuración ni fichas funcionales en este incremento. Trabajo local previo conservado. Siguiente paso: revisar el README en GitHub cuando se autorice su publicación; sin commit, push ni despliegue en esta tarea.
-
 
 ## Explorar: lista filtrada y paginada — 15 de octubre de 2026
 

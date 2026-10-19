@@ -1,5 +1,166 @@
 # Configuración y validación de la app
 
+## Moderación web — HU-14.3, patch030
+
+Administración/moderación exclusivamente en apps/platform por instrucción del
+usuario. Flutter no tiene paneles, menús ni acciones administrativas.029 ya
+aplicado según confirmación del usuario;030 también confirmado aplicado.
+Sin inspección SQL remota independiente; no reaplicar029/030.
+
+1. [030_patch_content_moderation.sql](../database/patchs/030_patch_content_moderation.sql)
+   ya ejecutado según confirmación del usuario; no reaplicarlo.
+2. Configurar en el servidor Nuxt SUPABASE_PUBLISHABLE_KEY (clave publicable o
+   anon heredada) y MODERATION_SESSION_SECRET aleatorio de al menos32 caracteres.
+   Debe ser idéntico entre réplicas; rotarlo invalida cookies anteriores. Nunca
+   usar NUXT_PUBLIC ni guardar secretos en el repositorio. Mantener SUPABASE_URL,
+   SUPABASE_SERVER_KEY y PUBLIC_WEB_ORIGIN (origen exacto, HTTPS en producción).
+3. Elegir una cuenta existente con correo/contraseña y asignarle permiso desde
+   una sesión SQL privilegiada del servidor. No hay revisor por defecto ni
+   autoasignación desde móvil/web. Sustituir UUID_DE_LA_CUENTA por su UUID real:
+
+```sql
+begin;
+insert into public.content_report_reviewers(user_id)
+select id from auth.users where id='UUID_DE_LA_CUENTA'::uuid
+on conflict(user_id) do nothing;
+commit;
+```
+
+Para revocar, desde el mismo entorno privilegiado:
+
+```sql
+delete from public.content_report_reviewers
+where user_id='UUID_DE_LA_CUENTA'::uuid;
+```
+
+No ejecutar estos ejemplos con el placeholder; no se han ejecutado en remoto.
+La asignación es un dato operativo; esquema/grants/RPC están versionados en030.
+No usar service_role para decisiones: el servidor ejecuta RPC con JWT del revisor.
+La clave secreta existente solo se usa en QR/proxy de foto tras autorizar/auditar.
+
+4. Actualizar Nuxt local; publicación y redeploy requieren autorización de la
+   tarea de despliegue. Abrir /moderacion, entrar con la cuenta revisora y probar
+   cola → detalle → foto bajo petición → motivo → decisión → recibo → consulta
+   actualizada. Las cuentas sin rol reciben denegación, sin datos privados.
+5. Verificar QR/lista/mapa/guardados sin contenido oculto, estado operativo del
+   caso intacto, restauración y revocación del revisor. Probar dos revisores
+   compitiendo sobre la misma versión y reintento tras respuesta perdida.
+
+La sesión usa cookie HttpOnly cifrada/autenticada, SameSite Strict y Secure en
+HTTPS; máximo1h, sin refresh token. Se pide nuevo login al expirar. Logout es de
+esta sesión web, sin cerrar sesiones Android. No se serializa evidencia en SSR.
+Los JWT emitidos conservan su vencimiento; revocar el rol bloquea nuevas
+operaciones aun con cookie válida. No se afirma revocación retroactiva de bytes
+ya descargados ni de URLs firmadas previamente emitidas. Firebase/FCM fuera del
+alcance. [Ficha](funcionalidades/moderacion-web.md),
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md).
+
+
+**Confirmación posterior18/10:** el usuario ya ejecutó029. No reaplicarlo.
+Actualizar/reiniciar Flutter y validar Denunciar contenido → recibo persistido.
+Las indicaciones inferiores de029 pendiente quedan sustituidas por esta nota.
+
+
+## Denuncias de contenido — HU-14.1, patch029
+
+028 aplicado según confirmación del usuario; no reaplicarlo. Para este incremento
+aplicar completo [029_patch_content_reports.sql](../database/patchs/029_patch_content_reports.sql)
+en desarrollo y actualizar Flutter.029 aún no aplicado ni verificado remotamente.
+No requiere Nuxt ni Firebase/FCM. No hay revisores predeterminados: la asignación
+en content_report_reviewers es una operación privilegiada de servidor, nunca
+metadatos de cuenta ni una acción cliente. Demo real debe probar denunciante,
+autor ajeno y revisor/revocación; la tabla de roles no tiene acceso directo cliente.
+Las notas antiguas de028 pendiente inferiores quedan sustituidas por esta confirmación.
+
+
+**Google, auditoría18/10:** el authorize público devuelve302 a Google con
+redirect_uri https://entrehuellas-supabase.kormind.com/auth/v1/callback,
+sin duplicación. El diagnóstico de ruta duplicada del7/10 es histórico; no
+repetir su corrección en un servidor que ya responde así. Falta demostrar el
+retorno Android abierto/cerrado; esta consulta no autentica una cuenta ni
+valida credenciales OAuth. Sin cambios de servidor ni tokens impresos.
+
+## Cierre y recuperación — HU-13, patch028
+
+027 ya aplicado según confirmación del usuario. Ejecutar **todo**
+[028_patch_case_closure.sql](../database/patchs/028_patch_case_closure.sql) en
+Supabase de desarrollo y actualizar/reiniciar Flutter. No reaplicar027 ni
+reescribir migraciones anteriores. No requiere desplegar Nuxt: el QR existente
+consulta el estado cerrado. No se configura Firebase/FCM/Edge/cron (ADR-068).
+
+Validar con responsable y cuenta ajena; dos sesiones cierran el mismo caso,
+reintento tras respuesta perdida conserva recibo/motivo/fecha, mismo QR muestra
+cierre sin datos privados, web/app rechazan nuevos avistamientos y las consultas
+activas/resueltas se actualizan. Comprobar historial/bandeja y publicar otro
+episodio de la mascota sin reabrir el anterior. Ver
+[ficha](funcionalidades/cierre-y-recuperacion.md) y [estado](ESTADO.md) para
+pruebas y limitaciones: Gradle aún bloquea el APK por conexión loopback.
+
+
+## Seguimiento y alertas — HU-12, 18/10/2026
+
+**Actualización vigente:** el usuario pospone FCM/Firebase. Solo se activa y valida
+seguimiento/bandeja con Supabase. El cliente ya no incluye SDK/plugin Firebase,
+no observa push ni ofrece registrar el teléfono. No configurar Firebase,
+secrets, Edge notification-delivery ni planificador para el incremento actual.
+Las instrucciones Firebase/FCM que siguen se conservan como referencia diferida,
+no como pasos pendientes para validar HU-12.1/12.2. Véase ADR-068.
+
+026 y [patch027](../database/patchs/027_patch_notifications.sql) ya confirmados
+por el usuario; no reaplicarlos. Confirmación comunicada, sin inspección remota
+independiente. Actualizar Flutter. Regeneración de artefactos:
+Build-NotificationsPatch.ps1 y Build-RunAll.ps1. No repetir025/026/027 ni ejecutar
+run_all como sustituto del patch.
+No requiere cambiar Nuxt: las escrituras existentes activan los triggers nuevos.
+
+Seguimiento/bandeja funcionan con sesión Supabase y clave publicable, sin Firebase.
+Abrir campana → preferencias → activar recepción/tipos/canales, seguir zona propia
+o caso y generar un evento nuevo con otra cuenta o desde QR. Instalar no genera
+alertas retroactivas. Leer, reiniciar, paginar y abrir caso con permisos actuales.
+No confundir Guardados con seguimiento ni asumir que una zona existente se sigue.
+
+Para push Android, registrar en Firebase el identificador existente
+`com.example.flutter_application_entrehuellas` (no renombrarlo). Descargar su
+google-services.json a apps/mobile/android/app/google-services.json, ignorado
+por Git. El plugin Google Services4.4.4 se aplica solo cuando existe ese archivo.
+Su configuración nativa permite recibir con app terminada; conservarla junto
+con los cuatro valores públicos de compilación del mismo proyecto:
+
+| Define Flutter | Valor del proyecto Android Firebase |
+| --- | --- |
+| FIREBASE_API_KEY | API key pública del proyecto/app |
+| FIREBASE_APP_ID | App ID Firebase Android, no el package name |
+| FIREBASE_MESSAGING_SENDER_ID | Número de proyecto / sender ID |
+| FIREBASE_PROJECT_ID | ID del proyecto Firebase |
+
+Añadirlos al mecanismo local de dart-defines existente, conservando los de
+Supabase/web. Sin los cuatro valores, Firebase no se activa; el botón informa
+indisponibilidad y la bandeja sigue operativa. Nunca colocar private_key,
+service_role o JSON de cuenta de servicio en esos defines ni en google-services.json.
+Dependencias fijadas firebase_core4.0.0/firebase_messaging16.0.0 para el contrato
+de registration token HTTP v1; no migrar a FID/APIs de v17 implícitamente.
+Referencia: [configuración Android oficial](https://firebase.google.com/docs/android/setup)
+y [FCM Flutter](https://firebase.google.com/docs/cloud-messaging/flutter/get-started).
+
+Activar FCM HTTP v1 y configurar secrets/desplegar Edge notification-delivery
+según [su README](../supabase/functions/notification-delivery/README.md).
+Configurar un planificador de servidor una vez por minuto con secreto seguro;
+sin planificador no se envía la cola automáticamente. Nada de esto está
+desplegado/programado por este incremento. La autorización actual cubre código
+y validación local; no modifica recursos remotos ni claves del usuario.
+
+Demo pendiente: dos usuarios y dos sesiones; no consultar/marcar bandeja ajena;
+seguir/dejar de seguir, pausar/tipos/canales, zona fuera/dentro de radio;
+FCM caído → alerta guardada → restaurar proveedor → reintento sin duplicar
+bandeja; token UNREGISTERED y token renovado; cierre antes del reintento;
+permiso denegado/aceptado, app abierta/en segundo plano/terminada, login al tocar
+aviso, cambio de cuenta y logout offline. Se acepta repetición del push tras acuse
+perdido; no se acredita entrega solo con estado sent.
+
+Intentos locales de APK debug (normal y preferencia IPv4) bloqueados por Gradle:
+`java.io.IOException: Unable to establish loopback connection` antes de compilar.
+No hay APK nuevo acreditado; compilar y ejecutar Android sigue pendiente.
+
 ## Cronología y revisión — HU-11, 18/10/2026
 
 El usuario indicó «ok ya esta» tras la entrega025; se conserva esa confirmación,
@@ -443,3 +604,28 @@ El servidor demo no acepta lang=es; se omite esa opción y conserva nombres loca
 
 
 Comprobación adicional con cliente Dart real: el endpoint inicial respondió403 al cliente sin identificar. PhotonPlaceDataSource envía ahora User-Agent legítimo EntreHuellas/0.1 con el enlace del proyecto, sin suplantación de navegador. Con esa cabecera, la fuente/repositorio/caso de uso devolvieron5 resultados válidos para Miraflores Lima Peru. Repetir en Android y en cualquier endpoint sustituido; no usar la prueba de escritorio como garantía del servidor demo.
+
+## Login social web — Google y Facebook
+
+La web usa los proveedores habilitados en el mismo Supabase que móvil; registrar
+la redirección web adicional. Completar SUPABASE_PUBLISHABLE_KEY,
+MODERATION_SESSION_SECRET (mínimo32 caracteres aleatorios privados) y
+PUBLIC_WEB_ORIGIN con el origen exacto, por ejemplo http://127.0.0.1:5173 para
+desarrollo o https://entrehuellas.kormind.com para producción. Guardar localmente
+en .env.local y configurar servidor/Dokploy, nunca cliente/NUXT_PUBLIC.
+
+En Auth URL Configuration autorizar únicamente los callback de los entornos
+usados: <PUBLIC_WEB_ORIGIN>/api/moderation/oauth/callback?flow=* (la parte flow
+es aleatoria por intento; usar el patrón acotado de redirect URLs de Supabase).
+Validar que el patrón admita la query flow sin permitir hosts externos.
+Google/Facebook se configuran en el Dashboard del proveedor/Supabase con sus
+credenciales existentes; no copiar client secrets a esta app. El callback del
+proveedor hacia Supabase sigue siendo el de ese backend, no el callback Nuxt.
+Probar consentimiento/cancelación y retorno web con una cuenta revisora real.
+
+No registrar códigos/verifiers/tokens ni query de callback en logs del proxy.
+La cookie temporal eh_oauth es HttpOnly/Lax, dura10min y contiene estado/verifier
+cifrados; solo el intento más reciente del navegador es válido. La cookie final
+conserva Strict/HttpOnly. OAuth puede crear/vincular identidades según Auth, pero
+los permisos administrativos siempre se asignan desde servidor.
+Activación no realizada en esta tarea; pruebas con proveedores simulados.

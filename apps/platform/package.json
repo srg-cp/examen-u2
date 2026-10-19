@@ -11,8 +11,8 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "start": "node --env-file-if-exists=.env .output/server/index.mjs",
-    "test": "node --experimental-transform-types --test tests/reader.test.mjs tests/architecture.test.mjs tests/sightings.test.mjs tests/app-sightings.test.mjs",
-    "test:server": "node --test tests/production.test.mjs"
+    "test": "node --experimental-transform-types --test tests/reader.test.mjs tests/architecture.test.mjs tests/sightings.test.mjs tests/app-sightings.test.mjs tests/moderation.test.mjs",
+    "test:server": "node --test tests/production.test.mjs tests/moderation-production.test.mjs"
   },
   "dependencies": {
     "leaflet": "1.9.4",

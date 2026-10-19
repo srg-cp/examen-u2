@@ -1,5 +1,44 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Documentos legales del acceso —18/10/2026
+
+El usuario solicita animación del icono, orbe en login y enlaces de términos/
+privacidad. /terms y /privacy públicas, con correo y responsable confirmados;
+ampliación autorizada del acceso, sin nueva HU/issue ni funciones administrativas
+por arrastre. Sin SQL/móvil/despliegue. Ver ficha documentos-legales y ESTADO.
+
+## Ampliación autorizada de acceso web social —18/10/2026
+
+El usuario solicita Google/Facebook como en móvil, retirar texto de cuentas
+autorizadas y revisar skeleton. Implementación de /login dentro del incremento
+HU-14.3 / issue #45; no crea una HU/issue nuevo ni cierra historia automáticamente.
+PKCE y permisos en servidor, sin cambios SQL/móvil. Configuración de proveedores,
+allowlist web y demo real pendientes; [ficha](funcionalidades/acceso-web.md).
+
+## Separación del login web —18/10/2026
+
+Petición explícita del usuario: /login separado y redirecciones de /moderacion,
+login, logout y expiración. Incremento de acceso de HU-14.3 / issue #45, sin
+registro ni nuevos roles/HU, sin SQL ni cambio de alcance móvil.
+[Ficha de acceso](funcionalidades/acceso-web.md) y ESTADO separan QA fixture
+de validación remota pendiente.030 ya confirmado por usuario.
+
+**Incremento18/10 HU-14.3/#45:** usuario autoriza moderación exclusivamente en
+apps/platform; móvil conserva denuncia de usuario, sin administración. Se
+implementa cola/revisión/decisión con auditoría y visibilidad independiente del
+estado del caso.029 ya aplicado según usuario;030/configuración/demo pendientes.
+HU-14.2 bloqueo y HU-14.4 apelación no se entregan por arrastre. FCM fuera del
+alcance. [Ficha](funcionalidades/moderacion-web.md),
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md).
+
+
+**Avance18/10:** usuario confirma028 aplicado y autoriza HU-14.1/#43 de S6.
+Denuncia Android/SQL implementada localmente, pendiente029/demo/integración.
+[Alcance y validación](funcionalidades/denuncias-contenido.md). Firebase/FCM está
+fuera del alcance activo; no se condiciona este avance a su activación.
+Las referencias históricas a028 pendiente quedan sustituidas por la confirmación.
+
+
 **Regla vigente — 11 de octubre de 2026:** feedback de errores, validación y resultados en el toast superior compartido en todas las funcionalidades. Sin texto bajo inputs, errorText/helperText ni indicadores circulares/lineales. Skeleton y LoadingShimmer para carga inicial/acciones; ContentRefresh con shimmer conserva contenido durante refresh. Se mantienen invalid/ShakeField, semántica, reintentos, etiquetas/datos e instrucciones de privacidad. [ADR-027](decisiones/027-feedback-global-toast-shimmer.md) sustituye las restricciones anteriores de feedback; las notas fechadas anteriores son historia de las decisiones.
 
 Fecha: 4 de octubre de 2026. Repositorio: https://github.com/srg-cp/entrehuellas.
@@ -252,6 +291,35 @@ Implementa S4: HU-08 a HU-10 de docs/GUIA_MVP.md. Crea cartel PDF/QR y una web p
 
 ### S5 - Seguimiento, alertas y cierre
 
+18/10/2026: HU-13/#13 implementada localmente: cierre por responsable con
+actor/fecha/motivo/evidencia testimonial opcional privados, recibo estable,
+transacción con historial/contador/cancelación de difusión pendiente y consulta
+desde ficha resuelta. QR existente y rechazo de avistamientos consumen estado
+vigente; episodio nuevo conserva el anterior. Plan028 después de027 confirmado;
+no cerrar historia antes de activar y validar Android/Supabase reales. FCM
+continúa pospuesto (ADR-068). [Ficha](funcionalidades/cierre-y-recuperacion.md),
+[ADR-069](decisiones/069-cierre-recuperacion-auditado.md).
+
+
+**Alcance vigente por instrucción del usuario18/10/2026:** FCM e implementación
+Firebase quedan pospuestos (HU-12.3/#42). El incremento activo HU-12 comprende
+HU-12.1/#40 y HU-12.2/#41, seguimiento/bandeja con Supabase.027 ya aplicado
+según usuario; no se reaplica. Sin configuración Firebase, registro de teléfono,
+despliegue Edge ni cron de push. La activación inmediata descrita en las notas,
+lista y prompt anteriores de planificación queda sustituida por
+[ADR-068](decisiones/068-posponer-fcm-firebase.md). No cerrar HU-12.3 por este recorte.
+
+18/10/2026: después de la confirmación operativa de HU-11 registrada en ESTADO,
+se implementa localmente HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42: seguimiento
+explícito separado de Guardados, zonas propias, destinatarios en servidor,
+bandeja paginada/leído y outbox transaccional con Edge FCM HTTP v1 y reintentos.
+Plan027; no se reaplica026 confirmado. Configuración Firebase, planificador,
+activación027, entrega y concurrencia hosted/Android pendientes; sin cierre
+de historias por evidencia local. [Ficha](funcionalidades/seguimiento-y-alertas.md),
+[ADR-067](decisiones/067-seguimiento-bandeja-y-push.md). Las notas de activación026
+pendiente inmediatamente inferiores describen la entrega anterior, sustituida
+por la confirmación más reciente del usuario en ESTADO.
+
 18/10/2026: HU-11.1 / RF-14 / #38 y HU-11.2 / RF-12,14 / #39 implementadas
 localmente en Android. Historial propio ordenado por hora del suceso, recepción
 y tardíos separados, foto/punto privados y clasificación con motivo/actor/fecha
@@ -264,14 +332,14 @@ eventos. Sin push, offline o panel web nuevo. [Ficha](funcionalidades/cronologia
 ni acciones GitHub; siguiente incremento funcional HU-12 tras validar HU-11.
 
 - **HU-11 / RF-12,14:** revisar avistamientos, guardar actor/motivo y ordenar cronología por hora real.
-- **HU-12 / RF-17,18:** zonas/casos seguidos, selección de destinatarios, bandeja persistente y push. Persistir trabajo de notificación con mecanismo de reintento; integrar FCM mediante operación server-side.
+- **HU-12 / RF-17,18:** alcance activo HU-12.1/12.2: zonas/casos seguidos, destinatarios y bandeja persistente con Supabase. HU-12.3 (push/FCM/Firebase) pospuesta por el usuario, ADR-068; conservar el outbox027 aplicado sin activar entregas.
 - **HU-13 / RF-07:** responsable autorizado cierra en una operación atómica con historial; QR actualizado y nuevas alertas de búsqueda detenidas.
-- **Demo:** dejar fallar el push y encontrar la alerta en bandeja; cerrar, reabrir QR y comprobar que un usuario ajeno no puede cerrar.
+- **Demo activa:** generar un evento nuevo, consultar/marcar leída en bandeja, verificar seguimiento/preferencias y aislamiento entre cuentas; cerrar, reabrir QR y comprobar que un usuario ajeno no puede cerrar. Demo FCM diferida junto con HU-12.3.
 
 Prompt:
 
 ```text
-Implementa S5: HU-11 a HU-13 de docs/GUIA_MVP.md. Agrega revisión/cronología, bandeja persistente, FCM y cierre autorizado. Guarda las alertas y su trabajo de envío antes del push, con reintentos y deduplicación. Valida estados en Supabase y actualiza el QR al resolver. Prueba fallo del proveedor, usuario no autorizado y cierre concurrente. Actualiza docs/ESTADO.md.
+Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md. Revisión/cronología, seguimiento, bandeja persistente y cierre autorizado con Supabase. Mantén las alertas deduplicadas y el outbox027 existente inactivo. FCM, Firebase y HU-12.3 quedan pospuestos por el usuario (ADR-068); no configurar otro proveedor ni desplegar el emisor. Valida permisos, reintentos y cierre concurrente, y actualiza QR/ESTADO.
 ```
 
 ### S6 - Moderación, offline y validación

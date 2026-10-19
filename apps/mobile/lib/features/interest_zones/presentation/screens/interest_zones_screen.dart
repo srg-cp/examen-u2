@@ -19,7 +19,8 @@ import '../widgets/zone_editor.dart';
 import '../widgets/zone_confirmation_dialog.dart';
 
 class InterestZonesScreen extends ConsumerStatefulWidget {
-  const InterestZonesScreen({super.key});
+  const InterestZonesScreen({this.followActionBuilder, super.key});
+  final Widget Function(String id)? followActionBuilder;
   @override
   ConsumerState<InterestZonesScreen> createState() =>
       _InterestZonesScreenState();
@@ -304,6 +305,8 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
           Wrap(
             spacing: 12,
             children: [
+              if (widget.followActionBuilder != null)
+                widget.followActionBuilder!(zone.id),
               TextButton(
                 onPressed: data.busy || data.refreshing
                     ? null

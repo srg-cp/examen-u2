@@ -19,6 +19,13 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Por instrucción explícita del usuario del18/10/2026, administración y
+  moderación se implementan exclusivamente en `apps/platform` (Vue/Nuxt).
+  `apps/mobile` no contiene pantallas, menús, guards ni acciones administrativas;
+  conserva las operaciones del usuario, como denunciar contenido. La separación
+  visual no sustituye la autorización por rol en servidor en cada operación.
+  Seguir ADR-071; no crear una aplicación adicional por rol.
+
 - Web, referencia aprobada del 18/10/2026: antes de cambios visuales en
   `apps/platform`, leer [REGLAS_UI_UX_WEB](docs/REGLAS_UI_UX_WEB.md).
   La landing final guía público, usuarios y administración; adaptar escala y

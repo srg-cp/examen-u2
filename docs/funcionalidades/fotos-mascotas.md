@@ -1,5 +1,7 @@
 # Fotos de mascotas: cámara, galería, principal y procesamiento
 
+**Auditoría de seguimiento18/10:** HU-04/#4 y derivadas #30/#31 en Done: cámara/galería, procesamiento/miniaturas y principal/retirada implementados e integrados.012/WASM/guardado confirmados y fuentes/pruebas concretas verificadas. Las notas antiguas de cámara/principal todavía por implementar quedan sustituidas; se conservan límites de QA sin atribuir una nueva demo a esta auditoría.
+
 Módulo: `pets`; servidor: `pet-photo-process`. HU-04 / RF-03;
 [#30](../backlog/030-HU-04.1.md) y [#31](../backlog/031-HU-04.2.md).
 

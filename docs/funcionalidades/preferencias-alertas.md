@@ -1,5 +1,12 @@
 # Preferencias de alertas por cuenta
 
+**Auditoría de seguimiento18/10:** HU-02.2/#27 y épica #2 en Done: configuración por cuenta integrada,011 confirmado y validación HU-02 registrada. FCM es HU-12.3 pospuesta y no bloquea estas preferencias.027 ya está confirmado; seguimiento/bandeja conservan integración/demo propias pendientes.
+
+18/10/2026, instrucción del usuario: FCM/Firebase pospuestos (ADR-068).
+Las preferencias de recepción/tipos/bandeja siguen operativas; la elección
+de teléfono solo guarda la preferencia futura, con explicación explícita.
+No registra token, no pide permiso ni activa un proveedor en este incremento.
+
 Ajuste del15 de octubre: etiquetas Zona/Zonas se denominan Ubicación/Ubicaciones; contratos y preferencias persistidas conservados. Formato/análisis, sin nuevas pruebas por instrucción del usuario. [ADR-047](../decisiones/047-ubicacion-actual-y-radio-inicial.md).
 
 Módulo: `alert_preferences`. HU-02.2 / RF-02,16;
@@ -11,9 +18,11 @@ Desde Perfil se configura si recibir alertas, qué tipos interesan y qué canale
 se prefieren. Los tipos son mascotas perdidas, encontradas y novedades de casos;
 los canales son dentro de la app y push. Pausar conserva las elecciones.
 
-Estas elecciones se guardan por cuenta. Todavía no crean avisos, envían push,
-registran tokens de dispositivo ni solicitan permisos Android. La bandeja y
-entrega corresponden a HU-12, después de disponer de casos.
+Estas elecciones se guardan por cuenta. HU-12 consume sus valores en servidor
+para seleccionar destinatarios y revalidar reintentos. Seguimiento/bandeja y
+registro de teléfono se implementan en notifications; esta pantalla no pide
+permiso ni maneja SDK de Firebase. 027 confirmado y FCM pospuesto (ADR-068), sin afirmar
+entrega real. [Ficha de alertas](seguimiento-y-alertas.md).
 
 ## Reglas, estado y persistencia
 

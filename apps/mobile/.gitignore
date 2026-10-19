@@ -43,3 +43,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Local Firebase project configuration; service-account keys are server-only.
+/android/app/google-services.json

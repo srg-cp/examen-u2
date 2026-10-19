@@ -1,5 +1,12 @@
 # Ubicaciones de interés privadas
 
+**Auditoría de seguimiento18/10:** HU-02.1/#26 y épica #2 en Done: implementación integrada,010 confirmado y evidencia posterior. No se conserva integración en main como pendiente. El seguimiento de ubicaciones corresponde a HU-12 y no bloquea esta entrega de configuración.
+
+18/10/2026: HU-12 añade Seguir zona/Dejar de seguir por slot compuesto en router,
+sin importar presentation de notifications. Zona existente no se sigue de forma
+automática. Eliminada deja de seleccionar destinatarios; preferencias siguen
+controlando recepción. [Seguimiento y alertas](seguimiento-y-alertas.md);027 pendiente.
+
 Recarga por gesto (ajuste16 de octubre): indicador reutiliza GlassSurface52/radio26/icono28 igual al retorno. Conserva gesto/giro/retirada y bloqueo al editar. Formato/análisis sin incidencias; sin pruebas/renders por instrucción vigente, revisión Android pendiente.
 
 Refinamiento del gesto: icono de recarga sigue el jalón, gira durante actualización real y retorna al terminar/cancelar, con movimiento reducido respetado. Edición conserva bloqueo de gesto. [ADR-049](../decisiones/049-indicador-recarga-y-retorno.md). Análisis estático sin incidencias; sin nuevas pruebas por instrucción del usuario, pendiente revisión Android.

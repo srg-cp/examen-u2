@@ -1,5 +1,70 @@
 # Arquitectura de Entre Huellas
 
+## Acceso web separado —18/10
+
+/login separa el formulario de /moderacion. AccessViewModel de presentación
+consume AccessModeration; plugin compone repositorio/caso de uso por instancia.
+Middleware cliente y pantalla inicial consultan sesión sin exponer cookie ni
+serializar datos privados en SSR; permisos por operación en servidor vigentes.
+[Ficha de acceso](funcionalidades/acceso-web.md), ADR-071 actualizado.
+
+## Moderación exclusiva de platform — HU-14.3,18/10
+
+Por instrucción expresa, administración solo en apps/platform; sin pantallas,
+menús, guards o acciones administrativas Flutter. /moderacion ofrece acceso,
+cola, evidencia y decisión real. Dominio/contratos/casos de uso TypeScript,
+repositorios HTTP/servidor y DTO separados; ViewModel y componentes compartidos.
+Sesión web HttpOnly cifrada, rol comprobado en Auth/RPC por operación, SSR sin
+contenido privado y operaciones same-origin. SQL102–105/plan030 conserva
+visibilidad separada del ciclo de vida, decisiones append-only/CAS y accesos
+auditados; proyecciones públicas/QR/fotos excluyen ocultos.029 confirmado.
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md),
+[ficha](funcionalidades/moderacion-web.md).030/configuración/demo pendientes.
+
+
+HU-14.1/#43 (18/10): content_reports separa dominio/caso de uso/contrato,
+DTO/fuente/repositorio, providers declarativos y presentación autoDispose. App
+compone accesos desde fichas/revisión mediante slots. SQL099–101/plan029 persiste
+denuncias privadas con UUID estable y autorización por recurso; lectura solo
+denunciante/revisor asignado en servidor, sin autoasignación ni cambios operativos
+automáticos. [ADR-070](decisiones/070-denuncias-privadas-idempotentes.md).028
+confirmado aplicado por usuario. Firebase/FCM fuera del alcance.
+
+
+HU-13 (18/10): case_closure añade dominio/casos de uso/repositorio, DTO/fuente
+Supabase, providers declarativos y ViewModel autoDispose. App compone ruta desde
+fichas y actualiza consultas; sin imports de presentation/data entre módulos.
+SQL096–098/plan028 guarda recibo privado y cierra con historial/contador/outbox
+en transacción, RPC autorizadas y UUID estable. QR conserva proyección neutra.
+Compatibilidad con resolución anterior sin backfill. [ADR-069](decisiones/069-cierre-recuperacion-auditado.md).
+FCM/Firebase siguen pospuestos por ADR-068.
+
+## Alcance activo de alertas — 18/10/2026, ADR-068
+
+Por instrucción del usuario se pospone HU-12.3/#42 y la implementación Firebase.
+Cliente sin firebase_core/firebase_messaging, adaptador Firebase ni plugin Google
+Services; bootstrap conserva PushRepository no disponible y main no observa push.
+La campana abre InboxScreen sin registro de teléfono. HU-12.1/12.2 siguen con
+Supabase;027 aplicado se conserva sin reescribir SQL. Contratos genéricos/emisor
+preparado quedan inactivos y fuera de entrega; config.toml no declara el emisor.
+Las notas de integración FCM inferiores describen el trabajo anterior, sustituido
+por [ADR-068](decisiones/068-posponer-fcm-firebase.md). Sin nuevo proveedor o servidor.
+
+## Seguimiento, bandeja y push — 18/10/2026
+
+HU-12.1/#40,12.2/#41,12.3/#42: módulo notifications de apps/mobile con dominio,
+casos de uso concretos, providers declarativos, ViewModels/estado/widgets y
+fuentes Supabase/Firebase detrás de repositorios. App compone slots de fichas,
+zonas y campana; main activa el observador de push con servicios de bootstrap.
+Sin imports de presentation/data entre funcionalidades. Login/onboarding
+preceden apertura de bandeja desde push; nunca autorización por payload.
+Plan027/fuentes091–095: suscripciones CAS/órdenes, notificaciones privadas,
+outbox/leases y triggers atómicos. RPC de cliente autenticadas; claim/finish
+solo service_role. Edge notification-delivery usa HTTP v1/OAuth y secreto
+de planificador, con payload neutro, tag estable, TTL60s y fallos seguros.
+Sin Redis, servidor nuevo o cambio en Nuxt. Activación remota, Firebase y cron
+pendientes; [ADR-067](decisiones/067-seguimiento-bandeja-y-push.md).
+
 ## Cronología y revisión privada — 18/10/2026
 
 HU-11.1/#38 y HU-11.2/#39: `features/case_timeline` contiene dominio/casos de

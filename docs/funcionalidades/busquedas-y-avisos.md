@@ -1,5 +1,7 @@
 # Búsquedas y avisos vinculados
 
+**Auditoría de seguimiento18/10:** HU-05/#5 y HU-06/#6 en Done por entrega integrada y evidencia posterior. HU-13/#13 sigue In progress por integración/028/demo pendientes; cerrar las publicaciones no da por activado el cierre nuevo.
+
 HU-10.2,18/10: la ficha abierta añade Reportar avistamiento mediante el módulo
 [avistamientos Android](avistamientos-android.md), con comentario/foto opcionales
 y evidencia privada. La vi o la encontré conserva el aviso público/custodia

@@ -2730,4 +2730,860 @@ revoke all on function public.review_sighting(uuid,uuid,integer,text,text) from 
 grant execute on function public.can_read_case_timeline(text,uuid),public.read_case_timeline(text,uuid,timestamptz,text,integer),
  public.read_sighting_review(uuid,integer),public.read_sighting_evidence(uuid),public.review_sighting(uuid,uuid,integer,text,text) to authenticated;
 
+-- Source: database/tables/091_notifications.sql | normalized SHA256: 848f5e5006c8d710939831457b69bb4f647a0c80e8efff03c977b94d548a5d49
+-- HU-12 / RF-16,17,18. Private subscriptions, inbox and durable delivery outbox.
+create table if not exists public.alert_subscriptions (
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ target_kind text not null check(target_kind in ('lost','found','zone')),
+ target_id uuid not null, following boolean not null, version integer not null check(version>0),
+ primary key(owner_id,target_kind,target_id)
+);
+create table if not exists public.alert_subscription_commands (
+ id uuid primary key, owner_id uuid not null references auth.users(id) on delete cascade,
+ target_kind text not null, target_id uuid not null, following boolean not null,
+ expected_version integer not null, receipt jsonb not null
+);
+create table if not exists public.notifications (
+ id bigint generated always as identity primary key,
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ event_key text not null, case_source text not null check(case_source in ('lost','found')),
+ case_id uuid not null, kind text not null check(kind in ('published','update','resolved')),
+ title text not null, created_at timestamptz not null default clock_timestamp(), read_at timestamptz,
+ unique(owner_id,event_key)
+);
+create index if not exists notifications_owner_page on public.notifications(owner_id,id desc);
+create table if not exists public.push_devices (
+ token text primary key check(length(token) between 20 and 4096),
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ updated_at timestamptz not null default clock_timestamp(), disabled_at timestamptz
+);
+create table if not exists public.notification_deliveries (
+ notification_id bigint primary key references public.notifications(id) on delete cascade,
+ attempts integer not null default 0, next_attempt_at timestamptz not null default clock_timestamp(),
+ lease uuid, leased_until timestamptz, status text not null default 'pending'
+ check(status in ('pending','sent','cancelled')), last_error text, sent_at timestamptz
+);
+create index if not exists notification_delivery_due on public.notification_deliveries(next_attempt_at) where status='pending';
+alter table public.alert_subscriptions enable row level security;
+alter table public.alert_subscription_commands enable row level security;
+alter table public.notifications enable row level security;
+alter table public.push_devices enable row level security;
+alter table public.notification_deliveries enable row level security;
+revoke all on public.alert_subscriptions,public.alert_subscription_commands,public.notifications,public.push_devices,public.notification_deliveries from public,anon,authenticated,service_role;
+
+-- Source: database/functions/092_notification_commands.sql | normalized SHA256: f85d29391ef789d434e905f1fe731873fd65920f5d5582b81d6a2462216fb018
+create or replace function public.read_alert_subscription(p_kind text,p_target uuid)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare r public.alert_subscriptions;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ if p_kind is null or p_kind not in ('lost','found','zone') or p_target is null then raise exception using errcode='23514',message='alerts_invalid';end if;
+ select * into r from public.alert_subscriptions where owner_id=auth.uid() and target_kind=p_kind and target_id=p_target;
+ return jsonb_build_object('following',coalesce(r.following,false),'version',coalesce(r.version,0));
+end $$;
+
+create or replace function public.set_alert_subscription(p_command uuid,p_kind text,p_target uuid,p_following boolean,p_version integer)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare r public.alert_subscriptions;c public.alert_subscription_commands;v jsonb;visible boolean:=false;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ if p_command is null or p_target is null or p_kind is null or p_kind not in ('lost','found','zone') or p_following is null or p_version is null or p_version<0 or p_version>=2147483647 then raise exception using errcode='23514',message='alerts_invalid';end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_command::text,12));
+ select * into c from public.alert_subscription_commands where id=p_command;
+ if found then
+  if (c.owner_id,c.target_kind,c.target_id,c.following,c.expected_version) is distinct from (auth.uid(),p_kind,p_target,p_following,p_version) then raise exception using errcode='40001',message='alerts_conflict';end if;
+  return c.receipt;
+ end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(auth.uid()::text||p_kind||p_target::text,12));
+ select * into r from public.alert_subscriptions where owner_id=auth.uid() and target_kind=p_kind and target_id=p_target for update;
+ if coalesce(r.version,0)<>p_version then raise exception using errcode='40001',message='alerts_conflict';end if;
+ if p_following then
+  if p_kind='zone' then
+   select exists(select 1 from public.interest_zones where id=p_target and owner_id=auth.uid() and deleted_at is null) into visible;
+  elsif p_kind='lost' then select exists(select 1 from public.read_recovery_pet_case(p_target) payload where payload->>'status'='active') into visible;
+  else select exists(select 1 from public.read_recovery_report(p_target) payload where payload->>'status'='active') into visible;end if;
+  if p_kind<>'zone' then visible=visible and exists(select 1 from public.alert_case(p_kind,p_target) where status='active');end if;
+  if not visible then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ end if;
+ insert into public.alert_subscriptions values(auth.uid(),p_kind,p_target,p_following,p_version+1)
+ on conflict(owner_id,target_kind,target_id) do update set following=excluded.following,version=excluded.version;
+ v=jsonb_build_object('following',p_following,'version',p_version+1);
+ insert into public.alert_subscription_commands values(p_command,auth.uid(),p_kind,p_target,p_following,p_version,v);
+ return v;
+end $$;
+
+create or replace function public.list_notifications(p_before bigint default null,p_limit integer default 20)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare items jsonb;cursor bigint;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ if p_limit is null or p_limit not between 1 and 50 or p_before<=0 then raise exception using errcode='23514',message='alerts_invalid';end if;
+ with page as (select id::text id,case_source,case_id,kind,title,created_at,read_at,row_number() over(order by id desc) n
+  from public.notifications where owner_id=auth.uid() and (p_before is null or id<p_before) order by notifications.id desc limit p_limit+1)
+ select coalesce(jsonb_agg(to_jsonb(page)-'n' order by id::bigint desc) filter(where n<=p_limit),'[]'::jsonb),
+ case when count(*)>p_limit then (select id::bigint from page where n=p_limit) end into items,cursor from page;
+ return jsonb_build_object('items',items,'next',cursor::text);
+end $$;
+
+create or replace function public.mark_notification_read(p_id bigint)
+returns void language plpgsql security definer set search_path='' as $$
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ update public.notifications set read_at=coalesce(read_at,clock_timestamp()) where id=p_id and owner_id=auth.uid();
+ if not found then raise exception using errcode='42501',message='alerts_forbidden';end if;
+end $$;
+
+create or replace function public.register_push_device(p_token text,p_enabled boolean)
+returns void language plpgsql security definer set search_path='' as $$
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='alerts_forbidden';end if;
+ if p_token is null or length(p_token) not between 20 and 4096 or p_enabled is null then raise exception using errcode='23514',message='alerts_invalid';end if;
+ if p_enabled then
+  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(auth.uid()::text,13));
+  if (select count(*) from public.push_devices where owner_id=auth.uid() and disabled_at is null and token<>p_token)>=10 then
+   raise exception using errcode='23514',message='alerts_device_limit';end if;
+  insert into public.push_devices(token,owner_id) values(p_token,auth.uid())
+  on conflict(token) do update set owner_id=excluded.owner_id,updated_at=clock_timestamp(),disabled_at=null;
+ else update public.push_devices set disabled_at=clock_timestamp() where token=p_token and owner_id=auth.uid();end if;
+end $$;
+
+-- Current public case state, for routing/recipient selection. Never exposes private evidence.
+create or replace function public.alert_case(p_source text,p_case uuid)
+returns table(owner_id uuid,status text,latitude double precision,longitude double precision,searching boolean)
+language sql stable security definer set search_path='' as $$
+ select c.owner_id,c.status,c.public_latitude,c.public_longitude,true from public.lost_cases c join public.pets p on p.id=c.pet_id
+ where p_source='lost' and c.id=p_case and c.deleted_at is null and p.deletion_requested_at is null
+ union all
+ select c.owner_id,c.status,c.public_latitude,c.public_longitude,c.report_kind='possible_loss' from public.found_cases c
+ where p_source='found' and c.id=p_case and c.deleted_at is null and c.status in ('active','resolved') and c.report_kind in ('possible_loss','legacy_found')
+$$;
+
+create or replace function public.enqueue_case_notification(p_source text,p_case uuid,p_key text,p_kind text)
+returns void language plpgsql security definer set search_path='' as $$
+declare c record;r record;v_id bigint;v_title text;
+begin
+ select * into c from public.alert_case(p_source,p_case);
+ if not found or (p_kind<>'resolved' and c.status<>'active') then return;end if;
+ v_title=case p_kind when 'published' then 'Nuevo caso en una zona que sigues' when 'resolved' then 'Una búsqueda ha finalizado' else 'Hay novedades en un caso que sigues' end;
+ for r in select p.owner_id,p.push from public.alert_preferences p where p.enabled and (p.in_app or p.push) and
+  ((p_kind in ('update','resolved') and p.case_updates and (p.owner_id=c.owner_id or exists(
+    select 1 from public.alert_subscriptions s where s.owner_id=p.owner_id and s.target_kind=p_source and s.target_id=p_case and s.following)))
+   or (p_kind='published' and p.owner_id<>c.owner_id and ((c.searching and p.lost_pets) or (not c.searching and p.found_pets)) and exists(
+    select 1 from public.interest_zones z join public.alert_subscriptions s on s.owner_id=z.owner_id and s.target_kind='zone' and s.target_id=z.id and s.following
+    where z.owner_id=p.owner_id and z.deleted_at is null and extensions.st_dwithin(
+      extensions.st_setsrid(extensions.st_makepoint(z.longitude,z.latitude),4326)::extensions.geography,
+      extensions.st_setsrid(extensions.st_makepoint(c.longitude,c.latitude),4326)::extensions.geography,z.radius_meters))))
+ loop
+  insert into public.notifications(owner_id,event_key,case_source,case_id,kind,title) values(r.owner_id,p_key,p_source,p_case,p_kind,v_title)
+  on conflict(owner_id,event_key) do nothing returning id into v_id;
+  if v_id is not null and r.push then insert into public.notification_deliveries(notification_id) values(v_id) on conflict do nothing;end if;
+ end loop;
+end $$;
+
+create or replace function public.notification_event_trigger()
+returns trigger language plpgsql security definer set search_path='' as $$
+declare src text;target uuid;k text;ek text;
+begin
+ if tg_table_name='public_sightings' then src=new.case_source;target=new.case_id;k='update';ek='sighting:'||new.id;
+ elsif tg_table_name='sighting_reviews' then
+  select case_source,case_id into src,target from public.public_sightings where id=new.sighting_id;k='update';ek='review:'||new.command_id;
+ elsif tg_table_name='case_events' then src='lost';target=new.case_id;k=case when new.event_type='resolved' then 'resolved' else 'published' end;ek='lost:'||target||':'||new.event_type;
+ else
+  select case when target_lost_case_id is not null then 'lost' else 'found' end,coalesce(target_lost_case_id,target_community_case_id)
+   into src,target from public.found_cases where id=new.case_id and report_kind in ('sighting','with_reporter');
+  if target is not null then k='update';ek='report:'||new.case_id;
+  else src='found';target=new.case_id;k=case when new.event_type='resolved' then 'resolved' else 'published' end;ek='found:'||target||':'||new.event_type;end if;
+ end if;
+ perform public.enqueue_case_notification(src,target,ek,k);return new;
+end $$;
+
+-- Source: database/functions/093_push_delivery_commands.sql | normalized SHA256: c859e132ce1c6d33bdb2ced3e21b3ca4f1fead8b051d2a0d6f2bd734042fc375
+-- Service-only outbox. A lease prevents simultaneous workers from claiming the same job.
+create or replace function public.claim_notification_delivery()
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare d public.notification_deliveries;n public.notifications;p public.alert_preferences;c record;tokens jsonb;eligible boolean;
+begin
+ select * into d from public.notification_deliveries where status='pending' and next_attempt_at<=clock_timestamp()
+  and (leased_until is null or leased_until<clock_timestamp()) order by next_attempt_at,notification_id for update skip locked limit 1;
+ if not found then return null;end if;
+ select * into n from public.notifications where id=d.notification_id;
+ select * into p from public.alert_preferences where owner_id=n.owner_id;
+ select * into c from public.alert_case(n.case_source,n.case_id);
+ eligible=found;
+ if eligible then
+  eligible=p.enabled and p.push and (n.kind='resolved' or c.status='active') and
+   ((n.kind in ('update','resolved') and p.case_updates and (n.owner_id=c.owner_id or exists(
+    select 1 from public.alert_subscriptions s where s.owner_id=n.owner_id and s.target_kind=n.case_source and s.target_id=n.case_id and s.following)))
+   or (n.kind='published' and ((c.searching and p.lost_pets) or (not c.searching and p.found_pets)) and exists(
+    select 1 from public.interest_zones z join public.alert_subscriptions s on s.owner_id=z.owner_id and s.target_kind='zone' and s.target_id=z.id and s.following
+     where z.owner_id=n.owner_id and z.deleted_at is null and extensions.st_dwithin(
+      extensions.st_setsrid(extensions.st_makepoint(z.longitude,z.latitude),4326)::extensions.geography,
+      extensions.st_setsrid(extensions.st_makepoint(c.longitude,c.latitude),4326)::extensions.geography,z.radius_meters))));
+ end if;
+ if not coalesce(eligible,false) then
+  update public.notification_deliveries set status='cancelled',last_error='no_longer_eligible',lease=null,leased_until=null where notification_id=d.notification_id;return jsonb_build_object('skipped',true);
+ end if;
+ select coalesce(jsonb_agg(token),'[]'::jsonb) into tokens from public.push_devices where owner_id=n.owner_id and disabled_at is null and updated_at>clock_timestamp()-interval '60 days';
+ if jsonb_array_length(tokens)=0 then
+  update public.notification_deliveries set next_attempt_at=clock_timestamp()+interval '1 hour',last_error='no_device' where notification_id=d.notification_id;return jsonb_build_object('skipped',true);
+ end if;
+ update public.notification_deliveries set lease=gen_random_uuid(),leased_until=clock_timestamp()+interval '5 minutes',attempts=attempts+1
+ where notification_id=d.notification_id returning * into d;
+ return jsonb_build_object('id',n.id::text,'lease',d.lease,'tokens',tokens,'title',n.title);
+end $$;
+
+create or replace function public.finish_notification_delivery(p_id bigint,p_lease uuid,p_success boolean,p_error text,p_invalid_tokens text[] default '{}')
+returns void language plpgsql security definer set search_path='' as $$
+declare d public.notification_deliveries;v_owner uuid;
+begin
+ select * into d from public.notification_deliveries where notification_id=p_id and lease=p_lease and status='pending' for update;
+ if not found then raise exception using errcode='40001',message='alerts_lease_conflict';end if;
+ select owner_id into v_owner from public.notifications where id=p_id;
+ update public.push_devices set disabled_at=clock_timestamp() where owner_id=v_owner and token=any(p_invalid_tokens);
+ update public.notification_deliveries set status=case when p_success then 'sent' else 'pending' end,
+  sent_at=case when p_success then clock_timestamp() end,lease=null,leased_until=null,
+  last_error=case when p_success then null else case when p_error in ('provider_unavailable','invalid_device','configuration') then p_error else 'provider_unavailable' end end,
+  next_attempt_at=clock_timestamp()+make_interval(secs=>least(21600,30*power(2,least(d.attempts,9)))::integer)
+ where notification_id=p_id;
+end $$;
+
+-- Source: database/triggers/094_notification_events.sql | normalized SHA256: 7ef0d2602f689175d6f71e0660522ff7a8efb1609d3f42bbc0e01b647b504403
+-- No backfill: installing HU-12 does not fabricate notifications for previous events.
+drop trigger if exists alerts_case_event on public.case_events;
+create trigger alerts_case_event after insert on public.case_events for each row execute function public.notification_event_trigger();
+drop trigger if exists alerts_found_event on public.found_case_events;
+create trigger alerts_found_event after insert on public.found_case_events for each row execute function public.notification_event_trigger();
+drop trigger if exists alerts_sighting on public.public_sightings;
+create trigger alerts_sighting after insert on public.public_sightings for each row execute function public.notification_event_trigger();
+drop trigger if exists alerts_review on public.sighting_reviews;
+create trigger alerts_review after insert on public.sighting_reviews for each row execute function public.notification_event_trigger();
+
+-- Source: database/grants/095_notification_permissions.sql | normalized SHA256: a46f23735eb5d99e45c56e0791c2bb258d8d9b11ffed25a89865566f69d11e0e
+revoke all on function public.alert_case(text,uuid),public.enqueue_case_notification(text,uuid,text,text),public.notification_event_trigger(),public.claim_notification_delivery(),public.finish_notification_delivery(bigint,uuid,boolean,text,text[]) from public,anon,authenticated,service_role;
+grant execute on function public.claim_notification_delivery(),public.finish_notification_delivery(bigint,uuid,boolean,text,text[]) to service_role;
+revoke all on function public.read_alert_subscription(text,uuid),public.set_alert_subscription(uuid,text,uuid,boolean,integer),public.list_notifications(bigint,integer),public.mark_notification_read(bigint),public.register_push_device(text,boolean) from public,anon,authenticated,service_role;
+grant execute on function public.read_alert_subscription(text,uuid),public.set_alert_subscription(uuid,text,uuid,boolean,integer),public.list_notifications(bigint,integer),public.mark_notification_read(bigint),public.register_push_device(text,boolean) to authenticated;
+
+-- Source: database/tables/096_case_closures.sql | normalized SHA256: fece9fa51e2c519a6449f58e69c0bd117ada0611738b85da04a7f449784d8e3e
+-- HU-13 / RF-07. Private, immutable receipt; no invented history for old closures.
+create table if not exists public.case_closures (
+ command_id uuid primary key,
+ case_source text not null check(case_source in ('lost','found')),
+ case_id uuid not null,
+ actor_id uuid not null references auth.users(id),
+ closed_at timestamptz not null default clock_timestamp(),
+ reason text not null check(char_length(reason) between 1 and 500),
+ evidence_note text check(char_length(evidence_note) between 1 and 500),
+ unique(case_source,case_id)
+);
+alter table public.case_closures enable row level security;
+revoke all on public.case_closures from public,anon,authenticated,service_role;
+
+-- Source: database/functions/097_case_closure_commands.sql | normalized SHA256: d48d4ee4e57e96954dad20b03c54b203a9406d24a739a18c3b2df8d5263d496b
+create or replace function public.read_case_closure(p_source text,p_case uuid)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_status text;v_receipt jsonb;
+begin
+ v_status=public.authorized_timeline_case(p_source,p_case);
+ if p_source='found' and not exists(select 1 from public.found_cases where id=p_case and report_kind='possible_loss') then
+  raise exception using errcode='42501',message='closure_forbidden';end if;
+ select to_jsonb(c) into v_receipt from public.case_closures c where case_source=p_source and case_id=p_case;
+ return jsonb_build_object('status',v_status,'receipt',v_receipt);
+end $$;
+
+create or replace function public.close_recovery_case(p_command uuid,p_source text,p_case uuid,p_reason text,p_evidence_note text default null)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_status text;v_old public.case_closures;v_new public.case_closures;v_pet uuid;
+ v_reason text:=public.pet_trim(p_reason);
+ v_note text:=nullif(public.pet_trim(p_evidence_note),'');
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='closure_forbidden';end if;
+ if p_command is null or p_source is null or p_source not in ('lost','found') or p_case is null
+ or v_reason is null or char_length(v_reason) not between 1 and 500 or char_length(v_note)>500 then
+  raise exception using errcode='23514',message='closure_invalid';end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_command::text,13));
+ -- Same order as publication, sightings, review and deletion: pet -> case.
+ if p_source='lost' then
+  select pet_id into v_pet from public.lost_cases where id=p_case and owner_id=auth.uid() and deleted_at is null;
+  if not found then raise exception using errcode='42501',message='closure_forbidden';end if;
+  perform 1 from public.pets where id=v_pet and deletion_requested_at is null for update;
+  if not found then raise exception using errcode='42501',message='closure_forbidden';end if;
+  select status into v_status from public.lost_cases where id=p_case and owner_id=auth.uid() and deleted_at is null for update;
+ else
+  select status into v_status from public.found_cases where id=p_case and owner_id=auth.uid() and deleted_at is null and report_kind='possible_loss' for update;
+ end if;
+ if v_status is null then raise exception using errcode='42501',message='closure_forbidden';end if;
+ select * into v_old from public.case_closures where command_id=p_command;
+ if found then
+  if (v_old.actor_id,v_old.case_source,v_old.case_id,v_old.reason,v_old.evidence_note)
+   is distinct from (auth.uid(),p_source,p_case,v_reason,v_note) then
+   raise exception using errcode='40001',message='closure_conflict';end if;
+  return to_jsonb(v_old);
+ end if;
+ if v_status<>'active' then raise exception using errcode='40001',message='closure_closed';end if;
+ insert into public.case_closures(command_id,case_source,case_id,actor_id,reason,evidence_note)
+ values(p_command,p_source,p_case,auth.uid(),v_reason,v_note) returning * into v_new;
+ if p_source='lost' then
+  update public.lost_cases set status='resolved' where id=p_case;
+  update public.pets set active_case_count=active_case_count-1,version=version+1,updated_at=clock_timestamp() where id=v_pet;
+  insert into public.case_events(case_id,actor_id,event_type,created_at) values(p_case,auth.uid(),'resolved',v_new.closed_at);
+ else
+  update public.found_cases set status='resolved' where id=p_case;
+  insert into public.found_case_events(case_id,actor_id,event_type,created_at) values(p_case,auth.uid(),'resolved',v_new.closed_at);
+ end if;
+ -- Keep the inbox as history; cancel search work (including leases) atomically.
+ -- A push already accepted/in transit cannot be recalled; closure notices remain eligible.
+ update public.notification_deliveries d set status='cancelled',last_error='case_closed',lease=null,leased_until=null
+ from public.notifications n where n.id=d.notification_id and n.case_source=p_source and n.case_id=p_case
+ and n.kind<>'resolved' and d.status='pending';
+ return to_jsonb(v_new);
+end $$;
+
+-- Compatibility for installed clients: affirmative action supplies a truthful reason.
+-- Existing closures are preserved without fabricated receipts or backfill.
+create or replace function public.resolve_recovery_search(p_id uuid,p_community boolean)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_source text;
+begin
+ if p_community is null then raise exception using errcode='42501',message='case_unauthorized';end if;
+ v_source=case when p_community then 'found' else 'lost' end;
+ perform public.close_recovery_case(gen_random_uuid(),v_source,p_id,'Recuperación confirmada por el responsable',null);
+exception
+ when insufficient_privilege then raise exception using errcode='42501',message='case_unauthorized';
+ when serialization_failure then
+  if sqlerrm<>'closure_closed' then raise;end if;
+end $$;
+
+-- Source: database/grants/098_case_closure_permissions.sql | normalized SHA256: 739a2823cbe73ba5c8f90fef0d1bef6f9a1d0f9192e2422ac2b1c596bc51d885
+revoke all on function public.read_case_closure(text,uuid),public.close_recovery_case(uuid,text,uuid,text,text) from public,anon,authenticated,service_role;
+grant execute on function public.read_case_closure(text,uuid),public.close_recovery_case(uuid,text,uuid,text,text) to authenticated;
+
+-- Source: database/tables/099_content_reports.sql | normalized SHA256: f4c6fddf946047939dd20f021f09dde47c6a1a150fba0e6c01e7d1befb6ca4ab
+-- HU-14.1 / RF-22: private submissions, independent of operational case state.
+create table if not exists public.content_reports (
+ id uuid primary key,
+ reporter_id uuid not null references auth.users(id),
+ resource_kind text not null check(resource_kind in ('lost','found','sighting')),
+ resource_id uuid not null,
+ reason text not null check(char_length(public.pet_trim(reason)) between 1 and 500),
+ evidence_note text check(char_length(evidence_note) between 1 and 1000),
+ submitted_at timestamptz not null default clock_timestamp()
+);
+create index if not exists content_reports_reporter_time on public.content_reports(reporter_id,submitted_at desc);
+-- Assignment is a privileged server operation, never user metadata or client input.
+create table if not exists public.content_report_reviewers (
+ user_id uuid primary key references auth.users(id)
+);
+alter table public.content_reports enable row level security;
+alter table public.content_report_reviewers enable row level security;
+
+-- Source: database/functions/100_content_report_commands.sql | normalized SHA256: e732f2e23616f59e62bd3e36b63fae13eba8e2c2a47cb713b2c16bd5ee161814
+create or replace function public.authorize_report_resource(p_kind text,p_resource uuid)
+returns void language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare v_visible boolean; s public.public_sightings;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='report_forbidden';end if;
+ if p_kind='lost' then
+  select exists(select 1 from public.read_recovery_pet_case(p_resource)) into v_visible;
+ elsif p_kind='found' then
+  select exists(select 1 from public.read_recovery_report(p_resource)) into v_visible;
+ elsif p_kind='sighting' then
+  select * into s from public.public_sightings where id=p_resource;
+  if found then
+   -- Sightings are private; only the responsible account can view/report them.
+   v_visible=public.can_read_case_timeline(s.case_source,s.case_id);
+  end if;
+ end if;
+ if not coalesce(v_visible,false) then raise exception using errcode='42501',message='report_forbidden';end if;
+end $$;
+
+create or replace function public.submit_content_report(p_command uuid,p_kind text,p_resource uuid,p_reason text,p_evidence_note text default null)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' set statement_timeout='10s' as $$
+declare v_actor uuid:=auth.uid();r public.content_reports;v_reason text:=public.pet_trim(p_reason);v_note text:=nullif(public.pet_trim(p_evidence_note),'');
+begin
+ if v_actor is null then raise exception using errcode='42501',message='report_forbidden';end if;
+ if p_command is null or p_command::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+ or p_kind is null or p_kind not in ('lost','found','sighting') or p_resource is null
+ or v_reason is null or char_length(v_reason) not between 1 and 500 or char_length(v_note)>1000 then
+  raise exception using errcode='23514',message='report_invalid';end if;
+ -- Serialize UUID retries, including the first request and requests by another actor.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('content_report:'||p_command::text,0));
+ select * into r from public.content_reports where id=p_command;
+ if found then
+  if r.reporter_id<>v_actor then raise exception using errcode='42501',message='report_forbidden';end if;
+  if r.resource_kind<>p_kind or r.resource_id<>p_resource or r.reason<>v_reason or r.evidence_note is distinct from v_note then
+   raise exception using errcode='40001',message='report_conflict';end if;
+  -- A receipt remains replayable if the resource later closes or disappears.
+  return to_jsonb(r);
+ end if;
+ perform public.authorize_report_resource(p_kind,p_resource);
+ insert into public.content_reports(id,reporter_id,resource_kind,resource_id,reason,evidence_note)
+ values(p_command,v_actor,p_kind,p_resource,v_reason,v_note) returning * into r;
+ return to_jsonb(r);
+end $$;
+
+create or replace function public.read_content_report(p_id uuid)
+returns jsonb language plpgsql stable security definer set search_path='' as $$
+declare r public.content_reports;v_actor uuid:=auth.uid();
+begin
+ if v_actor is null then raise exception using errcode='42501',message='report_forbidden';end if;
+ select * into r from public.content_reports where id=p_id;
+ if not found or (r.reporter_id<>v_actor and not exists(select 1 from public.content_report_reviewers where user_id=v_actor)) then
+  raise exception using errcode='42501',message='report_forbidden';end if;
+ return to_jsonb(r);
+end $$;
+
+-- Source: database/grants/101_content_report_permissions.sql | normalized SHA256: 39a1e95da5db7aa51050b22063ce42c0a5942ed07708ce95cdc281e218f23687
+revoke all on public.content_reports,public.content_report_reviewers from public,anon,authenticated,service_role;
+revoke all on function public.authorize_report_resource(text,uuid) from public,anon,authenticated,service_role;
+revoke all on function public.submit_content_report(uuid,text,uuid,text,text) from public,anon,authenticated,service_role;
+revoke all on function public.read_content_report(uuid) from public,anon,authenticated,service_role;
+grant execute on function public.submit_content_report(uuid,text,uuid,text,text) to authenticated;
+grant execute on function public.read_content_report(uuid) to authenticated;
+
+-- Source: database/tables/102_content_moderation.sql | normalized SHA256: 4442d26b2ffdca99c784603448fa1c91a732c72642ea4c4f1201924f9956b478
+-- HU-14.3 / RF-22,33. Operational lifecycle remains independent.
+create table if not exists public.content_visibility (
+ resource_kind text not null check(resource_kind in ('lost','found','sighting')),
+ resource_id uuid not null,
+ hidden boolean not null,
+ version integer not null check(version>0),
+ primary key(resource_kind,resource_id)
+);
+create table if not exists public.content_report_resolutions (
+ report_id uuid primary key references public.content_reports(id),
+ version integer not null check(version>0),
+ resolved_at timestamptz not null default clock_timestamp()
+);
+create table if not exists public.content_moderation_decisions (
+ command_id uuid primary key,
+ report_id uuid not null references public.content_reports(id),
+ actor_id uuid not null references auth.users(id),
+ action text not null check(action in ('hide','show','dismiss')),
+ reason text not null check(char_length(public.pet_trim(reason)) between 1 and 500),
+ report_version integer not null,
+ resource_version integer not null,
+ hidden boolean not null,
+ decided_at timestamptz not null default clock_timestamp(),
+ unique(report_id,report_version)
+);
+create table if not exists public.content_moderation_access (
+ id bigint generated always as identity primary key,
+ actor_id uuid not null references auth.users(id),
+ report_id uuid references public.content_reports(id),
+ action text not null check(action in ('queue','detail','evidence','decision')),
+ accessed_at timestamptz not null default clock_timestamp()
+);
+create index if not exists moderation_queue_order on public.content_reports(submitted_at desc,id desc);
+alter table public.content_visibility enable row level security;
+alter table public.content_report_resolutions enable row level security;
+alter table public.content_moderation_decisions enable row level security;
+alter table public.content_moderation_access enable row level security;
+
+-- Source: database/functions/103_moderation_commands.sql | normalized SHA256: 13f1b862a83ab624cfe713e31cb3ff766f38039a5f0b7d8be7129cdfedcb860f
+create or replace function public.require_content_reviewer()
+returns uuid language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+begin
+ perform 1 from public.content_report_reviewers where user_id=auth.uid() for share;
+ if auth.uid() is null or not found then
+  raise exception using errcode='42501',message='moderation_forbidden';end if;
+ return auth.uid();
+end $$;
+
+create or replace function public.is_moderation_hidden(p_kind text,p_resource uuid)
+returns boolean language sql stable security definer set search_path='' as $$
+ select exists(select 1 from public.content_visibility where resource_kind=p_kind and resource_id=p_resource and hidden)
+ or (p_kind='found' and exists(select 1 from public.found_cases c join public.content_visibility v
+ on (v.resource_kind='lost' and v.resource_id=c.target_lost_case_id) or (v.resource_kind='found' and v.resource_id=c.target_community_case_id)
+ where c.id=p_resource and v.hidden))
+ or (p_kind='sighting' and exists(select 1 from public.public_sightings s join public.content_visibility v
+ on v.resource_kind=s.case_source and v.resource_id=s.case_id where s.id=p_resource and v.hidden));
+$$;
+
+create or replace function public.list_moderation_reports(p_resolved boolean default false,p_before_time timestamptz default null,p_before_id uuid default null)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare v_actor uuid:=public.require_content_reviewer();v_items jsonb;v_next jsonb;
+begin
+ if p_resolved is null or (p_before_time is null)<>(p_before_id is null) or (p_before_time is not null and not isfinite(p_before_time)) then
+  raise exception using errcode='23514',message='moderation_invalid';end if;
+ insert into public.content_moderation_access(actor_id,action) values(v_actor,'queue');
+ with page as (
+  select r.id,r.resource_kind,r.resource_id,r.submitted_at,coalesce(s.version,0) version
+  from public.content_reports r left join public.content_report_resolutions s on s.report_id=r.id
+  where (s.report_id is not null)=p_resolved and (p_before_time is null or (r.submitted_at,r.id)<(p_before_time,p_before_id))
+  order by r.submitted_at desc,r.id desc limit 21
+ ), numbered as(select *,row_number() over(order by submitted_at desc,id desc) n from page)
+ select coalesce(jsonb_agg(to_jsonb(numbered)-'n' order by submitted_at desc,id desc) filter(where n<=20),'[]'::jsonb),
+ case when count(*)>20 then (select jsonb_build_object('time',submitted_at,'id',id) from numbered where n=20) end
+ into v_items,v_next from numbered;
+ return jsonb_build_object('items',v_items,'next',v_next);
+end $$;
+
+create or replace function public.read_moderation_report(p_id uuid)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare v_actor uuid:=public.require_content_reviewer();r public.content_reports;v_resource jsonb;v_history jsonb;
+begin
+ select * into r from public.content_reports where id=p_id;
+ if not found then raise exception using errcode='42501',message='moderation_forbidden';end if;
+ insert into public.content_moderation_access(actor_id,report_id,action) values(v_actor,p_id,'detail');
+ if r.resource_kind='lost' then
+  select jsonb_build_object('title',pet_name,'text',traits,'status',status,'removed',deleted_at is not null,
+  'has_photo',exists(select 1 from public.pet_photos ph where ph.id=any(c.photo_ids) and ph.status='published' and ph.processed_at is not null))
+  into v_resource from public.lost_cases c where id=r.resource_id;
+ elsif r.resource_kind='found' then
+  select jsonb_build_object('title',case when report_kind='possible_loss' then 'Búsqueda comunitaria' else 'Aviso' end,'text',traits,'status',status,'removed',deleted_at is not null,
+  'has_photo',exists(select 1 from public.found_case_photos ph where ph.id=any(c.photo_ids) and ph.status='ready' and ph.processed_at is not null))
+  into v_resource from public.found_cases c where id=r.resource_id;
+ else
+  select jsonb_build_object('title','Avistamiento','text',comment,'status','received','removed',false,'has_photo',evidence_jpeg is not null)
+  into v_resource from public.public_sightings where id=r.resource_id;
+ end if;
+ select coalesce(jsonb_agg(to_jsonb(d) order by report_version desc),'[]'::jsonb) into v_history
+ from (select * from public.content_moderation_decisions where report_id=p_id order by report_version desc limit 20) d;
+ return jsonb_build_object('report',to_jsonb(r),'resource',v_resource,
+  'report_version',coalesce((select version from public.content_report_resolutions where report_id=p_id),0),
+  'resource_version',coalesce((select version from public.content_visibility where resource_kind=r.resource_kind and resource_id=r.resource_id),0),
+  'hidden',coalesce((select hidden from public.content_visibility where resource_kind=r.resource_kind and resource_id=r.resource_id),false),
+  'effective_hidden',public.is_moderation_hidden(r.resource_kind,r.resource_id),'history',v_history);
+end $$;
+
+-- Explicit access to the primary processed photo only. No original uploads or coordinates.
+create or replace function public.read_moderation_evidence(p_id uuid)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare v_actor uuid:=public.require_content_reviewer();r public.content_reports;v_photo jsonb;
+begin
+ select * into r from public.content_reports where id=p_id;
+ if not found then raise exception using errcode='42501',message='moderation_forbidden';end if;
+ insert into public.content_moderation_access(actor_id,report_id,action) values(v_actor,p_id,'evidence');
+ if r.resource_kind='sighting' then
+  select jsonb_build_object('jpeg',encode(evidence_jpeg,'base64')) into v_photo from public.public_sightings where id=r.resource_id and evidence_jpeg is not null;
+ elsif r.resource_kind='lost' then
+  select jsonb_build_object('bucket','pet-photo-renditions','path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg') into v_photo
+  from public.lost_cases c join public.pet_photos ph on ph.id=any(c.photo_ids) and ph.pet_id=c.pet_id and ph.owner_id=c.owner_id
+  where c.id=r.resource_id and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null order by ph.is_primary desc,ph.created_at,ph.id limit 1;
+ else
+  select jsonb_build_object('bucket','found-photo-renditions','path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg') into v_photo
+  from public.found_cases c join public.found_case_photos ph on ph.id=any(c.photo_ids) and ph.case_id=c.id and ph.owner_id=c.owner_id
+  where c.id=r.resource_id and ph.status='ready' and ph.processed_at is not null and ph.content_hash is not null order by ph.created_at,ph.id limit 1;
+ end if;
+ return v_photo;
+end $$;
+
+create or replace function public.decide_content_report(p_command uuid,p_report uuid,p_report_version integer,p_resource_version integer,p_action text,p_reason text)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' set statement_timeout='10s' as $$
+declare v_actor uuid:=public.require_content_reviewer();r public.content_reports;d public.content_moderation_decisions;
+ v_report_version integer;v_resource_version integer;v_hidden boolean;v_reason text:=public.pet_trim(p_reason);
+begin
+ if p_command is null or p_command::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+ or p_report is null or p_report_version is null or p_report_version<0 or p_resource_version is null or p_resource_version<0
+ or p_action is null or p_action not in ('hide','show','dismiss') or v_reason is null or char_length(v_reason) not between 1 and 500 then
+  raise exception using errcode='23514',message='moderation_invalid';end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('moderation_command:'||p_command::text,0));
+ select * into d from public.content_moderation_decisions where command_id=p_command;
+ if found then
+  if d.actor_id<>v_actor or d.report_id<>p_report or d.action<>p_action or d.reason<>v_reason
+   or d.report_version<>p_report_version+1 or d.resource_version<>p_resource_version+1 then
+   raise exception using errcode='40001',message='moderation_conflict';end if;
+  return to_jsonb(d);
+ end if;
+ select * into r from public.content_reports where id=p_report;
+ if not found then raise exception using errcode='42501',message='moderation_forbidden';end if;
+ -- All reports for one resource serialize; CAS protects decisions made from stale detail.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('moderation_resource:'||r.resource_kind||r.resource_id::text,0));
+ select coalesce((select version from public.content_report_resolutions where report_id=p_report),0),
+ coalesce((select version from public.content_visibility where resource_kind=r.resource_kind and resource_id=r.resource_id),0),
+ coalesce((select hidden from public.content_visibility where resource_kind=r.resource_kind and resource_id=r.resource_id),false)
+ into v_report_version,v_resource_version,v_hidden;
+ if v_report_version<>p_report_version or v_resource_version<>p_resource_version then
+  raise exception using errcode='40001',message='moderation_conflict';end if;
+ v_hidden=case p_action when 'hide' then true when 'show' then false else v_hidden end;
+ insert into public.content_visibility values(r.resource_kind,r.resource_id,v_hidden,v_resource_version+1)
+ on conflict(resource_kind,resource_id) do update set hidden=excluded.hidden,version=excluded.version;
+ insert into public.content_report_resolutions(report_id,version) values(p_report,v_report_version+1)
+ on conflict(report_id) do update set version=excluded.version,resolved_at=clock_timestamp();
+ insert into public.content_moderation_decisions(command_id,report_id,actor_id,action,reason,report_version,resource_version,hidden)
+ values(p_command,p_report,v_actor,p_action,v_reason,v_report_version+1,v_resource_version+1,v_hidden) returning * into d;
+ insert into public.content_moderation_access(actor_id,report_id,action) values(v_actor,p_report,'decision');
+ return to_jsonb(d);
+end $$;
+
+-- Replace reviewer reads from029 so every privileged read is audited.
+create or replace function public.read_content_report(p_id uuid)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare r public.content_reports;v_actor uuid:=auth.uid();
+begin
+ if v_actor is null then raise exception using errcode='42501',message='report_forbidden';end if;
+ select * into r from public.content_reports where id=p_id;
+ if not found then raise exception using errcode='42501',message='report_forbidden';end if;
+ if r.reporter_id<>v_actor then
+  if not exists(select 1 from public.content_report_reviewers where user_id=v_actor) then
+   raise exception using errcode='42501',message='report_forbidden';end if;
+  perform public.require_content_reviewer();
+  insert into public.content_moderation_access(actor_id,report_id,action) values(v_actor,p_id,'detail');
+ end if;
+ return to_jsonb(r);
+end $$;
+
+-- Source: database/functions/104_moderation_visibility.sql | normalized SHA256: 0ad7db15576c83c5a73f550b1d6c3b16afcd99092cef46f13ee98b1305479669
+-- HU-14.3: versioned evolution of public visibility; applied sources remain immutable.
+create or replace function public.read_public_lost_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    pet_name text,species text,species_detail text,size text,sex text,age_months integer,traits text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.pet_name,c.species,c.species_detail,c.size,c.sex,c.age_months,c.traits,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg')
+            order by ph.is_primary desc,ph.created_at,ph.id) from public.pet_photos ph
+            where ph.id=any(c.photo_ids) and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null),'[]'::jsonb)
+    from public.lost_cases c where c.id=p_id and not public.is_moderation_hidden('lost',c.id) and c.deleted_at is null and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()));
+$$;
+
+create or replace function public.read_public_found_case(p_id uuid)
+returns table(id uuid,status text,occurred_at timestamptz,latitude double precision,longitude double precision,
+    species text,species_detail text,size text,sex text,traits text,custody text,photos jsonb)
+language sql stable security definer set search_path='' as $$
+    select c.id,c.status,c.occurred_at,c.public_latitude,c.public_longitude,c.species,c.species_detail,c.size,c.sex,c.traits,c.custody,
+        coalesce((select jsonb_agg(jsonb_build_object('id',ph.id,'path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg') order by ph.created_at,ph.id)
+            from public.found_case_photos ph where ph.case_id=c.id and ph.id=any(c.photo_ids) and ph.status='ready' and ph.processed_at is not null),'[]'::jsonb)
+    from public.found_cases c where c.id=p_id and not public.is_moderation_hidden('found',c.id) and c.deleted_at is null and (c.status='active' or (c.status='resolved' and c.owner_id=auth.uid()));
+$$;
+
+create or replace function public.is_public_case_rendition(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+    select exists(select 1 from public.lost_cases c join public.pet_photos ph on ph.id=any(c.photo_ids) and ph.pet_id=c.pet_id
+        where not public.is_moderation_hidden('lost',c.id) and c.deleted_at is null and c.status='active' and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null
+        and p_name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg');
+$$;
+
+create or replace function public.can_read_found_photo(p_name text)
+returns boolean language sql stable security definer set search_path='' as $$
+ select exists(select 1 from public.found_case_photos ph join public.found_cases c on c.id=ph.case_id
+ where p_name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg' and
+ (ph.owner_id=auth.uid() or (not public.is_moderation_hidden('found',c.id) and c.status='active' and c.deleted_at is null and ph.status='ready' and ph.processed_at is not null and ph.id=any(c.photo_ids)
+ and (c.report_kind in ('legacy_found','possible_loss')
+ or exists(select 1 from public.lost_cases target where target.id=c.target_lost_case_id and target.deleted_at is null and (target.status='active' or target.owner_id=auth.uid()))
+ or exists(select 1 from public.found_cases target where target.id=c.target_community_case_id and target.report_kind='possible_loss'
+ and target.deleted_at is null and (target.status='active' or target.owner_id=auth.uid()))))));
+$$;
+
+create or replace function public.read_qr_case(p_slug text)
+returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='5s' as $$
+declare v_link public.case_public_links; v_lost public.lost_cases; v_found public.found_cases;
+ v_photos jsonb; v_payload jsonb; v_closed_at timestamptz;
+begin
+ if p_slug is null or p_slug !~ '^[0-9a-f]{64}$' then return jsonb_build_object('state','unavailable'); end if;
+ select * into v_link from public.case_public_links where public_slug=p_slug and revoked_at is null;
+ if not found then return jsonb_build_object('state','unavailable'); end if;
+ if public.is_moderation_hidden(v_link.case_source,v_link.case_id) then return jsonb_build_object('state','unavailable');end if;
+ if v_link.case_source='lost' then
+  select * into v_lost from public.lost_cases where id=v_link.case_id and owner_id=v_link.owner_id and deleted_at is null;
+  if not found or not exists(select 1 from public.pets where id=v_lost.pet_id and owner_id=v_link.owner_id and deletion_requested_at is null) then
+   return jsonb_build_object('state','unavailable'); end if;
+  if v_lost.status='resolved' then
+   select created_at into v_closed_at from public.case_events where case_id=v_lost.id and event_type='resolved';
+   return jsonb_build_object('state','closed','resolution','resolved','closed_at',v_closed_at);
+  end if;
+  if v_lost.status<>'active' then return jsonb_build_object('state','unavailable'); end if;
+  select coalesce(jsonb_agg(jsonb_build_object('bucket','pet-photo-renditions','path',ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg')
+   order by ph.is_primary desc,ph.created_at,ph.id),'[]'::jsonb) into v_photos
+   from public.pet_photos ph where ph.id=any(v_lost.photo_ids) and ph.pet_id=v_lost.pet_id and ph.owner_id=v_link.owner_id
+   and ph.status='published' and ph.processed_at is not null and ph.content_hash is not null
+   and exists(select 1 from storage.objects o where o.bucket_id='pet-photo-renditions'
+    and o.name=ph.owner_id::text||'/'||ph.pet_id::text||'/'||ph.id::text||'.jpg'
+    and o.metadata->>'mimetype'='image/jpeg' and (o.metadata->>'size')::bigint between 1 and 2097152);
+  v_payload=jsonb_build_object('kind','lost','name',v_lost.pet_name,'species',v_lost.species,'species_detail',v_lost.species_detail,
+   'size',v_lost.size,'sex',v_lost.sex,'traits',v_lost.traits,'occurred_at',v_lost.occurred_at,
+   'area',jsonb_build_object('latitude',round(v_lost.public_latitude::numeric,2),'longitude',round(v_lost.public_longitude::numeric,2)));
+ else
+  select * into v_found from public.found_cases where id=v_link.case_id and owner_id=v_link.owner_id and deleted_at is null
+   and report_kind in ('possible_loss','legacy_found');
+  if not found then return jsonb_build_object('state','unavailable'); end if;
+  if v_found.status='resolved' then
+   select created_at into v_closed_at from public.found_case_events where case_id=v_found.id and event_type='resolved';
+   return jsonb_build_object('state','closed','resolution','resolved','closed_at',v_closed_at);
+  end if;
+  if v_found.status<>'active' then return jsonb_build_object('state','unavailable'); end if;
+  select coalesce(jsonb_agg(jsonb_build_object('bucket','found-photo-renditions','path',ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg')
+   order by ph.created_at,ph.id),'[]'::jsonb) into v_photos
+   from public.found_case_photos ph where ph.id=any(v_found.photo_ids) and ph.case_id=v_found.id and ph.owner_id=v_link.owner_id
+   and ph.status='ready' and ph.processed_at is not null and ph.content_hash is not null
+   and exists(select 1 from storage.objects o where o.bucket_id='found-photo-renditions'
+    and o.name=ph.owner_id::text||'/'||ph.case_id::text||'/'||ph.id::text||'.jpg'
+    and o.metadata->>'mimetype'='image/jpeg' and (o.metadata->>'size')::bigint between 1 and 2097152);
+  v_payload=jsonb_build_object('kind',case when v_found.report_kind='possible_loss' then 'lost' else 'found' end,
+   'name','','species',v_found.species,'species_detail',v_found.species_detail,'size',v_found.size,'sex',v_found.sex,
+   'traits',v_found.traits,'occurred_at',v_found.occurred_at,
+   'area',jsonb_build_object('latitude',round(v_found.public_latitude::numeric,2),'longitude',round(v_found.public_longitude::numeric,2)));
+ end if;
+ if jsonb_array_length(v_photos)=0 then return jsonb_build_object('state','unavailable'); end if;
+ return v_payload||jsonb_build_object('state','active','photo_objects',v_photos);
+end $$;
+
+create or replace function public.read_case_timeline(p_source text,p_case uuid,p_before_time timestamptz default null,p_before_key text default null,p_limit integer default 20)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare v_status text;v_items jsonb;v_next jsonb;
+begin
+ v_status=public.authorized_timeline_case(p_source,p_case);
+ if p_limit is null or p_limit not between 1 and 50 or (p_before_time is null)<>(p_before_key is null)
+ or (p_before_time is not null and (not isfinite(p_before_time) or length(p_before_key)>80)) then
+  raise exception using errcode='23514',message='timeline_invalid';end if;
+ with events as (
+  select 'sighting:'||s.id::text key,'sighting' kind,s.id::text id,s.observed_at,s.received_at,s.is_late,s.comment,
+   s.evidence_jpeg is not null has_photo,coalesce(r.state,'unreviewed') review_state,coalesce(r.revision,0) revision
+  from public.public_sightings s left join lateral
+   (select state,revision from public.sighting_reviews where sighting_id=s.id order by revision desc limit 1) r on true
+  where s.case_source=p_source and s.case_id=p_case and not public.is_moderation_hidden('sighting',s.id)
+  union all
+  select e.event_type,e.event_type,e.event_type,e.created_at,e.created_at,false,'',false,'unreviewed',0
+   from public.case_events e where p_source='lost' and e.case_id=p_case
+  union all
+  select e.event_type,e.event_type,e.event_type,e.created_at,e.created_at,false,'',false,'unreviewed',0
+   from public.found_case_events e where p_source='found' and e.case_id=p_case
+ ), page as (
+  select * from events where p_before_time is null or (observed_at,key)<(p_before_time,p_before_key)
+  order by observed_at desc,key desc limit p_limit+1
+ ), numbered as (select *,row_number() over(order by observed_at desc,key desc) n from page)
+ select coalesce(jsonb_agg(to_jsonb(numbered)-'n' order by observed_at desc,key desc) filter(where n<=p_limit),'[]'::jsonb),
+  case when count(*)>p_limit then (select jsonb_build_object('time',observed_at,'key',key) from numbered where n=p_limit) end
+ into v_items,v_next from numbered;
+ return jsonb_build_object('case_status',v_status,'items',v_items,'next',v_next);
+end $$;
+
+create or replace function public.read_sighting_review(p_id uuid,p_before_revision integer default null)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare s public.public_sightings;r public.sighting_reviews;v_status text;v_history jsonb;v_next integer;
+begin
+ select * into s from public.public_sightings where id=p_id;
+ if not found or public.is_moderation_hidden('sighting',p_id) then raise exception using errcode='42501',message='timeline_forbidden';end if;
+ v_status=public.authorized_timeline_case(s.case_source,s.case_id);
+ if p_before_revision is not null and p_before_revision<1 then raise exception using errcode='23514',message='timeline_invalid';end if;
+ select * into r from public.sighting_reviews where sighting_id=p_id order by revision desc limit 1;
+ with page as (select * from public.sighting_reviews where sighting_id=p_id and (p_before_revision is null or revision<p_before_revision) order by revision desc limit 21),
+ numbered as (select *,row_number() over(order by revision desc) n from page)
+ select coalesce(jsonb_agg(to_jsonb(numbered)-'n' order by revision desc) filter(where n<=20),'[]'::jsonb),
+  case when count(*)>20 then (select revision from numbered where n=20) end into v_history,v_next from numbered;
+ return jsonb_build_object('id',s.id,'case_source',s.case_source,'case_id',s.case_id,'can_review',v_status='active',
+  'observed_at',s.observed_at,'received_at',s.received_at,'is_late',s.is_late,'comment',s.comment,
+  'latitude',s.latitude,'longitude',s.longitude,'location_source',s.location_source,'accuracy_meters',s.accuracy_meters,
+  'has_photo',s.evidence_jpeg is not null,'review_state',coalesce(r.state,'unreviewed'),'revision',coalesce(r.revision,0),
+  'history',v_history,'next_revision',v_next);
+end $$;
+
+create or replace function public.read_sighting_evidence(p_id uuid)
+returns text language plpgsql security definer set search_path='' as $$
+declare s public.public_sightings;
+begin
+ select * into s from public.public_sightings where id=p_id;
+ if not found or public.is_moderation_hidden('sighting',p_id) then raise exception using errcode='42501',message='timeline_forbidden';end if;
+ perform public.authorized_timeline_case(s.case_source,s.case_id);
+ return encode(s.evidence_jpeg,'base64');
+end $$;
+
+create or replace function public.review_sighting(p_command uuid,p_id uuid,p_expected_revision integer,p_state text,p_reason text)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' as $$
+declare s public.public_sightings;r public.sighting_reviews;v_status text;v_revision integer;v_previous text;
+begin
+ select * into s from public.public_sightings where id=p_id;
+ if not found or public.is_moderation_hidden('sighting',p_id) then raise exception using errcode='42501',message='timeline_forbidden';end if;
+ v_status=public.authorized_timeline_case(s.case_source,s.case_id);
+ if p_command is null or p_command::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+ or p_expected_revision is null or p_expected_revision<0 or p_expected_revision>=2147483647
+ or p_state is null or p_state not in ('useful','doubtful','rejected','confirmed')
+ or p_reason is null or char_length(public.pet_trim(p_reason)) not between 1 and 500 then raise exception using errcode='23514',message='timeline_invalid';end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_command::text,27));
+ select * into r from public.sighting_reviews where command_id=p_command;
+ if found then
+  if r.sighting_id<>p_id or r.actor_id<>auth.uid() or r.revision<>p_expected_revision+1 or r.state<>p_state or r.reason<>public.pet_trim(p_reason) then
+   raise exception using errcode='40001',message='timeline_conflict';end if;
+  return to_jsonb(r);
+ end if;
+ if v_status<>'active' then raise exception using errcode='23514',message='timeline_closed';end if;
+ perform 1 from public.public_sightings where id=p_id for update;
+ select revision,state into v_revision,v_previous from public.sighting_reviews where sighting_id=p_id order by revision desc limit 1;
+ v_revision=coalesce(v_revision,0);v_previous=coalesce(v_previous,'unreviewed');
+ if v_revision<>p_expected_revision then raise exception using errcode='40001',message='timeline_conflict';end if;
+ if v_previous=p_state then raise exception using errcode='23514',message='timeline_transition';end if;
+ insert into public.sighting_reviews(command_id,sighting_id,revision,previous_state,state,reason,actor_id)
+ values(p_command,p_id,v_revision+1,v_previous,p_state,public.pet_trim(p_reason),auth.uid()) returning * into r;
+ return to_jsonb(r);
+end $$;
+
+create or replace function public.persist_sighting(p_source text,p_case uuid,p_report jsonb,p_request_hash text,p_actor_hash text,p_evidence text default null,p_reporter uuid default null)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='5s' set statement_timeout='10s' as $$
+declare v_previous public.public_sightings; v_id uuid; v_observed timestamptz;
+ v_lat double precision;v_lon double precision;v_accuracy double precision;v_source text;v_comment text;v_photo bytea;
+ v_now timestamptz:=clock_timestamp();v_active boolean;v_pet uuid;v_late boolean;
+begin
+ if p_source is null or p_source not in ('lost','found') or p_case is null or p_request_hash is null or p_request_hash !~ '^[0-9a-f]{64}$'
+ or p_actor_hash is null or p_actor_hash !~ '^[0-9a-f]{64}$' or p_report is null or jsonb_typeof(p_report)<>'object' then
+  raise exception using errcode='23514',message='sighting_invalid'; end if;
+ begin
+  v_id=(p_report->>'id')::uuid;v_observed=(p_report->>'observedAt')::timestamptz;
+  v_lat=(p_report->'point'->>'latitude')::double precision;v_lon=(p_report->'point'->>'longitude')::double precision;
+  v_source=p_report->'point'->>'source';v_accuracy=(p_report->'point'->>'accuracy')::double precision;
+  v_comment=btrim(p_report->>'comment');
+  if p_evidence is not null then
+   if length(p_evidence)>1398104 then raise exception 'invalid';end if;
+   v_photo=decode(p_evidence,'base64');
+  end if;
+ exception when others then raise exception using errcode='23514',message='sighting_invalid';end;
+ if v_id is null or v_id::text !~ '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+ or v_observed is null or not isfinite(v_observed) or v_observed<'2000-01-01' or v_observed>v_now
+ or v_lat is null or not(v_lat between -85 and 85) or v_lon is null or not(v_lon between -180 and 180)
+ or v_source is null or v_source not in ('manual','gps')
+ or (v_source='manual' and v_accuracy is not null) or (v_source='gps' and (v_accuracy is null or not(v_accuracy between 0 and 100000)))
+ or v_comment is null or char_length(v_comment)>500
+ or (v_photo is not null and (octet_length(v_photo) not between 4 and 1048576 or substring(v_photo from 1 for 2)<>'\xffd8'::bytea or substring(v_photo from octet_length(v_photo)-1 for 2)<>'\xffd9'::bytea)) then
+  raise exception using errcode='23514',message='sighting_invalid';end if;
+ -- Lock retry key before budgets. Stable lock order and row locks serialize with revoke/close.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(v_id::text,24));
+ select * into v_previous from public.public_sightings where id=v_id;
+ if found then
+  if v_previous.case_source<>p_source or v_previous.case_id<>p_case or v_previous.request_hash<>p_request_hash or v_previous.actor_hash<>p_actor_hash or v_previous.reporter_id is distinct from p_reporter then
+   raise exception using errcode='40001',message='sighting_conflict';end if;
+  return jsonb_build_object('id',v_previous.id,'receivedAt',v_previous.received_at,'late',v_previous.is_late);
+ end if;
+ if p_source='lost' then
+  select pet_id into v_pet from public.lost_cases where id=p_case;
+  perform 1 from public.pets where id=v_pet and deletion_requested_at is null for share;
+  v_active=found;
+  perform 1 from public.lost_cases where id=p_case and status='active' and deleted_at is null for share;
+  v_active=v_active and found;
+ else
+  perform 1 from public.found_cases where id=p_case and status='active' and deleted_at is null
+   and report_kind in ('possible_loss','legacy_found') for share;
+  v_active=found;
+ end if;
+ if public.is_moderation_hidden(p_source,p_case) then raise exception using errcode='40001',message='sighting_closed';end if;
+ if not v_active then raise exception using errcode='40001',message='sighting_closed';end if;
+ -- Persistent rolling budgets shared by replicas. HMAC is generated by the web server, never by visitors.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_actor_hash,25));
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_source||p_case::text,26));
+ if (select count(*) from public.public_sightings where actor_hash=p_actor_hash and received_at>v_now-interval '10 minutes')>=5
+ or (select count(*) from public.public_sightings where case_source=p_source and case_id=p_case and received_at>v_now-interval '1 hour')>=30 then
+  raise exception using errcode='54000',message='sighting_rate_limited';end if;
+ v_late=v_observed<v_now-interval '24 hours';
+ insert into public.public_sightings(id,case_source,case_id,request_hash,actor_hash,observed_at,received_at,latitude,longitude,location_source,accuracy_meters,comment,is_late,evidence_jpeg,reporter_id)
+ values(v_id,p_source,p_case,p_request_hash,p_actor_hash,v_observed,v_now,v_lat,v_lon,v_source,v_accuracy,v_comment,v_late,v_photo,p_reporter);
+ return jsonb_build_object('id',v_id,'receivedAt',v_now,'late',v_late);
+end $$;
+
+create or replace function public.guard_hidden_recovery_notice()
+returns trigger language plpgsql security definer set search_path='' as $$
+begin
+ if new.status='active' and (
+ public.is_moderation_hidden('lost',new.target_lost_case_id) or public.is_moderation_hidden('found',new.target_community_case_id)) then
+  raise exception using errcode='23514',message='case_unavailable';end if;
+ return new;
+end $$;
+revoke all on function public.guard_hidden_recovery_notice() from public,anon,authenticated,service_role;
+drop trigger if exists hidden_recovery_notice_guard on public.found_cases;
+create trigger hidden_recovery_notice_guard before insert or update of status,target_lost_case_id,target_community_case_id on public.found_cases
+for each row execute function public.guard_hidden_recovery_notice();
+
+-- Source: database/grants/105_moderation_permissions.sql | normalized SHA256: 497c68baac4278f7c279b37cc3ec564ff5db7cf374065a3e83a3a228658d010a
+revoke all on public.content_visibility,public.content_report_resolutions,public.content_moderation_decisions,public.content_moderation_access from public,anon,authenticated,service_role;
+revoke all on sequence public.content_moderation_access_id_seq from public,anon,authenticated,service_role;
+revoke all on function public.require_content_reviewer(),public.is_moderation_hidden(text,uuid),public.list_moderation_reports(boolean,timestamptz,uuid),public.read_moderation_report(uuid),public.read_moderation_evidence(uuid),public.decide_content_report(uuid,uuid,integer,integer,text,text) from public,anon,authenticated,service_role;
+grant execute on function public.require_content_reviewer(),public.list_moderation_reports(boolean,timestamptz,uuid),public.read_moderation_report(uuid),public.read_moderation_evidence(uuid),public.decide_content_report(uuid,uuid,integer,integer,text,text) to authenticated;
+
 commit;

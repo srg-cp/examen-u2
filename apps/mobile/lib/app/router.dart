@@ -1,3 +1,10 @@
+import '../features/content_reports/presentation/screens/content_report_screen.dart';
+import '../features/content_reports/presentation/widgets/report_content_button.dart';
+import '../features/case_closure/presentation/screens/case_closure_screen.dart';
+import '../features/found_cases/presentation/view_models/found_read_view_model.dart';
+import '../features/explore/presentation/view_models/explore_view_model.dart';
+import '../features/notifications/presentation/screens/inbox_screen.dart';
+import '../features/notifications/presentation/widgets/follow_target_button.dart';
 import '../features/explore/presentation/widgets/explore_section.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
 import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
@@ -117,10 +124,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-cases' ||
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
+              state.uri.path == '/home/notifications' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
+              state.uri.path.startsWith('/home/denounce/') ||
+              state.uri.path.startsWith('/home/closure/') ||
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
@@ -206,6 +216,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => HomeScreen(
+          onAlerts: () => context.push('/home/notifications'),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),
           exploreContent: ExploreSection(
@@ -214,6 +225,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ),
         routes: [
+          GoRoute(
+            path: 'notifications',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: const InboxScreen(),
+            ),
+          ),
           GoRoute(
             path: 'saved-cases',
             pageBuilder: (context, state) => entityEditorPage(
@@ -306,7 +326,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
+                reportAction: ReportContentButton(
+                  target: (kind: 'found', id: state.pathParameters['id']!),
+                ),
                 id: state.pathParameters['id']!,
+                followAction: FollowTargetButton(
+                  target: (kind: 'found', id: state.pathParameters['id']!),
+                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
@@ -372,7 +398,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
+                reportAction: ReportContentButton(
+                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                ),
                 id: state.pathParameters['id']!,
+                followAction: FollowTargetButton(
+                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: false),
                 ),
@@ -412,6 +444,61 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'denounce/:kind/:id',
+            redirect: (_, state) =>
+                ![
+                      'lost',
+                      'found',
+                      'sighting',
+                    ].contains(state.pathParameters['kind']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: ContentReportScreen(
+                target: (
+                  kind: state.pathParameters['kind']!,
+                  id: state.pathParameters['id']!,
+                ),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'closure/:source/:id',
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f-]{36}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: CaseClosureScreen(
+                target: (
+                  id: state.pathParameters['id']!,
+                  community: state.pathParameters['source'] == 'found',
+                ),
+                onSaved: () {
+                  ref.invalidate(publicCaseViewModelProvider);
+                  ref.invalidate(publicFoundViewModelProvider);
+                  ref.invalidate(myCasesViewModelProvider);
+                  ref.invalidate(myFoundCasesViewModelProvider);
+                  ref.invalidate(petListViewModelProvider);
+                  ref.invalidate(petDetailViewModelProvider);
+                  ref.read(exploreViewModelProvider.notifier).refresh();
+                },
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'timeline/:source/:id',
             redirect: (_, state) =>
                 !['lost', 'found'].contains(state.pathParameters['source']) ||
@@ -439,6 +526,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                   key: state.pageKey,
                   source: state.extra,
                   child: SightingReviewScreen(
+                    reportAction: ReportContentButton(
+                      target: (
+                        kind: 'sighting',
+                        id: state.pathParameters['sighting']!,
+                      ),
+                    ),
                     reviewKey: (
                       target: (
                         id: state.pathParameters['id']!,
@@ -539,7 +632,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'interest-zones',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
-              child: const InterestZonesScreen(),
+              child: InterestZonesScreen(
+                followActionBuilder: (id) =>
+                    FollowTargetButton(target: (kind: 'zone', id: id)),
+              ),
             ),
           ),
         ],

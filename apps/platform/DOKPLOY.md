@@ -1,5 +1,18 @@
 # Despliegue GitHub → Dokploy → entrehuellas.kormind.com
 
+## Activación de moderación HU-14.3
+
+No hay despliegue automático en este incremento. Tras validación/autorización,
+publicar el código Nuxt y aplicar030 en el entorno correspondiente (029 ya
+confirmado, no reaplicarlo). Añadir SUPABASE_PUBLISHABLE_KEY y un
+MODERATION_SESSION_SECRET aleatorio de al menos32 caracteres, idéntico entre
+réplicas; conservar SUPABASE_URL/SUPABASE_SERVER_KEY y PUBLIC_WEB_ORIGIN HTTPS.
+No usar NUXT_PUBLIC. Rotar el secreto invalida cookies administrativas anteriores.
+Asignar revisor explícito desde servidor según CONFIGURACION y verificar
+/moderacion con revisor/cuenta ordinaria. La landing/QR siguen públicos; no se
+despliega administración móvil ni se activa Firebase/FCM.
+
+
 HU-10.1,18/10: la rama local `feature/public-web-sighting` incorpora POST de
 avistamientos, sharp/Leaflet y migración024. No se ha publicado/desplegado.
 Antes de activarlo: aplicar024 después de023 y añadir

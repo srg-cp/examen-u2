@@ -1,5 +1,39 @@
 # Base de datos de Entre Huellas
 
+HU-14.3/#45: fuentes102–105/plan030, migración y patch030 generados mediante
+Build-ModerationPatch/Build-RunAll. RLS/grants privados, rol por operación,
+visibilidad independiente, decisiones CAS/UUID y accesos auditados.029 confirmado
+aplicado; no reaplicarlo ni modificarlo.030/configuración/demo pendientes.
+Build-RunAll valida migraciones previas sin reescribir sus patches manuales;
+los generadores específicos de patch siguen disponibles. Se evita el bloqueo
+Windows por reescrituras idénticas observado al generar. [ADR-071](../docs/decisiones/071-moderacion-exclusiva-platform.md).
+
+
+HU-14.1/#43: fuentes099–101/plan029, migración20261018002900_content_reports.sql
+y patch029 generados mediante Build-ContentReportsPatch.ps1/Build-RunAll.ps1.
+Denuncias privadas, recursos autorizados, recibo estable y revisor asignado por
+servidor; sin ocultamiento/cierre automático.028 ya aplicado según usuario;
+no modificar/reaplicar sus fuentes.029/validación remota pendientes.
+[Ficha](../docs/funcionalidades/denuncias-contenido.md),
+[ADR-070](../docs/decisiones/070-denuncias-privadas-idempotentes.md).
+
+
+HU-13,18/10: fuentes096–098/plan028 generan migración028 y
+[patch028](patchs/028_patch_case_closure.sql), después de027 confirmado por usuario.
+Recibo privado/RLS, cierre atómico autorizado e idempotente con auditoría,
+contador y cancelación de difusión pendiente. Build-CaseClosurePatch/Build-RunAll;
+SQL remoto028 pendiente. FCM sigue pospuesto por ADR-068.
+
+HU-12,18/10: fuentes091–095/plan027 generan
+[migración027](../supabase/migrations/20261018002700_notifications.sql) y
+[patch027](patchs/027_patch_notifications.sql). Requiere026, confirmado por usuario.
+Build-NotificationsPatch/Build-RunAll; sin reescribir migraciones previas.
+Suscripciones/órdenes privadas CAS e idempotencia, bandeja paginada/leído y
+outbox transaccional por evento/destinatario. Triggers sin backfill, destinatarios
+según preferencias y zona pública aproximada; leases/reintentos solo servidor.
+RLS sin grants directos; Edge y planificador requieren configuración operativa
+separada. SQL hosted no aplicado; [ficha](../docs/funcionalidades/seguimiento-y-alertas.md).
+
 Cronología/revisión18/10: fuentes088–090/plan026 generan
 [migración026](../supabase/migrations/20261018002600_case_timeline.sql) y
 [patch026](patchs/026_patch_case_timeline.sql), después de025 confirmado por

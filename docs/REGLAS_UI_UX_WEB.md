@@ -2,8 +2,16 @@
 
 Estado: norma para el desarrollo web. Aprobada por el usuario el 18 de octubre
 de 2026, America/Lima, tomando la landing terminada como referencia.
+Consolidada el 19/10/2026 con los fondos, stagger del login, toast y controles legales aprobados.
 
 ## 1. Referencia y alcance
+
+Por instrucción explícita del usuario del18/10/2026, la administración y
+moderación son exclusivas de esta plataforma web. No hay equivalente
+administrativo en Flutter. La denuncia móvil es una operación de usuario.
+El acceso real de HU-14.3 se documenta en
+[ADR-071](decisiones/071-moderacion-exclusiva-platform.md); no confundir una
+pantalla de acceso con autorización, comprobada también en servidor y SQL.
 
 La plataforma `apps/platform` (Vue/Nuxt/TypeScript) debe continuar la identidad
 visual de la landing aprobada en `/`: cálida, clara, amable y con protagonismo
@@ -20,7 +28,9 @@ vigentes. Las notas históricas de paletas intermedias no sustituyen esta base.
 
 Esta norma no afirma que los componentes actuales del lector QR ya tengan estos
 estilos. Se adaptarán al intervenir cada recorrido, con revisión de regresión.
-Tampoco implica que existan acceso web, panel de usuario o administración.
+La implementación vigente de acceso web separado y moderación se documenta en
+[Acceso web](funcionalidades/acceso-web.md) y [Moderación](funcionalidades/moderacion-web.md);
+esta guía no declara implementado un panel general de usuario.
 
 ## 2. Fuentes reales de la referencia
 
@@ -28,6 +38,7 @@ Tampoco implica que existan acceso web, panel de usuario o administración.
 | --- | --- |
 | [landing.css](../apps/platform/app/features/landing/presentation/styles/landing.css) | Valores, cascada final, variantes y media queries aprobadas. |
 | [LandingPage.vue](../apps/platform/app/features/landing/presentation/screens/LandingPage.vue) | Composición, jerarquía, textos, anclas y FAQ. |
+| [BackgroundGlowOrb.vue](../apps/platform/app/components/BackgroundGlowOrb.vue) | Resplandor compartido, intensidades, colores y movimiento reducido. |
 | [Widgets de landing](../apps/platform/app/features/landing/presentation/widgets) | Marca, acciones, iconos, tarjetas e ilustraciones. |
 | [LANDING_ASSETS](../apps/platform/LANDING_ASSETS.md) | Recursos independientes, dimensiones y procedencia. |
 | [Ficha de landing](funcionalidades/landing-page.md) | Recorrido, límites y evidencia de validación. |
@@ -42,25 +53,52 @@ la decisión. No copiar declaraciones antiguas ignorando los overrides finales.
 | --- | --- |
 | Fondo crema | `#FFFBEF` (`--cream`). |
 | Texto principal | `#171918` (`--ink`). |
-| Texto secundario | `#656861` (`--muted`). |
+| Texto secundario de landing | `#787774` (`--muted`); revisar contraste por superficie. |
 | Azul de marca | `#3C537B` (`--brand-blue`). |
 | Acento azul | `#2C87CE` (`--brand-accent`). |
 | Celeste | `#B5D5E9` (`--brand-sky`). |
 | Superficie azul tenue | `#EDF5FA` (`--brand-mist`). |
-| Superficie de contenido | Blanco, sobre crema o fondos suaves. |
+| Paneles de landing | `#F3F2EE` (`.panel`), incluido «Una comunidad con un propósito». |
+| Otras superficies de contenido | Blanco o fondos suaves según el recorrido. |
 
-El fondo general de landing combina crema con un radial `#fffdf8` transparente.
+### Fondos vigentes de landing
+
+Distinguir el fondo exterior de la página, el fondo detrás del carrusel y los
+paneles de contenido. Mantener estas capas al ajustar colores:
+
+| Capa | Composición vigente |
+| --- | --- |
+| Fondo general exterior | Blanco con radiales celestes suaves y transición vertical al cream del footer. |
+| Fondo detrás del carrusel de mascotas | Blanco predominante con cream tenue y bordes difuminados, sobre el fondo general animado. |
+| Panel «Una comunidad con un propósito» | `#F3F2EE`, igual que la base `.panel`. |
+| Footer | Conserva `--cream: #FFFBEF` mediante la transición del fondo general; el resplandor se desvanece antes del pie. |
+
+El fondo general de `.landing-page` combina dos radiales:
+`ellipse at 0% 12%, #dceaffd9 0, transparent 45%` y
+`ellipse at 100% 40%, #e7f3ffb3 0, transparent 45%`, sobre
+`linear-gradient(180deg, #fafdff 0%, #ffffff 65%, #fffdf7 84%, var(--cream) 100%)`.
+Sustituye el antiguo radial crema `#fffdf8` sobre `--cream`.
+
+El fondo exterior del carrusel corresponde a `.character-strip::before`:
+`linear-gradient(180deg, #ffffff00 0%, #fffffff2 16%, #fffdf8f5 55%, #fffbefe6 84%, #fffbef00 100%)`.
+La capa es absoluta, decorativa y sin eventos, con aislamiento local y orden de
+capas detrás de tarjetas y control de pausa. Conservar tamaños, espacios,
+colores de las tarjetas y movimiento de mascotas al ajustar este fondo.
+La aclaración del usuario sitúa el blanco/cream en esta zona exterior;
+el panel de propósito conserva su color original `#F3F2EE`.
+
 Usar superficies claras, texto oscuro y separación por espacio, radios y color;
-evitar convertir todo el sistema en bloques de azul saturado o sombras pesadas.
-Azul de marca y azul de acción son usos distintos: el botón principal aprobado
-tiene degradado, no fondo plano `#3C537B`.
+evitar bloques de azul saturado o sombras pesadas. Azul de marca y azul de acción
+son usos distintos: el botón principal tiene degradado, no fondo plano `#3C537B`.
 
-La landing conserva deliberadamente variantes por sección:
+La landing conserva variantes por sección:
 
-- Hero: aurora multicolor original, con verde/lima/celeste/lavanda; mascotas
-  pequeñas originales y valores blancos. No reemplazarla por la aurora azul.
-- Oportunidad, comunidad y colaboración: colores originales restaurados.
-- Cierre «Una huella tuya»: aurora azul/celeste/lavanda aprobada.
+- Hero: aurora multicolor verde/lima/celeste/lavanda; mascotas pequeñas
+  originales y valores blancos.
+- Oportunidad: conservar el retoque local del usuario en escritorio,
+  `linear-gradient(#80cbfa 0%, #a3e2f0 46%, #ccd2e39e 100%)`, y su variante
+  responsive vigente en CSS. Comunidad y colaboración conservan sus variantes.
+- Cierre «Una huella tuya»: aurora azul/celeste/lavanda.
 - Pasos 01–04: numeración `#171918`, sin los pines CSS retirados en 02/03.
 
 Estas composiciones sirven para presentación institucional. En formularios,
@@ -71,7 +109,10 @@ verificado. La landing informativa no define una paleta completa de estados.
 
 ## 4. Tipografía y jerarquía
 
-La familia real aprobada es `Arial, Helvetica, sans-serif`. No añadir otra fuente
+La familia general aprobada es `Arial, Helvetica, sans-serif`. Por instrucción
+posterior del18/10/2026, únicamente /terms y /privacy usan DM Sans local,
+como sader-panel; la excepción incluye títulos, cuerpo y metadatos legales.
+Login, landing y moderación conservan la familia general. No añadir otra fuente
 como parte de una nueva pantalla sin registrar el cambio de referencia.
 Por instrucción explícita posterior del18/10/2026, solo la frase del detalle
 decorativo superpuesto al footer usa Kalam Regular local (SIL OFL); la referencia
@@ -87,6 +128,18 @@ manuscrita no se extiende a títulos, formularios ni otros textos. Véase ADR-06
 | Párrafos base | Interlineado `1.3`, con ajustes de lectura por sección. |
 | Botón | Peso `600`, tracking `-0.035em`. |
 | Marca visible | «entre huellas», minúsculas y peso `500`. |
+
+La página /login adapta el acceso móvil y la composición de sader-panel por
+solicitud posterior del usuario: marca grande en dos líneas, formulario sin
+tarjeta exterior, campos suaves con iconos y control Mostrar/Ocultar contraseña.
+Mantiene Arial; no adopta la fuente de sader-panel ni la de Flutter.
+WebShell minimal retira cabecera/footer institucionales duplicados en ese
+recorrido y mantiene el salto al contenido. Columna de hasta488px incluyendo
+padding lateral24px, centrada verticalmente y con scroll natural en poca altura.
+LoginInput usa #F5F5F7/radio22px/alto mínimo76px, etiqueta flotante persistente y
+control de visibilidad48px. Estados/foco/invalid/toast/shimmer siguen las reglas
+globales y el resplandor soft permanece. Botón carbón es variante exclusiva de
+login. No extender esta composición a páginas operativas automáticamente.
 
 En páginas de trabajo conservar familia, pesos y jerarquía, adaptando la escala
 a la tarea. Los 108px del hero no son una medida para títulos de formularios.
@@ -126,6 +179,7 @@ secundarios y variantes responsive; los controles solo de icono son circulares.
 
 | Variante | Apariencia aprobada |
 | --- | --- |
+| Principal de login | Por solicitud posterior del18/10: carbón `#111111`, texto blanco, sin sombra ni degradado; conserva cápsula y shimmer. |
 | Principal azul | `linear-gradient(180deg, #75bfff 0%, #459ff6 48%, #2887ef 100%)`, texto blanco. |
 | Secundario de marca | `linear-gradient(145deg, #e5f2fa, #b5d5e9)`, texto `#3C537B`. |
 | Principal en hero/oportunidad/comunidad | `linear-gradient(160deg, #eaff9c, #c3fb56)`, texto `#171918`. |
@@ -183,6 +237,35 @@ doce fases cada 0.5s y amplitud adaptable de 24–56px. Conservar continuidad,
 control de pausa y copias decorativas sin duplicar mensajes accesibles.
 No extender animaciones infinitas a tablas o formularios.
 
+### Resplandor ambiental compartido
+
+Reutilizar [BackgroundGlowOrb.vue](../apps/platform/app/components/BackgroundGlowOrb.vue)
+desde componentes compartidos. Contiene dos orbes difuminados, halo y grano SVG
+local [glow-grain.svg](../apps/platform/public/images/glow-grain.svg).
+
+| Configuración | Valor vigente |
+| --- | --- |
+| Prop `intensity` | `soft` = 0.42, `medium` = 0.5 (predeterminado), `strong` = 0.62. |
+| Colores por tokens CSS | `--glow-color`: `#9BC6F5`; `--glow-secondary`: `#D6E8FF`. |
+| Movimiento | Orbe principal 17s, secundario 11s y halo 16s; `ease-in-out infinite`. |
+| Aparición | Opacidad durante 1.3s, retraso 300ms. |
+| Integración de landing | Una instancia `intensity="soft"` detrás del contenido. |
+
+El consumidor aporta posición relativa y orden de capas; la landing usa
+`isolation: isolate` y `z-index: -1` para el resplandor. Su viewport interno es
+sticky con altura `100svh`, de modo que acompaña el scroll. La máscara exclusiva
+de landing `linear-gradient(#000 0% 70%, transparent 92%)` extingue la luz antes
+del footer. El componente compartido mantiene esta decisión fuera de su lógica.
+
+Decorativo con `aria-hidden="true"` y `pointer-events: none`; no debe interceptar
+clics, agregar foco ni generar desbordamientos. Colores desde CSS e intensidad
+por clases, sin estilos inline, recursos externos ni excepciones CSP. Con
+movimiento reducido queda estático y visible, sin aparición animada.
+
+Al usarlo en otro recorrido, importar el componente compartido y definir sus
+tokens/capas en el consumidor. Su integración no lo activa globalmente; elegir
+intensidad y ubicación según la legibilidad de cada tarea.
+
 Respetar `prefers-reduced-motion`: sin animaciones/transiciones decorativas ni
 scroll suave obligatorio. El contenido debe permanecer visible y operable.
 
@@ -237,6 +320,9 @@ Criterios para aceptar cada incremento web:
   en tamaño pequeño. Sin recortes, cruces ni acciones inaccesibles.
 - Teclado, foco, movimiento reducido, estados reales y recuperación verificados.
 - En landing: anclas/FAQ, ilustraciones, auroras visibles y pausa de personajes.
+- Fondos: carrusel blanco/cream, panel de propósito #F3F2EE y footer cream;
+  resplandor detrás del contenido, sin interceptar acciones, activo con movimiento
+  normal y estático/visible con movimiento reducido.
 - Navegación landing → QR → landing sin contaminación de CSS ni regresión de datos.
 - SSR/hidratación sin errores, consulta duplicada ni exposición de datos privados;
   sin relajar CSP para estilos o recursos. SEO público solo donde está autorizado.
@@ -255,3 +341,104 @@ real. Documentar sus dimensiones y estados al implementarlos. No crear pantallas
 permisos ficticios, métricas, datos simulados o catálogos vacíos para completar
 una apariencia. Cambiar paleta, tipografía o lenguaje de interacción requiere
 decisión explícita y actualización de reglas, componentes y validación afectada.
+
+## Acceso social y consulta inicial del login —18/10/2026
+
+Por solicitud posterior, /login muestra siempre su formulario local; comprobar
+sesión no lo sustituye por un skeleton ni remonta su reveal. Mientras consulta,
+controles deshabilitados y aria-busy, sin shimmer por deshabilitación.
+La carga de datos remotos en otras pantallas conserva skeleton. Se retira el
+texto de cuentas autorizadas. Google/Facebook usan SocialSignInButton reutilizado,
+iconos locales, separador «o continúa con», cápsula blanca/borde suave60px y
+Arial1rem; texto ampliado puede ocupar varias líneas sin recorte. Shimmer de
+proveedor solo durante su petición, bloqueo de dobles envíos y toast compartido
+para errores/cancelación. No mostrar códigos ni mensajes del proveedor en UI.
+
+## Icono, orbe y enlaces legales del acceso —18/10/2026
+
+Por corrección posterior del usuario, /login usa la entrada de sader-panel:
+opacidad0→1, blur18→0px y desplazamiento desde arriba28px, duración850ms, curva
+cubic-bezier(.22,1,.36,1) y separación90ms. Grupos: icono, nombre, título, lema,
+formulario y enlaces legales. La implementación vigente es el composable compartido
+useStaggerReveal, port del hook de sader-panel: transiciones (sin keyframes),
+doble requestAnimationFrame y will-change persistente. Conservar opciones de
+orden/dirección, activación y limpieza; índices explícitos en el login. Aplicar
+estilos con vStaggerReveal/CSSOM para respetar CSP; clase SSR oculta equivalente.
+Entrada del icono en wrapper exterior al hover. No usa .reveal ni su cobertura crema: esa capa
+producía el destello amarillo al recargar. Esta indicación sustituye la entrada
+previa del icono700ms/12px/escala y el cover del login exclusivamente; las demás
+pantallas conservan sus efectos. La cabecera entra una vez y permanece estable
+al editar/comprobar sesión. Hover/foco del icono1.05 en300ms, separado de entrada.
+Movimiento reducido estático, sin escala interactiva. Tipografía Arial conservada.
+
+AmbientPageShell comparte fondo blanco/celeste→cream y BackgroundGlowOrb; login
+usa strong0.62 y documentos legales medium0.5 fijo al viewport. La landing conserva su composición.
+El resplandor sigue siendo decorativo, sin eventos ni cambios de foco.
+
+/login muestra enlaces a /terms y /privacy después del formulario. Documentos
+legibles en SSR, barra superior dentro del documento, retorno glass y contacto
+real; textos ampliados ajustan línea sin ocultar overflow ni reducir tamaño.
+Contenido permanente del servicio, sin rótulos de MVP ni datos legales inventados.
+
+## Referencia legal sader-panel —corrección18/10/2026
+
+/terms y /privacy usan su composición de lectura: documento máximo896px,
+barra superior alineada (retorno y enlace cruzado), separación inferior24px/
+margen32px, título centrado con degradado oscuro/gris y fila de metadatos con
+iconos de reloj/anuncio16px. Los controles de la barra usan estas medidas vigentes:
+
+| Control | Medidas y estilo |
+| --- | --- |
+| Retorno izquierdo | Círculo glass de36×36px; chevrón vectorial16px; blur22px. En flujo dentro de la barra. |
+| Enlace derecho al otro documento | Alto mínimo36px; padding vertical8px/horizontal12px; gap8px; flecha16px. |
+| Radio del enlace derecho | calc(.625rem + 8px), equivalente a rounded-2xl de sader-panel:18px a tamaño base. |
+| Texto del enlace derecho | DM Sans14px, peso500, interlineado20px; colores de Entre Huellas. |
+
+El enlace puede crecer y ajustar líneas con texto ampliado; no fijar su altura
+ni recortar texto. El retorno conserva diseño circular glass, foco, tooltip y
+navegación al login. Ambos cambios son locales a LegalPage: el componente
+GlassNavigationButton mantiene52px/chevrón28px en los demás recorridos.
+Sin logo/descripción/índice adicional. Por corrección posterior del usuario,
+DM Sans local solo en estas dos páginas; escala equivalente al
+CSS real de la referencia: h1 45px/h2 32px/cuerpo16px con interlineado24px,
+metadatos14px y footer12px. Rem conserva crecimiento con texto ampliado.
+
+Scroll independiente del contenido en100svh; orbe medium0.5 fijo, sin máscara
+vertical que lo apague al desplazarse. Capa de lectura backdrop-blur10px con
+bordes difuminados. Sin cobertura crema ni entrada del artículo en estas páginas,
+por solicitud de igualar la referencia estática. Movimiento reducido deja
+el resplandor visible/estático. Login y landing conservan sus efectos vigentes.
+
+## Chevrón vectorial e iconos de metadatos —18/10/2026
+
+El retorno web usa AppIcon con chevron_left de Material Symbols Rounded
+(FILL1,24px ópticos) renderizado a28px; nunca un carácter tipográfico.
+GlassNavigationButton conserva círculo52px/foco/tooltip/área táctil y añade
+gradiente translúcido/reflejos interiores y blur22px como el móvil. La posición
+de la barra legal conserva su override en flujo y variante compacta36px/icono16px;
+los demás usos siguen flotantes con52px/icono28px.
+
+Reloj/anuncio: schedule/campaign de Material Symbols Outlined FILL1,
+óptica20 y tamaño16px, igual que sader-panel. Trazados SVG locales oficiales,
+sin peticiones ni fuente de iconos externa. DM Sans variable local con licencia
+OFL y preload solo en páginas legales; no extender esa familia a todo el sitio.
+Ver ASSETS_UI de platform para procedencia y licencias.
+
+## Toast web alineado con móvil —18/10/2026
+
+Por solicitud del usuario, TopToast compartido reproduce ConfirmationToastHost
+móvil: cápsula #F5F5F7 al90%, borde blanco70%, radio28px, blur18px y sombra
+#24282A al10% desplazada6px/blur20px. Ancho ajustado al mensaje hasta360px,
+márgenes laterales24px y safe-area superior+12px, mínimo48px, padding16/8px.
+Icono Material Rounded oficial20px dentro de círculo neutro32px; error_outline
+en #B53F48 para error y check #111111 para confirmación. Texto14px, peso400 (normal, sin negrita) y fuente heredada de la página.
+La ausencia de negrita es una corrección explícita del usuario y prevalece
+sobre el peso600 del toast móvil de referencia. Sin X: tocar el aviso o activar su botón mediante
+teclado lo cierra. Reintentar sigue siendo acción independiente, cierra primero
+y ejecuta su callback. Entrada fade lineal y slide easeOutCubic de180ms;
+movimiento reducido estático. Mensajes extensos/texto ampliado pueden hacer
+scroll vertical dentro del límite30svh/220px, sin recorte de contenido.
+
+Conserva API show, roles alert/status, expiración web6500ms y limpieza al
+desmontar; no se altera autenticación, stagger, orbe ni código Flutter.
+La adaptación se comparte con los recorridos que ya consumen TopToast.

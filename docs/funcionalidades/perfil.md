@@ -1,5 +1,7 @@
 # Perfil y fotografía de cuenta
 
+**Auditoría de seguimiento18/10:** HU-01.7/#23 en Done: edición/foto/ciudad y reglas de acceso entregadas e integradas, con regresiones y CI aprobados. Se retira la nota inicial de falta de PR/integración; no se afirma una escritura remota nueva ni una inspección hosted durante la auditoría.
+
 Confirmación posterior16 de octubre: Flutter38946521408 de c727b2f pasa en Linux con339 pruebas, incluidos guardado de perfil y navegación normal/pequeña que fallaban antes. Se sustituye el pendiente de CI de la nota siguiente; no equivale a comprobación de permisos o guardado remoto de perfil.
 
 Validación16 de octubre: se corrigen fixtures de CI para seleccionar Cusco con selectCity antes de comprobar fallo/reintento de guardado, e inyectar GPS de prueba al recorrer Explorar→Perfil. Se conserva la validación de ciudad y el feedback de producción.18 pruebas de perfil/navegación/Explorar y suite completa339 aprobadas localmente; CI Linux pendiente de volver a ejecutar al publicar. Véase ESTADO para evidencia y límites.

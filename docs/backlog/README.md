@@ -1,5 +1,139 @@
 # Backlog de Entre Huellas
 
+**Avance posterior18/10:** HU-14.3/#45 implementada localmente en platform,
+con030/configuración/demo/integración pendientes. Administración exclusivamente
+web; Flutter conserva denuncia del usuario. Estados remotos/tablas inferiores
+son la última instantánea, sin nuevas acciones GitHub en este incremento.
+
+
+**Avance local posterior18/10:**028 confirmado aplicado; el usuario autoriza
+HU-14.1/#43, implementada localmente en feature/content-reports, pendiente029/demo.
+[Denuncias](../funcionalidades/denuncias-contenido.md). Tabla y estados remotos
+inferiores conservan la última instantánea API; sin sincronización GitHub nueva.
+Firebase/FCM fuera del alcance, sin considerarlo bloqueo de las historias activas.
+
+
+Sincronización auditada: **18 de octubre de 2026**, America/Lima.
+[Tablero](https://github.com/users/srg-cp/projects/3) · [Issues](https://github.com/srg-cp/entrehuellas/issues) · [Auditoría y evidencia](AUDITORIA_2026-10-18.md).
+
+51 elementos:39 historias ejecutables y12 épicas;24 issues abiertos/27 cerrados.
+No contar épicas y derivadas como el mismo esfuerzo. Verificado por API: cada
+Status coincide con una única etiqueta status:*.
+
+## Estados actuales
+
+| Estado | Total | Historias | Épicas |
+| --- | ---: | ---: | ---: |
+| Done | 27 | 21 | 6 |
+| In progress | 9 | 6 | 3 |
+| Ready | 2 | 1 | 1 |
+| Backlog | 13 | 11 | 2 |
+| In review | 0 | 0 | 0 |
+
+## Criterio aplicado
+
+Se sustituyeron motivos históricos (sin PR, fotos/principal/cámara o integración
+pendientes) por el estado de main, pruebas y confirmaciones posteriores. La
+auditoría ampliada movió20 tarjetas más a Done y actualizó29 motivos; no equivale
+a realizar una nueva demo ni autoriza SQL/despliegues. Las limitaciones de la
+evidencia se conservan sin convertir todo QA ampliado en desarrollo pendiente.
+
+- **Done:** entrega implementada/integrada y respaldada por evidencia posterior.
+  Incluye las aceptaciones expresas de HU-10.1/HU-11 y corrección de HU-03. La
+  [matriz](AUDITORIA_2026-10-18.md) justifica cada corrección adicional.
+- **In progress:** pendiente concreto: #1 (Google/baja/exportación), #19
+  (retorno OAuth Android), #8/#34/#35 (impresión/escaneo/hojas nativas),
+  #12/#40/#41 (integrar seguimiento/bandeja y demo) y #13 (integración/028/demo).
+  No se exige Firebase a HU-02 ni reactivar FCM para validar bandeja.
+- **Ready:** #43 denuncia y épica #14; no hay implementación iniciada.
+- **Backlog:** cuenta/offline/métricas/moderación posterior sin iniciar; #42
+  FCM explícitamente pospuesto y #44/#51 con needs:refinement conservado.
+- **In review:** reservado a entrega presentada a revisión; sin tarjetas actuales.
+
+[ESTADO](../ESTADO.md) y [funcionalidades](../funcionalidades/README.md) detallan
+comportamiento y límites. Las notas antiguas se conservan como historial fechado
+y se leen junto al motivo actual, no como bloqueos vigentes automáticos.
+
+## Done
+
+| Issue local | Tipo | Resultado |
+| --- | --- | --- |
+| [#2](002-HU-02.md) | Épica | Épica — HU-02 — Elegir zonas y preferencias de alertas |
+| [#3](003-HU-03.md) | Épica | Épica — HU-03 — Registrar una mascota |
+| [#4](004-HU-04.md) | Épica | Épica — HU-04 — Administrar las fotos de mi mascota |
+| [#5](005-HU-05.md) | Historia | HU-05 — Publicar un caso de mascota perdida |
+| [#6](006-HU-06.md) | Historia | HU-06 — Publicar una mascota encontrada |
+| [#7](007-HU-07.md) | Épica | Épica — HU-07 — Consultar y filtrar casos en lista y mapa |
+| [#9](009-HU-09.md) | Historia | HU-09 — Consultar la ficha del caso desde el navegador |
+| [#10](010-HU-10.md) | Épica | Épica — HU-10 — Reportar un avistamiento desde web o app |
+| [#11](011-HU-11.md) | Épica | Épica — HU-11 — Revisar avistamientos y consultar la cronología |
+| [#17](017-HU-01.1.md) | Historia | HU-01.1 — Registrarme y confirmar mi correo |
+| [#18](018-HU-01.2.md) | Historia | HU-01.2 — Acceder con correo y contraseña |
+| [#20](020-HU-01.4.md) | Historia | HU-01.4 — Conservar y cerrar mi sesión de forma segura |
+| [#21](021-HU-01.5.md) | Historia | HU-01.5 — Completar el onboarding de mi cuenta |
+| [#22](022-HU-01.6.md) | Historia | HU-01.6 — Recuperar mi contraseña con un código |
+| [#23](023-HU-01.7.md) | Historia | HU-01.7 — Consultar y editar mi perfil |
+| [#26](026-HU-02.1.md) | Historia | HU-02.1 — Guardar mis zonas y radios de interés |
+| [#27](027-HU-02.2.md) | Historia | HU-02.2 — Configurar mis preferencias de alertas |
+| [#28](028-HU-03.1.md) | Historia | HU-03.1 — Registrar y consultar mis mascotas |
+| [#29](029-HU-03.2.md) | Historia | HU-03.2 — Editar la ficha de mi mascota con sus fotos |
+| [#30](030-HU-04.1.md) | Historia | HU-04.1 — Agregar fotografías seguras a mi mascota |
+| [#31](031-HU-04.2.md) | Historia | HU-04.2 — Elegir y retirar fotografías de mi mascota |
+| [#32](032-HU-07.1.md) | Historia | HU-07.1 — Consultar y filtrar casos en una lista |
+| [#33](033-HU-07.2.md) | Historia | HU-07.2 — Explorar los mismos casos en el mapa |
+| [#36](036-HU-10.1.md) | Historia | HU-10.1 — Reportar un avistamiento desde la web pública |
+| [#37](037-HU-10.2.md) | Historia | HU-10.2 — Reportar un avistamiento desde Android |
+| [#38](038-HU-11.1.md) | Historia | HU-11.1 — Consultar la cronología del caso |
+| [#39](039-HU-11.2.md) | Historia | HU-11.2 — Revisar y clasificar un avistamiento |
+
+## In progress
+
+| Issue local | Tipo | Resultado |
+| --- | --- | --- |
+| [#1](001-HU-01.md) | Épica | Épica — HU-01 — Entrar y gestionar mi cuenta |
+| [#8](008-HU-08.md) | Épica | Épica — HU-08 — Generar y compartir un cartel con QR |
+| [#12](012-HU-12.md) | Épica | Épica — HU-12 — Recibir alertas y consultarlas en la bandeja |
+| [#13](013-HU-13.md) | Historia | HU-13 — Cerrar un caso como recuperado |
+| [#19](019-HU-01.3.md) | Historia | HU-01.3 — Acceder con Google |
+| [#34](034-HU-08.1.md) | Historia | HU-08.1 — Generar un cartel PDF con QR legible |
+| [#35](035-HU-08.2.md) | Historia | HU-08.2 — Descargar y compartir mi cartel y enlace |
+| [#40](040-HU-12.1.md) | Historia | HU-12.1 — Seguir y dejar de seguir casos y zonas |
+| [#41](041-HU-12.2.md) | Historia | HU-12.2 — Consultar mis alertas en una bandeja persistente |
+
+## Ready
+
+| Issue local | Tipo | Resultado |
+| --- | --- | --- |
+| [#14](014-HU-14.md) | Épica | Épica — HU-14 — Denunciar contenido y atender reportes |
+| [#43](043-HU-14.1.md) | Historia | HU-14.1 — Denunciar contenido con un motivo |
+
+## Backlog
+
+| Issue local | Tipo | Resultado |
+| --- | --- | --- |
+| [#15](015-HU-15.md) | Épica | Épica — HU-15 — Conservar borradores sin conexión y reintentar envíos |
+| [#16](016-HU-16.md) | Épica | Épica — HU-16 — Consultar estadísticas básicas del MVP |
+| [#24](024-HU-01.8.md) | Historia | HU-01.8 — Solicitar la baja y consultar su estado |
+| [#25](025-HU-01.9.md) | Historia | HU-01.9 — Exportar los datos básicos de mi cuenta |
+| [#42](042-HU-12.3.md) | Historia | HU-12.3 — Recibir notificaciones push con reintento |
+| [#44](044-HU-14.2.md) | Historia | HU-14.2 — Bloquear y desbloquear usuarios |
+| [#45](045-HU-14.3.md) | Historia | HU-14.3 — Revisar denuncias y moderar con auditoría |
+| [#46](046-HU-14.4.md) | Historia | HU-14.4 — Apelar una decisión de moderación |
+| [#47](047-HU-15.1.md) | Historia | HU-15.1 — Conservar borradores al perder conexión |
+| [#48](048-HU-15.2.md) | Historia | HU-15.2 — Reintentar mis envíos pendientes sin duplicarlos |
+| [#49](049-HU-15.3.md) | Historia | HU-15.3 — Consultar casos guardados sin conexión |
+| [#50](050-HU-16.1.md) | Historia | HU-16.1 — Consultar estadísticas agregadas del piloto |
+| [#51](051-HU-16.2.md) | Historia | HU-16.2 — Controlar funciones del piloto con auditoría |
+
+## In review
+
+Sin elementos.
+
+<details>
+<summary>Instantánea histórica del10 de octubre de2026 (sustituida por la sincronización anterior)</summary>
+
+### Backlog anterior
+
 Sincronización: 10 de octubre de 2026, America/Lima. Repositorio: [srg-cp/entrehuellas](https://github.com/srg-cp/entrehuellas/issues).
 
 Hay **51 archivos de issue**, uno por cada #1–#51, además de este índice. El nombre combina número GitHub e identificador HU, por ejemplo `017-HU-01.1.md`. Se conservan descripción, aceptación, dependencias, validación y definición de terminado del issue, junto a metadatos, estado y motivo de clasificación.
@@ -116,3 +250,6 @@ Sin issues en este estado.
 Sin issues en este estado.
 
 Avance local posterior: HU-04.1/#30 y HU-04.2/#31 continúan en codex/pet-photos con cámara, principal y procesamiento protegido/miniaturas preparados. Snapshot remoto In progress conservado. Patch012/Edge y demo Android/Supabase/runtime hosted pendientes; no se cierran issues por225 Flutter/15 SQL/7 Deno locales. Detalles en ESTADO y ADR-020.
+
+
+</details>

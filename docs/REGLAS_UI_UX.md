@@ -1,9 +1,35 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Consolidación web —19/10/2026:** las medidas vigentes están en
+[REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md). Estas correcciones prevalecen sobre
+las notas anteriores de los mismos recorridos, sin modificar Flutter:
+
+- Login: useStaggerReveal compartido, port del hook de sader-panel. Transiciones
+  de850ms, intervalo90ms, blur18px y desplazamiento desde arriba28px; doble rAF,
+  will-change persistente y estilos por CSSOM para respetar CSP. Sin keyframes
+  alternativos ni cobertura crema; entrada del icono separada de su hover.
+  No reiniciar al editar o comprobar sesión; movimiento reducido estático.
+- Toast web: cápsula clara glass del móvil, radio28px, blur18px, ancho hasta360px,
+  medallón32px/icono20px y entrada180ms. Texto14px/peso400 sin negrita, sin X;
+  cierre al tocar o por teclado, acción Reintentar independiente y lifecycle.
+- /terms y /privacy: DM Sans local. Retorno circular glass36×36px/chevrón16px;
+  enlace derecho mínimo36px, padding8/12px, radio18px a tamaño base,
+  texto14px/500/línea20px e icono16px. Altura flexible con texto ampliado.
+  Solo la barra legal reduce el retorno; otros usos conservan52px/icono28px.
+  Metadatos con Material Symbols filled16px. Login y landing mantienen Arial.
+
+**Administración18/10:** solo en la plataforma web, por instrucción del usuario.
+No añadir controles administrativos a Flutter; la denuncia de contenido sigue
+siendo una operación de usuario. La UI de moderación web sigue
+[REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md) y autorización efectiva del servidor.
+
 **Web — 18/10/2026:** el usuario aprueba la landing terminada como referencia
 para toda la plataforma web (público, usuarios y administración). Antes de cambios
 web leer [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md): consolida valores finales,
-variantes, componentes, movimiento y criterios de aceptación.
+variantes, componentes, movimiento y criterios de aceptación. La consolidación
+posterior del18/10 incluye fondo blanco/celeste con footer cream, resplandor
+BackgroundGlowOrb compartido y fondo blanco/cream detrás del carrusel;
+el panel de propósito conserva #F3F2EE.
 [ADR-063](decisiones/063-landing-como-referencia-ui-ux-web.md) sustituye el
 aislamiento de referencia visual de ADR-060; el CSS sigue encapsulado y el QR se
 adaptará al intervenir sus recorridos, sin afirmar migración realizada. Flutter
