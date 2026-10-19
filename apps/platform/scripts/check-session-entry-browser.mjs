@@ -9,8 +9,10 @@ try {
   const errors = [];
   await context.addInitScript(() => {
     window.loginWasMounted = false;
+    window.accountWasMounted = false;
     new MutationObserver(() => {
       if (document.querySelector('.login-screen')) window.loginWasMounted = true;
+      if (document.querySelector('.account-layout')) window.accountWasMounted = true;
     }).observe(document, { subtree: true, childList: true });
   });
   const page = await context.newPage();
@@ -24,7 +26,7 @@ try {
   assert.equal(cookie.path, '/'); assert.equal(cookie.httpOnly, true);
   for (const completed of [true, false]) {
     server.setOnboarding(ordinary, completed);
-    for (const url of ['/iniciar-sesion', '/login?reason=expired']) {
+    for (const url of ['/iniciar-sesion', '/login?reason=expired', completed ? '/bienvenida' : '/inicio']) {
       await page.goto(server.origin + url);
       await page.waitForURL('**/' + (completed ? 'inicio' : 'bienvenida'));
       assert.equal(await page.evaluate(() => window.loginWasMounted), false, 'SSR must never mount login');
@@ -52,6 +54,24 @@ try {
   assert.equal((await context.cookies()).filter(c => c.name === 'eh_access').length, 0);
   await page.reload(); await page.waitForURL('**/iniciar-sesion?reason=signed-out');
   await page.locator('.login-screen').waitFor();
+  for (const path of ['/inicio', '/bienvenida']) {
+    await page.goto(server.origin + path);
+    await page.waitForURL('**/iniciar-sesion'); await page.locator('.login-screen').waitFor();
+    assert.equal(await page.evaluate(() => window.accountWasMounted), false, 'Signed-out SSR must never mount account/skeleton: ' + path);
+    await page.reload(); await page.locator('.login-screen').waitFor();
+    assert.equal(await page.evaluate(() => window.accountWasMounted), false);
+    await page.waitForFunction(() => !!document.querySelector('#__nuxt')?.__vue_app__);
+    await page.evaluate(path => document.querySelector('#__nuxt').__vue_app__.config.globalProperties.$router.push(path), path);
+    await page.waitForURL('**/iniciar-sesion'); await page.locator('.login-screen').waitFor();
+    assert.equal(await page.evaluate(() => window.accountWasMounted), false, 'Signed-out SPA must never mount account/skeleton: ' + path);
+  }
+  // Backend failures on a legacy session must reach retry, without redirect loops.
+  await context.addCookies([{ ...cookie, path: '/api' }]); server.profileFailure(true);
+  await page.goto(server.origin + '/inicio');
+  await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).waitFor();
+  server.profileFailure(false);
+  await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click();
+  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
   assert.deepEqual(errors, []); await context.close();
-  console.log('Session entry Chrome QA passed: SSR/SPA/legacy login never mounts, onboarding destinations, API-only cookie migration, no-JS redirect, logout/reload and no hydration/CSP errors. Fixture backend only.');
+  console.log('Session entry Chrome QA passed: SSR/SPA/legacy login never mounts, onboarding destinations, API-only cookie migration, no-JS redirect, logout/reload, signed-out inicio/bienvenida never mount account/skeleton, legacy backend failure retry and no hydration/CSP errors. Fixture backend only.');
 } finally { await browser.close(); await server.close(); }

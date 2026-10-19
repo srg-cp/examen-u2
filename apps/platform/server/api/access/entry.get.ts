@@ -9,7 +9,7 @@ export default defineEventHandler(async event => {
       services.save();
       return sendRedirect(event, session.profile.onboardingCompleted ? '/inicio' : '/bienvenida', 302);
     } catch (error) {
-      if (!(error instanceof AccessFailure) || error.kind !== 'unauthenticated') return sendRedirect(event, '/inicio', 302);
+      if (!(error instanceof AccessFailure) || error.kind !== 'unauthenticated') return sendRedirect(event, '/inicio?entry=unavailable', 302);
       clearAccountCookie(event);
     }
   }

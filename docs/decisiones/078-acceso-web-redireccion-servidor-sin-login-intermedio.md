@@ -38,6 +38,26 @@ conserva su autorización por operación y recibe la misma sesión general.
 
 ## Consecuencias y validación
 
+### Corrección de entradas sin sesión a inicio/bienvenida —19/10/2026
+
+La primera implementación solo interceptaba /iniciar-sesion: entrar a /inicio
+sin sesión todavía renderizaba su skeleton antes de redirigir desde onMounted.
+Por el reporte del usuario, session-entry también comprueba /inicio y /bienvenida
+antes del HTML. Sin cookie pasa por el puente existente y llega al formulario;
+con cookie inválida la elimina y redirige al login. Con sesión válida conserva
+la ruta correcta o redirige según onboarding antes de renderizar la incorrecta.
+account-access espera al mismo ViewModel/caso de uso en navegaciones cliente,
+sin montar la pantalla de cuenta si falta sesión. Las APIs siguen autorizando
+cada operación; el middleware no concede acceso a datos.
+
+Un error de backend en rutas de cuenta permite su shell de reintento existente.
+Si ocurre al recuperar cookie antigua en /api/access/entry, /inicio recibe
+entry=unavailable para evitar volver al puente en bucle. Ese marcador solo permite
+un shell sin información privada: la pantalla vuelve a validar por API y no
+obtiene datos sin sesión autorizada. No equivale a sesión anónima confirmada.
+Pruebas de servidor y observación de montajes en Chrome verifican ambas rutas
+tras logout, recarga, navegación SPA, destinos por onboarding y recuperación503.
+
 El navegador recibe directamente el destino autenticado: no hay formulario ni
 skeleton de acceso intermedio. Los datos de /inicio y /bienvenida conservan
 su carga actual, sin publicar información privada en SSR. No cambia Flutter,

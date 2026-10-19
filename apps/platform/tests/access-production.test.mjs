@@ -43,6 +43,39 @@ test('Login redirects before rendering HTML, validates onboarding and never redi
  assert.ok(!failure.headers.getSetCookie().some(c => /Max-Age=0/.test(c)));
 });
 
+test('Signed-out account pages redirect before rendering their shell; authenticated pages enforce onboarding before HTML', async t => {
+ const s = await moderationFixture(); t.after(s.close);
+ const cookie = cookieOf(await login(s));
+ await post(s, 'logout', {}, cookie);
+ for (const path of ['/inicio', '/bienvenida']) {
+  for (const supplied of ['', 'eh_access=forged']) {
+   const r = await fetch(s.origin + path, { headers: { Cookie: supplied }, redirect: 'manual' });
+   assert.equal(r.status, 302);
+   assert.doesNotMatch(await r.text(), /account-layout|account-main|skeleton|Consultando tu cuenta/);
+   assert.match(r.headers.get('cache-control'), /no-store/);
+   const form = await fetch(s.origin + path);
+   assert.equal(new URL(form.url).pathname, '/iniciar-sesion');
+   const html = await form.text(); assert.match(html, /Inicia sesión/);
+   assert.doesNotMatch(html, /account-layout|account-main/);
+  }
+ }
+ const active = cookieOf(await login(s));
+ for (const completed of [true, false]) {
+  s.setOnboarding(ordinary, completed);
+  const right = completed ? '/inicio' : '/bienvenida', wrong = completed ? '/bienvenida' : '/inicio';
+  const r = await fetch(s.origin + wrong, { headers: { Cookie: active }, redirect: 'manual' });
+  assert.equal(r.status, 302); assert.equal(r.headers.get('location'), right);
+  assert.doesNotMatch(await r.text(), /account-layout|skeleton/);
+ }
+ s.profileFailure(true);
+ const failure = await fetch(s.origin + '/inicio', { headers: { Cookie: active }, redirect: 'manual' });
+ assert.equal(failure.status, 200); assert.match(await failure.text(), /account-layout/);
+ const legacyFailure = await fetch(s.origin + '/api/access/entry', { headers: { Cookie: active }, redirect: 'manual' });
+ assert.equal(legacyFailure.headers.get('location'), '/inicio?entry=unavailable');
+ const retryShell = await fetch(s.origin + legacyFailure.headers.get('location'), { redirect: 'manual' });
+ assert.equal(retryShell.status, 200); assert.doesNotMatch(await retryShell.text(), /Usuario de prueba|ordinario@example.test/);
+});
+
 test('API-only sessions migrate without rendering login; anonymous/forged sessions reach the form without loops', async t => {
  const s = await moderationFixture(); t.after(s.close);
  const cookie = cookieOf(await login(s));

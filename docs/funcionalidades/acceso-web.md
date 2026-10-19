@@ -1,5 +1,18 @@
 # Acceso web
 
+## Inicio/bienvenida después de cerrar sesión —19/10/2026
+
+Corregido el caso que quedaba pendiente: entrar a /inicio sin sesión montaba su
+skeleton antes del login. Ambas rutas /inicio y /bienvenida ahora comprueban
+sesión antes de renderizar en servidor y antes de montar en navegación cliente
+(account-access). Anónimo llega directamente al formulario, sin shell/skeleton
+de cuenta. Sesión válida dirige a la etapa que corresponde; cookie inválida se
+limpia. Fallos de backend conservan el reintento y no se interpretan como logout.
+El puente de cookies antiguas usa entry=unavailable solo para permitir ese shell
+de reintento sin bucles; ningún marcador concede identidad, datos o permisos.
+Mismos contratos/configuración de ADR-078, sin SQL ni alcance funcional nuevo.
+Validación del escenario tras logout/recarga/SPA documentada en ESTADO.
+
 ## Entrada directa con sesión activa —19/10/2026
 
 /iniciar-sesion ahora valida Auth y perfil en servidor y redirige302 a /inicio

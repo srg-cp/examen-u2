@@ -6,6 +6,9 @@ cifrada con path /, transición de cookies anteriores sin exponer credenciales
 ni perfiles en SSR; navegación cliente espera al caso de uso/ViewModel.
 Sin login ni skeleton de acceso intermedio; los datos del destino conservan su
 carga. Autorización por operación intacta. [ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md).
+La misma comprobación previa aplica a /inicio y /bienvenida: sin sesión no
+renderizar ni montar shell/skeleton de cuenta antes de ir al login. Distinguir
+fallo de backend de sesión ausente y conservar el reintento existente.
 
 **Reveal web compartido —19/10/2026:** retirar la utilidad .reveal y su capa
 opaca. StaggerReveal reutiliza useStaggerReveal para entradas generales, conserva

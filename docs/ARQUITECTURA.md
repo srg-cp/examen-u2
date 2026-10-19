@@ -2,6 +2,13 @@
 
 ## Redirección del acceso antes de renderizar —19/10/2026
 
+Corrección posterior del mismo19/10: session-entry también intercepta /inicio
+y /bienvenida para que una cuenta sin sesión no renderice su shell/skeleton.
+account-access comprueba antes del montaje en navegación cliente. Las cuentas
+válidas redirigen según onboarding; los errores de backend conservan reintento.
+El puente puede usar entry=unavailable para renderizar únicamente el shell de
+reintento sin bucles, siempre sin datos privados y sin conceder autorización.
+
 session-entry valida eh_access mediante AccessAccount/Auth/perfil y responde302
 a /inicio o /bienvenida antes del HTML de login. Cookie cifrada HttpOnly/path /
 sustituye path /api; /api/access/entry recupera sesiones anteriores y termina
