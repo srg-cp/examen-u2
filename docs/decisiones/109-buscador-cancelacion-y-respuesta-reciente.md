@@ -2,6 +2,10 @@
 
 Fecha:20/10/2026. Estado: aceptada por instrucción del usuario.
 
+Corrección posterior: [ADR-110](110-buscador-parcial-y-tiempo-de-respuesta.md)
+restaura600ms por instrucción del usuario y amplía timeout HTTP a20s tras
+reproducir respuestas válidas después de12s. Cancelación y descarte se conservan.
+
 ## Motivo
 
 El usuario observa6–9 segundos para seleccionar sugerencias. La implementación

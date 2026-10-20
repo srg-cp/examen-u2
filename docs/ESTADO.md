@@ -5362,3 +5362,24 @@ previas con/sin PE5,6–8s. El incremento elimina espera acumulada del cliente; 
 acredita latencia inferior3s del proveedor ni rendimiento en Android. Siguiente
 paso: medir en Android con la red del usuario; si persiste la lentitud, evaluar
 la latencia/disponibilidad del proveedor con evidencia de ese entorno.
+
+## Buscador: restaurar600ms y evitar errores por respuestas tardías —20/10/2026
+
+Por nueva instrucción del usuario, restaurado debounce600ms. Cancelación de
+consultas anteriores y descarte tardío se conservan. Diagnóstico con cliente Dart
+real: fuente Tacna/Lima vencía a12s; GET anterior y AbortableRequest devolvieron
+HTTP200/mismos1705 bytes a13,95/13,88s. `tacn` sí devuelve cinco sugerencias
+Tacna/PE a13,42s y `tacna` a14,37s: el corte12s impedía recibirlas. Fuente ahora
+permite20s con aborto al vencer; no exige nombre completo ni añade comodines.
+Consulta sin PE también tardó15,87s. Sin cambiar proveedor, mapa, overlay,
+permisos o alcance. ADR-110 sustituye300ms/timeout12s de ADR-109; ficha actualizada.
+
+Validación:57 pruebas aprobadas en build/place-timeout-prefix-tests.log. Tres
+nuevas verifican respuesta parcial válida después15s en modo dirección/Ciudad y
+aborto ante proveedor sin respuesta a20s; prueba de concurrencia adaptada a600ms.
+Regresiones de places/overlay/arquitectura/Explorar/Reportar/Perfil aprobadas.
+Análisis completo sin incidencias en build/place-timeout-prefix-analysis.log;
+formato correcto. Diagnóstico temporal retirado tras usar fuente/cliente reales.
+No se desplegó. La corrección recupera respuestas válidas, no acelera el servidor
+ni garantiza3s. Siguiente paso: revisión Android/red del usuario y, si persiste
+latencia, evaluar proveedor/cobertura/condiciones con evidencia de ese entorno.

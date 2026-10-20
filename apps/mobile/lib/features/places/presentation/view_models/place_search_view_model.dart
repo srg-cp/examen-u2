@@ -59,7 +59,7 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     _cancelSearch();
     state = PlaceSearchState(noticeId: state.noticeId);
     if (normalized.runes.length < 3 || normalized.runes.length > 120) return;
-    _debounce = Timer(const Duration(milliseconds: 300), () {
+    _debounce = Timer(const Duration(milliseconds: 600), () {
       if (ref.mounted) unawaited(search(normalized, automatic: true));
     });
   }

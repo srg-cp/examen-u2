@@ -52,7 +52,7 @@ class PhotonPlaceDataSource implements PlaceSearchDataSource {
         await (() async => http.Response.fromStream(
           await _client.send(request),
         ))().timeout(
-          const Duration(seconds: 12),
+          const Duration(seconds: 20),
           onTimeout: () {
             cancel();
             throw TimeoutException('Place lookup timed out');

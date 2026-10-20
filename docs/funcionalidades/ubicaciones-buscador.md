@@ -6,7 +6,7 @@ Módulo places, extraído el16 de octubre de2026 para Explorar (HU-07/RF-13) y P
 
 ## Qué hace y recorrido
 
-Sugerencias al escribir3–120 caracteres tras pausa300ms. En Ubicación busca ciudad/dirección para elegir centro del mapa; en Perfil solo ciudades/asentamientos para confirmar Ciudad. Selección explícita, cinco resultados, campo editable mientras consulta, sin botón de búsqueda; teclado admite envío inmediato cuando no hay otra petición.
+Sugerencias al escribir3–120 caracteres tras pausa600ms. En Ubicación busca ciudad/dirección para elegir centro del mapa; en Perfil solo ciudades/asentamientos para confirmar Ciudad. Selección explícita, cinco resultados, campo editable mientras consulta, sin botón de búsqueda; teclado admite envío inmediato cuando no hay otra petición.
 
 ## Reglas, persistencia y permisos
 
@@ -73,3 +73,17 @@ modos, aborto del transporte, descarte tardío/caché y limpieza. La latencia de
 proveedor observada desde este entorno fue5,6–9,75s: no garantiza menos3s.
 Android y tiempos desde la red del usuario pendientes.
 [ADR-109](../decisiones/109-buscador-cancelacion-y-respuesta-reciente.md).
+
+## Corrección de errores y búsqueda parcial —20/10/2026
+
+Regla vigente ADR-110: restaurar600ms por instrucción del usuario; mantener
+cancelación inmediata y última consulta sin cola. Fuente acepta texto parcial:
+la prueba real `tacn` devolvió cinco lugares PE/Tacna a13,42s; `tacna` a14,37s.
+El timeout12s descartaba respuestas válidas: presupuesto ampliado a20s con
+aborto al vencer. GET anterior y petición cancelable tardaron ambos13,9s y
+devolvieron los mismos datos. No se añade igualdad del nombre ni comodines.
+Consulta, país y modo siguen llegando intactos al servicio. Sin reintentos
+automáticos ni cambio de proveedor. Errores reales conservan toast/reintento;
+no se confunden con vacío confirmado. No promete reducir latencia del servidor.
+Pruebas con respuesta válida a15s y aborto a20s; Android pendiente.
+[ADR-110](../decisiones/110-buscador-parcial-y-tiempo-de-respuesta.md).

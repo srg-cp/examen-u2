@@ -16,7 +16,82 @@ import 'support/fake_place_search.dart';
 void main() {
   for (final citiesOnly in [false, true]) {
     testWidgets(
-      'Latest lookup starts at 300ms without waiting for obsolete response: cities=$citiesOnly',
+      'Partial tacn lookup accepts Tacna after a 15s provider response: cities=$citiesOnly',
+      (tester) async {
+        final client = MockClient((request) async {
+          expectSync(request.url.queryParameters['q'], 'tacn');
+          expectSync(request.url.queryParameters['countrycode'], 'PE');
+          await Future<void>.delayed(const Duration(seconds: 15));
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'geometry': {
+                    'coordinates': [-70.25, -18.01],
+                  },
+                  'properties': {
+                    'name': 'Tacna',
+                    'countrycode': 'PE',
+                    'type': 'city',
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        });
+        addTearDown(client.close);
+        var finished = false;
+        final work = PhotonPlaceDataSource(
+          client,
+        ).search('tacn', citiesOnly: citiesOnly);
+        final result = expectLater(
+          work.then((rows) {
+            finished = true;
+            return rows.single.label;
+          }),
+          completion('Tacna'),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 12));
+        expect(finished, isFalse);
+        await tester.pump(const Duration(seconds: 3));
+        await result;
+        expect(finished, isTrue);
+      },
+    );
+  }
+
+  testWidgets('An unresponsive provider still times out and aborts after 20s', (
+    tester,
+  ) async {
+    var aborted = false;
+    final client = MockClient.streaming((request, _) async {
+      await (request as http.AbortableRequest).abortTrigger;
+      aborted = true;
+      throw http.RequestAbortedException(request.url);
+    });
+    addTearDown(client.close);
+    final repo = PlaceSearchRepositoryImpl(PhotonPlaceDataSource(client));
+    final work = expectLater(
+      repo.search('tacn'),
+      throwsA(
+        isA<PlaceSearchFailure>().having(
+          (failure) => failure.kind,
+          'kind',
+          PlaceSearchFailureKind.unavailable,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 20));
+    await work;
+    expect(aborted, isTrue);
+  });
+
+  for (final citiesOnly in [false, true]) {
+    testWidgets(
+      'Latest lookup starts at 600ms without waiting for obsolete response: cities=$citiesOnly',
       (tester) async {
         final repo = FakePlaceSearch()..pending = Completer();
         final oldResponse = repo.pending!;
@@ -42,7 +117,7 @@ void main() {
         final latest = repo.pending!;
         model.queryChanged('Chiclayo');
         expect(oldCancellation.isCancelled, isTrue);
-        await tester.pump(const Duration(milliseconds: 299));
+        await tester.pump(const Duration(milliseconds: 599));
         expect(repo.queries, ['Chic']);
         await tester.pump(const Duration(milliseconds: 1));
         expect(repo.queries, ['Chic', 'Chiclayo']);

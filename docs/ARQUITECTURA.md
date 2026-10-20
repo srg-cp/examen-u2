@@ -759,3 +759,9 @@ contratos y repositorio; data traduce a AbortableRequest del cliente inyectado.
 ViewModel cancela al editar/limpiar/cambiar cuenta/desmontar y lanza a300ms sin
 cola detrás de consultas antiguas. Generación descarta resultados/errores tardíos;
 repositorio impide cachear respuestas canceladas. Sin SDK en presentación/dominio.
+
+Corrección places20/10, ADR-110: debounce600ms por instrucción explícita, sin
+cola para peticiones recientes y con cancelación por operación conservada.
+Timeout de transporte20s tras reproducir respuestas válidas a13–16s; mantiene
+aborto al vencer. Búsqueda parcial delegada a fuente sin comparar nombres por
+igualdad ni introducir comodines. Filtro Perú y contratos de ADR-109 conservados.

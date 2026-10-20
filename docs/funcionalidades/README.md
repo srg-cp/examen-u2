@@ -214,3 +214,7 @@ continuo, sin empujar el contenido de Reportar, Explorar o Perfil. ADR-108.
 Ubicaciones20/10: [respuesta reciente](ubicaciones-buscador.md) con debounce300ms
 y cancelación HTTP por consulta para evitar esperas acumuladas. Filtro PE y
 panel flotante conservados; latencia del proveedor variable. ADR-109.
+
+Ubicaciones20/10: [corrección de espera y búsqueda parcial](ubicaciones-buscador.md).
+Pausa600ms restaurada; timeout20s para respuestas válidas tardías del proveedor.
+`tacn` devuelve Tacna en consulta real; cancelación/Perú/panel conservados. ADR-110.
