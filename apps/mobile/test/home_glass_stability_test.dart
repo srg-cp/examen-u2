@@ -85,7 +85,8 @@ void main() {
         find.image(const AssetImage('assets/illustrations/reunion.png')),
         findsOneWidget,
       );
-      await tester.tap(find.text('Conoce Mis mascotas'));
+      await tester.ensureVisible(find.text('Mis mascotas'));
+      await tester.tap(find.text('Mis mascotas'));
       expect(selected, HomeSection.pets);
       expect(tester.takeException(), isNull);
     },

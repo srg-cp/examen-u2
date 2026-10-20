@@ -1,3 +1,4 @@
+import '../features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import '../features/content_reports/presentation/screens/content_report_screen.dart';
 import '../features/content_reports/presentation/widgets/report_content_button.dart';
 import '../features/case_closure/presentation/screens/case_closure_screen.dart';
@@ -334,6 +335,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
+                contact: CaseContactPanel(
+                  target: (source: 'found', id: state.pathParameters['id']!),
+                ),
                 reportAction: ReportContentButton(
                   target: (kind: 'found', id: state.pathParameters['id']!),
                 ),
@@ -406,6 +410,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
+                contact: CaseContactPanel(
+                  target: (source: 'lost', id: state.pathParameters['id']!),
+                ),
                 reportAction: ReportContentButton(
                   target: (kind: 'lost', id: state.pathParameters['id']!),
                 ),
@@ -430,6 +437,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
+                  showSightingAction: false,
                   id: value.id,
                   community: false,
                   canResolve: value.canResolve,

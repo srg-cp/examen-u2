@@ -209,10 +209,10 @@ void main() {
         await tester.pump(const Duration(seconds: 8));
         await tester.pumpAndSettle();
         await tester.ensureVisible(
-          find.text('Ver historial', skipOffstage: false),
+          find.text('Ver seguimiento', skipOffstage: false),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Ver historial', skipOffstage: false));
+        await tester.tap(find.text('Ver seguimiento', skipOffstage: false));
         await tester.pumpAndSettle();
         expect(find.byType(CaseTimelineScreen), findsOneWidget);
         final timeline = tester.widget<CaseTimelineScreen>(

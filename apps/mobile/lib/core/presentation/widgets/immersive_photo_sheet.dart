@@ -1,6 +1,6 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'zone_map_picker.dart';
-import 'case_preview_geometry.dart';
+import 'immersive_photo_sheet_geometry.dart';
 import 'package:flutter/material.dart';
 import 'expandable_description.dart';
 import 'glass_surface.dart';
@@ -12,9 +12,13 @@ class PreviewFact {
   final String label;
 }
 
-/// Shared photo-led preview. Features supply public data and real actions.
-class CasePublicationPreview extends StatefulWidget {
-  const CasePublicationPreview({
+/// Full-screen photo gallery with a draggable glass details sheet.
+///
+/// Preserved design: "Ficha fotográfica inmersiva" (formerly
+/// CasePublicationPreview). Features supply public data and real actions.
+/// See docs/funcionalidades/ficha-fotografica-inmersiva.md for reuse constraints.
+class ImmersivePhotoSheet extends StatefulWidget {
+  const ImmersivePhotoSheet({
     required this.name,
     required this.photos,
     required this.facts,
@@ -37,10 +41,10 @@ class CasePublicationPreview extends StatefulWidget {
   final Widget? actions;
   final TileProvider Function()? createMapTileProvider;
   @override
-  State<CasePublicationPreview> createState() => _CasePublicationPreviewState();
+  State<ImmersivePhotoSheet> createState() => _ImmersivePhotoSheetState();
 }
 
-class _CasePublicationPreviewState extends State<CasePublicationPreview> {
+class _ImmersivePhotoSheetState extends State<ImmersivePhotoSheet> {
   int _photo = 0;
   final _sheet = DraggableScrollableController();
   bool _expanded = false;
@@ -204,14 +208,14 @@ class _CasePublicationPreviewState extends State<CasePublicationPreview> {
                   ),
                   SliverLayoutBuilder(
                     builder: (context, constraints) => SliverPadding(
-                      padding: CasePreviewGeometry.cardPadding(context),
+                      padding: ImmersivePhotoSheetGeometry.cardPadding(context),
                       sliver: SliverToBoxAdapter(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             minHeight:
                                 (constraints.viewportMainAxisExtent -
                                         constraints.precedingScrollExtent -
-                                        CasePreviewGeometry.cardPadding(
+                                        ImmersivePhotoSheetGeometry.cardPadding(
                                           context,
                                         ).bottom)
                                     .clamp(0.0, double.infinity),
@@ -219,7 +223,7 @@ class _CasePublicationPreviewState extends State<CasePublicationPreview> {
                           child: StaggerRevealItem(
                             order: 1,
                             child: GlassSurface(
-                              radius: CasePreviewGeometry.cardRadius,
+                              radius: ImmersivePhotoSheetGeometry.cardRadius,
                               child: ColoredBox(
                                 color: const Color(0xDDF5F5F7),
                                 child: Column(

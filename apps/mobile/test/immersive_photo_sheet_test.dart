@@ -10,7 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_publication_preview.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/immersive_photo_sheet.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_screen_shell.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/expandable_description.dart';
@@ -87,7 +87,7 @@ void main() {
                 child: CaseScreenShell(
                   title: 'Mascota perdida',
                   immersive: true,
-                  child: CasePublicationPreview(
+                  child: ImmersivePhotoSheet(
                     name: small
                         ? 'Luna de nombre extraordinariamente largo sin espacio final abcdefghijklmnopqrstuvwxyz'
                         : 'Luna',

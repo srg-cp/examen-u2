@@ -1,5 +1,7 @@
 # Patches manuales de Supabase
 
+Contacto por caso20/10: [031_patch_case_contacts.sql](031_patch_case_contacts.sql), generado con Build-CaseContactsPatch.ps1. Ejecutar íntegro después de030 cuando se autorice activar el backend. No reaplicar patches anteriores. Validación local/limitaciones en docs/ESTADO.md; no aplicado remotamente.
+
 **Confirmación posterior18/10:**030 aplicado por el usuario, sin inspección
 remota nueva. No reaplicar030. Continúan los pasos de configuración/acceso/rol
 y validación real de moderación web descritos en CONFIGURACION.

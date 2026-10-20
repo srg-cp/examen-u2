@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'scroll_safe_area.dart';
 
-abstract final class CasePreviewGeometry {
+abstract final class ImmersivePhotoSheetGeometry {
   static const titlePadding = EdgeInsets.fromLTRB(24, 0, 24, 12);
   static const cardRadius = 32.0;
   static double photoSpace(BuildContext context) =>

@@ -1,5 +1,130 @@
 # Estado del proyecto
 
+## Ficha pública: fidelidad de Perdido y glass —20/10/2026
+
+Por corrección explícita del usuario, la etiqueta del caso se coloca a la derecha
+del nombre en la misma fila, centrada verticalmente. Los puntos de galería van
+centrados debajo. Texto ampliado o etiqueta larga apilan sin recortar el estado;
+la foto ampliada usa proporción0.8 para reservar espacio.
+
+GlassSurface incorpora el acabado frosted compartido: ribete blanco único,
+sombra difusa suave y gradiente perla/celeste traslúcido. Tarjetas de la ficha y
+controles de contacto lo reutilizan, retirando el relleno gris adicional y el
+doble borde oscuro. SMS/teléfono conservan iconos azules, ahora22, y objetivo52.
+Volver/guardar mantienen el glass anterior; polished sigue siendo el valor por
+defecto para todos los consumidores previos. ImmersivePhotoSheet intacto.
+
+ADR-113, normas, diseño, arquitectura, índice y fichas actualizados. Sin cambios
+funcionales, datos, SQL, permisos o alcance HU; activación031 sigue pendiente.
+
+Validación: formato correcto y flutter analyze sin incidencias.28 pruebas de ficha,
+contacto, patrón inmersivo, carga y arquitectura aprobadas;26 de perdidos/encontrados
+y1 de estabilidad de glass en Inicio también aprobadas (55 en total). Regresión
+geométrica confirma misma línea nombre/estado, margen derecho16 y paginación
+centrada;390×844 y320×350/texto2, movimiento normal/reducido. La prueba de Inicio
+ya verificaba pintura estable y falló solo por una etiqueta retirada; se actualizó
+su toque a la acción real Mis mascotas, sin cambiar Inicio.
+
+Capturas normal/pequeña revisadas en apps/mobile/build/ui-preview/public-cards,
+comparadas con mockups/ficha-publica-glass-contacto.png. Fotos/datos de fixture y
+teselas simuladas; no prueba red real. Logs public-cards-fidelity-{tests,analyze,
+regressions,home-glass} en apps/mobile/build. Siguiente paso: revisión Android
+físico. Sin APK, despliegue ni operaciones remotas; cambios previos conservados.
+
+## Nueva ficha pública glass y contacto autorizado —20/10/2026
+
+Implementados CasePublicCards/CasePublicScreenShell en consultas de perdidos y
+encontrados, según el último mockup aprobado (conservado en
+mockups/ficha-publica-glass-contacto.png). Foto redondeada, nombre blanco48/800,
+metadatos/rasgos en tarjetas gris perla, mapa propio con punto/halo azul y créditos
+compactos, CTA azul y enlace Ver seguimiento. Volver/guardar mantienen glass
+compartido; SMS/teléfono también usan ese control con iconos azules. Título de
+navegación20 por composición aprobada,32 en fila propia con texto ampliado.
+Scroll normal; título se desplaza para evitar solapamientos. Se conservan
+operaciones reales y permisos de seguimiento, avisos/custodia, cartel, cierre y
+denuncia. ImmersivePhotoSheet conserva íntegro su diseño y uso en vistas previas.
+
+Por elección explícita del usuario se añade case_contacts, dominio/casos de uso,
+DTO/fuente/repositorio y ViewModel autoDispose por caso/cuenta. Router compone el
+panel por slot; bootstrap/main inyectan. El autor registra/edita/retira contacto
+DESDE SU FICHA PUBLICADA, con consentimiento desactivado inicialmente y elección
+separada para foto. Guardado independiente, sin volver a publicar el caso.
+Nombre público2–80, teléfono internacional y avatar de perfil almacenado opcional;
+inicial real si no hay foto. SMS/marcador son acciones externas, sin chat propio.
+
+Plan031/fuentes106–109, migración20261020003100_case_contacts.sql y patch031
+versionados/generados. Tabla privada/RLS/RPC, autor por auth.uid(), CAS/reintento
+exacto y autorización por caso activo/visible. Foto: SELECT acotado y URL60s;
+escrituras continúan privadas incluso ante políticas permisivas amplias.
+Retirada/cierre/ocultamiento bloquean nuevas lecturas/firmas, sin recuperar
+imágenes descargadas ni invalidar antes de tiempo una firma ya emitida.
+No se amplían QR/web anónima/carteles ni consultas de perfiles privados.
+
+Documentados ADR-113/114, fichas ficha-publica-mobile/contacto-reportante,
+índice, patrón conservado, guía, arquitectura, diseño, normas y AGENTS.
+Ampliación explícita de HU-05/06/07, RF-05/06/13; sin issue nuevo ni cierre de HU.
+
+Validación local final: flutter analyze sin incidencias, formato correcto y
+78/78 pruebas Flutter aprobadas: layouts390×844 y320×350/texto2, movimiento
+normal/reducido, galería/descripción, mapa público, acciones/retorno, contacto,
+reintento ambiguo/doble envío/cambio de cuenta, navegación, recuperación,
+cronología, mapas compartidos y arquitectura. Se corrigió un desbordamiento
+real del enlace de seguimiento con texto2 detectado al ampliar la suite.
+Pruebas con AMBIENT_BACKGROUND_MOTION=false y base Positron configurada.
+Renders revisados en apps/mobile/build/ui-preview/public-cards (fixtures de
+prueba y teselas simuladas, sin afirmar validación del proveedor por red).
+
+SQL:43/43 pruebas de la batería PostgreSQL/PostGIS local aprobadas, más repetición
+de las2 de contacto fortalecidas con ocultamiento por moderación y conflicto
+tras edición intermedia. Se verifican aislamiento, consentimiento, firma autorizada,
+revocación, restricciones, reintentos y repetición de migración/bundle.
+Build-Migration/Build-CaseContactsPatch/Build-RunAll correctos, sin reescribir
+migraciones anteriores. Logs public-cards-final-{analyze,tests},
+public-cards-sql-suite y sql-contact-tests en apps/mobile/build.
+
+Pendiente: aplicar031 después de030 en Supabase, verificar Storage/foto y
+SMS/marcador en Android físico. Sin activación hosted, APK, despliegue o GitHub.
+Siguiente paso: activación remota autorizada y revisión física con dos cuentas;
+el diseño queda implementado y el patrón anterior conservado. Cambios locales
+previos preservados, incluido mockups/detalles-ficha.png.
+
+## Diseño conservado: Ficha fotográfica inmersiva —20/10/2026
+
+Por petición explícita se conserva el diseño actual de Ver ficha para una futura
+funcionalidad. CasePublicationPreview se renombra a ImmersivePhotoSheet y su
+geometría a ImmersivePhotoSheetGeometry, con archivos, imports, consumidores y
+pruebas actualizados. Sin cambios visuales o de comportamiento: sigue activo
+en fichas/vistas previas de perdidos/encontrados. No se elimina ni duplica.
+
+ADR-112 y ficha funcionalidades/ficha-fotografica-inmersiva.md documentan
+composición, medidas, gestos, campos, privacidad, dependencias, errores y
+reutilización. Índice, arquitectura, diseño, normas UI, AGENTS, guía y ficha de
+reportes enlazan la conservación. Sin nueva HU/issue, cierre de historias,
+operaciones, SQL o permisos. Propuesta glass por tarjetas aprobada visualmente,
+aún sin aplicar; funcionalidad futura sin definir.
+
+Validación local: formato de8 archivos y40/40 pruebas existentes aprobadas
+(composición normal/compacta, texto2, movimiento normal/reducido, integraciones
+perdidos/encontrados y arquitectura), con AMBIENT_BACKGROUND_MOTION=false.
+Flutter analyze sin incidencias. Revisión física Android pendiente. Siguiente paso:
+aplicar el nuevo diseño a Ver ficha en otro incremento conservando este patrón.
+Sin APK, despliegue ni acciones GitHub. Cambios locales previos conservados.
+
+## Ficha del caso: nombre con diseño original —20/10/2026
+
+Por instrucción explícita se restaura únicamente el nombre sobre fotografía
+de CasePublicationPreview a su diseño anterior: fuente del sistema, blanco,
+tamaño48/peso800, altura1.05, sombra suave y dos líneas con elipsis; sin cápsula.
+Los demás títulos mantienen Poppins400/32/gris. Excepción registrada en AGENTS,
+ADR-111, norma UI y fichas. Sin cambios de datos/permisos/acciones o alcance.
+
+Validación: formato correcto y4/4 pruebas del preview aprobadas en390×844 y
+320×350/texto2 con movimiento normal/reducido; se verifican estilo original,
+scroll y acciones. Captura390 revisada con texto blanco directamente sobre foto;
+renders en apps/mobile/build/ui-preview/publication-preview. Flutter analyze sin incidencias.
+Logs case-title-original-* en apps/mobile/build. Siguiente paso: revisión Android
+físico; sin APK ni despliegue.
+
 ## Ver ficha: nombre sin cápsula blanca —20/10/2026
 
 Por corrección explícita del usuario se retira GlassSurface/ColoredBox y padding

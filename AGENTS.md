@@ -1,5 +1,9 @@
 # Entre Huellas: instrucciones del proyecto
 
+Ficha pública móvil20/10, ADR-113/114: consultas usan CasePublicCards con tarjetas glass según mockup aprobado; conservar ImmersivePhotoSheet en vistas previas y para reutilización futura. Título compacto de navegación Poppins400/20/gris por aprobación explícita; con texto ampliado título32 en fila propia. Nombre sobre foto blanco48/800. Contacto del autor por caso con consentimiento y RPC protegidas (plan031), sin ampliar perfiles privados/QR.
+
+Conservación20/10, ADR-112: el componente `CasePublicationPreview` se renombra a `ImmersivePhotoSheet` (Ficha fotográfica inmersiva). Conservarlo para reutilización futura, también cuando se sustituya el diseño de Ver ficha. Las reglas anteriores de su nombre blanco48/800 siguen vigentes. Véase docs/funcionalidades/ficha-fotografica-inmersiva.md.
+
 ## Contexto
 
 Construimos el MVP de recuperación colaborativa. Android primero. La arquitectura acordada es Clean Architecture por funcionalidad con Flutter, MVVM, Riverpod, casos de uso, repositorios y Supabase como backend. La web QR forma parte del MVP. Los motivos y las consecuencias se registran en [ADR-001](docs/decisiones/001-arquitectura-aplicacion.md).

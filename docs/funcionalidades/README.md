@@ -1,5 +1,14 @@
 # Funcionalidades de Entre Huellas
 
+Ficha pública20/10: [corrección de posición de Perdido y acabado glass](ficha-publica-mobile.md), con frosted compartido y paginación centrada; refinamiento ADR-113. Validación visual normal/pequeña y preservación del glass anterior en ESTADO.
+
+Ficha pública móvil20/10: [nuevo diseño por tarjetas glass](ficha-publica-mobile.md) y [contacto del reportante con permiso por caso](contacto-reportante.md), ADR-113/114. Diseño implementado localmente; contacto requiere activación031. El [patrón inmersivo](ficha-fotografica-inmersiva.md) se conserva en vistas previas.
+
+Diseño conservado20/10: [Ficha fotográfica inmersiva](ficha-fotografica-inmersiva.md) (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), renombrada para reutilización futura. Continúa activa; ADR-112.
+
+Ficha del caso20/10: [nombre sobre fotografía con diseño original](identidad-visual.md),
+blanco48/800 con sombra, sin cápsula; excepción local a ADR-111.
+
 Móvil20/10: [títulos de las secciones alineados con Inicio](identidad-visual.md),
 sin centrado vertical según la altura del botón. Refinamiento de ADR-111.
 

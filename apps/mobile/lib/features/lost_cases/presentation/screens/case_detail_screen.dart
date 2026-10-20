@@ -1,10 +1,11 @@
 import '../../domain/entities/lost_case.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
+import '../../../../core/presentation/widgets/collection_add_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/presentation/widgets/case_public_skeleton.dart';
+import '../../../../core/presentation/widgets/case_public_cards_skeleton.dart';
 import '../view_models/case_read_view_model.dart';
-import '../widgets/case_screen_shell.dart';
+import '../../../../core/presentation/widgets/case_public_screen_shell.dart';
 import '../widgets/case_public_content.dart';
 
 class CaseDetailScreen extends ConsumerWidget {
@@ -12,6 +13,7 @@ class CaseDetailScreen extends ConsumerWidget {
     required this.id,
     this.recoveryActions,
     this.savedAction,
+    this.contact,
     this.posterAction,
     this.timelineAction,
     this.followAction,
@@ -19,6 +21,7 @@ class CaseDetailScreen extends ConsumerWidget {
     super.key,
   });
   final Widget? savedAction;
+  final Widget? contact;
   final Widget? posterAction;
   final Widget? timelineAction;
   final Widget? followAction;
@@ -29,15 +32,13 @@ class CaseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(publicCaseViewModelProvider(id));
     final model = ref.read(publicCaseViewModelProvider(id).notifier);
-    return CaseScreenShell(
-      title: 'Ficha pública',
+    return CasePublicScreenShell(
       trailingAction:
           !state.isLoading &&
               !state.hasError &&
               state.asData?.value.value != null
           ? savedAction
           : null,
-      immersive: state.isLoading || state.asData?.value.value != null,
       loading: state.isLoading,
       notice: state.hasError
           ? 'No pudimos consultar el caso.'
@@ -48,7 +49,7 @@ class CaseDetailScreen extends ConsumerWidget {
           : null,
       noticeId: state.error ?? state.asData?.value,
       child: state.isLoading
-          ? const CasePublicSkeleton()
+          ? const CasePublicCardsSkeleton()
           : state.hasError
           ? Column(
               children: [
@@ -59,16 +60,26 @@ class CaseDetailScreen extends ConsumerWidget {
               ],
             )
           : state.requireValue.value == null
-          ? const Text('Este caso no está disponible públicamente.')
+          ? const SizedBox.shrink()
           : ContentRefresh(
               refreshing: state.requireValue.refreshing,
               label: 'Actualizando caso',
               child: CasePublicContent(
                 value: state.requireValue.value!,
+                contact: contact,
                 actions: Column(
                   children: [
-                    if (followAction != null) followAction!,
                     if (timelineAction != null) timelineAction!,
+                    if (state.requireValue.value!.status == 'active') ...[
+                      CollectionAddButton(
+                        label: 'Reportar avistamiento',
+                        icon: Icons.visibility_outlined,
+                        accented: true,
+                        route: '/home/sightings/lost/$id',
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                    if (followAction != null) followAction!,
                     if (state.requireValue.value!.canResolve &&
                         posterAction != null)
                       posterAction!,

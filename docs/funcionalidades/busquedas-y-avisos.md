@@ -1,5 +1,9 @@
 # Búsquedas y avisos vinculados
 
+Actualización20/10, ADR-113/114: Ver ficha usa [tarjetas glass](ficha-publica-mobile.md), con [contacto del autor autorizado por caso](contacto-reportante.md). La publicación conserva vista previa ImmersivePhotoSheet. Contacto se registra/edita desde la ficha publicada y no repite publicación. Plan031/activación remota pendientes; alcance ampliado explícitamente en este chat.
+
+Conservación20/10, ADR-112: el diseño actual se llama **Ficha fotográfica inmersiva** (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), sin cambio visual ni funcional. [Contrato de reutilización](ficha-fotografica-inmersiva.md). Las referencias al nombre anterior designan el mismo componente. Nuevo diseño glass por tarjetas pendiente de otro incremento.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

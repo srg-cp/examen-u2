@@ -250,6 +250,11 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Incremento autorizado20/10 de HU-05/06/07, RF-05/06/13: nueva ficha pública móvil por tarjetas glass (ADR-113) y ampliación explícita de contacto por caso (ADR-114). Registro/edición/retiro del contacto desde la ficha publicada, con consentimiento separado para foto y sin repetir publicación. Plan031 requiere030, activación hosted pendiente. Vistas previas conservan ImmersivePhotoSheet. Sin issue nuevo ni cierre de historias; sin contacto en QR/web anónima/cartel.
+
+
+Conservación20/10 de fichas/vistas previas HU-05/06/07: diseño renombrado a ImmersivePhotoSheet (Ficha fotográfica inmersiva), ADR-112. Sin nueva HU/issue, ampliación de alcance o cierre de historias. Uso futuro documentado; nuevo diseño glass por tarjetas aún sin implementar.
+
 Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: panel de mapa minimizable
 hasta Ver ficha, apertura50% y límite adaptable por contenido/texto; créditos
 compactos junto al panel. ADR-106, sin alcance/SQL/permisos nuevos.

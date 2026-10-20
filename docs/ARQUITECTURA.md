@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+Refinamiento de presentación20/10, ADR-113: GlassSurface incorpora GlassSurfaceFinish.frosted, reutilizado por CasePublicGlassCard y controles de contacto. El valor polished por defecto mantiene los consumidores anteriores. CasePublicCards separa caption adaptable (nombre/estado en fila y paginación centrada) sin cambiar dominio, datos, mapas o acciones.
+
+Ficha pública20/10, ADR-113/114: CasePublicCards y CasePublicScreenShell componen tarjetas glass y navegación compartida; ImmersivePhotoSheet se conserva en vistas previas. case_contacts separa dominio/casos de uso/repositorio/DTO/fuente/ViewModel; router inyecta su panel por slot y bootstrap/main sus dependencias. Plan031 protege consentimiento y foto por caso; no amplía QR ni perfiles privados.
+
+Diseño conservado20/10, ADR-112: `ImmersivePhotoSheet` sustituye el nombre `CasePublicationPreview`; geometría `ImmersivePhotoSheetGeometry`. Sigue activo sin cambios visuales en perdidos/encontrados. Contrato en [Ficha fotográfica inmersiva](funcionalidades/ficha-fotografica-inmersiva.md). Las referencias anteriores al nombre antiguo son históricas.
+
 Tipografía20/10, ADR-111: AppTypography.primaryTitle en core/theme es el contrato
 de títulos principales móvil (Poppins400/32/#454746/1.25/tracking0), consumido por
 tema, shells y cabeceras específicas. Nuxt registra typography.css global con

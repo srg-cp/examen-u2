@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Fidelidad de la ficha20/10, refinamiento ADR-113: Perdido acompaña al nombre en la misma fila, a su derecha; paginación centrada debajo. Material frosted compartido para tarjetas/contacto, ribete blanco único y sombras suaves. No aplicar el contorno doble metálico a estas tarjetas; volver/guardar conservan su glass anterior. Etiquetas largas y texto ampliado se apilan sin recortar el estado.
+
+Ficha pública móvil20/10, ADR-113: CasePublicCards sustituye el layout inmersivo solo al consultar casos. GlassSurface gris perla, navegación compartida52, nombre blanco48/800 y título de navegación Poppins400/20/gris según mockup aprobado (con texto ampliado título32 en fila propia); excepción local a ADR-111. ImmersivePhotoSheet sigue conservado en vistas previas. Contacto real por consentimiento y permisos, ADR-114; sin datos simulados en producción.
+
+Renombrado20/10, ADR-112: `CasePublicationPreview` pasa a llamarse `ImmersivePhotoSheet` (**Ficha fotográfica inmersiva**). Sus reglas visuales, incluida la excepción del nombre blanco48/800, se conservan. [Guía del patrón](funcionalidades/ficha-fotografica-inmersiva.md).
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

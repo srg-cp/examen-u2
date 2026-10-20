@@ -1,3 +1,6 @@
+import '../features/case_contacts/domain/repositories/case_contact_repository.dart';
+import '../features/case_contacts/data/repositories/case_contact_repository_impl.dart';
+import '../features/case_contacts/data/data_sources/case_contact_source.dart';
 import '../features/content_reports/domain/repositories/content_report_repository.dart';
 import '../features/content_reports/data/repositories/content_report_repository_impl.dart';
 import '../features/content_reports/data/data_sources/content_report_source.dart';
@@ -101,6 +104,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.caseContactRepository = const UnavailableCaseContactRepository(),
     this.contentReportRepository = const UnavailableContentReportRepository(),
     this.caseClosureRepository = const UnavailableCaseClosureRepository(),
     this.notificationRepository = const UnavailableNotificationRepository(),
@@ -130,6 +134,7 @@ class AppBootstrap {
   });
 
   final CaseClosureRepository caseClosureRepository;
+  final CaseContactRepository caseContactRepository;
   final ContentReportRepository contentReportRepository;
   final StartupState state;
   final NotificationRepository notificationRepository;
@@ -217,6 +222,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           ),
           savedCasesRepository: SavedCasesRepositoryImpl(
             SupabaseSavedCasesDataSource(supabase.client),
+          ),
+          caseContactRepository: CaseContactRepositoryImpl(
+            CaseContactSource(supabase.client),
           ),
           currentLocationRepository: const CurrentLocationRepositoryImpl(
             DeviceLocationSource(),
