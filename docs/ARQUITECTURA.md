@@ -739,3 +739,23 @@ Core contiene FilterPopover<T>, FilterChoiceGroup<T> y SelectionPillSurface. El 
 ## Búsqueda de lugares y filtros integrados
 
 ADR-042 sustituye la ruta modal de ADR-041 por FilterExpansion<T>, manteniendo SelectionPillSurface/FilterChoiceGroup compartidos y sin dependencias core→features. ExploreFilters conserva borrador local y confirmación hacia ExploreViewModel. SearchPlaces→PlaceSearchRepository→PlaceSearchRepositoryImpl→PhotonPlaceDataSource incorpora búsqueda de ciudades/direcciones; DTO GeoJSON y errores/caché permanecen en data. PlaceSearchViewModel autoDispose gobierna consulta y descarte por cuenta/disposición. Bootstrap/main inyectan cliente/endpoint/repositorio; providers declaran contratos. ZoneMapPicker añade fitRadius opt-in sin reglas de negocio. Sin cambios de permisos o contrato SQL019. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+Reportar20/10, ADR-107: CaseLocationFields/CaseReportFields reciben slot
+ReportLocationSearchBuilder sin imports core→features. App compone places para
+pérdida propia/comunitaria y router inyecta el builder en hallazgo. ProviderScope
+local aísla ViewModel autoDispose de Explorar; casos de uso/fuente/caché existentes.
+Photon solicita countrycode=PE y filtra respuestas por código, sin límites de
+mapa ni SQL nuevos. Selección pasa por el ViewModel del reporte; referencia
+privada independiente. [ADR-107](decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
+
+Places20/10, ADR-108: OverlayPortal/CompositedTransformTarget/Follower resuelve
+sugerencias sin afectar layout de formularios. Presentación conserva resultados
+en ViewModel existente; foco/portal/geometría pertenecen al widget. AppTextField
+acepta FocusNode externo sin disponerlo, mantiene nodo propio por defecto.
+Sin cambios de dominio/data/servidor; restricciones de Perú de ADR-107 intactas.
+
+Places20/10, ADR-109: cancelación de dominio por operación atraviesa SearchPlaces,
+contratos y repositorio; data traduce a AbortableRequest del cliente inyectado.
+ViewModel cancela al editar/limpiar/cambiar cuenta/desmontar y lanza a300ms sin
+cola detrás de consultas antiguas. Generación descarta resultados/errores tardíos;
+repositorio impide cachear respuestas canceladas. Sin SDK en presentación/dominio.

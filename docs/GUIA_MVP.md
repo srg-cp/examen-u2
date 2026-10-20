@@ -711,3 +711,10 @@ y se regenera el emblema blanco dentro de las ilustraciones, sin overlays.
 Logo actualizado en web/QR/favicon y recursos Flutter/nativos, sin nuevos casos
 de uso, permisos, HU/issue o ampliación funcional de plataformas futuras.
 Validación y límites registrados en ESTADO y ficha identidad-visual.
+
+Refinamiento20/10/2026 de S3 (HU-05/RF-05/issue #5, HU-06/RF-06/issue #6):
+buscador opcional antes del mapa para reportar pérdida/hallazgo, reutilizando
+places. Sugerencias de Perú también en Explorar (HU-07/RF-13) y Ciudad del perfil
+(HU-01.7/RF-01); mapa manual libre. Sin nuevas historias/SQL ni cierre adicional.
+[ADR-107](decisiones/107-busqueda-reportes-y-sugerencias-peru.md),
+[ficha](funcionalidades/ubicaciones-buscador.md).

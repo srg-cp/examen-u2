@@ -1,5 +1,83 @@
 # Estado del proyecto
 
+## Alertas: expansión desde campana y vacío compartido —20/10/2026
+
+La campana de Inicio entrega OriginPageSource con sus límites reales relativos
+al Navigator a la ruta existente de Alertas. Reutiliza entityEditorPage y
+OriginPageTransition (320ms/260ms, movimiento reducido inmediato), conservando
+la sección subyacente. Bandeja vacía confirmada reutiliza CollectionEmptyState
+de Mis mascotas/Explorar con campana neutra, título y descripción centrados.
+Skeleton/error no muestran vacío; preferencias, lectura, paginación y refresh
+conservan su comportamiento. Refinamiento de HU-12.2/#41, RF-17,18 según ADR-006;
+sin dominio/data/SQL nuevos ni cambios de alcance.
+
+Validación:40/40 pruebas de notificaciones, navegación, Inicio, arquitectura y
+consistencia aprobadas con AMBIENT_BACKGROUND_MOTION=false; análisis Flutter
+completo sin incidencias. Regresión de navegación verifica origen real,
+expansión intermedia y retorno; cuatro de bandeja verifican carga/vacío/error
+y recuperación en390×844 y320×350/texto2, este último con movimiento reducido.
+Capturas del vacío en apps/mobile/build/ui-preview/notifications.
+Siguiente paso: revisión visual Android autenticado y demo real de HU-12;
+sin APK, despliegue ni cierre de historia.
+
+## Selectores móviles: una sola entrada de opciones —20/10/2026
+
+Corregida la apertura duplicada de AppSelectField, visible en Especie y Sexo
+(opcional): el panel inferior ya animaba su entrada y su cuerpo añadía otra
+cortina de AppPageBackground antes del stagger. Retirada esa cortina interna;
+StaggerReveal empieza al completar la animación de ruta del panel, con cabecera
+estable y movimiento reducido inmediato. Corrección compartida para todos sus
+consumidores, sin cambiar opciones, selección, cancelación o contratos.
+Refinamiento de ADR-006, sin ampliar HU-03/RF-03 ni otros recorridos consumidores.
+
+Validación: formato correcto y análisis Flutter completo sin incidencias;
+20/20 pruebas de selector, arquitectura y consistencia aprobadas;
+cuatro regresiones nuevas comprueban Especie/Sexo, ausencia de cortina, espera
+hasta abrir el panel, progreso sin reinicio y selección, en390×844 y320×350
+con texto2/movimiento reducido. Las pruebas existentes mantienen cancelación,
+valor desconocido y bloqueo. Fondo ambiental desactivado mediante configuración
+de pruebas para permitir pumpAndSettle. Logs en apps/mobile/build/select-reveal-*.log.
+Siguiente paso: revisión visual Android de apertura/cierre; sin APK ni despliegue.
+
+## Preferencias y ubicaciones: entrada sin reveal duplicado —20/10/2026
+
+Corregido el reinicio de cover/stagger al resolver la consulta en Preferencias
+de alertas y Ubicaciones de interés (HU-02.2/#27 y HU-02.1/#26; RF-02,16).
+Las claves dependientes de datos reconstruían la transición al pasar de
+unavailable a la cuenta; en preferencias también reconstruían el scroll.
+Se conserva el subárbol de entrada y se deshabilita la cortina durante carga,
+siguiendo la regla existente: skeleton y resultado pertenecen a una sola entrada.
+Las etapas lista/editor mantienen su transición; datos de otra identidad siguen
+ocultos por el estado del ViewModel. Sin cambios de dominio, persistencia o alcance.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias;24 nuevas
+regresiones de ambas pantallas con consultas50/2000ms, datos/vacío/error y
+movimiento reducido. Suite focalizada38/38 con fondo animado; suite ampliada61/61
+con AMBIENT_BACKGROUND_MOTION=false, incluidos formularios normales/pequeños,
+descarte, reintentos, arquitectura y consistencia. Primer intento ampliado:55/61,
+con6 timeouts de pumpAndSettle por la animación continua del fondo; repetición
+con su configuración de movimiento desactivada aprobada. Logs en
+apps/mobile/build/preferences-reveal-{focused,static-background,analyze}.log.
+Siguiente paso: comprobar ambas entradas en Android autenticado; no se generó
+APK ni se desplegó.
+
+## Explorar: continuidad del gesto del panel —20/10/2026
+
+Nueva corrección solicitada por el usuario: el acomodo conserva velocidad al
+soltar mediante resorte amortiguado1/260/34; sustituye el reinicio desde reposo
+de easeInOutCubic. Tocar otra vez detiene el controlador antes de reconocer el
+nuevo arrastre. Controlador liberado al desmontar; límites, scroll de contenido,
+resistencia inferior, créditos y movimiento reducido conservados. Solo presentación,
+refinamiento de ADR-106 / HU-07.2 / RF-13 / issue #33, sin ampliar alcance.
+
+Validación inicial:16 pruebas de mapa/arquitectura aprobadas, incluida regresión
+de impulso tras pasada rápida, interrupción al contacto y arrastre en sentido
+contrario. Las6 pruebas de mapa repetidas con CARTO/capturas también aprobadas
+en apps/mobile/build/explore-panel-fluid-carto.log. Formato correcto y análisis
+completo sin incidencias (build/explore-panel-fluid-analyze.log).
+Siguiente paso: revisar sensación y rendimiento en Android físico;
+los frames de widget no certifican fluidez del dispositivo. Sin APK ni despliegue.
+
 ## Explorar: movimiento más suave del panel —20/10/2026
 
 Por petición del usuario, sustituir snap lineal por acomodo easeInOutCubic al
@@ -5216,3 +5294,71 @@ Validación: suite completa Flutter **336 pruebas aprobadas** en build/explore-i
 Después de la identificación HTTP, fuente/repositorio/caso de uso reales ejecutados con Dart devolvieron **5 resultados válidos** para Miraflores Lima Peru en build/explore-place-live.log. Las4 pruebas del buscador se repiten en build/explore-place-final-tests.log tras ese ajuste. Análisis sin incidencias en build/explore-inline-analyze-final.log; formato en build/explore-inline-format.log. Dependencias resueltas offline; sin actualización de versiones. ADR-042 sustituye la parte modal de041; norma UI, diseño/arquitectura, configuración, guía y ficha actualizados.
 
 Pendiente: Android autenticado con backend019, fotos y teselas reales, cobertura de direcciones del proveedor y rendimiento nativo. La prueba HTTP no acredita disponibilidad futura ni un servicio de producción. Sin APK, commit/push, modificación remota de Supabase o despliegue. Siguiente paso: verificar este recorrido en la app.
+
+## Reportar: buscador previo al mapa y sugerencias de Perú —20/10/2026
+
+Por instrucción del usuario, se reutiliza places antes del mapa en pérdida
+propia/comunitaria y avisos de hallazgo. Elegir sugerencia actualiza el punto
+privado mediante su ViewModel y centra ZoneMapPicker; después permite ajuste
+manual. Búsqueda opcional, referencia privada independiente, sin GPS ni cambios
+de precisión pública/permisos. App compone el slot compartido; ViewModel de
+búsqueda aislado de Explorar mediante ProviderScope local/autoDispose.
+
+Toda consulta textual compartida (Explorar, reportes y Ciudad del perfil) pide
+countrycode=PE y comprueba país PE de cada respuesta. País ausente/otro se
+descarta; respuestas válidas extranjeras dan vacío, malformadas conservan fallo.
+Mapa manual libre; no es restricción territorial de publicación. Sin SQL,
+configuración o despliegue nuevos. ADR-107 y fichas actualizadas; sin ampliar HU.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y72
+pruebas aprobadas:24 places/arquitectura/creación por rutas reales y48 de
+Explorar/perfil/perdidos/encontrados. Incluye sugerencias extranjeras o sin país,
+modo Ciudad, selección que centra mapa, ajuste posterior y referencia conservada.
+Renders390×844/texto1 y320×350/texto2 revisados sin overflow; las capturas no
+acreditan teselas reales (red bloqueada por harness). Consulta real Tacna/PE:
+cinco sugerencias PE. No se publicó ni desplegó. Siguiente paso: comprobar en
+Android sugerencias reales, teclado, mapa y reintento con conectividad variable.
+
+## Buscador: sugerencias superpuestas y lista continua —20/10/2026
+
+Por corrección del usuario con dos capturas, PlaceSearchFields muestra un panel
+único continuo sobre el contenido, sin cápsulas individuales ni desplazar
+mapa/radio/campos durante consulta o resultados. OverlayPortal anclado al campo,
+ancho compartido, filas mínimo48, máximo320 con scroll y límites de teclado/área
+segura; apertura arriba cuando falta espacio abajo. Común a Reportar, Explorar
+y Ciudad del perfil, con la política Perú/casos de uso/persistencia conservados.
+AppTextField admite FocusNode externo sin disponerlo. Seleccionar/tocar fuera,
+Escape/retorno y desmontar limpian el panel; tocar fuera invalida pendientes y
+no consume la acción exterior. Toast/skeleton/shimmer existentes conservados.
+ADR-108, ficha/índice y documentación de diseño/arquitectura actualizados.
+
+Validación:50 pruebas aprobadas en build/place-overlay-final-tests.log (4 nuevas
+para geometría de consulta/resultados, selección/scroll normal y pequeño,
+teclado300/apertura arriba, cierre exterior/respuesta tardía y desmontaje;
+regresiones de places/Explorar/Reportar/Perfil/arquitectura). Renders390×844/texto1
+y320×350/texto2 en build/ui-preview/place-overlay revisados sin overflow y con
+lista continua. Formato limpio; análisis completo sin incidencias. Sin despliegue.
+Siguiente paso: revisar en Android teclado real, scroll del formulario y panel.
+
+## Buscador: cancelar consultas antiguas y priorizar el último texto —20/10/2026
+
+Por petición del usuario ante demora6–9s, debounce de600 a300ms y retirada de la
+cola que esperaba la petición anterior. Editar cancela inmediatamente; última
+consulta empieza tras300ms sin esperar la anterior. Cancelación por operación
+independiente de Flutter/HTTP, transmitida por caso de uso/repositorio a fuente
+AbortableRequest. Selección/cierre/cambio de cuenta/disposición cancelan trabajo.
+Consultas activas idénticas se deduplican; generaciones protegen contra respuestas
+y errores tardíos. Caché30/5min no acepta respuestas canceladas. Cliente inyectado,
+PE/filtro recibido, Ciudad/dirección y overlay conservados; sin nueva dependencia,
+SQL, proveedor ni despliegue. ADR-109 y ficha compartida actualizados.
+
+Validación:54 pruebas aprobadas en build/place-speed-final-tests.log;4 nuevas
+comprueban300ms sin esperar respuesta antigua en ambos modos, cancelación HTTP,
+cacheo tras aborto y limpieza/desmontaje. Regresión de places/overlay/arquitectura,
+Explorar, Reportar y Perfil. Formato limpio y análisis Flutter completo sin
+incidencias en build/place-speed-analysis.log. Medición real adicional Chiclayo/PE:
+HTTP200, cero redirecciones, conexión0,25s y primer byte/total9,75s. Mediciones
+previas con/sin PE5,6–8s. El incremento elimina espera acumulada del cliente; no
+acredita latencia inferior3s del proveedor ni rendimiento en Android. Siguiente
+paso: medir en Android con la red del usuario; si persiste la lentitud, evaluar
+la latencia/disponibilidad del proveedor con evidencia de ese entorno.

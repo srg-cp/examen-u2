@@ -20,8 +20,11 @@ fuera de la vista. Snap en mínimo,50% cuando cabe y90%; colapso accesible
 restablece scroll. Mantener resistencia/rebote, movimiento reducido, selección,
 ficha y paginación/reintento. La cámara reserva también espacio para los créditos.
 
-Refinamiento de movimiento por petición del usuario: reemplazar el snap lineal
-del SDK por acomodo con easeInOutCubic y duración320–540ms según distancia.
+Refinamiento posterior de movimiento por petición del usuario: el acomodo usa
+resorte amortiguado (masa1/rigidez260/amortiguación34) con velocidad inicial del
+gesto, normalizada por altura del panel. Sustituye easeInOutCubic320–540ms, que
+reiniciaba desde reposo al soltar. Controlador propio cancelado al tocar de nuevo,
+incluso antes de ganar el gesto; liberar controlador al desmontar.
 El panel sigue directamente al dedo; al soltar, una pasada rápida avanza en su
 dirección y una liberación lenta elige la parada más próxima. No interceptar
 la inercia del contenido cuando la lista ya se está desplazando. La resistencia

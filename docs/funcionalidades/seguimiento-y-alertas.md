@@ -1,5 +1,21 @@
 # Seguimiento y alertas
 
+**Refinamiento móvil20/10/2026:** la campana entrega sus límites reales respecto
+al Navigator y su identidad visual mediante OriginPageSource. Alertas reutiliza
+entityEditorPage/OriginPageTransition: expansión320ms y retorno260ms al origen,
+inmediatos con movimiento reducido. Se conserva la sección de Inicio subyacente.
+La bandeja confirmada vacía usa CollectionEmptyState de Mis mascotas/Explorar,
+con campana neutra88px, título centrado y orientación sobre casos/ubicaciones y
+preferencias. Skeleton y error no se presentan como vacío; reintento y refresh
+conservan sus acciones. Solo presentación de HU-12.2/#41, RF-17,18, sin cambios
+de persistencia, permisos, activación ni alcance.
+
+Validación local:40 pruebas de notificaciones/navegación/Inicio/arquitectura y
+consistencia aprobadas; cuatro regresiones comprueban carga→vacío, error y
+reintento en390×844 y320×350/texto2 (movimiento reducido en este último).
+La navegación comprueba geometría real, expansión intermedia y contracción.
+Análisis Flutter sin incidencias. Revisión Android física pendiente.
+
 **Auditoría de seguimiento18/10:** HU-12/#12 y #40/#41 siguen In progress:027 confirmado, implementación local probada, pero main todavía no contiene notifications y falta demo del evento/bandeja actual. FCM/Firebase #42 sigue pospuesto; no es el bloqueo de preferencias ni de bandeja.
 
 HU-12.1/#40, HU-12.2/#41 y HU-12.3/#42; RF-16,17,18. Implementación local

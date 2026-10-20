@@ -38,6 +38,9 @@ import 'package:flutter_application_entrehuellas/features/found_cases/domain/ent
 import 'support/fake_password_recovery.dart';
 import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
+import 'support/fake_place_search.dart';
+import 'package:flutter_application_entrehuellas/features/places/providers/places_providers.dart';
+import 'package:flutter_application_entrehuellas/features/places/presentation/widgets/place_search_fields.dart';
 
 void main() {
   setUpAll(
@@ -121,6 +124,9 @@ void main() {
                   FakeOnboarding(auth)..completed.add('one'),
                 ),
                 petRepositoryProvider.overrideWithValue(pets),
+                placeSearchRepositoryProvider.overrideWithValue(
+                  FakePlaceSearch(),
+                ),
                 petPhotoRepositoryProvider.overrideWithValue(FakePetPhotos()),
                 lostCaseRepositoryProvider.overrideWithValue(lost),
                 foundCaseRepositoryProvider.overrideWithValue(reports),
@@ -239,6 +245,37 @@ void main() {
             final location = tester.widget<ZoneMapPicker>(
               find.byType(ZoneMapPicker),
             );
+            expect(find.byType(PlaceSearchFields), findsOneWidget);
+            final searchInput = find.descendant(
+              of: find.byType(PlaceSearchFields),
+              matching: find.byType(TextField),
+            );
+            await tester.ensureVisible(searchInput);
+            await tester.pumpAndSettle();
+            await tester.enterText(searchInput, 'Miraflores');
+            await tester.pump(const Duration(milliseconds: 650));
+            await tester.pumpAndSettle();
+            await tester.ensureVisible(find.text(FakePlaceSearch.place.label));
+            await tester.pumpAndSettle();
+            await tester.tap(find.text(FakePlaceSearch.place.label));
+            await tester.pumpAndSettle();
+            final searched = tester.widget<ZoneMapPicker>(
+              find.byType(ZoneMapPicker),
+            );
+            expect(searched.latitude, FakePlaceSearch.place.latitude);
+            expect(searched.longitude, FakePlaceSearch.place.longitude);
+            expect(
+              tester
+                  .widget<CaseLocationFields>(find.byType(CaseLocationFields))
+                  .placeController
+                  .text,
+              isEmpty,
+            );
+            if (capture) {
+              await tester.ensureVisible(find.byType(PlaceSearchFields));
+              await tester.pumpAndSettle();
+              await shot('location-search');
+            }
             location.onSelect!(-12.04, -77.03);
             await tester.pumpAndSettle();
             final selected = found

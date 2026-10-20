@@ -26,12 +26,14 @@ class FoundEditorScreen extends ConsumerStatefulWidget {
   const FoundEditorScreen({
     this.embedded = false,
     this.petDetailsOnly = false,
+    this.locationSearchBuilder,
     super.key,
   });
   final bool embedded;
 
   /// App composes the common report fields for embedded creation.
   final bool petDetailsOnly;
+  final ReportLocationSearchBuilder? locationSearchBuilder;
   @override
   ConsumerState<FoundEditorScreen> createState() => _FoundEditorScreenState();
 }
@@ -148,7 +150,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
             ? 'Posible pérdida'
             : 'Reportar aviso',
         count: v != null && v.stage == FoundStage.form
-            ? (v.communitySearch ? 12 : 8)
+            ? (v.communitySearch ? 13 : 9)
             : 2,
         onBack: _leave,
         stage: v?.stage ?? 'initial',
@@ -524,6 +526,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
         ),
         if (!widget.petDetailsOnly)
           CaseReportFields(
+            locationSearchBuilder: widget.locationSearchBuilder,
             dateTime: v.dateTimeDraft,
             latitude: v.latitude,
             longitude: v.longitude,

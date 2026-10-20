@@ -2,6 +2,7 @@ import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
@@ -25,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
   final Widget? petsContent;
   final Widget? exploreContent;
   final Widget? exploreFloatingAction;
-  final VoidCallback? onAlerts;
+  final ValueChanged<OriginPageSource?>? onAlerts;
   final Future<void> Function()? onHomeRefresh;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -81,12 +82,49 @@ class HomeScreen extends ConsumerWidget {
                                       ),
                                     ),
                                   ),
-                                  IconButton(
-                                    tooltip: 'Alertas',
-                                    onPressed: onAlerts,
-                                    icon: const Icon(
-                                      Icons.notifications_none_rounded,
-                                      color: Color(0xFF6E6E73),
+                                  Builder(
+                                    builder: (source) => IconButton(
+                                      tooltip: 'Alertas',
+                                      onPressed: onAlerts == null
+                                          ? null
+                                          : () {
+                                              final box = source
+                                                  .findRenderObject();
+                                              final navigator = Navigator.of(
+                                                source,
+                                              ).context.findRenderObject();
+                                              final bounds =
+                                                  box is RenderBox &&
+                                                      box.hasSize
+                                                  ? box.localToGlobal(
+                                                          Offset.zero,
+                                                          ancestor: navigator,
+                                                        ) &
+                                                        box.size
+                                                  : null;
+                                              onAlerts!(
+                                                bounds == null
+                                                    ? null
+                                                    : OriginPageSource(
+                                                        bounds: bounds,
+                                                        color: Colors.white,
+                                                        radius: 24,
+                                                        child: const Center(
+                                                          child: Icon(
+                                                            Icons
+                                                                .notifications_none_rounded,
+                                                            color: Color(
+                                                              0xFF6E6E73,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                              );
+                                            },
+                                      icon: const Icon(
+                                        Icons.notifications_none_rounded,
+                                        color: Color(0xFF6E6E73),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 4),

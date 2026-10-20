@@ -1,5 +1,12 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Corrección20/10/2026: Especie y Sexo (opcional) reutilizan AppSelectField con
+una sola entrada: apertura del panel y después stagger, sin cortina interior
+azul/blanca. Se conserva cabecera, selección, desconocido, cancelación, scroll,
+texto ampliado y movimiento reducido.20 pruebas de selector/arquitectura/
+consistencia aprobadas; cuatro regresiones nuevas de tiempos y ambas etiquetas.
+Sin cambios de dominio/datos; revisión visual Android pendiente. Véase [ESTADO](../ESTADO.md).
+
 19/10/2026: título Mis mascotas en peso500 mediante CollectionHeader compartido,
 por petición del usuario para igualar el peso de Inicio web. Tamaño32 y
 composición existentes conservados. Revisión visual Android pendiente.

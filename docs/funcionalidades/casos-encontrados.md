@@ -142,3 +142,11 @@ Cambio de alcance autorizado: HU-05/RF-05 y HU-06/RF-06; se adelantan partes app
 
 
 La vi/La encontré se reporta desde ficha de búsqueda abierta, con vínculo fijo. Retirado el acceso genérico de Reportar y dropdown de casos; ReadRecoverySearch solo lee el destino concreto. El listado histórico conserva consulta/descarte y + abre Mascota perdida. [ADR-037](../decisiones/037-avisos-desde-ficha.md). Sin SQL nuevo; Explorar/HU-07 y Android real pendientes.
+
+## Búsqueda del lugar —20/10/2026
+
+Avisos de hallazgo reutilizan el [buscador compartido](ubicaciones-buscador.md)
+antes del mapa. Sugerencias de Perú; elegir centra/marca el punto privado, con
+ajuste manual posterior. No rellena la referencia ni exige buscar; mapa libre,
+sin SQL/permisos nuevos.24 pruebas places/arquitectura/creación aprobadas;
+Android pendiente. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).

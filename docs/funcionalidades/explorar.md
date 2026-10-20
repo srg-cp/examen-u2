@@ -8,13 +8,15 @@ del panel a la derecha, siguiendo su posición; tooltip/nombre completo si se
 elide al ampliar texto. Título central se retira si falta espacio, retorno
 conservado. Sustituye mínimo50%/atribución superior de notas anteriores.
 Sin cambios de persistencia/permisos/activación; paleta global ADR-104 intacta.
-Movimiento refinado: acomodo suave al soltar/subir/bajar con easeInOutCubic
-y duración320–540ms según recorrido, con retorno amortiguado bajo el mínimo.
+Movimiento refinado: acomodo al soltar/subir/bajar con resorte amortiguado
+1/260/34, conservando impulso del gesto y cancelándose al contacto siguiente;
+sustituye easeInOutCubic320–540ms. Retorno amortiguado bajo el mínimo.
 Durante arrastre sigue al dedo; gesto nuevo cancela el acomodo anterior y los
 toques en acciones no lo disparan. Reduced mantiene acciones inmediatas y
 sin acomodo autónomo; contenidos conservan scroll/inercia.
-Validación del movimiento:6 pruebas de mapa (incluida posición intermedia y
-convergencia tras soltar) y10 de arquitectura aprobadas, formato/análisis
+Validación del movimiento:6 pruebas de mapa (posición intermedia, convergencia,
+impulso rápido, interrupción al contacto y cambio de dirección) y10 de arquitectura
+aprobadas; repetición de6 con CARTO/capturas aprobada, formato/análisis
 completos limpios. Pendiente evaluar sensación real en Android físico.
 Validación de ADR-106:17 pruebas de mapa/selector/arquitectura aprobadas con
 teselas CARTO de fixture, análisis limpio y renders390×844/320×350/texto2
@@ -315,3 +317,7 @@ Sustituye el panel modal descrito arriba, por nueva corrección explícita del u
 Zona de búsqueda: Todas las zonas o Por ubicación. En esta última se escribe ciudad/dirección y se pulsa Buscar ubicación o la acción del teclado; no hay autocomplete por tecla. Seleccionar un resultado centra el mapa; slider de1–50km cambia el radio/círculo y ajusta cámara. Tocar mapa permite ajustar el centro manualmente. Sin GPS ni permiso nuevo. Al aplicar se usan los mismos parámetros geográficos de019, siempre sobre ubicación aproximada pública de los casos. Sin centro se conserva shake/toast y no aplica.
 
 Búsqueda de lugares mediante Photon/OpenStreetMap, cinco resultados y caché en memoria, sin historial persistente. El texto escrito se consulta al proveedor; no se envían tokens o datos privados de casos. Atribución enlazada junto al buscador. PLACE_SEARCH_URL permite sustituir el endpoint; el servidor demo inicial admite uso razonable sin garantías y requiere revisión antes de distribución/volumen mayor. Error del servicio mantiene opción manual y reintento, con feedback superior. [ADR-042](../decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+20/10/2026: sugerencias textuales limitadas a Perú en la fuente compartida de
+places, con petición countrycode=PE y comprobación del país recibido. Mapa,
+GPS, radio y consulta conservados. [Ficha](ubicaciones-buscador.md), ADR-107.

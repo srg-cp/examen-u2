@@ -1,5 +1,13 @@
 # Ubicaciones de interés privadas
 
+Corrección20/10/2026: la consulta conserva el subárbol de transición al resolver
+datos, vacío o error; skeleton sin cortina/stagger y resultado sin segunda
+entrada. Cambios lista/editor conservan cover/stagger y edición/refresh mantienen
+su comportamiento.24 regresiones nuevas compartidas con preferencias; suite
+ampliada61/61 con fondo animado desactivado para pumpAndSettle y análisis limpio.
+Sin cambios de persistencia/permisos. Evidencia en [ESTADO](../ESTADO.md);
+revisión Android autenticado pendiente.
+
 **Auditoría de seguimiento18/10:** HU-02.1/#26 y épica #2 en Done: implementación integrada,010 confirmado y evidencia posterior. No se conserva integración en main como pendiente. El seguimiento de ubicaciones corresponde a HU-12 y no bloquea esta entrega de configuración.
 
 18/10/2026: HU-12 añade Seguir zona/Dejar de seguir por slot compuesto en router,

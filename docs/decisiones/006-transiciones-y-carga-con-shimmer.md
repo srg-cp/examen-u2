@@ -4,6 +4,13 @@ Fecha: 8 de octubre de 2026. Estado: aceptada por instrucción del usuario.
 
 ## Contexto
 
+Refinamiento20/10/2026, corrección solicitada del reveal duplicado en selectores:
+AppSelectField usa la apertura nativa del panel seguida del stagger compartido
+cuando finaliza la animación de ruta. No añade AuthStageTransition/CoverReveal
+interior, que reproducía otra apertura y pintaba el fondo de página en el panel.
+Cabecera fuera del efecto; movimiento reducido inmediato. Alcance compartido a
+sus consumidores, sin cambios de selección, dominio o persistencia.
+
 El usuario solicita una UX consistente con cover reveal seguido de stagger reveal en los lugares apropiados, incluido el resultado Contraseña actualizada. Rechaza etiquetas de carga con puntos suspensivos, como Enviando…, y pide shimmer como indicador de trabajo en curso. La marca debe permanecer estable durante las etapas de acceso.
 
 ## Decisión

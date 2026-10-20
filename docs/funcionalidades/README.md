@@ -2,6 +2,8 @@
 
 Explorar20/10: [panel minimizable hasta Ver ficha](explorar.md) y créditos
 compactos que acompañan su borde superior, según ADR-106. Paleta global intacta.
+Refinamiento de movimiento: impulso al soltar y detención al nuevo contacto;
+validación y revisión Android pendiente en la misma ficha.
 
 Cartografía20/10: [acabado compartido móvil/web](cartografia-compartida.md),
 intermedio entre Reportar y Explorar, obligatorio en adaptadores comunes.
@@ -201,3 +203,14 @@ La corrección global del11 de octubre aplica ADR-027/028 a las fichas existente
 
 
 Mascota perdida adopta un único formulario con selección de ficha y datos del reporte conservados: [búsquedas y avisos](busquedas-y-avisos.md), [ADR-038](../decisiones/038-formulario-unico-mascota-perdida.md).
+
+Reportar20/10: [buscador compartido](ubicaciones-buscador.md) antes del mapa para
+pérdida/hallazgo. Sugerencias de Perú también en Explorar y Ciudad del perfil;
+mapa manual libre. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
+
+Ubicaciones20/10: [sugerencias flotantes](ubicaciones-buscador.md) en panel único
+continuo, sin empujar el contenido de Reportar, Explorar o Perfil. ADR-108.
+
+Ubicaciones20/10: [respuesta reciente](ubicaciones-buscador.md) con debounce300ms
+y cancelación HTTP por consulta para evitar esperas acumuladas. Filtro PE y
+panel flotante conservados; latencia del proveedor variable. ADR-109.

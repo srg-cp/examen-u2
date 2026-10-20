@@ -12,8 +12,8 @@ o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:
 fuente8/escalable, ribete claro estrecho, objetivos48; derecha8/izquierda84,
 crédito visual aproximadamente8px sobre panel, sigue extensión/resistencia.
 Título central se retira en altura insuficiente; retorno conservado.
-Movimiento del panel: snap propio easeInOutCubic320–540ms según distancia,
-parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
+Movimiento del panel: resorte propio1/260/34 con impulso del gesto, cancelado
+al tocar de nuevo. Parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
 inferior1/190/28; dedo directo, contenido con su inercia, reduced sin acomodo.
 
 Título de Inicio móvil20/10: referencia tipográfica del usuario aplicada con
@@ -480,6 +480,12 @@ QA reproducible: flutter test --no-pub test/pets_navigation_test.dart --concurre
 
 ## AppSelectField: selección acorde a los inputs
 
+Corrección20/10/2026: la apertura de ruta del panel precede a una única línea
+StaggerReveal de opciones. Sin AuthStageTransition/CoverReveal interior: evitamos
+una segunda apertura y la cortina con el fondo de página dentro del panel blanco.
+El stagger espera AnimationStatus.completed, sin temporizadores; reconstrucciones
+y cierre conservan su estado. Movimiento reducido muestra opciones inmediatamente.
+
 Core/presentation/widgets/app_select_field.dart implementa campo controlado reutilizando decoración compartida y panel inferior de opciones propio. Especie y Sexo en PetEditorScreen consumen el mismo componente; callback solo llama al ViewModel. AppSelectOption envuelve incluso valores null para diferenciar desconocido de cancelación. Sin SDK ni reglas de dominio en el componente.
 
 Panel blanco sin elevación/tinte, radio superior 28; filas neutras de radio 18, estado activo carbón/check, iconos decorativos y etiquetas accesibles. Cabecera fuera de cover/stagger; cuerpo desplazable, texto ampliado y movimiento reducido conservados. Campo y flecha conservan dimensiones de input y foco/error. QA añade pets_options_normal/small; pruebas de selector comprueban cancelación, desconocido y bloqueo, junto al recorrido completo de mascotas.
@@ -787,3 +793,17 @@ presenta PNG y LandingCharacterCard conserva figura/caption/decoración nativas.
 Fuentes oficiales actualizadas en logo se conservan; copias oficiales PNG en landing/QR/favicon y /brand.svg disponible como vector y recursos
 Flutter/launchers/splash actualizados. Animación hero aprobada conservada.
 Prompts finales/procedencia: apps/platform/LANDING_ASSETS.md.
+
+Reportar20/10, ADR-107: buscador compartido de ciudad/dirección antes del mapa,
+con sugerencias de Perú y mismo campo/listado de Explorar. Título/privacidad,
+buscador, mapa y referencia participan en el stagger con cuenta actualizada;
+header persistente. Buscar es opcional, elegir centra/marca y tocar mapa ajusta;
+referencia privada independiente. Skeleton/shimmer y toast compartidos.
+Renders390×844/texto1 y320×350/texto2 revisados sin overflow; Android pendiente.
+
+Buscador20/10, ADR-108: OverlayPortal/LayerLink anclado al campo; panel único
+#F5F5F7/radio22/separación8, ancho del campo, altura máxima320 limitada por teclado
+y área segura. Preferir debajo; arriba si debajo hay menos120 y arriba hay más.
+Filas rectas mínimo48, texto13/fuente compartida, icono18; scroll sin expansión
+del formulario. Foco/selección/cierre fuera/Escape/retorno y desmontaje cuidados.
+Consulta muestra skeleton/shimmer en el panel, sin repetir stagger por edición.

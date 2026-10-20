@@ -1,5 +1,12 @@
 # Preferencias de alertas por cuenta
 
+Corrección20/10/2026: conservar la transición y el scroll al resolver la consulta,
+sin claves derivadas de datos pendientes. Skeleton sin cortina/stagger y resultado
+inmediato, sin segunda entrada. Selecciones, errores, reintentos y aislamiento
+entre cuentas conservados.24 regresiones nuevas compartidas con ubicaciones;
+suite ampliada61/61 con fondo animado desactivado para pumpAndSettle y análisis
+limpio. Evidencia y límites en [ESTADO](../ESTADO.md); revisión Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-02.2/#27 y épica #2 en Done: configuración por cuenta integrada,011 confirmado y validación HU-02 registrada. FCM es HU-12.3 pospuesta y no bloquea estas preferencias.027 ya está confirmado; seguimiento/bandeja conservan integración/demo propias pendientes.
 
 18/10/2026, instrucción del usuario: FCM/Firebase pospuestos (ADR-068).

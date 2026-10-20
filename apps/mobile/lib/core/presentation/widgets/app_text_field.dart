@@ -22,6 +22,7 @@ class AppTextField extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.onSubmitted,
+    this.focusNode,
     super.key,
   }) : assert(minLines > 0),
        assert(maxLines >= minLines);
@@ -42,13 +43,15 @@ class AppTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
 
 class _AppTextFieldState extends State<AppTextField> {
-  final _focus = FocusNode();
+  final _ownFocus = FocusNode();
+  FocusNode get _focus => widget.focusNode ?? _ownFocus;
 
   @override
   void initState() {
@@ -59,9 +62,18 @@ class _AppTextFieldState extends State<AppTextField> {
   void _focusChanged() => setState(() {});
 
   @override
+  void didUpdateWidget(covariant AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      (oldWidget.focusNode ?? _ownFocus).removeListener(_focusChanged);
+      _focus.addListener(_focusChanged);
+    }
+  }
+
+  @override
   void dispose() {
     _focus.removeListener(_focusChanged);
-    _focus.dispose();
+    _ownFocus.dispose();
     super.dispose();
   }
 

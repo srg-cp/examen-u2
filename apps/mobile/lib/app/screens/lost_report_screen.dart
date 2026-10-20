@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/report_location_search.dart';
 
 import '../../core/presentation/widgets/case_screen_shell.dart';
 import '../../core/presentation/widgets/confirm_discard_action.dart';
@@ -92,6 +93,7 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
     final ownModel = ref.read(caseEditorViewModelProvider.notifier);
     final otherModel = ref.read(foundEditorViewModelProvider.notifier);
     return CaseReportFields(
+      locationSearchBuilder: buildReportLocationSearch,
       key: const ValueKey('shared-report-fields'),
       dateTime: dateTime,
       latitude: _community ? other!.latitude : own!.latitude,
@@ -227,7 +229,7 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
         loading: loading,
         immersive: preview,
         // Both forms share this completed timeline, including outgoing fields.
-        count: form ? 12 : 2,
+        count: form ? 13 : 2,
         stage: form ? 'form' : (_community, preview ? 'preview' : 'confirmed'),
         notice: notice,
         noticeIsError: !confirmed,

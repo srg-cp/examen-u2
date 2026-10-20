@@ -64,3 +64,7 @@ El layout utiliza ScrollSafeArea compartido: contenido visible hasta el borde in
 Consulta, edición, errores de campos y cierre de sesión usan toast. La preparación del avatar delega en el normalizador compartido, manteniendo el recorte512 y la recuperación nativa por cuenta.
 
 Carga mediante skeleton/shimmer y refresh conservado sin indicadores circulares/lineales. Véanse [ADR-027](../decisiones/027-feedback-global-toast-shimmer.md), [ADR-028](../decisiones/028-consistencia-fronteras-y-reutilizacion.md) y [ESTADO](../ESTADO.md) para evidencia local y pendientes. Esta corrección no cierra por sí sola la HU ni acredita pruebas remotas/Android autenticadas.
+
+20/10/2026: Ciudad comparte el filtro de sugerencias de Perú (petición PE y
+verificación del código recibido). Conserva ciudades anteriores y selección
+explícita para texto nuevo. [Ficha](ubicaciones-buscador.md), ADR-107.

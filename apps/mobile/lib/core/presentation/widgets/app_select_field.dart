@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app_field_surface.dart';
-import 'cover_reveal.dart';
 import 'stagger_reveal.dart';
 
 class AppSelectOption<T> {
@@ -170,73 +169,79 @@ class _SelectPanel<T> extends StatelessWidget {
   final List<AppSelectOption<T>> options;
   final T? value;
   @override
-  Widget build(BuildContext context) => SafeArea(
-    top: false,
-    child: ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * .85,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontFamily: 'sans-serif',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF111111),
+  Widget build(BuildContext context) {
+    final entrance =
+        ModalRoute.of(context)?.animation ??
+        const AlwaysStoppedAnimation<double>(1);
+    return SafeArea(
+      top: false,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * .85,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontFamily: 'sans-serif',
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111111),
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  tooltip: 'Cerrar opciones',
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: Color(0xFF6E6E73),
+                  IconButton(
+                    tooltip: 'Cerrar opciones',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Color(0xFF6E6E73),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Flexible(
-              child: SingleChildScrollView(
-                child: AuthStageTransition(
-                  stage: label,
-                  startCovered: true,
-                  builder: (play) => StaggerReveal(
-                    count: options.length,
-                    play: play,
-                    child: Column(
-                      children: [
-                        for (final entry in options.indexed)
-                          StaggerRevealItem(
-                            order: entry.$1,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: _SelectRow<T>(
-                                option: entry.$2,
-                                selected: entry.$2.value == value,
+                ],
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: AnimatedBuilder(
+                    animation: entrance,
+                    builder: (context, _) => StaggerReveal(
+                      count: options.length,
+                      play:
+                          entrance.status == AnimationStatus.completed ||
+                          MediaQuery.disableAnimationsOf(context),
+                      child: Column(
+                        children: [
+                          for (final entry in options.indexed)
+                            StaggerRevealItem(
+                              order: entry.$1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: _SelectRow<T>(
+                                  option: entry.$2,
+                                  selected: entry.$2.value == value,
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _SelectRow<T> extends StatelessWidget {

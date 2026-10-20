@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/failures/place_search_failure.dart';
+import '../../domain/cancellation/place_search_cancellation.dart';
 import '../../providers/places_providers.dart';
 import '../state/place_search_state.dart';
 
@@ -17,19 +18,26 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
   int _generation = 0;
   Timer? _debounce;
   String _input = '';
-  String? _queued;
-  bool _inFlight = false;
+  PlaceSearchCancellation? _activeCancellation;
+  String? _activeQuery;
+
+  void _cancelSearch() {
+    _activeCancellation?.cancel();
+    _activeCancellation = null;
+    _activeQuery = null;
+  }
+
   @override
   PlaceSearchState build() {
     _generation++;
     _debounce?.cancel();
-    _queued = null;
+    _cancelSearch();
     _input = '';
     ref.watch(placesSessionProvider);
     ref.onDispose(() {
       _generation++;
       _debounce?.cancel();
-      _queued = null;
+      _cancelSearch();
     });
     return const PlaceSearchState();
   }
@@ -37,7 +45,7 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
   void clear() {
     _generation++;
     _debounce?.cancel();
-    _queued = null;
+    _cancelSearch();
     _input = '';
     state = PlaceSearchState(noticeId: state.noticeId);
   }
@@ -48,24 +56,23 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
     _input = normalized;
     _generation++;
     _debounce?.cancel();
-    _queued = null;
+    _cancelSearch();
     state = PlaceSearchState(noticeId: state.noticeId);
     if (normalized.runes.length < 3 || normalized.runes.length > 120) return;
-    _debounce = Timer(const Duration(milliseconds: 600), () {
+    _debounce = Timer(const Duration(milliseconds: 300), () {
       if (ref.mounted) unawaited(search(normalized, automatic: true));
     });
   }
 
   Future<void> search(String query, {bool automatic = false}) async {
-    if (_inFlight) {
-      if (automatic) {
-        _queued = query;
-        state = PlaceSearchState(busy: true, noticeId: state.noticeId);
-      }
-      return;
-    }
+    final normalized = query.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (_activeQuery == normalized.toLowerCase()) return;
     _debounce?.cancel();
-    _inFlight = true;
+    _cancelSearch();
+    _input = normalized;
+    final cancellation = PlaceSearchCancellation();
+    _activeCancellation = cancellation;
+    _activeQuery = normalized.toLowerCase();
     final g = ++_generation, id = state.noticeId;
     state = PlaceSearchState(busy: true, noticeId: id);
     try {
@@ -73,8 +80,9 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
         throw const PlaceSearchFailure(PlaceSearchFailureKind.forbidden);
       }
       final places = await ref.read(searchPlacesProvider)(
-        query,
+        normalized,
         citiesOnly: citiesOnly,
+        cancellation: cancellation,
       );
       if (!ref.mounted || g != _generation) return;
       state = PlaceSearchState(
@@ -94,12 +102,11 @@ class PlaceSearchViewModel extends Notifier<PlaceSearchState> {
         noticeId: id + 1,
       );
     } finally {
-      _inFlight = false;
-      final next = _queued;
-      _queued = null;
-      if (ref.mounted && next != null) {
-        unawaited(search(next, automatic: true));
+      if (identical(_activeCancellation, cancellation)) {
+        _activeCancellation = null;
+        _activeQuery = null;
       }
+      cancellation.cancel();
     }
   }
 }

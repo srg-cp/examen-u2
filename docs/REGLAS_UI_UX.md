@@ -13,7 +13,8 @@ puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
 Reservar retorno; retirar título central si falta espacio. Sustituye mínimo50%
 y crédito superior de ADR-103/084 solo aquí, sin cambiar paleta global ADR-104.
 Movimiento refinado: acompañar al dedo directamente y acomodar al soltar con
-easeInOutCubic320–540ms, según distancia; retorno amortiguado en el mínimo.
+resorte1/260/34 que conserva velocidad del gesto y se detiene al tocar de nuevo;
+sustituye easeInOutCubic320–540ms. Retorno amortiguado en el mínimo.
 Sin tween durante arrastre ni acomodo autónomo con movimiento reducido.
 
 **Título de Inicio móvil20/10, ADR-105:** por referencia explícita del usuario,
@@ -675,3 +676,9 @@ los PNG mediante imagegen como estampado sobre la tela. Prohibido sustituirlo
 por un logo superpuesto a las mascotas desde Vue/CSS/SVG. Variar mascotas, razas,
 pelajes y colores de pañuelo, manteniendo estilo y animación hero aprobados.
 La marca de navegación/favicon usa las fuentes oficiales actualizadas de logo/.
+
+**Buscador20/10, ADR-108:** sugerencias de places en un panel flotante del ancho
+del campo, lista continua sin cápsulas por fila. No desplazar contenido con
+resultados ni skeleton. Respetar teclado/área segura, scroll/texto ampliado,
+cierre al elegir/tocar fuera/retorno y limpieza al desmontar. Aplicación compartida
+en Reportar, Explorar y Ciudad del perfil; filtro Perú de ADR-107 conservado.

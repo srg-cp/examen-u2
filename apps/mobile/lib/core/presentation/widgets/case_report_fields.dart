@@ -5,6 +5,7 @@ import 'event_date_time_fields.dart';
 import 'primary_action_button_style.dart';
 import 'shake_field.dart';
 import 'stagger_reveal.dart';
+export 'case_location_fields.dart' show ReportLocationSearchBuilder;
 
 /// One report block for search origins and linked notices.
 class CaseReportFields extends StatelessWidget {
@@ -25,6 +26,7 @@ class CaseReportFields extends StatelessWidget {
     this.enabled = true,
     this.order = 7,
     this.locationTitle = 'Lugar del reporte',
+    this.locationSearchBuilder,
     super.key,
   });
   final EventDateTimeDraft dateTime;
@@ -38,6 +40,7 @@ class CaseReportFields extends StatelessWidget {
   final int errorId, order;
   final bool dateInvalid, pointInvalid, placeInvalid, enabled;
   final String locationTitle;
+  final ReportLocationSearchBuilder? locationSearchBuilder;
 
   Future<void> _date(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -81,6 +84,7 @@ class CaseReportFields extends StatelessWidget {
       ),
       const SizedBox(height: 20),
       CaseLocationFields(
+        locationSearchBuilder: locationSearchBuilder,
         title: locationTitle,
         order: order + 1,
         latitude: latitude,
@@ -94,7 +98,7 @@ class CaseReportFields extends StatelessWidget {
       ),
       const SizedBox(height: 20),
       StaggerRevealItem(
-        order: order + 4,
+        order: order + 5,
         child: FilledButton(
           style: primaryActionButtonStyle(context),
           onPressed: enabled ? onReview : null,

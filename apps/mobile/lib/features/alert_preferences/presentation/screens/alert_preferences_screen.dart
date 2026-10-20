@@ -63,7 +63,6 @@ class AlertPreferencesScreen extends ConsumerWidget {
                   fit: StackFit.expand,
                   children: [
                     SingleChildScrollView(
-                      key: ValueKey(data?.saved.ownerId ?? 'unavailable'),
                       padding: EdgeInsets.fromLTRB(
                         24,
                         MediaQuery.paddingOf(context).top + 80,
@@ -83,7 +82,7 @@ class AlertPreferencesScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 20),
                           AuthStageTransition(
-                            key: ValueKey(data?.saved.ownerId ?? 'unavailable'),
+                            enabled: !async.isLoading,
                             startCovered: true,
                             stage: 'preferences',
                             builder: (play) => ContentReveal(

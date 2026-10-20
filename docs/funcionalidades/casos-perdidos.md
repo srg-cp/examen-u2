@@ -170,3 +170,11 @@ Selección Mi mascota/Otra mascota corregida: misma pantalla, selector persisten
 ## Un único formulario — 12 de octubre de 2026
 
 Mascota a reportar sustituye Mi mascota/Otra mascota como pestañas. Elegir una ficha usa sus datos/fotos; No está en mis mascotas pide descripción sin registrarla como propia. Un único bloque fecha/hora/lugar/referencia conserva lo escrito al cambiar el origen, manteniendo datos/fotos de cada mascota separados. Vista previa/publicación y privacidad existentes. [ADR-038](../decisiones/038-formulario-unico-mascota-perdida.md) y [ficha conjunta](busquedas-y-avisos.md); Android remoto pendiente.
+
+## Búsqueda del lugar —20/10/2026
+
+Reportar añade el [buscador compartido](ubicaciones-buscador.md) antes del mapa,
+también para pérdida comunitaria. Elegir sugerencia de Perú marca/centra el punto
+privado, ajustable después en mapa. Búsqueda opcional, referencia independiente
+y mapa libre. Sin SQL/permisos nuevos;24 pruebas places/arquitectura/creación
+aprobadas. Android pendiente. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
