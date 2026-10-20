@@ -1,5 +1,10 @@
 # Diseño de la interfaz: implementación y revisión
 
+Inicio, corrección posterior20/10: título Poppins26 sin contenedor glass,
+mismos pesos/colores de ADR-105. Descripción16/1.4 debajo del perro/gato dentro
+de HomeReunionCard glass, padding horizontal total22 y separación12 de imagen.
+HomeNotice de Cerca de ti reutiliza GlassSurface/radio26 y preserveBackdrop.
+
 Explorar20/10, ADR-106: mínimo =32 de tirador + altura real resumen/Ver ficha +
 inset inferior+12, dividido por viewport (18–85%); sin selección22%. Apertura50%
 o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:

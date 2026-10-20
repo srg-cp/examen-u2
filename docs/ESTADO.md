@@ -1,13 +1,37 @@
 # Estado del proyecto
 
+## Inicio: título libre y descripción junto a ilustración —20/10/2026
+
+Por instrucción del usuario se retira GlassSurface del título «Su regreso
+empieza contigo» y se aumenta de23 a26, conservando Poppins, pesos, colores,
+salto y stagger. La descripción se mueve debajo del perro/gato dentro de
+HomeReunionCard, con la imagen3:2 y glass existentes. Cerca de ti conserva glass.
+Sin cambio de alcance, dominio, datos o permisos.
+Validación: formato/análisis completos limpios y11 comprobaciones de
+arquitectura/captura aprobadas; renders390×844/texto1 y320×350/texto2 revisados
+sin desbordamientos. La captura no acredita el render de la ilustración.
+Siguiente paso: revisión visual en Android con el asset real.
+
+## Inicio: glass en Cerca de ti —20/10/2026
+
+Por petición del usuario, HomeNotice reutiliza GlassSurface/radio26 en la
+tarjeta «Explora cerca de ti», como el título principal y la ilustración.
+Conserva contenido/padding y acción Explorar; entrada con preserveBackdrop
+para mantener el material glass. También aplica al fallback que usa HomeNotice.
+Sin cambios de alcance, datos o permisos.
+Validación: formato y análisis completo limpios;11 comprobaciones de
+arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+desbordamientos. Captura normal revisada. Siguiente paso: revisión en Android.
+
 ## Inicio móvil: tarjeta y accesos compactos —20/10/2026
 
 Por instrucción del usuario se retiran la huella sobre «Su regreso» y el
-enlace «Conoce Mis mascotas». Reportar, Mis reportes y Mis mascotas usan fondo
-azul #459FF6, igual que «empieza contigo», con iconos/textos oscuros.
+enlace «Conoce Mis mascotas». Corrección del usuario: Reportar, Mis reportes y
+Mis mascotas conservan fondo gris #F5F5F7; solo iconos/textos usan azul #459FF6,
+igual que «empieza contigo».
 Padding vertical16 (antes20), iconos25 (antes28), separación10 (antes12) y
 texto12.5 (antes13); ampliación y columna adaptable conservadas. Origen visual
-de apertura de Reportar actualizado al azul. Sin cambio de alcance o permisos.
+de apertura de Reportar conserva el fondo gris. Sin cambio de alcance o permisos.
 
 Validación: formato correcto, análisis Flutter completo sin incidencias y11
 comprobaciones aprobadas (arquitectura y captura específica de Inicio).

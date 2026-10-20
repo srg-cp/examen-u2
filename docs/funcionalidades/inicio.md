@@ -1,8 +1,25 @@
 # Inicio y navegación
 
+20/10/2026, composición vigente: título «Su regreso empieza contigo» sin
+glass, Poppins26 (antes23), mismos pesos/colores y ampliación del sistema.
+La descripción «Una comunidad…» se muestra debajo del perro/gato en la misma
+HomeReunionCard glass, conservando imagen3:2. Cerca de ti mantiene glass.
+Sin nuevas reglas, permisos, persistencia o activación. Formato/análisis
+limpios y11 comprobaciones de arquitectura/captura aprobadas; renders normal
+y pequeño/texto2 revisados sin overflow. Pendiente revisión Android con imagen.
+
+20/10/2026: «Explora cerca de ti» reutiliza GlassSurface/radio26 mediante
+HomeNotice, igual que las otras tarjetas glass de Inicio. Conserva textos,
+padding y acceso real a Explorar; entrada preserveBackdrop. El fallback que
+usa HomeNotice comparte el acabado. Sin nueva persistencia, permisos,
+dependencias o activación. Formato/análisis limpios y11 comprobaciones de
+arquitectura/captura aprobadas; tamaños normal y pequeño/texto2 sin overflow.
+Captura normal revisada; pendiente validación visual Android.
+
 20/10/2026, ajuste posterior: se retiran la huella superior de la tarjeta
 principal y «Conoce Mis mascotas». Los accesos Reportar/Mis reportes/Mis mascotas
-usan fondo #459FF6 como el énfasis del título, con iconos y texto oscuros;
+conservan fondo gris #F5F5F7 y usan iconos/texto #459FF6 como el énfasis del título
+(corrección explícita del usuario: el azul no corresponde al fondo);
 padding vertical16, iconos25, separación10 y texto12.5. Mantienen destinos,
 ampliación y columna adaptable; apertura de Reportar desde su color real.
 Sin nuevas reglas de dominio, persistencia, permisos o activación.

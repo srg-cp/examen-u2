@@ -18,50 +18,28 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      StaggerRevealItem(
+      const StaggerRevealItem(
         order: 0,
-        preserveBackdrop: true,
-        child: GlassSurface(
-          radius: 26,
-          backdropBlendMode: BlendMode.src,
-          child: Padding(
-            padding: const EdgeInsets.all(22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: 'Su regreso\n'),
-                      TextSpan(
-                        text: 'empieza contigo',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF459FF6),
-                        ),
-                      ),
-                    ],
-                  ),
-                  semanticsLabel: 'Su regreso empieza contigo',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 23,
-                    height: 1.25,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF454746),
-                  ),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: 'Su regreso\n'),
+              TextSpan(
+                text: 'empieza contigo',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF459FF6),
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Una comunidad para conectar mascotas perdidas con quienes pueden ayudar.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.4,
-                    color: Color(0xFF6E6E73),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          semanticsLabel: 'Su regreso empieza contigo',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 26,
+            height: 1.25,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF454746),
           ),
         ),
       ),
@@ -117,6 +95,7 @@ class HomeContent extends StatelessWidget {
       const SizedBox(height: 28),
       StaggerRevealItem(
         order: 3,
+        preserveBackdrop: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -162,7 +141,7 @@ class HomeQuickAction extends StatelessWidget {
   final ValueChanged<BuildContext> onTap;
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0xFF459FF6),
+    color: const Color(0xFFF5F5F7),
     borderRadius: BorderRadius.circular(22),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -173,7 +152,7 @@ class HomeQuickAction extends StatelessWidget {
           width: double.infinity,
           child: Column(
             children: [
-              Icon(icon, size: 25, color: const Color(0xFF111111)),
+              Icon(icon, size: 25, color: const Color(0xFF459FF6)),
               const SizedBox(height: 10),
               Text(
                 label,
@@ -181,7 +160,7 @@ class HomeQuickAction extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF111111),
+                  color: Color(0xFF459FF6),
                 ),
               ),
             ],
@@ -203,35 +182,35 @@ class HomeNotice extends StatelessWidget {
   final String title;
   final String description;
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      border: Border.all(color: const Color(0xFFE5E5EA)),
-      borderRadius: BorderRadius.circular(22),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: const Color(0xFF6E6E73), size: 28),
-        const SizedBox(height: 12),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111111),
+  Widget build(BuildContext context) => GlassSurface(
+    radius: 26,
+    backdropBlendMode: BlendMode.src,
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: const Color(0xFF6E6E73), size: 28),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF111111),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          description,
-          style: const TextStyle(
-            fontSize: 16,
-            height: 1.4,
-            color: Color(0xFF6E6E73),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.4,
+              color: Color(0xFF6E6E73),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

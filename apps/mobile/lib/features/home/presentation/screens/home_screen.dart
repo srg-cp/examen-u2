@@ -105,7 +105,7 @@ class HomeScreen extends ConsumerWidget {
                                         onSelect: model.select,
                                         onReport: (source) => openLostReport(
                                           source,
-                                          color: const Color(0xFF459FF6),
+                                          color: const Color(0xFFF5F5F7),
                                           radius: 22,
                                         ),
                                       )

@@ -1,5 +1,10 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Corrección posterior20/10 del usuario para Inicio: título sin GlassSurface,
+tamaño26 en lugar de23; Poppins/pesos/colores de ADR-105 conservados.
+Descripción trasladada debajo de la ilustración, dentro de su tarjeta glass.
+«Explora cerca de ti» también reutiliza GlassSurface/radio26.
+
 **Explorar20/10, ADR-106:** apertura50% y máximo90%, mínimo adaptable a resumen
 y Ver ficha antes del separador, con inset inferior+12 libres. Texto ampliado
 puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
