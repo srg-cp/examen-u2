@@ -1,5 +1,74 @@
 # Estado del proyecto
 
+## Explorar: movimiento más suave del panel —20/10/2026
+
+Por petición del usuario, sustituir snap lineal por acomodo easeInOutCubic al
+soltar, con duración320–540ms según recorrido. Pasadas rápidas avanzan en su
+dirección; liberaciones lentas van a la parada cercana. Mismos límites mínimo
+adaptable/50%/90%, Ver ficha accesible y créditos acompañando el panel. Durante
+arrastre sigue al dedo sin tween; retorno de resistencia con resorte amortiguado
+1/190/28. No cortar la inercia de contenidos ni activar acomodo por simples
+toques. Nuevos gestos invalidan callbacks pendientes, con mounted/dispose.
+Reduced mantiene acciones inmediatas y sin acomodo autónomo. Refinamiento de
+ADR-106 / HU-07.2 / RF-13 / issue #33; sin dominio/data/SQL nuevos.
+
+Validación:6 pruebas de mapa con proveedor CARTO de fixture y10 de arquitectura
+aprobadas. La regresión de movimiento comprueba posición intermedia tras100ms
+y llegada a la parada al soltar despacio, además de los gestos de minimización,
+resistencia, selección, ficha, créditos, pan y altura pequeña/texto2 existentes.
+Formato correcto, análisis Flutter completo sin incidencias y diff limpio.
+Siguiente paso: comprobar sensación de movimiento en Android físico; las pruebas
+de frames no sustituyen esa revisión. Sin APK, instalación o despliegue.
+
+## Inicio: accesos negros con contenido blanco —20/10/2026
+
+Por nueva instrucción del usuario, Reportar/Mis reportes/Mis mascotas usan
+fondo negro #111111 y texto/iconos blancos. Texto recupera peso600 original y
+se retira el refuerzo de iconos. Tamaños compactos conservados; origen visual
+de apertura de Reportar actualizado al negro. Sin cambios de alcance o permisos.
+Validación: formato/análisis completos limpios;11 comprobaciones de
+arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+overflow. Captura normal revisada. Siguiente paso: revisión visual Android.
+
+## Inicio: actualizar al jalar hacia abajo —20/10/2026
+
+Por petición del usuario, Inicio habilita el PullToRefresh compartido, con
+el mismo indicador glass/gesto/retorno de Explorar y Mis mascotas. Recarga
+real del perfil de cabecera mediante su ViewModel/caso de uso existente;
+tarjetas e ilustración siguen siendo contenido fijo. Router inyecta callback,
+sin imports entre presentaciones. HomeViewModel bloquea duplicados y descarta
+errores tardíos al cambiar sección; toast superior con Reintentar ante fallo.
+Avatar conserva información durante refresh explícito de la misma identidad.
+Sin retrasos simulados, navegación nueva, SQL, permisos o ampliación de HU.
+
+Validación: formato/análisis completos limpios;14 pruebas de recarga de
+Inicio/Mascotas/arquitectura y8 de perfil aprobadas. Incluyen consulta real de
+perfil, conservación de iniciales, gesto/espera/duplicados, destino propio de
+Explorar, error/reintento y respuesta tardía. Dos pruebas antiguas de perfil
+esperaban cierre del toast a4s; ajustadas a6500ms y su animación de salida.
+Siguiente paso: comprobar el gesto y la consulta autenticada en Android.
+
+## Inicio: accesos con azul más intenso y mayor grosor —20/10/2026
+
+Por petición del usuario, Reportar/Mis reportes/Mis mascotas usan azul #2887EF
+en texto e iconos, conservando fondo gris y tamaño compacto. Texto700 (antes600)
+y refuerzo horizontal de iconos0.25px por lado, sin blur. Sin cambios de rutas,
+dominio, permisos o alcance. Formato/análisis completos limpios;11 comprobaciones
+de arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+overflow. Captura normal revisada. Siguiente paso: revisión visual Android.
+
+## Inicio: título mayor con degradado de referencia —20/10/2026
+
+Por nueva referencia del usuario, título Poppins32 (antes26), «Su regreso»
+gris400 y «empieza contigo» peso600 con degradado horizontal #459FF6→#75C9EF.
+ShaderMask local sobre la segunda frase; sin fondo glass. Dos textos con
+ajuste natural/ampliación y una etiqueta semántica completa, stagger conservado.
+Sin cambios de alcance o arquitectura. Descripción permanece bajo ilustración.
+Validación: formato/análisis limpios;11 comprobaciones de arquitectura/captura
+aprobadas. Renders390×844/texto1 y320×350/texto2 revisados sin overflow;
+texto ampliado puede repartir palabras entre líneas. Captura no acredita imagen.
+Siguiente paso: revisión visual Android.
+
 ## Inicio: título libre y descripción junto a ilustración —20/10/2026
 
 Por instrucción del usuario se retira GlassSurface del título «Su regreso

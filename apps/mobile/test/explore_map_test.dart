@@ -363,6 +363,29 @@ void main() {
           find.byType(DraggableScrollableSheet),
         );
         final before = sheet.controller!.size;
+        if (!reduced) {
+          final gentleDrag = await tester.startGesture(
+            tester.getCenter(
+              find.bySemanticsLabel(
+                'Desliza para ampliar o reducir el resumen',
+              ),
+            ),
+          );
+          await gentleDrag.moveBy(
+            Offset(0, -tester.view.physicalSize.height * .12),
+          );
+          await tester.pump(const Duration(milliseconds: 200));
+          await gentleDrag.up();
+          await tester.pump();
+          await tester.pump();
+          final released = sheet.controller!.size;
+          expect(released, greaterThan(.5));
+          await tester.pump(const Duration(milliseconds: 100));
+          expect(sheet.controller!.size, greaterThan(.5));
+          expect(sheet.controller!.size, lessThan(released));
+          await settleMap(tester);
+          expect(sheet.controller!.size, closeTo(.5, .001));
+        }
         expect(sheet.minChildSize, .22);
         expect(find.text('Filtros de búsqueda'), findsNothing);
         final back = find.byTooltip('Volver a Explorar');

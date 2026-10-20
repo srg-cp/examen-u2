@@ -48,6 +48,7 @@ import '../features/auth/presentation/view_models/recovery_access_view_model.dar
 import '../features/auth/domain/entities/recovery_access.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/widgets/profile_avatar.dart';
+import '../features/profile/presentation/view_models/profile_view_model.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/interest_zones/presentation/screens/interest_zones_screen.dart';
 import '../features/alert_preferences/presentation/screens/alert_preferences_screen.dart';
@@ -217,6 +218,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => HomeScreen(
+          onHomeRefresh: () async {
+            ref.read(profileViewModelProvider.notifier).retry();
+            await ref.read(profileViewModelProvider.future);
+          },
           onAlerts: () => context.push('/home/notifications'),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),

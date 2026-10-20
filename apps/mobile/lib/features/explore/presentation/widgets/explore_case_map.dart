@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'explore_map_pins.dart';
 import 'explore_map_case_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/config/map_config.dart';
@@ -46,6 +48,98 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
 
   late final _pullOffset = AnimationController.unbounded(vsync: this);
 
+  int? _sheetPointer;
+  VelocityTracker? _dragVelocity;
+  double? _dragStartExtent;
+  Offset? _dragOrigin;
+  bool _dragMoved = false;
+  int _settleRequest = 0;
+
+  void _beginSheetDrag(PointerDownEvent event) {
+    if (_sheetPointer != null) return;
+    _settleRequest++;
+    _sheetPointer = event.pointer;
+    _dragStartExtent = _sheet.isAttached ? _sheet.size : null;
+    _dragOrigin = event.position;
+    _dragMoved = false;
+    _dragVelocity = VelocityTracker.withKind(event.kind)
+      ..addPosition(event.timeStamp, event.position);
+    _pullOffset.stop();
+  }
+
+  void _trackSheetDrag(PointerMoveEvent event) {
+    if (event.pointer == _sheetPointer) {
+      _dragVelocity?.addPosition(event.timeStamp, event.position);
+      if (_dragOrigin != null && (event.position - _dragOrigin!).distance > 8) {
+        _dragMoved = true;
+      }
+    }
+  }
+
+  void _endSheetDrag(PointerEvent event, {bool cancelled = false}) {
+    if (event.pointer != _sheetPointer) return;
+    _dragVelocity?.addPosition(event.timeStamp, event.position);
+    final velocity = cancelled
+        ? 0.0
+        : _dragVelocity?.getVelocity().pixelsPerSecond.dy ?? 0.0;
+    final start = _dragStartExtent;
+    final moved = _dragMoved;
+    _sheetPointer = null;
+    _dragVelocity = null;
+    _dragStartExtent = null;
+    _dragOrigin = null;
+    _dragMoved = false;
+    final request = ++_settleRequest;
+    // Release the pointer before replacing the native linear settlement.
+    // A new touch or programmatic movement invalidates this request.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || request != _settleRequest || !_sheet.isAttached) return;
+      _releasePull();
+      if (!moved || start == null || (_sheet.size - start).abs() < .002) return;
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _sheet.jumpTo(_sheet.size);
+        return;
+      }
+      if ((_summaryScroll?.hasClients ?? false) && _summaryScroll!.offset > 1) {
+        return;
+      }
+      final current = _sheet.size;
+      final stops = [_minimumExtent, if (_minimumExtent < .5) .5, .9];
+      final double target;
+      if (velocity < -350) {
+        target =
+            stops.where((size) => size > current + .005).firstOrNull ??
+            stops.last;
+      } else if (velocity > 350) {
+        target =
+            stops.reversed.where((size) => size < current - .005).firstOrNull ??
+            stops.first;
+      } else {
+        target = stops.reduce(
+          (a, b) => (a - current).abs() <= (b - current).abs() ? a : b,
+        );
+      }
+      _moveSheet(target);
+    });
+  }
+
+  void _releasePull() {
+    if (_pullOffset.value <= 0) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pullOffset.value = 0;
+      return;
+    }
+    _pullOffset.animateWith(
+      SpringSimulation(
+        const SpringDescription(mass: 1, stiffness: 190, damping: 28),
+        _pullOffset.value,
+        0,
+        0,
+        tolerance: const Tolerance(distance: .01, velocity: .01),
+      ),
+    );
+  }
+
   bool _handleScroll(ScrollNotification notification) {
     if (MediaQuery.disableAnimationsOf(context)) return false;
     if (notification is OverscrollNotification &&
@@ -57,11 +151,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
       _pullOffset.value = (_pullOffset.value - notification.overscroll * .2)
           .clamp(0.0, 18.0);
     } else if (notification is ScrollEndNotification && _pullOffset.value > 0) {
-      _pullOffset.animateTo(
-        0,
-        duration: const Duration(milliseconds: 240),
-        curve: Curves.easeOutCubic,
-      );
+      _releasePull();
     }
     return false;
   }
@@ -78,14 +168,17 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
 
   void _moveSheet(double size) {
     if (!_sheet.isAttached) return;
+    _settleRequest++;
     size = size.clamp(_minimumExtent, .9);
     if (MediaQuery.disableAnimationsOf(context)) {
       _sheet.jumpTo(size);
     } else {
       _sheet.animateTo(
         size,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
+        duration: Duration(
+          milliseconds: (320 + (size - _sheet.size).abs() * 320).round(),
+        ),
+        curve: Curves.easeInOutCubic,
       );
     }
   }
@@ -104,6 +197,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
 
   @override
   void dispose() {
+    _settleRequest++;
     _pullOffset.dispose();
     _sheet.dispose();
     _map.dispose();
@@ -193,8 +287,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
               initialChildSize: math.max(.5, minimum),
               minChildSize: minimum,
               maxChildSize: .9,
-              snap: !media.disableAnimations,
-              snapSizes: [minimum, if (minimum < .5) .5, .9],
+              snap: false,
               shouldCloseOnMinExtent: false,
               builder: (context, scroll) {
                 _summaryScroll = scroll;
@@ -204,75 +297,84 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
                     offset: Offset(0, _pullOffset.value),
                     child: child,
                   ),
-                  child: Material(
-                    key: const ValueKey('map-case-surface'),
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(28),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: _handleScroll,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          bottom: media.padding.bottom + 12,
-                        ),
-                        child: CustomScrollView(
-                          controller: scroll,
-                          slivers: [
-                            SliverPersistentHeader(
-                              pinned: true,
-                              delegate: _MapSheetHandle(
-                                onExpand: () => _moveSheet(.9),
-                                onCollapse: () {
-                                  _resetSummaryScroll();
-                                  _moveSheet(minimum);
-                                },
+                  child: Listener(
+                    onPointerDown: _beginSheetDrag,
+                    onPointerMove: _trackSheetDrag,
+                    onPointerUp: _endSheetDrag,
+                    onPointerCancel: (event) =>
+                        _endSheetDrag(event, cancelled: true),
+                    child: Material(
+                      key: const ValueKey('map-case-surface'),
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(28),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: _handleScroll,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: media.padding.bottom + 12,
+                          ),
+                          child: CustomScrollView(
+                            controller: scroll,
+                            slivers: [
+                              SliverPersistentHeader(
+                                pinned: true,
+                                delegate: _MapSheetHandle(
+                                  onExpand: () => _moveSheet(.9),
+                                  onCollapse: () {
+                                    _resetSummaryScroll();
+                                    _moveSheet(minimum);
+                                  },
+                                ),
                               ),
-                            ),
-                            SliverToBoxAdapter(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  if (item == null)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                      ),
-                                      child: CollectionEmptyState(
-                                        title: widget.items.isNotEmpty
-                                            ? 'Selecciona un pin'
-                                            : widget.emptyMessage != null
-                                            ? 'Explora los casos cercanos'
-                                            : 'No encontramos casos',
-                                        description: widget.items.isNotEmpty
-                                            ? 'Selecciona un pin para ver el resumen del caso.'
-                                            : widget.emptyMessage ??
-                                                  'Prueba con otra ubicación o ajusta los filtros de búsqueda.',
-                                      ),
-                                    )
-                                  else
-                                    widget.previewBuilder?.call(
-                                          item,
-                                          _recordSummaryHeight,
-                                        ) ??
-                                        ExploreMapPreviewContent(
-                                          item: item,
-                                          scrollable: false,
-                                          onSummaryHeight: _recordSummaryHeight,
-                                          onOpen: widget.onOpen == null
-                                              ? null
-                                              : (source) => widget.onOpen!(
-                                                  item,
-                                                  source,
-                                                ),
+                              SliverToBoxAdapter(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (item == null)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
                                         ),
-                                  ...widget.trailing,
-                                  SizedBox(height: media.padding.bottom + 16),
-                                ],
+                                        child: CollectionEmptyState(
+                                          title: widget.items.isNotEmpty
+                                              ? 'Selecciona un pin'
+                                              : widget.emptyMessage != null
+                                              ? 'Explora los casos cercanos'
+                                              : 'No encontramos casos',
+                                          description: widget.items.isNotEmpty
+                                              ? 'Selecciona un pin para ver el resumen del caso.'
+                                              : widget.emptyMessage ??
+                                                    'Prueba con otra ubicación o ajusta los filtros de búsqueda.',
+                                        ),
+                                      )
+                                    else
+                                      widget.previewBuilder?.call(
+                                            item,
+                                            _recordSummaryHeight,
+                                          ) ??
+                                          ExploreMapPreviewContent(
+                                            item: item,
+                                            scrollable: false,
+                                            onSummaryHeight:
+                                                _recordSummaryHeight,
+                                            onOpen: widget.onOpen == null
+                                                ? null
+                                                : (source) => widget.onOpen!(
+                                                    item,
+                                                    source,
+                                                  ),
+                                          ),
+                                    ...widget.trailing,
+                                    SizedBox(height: media.padding.bottom + 16),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

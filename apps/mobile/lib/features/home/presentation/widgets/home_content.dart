@@ -18,28 +18,35 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const StaggerRevealItem(
+      StaggerRevealItem(
         order: 0,
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(text: 'Su regreso\n'),
-              TextSpan(
-                text: 'empieza contigo',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF459FF6),
+        child: Semantics(
+          label: 'Su regreso empieza contigo',
+          excludeSemantics: true,
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 32,
+              height: 1.25,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF454746),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Su regreso'),
+                ShaderMask(
+                  blendMode: BlendMode.srcIn,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFF459FF6), Color(0xFF75C9EF)],
+                  ).createShader(bounds),
+                  child: const Text(
+                    'empieza contigo',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          semanticsLabel: 'Su regreso empieza contigo',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 26,
-            height: 1.25,
-            fontWeight: FontWeight.w400,
-            color: Color(0xFF454746),
+              ],
+            ),
           ),
         ),
       ),
@@ -141,7 +148,7 @@ class HomeQuickAction extends StatelessWidget {
   final ValueChanged<BuildContext> onTap;
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0xFFF5F5F7),
+    color: const Color(0xFF111111),
     borderRadius: BorderRadius.circular(22),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -152,7 +159,7 @@ class HomeQuickAction extends StatelessWidget {
           width: double.infinity,
           child: Column(
             children: [
-              Icon(icon, size: 25, color: const Color(0xFF459FF6)),
+              Icon(icon, size: 25, color: Colors.white),
               const SizedBox(height: 10),
               Text(
                 label,
@@ -160,7 +167,7 @@ class HomeQuickAction extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF459FF6),
+                  color: Colors.white,
                 ),
               ),
             ],

@@ -8,6 +8,14 @@ del panel a la derecha, siguiendo su posición; tooltip/nombre completo si se
 elide al ampliar texto. Título central se retira si falta espacio, retorno
 conservado. Sustituye mínimo50%/atribución superior de notas anteriores.
 Sin cambios de persistencia/permisos/activación; paleta global ADR-104 intacta.
+Movimiento refinado: acomodo suave al soltar/subir/bajar con easeInOutCubic
+y duración320–540ms según recorrido, con retorno amortiguado bajo el mínimo.
+Durante arrastre sigue al dedo; gesto nuevo cancela el acomodo anterior y los
+toques en acciones no lo disparan. Reduced mantiene acciones inmediatas y
+sin acomodo autónomo; contenidos conservan scroll/inercia.
+Validación del movimiento:6 pruebas de mapa (incluida posición intermedia y
+convergencia tras soltar) y10 de arquitectura aprobadas, formato/análisis
+completos limpios. Pendiente evaluar sensación real en Android físico.
 Validación de ADR-106:17 pruebas de mapa/selector/arquitectura aprobadas con
 teselas CARTO de fixture, análisis limpio y renders390×844/320×350/texto2
 revisados. Gesto minimiza conservando Ver ficha visible y crédito sobre panel;

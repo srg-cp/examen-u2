@@ -2,6 +2,14 @@
 
 Fecha:20/10/2026. Estado: aceptada por instrucción explícita del usuario.
 
+Actualización posterior20/10 por instrucciones explícitas: título sin tarjeta
+glass y tamaño32 (tras26). La nueva referencia solicita degradado horizontal
+en la segunda frase: #459FF6→#75C9EF. Primera frase conserva gris/peso400,
+segunda peso600. Dos textos con ShaderMask solo sobre el remate, agrupados
+con etiqueta semántica completa; ajuste natural y ampliación conservados.
+Descripción pasa debajo de la ilustración dentro de su tarjeta glass.
+Esta actualización sustituye tamaño23, azul plano y composición anteriores.
+
 El usuario solicita aplicar al título «Su regreso empieza contigo» el estilo
 de su captura: formas geométricas suaves, comienzo ligero y remate más grueso.
 Se usa Poppins como aproximación visual, sin afirmar identificar la fuente

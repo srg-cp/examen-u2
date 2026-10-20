@@ -1,7 +1,8 @@
 # Entre Huellas: regla de oro de UI y UX
 
 Corrección posterior20/10 del usuario para Inicio: título sin GlassSurface,
-tamaño26 en lugar de23; Poppins/pesos/colores de ADR-105 conservados.
+tamaño32 tras nueva referencia (antes26/23); Poppins/pesos de ADR-105 conservados.
+«Su regreso» gris #454746; «empieza contigo» degradado horizontal #459FF6→#75C9EF.
 Descripción trasladada debajo de la ilustración, dentro de su tarjeta glass.
 «Explora cerca de ti» también reutiliza GlassSurface/radio26.
 
@@ -11,6 +12,9 @@ puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
 (fuente8, objetivos48) a la derecha justo sobre el panel y acompañando su gesto.
 Reservar retorno; retirar título central si falta espacio. Sustituye mínimo50%
 y crédito superior de ADR-103/084 solo aquí, sin cambiar paleta global ADR-104.
+Movimiento refinado: acompañar al dedo directamente y acomodar al soltar con
+easeInOutCubic320–540ms, según distancia; retorno amortiguado en el mínimo.
+Sin tween durante arrastre ni acomodo autónomo con movimiento reducido.
 
 **Título de Inicio móvil20/10, ADR-105:** por referencia explícita del usuario,
 «Su regreso» usa Poppins400/gris #454746 y «empieza contigo» Poppins600/azul

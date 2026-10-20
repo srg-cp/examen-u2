@@ -1,5 +1,37 @@
 # Inicio y navegación
 
+20/10/2026, acabado vigente de accesos: Reportar/Mis reportes/Mis mascotas con
+fondo negro #111111, iconos y texto blancos, peso600 original y sin refuerzo
+de iconos. Tamaños compactos y destinos conservados; apertura de Reportar
+parte del negro real. Sustituye el azul/gris de las notas anteriores. Sin
+nuevos datos, permisos o activación. Formato/análisis limpios;11 comprobaciones
+de arquitectura/captura aprobadas, normal y pequeño/texto2 sin overflow.
+Captura normal revisada; pendiente revisión visual Android.
+
+20/10/2026: Inicio también permite actualizar al jalar desde el borde superior
+y soltar al alcanzar el umbral, con PullToRefresh/indicador glass compartidos.
+Recarga el perfil real de cabecera; contenido editorial e ilustración fijos.
+Router inyecta el callback del ViewModel de perfil; HomeViewModel coordina
+duplicados, errores seguros y descarte al cambiar sección. Toast superior con
+Reintentar; avatar conservado durante refresh de la misma cuenta. Explorar y
+Mis mascotas mantienen sus callbacks propios. Sin nuevas tablas/permisos o
+activación.14 pruebas de recarga/arquitectura y8 de perfil aprobadas, análisis
+limpio. Pendiente gesto/consulta autenticada Android. Actualiza el alcance de
+[ADR-048](../decisiones/048-actualizar-listas-al-jalar.md), sin cierre de HU.
+
+20/10/2026, accesos vigentes: Reportar/Mis reportes/Mis mascotas usan texto700
+y azul #2887EF en texto/iconos, con refuerzo horizontal de iconos0.25px por lado.
+Conservan fondo gris, tamaños, destinos y ampliación. Sin nuevos datos, permisos
+o activación. Formato/análisis limpios y11 comprobaciones de arquitectura/captura
+aprobadas; renders normal/pequeño sin overflow, normal revisado. Android pendiente.
+
+20/10/2026, título vigente tras nueva referencia: Poppins32 (antes26), primera
+frase gris400 y segunda600 con degradado horizontal azul #459FF6→celeste #75C9EF.
+Sin glass. ShaderMask solo en «empieza contigo»; ampliación, ajuste natural,
+etiqueta accesible completa y stagger conservados. Sin nueva persistencia,
+permisos o activación. Formato/análisis limpios;11 comprobaciones aprobadas,
+renders390×844/texto1 y320×350/texto2 revisados sin overflow. Android pendiente.
+
 20/10/2026, composición vigente: título «Su regreso empieza contigo» sin
 glass, Poppins26 (antes23), mismos pesos/colores y ampliación del sistema.
 La descripción «Una comunidad…» se muestra debajo del perro/gato en la misma

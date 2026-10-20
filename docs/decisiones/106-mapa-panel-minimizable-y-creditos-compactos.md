@@ -20,6 +20,19 @@ fuera de la vista. Snap en mínimo,50% cuando cabe y90%; colapso accesible
 restablece scroll. Mantener resistencia/rebote, movimiento reducido, selección,
 ficha y paginación/reintento. La cámara reserva también espacio para los créditos.
 
+Refinamiento de movimiento por petición del usuario: reemplazar el snap lineal
+del SDK por acomodo con easeInOutCubic y duración320–540ms según distancia.
+El panel sigue directamente al dedo; al soltar, una pasada rápida avanza en su
+dirección y una liberación lenta elige la parada más próxima. No interceptar
+la inercia del contenido cuando la lista ya se está desplazando. La resistencia
+inferior vuelve con resorte amortiguado (masa1/rigidez190/amortiguación28), sin
+rebote excesivo. Créditos acompañan los mismos controladores.
+
+Nuevos gestos/movimientos invalidan acomodos pendientes; callbacks tras frame
+verifican mounted/controlador adjunto y se invalidan al liberar la pantalla.
+Un toque en una acción no dispara snap. Movimiento reducido conserva acciones
+inmediatas y detiene la inercia del panel al soltar, sin acomodo autónomo.
+
 Créditos de Explorar a la derecha justo encima del borde del panel, siguiendo
 arrastre y resistencia. Reutilizar MapAttribution.compact con fuente8 (antes10),
 fondo estrecho y objetivos táctiles48px, enlaces reales y toast ante fallo.

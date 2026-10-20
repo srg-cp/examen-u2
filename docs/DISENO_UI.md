@@ -1,7 +1,8 @@
 # Diseño de la interfaz: implementación y revisión
 
-Inicio, corrección posterior20/10: título Poppins26 sin contenedor glass,
-mismos pesos/colores de ADR-105. Descripción16/1.4 debajo del perro/gato dentro
+Inicio, corrección posterior20/10: título Poppins32 sin contenedor glass,
+mismos pesos de ADR-105. Primera frase gris #454746; segunda con ShaderMask
+horizontal #459FF6→#75C9EF según nueva captura. Descripción16/1.4 debajo del perro/gato dentro
 de HomeReunionCard glass, padding horizontal total22 y separación12 de imagen.
 HomeNotice de Cerca de ti reutiliza GlassSurface/radio26 y preserveBackdrop.
 
@@ -11,6 +12,9 @@ o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:
 fuente8/escalable, ribete claro estrecho, objetivos48; derecha8/izquierda84,
 crédito visual aproximadamente8px sobre panel, sigue extensión/resistencia.
 Título central se retira en altura insuficiente; retorno conservado.
+Movimiento del panel: snap propio easeInOutCubic320–540ms según distancia,
+parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
+inferior1/190/28; dedo directo, contenido con su inercia, reduced sin acomodo.
 
 Título de Inicio móvil20/10: referencia tipográfica del usuario aplicada con
 Poppins local, tamaño23/altura1.25. «Su regreso» gris #454746/peso400 y salto

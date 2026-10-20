@@ -2,6 +2,14 @@
 
 Estado: aceptada por instrucción explícita del usuario, 15 de octubre de 2026.
 
+Actualización20/10 por petición explícita: Inicio también habilita el gesto.
+Recarga real del perfil de cabecera mediante callback inyectado por router a
+HomeScreen; ProfileViewModel reutiliza ReadProfile. HomeViewModel coordina
+duplicados y fallo/reintento con toast, ignorando errores tras cambiar sección.
+Avatar conserva datos durante refresh de la misma identidad. Las tarjetas
+editoriales siguen fijas; no hay temporizadores de carga simulada. Esta nota
+sustituye la exclusión anterior de Inicio. Sin nuevo dominio, SQL o permisos.
+
 Actualización visual: [ADR-049](049-indicador-recarga-y-retorno.md) sustituye la flecha por icono de recarga con seguimiento/retorno y giro durante actualización real. Se conserva integración, callbacks y alcance de esta decisión.
 
 ## Decisión y recorrido
