@@ -3,6 +3,8 @@ import { ModerationFailure } from '../../shared/features/moderation/domain/moder
 import { AccessAccount, AccessFailure, CompleteAccountOnboarding, ReadManagementAccess } from '../../shared/features/access/domain/access';
 import { moderationConfiguration } from '../infrastructure/moderation_session';
 import { openAccountSession, sealAccountSession } from '../infrastructure/account_session';
+import type { PrivateAccountSession } from '../infrastructure/account_session';
+import type { AccountConfig } from '../features/access/data/account_source';
 import { AccountSource } from '../features/access/data/account_source';
 import { ServerAccountRepository } from '../features/access/data/server_account_repository';
 export const accountCookie = 'eh_access';
@@ -17,13 +19,15 @@ export function account(event: H3Event, bind = false) {
     save() {
       const s = repository.established;
       if (!s) throw new AccessFailure('unauthenticated');
-      const sealed = sealAccountSession(s, config.sessionSecret);
-      if (sealed.length > 3800) throw new AccessFailure('unavailable');
-      // Remove the previous API-only cookie before establishing the SSR session.
-      deleteCookie(event, accountCookie, { path: '/api', httpOnly: true, secure: config.secure, sameSite: 'strict' });
-      setCookie(event, accountCookie, sealed, { httpOnly: true, secure: config.secure, sameSite: 'strict', path: '/', maxAge: Math.max(1, Math.floor((s.expiresAt - Date.now()) / 1000)) });
+      saveAccountCookie(event, s, config);
     },
   };
+}
+export function saveAccountCookie(event: H3Event, session: PrivateAccountSession, config: AccountConfig) {
+  const sealed = sealAccountSession(session, config.sessionSecret);
+  if (sealed.length > 3800) throw new AccessFailure('unavailable');
+  deleteCookie(event, accountCookie, { path: '/api', httpOnly: true, secure: config.secure, sameSite: 'strict' });
+  setCookie(event, accountCookie, sealed, { httpOnly: true, secure: config.secure, sameSite: 'strict', path: '/', maxAge: Math.max(1, Math.floor((session.expiresAt - Date.now()) / 1000)) });
 }
 export function clearAccountCookie(event: H3Event) {
   for (const path of ['/', '/api']) deleteCookie(event, accountCookie, { path, httpOnly: true, sameSite: 'strict', secure: process.env.PUBLIC_WEB_ORIGIN?.startsWith('https://') === true });

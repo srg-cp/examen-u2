@@ -1,5 +1,12 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Registro/recuperación web —19/10/2026:** CredentialViewModel consume casos
+de uso de dominio; HTTP/Auth detrás de repositorios/fuentes y composición por
+petición. Política global incorpora recovery para la capacidad temporal de
+cambio de contraseña. Cookie eh_credentials cifrada con propósito/AAD distintos;
+verificar recovery no establece sesión general ni permisos. Sin tokens en JSON,
+SSR o cliente. Registro confirmado conserva onboarding. [ADR-087](decisiones/087-registro-y-recuperacion-web.md).
+
 **Cierre web sin bloquear por Supabase —19/10/2026:** endpoints confirman primero
 el borrado de cookies y vinculan el intento remoto al ciclo Nitro event.waitUntil.
 Conservar casos de uso/fuentes y controles de origen; no afirmar revocación

@@ -1,12 +1,22 @@
 import { account, accountCookie, clearAccountCookie } from '../utils/account';
 import { AccessFailure } from '../../shared/features/access/domain/access';
 import { routeAccess, sessionRedirect } from '../../shared/routing/route_policy';
+import { credentials, clearCredentialCookie } from '../utils/credentials';
+import { CredentialFailure } from '../../shared/features/access/domain/credentials';
 
 export default defineEventHandler(async event => {
   const url = getRequestURL(event);
   if (!['GET', 'HEAD'].includes(event.method)) return;
   const access = routeAccess(url.pathname);
   if (access === 'public') return;
+  if (access === 'recovery') {
+    try { await credentials(event).read.resetAccess(); }
+    catch (error) {
+      if (error instanceof CredentialFailure && error.kind === 'expired') { clearCredentialCookie(event); return sendRedirect(event, '/recuperar-contrasena?reason=expired', 302); }
+      // Only the existing retry UI can render on backend failure, never password inputs.
+    }
+    return;
+  }
   const login = access === 'guest';
   if (!getCookie(event, accountCookie)) {
     // Older sessions are scoped to /api and can only be recovered there.
@@ -14,7 +24,7 @@ export default defineEventHandler(async event => {
     if (login && url.searchParams.get('entry') === 'checked') return;
     // A failed legacy lookup can render the existing retry shell, never data.
     if (!login && url.searchParams.get('entry') === 'unavailable') return;
-    if (!login) url.searchParams.set('destination', url.pathname);
+    if (!login || url.pathname !== '/iniciar-sesion') url.searchParams.set('destination', url.pathname);
     return sendRedirect(event, '/api/access/entry' + url.search, 302);
   }
   try {

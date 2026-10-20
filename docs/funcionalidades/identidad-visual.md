@@ -1,5 +1,21 @@
 # Identidad visual y recursos de marca
 
+Reutilización móvil19/10: reunion.png original de landing copiado byte a byte a
+assets/illustrations/reunion.png para HomeReunionCard, sin regeneración ni recorte.
+Tarjeta ilustrada sin acción ficticia, semántica de imagen; comparación SHA256
+idéntica. ADR-093 y ficha fondos-mobile; no cambia el símbolo ni el lettering.
+
+Corrección móvil19/10 (ADR-092): el usuario exige fuente/grosor de la marca web.
+Símbolo ya idéntico byte a byte; cambia el lettering de sans-serif800/mayúsculas
+a «entre huellas» con contornos Arial equivalentes al peso CSS500, #171918 y
+tracking−.05em. BrandName comparte wordmark.svg entre BrandWordmark/StartupReveal,
+en acceso, preparación de cuenta, onboarding, Inicio y arranque. Sin fuente
+instalada/remota ni cambios al cuerpo de textos; etiqueta accesible conservada.
+Layout móvil en dos líneas y tamaño gráfico estables con texto ampliado.
+Asset nuevo requiere nuevo arranque; sin configuración/SQL/permisos nuevos.
+Errores/reintentos existentes conservados. Generador local en tool; validación
+local y Android pendiente en ESTADO. No cierra historias ni actualiza el launcher.
+
 Exportación posterior de23:30 del17/10: repetida sincronización global con el
 generador existente. Cinco copias verificadas idénticas,40 iconos legibles y
 PNG/SVG/favicon nuevos confirmados por HTTP en5173. Sin cambios de componentes,

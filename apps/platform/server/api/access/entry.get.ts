@@ -1,10 +1,10 @@
 import { account, accountCookie, clearAccountCookie } from '../../utils/account';
 import { AccessFailure } from '../../../shared/features/access/domain/access';
-import { accountDestination, routeAccess, sessionRedirect } from '../../../shared/routing/route_policy';
+import { entryDestination, routeAccess, sessionRedirect } from '../../../shared/routing/route_policy';
 
 export default defineEventHandler(async event => {
   const query = getRequestURL(event).searchParams;
-  const requested = accountDestination(query.get('destination'));
+  const requested = entryDestination(query.get('destination'));
   query.delete('destination');
   if (getCookie(event, accountCookie)) {
     try {
@@ -19,5 +19,5 @@ export default defineEventHandler(async event => {
     }
   }
   query.set('entry', 'checked');
-  return sendRedirect(event, '/iniciar-sesion?' + query.toString(), 302);
+  return sendRedirect(event, (requested && routeAccess(requested) === 'guest' ? requested : '/iniciar-sesion') + '?' + query.toString(), 302);
 });

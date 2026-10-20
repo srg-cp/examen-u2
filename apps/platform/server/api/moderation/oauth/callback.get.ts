@@ -3,6 +3,7 @@ import { clearModerationCookie } from '../../../utils/moderation';
 import { moderationConfiguration } from '../../../infrastructure/moderation_session';
 import { oauthCookie, oauthCookiePath, openOAuthFlow } from '../../../infrastructure/social_oauth';
 import { CompleteAccountSocialSignIn } from '../../../../shared/features/access/domain/access';
+import { clearCredentialCookie } from '../../../utils/credentials';
 export default defineEventHandler(async event => {
   const cookie = getCookie(event, oauthCookie), query = getQuery(event);
   deleteCookie(event, oauthCookie, { path: oauthCookiePath, httpOnly: true, sameSite: 'lax', secure: process.env.PUBLIC_WEB_ORIGIN?.startsWith('https://') === true });
@@ -13,7 +14,7 @@ export default defineEventHandler(async event => {
     else {
       const services = account(event);
       const session = await new CompleteAccountSocialSignIn(services.repository).execute(typeof query.code === 'string' ? query.code : '', flow.verifier);
-      services.save(); clearModerationCookie(event);
+      services.save(); clearModerationCookie(event); clearCredentialCookie(event);
       destination = session.profile.onboardingCompleted ? '/inicio' : '/bienvenida';
     }
   } catch { /* Never expose provider errors, codes or tokens. */ }

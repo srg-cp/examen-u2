@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'app_page_background.dart';
 
-/// A flat white curtain covers the content vertically without scaling it.
+/// A curtain with the shared background covers content without scaling it.
 class CoverReveal extends StatelessWidget {
   const CoverReveal({required this.animation, super.key});
   final Animation<double> animation;
@@ -9,7 +10,7 @@ class CoverReveal extends StatelessWidget {
     animation: animation,
     builder: (context, _) => ClipRect(
       clipper: _CoverClipper(Curves.easeInOutCubic.transform(animation.value)),
-      child: const ColoredBox(color: Colors.white, child: SizedBox.expand()),
+      child: const AppPageBackground(child: SizedBox.expand()),
     ),
   );
 }

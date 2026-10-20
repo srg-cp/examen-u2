@@ -2,6 +2,8 @@ import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import '../../../../core/presentation/widgets/glass_surface.dart';
+import 'home_reunion_card.dart';
 import '../state/home_view_state.dart';
 
 class HomeContent extends StatelessWidget {
@@ -16,51 +18,50 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      StaggerRevealItem(
-        order: 0,
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F7),
-            borderRadius: BorderRadius.circular(26),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.pets_outlined,
-                size: 32,
-                color: Color(0xFF111111),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Su regreso empieza contigo',
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
+      GlassSurface(
+        radius: 26,
+        child: StaggerRevealItem(
+          order: 0,
+          child: Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.pets_outlined,
+                  size: 32,
                   color: Color(0xFF111111),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Una comunidad para conectar mascotas perdidas con quienes pueden ayudar.',
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  color: Color(0xFF6E6E73),
+                const SizedBox(height: 16),
+                const Text(
+                  'Su regreso empieza contigo',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF111111),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextButton.icon(
-                onPressed: () => onSelect(HomeSection.pets),
-                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                label: const Text('Conoce Mis mascotas'),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF111111),
-                  padding: EdgeInsets.zero,
+                const SizedBox(height: 8),
+                const Text(
+                  'Una comunidad para conectar mascotas perdidas con quienes pueden ayudar.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.4,
+                    color: Color(0xFF6E6E73),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextButton.icon(
+                  onPressed: () => onSelect(HomeSection.pets),
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  label: const Text('Conoce Mis mascotas'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF111111),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -112,8 +113,10 @@ class HomeContent extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 28),
+      const HomeReunionCard(),
+      const SizedBox(height: 28),
       StaggerRevealItem(
-        order: 2,
+        order: 3,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

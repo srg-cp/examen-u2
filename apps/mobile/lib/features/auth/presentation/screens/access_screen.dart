@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,8 +23,7 @@ class AccessScreen extends ConsumerWidget {
       message: login.message ?? '',
       isError: true,
       noticeId: login.errorId,
-      child: Scaffold(
-        backgroundColor: Colors.white,
+      child: AppScaffold(
         body: AuthPageLayout(
           title: 'Iniciar sesión',
           reveal: true,

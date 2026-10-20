@@ -1,5 +1,36 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Glass estable y reunión en Inicio —19/10/2026
+
+GlassSurface envuelve StaggerRevealItem en las tarjetas de Inicio, de modo que
+el material no recibe blur/opacidad de entrada; solo entra el contenido.
+Conservar radio26 y padding22 de la tarjeta principal. HomeReunionCard añade
+el PNG original de landing, contenido3:2/padding12, sin recortar mascotas ni
+acciones inventadas. Secuencia: tarjeta principal, accesos rápidos, reunión,
+Cerca de ti (cuatro grupos). ADR-093; comparar ribete durante/final de entrada.
+
+## Marca móvil alineada con web —19/10/2026
+
+BrandName/wordmark.svg sustituye el texto anterior en BrandWordmark y StartupReveal:
+minúsculas, contornos Arial de peso CSS500, #171918 y tracking−.05em. Conservar
+el símbolo, posición y escala por pantalla; tamaños gráficos estables con texto2,
+semántica del contenedor y FittedBox en anchos pequeños. Gap7/16px según tamaño
+compacto/grande. No aplicar Arial al cuerpo de la app ni crear logos alternativos.
+Revisar acceso, bienvenida, Inicio y arranque. ADR-092.
+
+## Fondo móvil compartido —19/10/2026
+
+AppScaffold sustituye fondos blancos exteriores de pantallas Flutter y compone
+AppPageBackground por fuera del Scaffold transparente. Corrección ADR-091:
+blanco con cinco nubes azules a distintas alturas y movimiento suave de24s;
+trayectorias cerradas, pausa accesible/TickerMode, sin rebuild del contenido.
+HomeContent usa GlassSurface/radio26 en la tarjeta principal con padding22 y
+acción originales. Sustituye la distribución estática de ADR-088.
+Conservar áreas seguras/scroll y el tamaño completo del fondo con teclado.
+CoverReveal y OriginPageTransition reutilizan fondo; no recolorear superficies
+de campos, otras tarjetas, fotos/mapas o paneles. Verificar
+acceso/onboarding/Inicio/formularios, texto2 y movimiento reducido.
+
 ## Marca de cabecera compartida —19/10/2026
 
 SiteBrand/SiteHeader sustituyen las marcas independientes: misma posición,

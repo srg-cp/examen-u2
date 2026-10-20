@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../domain/failures/preference_failure.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
@@ -52,8 +53,7 @@ class AlertPreferencesScreen extends ConsumerWidget {
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) back();
         },
-        child: Scaffold(
-          backgroundColor: Colors.white,
+        child: AppScaffold(
           body: ScrollSafeArea(
             top: false,
             child: Center(

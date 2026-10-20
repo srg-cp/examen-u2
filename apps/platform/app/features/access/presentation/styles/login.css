@@ -13,7 +13,6 @@
 .reader-shell .login-field-icon{position:absolute;left:18px;top:26px;width:22px;height:22px;pointer-events:none;z-index:1}
 .reader-shell .login-password-toggle{position:absolute;right:8px;top:14px;display:grid;place-items:center;width:48px;height:48px;padding:12px;background:transparent;border:0;border-radius:50%;color:#6e6e73}
 .reader-shell .login-password-toggle svg{width:22px;height:22px;pointer-events:none}
-.reader-shell .login-field input:focus-visible{outline:2px solid #3c537b;outline-offset:3px}
 .reader-shell .login-field.invalid{color:#b53f48}
 .reader-shell .login-field.invalid input{border:2px solid #b53f48}
 .reader-shell .login-field.shake{animation:login-shake .28s ease-in-out}

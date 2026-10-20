@@ -1,5 +1,12 @@
 # Icono de Entre Huellas
 
+Lettering móvil19/10 (ADR-092): wordmark.svg contiene únicamente los contornos
+de «entre huellas» en Arial, como SiteBrand web (peso CSS500, tracking−.05em,
+#171918). BrandName lo reutiliza en pantallas y arranque. El icono no cambia.
+Regenerar desde apps/mobile con fonttools disponible:
+`py tool/generate_brand_wordmark.py C:/Windows/Fonts/arial.ttf`.
+Solo se exportan paths del lettering; no se incluye un archivo de fuente en la app.
+
 Mapa18/10/2026: only-black.svg también es la fuente del símbolo de los pines.
 apps/mobile/assets/branding/only-black.svg conserva bytes idénticos; el script
 generate_android_icons.ps1 la sincroniza junto a las demás copias. flutter_svg

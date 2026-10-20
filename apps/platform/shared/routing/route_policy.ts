@@ -1,10 +1,13 @@
-export type RouteAccess = 'public' | 'guest' | 'account' | 'onboarding' | 'reviewer';
+export type RouteAccess = 'public' | 'guest' | 'account' | 'onboarding' | 'reviewer' | 'recovery';
 
 // Every page must be registered here; the architecture check compares this
 // inventory with app/pages, including redirects and the public 404 fallback.
 export const routePolicies: Readonly<Record<string, RouteAccess>> = Object.freeze({
   '/': 'public',
   '/iniciar-sesion': 'guest',
+  '/crear-cuenta': 'guest',
+  '/recuperar-contrasena': 'guest',
+  '/restablecer-contrasena': 'recovery',
   '/inicio': 'account',
   '/bienvenida': 'onboarding',
   '/moderacion': 'reviewer',
@@ -30,7 +33,7 @@ export function routeAccess(path: string, policies: Readonly<Record<string, Rout
 }
 
 export function sessionRedirect(access: RouteAccess, onboardingCompleted: boolean): string | null {
-  if (access === 'public') return null;
+  if (access === 'public' || access === 'recovery') return null;
   if (!onboardingCompleted) return access === 'onboarding' ? null : '/bienvenida';
   return access === 'guest' || access === 'onboarding' ? '/inicio' : null;
 }
@@ -39,6 +42,10 @@ export function sessionRedirect(access: RouteAccess, onboardingCompleted: boolea
 export function accountDestination(value: unknown): string | null {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || /[\s?#\\]/.test(value)) return null;
   return ['account', 'onboarding', 'reviewer'].includes(routeAccess(value)) ? value : null;
+}
+export function entryDestination(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  return ['/crear-cuenta', '/recuperar-contrasena', '/iniciar-sesion'].includes(value) ? value : accountDestination(value);
 }
 
 export function assertRegisteredRoutes(paths: readonly string[]): void {

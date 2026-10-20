@@ -1,5 +1,31 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Glass de Inicio19/10:** superficie/ribete de tarjetas glass fuera de
+StaggerRevealItem; animar su contenido para evitar variar el material durante
+la entrada. Mantener el aspecto final, radios y geometría. HomeReunionCard usa
+reunion.png original de web, imagen3:2 contenida en card glass entre accesos
+rápidos y Cerca de ti, sin acción ficticia. Inicio tiene cuatro grupos. ADR-093.
+
+**Marca móvil19/10:** por instrucción del usuario, lettering igual al web:
+«entre huellas», Arial/peso CSS500, #171918, tracking−.05em. Reutilizar BrandName
+(contornos SVG) desde BrandWordmark y StartupReveal; sin sans-serif800 o mayúsculas
+alternativos. Mantener símbolo oficial, tamaños/posición por recorrido, semántica
+y disposición móvil en dos líneas. Marca como arte gráfico estable con FittedBox;
+los demás textos conservan ampliación y tipografía. Seguir ADR-092.
+
+**Fondo móvil19/10/2026, corrección vigente:** blanco con nubes azules difuminadas
+distribuidas arriba, en medio y abajo, con movimiento suave continuo de24s.
+Pausa por movimiento reducido y TickerMode; pintura aislada sin reconstruir UI.
+La tarjeta principal «Su regreso empieza contigo» reutiliza GlassSurface/radio26,
+transparencia, blur y ribete compartidos; contenido/padding/acción conservados.
+ADR-091 sustituye fondo estático/concentrado arriba de ADR-088 y el degradado086;
+no trasladar la composición ni funciones de logística. Web conserva ADR-083.
+Usar AppScaffold/AppPageBackground compartidos, también en arranque Flutter y
+onboarding; fondo exterior fijo al viewport, fuera del scroll/teclado/insets.
+CoverReveal y expansión desde origen acompañan la paleta, con efectos/tiempos
+conservados. Campos, tarjetas, fotos, mapas y modales conservan superficies.
+Sin cambios de splash nativo o landing web. Seguir ADR-091.
+
 **Cartografía móvil19/10:** CARTO Positron configurado por el usuario conserva
 los pines de marca y muestra créditos enlazados legibles arriba a la derecha,
 con retorno separado y reintento debajo. La confirmación actual sustituye la

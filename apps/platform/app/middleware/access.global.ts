@@ -1,10 +1,18 @@
 import { routeAccess, sessionRedirect } from '#shared/routing/route_policy';
+import { CredentialFailure } from '#shared/features/access/domain/credentials';
 
 export default defineNuxtRouteMiddleware(async to => {
   // Server middleware uses the same policy before any page HTML is generated.
   if (import.meta.server) return;
   const access = routeAccess(to.path);
   if (access === 'public') return;
+  if (access === 'recovery') {
+    const model = useNuxtApp().$credentialModel();
+    try { await model.checkResetAccess(); }
+    catch (error) { if (error instanceof CredentialFailure && error.kind === 'expired') return navigateTo('/recuperar-contrasena?reason=expired', { replace: true }); }
+    finally { model.dispose(); }
+    return;
+  }
   const model = useNuxtApp().$accessModel();
   try {
     await model.checkSession();

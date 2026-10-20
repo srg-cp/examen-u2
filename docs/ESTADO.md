@@ -1,5 +1,217 @@
 # Estado del proyecto
 
+## Glass estable al entrar e ilustración de reunión en Inicio —19/10/2026
+
+Por capturas del usuario, se retira GlassSurface del efecto ImageFiltered/Opacity
+de entrada: la superficie principal envuelve ahora el stagger de su contenido.
+Conserva material/radio26/padding22/acción. El fondo animado sigue reflejándose,
+sin aplicar un acabado temporal distinto al glass. HomeReunionCard añade el PNG
+original de platform/images/landing/reunion.png en card glass3:2, sin recorte,
+con etiqueta accesible y sin acción ficticia. Copia verificada por SHA256 idéntico.
+Ubicada entre accesos rápidos y Cerca de ti; cuatro grupos de entrada. Sin cambios
+web, datos, permisos, SQL, HU/issue nuevos ni cierre de historias. ADR-093.
+
+Validación:18 comprobaciones aprobadas de Inicio/arquitectura/harness y regresión
+visual nueva que compara píxeles del ribete y geometría durante/final de entrada,
+asset presente y acción Mis mascotas conservada. Análisis sin incidencias.
+Harness actualizado repetido y aprobado; home.png y home_reunion.png revisadas,
+con las mascotas completas, fondo transparente y sin recorte. Capturas pequeñas
+con texto2 del mismo harness conservadas sin overflow. Formato/análisis finales
+sin incidencias. Sin instalación/APK
+ni revisión Android nueva. Siguiente paso: inspección visual del nuevo card y
+revisión del usuario tras reiniciar para incorporar el asset.
+
+## Lettering móvil igual al de la web —19/10/2026
+
+Por petición explícita, BrandWordmark y StartupReveal comparten BrandName con
+lettering «entre huellas»: contornos de Arial regular equivalentes al peso500
+disponible en web, #171918, tracking−.05em y dos líneas para el layout móvil.
+Gap7px compacto/16px grande. Icono oficial verificado idéntico por SHA256 entre
+app_icon.png y /brand.png. Se retira sans-serif800/mayúsculas de ambas variantes.
+SVG de paths sin fuente instalada/remota; script local de exportación añadido,
+sin dependencias runtime nuevas. Tamaño gráfico explícito y etiqueta accesible
+conservados; cuerpo de textos y ampliación ajenos a la marca no cambian.
+ADR-092, reglas, diseño y ficha identidad-visual actualizados. Sin cambios web,
+launcher, dominio, datos, permisos o nuevas HU/issue/cierres.
+
+Validación:30 comprobaciones de arranque/Inicio/app/onboarding/arquitectura y
+harness visual aprobadas. Formato correcto y análisis sin incidencias. Capturas
+acceso/Inicio normal/pequeño revisadas en apps/mobile/build/ui-preview. Se ajustó
+la geometría gráfica para evitar overflow de onboarding en320×350/texto2.
+Sin nueva instalación Android; siguiente paso: revisar capturas y abrir la app
+con asset nuevo tras detener/iniciar. No se genera APK ni se despliega.
+
+## Hover glass web con mayor presencia —19/10/2026
+
+El usuario considera casi imperceptible el primer hover. Se refuerza el borde
+a#8FA9C4, el ribete interior de1 a2px y el reflejo blanco/azul. Sin halo exterior,
+cambios de tamaño o alteración de foco/error/táctil/disabled/readonly.
+ADR-090, regla web y ficha de acceso actualizadas con la corrección.
+
+Validación: build .nuxt-input-hover correcto; QA Chrome fixture verifica nueva
+intensidad/borde, geometría estable y estados anteriores conservados. Captura
+hover-desktop.png en apps/mobile/build/ui-preview/web-input-hover regenerada y
+revisada. Sin errores JavaScript; git diff --check correcto. Sin despliegue.
+Siguiente paso: revisión visual del usuario sobre la intensidad actual.
+
+## Nubes móviles en toda la altura y tarjeta glass —19/10/2026
+
+Por nueva referencia del usuario, «Su regreso empieza contigo» usa GlassSurface
+compartido/radio26 en lugar de gris opaco, conservando padding22, textos y acción.
+AppPageBackground distribuye cinco nubes azules por todo el viewport y las mueve
+con trayectorias suaves cerradas de24s. Pintura aislada por RepaintBoundary sin
+reconstruir contenido; controlador pausado con movimiento reducido/TickerMode y
+liberado al desmontar. Conserva insets/scroll/teclado y capas de transición.
+ADR-091 sustituye distribución estática de ADR-088. Sin cambios de web, datos,
+permisos, SQL, HU/RF/issue nuevos ni cierre de historias.
+
+Validación:30 comprobaciones aprobadas de Inicio/arranque/reveal/arquitectura,
+harness visual y test nuevo significativo de movimiento real de píxeles, contenido
+sin rebuild, pausa/reanudación y liberación. Regresiones/capturas fijan solo la
+animación ambiental mediante AMBIENT_BACKGROUND_MOTION=false; el test nuevo
+fuerza animate:true. Comando CI/README actualizados, sin ejecución remota de CI.
+Análisis sin incidencias; capturas390×844 y320×350/texto2 revisadas en
+apps/mobile/build/ui-preview (home.png muestra tarjeta glass y fondo completo).
+Sin nueva ejecución Android/APK. Pendiente revisar fluidez/coste del blur y
+sensación del movimiento en dispositivo; renders no acreditan ese rendimiento.
+Siguiente paso: revisión visual del usuario con ejecución móvil actualizada.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-091](decisiones/091-nubes-mobile-animadas-y-tarjeta-glass.md).
+
+## Hover glass fino en campos web —19/10/2026
+
+Por petición del usuario, los campos compartidos de reader-shell tienen hover
+con borde tenue#CAD6E3, reflejo blanco/azulado y luz inset1px, sin halo exterior.
+Solo puntero fino con hover y campos habilitados/editables sin foco ni error;
+foco interior/errores conservados. Sin cambios de geometría/padding/fondo base.
+Transición180ms de borde/sombra; movimiento reducido elimina transición.
+Landing, controles checkbox/radio/range/file y dispositivos táctiles conservados.
+[ADR-090](decisiones/090-hover-glass-interior-campos-web.md), regla/ficha actualizadas.
+
+Validación: build Nuxt aprobado (.nuxt-input-hover); Chrome de producción con
+fixture verifica hover/borde/reflejo interior, geometría idéntica, prioridad de
+foco/error, exclusión disabled/readonly y ausencia de hover en contexto táctil.
+Movimiento reducido comprobado; sin errores JavaScript. Captura escritorio
+revisada en apps/mobile/build/ui-preview/web-input-hover/hover-desktop.png.
+git diff --check correcto. Sin tests permanentes nuevos para este ajuste CSS.
+Sin SQL, Flutter, operaciones remotas, despliegue o cierre de HU. Siguiente paso:
+revisión visual del usuario sobre la intensidad del reflejo.
+
+## Foco interior en campos web —19/10/2026
+
+Por referencia explícita del usuario, el contorno de foco de los campos crece
+hacia dentro: outline2px con offset−2px, sin aro exterior ni cambios de geometría.
+Regla compartida en reader-shell para inputs de texto, textarea y select;
+retirados overrides exteriores de acceso, moderación y avistamientos. Se mantiene
+azul#3C537B y rojo#B53F48 cuando aria-invalid=true. :where evita que las exclusiones
+de tipos ganen especificidad al estado de error. Botones/enlaces, controles
+checkbox/radio/range/file y landing conservan su foco. Sin cambios de negocio.
+[ADR-089](decisiones/089-foco-interior-inputs-web.md), regla web y ficha actualizadas.
+
+Validación local: build Nuxt correcto (.nuxt-input-focus); QA Chrome de producción
+con fixture a1440/390 verifica foco interior2px por clic/teclado, geometría y
+padding idénticos antes/después, error rojo y herencia en login/registro/moderación.
+Sin errores JavaScript. Captura móvil revisada en apps/mobile/build/ui-preview/
+web-input-focus/login-focus-390.png. git diff --check correcto. Avistamientos
+verificado por retirada del override y herencia CSS; sin envío real nuevo.
+Sin SQL, Flutter, despliegue ni cambios de Auth/SMTP. Siguiente paso: revisión
+visual del usuario sobre el foco interior.
+
+## Corrección del fondo móvil según referencia —19/10/2026
+
+El usuario rechaza el degradado vertical y aporta referencia de pantallas de
+envíos. AppPageBackground ahora pinta blanco con nubes azules difuminadas arriba,
+aperturas blancas y reflejo frío tenue inferior izquierdo. Radiales proporcionales
+al viewport, estáticos y sin dependencia/bitmap. Alcance compartido y superficies
+conservados; CoverReveal y OriginPageTransition reutilizan el nuevo fondo.
+ADR-088 sustituye la paleta de ADR-086; web/landing conservadas. Sin operaciones,
+permisos, SQL, HU/issue nuevos ni cierre de historias.
+
+Validación:22 comprobaciones existentes de arranque/reveal/arquitectura y harness
+visual aprobadas. Capturas acceso/onboarding/Inicio/perfil revisadas en
+apps/mobile/build/ui-preview, con390×844 y320×350/texto2. Formato correcto y
+análisis final sin incidencias.
+Sin instalación ni revisión Android de este ajuste; render local no certifica
+identidad exacta con la captura ni aprobación del usuario. Siguiente paso:
+revisar el fondo en su ejecución móvil actualizada.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-088](decisiones/088-fondo-mobile-nubes-azules-referencia.md).
+
+## Registro, verificación y recuperación web completos en local —19/10/2026
+
+Por autorización del usuario se trasladan los recorridos de acceso móvil a web:
+Crear cuenta (nombre/correo/contraseña/confirmación), código6 con reenvío60s,
+recuperar acceso por código y guardar nueva contraseña. Enlaces reales en login;
+/crear-cuenta y /recuperar-contrasena con política guest, /restablecer-contrasena
+con recovery en la política única SSR/cliente. Registro confirmado entra al
+onboarding por cuenta; autoconfirmación Auth también compatible. Misma cuenta,
+full_name y perfil existentes, sin autoasignar roles.
+
+CredentialScreen observa CredentialViewModel y casos de uso concretos;
+HTTP/Auth tras repositorios/fuentes por petición. Recuperación usa cookie cifrada
+HttpOnly eh_credentials con propósito/AAD propio, id/espera/vencimiento y token
+solo en servidor/cookie. Nunca establece eh_access al verificar recovery;
+API general/moderación y páginas de cuenta siguen inaccesibles con esa capacidad.
+Reset revalida identidad y vencimiento antes de PUT Auth. Progreso sin tokens
+en JSON y sin datos de usuario en SSR. Pendiente máximo30min, reset máximo10min
+limitado por JWT; no se afirma el vencimiento remoto del código. Cancelar/confirmar
+retiran cookie; login/logout/OAuth confirmado limpian flujos anteriores. Conflicto
+de pestaña no borra el flujo nuevo. Sin reintentos automáticos de escrituras.
+
+UI mantiene fondo/orbe, marca responsive compartida, retorno glass sobre scroll,
+StaggerReveal, skeleton, shimmer de acciones y toast superior/invalid/shake.
+Recargar restaura etapa; falla de red conserva datos y permite reintentar.
+Mensajes de registro/recuperación no confirman existencia del correo.
+
+Validación local: typecheck y build Nuxt con .nuxt-credentials;54 pruebas unitarias/
+arquitectura y26 de servidor aprobadas (8 unitarias y5 de producción nuevas).
+Chrome fixture prueba registro inválido/coincidencia, código rechazado y correcto,
+restauración al recargar, llegada a onboarding; recuperación, nueva contraseña,
+fallo/reintento de guardado, éxito y login con nueva clave, cancelación, bloqueo
+de dobles envíos/shimmer y reset protegido SSR/SPA sin montar campos sin capacidad.
+18 capturas en apps/mobile/build/ui-preview/web-credentials a1440/390/320 con
+texto200%; revisados registro móvil y reset pequeño con texto ampliado. Sin
+overflow/CSP/hidratación/JavaScript. QA Chrome de acceso anterior también aprobado:
+Google/Facebook PKCE fixture, cuenta/revisión, permisos/revocación, expiración,
+onboarding, logout entre pestañas y responsive1920/1440/731/390/320/texto200%.
+git diff --check correcto.
+
+Documentados [ADR-087](decisiones/087-registro-y-recuperacion-web.md), reglas,
+arquitectura, guía, ficha/índice de acceso y desarrollo. Incremento HU-01/RF-01,34,
+sin nueva HU/issue ni cierre de historia. Sin SQL, cambios de Flutter propios de
+este incremento, variables nuevas, modificación Auth/SMTP remota o publicación.
+Trabajo paralelo móvil conservado. No acredita paridad global de funcionalidades.
+
+Pendiente demo con correo real y configuración efectiva de Auth: registro/correo
+habilitados, OTP6, SMTP y plantillas existentes con .Token. Ningún correo real
+enviado en las pruebas. Una respuesta perdida tras consumir código o actualizar
+clave puede requerir volver al login/reenvío; no se promete rollback ni revocación
+inmediata de JWT al cerrar localmente. Sin bloqueo de implementación local.
+Siguiente paso: probar ambos correos y el acceso final con una cuenta de desarrollo.
+
+## Fondo móvil con la regla de la web interior —19/10/2026
+
+Por instrucción del usuario se sustituye el fondo blanco exterior móvil por
+#E5EFFF → #F5F7FA55% → #FFFFFF. AppPageBackground/AppScaffold compartidos cubren
+las12 composiciones existentes de Scaffold: arranque Flutter, preparación de
+cuenta, acceso/registro/contraseña, onboarding, Inicio, perfil, preferencias,
+ubicaciones, EntityScreenShell y mapa inmersivo cuando no lo cubre la cartografía.
+Fondo fuera de áreas seguras y del ajuste de teclado; scroll conserva viewport.
+CoverReveal y expansión desde origen usan paleta compartida. Campos, tarjetas,
+fotos, mapas, paneles y splash nativo conservados. Sin orbes nuevos, SQL, dominio,
+datos, permisos o cambios web. ADR-086, reglas y ficha fondos-mobile actualizados;
+sin nueva HU/issue ni cierre de historias.
+
+Validación:53 pruebas existentes focalizadas de acceso/Inicio/app/onboarding/
+arranque/transiciones/creación de reportes/arquitectura aprobadas, más1 harness
+visual aprobado (54 en total). Formato de lib y harness correcto; análisis sin
+incidencias. Capturas de acceso, onboarding, Inicio y perfil revisadas en
+apps/mobile/build/ui-preview, incluyendo320×350/texto2 y390×844. El harness
+se actualiza para usar el retorno Volver real del reporte y simular path_provider;
+sin modificar navegación de producto. Sin pruebas nuevas de negocio.
+Emulador Android detectado al cierre; no se instaló/adjuntó una ejecución ni se
+generó APK. La evidencia es Flutter test/render local, sin backend real.
+Siguiente paso: revisar el fondo en la ejecución Android actualizada del usuario.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-086](decisiones/086-fondo-mobile-compartido-frio.md).
+
 ## Marca grande en login responsive —19/10/2026
 
 Por captura explícita del usuario, login hasta600px reutiliza SiteHeader/SiteBrand

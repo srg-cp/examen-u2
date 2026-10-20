@@ -1,5 +1,38 @@
 # Entre Huellas: reglas de UI y UX web
 
+## Hover glass fino de campos —19/10/2026
+
+Por petición del usuario, inputs de texto/textarea/select comparten hover con
+borde#8FA9C4, reflejo blanco/azulado visible y ribete interior2px, sin halo exterior
+ni cambios de tamaño. Solo ratón/puntero fino con hover y campos editables,
+habilitados, sin error/foco. Foco interior ADR-089 conserva prioridad; táctil y
+estados disabled/readonly/error no reciben hover. Transición180ms con movimiento
+reducido respetado. Regla compartida en reader-shell; landing conservada.
+[ADR-090](decisiones/090-hover-glass-interior-campos-web.md).
+
+## Foco interior de campos —19/10/2026
+
+Por referencia del usuario, inputs de texto, textarea y select dibujan el foco
+hacia dentro: outline2px, offset−2px, azul#3C537B; con aria-invalid=true rojo#B53F48.
+Sin aro exterior, cambio de tamaño/padding ni desplazamiento de etiquetas/iconos.
+Regla única en reader-shell, sin overrides de foco por funcionalidad. Botones,
+enlaces, checkbox/radio/range/file y landing conservan su estilo de foco.
+No se copia el tema oscuro ni el corte de etiqueta de la referencia.
+[ADR-089](decisiones/089-foco-interior-inputs-web.md).
+
+## Registro y recuperación web —19/10/2026
+
+Acceso incluye Crear cuenta y ¿Olvidaste tu contraseña? hacia recorridos reales.
+Registro/código/recuperación/nueva contraseña reutilizan la composición responsive
+del login y sus componentes compartidos; marca estable fuera del stagger,
+retorno glass sticky sobre scroll, fondo frío y orbe conservados. Error/validación/
+resultado en TopToast; invalid/shake en campos. Skeleton inicial y shimmer en
+trabajo real, etiqueta estable; reenvío60s deshabilitado sin shimmer por cooldown.
+Al avanzar se limpian contraseñas/código; conservar formulario ante fallo real.
+No anunciar existencia de cuenta, envío efectivo ni éxito antes de confirmación.
+El flujo de código se restaura por cookie privada, sin datos de cuenta en SSR.
+[ADR-087](decisiones/087-registro-y-recuperacion-web.md).
+
 ## Excepción responsive de marca en login —19/10/2026
 
 Por referencia explícita del usuario, el login hasta600px muestra el logo76px

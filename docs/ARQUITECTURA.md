@@ -1,5 +1,34 @@
 # Arquitectura de Entre Huellas
 
+## Lettering móvil de marca —19/10/2026
+
+BrandName de core/presentation renderiza contornos SVG de Arial de la marca web,
+sin fuente remota/SDK ni cambios al tema de texto general. BrandWordmark y arranque
+lo reutilizan. Recurso estático registrado en pubspec; símbolo oficial conservado.
+Generador local sin dependencias runtime nuevas. ADR-092.
+
+## Registro y recuperación web por código —19/10/2026
+
+CredentialScreen → CredentialViewModel → casos de uso concretos de credentials.ts
+→ CredentialRepository. Bootstrap inyecta HttpCredentialRepository; Nitro compone
+ServerCredentialRepository/CredentialSource/AccountSource por petición. Cifrado
+del flujo en infraestructura y cookies/HTTP en utilidades de composición.
+Registro confirmado establece sesión general revalidada, con onboarding por cuenta.
+Recovery permanece en cookie temporal aislada; política única SSR/cliente protege
+restablecer contraseña sin permitir cuenta/moderación. Sin SQL, SDK cliente o
+tokens en payload SSR. [ADR-087](decisiones/087-registro-y-recuperacion-web.md).
+
+## Fondo de presentación móvil —19/10/2026
+
+AppPageBackground pinta un fondo blanco con nubes radiales azules animadas a
+distintas alturas (ADR-091 sustituye distribución estática de ADR-088). Controlador
+local con pausa accesible/TickerMode, repintado aislado y liberación al desmontar.
+HomeContent reutiliza GlassSurface en su tarjeta principal, sin nuevo material.
+AppScaffold de core/presentation lo compone detrás del Scaffold transparente,
+fuera del ajuste de teclado. Pantallas existentes y EntityScreenShell lo reutilizan;
+CoverReveal y OriginPageTransition comparten el mismo fondo. No cambia contratos,
+dominio, data, providers ni bootstrap; sin dependencia de presentación web. ADR-086.
+
 ## Cartografía móvil configurable —19/10/2026
 
 ZoneMapPicker mantiene flutter_map y recibe la URL pública de cartografía desde

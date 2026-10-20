@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'app_page_background.dart';
 
 /// Visual identity of a navigation trigger, captured in Navigator coordinates.
 class OriginPageSource {
@@ -66,11 +67,7 @@ class OriginPageTransition extends StatelessWidget {
                 rect: surface,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Color.lerp(
-                      source?.color ?? Colors.white,
-                      Colors.white,
-                      progress,
-                    ),
+                    color: source?.color ?? Colors.white,
                     borderRadius: BorderRadius.circular(radius),
                     boxShadow: progress > 0 && progress < 1
                         ? const [
@@ -84,6 +81,14 @@ class OriginPageTransition extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
+                        Positioned.fill(
+                          child: Opacity(
+                            opacity: progress,
+                            child: const AppPageBackground(
+                              child: SizedBox.expand(),
+                            ),
+                          ),
+                        ),
                         OverflowBox(
                           alignment: Alignment.topLeft,
                           minWidth: bounds.width,

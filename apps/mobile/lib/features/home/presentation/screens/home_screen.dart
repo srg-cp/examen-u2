@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,7 @@ class HomeScreen extends ConsumerWidget {
     final animateContent =
         state.section != HomeSection.pets &&
         (state.section != HomeSection.explore || exploreContent == null);
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return AppScaffold(
       body: ScrollSafeArea(
         top: true,
         child: Center(
@@ -79,7 +79,7 @@ class HomeScreen extends ConsumerWidget {
                             builder: (play) => StaggerReveal(
                               enabled: animateContent,
                               key: ValueKey(state.section),
-                              count: state.section == HomeSection.home ? 3 : 2,
+                              count: state.section == HomeSection.home ? 4 : 2,
                               play: play,
                               child: Padding(
                                 padding: EdgeInsets.fromLTRB(

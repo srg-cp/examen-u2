@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/startup_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/brand_mark.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/brand_name.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 
@@ -39,10 +40,10 @@ void main() {
       expect(opacity, inExclusiveRange(0, 1));
       await tester.pump(const Duration(milliseconds: 200));
       final iconOvershoot = tester.getTopLeft(find.byType(BrandMark));
-      final textOvershoot = tester.getTopLeft(find.text('Entre\nHuellas'));
+      final textOvershoot = tester.getTopLeft(find.byType(BrandName));
       await tester.pump(const Duration(milliseconds: 200));
       final iconSettled = tester.getTopLeft(find.byType(BrandMark));
-      final textSettled = tester.getTopLeft(find.text('Entre\nHuellas'));
+      final textSettled = tester.getTopLeft(find.byType(BrandName));
       expect(iconOvershoot.dx, lessThan(iconSettled.dx));
       expect(textOvershoot.dx, greaterThan(textSettled.dx));
       expect(iconOvershoot.dy, iconStart.dy);

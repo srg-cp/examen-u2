@@ -1,5 +1,16 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Registro y recuperación web autorizados —19/10/2026
+
+El usuario autoriza completar los recorridos de acceso ya existentes en móvil:
+crear cuenta, verificar/reenviar código y recuperar/guardar nueva contraseña.
+Incremento web de HU-01/RF-01,34, sin nueva HU/issue ni cierre de #17/#18/#20/#22
+por arrastre (su evidencia móvil conserva su propio alcance). Las notas históricas
+de registro/recuperación web pendientes quedan sustituidas por esta implementación
+local. Conserva onboarding y gestión por permisos. [ADR-087](decisiones/087-registro-y-recuperacion-web.md),
+[ficha](funcionalidades/acceso-web.md). No añade perfil editable, baja/exportación,
+administración, SQL o despliegue; demo SMTP/Auth real pendiente.
+
 ## Corrección compartida del reveal web —19/10/2026
 
 Corrección transversal de presentación en inicio, moderación, QR y avistamientos.

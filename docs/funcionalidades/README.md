@@ -1,5 +1,24 @@
 # Funcionalidades de Entre Huellas
 
+Inicio móvil19/10: [glass estable y tarjeta de reunión](fondos-mobile.md),
+con imagen original de web y superficie fuera del stagger. ADR-093.
+
+Marca móvil19/10: [identidad visual](identidad-visual.md) usa el mismo lettering
+Arial de web en BrandWordmark/arranque, conservando símbolo oficial. ADR-092.
+
+Móvil19/10: [nubes en toda la altura con movimiento y tarjeta principal glass](fondos-mobile.md),
+reutilizando el material compartido; pausa accesible y por ruta oculta. ADR-091.
+
+Corrección móvil19/10: [fondo blanco con nubes azules](fondos-mobile.md) según
+referencia aportada; ADR-088 sustituye el degradado inicial de ADR-086.
+
+Acceso web19/10: [registro, verificación de correo y recuperación por código](acceso-web.md)
+implementados localmente, con capacidad recovery aislada; ADR-087. Demo SMTP real
+pendiente; no equivale a paridad global ni cierre de HU.
+
+Móvil19/10: [fondo frío compartido](fondos-mobile.md), con los mismos colores
+del resto de la web; arranque, shells y transiciones existentes. ADR-086.
+
 Cartografía móvil19/10: [Positron y crédito compartido](cartografia-mobile.md),
 con pines de marca conservados; ADR-084 sustituye ADR-054 para mapas CARTO.
 

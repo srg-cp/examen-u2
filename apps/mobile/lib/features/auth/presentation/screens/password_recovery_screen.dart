@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -94,8 +95,7 @@ class PasswordRecoveryScreen extends ConsumerWidget {
         },
         child: StaggerReveal(
           count: 9,
-          child: Scaffold(
-            backgroundColor: Colors.white,
+          child: AppScaffold(
             body: AuthPageLayout(
               title: title,
               showClose: true,

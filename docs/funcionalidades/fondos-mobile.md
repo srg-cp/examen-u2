@@ -1,0 +1,37 @@
+# Fondo compartido de la aplicación móvil
+
+Corrección19/10 (ADR-093): glass principal fuera del efecto de blur/opacidad de
+entrada, solo contenido animado; material y geometría estables. Se añade tarjeta
+HomeReunionCard con PNG idéntico al original web, imagen3:2 contenida y etiqueta
+accesible, entre accesos rápidos y Cerca de ti. Sin interacción ficticia.
+Fondo animado conserva su movimiento y reflejos naturales sobre el glass.
+Regresión de píxeles/ribete y18 comprobaciones aprobadas; render nuevo y límites
+de dispositivo en ESTADO. Requiere reiniciar para registrar el asset nuevo.
+
+Actualización19/10/2026: instrucción visual transversal, sin nueva HU/issue.
+[ADR-091 vigente](../decisiones/091-nubes-mobile-animadas-y-tarjeta-glass.md),
+que amplía ADR-088 con distribución completa, movimiento y tarjeta glass.
+
+- **Qué hace:** fondo exterior blanco con nubes azules suaves en toda la altura,
+  con movimiento continuo de24s; tarjeta principal de Inicio translúcida usando
+  GlassSurface compartido. Sin crema ni degradado vertical uniforme.
+- **Recorrido:** arranque Flutter, cuenta/acceso/registro/contraseña, bienvenida,
+  Inicio, perfil, preferencias, ubicaciones y pantallas basadas en EntityScreenShell
+  comparten AppScaffold/AppPageBackground. También cubre estados sin mapa visible.
+- **Reglas:** fondo detrás de áreas seguras y contenido; fijo al viewport durante
+  scroll y teclado. CoverReveal y expansión desde origen usan la misma paleta.
+  Se conservan campos, otras tarjetas, fotos, mapas, paneles y modales. Cabeceras,
+  animaciones existentes, insets y movimiento reducido mantienen su comportamiento.
+- **Persistencia/permisos:** no añade almacenamiento, configuración o servicios;
+  conserva sesiones, ViewModels, casos de uso y permisos.
+- **Errores/reintentos:** conserva skeleton/shimmer, toast y acciones reales.
+- **Activación/dependencias:** código Flutter compartido; sin paquetes nuevos ni
+  configuración remota. Hot reload o nuevo arranque con la compilación actualizada.
+- **Movimiento:** respeta accesibilidad y TickerMode; controlador liberado al
+  desmontar. Pintura separada del contenido, sin reconstruir formularios/acciones.
+- **Límites:** splash nativo conservado. Rendimiento Android físico pendiente;
+  renders locales no sustituyen esa revisión.
+- **Validación:**30 comprobaciones aprobadas, incluida animación real/pausas/
+  liberación y harness visual. Capturas normal/pequeña con texto2 revisadas.
+  Las regresiones usan AMBIENT_BACKGROUND_MOTION=false para fijar solo el fondo;
+  el test específico fuerza animate:true. Formato/análisis sin incidencias.

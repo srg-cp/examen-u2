@@ -78,7 +78,7 @@ test('Every registered route applies the common policy on SSR, including public 
    assert.equal(r.status, 302, path);
    assert.doesNotMatch(await r.text(), /account-layout|moderation-screen|skeleton/, path);
    const form = await fetch(s.origin + path);
-   assert.equal(new URL(form.url).pathname, '/iniciar-sesion', path);
+     assert.equal(new URL(form.url).pathname, access === 'guest' ? path : access === 'recovery' ? '/recuperar-contrasena' : '/iniciar-sesion', path);
   }
   assert.match(r.headers.get('cache-control'), /no-store/, path);
  }

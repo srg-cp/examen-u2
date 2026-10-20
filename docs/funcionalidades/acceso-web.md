@@ -1,5 +1,50 @@
 # Acceso web
 
+## Hover glass compartido en campos —19/10/2026
+
+LoginInput hereda reflejo glass interior visible (ribete2px/borde#8FA9C4) al pasar el ratón por campos
+habilitados/editables. Se mantiene el foco interior al escribir, error rojo y
+estados disabled/readonly; sin hover táctil ni cambios de geometría. Aplica a
+login, registro, código y nueva contraseña. Sin cambios de datos, permisos,
+persistencia o reintentos. [ADR-090](../decisiones/090-hover-glass-interior-campos-web.md);
+validación local en ESTADO.
+
+## Foco de campos hacia dentro —19/10/2026
+
+LoginInput hereda el foco interior compartido de reader-shell: outline2px con
+offset−2px, azul normal y rojo en invalid. Aplica a login, registro, código y
+nueva contraseña, con la misma geometría antes/después del foco. Sin cambios
+de etiquetas, datos, validaciones, permisos, persistencia o reintentos.
+[ADR-089](../decisiones/089-foco-interior-inputs-web.md); validación en ESTADO.
+
+## Registro, verificación y recuperación implementados —19/10/2026
+
+- Qué hace/recorrido: login ofrece Crear cuenta y ¿Olvidaste tu contraseña?.
+  /crear-cuenta solicita nombre/correo/contraseña/confirmación; si falta confirmar,
+  verifica código6 con reenvío60s. Sesión confirmada conduce a bienvenida/inicio.
+  /recuperar-contrasena solicita/verifica código; /restablecer-contrasena permite
+  cambiar contraseña y vuelve al login mediante acción explícita al confirmar.
+- Reglas/campos: nombre1–120 tras trim, correo válido<=254; contraseña8–1024 sin
+  trim y confirmación igual. Código exactamente6 cifras. Respuestas de correo
+  sin revelar existencia de cuenta. Autoconfirmación compatible si Auth la devuelve.
+- Persistencia/permisos: misma cuenta Auth y full_name que móvil. Cuenta y perfil
+  revalidados al establecer eh_access. Estado temporal en eh_credentials cifrada/
+  HttpOnly; recovery nunca concede sesión normal. Token sin exposición JSON/SSR.
+  Política global guest/recovery, sin guards por pantalla. Progreso se restaura
+  al recargar; formulario no guarda contraseña/código en almacenamiento.
+- Errores/reintentos: toast superior/invalid/shake; skeleton inicial, shimmer y
+  bloqueo de dobles envíos. Código incorrecto/caducado conserva etapa/reenvío;
+  falla de red conserva entrada y permite reintento. Otro flujo en pestaña produce
+  conflicto sin borrar el actual. Cancelar limpia capacidad; login/logout/OAuth
+  confirmado retiran flujo anterior. Sin reintentos automáticos de escrituras.
+- Dependencias/activación: variables Auth existentes, OTP6, plantillas .Token y
+  SMTP/registro habilitados. Sin SQL, configuración remota, Flutter o publicación.
+  Límite local pendiente30min y reset10min, sin afirmar vencimiento real del OTP.
+- Validación: pruebas locales y Chrome fixture detallados en ESTADO; demo con
+  correo real pendiente. Implementación no implica paridad global ni cierre de HU.
+
+[ADR-087](../decisiones/087-registro-y-recuperacion-web.md).
+
 ## Login responsive con marca grande —19/10/2026
 
 Hasta600px, la cabecera compartida presenta logo76px y texto «entre huellas»

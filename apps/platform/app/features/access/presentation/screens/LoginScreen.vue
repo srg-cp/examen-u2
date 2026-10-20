@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import '../styles/login.css';
+import '../styles/credentials.css';
 import { useStaggerReveal, vStaggerReveal } from '~/composables/useStaggerReveal';
 import LoginInput from '../widgets/LoginInput.vue';
 import SocialSignInButton from '../widgets/SocialSignInButton.vue';
 import type { SocialProvider } from '#shared/features/access/domain/access';
-const { revealStyle } = useStaggerReveal({ count: 4 });
+const { revealStyle } = useStaggerReveal({ count: 5 });
 const model = useNuxtApp().$accessModel();
 const state = shallowRef(model.state);
 const unsubscribe = model.subscribe(value => { state.value = value; });
@@ -69,12 +70,14 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); password.value = ''; cha
     <form class="login-form stagger-reveal-item" v-stagger-reveal="revealStyle(2)" :aria-busy="state.checking || state.busy" novalidate @submit.prevent="login">
       <LoginInput v-model="email" label="Correo" :disabled="state.busy || state.checking || !!state.session" :invalid="state.failure?.kind==='invalid'" :notice="state.notice" />
       <LoginInput v-model="password" label="Contraseña" password :disabled="state.busy || state.checking || !!state.session" :invalid="state.failure?.kind==='invalid'" :notice="state.notice" />
+      <NavigationLink class="login-recovery" to="/recuperar-contrasena">¿Olvidaste tu contraseña?</NavigationLink>
       <ActionButton class="login-submit" type="submit" variant="primary" :working="state.busy && !state.socialProvider" :disabled="state.checking || !!state.session || !!state.socialProvider">Iniciar Sesión</ActionButton>
       <div class="login-divider"><span>o continúa con</span></div>
       <SocialSignInButton provider="google" :working="state.busy && state.socialProvider==='google'" :disabled="state.busy || state.checking || !!state.session" @choose="social" />
       <SocialSignInButton provider="facebook" :working="state.busy && state.socialProvider==='facebook'" :disabled="state.busy || state.checking || !!state.session" @choose="social" />
     </form>
-    <p class="login-legal stagger-reveal-item" v-stagger-reveal="revealStyle(3)">Al iniciar sesión, aceptas nuestros <NavigationLink to="/terminos">Términos de servicio</NavigationLink> y reconoces haber leído nuestra <NavigationLink to="/privacidad">Política de privacidad</NavigationLink>.</p>
+    <p class="login-register stagger-reveal-item" v-stagger-reveal="revealStyle(3)"><span>¿Aún no tienes cuenta?</span> <NavigationLink to="/crear-cuenta">Crear cuenta</NavigationLink></p>
+    <p class="login-legal stagger-reveal-item" v-stagger-reveal="revealStyle(4)">Al iniciar sesión, aceptas nuestros <NavigationLink to="/terminos">Términos de servicio</NavigationLink> y reconoces haber leído nuestra <NavigationLink to="/privacidad">Política de privacidad</NavigationLink>.</p>
   </main>
   </div>
 </template>

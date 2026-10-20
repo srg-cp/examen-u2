@@ -1,5 +1,24 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## Registro y recuperación por código —19/10/2026
+
+El login incorpora /crear-cuenta y /recuperar-contrasena; el código verificado
+de recuperación habilita /restablecer-contrasena sin sesión normal. Misma cuenta
+Supabase que móvil; sin variables nuevas ni migraciones. Las notas siguientes
+que excluyen registro web son históricas. eh_access vigente usa path /.
+
+Requiere Auth con signup/correo habilitados, OTP6, contraseña>=8, SMTP y plantillas
+Confirm signup/Reset password con {{ .Token }}. Fuentes existentes en
+supabase/auth/templates; seguir su README sin reemplazar URLs/callbacks móviles.
+No se modificó ni verificó configuración remota. No hay callback nuevo: se ingresa
+el código en la web. Conservar PUBLIC_WEB_ORIGIN y cookies HTTPS seguras.
+
+Comprobaciones: npm run typecheck; npm test; npm run build; npm run test:server.
+scripts/check-credentials-browser.mjs usa PLAYWRIGHT_MODULE/CHROME_PATH y build
+vigente con fixture, sin correos reales. Capturas en apps/mobile/build/ui-preview/
+web-credentials. Login previo conserva scripts/check-access-browser.mjs.
+Detalles, TTL y límites de evidencia en ADR-087 y docs/ESTADO.md.
+
 ## Acceso general —19/10/2026
 
 Abrir /iniciar-sesion: cuenta válida → /bienvenida o /inicio sin exigir rol.

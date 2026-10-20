@@ -19,6 +19,14 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Registro y recuperación web por código (19/10/2026): seguir ADR-087.
+  /crear-cuenta y /recuperar-contrasena usan política guest;
+  /restablecer-contrasena usa recovery en la política global SSR/cliente.
+  La capacidad cifrada eh_credentials nunca autoriza inicio/moderación ni se
+  convierte en sesión normal al verificar recovery. Token solo en servidor/cookie
+  HttpOnly; código6 y reenvío60s validados en dominio/servidor. Registro confirmado
+  conserva onboarding por cuenta. No introducir guards por pantalla ni SDK cliente.
+
 - Por instrucción explícita del usuario del19/10/2026, el acceso y la etapa de
   cuenta se comprueban globalmente en todas las rutas web, antes de renderizar
   en servidor y montar en navegación cliente. Usar la política única compartida

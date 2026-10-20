@@ -9,7 +9,7 @@ export class AccountSessionTransport {
     const path = String(input);
     const sessionRead = path === '/api/access/session' && (!init?.method || init.method === 'GET');
     if (!sessionRead) {
-      const identityWrite = init?.method === 'POST' && /\/api\/(access|moderation)\/(login|logout|onboarding|oauth\/start)$/.test(path);
+      const identityWrite = init?.method === 'POST' && /\/api\/(access|moderation)\/(login|logout|onboarding|oauth\/start|credentials\/[^/]+)$/.test(path);
       if (identityWrite) this.invalidate();
       try {
         const response = await this.fetcher(input, init);
