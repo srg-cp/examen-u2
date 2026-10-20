@@ -1,5 +1,16 @@
 # Revisión y moderación de denuncias en la web
 
+## Cierre web sin bloqueo remoto —19/10/2026
+
+/api/moderation/logout comparte la semántica de acceso: borra las cookies
+generales/anteriores y confirma localmente mientras Nitro completa el intento
+remoto mediante event.waitUntil. Se conserva limpieza de evidencia/estado,
+confirmación de salida con borradores, avisos entre pestañas y controles de origen.
+No promete revocación inmediata de JWT ni afecta sesiones móviles. Pruebas
+retienen Supabase y exigen llegar al login antes de liberar su respuesta.
+[ADR-082](../decisiones/082-cierre-web-sin-esperar-supabase.md), resultados en
+ESTADO; sin nuevos permisos, SQL o despliegue.
+
 ## Política de acceso global —19/10/2026
 
 Moderación usa la misma política global de todas las páginas, con permiso de

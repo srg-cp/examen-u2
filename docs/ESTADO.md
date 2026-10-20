@@ -1,5 +1,116 @@
 # Estado del proyecto
 
+## Avisos web de una sola vez y URL limpia —19/10/2026
+
+Por autorización del usuario, login consume los motivos signed-out, expired,
+forbidden, oauth-failed y oauth-cancelled; inicio consume forbidden. Tras comprobar
+la sesión se reemplaza la entrada actual del router, retirando solo reason
+reconocido y mostrando el toast compartido. Recargar o volver desde legales no
+repite el aviso consumido. Parámetros ajenos (incluidos repetidos) y fragmento
+se conservan; el guard también conserva el fragmento al retirar entry=checked.
+No cambia autorización, callbacks OAuth, política SSR ni comprobación por operación.
+Los parámetros desconocidos no se interpretan como avisos. La limpieza requiere
+JavaScript; en SSR se mantiene el transporte existente hasta la hidratación.
+Sin SQL, Flutter, variables nuevas, despliegue ni cierre de HU-01/HU-14.3.
+
+Validación local: typecheck y build de Nuxt correctos;46 pruebas unitarias/
+arquitectura y21 de servidor aprobadas. Chrome sobre build de producción y backend
+fixture verifica los cinco motivos, alias /login, URL limpia sin entrada adicional
+en historial, parámetros repetidos/fragmento, navegación sobre la misma pantalla,
+recarga/volver, cierre de cuenta/moderación y denegación SSR/SPA sin montar revisión.
+Sin errores CSP/hidratación. No se usaron cuentas remotas ni se publicó.
+Siguiente paso: comprobar el recorrido con la configuración real antes de publicar.
+
+
+
+## Cierre de sesión web sin espera de Supabase —19/10/2026
+
+El usuario autoriza corregir la demora al cerrar sesión. Ambos endpoints web
+preparaban el borrado de cookies pero esperaban hasta5s a Supabase antes de
+enviar la respuesta. Ahora /api/access/logout y /api/moderation/logout borran
+eh_access en / y /api y eh_moderation, registran el caso de uso remoto con
+event.waitUntil de Nitro y responden {signedOut:true} sin esperar esa red.
+La confirmación acredita cierre local; si falta configuración remota también
+se borran cookies. Controles de origen/método siguen activos y rechazos no
+envían headers de borrado. Dominio/repositorios/fuentes conservan timeout5s,
+scope local y semántica remota; sin promesa suelta ni worker/servicio nuevo.
+Cliente conserva limpieza de datos, invalidación de preparación, avisos entre
+pestañas y espera la respuesta HTTP de borrado antes de salir al login.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md), reglas, arquitectura,
+fichas y guía de desarrollo actualizadas. Misma HU-01/HU-14.3, sin cierre de HU.
+
+Validación local: typecheck/build aislado .nuxt-logout aprobados,46 pruebas
+unitarias/arquitectura y21 de servidor aprobadas. Nuevos tests retienen el logout
+de Supabase y reciben200/cookies borradas antes de liberar ese trabajo en ambos
+endpoints; cubren configuración ausente y rechazo cross-origin. Chrome de política
+global también llega al login desde cuenta y moderación mientras Supabase sigue
+retenido (límite2s), con cookies/datos privados retirados, recarga posterior sin
+sesión y sin errores CSP/hidratación. Suite Chrome de moderación completa aprobada.
+Suite Chrome de acceso completa aprobada: logout entre pestañas, caducidad,
+onboarding, recuperación de conexión/permisos, OAuth fixture y responsive/texto200%.
+git diff --check aprobado. Evidencia con backend fixture, no medición remota.
+
+Sin SQL, Flutter, cambios de variables ni despliegue. Sin bloqueo local.
+El intento remoto depende del proceso/timeout y no es entrega duradera frente
+a reinicios; JWT emitidos conservan su vencimiento anterior y no se cierran
+sesiones móviles. La salida aún requiere red al servidor web. Siguiente paso:
+comprobar la sensación de cierre en el navegador real del usuario.
+
+## Toast web con entrada superior y descarte por gesto —19/10/2026
+
+TopToast compartido baja desde fuera del viewport y permite arrastrar hacia
+arriba con dedo/ratón para descartarlo. Gesto corto/cancelado vuelve a posición;
+hacia abajo ofrece resistencia. Entrada480ms, retorno420ms y salida240ms,
+sin transiciones con movimiento reducido. Mantiene toque, teclado/Escape,
+roles, reintento y expiración6500ms (pausada al sostener); arrastrar no dispara
+callbacks. Capturas y QA de producción con fixture:1920/1440/731/390/320 y
+texto200%, ratón/touch CDP, entrada, retorno/cancelación, reintento, teclado,
+expiración y movimiento reducido, sin overflow horizontal/CSP/hidratación.
+typecheck, build (NUXT_BUILD_DIR=.nuxt-toast para conservar dev activo) y46
+pruebas aprobados. Render320/texto200% revisado. Sin despliegue ni cambios
+remotos. Siguiente paso: comprobar sensación del gesto en Safari/iPhone físico.
+[ADR-081](decisiones/081-toast-web-deslizable.md), [ficha](funcionalidades/toast-web.md).
+
+## Acceso preparado desde landing, sin repetir la consulta al clic —19/10/2026
+
+Por autorización del usuario se sustituye la solución de solo feedback por
+preparación previa. Landing consulta mediante AccountViewModel/AccessAccount
+en segundo plano y precarga los componentes del destino. Iniciar sesión apunta
+a /inicio, /bienvenida o /iniciar-sesion antes del clic. AccountSessionTransport
+en data agrupa lecturas y reutiliza la respuesta para middleware/pantalla dentro
+de la misma app cliente, máximo15s/expiración (401 confirmado máximo5s). Sin
+singleton de servidor, datos privados SSR, almacenamiento persistente o permisos
+cacheados. Bootstrap lo inyecta también a moderación para invalidar su logout.
+
+La landing visible actualiza cada10s, foco/visibilidad y mensajes entre pestañas;
+se liberan timers/listeners/canal al salir. Mutaciones invalidan antes y después,
+401/409 y eventos de identidad descartan la preparación. Las respuestas anteriores
+en vuelo se rechazan; el guard vuelve a comprobar una sola vez si hubo conflicto
+por broadcast, resolviendo una carrera observada al cerrar sesión. Operaciones
+y permisos siguen autorizándose en servidor. Si se pulsa antes de preparar,
+caducó o falla la conexión puede haber espera real, con feedback existente.
+[ADR-080](decisiones/080-preparar-acceso-desde-landing.md), reglas, arquitectura,
+guía de desarrollo y fichas actualizadas; misma HU-01/RF-01,34, sin cierre.
+
+Validación local: typecheck y build aislado aprobados;46 pruebas unitarias y
+arquitectónicas y19 de servidor aprobadas. Nuevas pruebas cubren deduplicación,
+TTL/vencimiento,401/fallos, aislamiento por app y carreras con cambios de cuenta.
+Chrome global comprueba que preparación/guard/llegada comparten una consulta
+si el clic es temprano. Con href preparado bloquea nuevas consultas de sesión
+y exige llegar a /inicio o /bienvenida con datos correctos: cero consultas nuevas
+de sesión durante el salto. Comprueba además que un broadcast tras logout
+descarta el destino anterior y lleva al login sin montar cuenta.
+
+Suites Chrome de acceso y moderación completas aprobadas (caducidad, pestañas,
+logout, onboarding/reintento, permisos/revocación, operaciones/evidencia/OAuth
+fixture). Landing completa aprobada: responsive/texto200%, navegación SPA/QR,
+SSR sin JS y marca/estilos sin cambios, sin overflow ni errores CSP/hidratación.
+El401 de preparación anónima es esperado en QA de landing. git diff --check pasa.
+
+Sin bloqueos locales; evidencia de backend fixture, no medición de latencia
+remota. Sin SQL, Flutter, variables o despliegue. Siguiente paso: revisar el clic
+desde landing con la sesión real del usuario y desplegar solo si se autoriza.
+
 ## Navegación con feedback inmediato durante la comprobación —19/10/2026
 
 El usuario detecta que Iniciar sesión parece no responder desde landing mientras

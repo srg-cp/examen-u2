@@ -39,7 +39,7 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacidad',label:'Política
 <style scoped>
 @font-face{font-family:'DM Sans';font-style:normal;font-weight:100 1000;font-display:swap;src:url('/fonts/dm-sans-latin.woff2') format('woff2')}
 
-.reader-shell.legal-shell{font-family:'DM Sans',Arial,sans-serif;font-optical-sizing:auto;height:100svh;min-height:0;display:flex;flex-direction:column;align-items:stretch;background:#fbfdff}
+.reader-shell.legal-shell{font-family:'DM Sans',Arial,sans-serif;font-optical-sizing:auto;height:100svh;min-height:0;display:flex;flex-direction:column;align-items:stretch}
 .reader-shell.legal-shell :deep(.background-glow){position:fixed;inset:0;mask-image:none}
 .reader-shell.legal-shell :deep(.background-glow__viewport){position:absolute;inset:0;height:100%}
 .reader-shell .legal-scroll{width:100%;max-width:none;height:auto;min-height:0;flex:1;margin:0;padding:48px 16px;overflow:auto;scrollbar-gutter:stable}

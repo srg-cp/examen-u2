@@ -15,7 +15,7 @@ try {
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     page.on('console', msg => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(msg.text())) errors.push(msg.text()); });
-    page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${new URL(response.url()).pathname}`); });
+    page.on('response', response => { if (response.status() >= 400 && !(response.status() === 401 && new URL(response.url()).pathname === '/api/access/session')) errors.push(`${response.status()} ${new URL(response.url()).pathname}`); });
     const response = await page.goto(server.origin, { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200); assert.equal(await page.locator('h1').count(), 1);
     assert.equal(await page.locator('html').getAttribute('lang'), 'es');

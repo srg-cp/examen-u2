@@ -1,5 +1,11 @@
 # Funcionalidades de Entre Huellas
 
+Acceso web19/10: [avisos de una sola vez y URL limpia](acceso-web.md); se retira
+reason consumido conservando parámetros de integración y fragmento.
+
+Toast web: [entrada superior y descarte por gesto](toast-web.md), compartido
+en todos sus consumidores actuales; ADR-081, validación local19/10/2026.
+
 Corrección19/10: reveal compartido sin cobertura opaca en [acceso](acceso-web.md),
 [moderación](moderacion-web.md), [QR](ficha-publica-qr.md) y
 [avistamientos web](avistamientos-web.md). ADR-075; evidencia local en ESTADO.

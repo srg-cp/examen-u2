@@ -48,7 +48,7 @@ fechadas anteriores son el historial; no recuperar sus medidas sustituidas.
 | --- | --- |
 | Stagger de login | useStaggerReveal + vStaggerReveal; transiciones originales de sader-panel, doble rAF, will-change persistente,850ms/90ms, blur18px/offset−28px; CSSOM compatible con CSP. |
 | Marca de cabecera | SiteBrand/SiteHeader compartidos con landing, fuera del stagger; misma posición, color y escala responsive (ADR-077). |
-| TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X, cierre al tocar, entrada180ms. |
+| TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X. Entrada desde arriba480ms, descarte deslizando hacia arriba/salida240ms, retorno420ms; toque y teclado conservados (ADR-081). |
 | Retorno legal |36×36px, chevrón16px, circular glass/blur22px; variante local en LegalPage. |
 | Enlace legal derecho | Mínimo36px, padding8/12px, radio calc(.625rem + 8px), texto14px/500/línea20px, flecha16px. |
 | Fuente legal | DM Sans local, solo /terms y /privacy. |

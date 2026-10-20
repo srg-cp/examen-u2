@@ -1,5 +1,17 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Cierre web sin bloquear por Supabase —19/10/2026:** endpoints confirman primero
+el borrado de cookies y vinculan el intento remoto al ciclo Nitro event.waitUntil.
+Conservar casos de uso/fuentes y controles de origen; no afirmar revocación
+remota ni entrega duradera por una confirmación local.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md).
+
+**Acceso preparado desde landing —19/10/2026:** preparación mediante ViewModel
+y caso de uso; reutilización breve y deduplicación en data, por aplicación del
+navegador, sin singleton de servidor ni payload SSR privado. Invalidar por
+cambios de sesión/foco y vencimiento; permisos y operaciones no se cachean.
+[ADR-080](decisiones/080-preparar-acceso-desde-landing.md).
+
 **Acceso global a todas las rutas web —19/10/2026:** política compartida única
 para servidor y middleware cliente global; sin guards elegidos por pantalla.
 Clasificar cada página/alias como pública, acceso, cuenta, onboarding o permiso

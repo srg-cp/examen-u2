@@ -6,6 +6,7 @@ const model = useNuxtApp().$accessModel();
 const state = shallowRef(model.state);
 const unsubscribe = model.subscribe(value => { state.value = value; });
 const toast = useTemplateRef('toast');
+const consumeNotice = useRouteNotice();
 const route = useRoute();
 const onboardingView = useTemplateRef('onboardingView');
 const nextStep = () => model.nextStep();
@@ -24,6 +25,7 @@ let channel: BroadcastChannel | undefined;
 let expiry: ReturnType<typeof setTimeout> | undefined;
 let leaving = false;
 let signingOut = false;
+let noticesReady = false;
 async function logout() {
   signingOut = true;
   const done = await model.logout();
@@ -56,6 +58,10 @@ watch(() => [state.value.checking, state.value.session] as const, async ([checki
     leaving = true; await navigateTo('/iniciar-sesion', { replace: true });
   }
 });
+async function showRouteNotice() {
+  if (!props.onboarding && state.value.session && await consumeNotice(['forbidden']) === 'forbidden') toast.value?.show('Tu cuenta puede usar Entre Huellas, pero no tiene permiso para revisar denuncias.');
+}
+watch(() => route.query.reason, () => { if (noticesReady) void showRouteNotice(); });
 onMounted(async () => {
   if (props.onboarding) for (const name of ['dog_with_map.png', 'dog_and_cat.png']) { const image = new Image(); image.src = '/images/onboarding/' + name; }
   channel = new BroadcastChannel('eh-access');
@@ -65,7 +71,8 @@ onMounted(async () => {
   };
   await model.checkSession();
   if (state.value.session) channel?.postMessage({ actor: state.value.session.actor });
-  if (!props.onboarding && route.query.reason === 'forbidden') toast.value?.show('Tu cuenta puede usar Entre Huellas, pero no tiene permiso para revisar denuncias.');
+  noticesReady = true;
+  await showRouteNotice();
 });
 onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channel = undefined; clearTimeout(expiry); });
 </script>

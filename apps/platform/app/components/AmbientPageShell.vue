@@ -16,7 +16,6 @@ withDefaults(defineProps<{ intensity?: 'soft' | 'medium' | 'strong' }>(), { inte
   min-height: 100svh;
   position: relative;
   isolation: isolate;
-  background: linear-gradient(180deg, #ffffff, #fbfdff 65%, #fffbef);
 }
 .ambient-page-shell :deep(.background-glow) { z-index: -1; mask-image: linear-gradient(#000 0% 72%, transparent 100%); }
 </style>

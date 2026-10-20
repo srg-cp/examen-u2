@@ -1,5 +1,16 @@
 # Landing pública en la plataforma
 
+## Acceso preparado antes de pulsar —19/10/2026
+
+AccountViewModel consulta sesión en segundo plano al montar (SSR sigue público)
+y el enlace apunta al destino confirmado, con sus componentes precargados.
+Data reutiliza brevemente la consulta para guard/pantalla y agrupa concurrentes;
+no hay otra espera de sesión al clic preparado. Polling visible10s, foco y
+mensajes mantienen destino actualizado; recursos se liberan al salir. Sin sesión
+se conserva /iniciar-sesion y sin JS funciona redirección de servidor. No cachea
+permisos ni promete ausencia de espera antes de preparar/caducar. ADR-080 y ficha
+de acceso detallan invalidación/límites. Validación y pendientes en ESTADO.
+
 El enlace de acceso usa NavigationLink compartido: feedback inmediato con
 shimmer/aria-busy durante la comprobación y navegación, conservando texto/href
 y bloqueando clics repetidos. La latencia real de sesión permanece; no se monta

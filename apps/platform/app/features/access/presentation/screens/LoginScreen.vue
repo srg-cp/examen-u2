@@ -8,6 +8,7 @@ const { revealStyle } = useStaggerReveal({ count: 4 });
 const model = useNuxtApp().$accessModel();
 const state = shallowRef(model.state);
 const unsubscribe = model.subscribe(value => { state.value = value; });
+const consumeNotice = useRouteNotice();
 const route = useRoute();
 const toast = useTemplateRef('toast');
 const email = ref('');
@@ -21,6 +22,7 @@ const messages = {
 };
 let channel: BroadcastChannel | undefined;
 let leaving = false;
+let noticesReady = false;
 async function social(provider: SocialProvider) {
   password.value='';
   const url=await model.signInWithProvider(provider);
@@ -35,17 +37,23 @@ watch(() => state.value.notice, () => { if (state.value.failure) toast.value?.sh
 watch(() => state.value.session, async session => {
   if (session && !leaving) { leaving = true; await navigateTo(session.profile.onboardingCompleted ? '/inicio' : '/bienvenida', { replace: true }); }
 });
+async function showRouteNotice() {
+  if (!state.value.session && !state.value.failure) {
+    const reason = await consumeNotice(['forbidden', 'expired', 'oauth-failed', 'oauth-cancelled', 'signed-out']);
+    if (reason === 'forbidden') toast.value?.show(messages.forbidden);
+    if (reason === 'expired') toast.value?.show('La sesión expiró. Vuelve a iniciar sesión.');
+    if (reason === 'oauth-failed') toast.value?.show('No pudimos completar el acceso. Vuelve a intentarlo.');
+    if (reason === 'oauth-cancelled') toast.value?.show('Inicio de sesión cancelado.', null, false);
+    if (reason === 'signed-out') toast.value?.show('Sesión cerrada.', null, false);
+  }
+}
+watch(() => route.query.reason, () => { if (noticesReady) void showRouteNotice(); });
 onMounted(async () => {
   channel = new BroadcastChannel('eh-access');
   channel.onmessage = () => { password.value = ''; model.invalidate(); model.checkSession(); };
   await model.checkSession();
-  if (!state.value.session && !state.value.failure) {
-    if (route.query.reason === 'forbidden') toast.value?.show(messages.forbidden);
-    if (route.query.reason === 'expired') toast.value?.show('La sesión expiró. Vuelve a iniciar sesión.');
-    if (route.query.reason === 'oauth-failed') toast.value?.show('No pudimos completar el acceso. Vuelve a intentarlo.');
-    if (route.query.reason === 'oauth-cancelled') toast.value?.show('Inicio de sesión cancelado.', null, false);
-    if (route.query.reason === 'signed-out') toast.value?.show('Sesión cerrada.', null, false);
-  }
+  noticesReady = true;
+  await showRouteNotice();
 });
 onBeforeUnmount(() => { unsubscribe(); model.dispose(); password.value = ''; channel?.close(); });
 </script>

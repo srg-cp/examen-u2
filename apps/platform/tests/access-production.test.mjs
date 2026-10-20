@@ -9,6 +9,39 @@ const post = (s, path, body = {}, cookie = '', actor = ordinary, origin = s.orig
 });
 const login = (s, email = 'ordinario@example.test') => post(s, 'login', { email, password: 'test-fixture-password' });
 
+test('Both web logout endpoints clear cookies and respond while Supabase logout is still pending', async t => {
+ const s = await moderationFixture(); t.after(s.close);
+ for (const namespace of ['access', 'moderation']) {
+  const cookie = cookieOf(await login(s, 'moderador@example.test'));
+  const paused = s.pauseLogout();
+  try {
+   const responsePromise = fetch(s.origin + '/api/' + namespace + '/logout', {
+    method: 'POST', headers: { Origin: s.origin, 'Content-Type': 'application/json', Cookie: cookie }, body: '{}', signal: AbortSignal.timeout(2000),
+   });
+   await paused.started;
+   const response = await responsePromise;
+   assert.equal(response.status, 200); assert.deepEqual(await response.json(), { signedOut: true });
+   const removed = response.headers.getSetCookie();
+   for (const path of ['/', '/api']) assert.ok(removed.some(c => c.startsWith('eh_access=;') && c.includes('Path=' + path + ';') && c.includes('Max-Age=0')));
+   assert.ok(removed.some(c => c.startsWith('eh_moderation=;') && c.includes('Max-Age=0')));
+   assert.equal((await fetch(s.origin + '/api/access/session')).status, 401);
+   assert.equal((await fetch(s.origin + '/api/moderation/session')).status, 401);
+  } finally { paused.release(); }
+ }
+});
+
+test('Web logout clears cookies even if backend configuration is unavailable; cross-origin logout remains denied', async t => {
+ const { productionFixture } = await import('./server_fixture.mjs');
+ const s = await productionFixture(undefined, { env: { SUPABASE_PUBLISHABLE_KEY: '', MODERATION_SESSION_SECRET: '' } }); t.after(s.close);
+ for (const namespace of ['access', 'moderation']) {
+  const response = await fetch(s.origin + '/api/' + namespace + '/logout', { method: 'POST', headers: { Origin: s.origin, Cookie: 'eh_access=invalid; eh_moderation=invalid', 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(response.status, 200); assert.deepEqual(await response.json(), { signedOut: true });
+  assert.ok(response.headers.getSetCookie().filter(c => c.includes('Max-Age=0')).length >= 3);
+  const denied = await fetch(s.origin + '/api/' + namespace + '/logout', { method: 'POST', headers: { Origin: 'https://untrusted.example', 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(denied.status, 403); assert.equal(denied.headers.getSetCookie().length, 0);
+ }
+});
+
 test('External document navigation reaches login through the entry bridge while cross-site API calls remain denied', async t => {
  const s = await moderationFixture(); t.after(s.close);
  const headers = { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' };

@@ -1,5 +1,26 @@
 # Arquitectura de Entre Huellas
 
+## Ciclo de vida del cierre web —19/10/2026
+
+Los handlers logout de access/moderation confirman el borrado de cookies sin
+esperar la red de Supabase. Componen el caso de uso existente por petición y
+registran su promesa con event.waitUntil de Nitro; sin promesa suelta, worker
+o caché nueva. Dominio/repositorios/fuentes conservan logout remoto scope local
+con timeout5s. El éxito HTTP acredita cierre local, incluso con configuración
+remota ausente; no equivale a revocación de JWT ni entrega duradera.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md).
+
+## Preparación y reutilización breve de sesión —19/10/2026
+
+Landing prepara destino con AccountViewModel/AccessAccount y precarga componentes.
+Bootstrap inyecta AccountSessionTransport a repositorios HTTP de la aplicación:
+deduplica GET de sesión y reutiliza máximo15s/vencimiento (401 máximo5s), sin
+persistir, serializar ni compartir entre peticiones SSR. Data mantiene esta
+responsabilidad; ViewModels siguen independientes. Mutaciones, mensajes, foco,
+visibilidad y401/409 invalidan; permisos/API no se cachean. Una respuesta anterior
+invalidada se descarta y el guard comprueba identidad una vez más. ADR-080 detalla
+límites y limpieza; sustituye notas previas sin reutilización de sesión.
+
 ## Política global de navegación y acceso —19/10/2026
 
 route_policy.ts registra todas las páginas y comparte clasificación/regla de

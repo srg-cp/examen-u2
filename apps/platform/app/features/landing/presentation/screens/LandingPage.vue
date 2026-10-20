@@ -9,6 +9,35 @@ import LandingPawTrail from '../widgets/LandingPawTrail.vue';
 import LandingSideNote from '../widgets/LandingSideNote.vue';
 import '../styles/landing.css';
 const horizontalPaused = ref(false);
+const accessModel = useNuxtApp().$accessModel();
+const router = useRouter();
+const accessState = shallowRef(accessModel.state);
+const stopAccess = accessModel.subscribe(value => { accessState.value = value; });
+const accessTarget = computed(() => {
+  const session = accessState.value.session;
+  return session ? (session.profile.onboardingCompleted ? '/inicio' : '/bienvenida') : '/iniciar-sesion';
+});
+let accessChannel: BroadcastChannel | undefined;
+let accessTimer: ReturnType<typeof setInterval> | undefined;
+async function prepareAccess() {
+  if (document.visibilityState === 'hidden') return;
+  await accessModel.checkSession();
+  if (!accessState.value.failure) await preloadRouteComponents(accessTarget.value, router).catch(() => {});
+}
+onMounted(() => {
+  void prepareAccess();
+  accessTimer = setInterval(() => { void prepareAccess(); }, 10000);
+  window.addEventListener('focus', prepareAccess);
+  document.addEventListener('visibilitychange', prepareAccess);
+  accessChannel = new BroadcastChannel('eh-access');
+  accessChannel.onmessage = () => { accessModel.invalidate(); void prepareAccess(); };
+});
+onBeforeUnmount(() => {
+  clearInterval(accessTimer); accessChannel?.close();
+  window.removeEventListener('focus', prepareAccess);
+  document.removeEventListener('visibilitychange', prepareAccess);
+  stopAccess(); accessModel.dispose();
+});
 const characters = [
   { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search-corgi' },
   { title: 'Encontré', art: 'found-tabby' }, { title: 'Ayudo', art: 'help-dalmatian' },
@@ -34,7 +63,7 @@ const questions = [
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <SiteHeader class="header wrap">
       <nav aria-label="Navegación principal"><a href="#proyecto">Proyecto</a><a href="#como-funciona">Cómo funciona</a><a href="#comunidad">Comunidad</a><a href="#preguntas">Preguntas</a></nav>
-      <NavigationLink class="button button-primary header-cta" to="/iniciar-sesion">Iniciar sesión</NavigationLink>
+      <NavigationLink class="button button-primary header-cta" :to="accessTarget">Iniciar sesión</NavigationLink>
     </SiteHeader>
     <main id="contenido">
       <section id="inicio" class="hero wrap aurora" aria-labelledby="hero-title">

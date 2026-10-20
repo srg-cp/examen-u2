@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { moderationFixture, ordinary } from '../tests/moderation_fixture.mjs';
 import { routePolicies } from '../shared/routing/route_policy.ts';
-const { chromium } = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const runtime = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href), { chromium } = runtime.default || runtime;
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true });
 const server = await moderationFixture();
 try {
@@ -27,17 +27,49 @@ try {
   await page.getByRole('link', { name: 'Abrir Entre Huellas' }).click();
   await page.waitForURL('**/iniciar-sesion'); await page.locator('.login-screen').waitFor();
   assert.equal(await page.evaluate(() => window.accountWasMounted || window.moderationWasMounted), false);
+  // Transient notices are consumed without losing unrelated parameters/hash.
+  for (const [reason, text] of [
+    ['signed-out', 'Sesión cerrada.'], ['expired', 'La sesión expiró.'],
+    ['forbidden', 'Acceso denegado.'], ['oauth-failed', 'No pudimos completar el acceso.'],
+    ['oauth-cancelled', 'Inicio de sesión cancelado.'],
+  ]) {
+    await page.goto(server.origin + '/iniciar-sesion?reason=' + reason + '&keep=uno&keep=dos#view');
+    await page.locator('#notice').filter({ hasText: text }).waitFor({ state: 'visible' });
+    const clean = new URL(page.url());
+    assert.equal(clean.pathname, '/iniciar-sesion');
+    assert.deepEqual(clean.searchParams.getAll('keep'), ['uno', 'dos']);
+    assert.equal(clean.searchParams.has('reason'), false);
+    assert.equal(clean.searchParams.has('entry'), false);
+    assert.equal(clean.hash, '#view');
+    await page.reload(); await page.waitForLoadState('networkidle');
+    assert.equal(await page.locator('#notice').isVisible(), false, 'Reload must not repeat ' + reason);
+    await page.getByRole('link', { name: 'Términos de servicio', exact: true }).click();
+    await page.waitForURL('**/terminos'); await page.goBack();
+    await page.waitForLoadState('networkidle');
+    assert.equal(new URL(page.url()).pathname, '/iniciar-sesion');
+    assert.equal(await page.locator('#notice').isVisible(), false, 'Back must not repeat ' + reason);
+  }
+  await page.goto(server.origin + '/login?reason=expired&keep=alias');
+  await page.locator('#notice').filter({ hasText: 'La sesión expiró.' }).waitFor({ state: 'visible' });
+  assert.equal(new URL(page.url()).search, '?keep=alias');
+  await page.reload(); await page.waitForLoadState('networkidle');
+  const historyLength = await page.evaluate(() => history.length);
+  await page.evaluate(() => document.querySelector('#__nuxt').__vue_app__.config.globalProperties.$router.push('/iniciar-sesion?reason=signed-out&keep=spa#view'));
+  await page.locator('#notice').filter({ hasText: 'Sesión cerrada.' }).waitFor({ state: 'visible' });
+  assert.equal(new URL(page.url()).search, '?keep=spa');
+  assert.equal(new URL(page.url()).hash, '#view');
+  assert.equal(await page.evaluate(() => history.length), historyLength + 1, 'Consumption replaces the entry instead of adding another one');
   const response = await context.request.post(server.origin + '/api/access/login', {
     headers: { Origin: server.origin }, data: { email: 'ordinario@example.test', password: 'test-fixture-password' },
   });
   assert.equal(response.status(), 200);
   const cookie = (await context.cookies()).find(c => c.name === 'eh_access');
   assert.equal(cookie.path, '/'); assert.equal(cookie.httpOnly, true);
-  await page.goto(server.origin + '/');
-  await page.waitForFunction(() => !!document.querySelector('#__nuxt')?.__vue_app__);
   let releaseSession, sessionRequests = 0;
   const sessionGate = new Promise(resolve => { releaseSession = resolve; });
   await page.route('**/api/access/session', async route => { sessionRequests++; await sessionGate; await route.continue(); });
+  await page.goto(server.origin + '/');
+  await page.waitForFunction(() => !!document.querySelector('#__nuxt')?.__vue_app__);
   const entryLink = page.getByRole('link', { name: 'Iniciar sesión', exact: true });
   await entryLink.click();
   await page.waitForFunction(() => document.querySelector('.header-cta')?.getAttribute('aria-busy') === 'true');
@@ -48,6 +80,8 @@ try {
   await entryLink.evaluate(el => el.click());
   assert.equal(sessionRequests, 1, 'Repeated click must not start another session check');
   releaseSession(); await page.waitForURL('**/inicio');
+  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+  assert.equal(sessionRequests, 1, 'Preparation, guard redirects and account screen share one session read');
   await page.unroute('**/api/access/session');
   for (const completed of [true, false]) {
     server.setOnboarding(ordinary, completed);
@@ -57,10 +91,26 @@ try {
       assert.equal(await page.evaluate(() => window.loginWasMounted), false, 'SSR must never mount login');
     }
     await page.goto(server.origin + '/');
+    const target = completed ? '/inicio' : '/bienvenida';
+    await page.waitForFunction(target => document.querySelector('.header-cta')?.getAttribute('href') === target, target);
+    let blockingReads = 0;
+    await page.route('**/api/access/session', route => { blockingReads++; return route.abort(); });
     await page.getByRole('link', { name: 'Iniciar sesión', exact: true }).click();
     await page.waitForURL('**/' + (completed ? 'inicio' : 'bienvenida'));
     assert.equal(await page.evaluate(() => window.loginWasMounted), false, 'SPA must never mount login');
+    await page.getByRole('heading', { name: completed ? 'Tu cuenta' : 'Cada huella importa', exact: true }).waitFor();
+    assert.equal(blockingReads, 0, 'Prepared click and arrival must not wait on another session API request');
+    await page.unroute('**/api/access/session');
   }
+  await page.goto(server.origin + '/');
+  await page.waitForFunction(() => document.querySelector('.header-cta')?.getAttribute('href') === '/bienvenida');
+  const signedOutElsewhere = await context.request.post(server.origin + '/api/access/logout', { headers: { Origin: server.origin }, data: {} });
+  assert.equal(signedOutElsewhere.status(), 200);
+  await page.evaluate(() => { const channel = new BroadcastChannel('eh-access'); channel.postMessage('changed'); channel.close(); });
+  await page.waitForFunction(() => document.querySelector('.header-cta')?.getAttribute('href') === '/iniciar-sesion');
+  await page.getByRole('link', { name: 'Iniciar sesión', exact: true }).click();
+  await page.waitForURL('**/iniciar-sesion'); await page.locator('.login-screen').waitFor();
+  assert.equal(await page.evaluate(() => window.accountWasMounted), false, 'A prepared destination must be discarded after logout broadcast');
   server.setOnboarding(ordinary, true);
   await context.clearCookies();
   await context.addCookies([{ ...cookie, path: '/api' }]);
@@ -73,12 +123,35 @@ try {
   const noJsPage = await noJs.newPage();
   await noJsPage.goto(server.origin + '/iniciar-sesion'); assert.equal(new URL(noJsPage.url()).pathname, '/inicio');
   assert.equal(await noJsPage.locator('.login-screen').count(), 0); await noJs.close();
-  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
-  await page.waitForURL('**/iniciar-sesion?reason=signed-out');
-  await page.locator('.login-screen').waitFor();
+  const pausedAccountLogout = server.pauseLogout();
+  try {
+    await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
+    await pausedAccountLogout.started;
+    await page.waitForURL('**/iniciar-sesion', { timeout: 2000 });
+    await page.locator('#notice').filter({ hasText: 'Sesión cerrada.' }).waitFor({ state: 'visible' });
+    await page.locator('.login-screen').waitFor();
+    assert.equal(await page.getByText('ordinario@example.test', { exact: true }).count(), 0);
+  } finally { pausedAccountLogout.release(); }
   assert.equal((await context.cookies()).filter(c => c.name === 'eh_access').length, 0);
-  await page.reload(); await page.waitForURL('**/iniciar-sesion?reason=signed-out');
-  await page.locator('.login-screen').waitFor();
+  await page.reload(); await page.waitForURL('**/iniciar-sesion');
+  await page.locator('.login-screen').waitFor(); await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('#notice').isVisible(), false, 'Logout notice must not repeat on reload');
+  const reviewerLogin = await context.request.post(server.origin + '/api/access/login', {
+    headers: { Origin: server.origin }, data: { email: 'moderador@example.test', password: 'test-fixture-password' },
+  });
+  assert.equal(reviewerLogin.status(), 200);
+  await page.goto(server.origin + '/moderacion');
+  await page.getByRole('button', { name: 'Revisar denuncia', exact: true }).waitFor();
+  const pausedReviewerLogout = server.pauseLogout();
+  try {
+    await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
+    await pausedReviewerLogout.started;
+    await page.waitForURL('**/iniciar-sesion', { timeout: 2000 });
+    await page.locator('#notice').filter({ hasText: 'Sesión cerrada.' }).waitFor({ state: 'visible' });
+    await page.locator('.login-screen').waitFor();
+    assert.equal(await page.locator('.moderation-screen').count(), 0);
+    assert.equal((await context.cookies()).filter(c => ['eh_access', 'eh_moderation'].includes(c.name)).length, 0);
+  } finally { pausedReviewerLogout.release(); }
   const protectedPaths = Object.entries(routePolicies).filter(([, access]) => ['account', 'onboarding', 'reviewer'].includes(access)).map(([path]) => path);
   for (const path of protectedPaths) {
     await page.goto(server.origin + path);
@@ -116,12 +189,17 @@ try {
   server.profileFailure(false);
   await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click();
   await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
-  await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio?reason=forbidden');
+  await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio');
+  await page.locator('#notice').filter({ hasText: 'no tiene permiso' }).waitFor({ state: 'visible' });
+  await page.reload(); await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('#notice').isVisible(), false, 'Permission notice must not repeat on reload');
   assert.equal(await page.evaluate(() => window.moderationWasMounted), false, 'Denied SSR must never mount moderation');
   await page.waitForFunction(() => !!document.querySelector('#__nuxt')?.__vue_app__);
   await page.evaluate(() => document.querySelector('#__nuxt').__vue_app__.config.globalProperties.$router.push('/moderacion'));
-  await page.waitForURL('**/inicio?reason=forbidden');
+  await page.waitForURL('**/inicio');
+  await page.locator('#notice').filter({ hasText: 'no tiene permiso' }).waitFor({ state: 'visible' });
+  assert.equal(new URL(page.url()).search, '');
   assert.equal(await page.evaluate(() => window.moderationWasMounted), false, 'Denied SPA must never mount moderation');
   assert.deepEqual(errors, []); await context.close();
-  console.log('Global access Chrome QA passed: every registered page in SSR/SPA, public/QR/legal/legacy aliases, no private screen or skeleton after logout, no moderation mount without permission, authenticated login/onboarding, legacy cookies, backend retry, no-JS, no CSP/hydration errors. Fixture backend only.');
+  console.log('Global access Chrome QA passed: one-time notices, clean URLs, preserved query/hash, replace history, reload/back and same-page navigation; every registered page in SSR/SPA, public/QR/legal/legacy aliases, no private screen or skeleton after logout, no moderation mount without permission, authenticated login/onboarding, legacy cookies, backend retry, no-JS, no CSP/hydration errors. Fixture backend only.');
 } finally { await browser.close(); await server.close(); }

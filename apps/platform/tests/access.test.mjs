@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { AccessAccount, AccessFailure, CompleteAccountOnboarding, ReadManagementAccess, StartAccountSocialSignIn, CompleteAccountSocialSignIn } from '../shared/features/access/domain/access.ts';
 import { AccountViewModel } from '../shared/features/access/presentation/account_view_model.ts';
 import { HttpAccountRepository } from '../shared/features/access/data/http_account_repository.ts';
+import { AccountSessionTransport } from '../shared/features/access/data/account_session_transport.ts';
 import { accountSessionDto } from '../shared/features/access/data/account_session_dto.ts';
 import { AccountSource } from '../server/features/access/data/account_source.ts';
 import { ServerAccountRepository } from '../server/features/access/data/server_account_repository.ts';
@@ -11,6 +12,54 @@ import { openSession } from '../server/infrastructure/moderation_session.ts';
 const actor = '11111111-1111-4111-8111-111111111145', other = '22222222-2222-4222-8222-222222222245';
 const session = () => ({ actor, expiresAt: Date.now() + 60000, email: 'user@example.test', profile: { displayName: 'Luna', city: 'Lima', onboardingCompleted: false } });
 const vm = repo => new AccountViewModel(new AccessAccount(repo), new StartAccountSocialSignIn(repo), new CompleteAccountOnboarding(repo), new ReadManagementAccess(repo));
+
+test('Prepared session transport deduplicates reads, bounds reuse by TTL/token expiry and never caches permissions or failures', async () => {
+ let now = Date.now(), calls = 0, status = 200;
+ const transport = new AccountSessionTransport(async () => { calls++; return new Response(JSON.stringify({ ...session(), expiresAt: now + 60000 }), { status }); }, () => now);
+ const a = new HttpAccountRepository(transport.fetch), b = new HttpAccountRepository(transport.fetch);
+ await Promise.all([a.session(), b.session()]); assert.equal(calls, 1);
+ await b.session(); assert.equal(calls, 1);
+ now += 15001; await a.session(); assert.equal(calls, 2);
+ transport.invalidate(); status = 503;
+ await assert.rejects(a.session()); await assert.rejects(b.session()); assert.equal(calls, 4);
+ status = 401; await assert.rejects(a.session()); await assert.rejects(b.session()); assert.equal(calls, 5);
+ now += 5001; await assert.rejects(a.session()); assert.equal(calls, 6);
+ transport.invalidate(); status = 200;
+ await a.session();
+ await transport.fetch('/api/access/management'); await transport.fetch('/api/access/management');
+ assert.equal(calls, 9, 'Permission checks are never reused');
+ await transport.fetch('/api/moderation/logout', { method: 'POST' });
+ await a.session(); assert.equal(calls, 11, 'Moderation logout invalidates the prepared account');
+ let refreshed = false;
+ // A stale success cannot survive the token deadline (a new read is required).
+ const expiryTransport = new AccountSessionTransport(async () => { refreshed = true; return new Response(JSON.stringify({ ...session(), expiresAt: now + 100 })); }, () => now);
+ await expiryTransport.fetch('/api/access/session'); refreshed = false; now += 101;
+ await expiryTransport.fetch('/api/access/session'); assert.equal(refreshed, true);
+});
+
+test('Invalidation discards an in-flight identity response and each browser app owns its own preparation', async () => {
+ let complete;
+ const transport = new AccountSessionTransport(() => new Promise(resolve => { complete = resolve; }));
+ const pending = transport.fetch('/api/access/session'); transport.invalidate();
+ complete(new Response(JSON.stringify(session())));
+ assert.equal((await pending).status, 409);
+ let calls = 0;
+ const otherApp = new AccountSessionTransport(async () => { calls++; return new Response('{}', { status: 401 }); });
+ await otherApp.fetch('/api/access/session'); assert.equal(calls, 1);
+});
+
+test('An identity write discards session reads started before or during the mutation', async () => {
+ let finishWrite, finishRead;
+ const transport = new AccountSessionTransport(async (input) => {
+  if (String(input).endsWith('/login')) return new Promise(resolve => { finishWrite = resolve; });
+  return new Promise(resolve => { finishRead = resolve; });
+ });
+ const login = transport.fetch('/api/access/login', { method: 'POST' });
+ const oldRead = transport.fetch('/api/access/session');
+ finishWrite(new Response('{}')); await login;
+ finishRead(new Response(JSON.stringify(session())));
+ assert.equal((await oldRead).status, 409);
+});
 test('General login validates credentials without requiring reviewer permission; DTO drops external roles and private fields', async () => {
  let calls = 0;
  const access = new AccessAccount({ login: async () => { calls++; return session(); } });

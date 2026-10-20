@@ -8,6 +8,9 @@ export default defineNuxtRouteMiddleware(async to => {
   const model = useNuxtApp().$accessModel();
   try {
     await model.checkSession();
+    // A broadcast can invalidate preparation while this read is in flight.
+    // Re-read the current identity once instead of routing on the discarded one.
+    if (model.state.failure?.kind === 'conflict') await model.checkSession();
     const session = model.state.session;
     if (!session) {
       if (model.state.failure) {
@@ -17,7 +20,7 @@ export default defineNuxtRouteMiddleware(async to => {
       if (access !== 'guest') return navigateTo('/iniciar-sesion', { replace: true });
       if (to.query.entry === 'checked') {
         const { entry: _, ...query } = to.query;
-        return navigateTo({ path: to.path, query }, { replace: true });
+        return navigateTo({ path: to.path, query, hash: to.hash }, { replace: true });
       }
       return;
     }

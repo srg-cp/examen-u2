@@ -102,6 +102,21 @@ público, QR y zonas privadas futuras. No cambia Flutter ni las políticas SQL.
 
 ## Validación y producción
 
+ADR-082: los dos endpoints logout confirman el borrado local de cookies y usan
+event.waitUntil de Nitro para el intento remoto (timeout existente5s). El fixture
+moderationFixture.pauseLogout retiene Supabase hasta liberarlo explícitamente;
+access-production y check-session-entry-browser exigen respuesta/login antes de
+liberarlo, con cookies y datos retirados. No es una cola duradera ni confirmación
+de revocación remota; una caída del servidor puede interrumpir ese intento.
+
+ADR-080: landing prepara sesión/destino en cliente y precarga su página.
+AccountSessionTransport reutiliza GET de sesión máximo15s/expiración (4015s),
+deduplica lecturas e invalida por mutaciones, broadcasts, foco y visibilidad.
+No cachea permisos ni operaciones. check-session-entry-browser verifica que
+el clic preparado y la llegada no consultan otra vez sesión, bloqueando esa API;
+el clic temprano comparte la consulta pendiente. Pruebas de TTL/carreras en
+access.test.mjs. SSR de landing permanece público y sin datos de cuenta.
+
 ADR-079: todas las páginas usan shared/routing/route_policy.ts y el middleware
 global de acceso. Registrar allí cualquier página o alias nuevo: pages:extend
 rechaza omisiones en preparación/build y architecture.test.mjs compara el

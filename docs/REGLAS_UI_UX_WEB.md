@@ -1,5 +1,15 @@
 # Entre Huellas: reglas de UI y UX web
 
+## Toast deslizable —19/10/2026
+
+Por instrucción del usuario, TopToast entra desde fuera del viewport superior
+en480ms y sale hacia arriba en240ms, con gesto de descarte dedo/ratón. Sigue el
+arrastre; gesto corto/cancelado retorna en420ms, hacia abajo ofrece resistencia.
+Conservar toque/teclado/reintento, roles, expiración y limpieza. No ejecutar
+callbacks al arrastrar. Movimiento reducido sin transiciones. Esta decisión
+sustituye la entrada fade/slide180ms anterior, manteniendo glass y tipografía.
+[ADR-081](decisiones/081-toast-web-deslizable.md), [ficha](funcionalidades/toast-web.md).
+
 ## Regla obligatoria de ubicación y estabilidad de marca
 
 El logo oficial y el texto «entre huellas» se colocan juntos, en una línea,

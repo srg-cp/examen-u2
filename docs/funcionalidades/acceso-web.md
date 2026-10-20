@@ -1,5 +1,54 @@
 # Acceso web
 
+## Avisos web de una sola vez y URL limpia —19/10/2026
+
+Por autorización del usuario, login consume los motivos signed-out, expired,
+forbidden, oauth-failed y oauth-cancelled; inicio consume forbidden. Tras comprobar
+la sesión se reemplaza la entrada actual del router, retirando solo reason
+reconocido y mostrando el toast compartido. Recargar o volver desde legales no
+repite el aviso consumido. Parámetros ajenos (incluidos repetidos) y fragmento
+se conservan; el guard también conserva el fragmento al retirar entry=checked.
+No cambia autorización, callbacks OAuth, política SSR ni comprobación por operación.
+Los parámetros desconocidos no se interpretan como avisos. La limpieza requiere
+JavaScript; en SSR se mantiene el transporte existente hasta la hidratación.
+Sin SQL, Flutter, variables nuevas, despliegue ni cierre de HU-01/HU-14.3.
+
+Validación local: typecheck y build de Nuxt correctos;46 pruebas unitarias/
+arquitectura y21 de servidor aprobadas. Chrome sobre build de producción y backend
+fixture verifica los cinco motivos, alias /login, URL limpia sin entrada adicional
+en historial, parámetros repetidos/fragmento, navegación sobre la misma pantalla,
+recarga/volver, cierre de cuenta/moderación y denegación SSR/SPA sin montar revisión.
+Sin errores CSP/hidratación. No se usaron cuentas remotas ni se publicó.
+Siguiente paso: comprobar el recorrido con la configuración real antes de publicar.
+
+
+
+## Cierre sin esperar a Supabase —19/10/2026
+
+El servidor elimina cookies web y confirma el cierre local antes de terminar
+la llamada a Supabase. Nitro event.waitUntil mantiene ese intento en servidor
+con timeout existente5s; no bloquea navegar al login. El cliente espera únicamente
+la respuesta de borrado HTTP, limpia datos/preparación y avisa a otras pestañas.
+Sin configuración remota también borra cookies; origen/métodos siguen protegidos.
+La confirmación no afirma revocación remota ni entrega duradera ante reinicio.
+JWT emitidos conservan vencimiento y las sesiones móviles no se cierran.
+[ADR-082](../decisiones/082-cierre-web-sin-esperar-supabase.md); pruebas con
+Supabase retenido, evidencia en ESTADO. Sin SQL, variables nuevas ni despliegue.
+
+## Destino preparado desde landing —19/10/2026
+
+La landing prepara la sesión con el ViewModel y precarga el destino. El enlace
+apunta a /inicio, /bienvenida o /iniciar-sesion antes de pulsar. Preparación,
+guard y llegada reutilizan la respuesta en memoria de la misma app máximo15s,
+limitada por expiresAt;401 confirmado máximo5s, fallos no se guardan. Data
+deduplica consultas y se invalida por mutaciones, cambios entre pestañas, foco,
+visibilidad y401/409. Pantalla refresca preparación cada10s solo visible; limpia
+timers/listeners al salir. Permisos/operaciones siempre van al servidor.
+Sin estado privado SSR, almacenamiento persistente o singleton de servidor.
+Si se pulsa antes de preparar o después de caducar puede haber espera real y
+se conserva shimmer. [ADR-080](../decisiones/080-preparar-acceso-desde-landing.md)
+sustituye la limitación de feedback únicamente descrita en la nota anterior.
+
 ## Feedback inmediato al navegar —19/10/2026
 
 La comprobación global de sesión es asíncrona: Vue Router conserva la página

@@ -36,7 +36,7 @@ try {
   await page.getByLabel('Correo', { exact: true }).fill(email); await page.getByLabel('Contraseña', { exact: true }).fill('test-fixture-password'); await page.getByLabel('Contraseña', { exact: true }).press('Enter');
  }
  async function signout() {
-  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await page.waitForURL('**/iniciar-sesion?reason=signed-out');
+  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click(); await page.waitForURL('**/iniciar-sesion');
  }
  await captures('login');
  server.setOnboarding(ordinary, false);
@@ -54,7 +54,7 @@ try {
  await page.getByRole('heading', { name: 'Hola, Usuario de prueba', exact: true }).waitFor(); assert.equal(server.completions(), 1);
  assert.equal(await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).count(), 0);
  await captures('ordinary-home');
- await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio?reason=forbidden'); await page.getByRole('alert').filter({ hasText: 'no tiene permiso' }).waitFor();
+ await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio'); await page.getByRole('alert').filter({ hasText: 'no tiene permiso' }).waitFor();
  await page.goto(server.origin + '/login?next=https://untrusted.example'); await page.waitForURL('**/inicio'); // Fixed destination, not an open redirect.
  const other = await context.newPage(); observe(other); await other.goto(server.origin + '/inicio'); await other.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
  await signout(); await other.waitForURL('**/iniciar-sesion'); assert.equal(await other.getByText('ordinario@example.test', { exact: true }).count(), 0);
@@ -66,7 +66,7 @@ try {
  await page.getByRole('heading', { name: 'Hola, Revisor de prueba', exact: true }).waitFor();
  await page.unroute('**/api/access/management'); await page.getByRole('button', { name: 'Reintentar acceso a gestión', exact: true }).click();
  await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).click(); await page.waitForURL('**/moderacion'); await page.getByRole('button', { name: 'Revisar denuncia', exact: true }).waitFor();
- server.revoke(true); await page.reload(); await page.waitForURL('**/inicio?reason=forbidden'); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+ server.revoke(true); await page.reload(); await page.waitForURL('**/inicio'); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
  assert.equal(await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).count(), 0); server.revoke(false);
  await page.route('**/api/access/session', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' }));
  await page.reload(); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).waitFor(); assert.equal(await page.getByText('moderador@example.test', { exact: true }).count(), 0);
@@ -77,7 +77,7 @@ try {
   if (Date.now() >= expiresAt) return route.fulfill({ status: 401, contentType: 'application/json', body: '{"error":"unauthenticated"}' });
   const response = await route.fetch(), body = await response.json(); await route.fulfill({ response, json: { ...body, expiresAt } });
  });
- await page.reload(); await page.waitForURL('**/iniciar-sesion?reason=expired'); await page.getByRole('alert').filter({ hasText: 'La sesión expiró' }).waitFor();
+ await page.reload(); await page.waitForURL('**/iniciar-sesion'); await page.getByRole('alert').filter({ hasText: 'La sesión expiró' }).waitFor();
  await page.unroute('**/api/access/session'); await context.clearCookies(); await other.close();
  for (const provider of ['Google', 'Facebook']) {
   server.oauthDenied(provider === 'Facebook');
