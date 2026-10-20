@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,8 +35,7 @@ class RegisterScreen extends ConsumerWidget {
         canPop: !state.isBusy,
         child: StaggerReveal(
           count: 8,
-          child: Scaffold(
-            backgroundColor: Colors.white,
+          child: AppScaffold(
             body: AuthPageLayout(
               title: state.confirmationEmail == null ? 'Crear cuenta' : null,
               showClose: true,

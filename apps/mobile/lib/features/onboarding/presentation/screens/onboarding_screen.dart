@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,8 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       noticeId: state,
       child: PopScope(
         canPop: false,
-        child: Scaffold(
-          backgroundColor: Colors.white,
+        child: AppScaffold(
           body: SafeArea(
             child: Center(
               child: ConstrainedBox(

@@ -1,5 +1,165 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Corrección posterior20/10 del usuario para Inicio: título sin GlassSurface,
+tamaño32 tras nueva referencia (antes26/23); Poppins/pesos de ADR-105 conservados.
+«Su regreso» gris #454746; «empieza contigo» degradado horizontal #459FF6→#75C9EF.
+Descripción trasladada debajo de la ilustración, dentro de su tarjeta glass.
+«Explora cerca de ti» también reutiliza GlassSurface/radio26.
+
+**Explorar20/10, ADR-106:** apertura50% y máximo90%, mínimo adaptable a resumen
+y Ver ficha antes del separador, con inset inferior+12 libres. Texto ampliado
+puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
+(fuente8, objetivos48) a la derecha justo sobre el panel y acompañando su gesto.
+Reservar retorno; retirar título central si falta espacio. Sustituye mínimo50%
+y crédito superior de ADR-103/084 solo aquí, sin cambiar paleta global ADR-104.
+Movimiento refinado: acompañar al dedo directamente y acomodar al soltar con
+easeInOutCubic320–540ms, según distancia; retorno amortiguado en el mínimo.
+Sin tween durante arrastre ni acomodo autónomo con movimiento reducido.
+
+**Título de Inicio móvil20/10, ADR-105:** por referencia explícita del usuario,
+«Su regreso» usa Poppins400/gris #454746 y «empieza contigo» Poppins600/azul
+#459FF6, en líneas separadas, tamaño23/altura1.25 y ampliación del sistema.
+Excepción local a la fuente del sistema; fuentes incluidas con licencia OFL.
+Resto de componentes/tipografía conservados. [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+
+**Todos los mapas,20/10, ADR-104:** acabado intermedio50/50 entre color original
+de Reportar y anterior Explorar. Solo teselas, con base Positron configurada y
+matriz compartida obligatoria; pines/radios/créditos/controles fuera del filtro.
+Aplica móvil y web, incluidos mapas nuevos; sustituye estilo exclusivo de
+Explorar y variantes anteriores. Panel/cámara siguen siendo propios del flujo.
+
+**Mapa20/10, ADR-103:** aplicar la propuesta ImageGen aprobada: mapa claro sin
+disco del radio, pines con símbolo oficial y selección negra/blanca, panel50–90%
+con miniatura112×112, nombre/rasgos, flecha azul compartida con navegación y Ver
+ficha gris. Ambos abren detalle; datos en vertical después del separador.
+Sustituye foto4:3/fila horizontal/CTA fijo y mínimo42% de ADR-099/097/061.
+Conservar créditos, consultas, scroll, toast/shimmer y accesibilidad.
+Refinamiento20/10: Explorar en cápsula GlassSurface/radio24; teselas blanco grisáceo
+con calidez leve (claro orientativo #F6F6F2), sin afectar símbolo/créditos, y zoom mínimo15 al seleccionar
+desde una vista más amplia. Foto112px, scroll con texto ampliado.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md).
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+**Mapa flotante19/10, ADR-101:** sustituir Lista/Mapa en Explorar por cápsula
+Mapa con GlassSurface/radio26, icono22 y texto14/600. Fija derecha16,
+bottom100 más inset; mínimo48px y20px sobre navegación. Padding final200 más
+crecimiento del texto/inset; no repetir entrada al desplazar. Mantener origen
+real, consulta/scroll, movimiento reducido y carga/bloqueo existentes.
+[ADR-101](decisiones/101-mapa-acceso-flotante-explorar.md).
+
+**Explorar compacto19/10, ADR-100:** Ubicación aprovecha el ancho y muestra
+lugar/radio en línea, con tooltip completo para el lugar elidido. Filtrar casos
+usa solo tune en círculo48×48, sin etiqueta visible/chevrón, con nombre accesible,
+tooltip y estado expandido. Fila48px con texto normal; permitir crecer con texto
+ampliado. Área táctil mínima48, paneles y efectos compartidos conservados.
+[ADR-100](decisiones/100-explorar-controles-compactos.md).
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+**Mapa móvil19/10, corrección ADR-099:** tipo de mascota (Perro/Gato/Otra
+especie), sin raza. Foto4:3 a ancho completo adaptable, sin altura fija136px.
+Sin líneas Abierto/Resuelto ni conteo de casos/ubicaciones en el panel. Cada
+caso tiene su pin; separar visualmente objetivos solapados, sin agrupación,
+contador o selector1 de2. Conservar coordenadas públicas y búsqueda reales,
+Ver ficha, paginación/reintento, panel/retorno y accesibilidad. Sustituye esos
+puntos de ADR-062/097; [ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+**Navegación móvil19/10, ADR-098:** opción activa y Reportar usan el acabado
+de Iniciar sesión de landing: cápsula azul75BFFF/459FF6/2887EF, brillo superior
+y sombras. Hover/foco/pulsación: elevación2px y oscurecimiento3% en200ms.
+Movimiento reducido sin elevación ni transición. Conservar glass, tamaños,
+iconos y deslizamiento320ms. Excepción visual limitada a estos acentos.
+[ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
+**Explorar móvil19/10, ADR-097:** filtros y ubicación se editan solo desde
+Explorar. El mapa muestra el resumen público del pin en su panel inferior y
+Ver ficha abre el detalle existente; sin tarjeta duplicada junto al punto.
+Foto/nombre/tamaño/raza/fecha/estado, coincidencias anterior/siguiente y scroll
+del panel. CTA fijo cuando cabe, dentro del scroll en altura pequeña/texto2;
+sin selección no hay CTA. Conservar42–90%, resistencia, retorno glass,
+movimiento reducido, paginación y consulta compartida. Sustituye los filtros
+de ADR-056/061 y la ubicación del preview de ADR-062.
+[ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
+
+**Toast móvil igual al web —19/10/2026:** ConfirmationToastHost conserva glass
+y tamaños de TopToast; texto14/peso400 y acción subrayada. Entrada desde fuera
+del borde superior480ms, descarte hacia arriba240ms y retorno420ms. Gesto con
+dedo/ratón, resistencia hacia abajo y scroll en mensajes extensos.6500ms de
+duración, pausada al sostener; mantener toque/teclado/reintento y limpieza.
+Movimiento reducido sin transiciones. Sustituye entrada180ms/peso600/duración
+3–6s de móvil. [ADR-096](decisiones/096-toast-mobile-igual-web.md).
+
+**Títulos de sección móvil19/10:** CollectionHeader usa peso500, como el título
+de Inicio web, por petición del usuario. Aplica a Explorar, Mis mascotas y los
+listados que comparten cabecera. El fallback de Home conserva el mismo peso;
+tamaño32, color y adaptación existentes se mantienen.
+
+**Entrada Inicio/Explorar19/10:** un único stagger, sin cover previo en estas
+dos secciones. Explorar conserva su timeline propio sin otro activo desde Home.
+Las tarjetas glass usan StaggerRevealItem/preserveBackdrop: fade y desplazamiento
+compartidos, sin recorte progresivo ni ImageFiltered sobre el material. GlassSurface
+usa backdropBlendMode src en estas tarjetas para componer la opacidad. ADR-095
+sustituye el recorte de094; superficie y contenido entran juntos.
+Aspecto final/radios/geometría conservados. ADR-094 sustituye esta parte de093.
+HomeReunionCard usa
+reunion.png original de web, imagen3:2 contenida en card glass entre accesos
+rápidos y Cerca de ti, sin acción ficticia. Inicio tiene cuatro grupos.
+
+**Marca móvil19/10:** por instrucción del usuario, lettering igual al web:
+«entre huellas», Arial/peso CSS500, #171918, tracking−.05em. Reutilizar BrandName
+(contornos SVG) desde BrandWordmark y StartupReveal; sin sans-serif800 o mayúsculas
+alternativos. Mantener símbolo oficial, tamaños/posición por recorrido, semántica
+y disposición móvil en dos líneas. Marca como arte gráfico estable con FittedBox;
+los demás textos conservan ampliación y tipografía. Seguir ADR-092.
+
+**Fondo móvil19/10/2026, corrección vigente:** blanco con nubes azules difuminadas
+distribuidas arriba, en medio y abajo, con movimiento suave continuo de24s.
+Pausa por movimiento reducido y TickerMode; pintura aislada sin reconstruir UI.
+La tarjeta principal «Su regreso empieza contigo» reutiliza GlassSurface/radio26,
+transparencia, blur y ribete compartidos; contenido/padding/acción conservados.
+ADR-091 sustituye fondo estático/concentrado arriba de ADR-088 y el degradado086;
+no trasladar la composición ni funciones de logística. Web conserva ADR-083.
+Usar AppScaffold/AppPageBackground compartidos, también en arranque Flutter y
+onboarding; fondo exterior fijo al viewport, fuera del scroll/teclado/insets.
+CoverReveal y expansión desde origen acompañan la paleta, con efectos/tiempos
+conservados. Campos, tarjetas, fotos, mapas y modales conservan superficies.
+Sin cambios de splash nativo o landing web. Seguir ADR-091.
+
+**Cartografía móvil19/10:** CARTO Positron configurado por el usuario conserva
+los pines de marca y muestra créditos enlazados legibles arriba a la derecha,
+con retorno separado y reintento debajo. La confirmación actual sustituye la
+retirada de ADR-054 únicamente para mapas CARTO, sin créditos nuevos en Photon.
+Texto adaptable, áreas táctiles y toast ante fallo de enlaces; ADR-084.
+
+**Marca web compartida —19/10/2026:** usar posición, color y medidas reales
+de landing con SiteBrand/SiteHeader, también en login/onboarding y responsive.
+Cuerpo de pantallas/móvil conserva su referencia.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+**Marca web —19/10/2026:** logo/texto en cabecera superior izquierda como
+landing y onboarding, también en responsive; fuera del contenido y sus efectos.
+Referencia móvil conservada. [ADR-076](decisiones/076-posicion-unificada-marca-web.md).
+
+
+**Corrección web —19/10/2026:** la norma cover→stagger se sustituye en entradas
+generales de apps/platform por StaggerReveal/useStaggerReveal sin capa opaca.
+No altera Flutter ni el clip-path aprobado de landing. Preservar cabeceras,
+movimiento reducido y lectura SSR del QR sin JavaScript.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+**Onboarding web19/10:** /bienvenida adopta sader-panel por solicitud expresa,
+con imágenes/textos de móvil; excepción local a Arial/cápsula/cover globales.
+Inter, salida→entrada sin cobertura crema y movimiento reducido según
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+No modifica la presentación móvil ni las demás rutas web.
+
 **Consolidación web —19/10/2026:** las medidas vigentes están en
 [REGLAS_UI_UX_WEB](REGLAS_UI_UX_WEB.md). Estas correcciones prevalecen sobre
 las notas anteriores de los mismos recorridos, sin modificar Flutter:

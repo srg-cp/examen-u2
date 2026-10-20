@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { test } from 'node:test';
+import { posix } from 'node:path';
 import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts';
 import { configuration } from '../server/infrastructure/config.ts';
+import { routePolicies, routeAccess, sessionRedirect, accountDestination, assertRegisteredRoutes } from '../shared/routing/route_policy.ts';
 async function sources(path) {
   const files = [];
   for (const item of await readdir(path, { withFileTypes: true })) {
@@ -12,6 +14,61 @@ async function sources(path) {
   }
   return files;
 }
+
+test('All maps use shared adapters and the same mobile/web tile palette', async () => {
+  for (const [path, source] of await sources(new URL('../app/', import.meta.url))) {
+    if (path.endsWith('/components/LocationMap.vue')) continue;
+    assert.doesNotMatch(source, /from ['"]leaflet['"]|import\(['"]leaflet['"]\)|\bL\.map\(/, path);
+  }
+  const adapter = await readFile(new URL('../app/components/LocationMap.vue', import.meta.url), 'utf8');
+  assert.match(adapter, /config\.public\.mapTileUrl/);
+  assert.match(adapter, /map-attribution/);
+  const dart = await readFile(new URL('../../mobile/lib/core/presentation/widgets/map_style.dart', import.meta.url), 'utf8');
+  const svg = await readFile(new URL('../public/map-style.svg', import.meta.url), 'utf8');
+  const mobile = dart.match(/ColorFilter\.matrix\(\[([\s\S]*?)\]\)/)[1].split(',').map(s => s.trim()).filter(Boolean).map(Number);
+  const web = svg.match(/values="([\s\S]*?)"/)[1].trim().split(/\s+/).map(Number);
+  assert.equal(mobile.length, 20); assert.equal(web.length, 20);
+  for (let i = 0; i < mobile.length; i++) assert.ok(Math.abs(mobile[i] / (i % 5 === 4 ? 255 : 1) - web[i]) < 1e-10, `Matrix differs at ${i}`);
+  assert.match(svg, /color-interpolation-filters="sRGB"/);
+  const css = await readFile(new URL('../app/assets/maps.css', import.meta.url), 'utf8');
+  assert.match(css, /\.leaflet-tile-pane\s*\{\s*filter: url\('\/map-style\.svg#cartography'\)/);
+});
+
+test('All pages share the global access policy; new pages cannot bypass registration', async () => {
+  const pages = await sources(new URL('../app/pages/', import.meta.url));
+  const patterns = pages.map(([path, source]) => {
+    assert.doesNotMatch(source, /middleware\s*:/, 'Page must use the global access guard: ' + path);
+    return '/' + path.split('/app/pages/')[1].replace(/\.vue$/, '').replace(/\[\.\.\.(\w+)\]/g, ':$1(.*)*').replace(/\[(\w+)\]/g, ':$1').replace(/(^|\/)index$/, '');
+  });
+  assert.deepEqual(patterns.sort(), Object.keys(routePolicies).sort());
+  assertRegisteredRoutes(patterns);
+  assert.throws(() => assertRegisteredRoutes(['/nueva-pagina']), /Define the access policy/);
+  assertRegisteredRoutes(['/c/:slug()', '/:path(.*)*']);
+  assert.equal(routeAccess('/moderacion/'), 'reviewer');
+  assert.equal(routeAccess('/c/token'), 'public');
+  assert.equal(routeAccess('/no-existe'), 'public');
+  const extended = { ...routePolicies, '/mascotas/:id': 'account', '/revision/:id': 'reviewer' };
+  assert.equal(routeAccess('/mascotas/123', extended), 'account');
+  assert.equal(routeAccess('/revision/123/', extended), 'reviewer');
+  assert.equal(routeAccess('/mascotas/123/otra', extended), 'public');
+  assert.equal(sessionRedirect('reviewer', false), '/bienvenida');
+  assert.equal(sessionRedirect('reviewer', true), null);
+  assert.equal(sessionRedirect('public', false), null);
+  for (const value of ['https://untrusted.example', '//untrusted.example', '/no-existe', '/terminos', '/moderacion?next=x']) assert.equal(accountDestination(value), null);
+  assert.equal(accountDestination('/moderacion'), '/moderacion');
+  const global = await readFile(new URL('../app/middleware/access.global.ts', import.meta.url), 'utf8');
+  assert.match(global, /routeAccess/);
+  const config = await readFile(new URL('../nuxt.config.ts', import.meta.url), 'utf8');
+  assert.match(config, /pages:extend/); assert.match(config, /assertRegisteredRoutes/);
+});
+
+test('Web reveal has no legacy painted cover utility or per-screen reveal classes', async () => {
+  const css = await readFile(new URL('../app/assets/main.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /\.reveal\b|@keyframes\s+(?:cover|arrive)\s*\{/);
+  for (const [path, source] of await sources(new URL('../app/features/', import.meta.url))) {
+    assert.doesNotMatch(source, /class="[^"]*(?<![\w-])reveal(?![\w-])/, path);
+  }
+});
 test('Domain and presentation boundaries keep credentials, infrastructure and SDK out of Vue/client', async () => {
   for (const [path, source] of await sources(new URL('../shared/features/', import.meta.url))) {
     if (path.includes('/domain/')) assert.doesNotMatch(source, /node:|supabase|from ['"].*(data|presentation|vue|nuxt)|fetch\(/);
@@ -39,5 +96,21 @@ test('Administrative UI remains exclusive to platform, with no Flutter administr
   assert.match(page, /ModerationScreen/);
   for (const [path, source] of await sources(new URL('../server/features/moderation/', import.meta.url))) {
     assert.doesNotMatch(source, /\/presentation\/|from ['"].*(?:vue|nuxt)/, path);
+  }
+});
+
+test('Features collaborate through domain contracts without importing another feature data or presentation', async () => {
+  for (const root of ['../shared/features/', '../app/features/', '../server/features/']) {
+    for (const [path, source] of await sources(new URL(root, import.meta.url))) {
+      const feature = path.match(/\/features\/([^/]+)\//)?.[1];
+      for (const [, specifier] of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)) {
+        const target = specifier.startsWith('.') ? posix.normalize(posix.dirname(path) + '/' + specifier) : specifier;
+        const dependency = target.match(/(?:^|\/)features\/([^/]+)\/(data|presentation)\//);
+        if (dependency) assert.equal(dependency[1], feature, path + ' imports ' + specifier);
+      }
+    }
+  }
+  for (const [path, source] of await sources(new URL('../app/components/', import.meta.url))) {
+    assert.doesNotMatch(source, /from\s+['"][^'"]*features\//, path);
   }
 });

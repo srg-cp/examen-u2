@@ -2,6 +2,8 @@ import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import '../../../../core/presentation/widgets/glass_surface.dart';
+import 'home_reunion_card.dart';
 import '../state/home_view_state.dart';
 
 class HomeContent extends StatelessWidget {
@@ -18,49 +20,33 @@ class HomeContent extends StatelessWidget {
     children: [
       StaggerRevealItem(
         order: 0,
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F7),
-            borderRadius: BorderRadius.circular(26),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.pets_outlined,
-                size: 32,
-                color: Color(0xFF111111),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Su regreso empieza contigo',
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF111111),
+        child: Semantics(
+          label: 'Su regreso empieza contigo',
+          excludeSemantics: true,
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 32,
+              height: 1.25,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF454746),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Su regreso'),
+                ShaderMask(
+                  blendMode: BlendMode.srcIn,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFF459FF6), Color(0xFF75C9EF)],
+                  ).createShader(bounds),
+                  child: const Text(
+                    'empieza contigo',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Una comunidad para conectar mascotas perdidas con quienes pueden ayudar.',
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  color: Color(0xFF6E6E73),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextButton.icon(
-                onPressed: () => onSelect(HomeSection.pets),
-                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                label: const Text('Conoce Mis mascotas'),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF111111),
-                  padding: EdgeInsets.zero,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -112,8 +98,11 @@ class HomeContent extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 28),
+      const HomeReunionCard(),
+      const SizedBox(height: 28),
       StaggerRevealItem(
-        order: 2,
+        order: 3,
+        preserveBackdrop: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -159,26 +148,26 @@ class HomeQuickAction extends StatelessWidget {
   final ValueChanged<BuildContext> onTap;
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0xFFF5F5F7),
+    color: const Color(0xFF111111),
     borderRadius: BorderRadius.circular(22),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
       onTap: () => onTap(context),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
         child: SizedBox(
           width: double.infinity,
           child: Column(
             children: [
-              Icon(icon, size: 28, color: const Color(0xFF111111)),
-              const SizedBox(height: 12),
+              Icon(icon, size: 25, color: Colors.white),
+              const SizedBox(height: 10),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF111111),
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -200,35 +189,35 @@ class HomeNotice extends StatelessWidget {
   final String title;
   final String description;
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      border: Border.all(color: const Color(0xFFE5E5EA)),
-      borderRadius: BorderRadius.circular(22),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: const Color(0xFF6E6E73), size: 28),
-        const SizedBox(height: 12),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111111),
+  Widget build(BuildContext context) => GlassSurface(
+    radius: 26,
+    backdropBlendMode: BlendMode.src,
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: const Color(0xFF6E6E73), size: 28),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF111111),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          description,
-          style: const TextStyle(
-            fontSize: 16,
-            height: 1.4,
-            color: Color(0xFF6E6E73),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.4,
+              color: Color(0xFF6E6E73),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

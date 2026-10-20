@@ -132,12 +132,16 @@ class StaggerRevealItem extends StatelessWidget {
     required this.order,
     required this.child,
     this.enabled = true,
+    this.preserveBackdrop = false,
     super.key,
   }) : assert(order >= 0);
 
   final int order;
   final Widget child;
   final bool enabled;
+
+  /// Reveals glass and its content together without filtering their backdrop.
+  final bool preserveBackdrop;
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +169,7 @@ class StaggerRevealItem extends StatelessWidget {
             child: Transform.translate(
               offset: Offset(0, -28 * (1 - progress)),
               child: ImageFiltered(
-                enabled: progress > 0 && progress < 1,
+                enabled: !preserveBackdrop && progress > 0 && progress < 1,
                 imageFilter: ui.ImageFilter.blur(
                   sigmaX: 18 * (1 - progress),
                   sigmaY: 18 * (1 - progress),

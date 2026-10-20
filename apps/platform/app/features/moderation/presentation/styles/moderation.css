@@ -6,7 +6,6 @@
 .reader-shell .moderation-screen label{display:flex;flex-direction:column;gap:10px;color:#171918;line-height:1.5;position:relative}
 .reader-shell .moderation-screen input,.reader-shell .moderation-screen textarea,.reader-shell .moderation-screen select{font:inherit;font-size:1rem;width:100%;min-height:60px;padding:18px 16px;border:1px solid #c8d1d5;border-radius:22px;background:#f9fbfc;color:#171918}
 .reader-shell .moderation-screen textarea{resize:vertical;padding-bottom:40px}
-.reader-shell .moderation-screen input:focus-visible,.reader-shell .moderation-screen textarea:focus-visible,.reader-shell .moderation-screen select:focus-visible{outline:3px solid #2c87ce;outline-offset:4px}
 .reader-shell .moderation-screen .field-count{position:absolute;bottom:12px;right:16px;color:#656861;font-size:.85rem;pointer-events:none}
 .reader-shell .moderation-screen .invalid input,.reader-shell .moderation-screen .invalid textarea{border:2px solid #b42318}
 .reader-shell .moderation-screen .shake{animation:moderation-shake .28s ease-in-out}

@@ -18,7 +18,7 @@ class CollectionHeader extends StatelessWidget {
         title,
         style: const TextStyle(
           fontSize: 32,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w500,
           color: Color(0xFF111111),
         ),
       );

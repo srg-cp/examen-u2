@@ -19,6 +19,77 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Cartografía global20/10/2026: todos los mapas móviles/web usan el acabado
+  intermedio entre Reportar original y Explorar, según
+  [ADR-104](docs/decisiones/104-cartografia-global-mobile-web.md). Reutilizar
+  ZoneMapPicker/MapStyle en Flutter y LocationMap/maps.css/map-style.svg en Nuxt;
+  sin filtros por funcionalidad ni mapas que eludan adaptadores compartidos.
+  Solo teselas, manteniendo contraste de pines/radios/créditos, datos, permisos,
+  selección y reintentos. Configurar la misma base Positron en ambos entornos;
+  ninguna credencial de backend en URL pública de cartografía.
+
+- Registro y recuperación web por código (19/10/2026): seguir ADR-087.
+  /crear-cuenta y /recuperar-contrasena usan política guest;
+  /restablecer-contrasena usa recovery en la política global SSR/cliente.
+  La capacidad cifrada eh_credentials nunca autoriza inicio/moderación ni se
+  convierte en sesión normal al verificar recovery. Token solo en servidor/cookie
+  HttpOnly; código6 y reenvío60s validados en dominio/servidor. Registro confirmado
+  conserva onboarding por cuenta. No introducir guards por pantalla ni SDK cliente.
+
+- Por instrucción explícita del usuario del19/10/2026, el acceso y la etapa de
+  cuenta se comprueban globalmente en todas las rutas web, antes de renderizar
+  en servidor y montar en navegación cliente. Usar la política única compartida
+  de ADR-079; no añadir guards por pantalla. Toda página/alias nueva declara su
+  política y el build/comprobaciones rechazan omisiones. Públicas, QR y legales
+  conservan acceso anónimo; rutas protegidas no muestran shell/skeleton antes
+  del login sin sesión. Permisos por operación y reintento ante fallo de backend
+  se mantienen. Véase [ADR-079](docs/decisiones/079-politica-global-de-acceso-web.md).
+
+- Marca web: reutilizar SiteBrand/SiteHeader de la landing en todos los
+  recorridos, con su posición, color #171918, tipografía y tamaños adaptables,
+  incluidos login/onboarding. Cabecera fuera del stagger; no crear variantes
+  por funcionalidad. Mantener posición y dimensiones desde el primer render SSR
+  hasta hidratación/recarga completadas, sin saltos ni recentrado; acciones y
+  retorno no desplazan ni tapan la marca. Seguir [ADR-077](docs/decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+- Por instrucción explícita del usuario del19/10/2026, el logo oficial y texto
+  «entre huellas» de la web van en la cabecera superior, alineados a la izquierda
+  con la posición/márgenes de landing y onboarding, también en responsive.
+  Fuera de la columna de contenido, stagger y skeletons; estables entre etapas.
+  Aplica también a acceso y gestión, sustituyendo posiciones previas dentro
+  del contenido. Seguir [ADR-076](docs/decisiones/076-posicion-unificada-marca-web.md).
+
+
+- Por instrucción explícita del usuario del19/10/2026, /bienvenida web toma la
+  composición/tipografía/botones y transición de sader-panel, con los tres PNG
+  y textos originales de onboarding móvil. Seguir
+  [ADR-074](docs/decisiones/074-onboarding-web-referencia-sader-y-mobile.md):
+  Inter local, botones radio18px base y stagger550ms/90ms con salida antes del
+  cambio. Es excepción local a Arial/cápsula/cover; no usar .reveal ni cobertura
+  crema en onboarding, ni copiar apariencia/roles del otro proyecto.
+  Mantener movimiento reducido, shimmer de guardado, reintento y limpieza.
+
+- Por instrucción explícita del usuario del19/10/2026, Entre Huellas ofrece
+  funciones de usuario en web y móvil sobre la misma cuenta/datos. La landing
+  presenta el proyecto; el login web es general y no exige rol de moderación.
+  Seguir [ADR-073](docs/decisiones/073-acceso-general-web-y-gestion-por-permisos.md):
+  entrada común, bienvenida por cuenta y espacios de gestión según permisos.
+  Administrador y moderador son permisos diferenciados, sin herencia implícita
+  ni autoasignación. El incremento actual entrega inicio de cuenta y revisión;
+  no afirmar paridad completa ni crear páginas de administración/usuario vacías.
+  Administración y moderación siguen exclusivamente en web.
+
+- Por instrucción explícita del usuario del19/10/2026, las rutas de navegación
+  visibles de `apps/platform` usan español, minúsculas y guiones, sin tildes ni ñ.
+  Seguir [ADR-072](docs/decisiones/072-rutas-web-en-espanol.md): objetivos
+  `/iniciar-sesion`, `/terminos` y `/privacidad`; al migrar, conservar redirecciones
+  desde `/login`, `/terms` y `/privacy` y los parámetros necesarios del flujo.
+  La raíz `/` y el contrato QR `/c/:token` se conservan. Código, SQL y endpoints
+  internos pueden seguir en inglés; callbacks OAuth y deep links son contratos
+  de integración y no se renombran por esta regla. Login y legales ya migrados
+  con redirecciones por ADR-073; otros nombres objetivo no crean pantallas vacías.
+
 - Por instrucción explícita del usuario del18/10/2026, administración y
   moderación se implementan exclusivamente en `apps/platform` (Vue/Nuxt).
   `apps/mobile` no contiene pantallas, menús, guards ni acciones administrativas;
@@ -53,6 +124,10 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 - Nunca usar SnackBar en la UI del proyecto, directamente ni mediante wrappers/paquetes. No sustituirlo por una barra inferior equivalente. Por instrucción explícita del usuario, ADR-007 permite toast superior propio para éxito confirmado y ADR-009 lo amplía a errores de foto de perfil; ADR-013 permite también errores de eliminación de mascotas en el mismo toast superior; ADR-016 permite validación y errores de guardado/fotos en Registrar/Editar mascota con shake danger, sin mensajes debajo. Los demás errores/validación permanecen contextuales según ADR-005. Mantener las comprobaciones y el ciclo de vida del aviso.
 - Antes de cualquier cambio visual, leer y cumplir [la regla de oro de UI y UX](docs/REGLAS_UI_UX.md). La referencia aprobada es el flujo actual de acceso/cuenta/códigos/contraseña; no reutilizar la dirección antigua ni el Inicio retirado como modelo. Consultar `docs/DISENO_UI.md` para implementación/revisión. Reutilizar componentes, dimensiones, estados y efectos; revisar renders normales/pequeños con texto ampliado, sin acciones vacías ni datos simulados.
 - Retorno/cierre superior de pantallas: usar GlassNavigationButton compartido, circular glass flotante sobre el scroll, sin franja opaca; chevrón para volver y X para cerrar. Respetar insets, tooltip y área táctil. Seguir ADR-015 y REGLAS_UI_UX.
+- Web: usar StaggerReveal/useStaggerReveal sin capa opaca ni utilidad .reveal;
+  preservar parámetros de login/onboarding, cabeceras, movimiento reducido y
+  QR SSR sin JS. Landing conserva clip-path aprobado. ADR-075 sustituye
+  cover→stagger para estas entradas web; la regla siguiente conserva Flutter.
 - Aplicar cover reveal seguido de stagger reveal en entradas de pantalla y cambios discretos de etapa, con cabeceras persistentes fuera del efecto y movimiento reducido respetado. No repetir efectos con edición/teclado/contadores/reenvío ni durante cada frame de un gesto; seguir ADR-006.
 - Nunca indicar carga de botones mediante etiquetas con puntos suspensivos (`...` o `…`). Mantener la etiqueta y usar `LoadingShimmer` compartido durante trabajo real, con semántica de progreso y bloqueo de dobles envíos; sin spinner en botones ni shimmer por simple deshabilitación/cooldown. Mantener la comprobación automática y seguir ADR-006.
 - Carga de contenido según ADR-011: skeleton en carga inicial, contenido conservado con progreso fino superpuesto durante refresh explícito de la misma cuenta. Sin textos visibles de carga ni indicadores circulares; labels accesibles permitidos. Ocultar datos anteriores al cambiar identidad y distinguir error de vacío confirmado.

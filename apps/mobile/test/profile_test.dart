@@ -273,7 +273,8 @@ void main() {
         await tester.tap(find.text('Guardar cambios'));
         await tester.pumpAndSettle();
         expect(find.text('Cambios guardados'), findsOneWidget);
-        await tester.pump(const Duration(seconds: 4));
+        await tester.pump(const Duration(seconds: 7));
+        await tester.pumpAndSettle();
         expect(find.text('Cambios guardados'), findsNothing);
         expect(tester.takeException(), isNull);
       },

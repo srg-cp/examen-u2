@@ -1,5 +1,12 @@
 # Perfil y fotografía de cuenta
 
+20/10/2026: el gesto de actualización de Inicio recarga el perfil mediante
+ProfileViewModel.retry/ReadProfile existentes, esperando el resultado real.
+Avatar conserva información durante refresh explícito de la misma cuenta;
+Inicio gestiona el fallo con toast y Reintentar. Sin nuevo contrato/backend.
+Prueba de consulta e iniciales conservadas aprobada, además de8 pruebas de
+perfil. Fixtures de toast esperan6500ms más animación. Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-01.7/#23 en Done: edición/foto/ciudad y reglas de acceso entregadas e integradas, con regresiones y CI aprobados. Se retira la nota inicial de falta de PR/integración; no se afirma una escritura remota nueva ni una inspección hosted durante la auditoría.
 
 Confirmación posterior16 de octubre: Flutter38946521408 de c727b2f pasa en Linux con339 pruebas, incluidos guardado de perfil y navegación normal/pequeña que fallaban antes. Se sustituye el pendiente de CI de la nota siguiente; no equivale a comprobación de permisos o guardado remoto de perfil.

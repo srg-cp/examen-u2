@@ -9,6 +9,35 @@ import LandingPawTrail from '../widgets/LandingPawTrail.vue';
 import LandingSideNote from '../widgets/LandingSideNote.vue';
 import '../styles/landing.css';
 const horizontalPaused = ref(false);
+const accessModel = useNuxtApp().$accessModel();
+const router = useRouter();
+const accessState = shallowRef(accessModel.state);
+const stopAccess = accessModel.subscribe(value => { accessState.value = value; });
+const accessTarget = computed(() => {
+  const session = accessState.value.session;
+  return session ? (session.profile.onboardingCompleted ? '/inicio' : '/bienvenida') : '/iniciar-sesion';
+});
+let accessChannel: BroadcastChannel | undefined;
+let accessTimer: ReturnType<typeof setInterval> | undefined;
+async function prepareAccess() {
+  if (document.visibilityState === 'hidden') return;
+  await accessModel.checkSession();
+  if (!accessState.value.failure) await preloadRouteComponents(accessTarget.value, router).catch(() => {});
+}
+onMounted(() => {
+  void prepareAccess();
+  accessTimer = setInterval(() => { void prepareAccess(); }, 10000);
+  window.addEventListener('focus', prepareAccess);
+  document.addEventListener('visibilitychange', prepareAccess);
+  accessChannel = new BroadcastChannel('eh-access');
+  accessChannel.onmessage = () => { accessModel.invalidate(); void prepareAccess(); };
+});
+onBeforeUnmount(() => {
+  clearInterval(accessTimer); accessChannel?.close();
+  window.removeEventListener('focus', prepareAccess);
+  document.removeEventListener('visibilitychange', prepareAccess);
+  stopAccess(); accessModel.dispose();
+});
 const characters = [
   { title: 'Volvemos', art: 'return' }, { title: 'Busco', art: 'search-corgi' },
   { title: 'Encontré', art: 'found-tabby' }, { title: 'Ayudo', art: 'help-dalmatian' },
@@ -32,11 +61,10 @@ const questions = [
   <div class="landing-page">
     <BackgroundGlowOrb class="landing-ambient-glow" intensity="soft" />
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <header class="header wrap">
-      <LandingBrand />
+    <SiteHeader class="header wrap">
       <nav aria-label="Navegación principal"><a href="#proyecto">Proyecto</a><a href="#como-funciona">Cómo funciona</a><a href="#comunidad">Comunidad</a><a href="#preguntas">Preguntas</a></nav>
-      <a class="button button-primary header-cta" href="#proyecto">Conoce el proyecto</a>
-    </header>
+      <NavigationLink class="button button-primary header-cta" :to="accessTarget">Iniciar sesión</NavigationLink>
+    </SiteHeader>
     <main id="contenido">
       <section id="inicio" class="hero wrap aurora" aria-labelledby="hero-title">
         <LandingPawTrail />
@@ -79,6 +107,6 @@ const questions = [
       <section id="preguntas" class="faq panel wrap" aria-labelledby="faq-title"><h2 id="faq-title">Entre Huellas<br>responde.</h2><div class="faq-list"><details v-for="([question, answer], index) in questions" :key="question" name="preguntas" :open="index === 0"><summary>{{ question }}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></summary><p>{{ answer }}</p></details></div></section>
       <section class="closing-scene" aria-labelledby="closing-title"><LandingPawTrail /><span class="closing-extra-paws" aria-hidden="true"><span class="paw-mark paw-mark-extra-1" /><span class="paw-mark paw-mark-extra-2" /><span class="paw-mark paw-mark-extra-3" /><span class="paw-mark paw-mark-extra-4" /><span class="paw-mark paw-mark-extra-5" /><span class="paw-mark paw-mark-extra-6" /></span><div class="closing aurora wrap"><h2 id="closing-title">Una huella tuya <span class="inline-pet"><LandingArt name="hero-dog" /></span><br>puede acercarlos a casa.</h2><LandingActions /></div></section>
     </main>
-    <footer class="footer wrap"><LandingSideNote /><LandingArt name="footer-dog" class="footer-dog" /><div class="footer-content"><LandingBrand footer /><p class="development">Proyecto Android en desarrollo.</p><div class="footer-links"><div><h3>Proyecto</h3><a href="#proyecto">Qué es</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></div><div><h3>Información</h3><a href="#preguntas">Privacidad</a><a href="#proyecto">Nuestra iniciativa</a><a href="#preguntas">Etapa del proyecto</a></div><div><h3>Comunidad</h3><a href="#comunidad">Colabora</a><a href="#colaborar">Difunde</a><a href="#como-funciona">Deja tu huella</a></div></div><p class="copyright">Entre Huellas · Más caminos de vuelta a casa.</p></div><LandingArt name="footer-cat" class="footer-cat" /></footer>
+    <footer class="footer wrap"><LandingSideNote /><LandingArt name="footer-dog" class="footer-dog" /><div class="footer-content"><LandingBrand footer /><p class="development">Proyecto Android en desarrollo.</p><div class="footer-links"><div><h3>Proyecto</h3><a href="#proyecto">Qué es</a><a href="#como-funciona">Cómo funciona</a><a href="#preguntas">Preguntas</a></div><div><h3>Información</h3><NavigationLink to="/privacidad">Privacidad</NavigationLink><NavigationLink to="/terminos">Términos de servicio</NavigationLink><a href="#proyecto">Nuestra iniciativa</a><a href="#preguntas">Etapa del proyecto</a></div><div><h3>Comunidad</h3><a href="#comunidad">Colabora</a><a href="#colaborar">Difunde</a><a href="#como-funciona">Deja tu huella</a></div></div><p class="copyright">Entre Huellas · Más caminos de vuelta a casa.</p></div><LandingArt name="footer-cat" class="footer-cat" /></footer>
   </div>
 </template>

@@ -347,6 +347,11 @@ void main() {
         expect(find.byType(SwitchListTile), findsNWidgets(6));
         await capture(tester, boundary, small, 'choices');
         Future<void> toggle(String label) async {
+          final toast = find.byKey(const ValueKey('feedback-toast'));
+          if (toast.evaluate().isNotEmpty) {
+            await tester.tap(toast);
+            await tester.pumpAndSettle();
+          }
           await tester.ensureVisible(find.text(label));
           await tester.pumpAndSettle();
           final tile = find.ancestor(

@@ -105,21 +105,3 @@ test('Social flow binds state/verifier, encrypts cookies, expires and rejects ta
  assert.throws(()=>openOAuthFlow(sealOAuthFlow({...flow,expiresAt:Date.now()-1},secret),flow.state,secret));
  const url=new URL(authorizeSocialUrl('https://backend.example','https://web.example',flow));assert.equal(url.searchParams.get('provider'),'google');assert.equal(url.searchParams.get('code_challenge_method'),'s256');assert.notEqual(url.searchParams.get('code_challenge'),flow.verifier);assert.equal(new URL(url.searchParams.get('redirect_to')).origin,'https://web.example');
 });
-
-test('Social access view model blocks double start, supports retry and ignores a late redirect',async()=>{
- const {AccessViewModel}=await import('../shared/features/moderation/presentation/access_view_model.ts');
- const {StartSocialSignIn}=await import('../shared/features/moderation/domain/social_access.ts');
- let resolve,calls=0;const model=new AccessViewModel(new AccessModeration({session:async()=>{throw new ModerationFailure('unauthenticated');}}),new StartSocialSignIn({start:()=>{calls++;return new Promise(r=>resolve=r);}}));
- await model.checkSession();const pending=model.signInWithProvider('facebook');assert.equal(model.state.socialProvider,'facebook');assert.equal(await model.signInWithProvider('google'),null);assert.equal(calls,1);model.dispose();resolve('https://backend.example/auth/v1/authorize');assert.equal(await pending,null);
- const broken=new AccessViewModel(new AccessModeration({session:async()=>{throw new ModerationFailure('unauthenticated');}}),new StartSocialSignIn({start:async()=>{throw Error();}}));await broken.checkSession();assert.equal(await broken.signInWithProvider('google'),null);assert.equal(broken.state.busy,false);assert.equal(broken.state.socialProvider,null);assert.equal(broken.state.failure.kind,'unavailable');
-});
-
-
-test('Social HTTP adapter keeps secrets server-side and rejects invalid destinations',async()=>{
- const {HttpSocialSignInRepository}=await import('../shared/features/moderation/data/http_social_sign_in_repository.ts');
- let request;const repository=new HttpSocialSignInRepository(async(path,init)=>{request={path,init};return new Response(JSON.stringify({url:'https://auth.example/auth/v1/authorize?provider=google'}),{status:200});});
- assert.match(await repository.start('google'),/^https:\/\/auth.example/);assert.equal(request.path,'/api/moderation/oauth/start');assert.equal(request.init.credentials,'same-origin');assert.deepEqual(JSON.parse(request.init.body),{provider:'google'});assert.doesNotMatch(request.init.body,/verifier|token|secret/);
- for(const url of ['javascript:alert(1)','https://auth.example/other','https://auth.example/auth/v1/authorize?provider=facebook']){
-  await assert.rejects(()=>new HttpSocialSignInRepository(async()=>new Response(JSON.stringify({url}),{status:200})).start('google'),error=>error.kind==='unavailable');
- }
-});

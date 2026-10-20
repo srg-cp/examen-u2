@@ -46,12 +46,12 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); photo.value = null; });
   <section class="sighting-screen" aria-label="Reportar avistamiento">
     <button class="glass sighting-back" type="button" aria-label="Volver a la ficha" title="Volver a la ficha" :disabled="state.working" @click="emit('close')">‹</button>
     <header><p class="eyebrow">Una huella tuya puede ayudar</p><h1 ref="heading" tabindex="-1">{{ state.receipt ? 'Gracias por colaborar' : '¿Dónde le viste?' }}</h1></header>
-    <div v-if="state.receipt" class="reveal sighting-confirmation">
+    <StaggerReveal as="div" v-if="state.receipt" class="sighting-confirmation">
       <h2>Avistamiento guardado</h2><p>Tu información quedó vinculada a este caso.</p>
       <p v-if="state.receipt.late" class="muted">Se registró como avistamiento tardío, con la fecha y hora en que ocurrió.</p>
       <ActionButton variant="primary" @click="emit('close')">Volver al caso</ActionButton>
-    </div>
-    <form v-else class="reveal sighting-form" novalidate @submit.prevent="send">
+    </StaggerReveal>
+    <StaggerReveal as="form" v-else class="sighting-form" novalidate @submit.prevent="send">
       <p class="muted">Ayuda a encontrar a {{ activeCase.name || 'esta mascota' }}. No necesitas crear una cuenta.</p>
       <fieldset :disabled="blocked"><legend>Cuándo le viste</legend>
         <div class="sighting-date-row" :class="{ invalid: invalid('observedAt'), shake: invalid('observedAt') }" :key="invalid('observedAt') ? state.noticeId : 'date'">
@@ -74,7 +74,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); photo.value = null; });
         <p class="privacy">Puedes elegir una foto de tu galería. Si cancelas o no das permiso, puedes continuar sin foto. Se eliminan sus metadatos antes de guardarla.</p>
       </fieldset>
       <ActionButton variant="primary" :working="state.working" :disabled="photoBusy || state.locating || state.failure?.kind === 'closed' || state.failure?.kind === 'conflict'" @click="send">{{ state.locked ? 'Reintentar envío' : 'Enviar avistamiento' }}</ActionButton>
-    </form>
+    </StaggerReveal>
     <TopToast ref="toast" />
   </section>
 </template>

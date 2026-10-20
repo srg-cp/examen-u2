@@ -1,5 +1,178 @@
 # Diseño de la interfaz: implementación y revisión
 
+Inicio, corrección posterior20/10: título Poppins32 sin contenedor glass,
+mismos pesos de ADR-105. Primera frase gris #454746; segunda con ShaderMask
+horizontal #459FF6→#75C9EF según nueva captura. Descripción16/1.4 debajo del perro/gato dentro
+de HomeReunionCard glass, padding horizontal total22 y separación12 de imagen.
+HomeNotice de Cerca de ti reutiliza GlassSurface/radio26 y preserveBackdrop.
+
+Explorar20/10, ADR-106: mínimo =32 de tirador + altura real resumen/Ver ficha +
+inset inferior+12, dividido por viewport (18–85%); sin selección22%. Apertura50%
+o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:
+fuente8/escalable, ribete claro estrecho, objetivos48; derecha8/izquierda84,
+crédito visual aproximadamente8px sobre panel, sigue extensión/resistencia.
+Título central se retira en altura insuficiente; retorno conservado.
+Movimiento del panel: snap propio easeInOutCubic320–540ms según distancia,
+parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
+inferior1/190/28; dedo directo, contenido con su inercia, reduced sin acomodo.
+
+Título de Inicio móvil20/10: referencia tipográfica del usuario aplicada con
+Poppins local, tamaño23/altura1.25. «Su regreso» gris #454746/peso400 y salto
+de línea antes de «empieza contigo», azul #459FF6/peso600. Text.rich sin altura
+fija ni truncamiento; ampliación y etiqueta accesible completa conservadas.
+Excepción local documentada en [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+
+Cartografía vigente20/10, ADR-104: todos los mapas móviles/web comparten el
+punto medio50/50 entre fuente original de Reportar y filtro anterior de Explorar.
+Conservar color parcial y claridad leve; MapStyle Flutter y SVG sRGB Nuxt con
+paridad numérica. Solo teselas; marca/pines, círculos, créditos y controles
+sin filtro. Usar adaptadores compartidos; revisar fuentes reales y text scale.
+
+Mapa20/10, ADR-103: resumen compacto con foto112×112/radio18, nombre20/600 y
+rasgos14 hasta dos líneas; sin tipo de reporte debajo del nombre. Flecha48
+con NavigationAccentSurface de core, compartido con LiquidNavigation. Ver ficha
+gris/radio12/alto mínimo48 y detalles verticales tras separador.
+Detalles: separador con padding vertical16, título→datos16 y gap16 entre
+Tamaño/Especie/Fecha, según captura aprobada; etiqueta/valor conservados.
+Panel50–90%, contenido desplazable y tirador32. Sin disco gris del radio; créditos bajo
+cabecera y símbolo oficial en pines de ubicación. Selección negra/blanca.
+Sustituye las dimensiones anteriores del resumen; consulta/radio real intactos.
+Refinamiento20/10: título centrado con GlassSurface/radio24/padding22×12.
+Teselas blanco grisáceo con calidez leve (claro orientativo #F6F6F2), con pines/créditos intactos; selección acerca
+a zoom15 si estaba más lejos, sin alejar una cámara ya más próxima.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md).
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+Mapa flotante19/10: elección3 sustituye fila Lista/Mapa; GlassSurface/radio26,
+padding18/12, icono22 +8 + texto14/600, mínimo48. Posición derecha16/bottom100
+más inset,20 sobre barra. Scroll reserva200 más ampliación de texto/inset.
+Origen real y retorno conservados; ADR-101, revisión física Android pendiente.
+
+Explorar compacto19/10: fila con Ubicación expandida y botón tune48×48 a la
+derecha, separación8. Lugar y radio en línea; lugar elidido con tooltip completo.
+FilterExpansion.compact conserva48 táctiles sin padding exterior y6 verticales
+interiores. Variante iconOnly con tooltip/semántica y estado expandido, sin
+chevrón/texto. Altura normal48, adaptable a texto2. Paneles y estilos compartidos
+conservados. [ADR-100](decisiones/100-explorar-controles-compactos.md).
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+## Mapa: pines individuales y foto mayor —19/10/2026
+
+ADR-099: reemplazar raza por especie disponible (Perro/Gato/Otra especie), con
+fallback Tipo no registrado. Foto a ancho completo4:3, sin136px fijos. Sin estado
+ni conteo textual del mapa en el panel. ExploreMapPins separa objetivos48px con
+paso56px, preferencia horizontal y proyección de cámara; sin contador ni flechas
+entre casos. Zoom/giro recalculan la presentación, conservando coordenadas y
+consulta. Mantener scroll, CTA y panel42–90%. Capturas normales/pequeñas y panel
+expandido revisados; Android del ajuste pendiente.
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+Navegación móvil19/10: LiquidNavigation comparte el acabado de Iniciar sesión
+de landing entre selección activa y Reportar. Gradiente vertical75BFFF/459FF6
+al48%/2887EF, brillo blanco superior y sombras azules7/20 y2/5. Interacción
+hover/foco/pulsación200ms, elevación2px y brillo97%; con movimiento reducido,
+color inmediato y posición fija. Glass y geometría existentes;
+selección320ms conservada. [ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
+## Resumen inferior del mapa móvil —19/10/2026
+
+Filtros/Ubicación solo en Explorar. ExploreCaseMap coloca la vista previa
+pública dentro del panel42–90%, sin callout junto al pin. Tirador persistente,
+foto arriba, nombre/fila de datos debajo y estado; Ver ficha fijo si cabe y
+alcanzable por scroll en altura reducida. Sin selección, instrucción para tocar
+un pin. Coincidencias con anterior/siguiente; cámara sin efectos en la consulta.
+Capturas390×844 y320×350/texto2 revisadas; Android del nuevo recorrido pendiente.
+[ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
+
+## Toast móvil con referencia web —19/10/2026
+
+ConfirmationToastHost adopta entrada480ms desde fuera del viewport, retorno420ms,
+salida superior240ms y gesto de TopToast; texto14/400/1.4 y acción subrayada mínima44.
+Conservar glass/blur18/radio28, icono32/20, máximo360/márgenes24 y safe-area+12.
+6500ms con pausa al sostener. Scroll/texto2, toque/teclado/semántica y movimiento
+reducido conservados. Revisar capturas de entrada/arrastre/retorno y320×350/texto2.
+[ADR-096](decisiones/096-toast-mobile-igual-web.md), [ficha](funcionalidades/toast-mobile.md).
+
+## Glass estable y reunión en Inicio —19/10/2026
+
+Corrección ADR-095: las tarjetas de Inicio entran con StaggerRevealItem y
+preserveBackdrop: fade/desplazamiento habituales, sin recorte ni blur de entrada
+del material. GlassSurface usa blendMode src en la capa de opacidad de estas
+tarjetas. Inicio/Explorar omiten cover previo y tienen un solo
+timeline activo; no reiniciar por datos de consulta o refresh.
+Conservar radio26 y padding22 de la tarjeta principal. HomeReunionCard añade
+el PNG original de landing, contenido3:2/padding12, sin recortar mascotas ni
+acciones inventadas. Secuencia: tarjeta principal, accesos rápidos, reunión,
+Cerca de ti (cuatro grupos). ADR-093; comparar ribete durante/final de entrada.
+
+## Marca móvil alineada con web —19/10/2026
+
+BrandName/wordmark.svg sustituye el texto anterior en BrandWordmark y StartupReveal:
+minúsculas, contornos Arial de peso CSS500, #171918 y tracking−.05em. Conservar
+el símbolo, posición y escala por pantalla; tamaños gráficos estables con texto2,
+semántica del contenedor y FittedBox en anchos pequeños. Gap7/16px según tamaño
+compacto/grande. No aplicar Arial al cuerpo de la app ni crear logos alternativos.
+Revisar acceso, bienvenida, Inicio y arranque. ADR-092.
+
+## Fondo móvil compartido —19/10/2026
+
+AppScaffold sustituye fondos blancos exteriores de pantallas Flutter y compone
+AppPageBackground por fuera del Scaffold transparente. Corrección ADR-091:
+blanco con cinco nubes azules a distintas alturas y movimiento suave de24s;
+trayectorias cerradas, pausa accesible/TickerMode, sin rebuild del contenido.
+HomeContent usa GlassSurface/radio26 en la tarjeta principal con padding22 y
+acción originales. Sustituye la distribución estática de ADR-088.
+Conservar áreas seguras/scroll y el tamaño completo del fondo con teclado.
+CoverReveal y OriginPageTransition reutilizan fondo; no recolorear superficies
+de campos, otras tarjetas, fotos/mapas o paneles. Verificar
+acceso/onboarding/Inicio/formularios, texto2 y movimiento reducido.
+
+## Marca de cabecera compartida —19/10/2026
+
+SiteBrand/SiteHeader sustituyen las marcas independientes: misma posición,
+color#171918, Arial500, gap7px y tamaños adaptables de landing. Incluye login
+y onboarding; cabecera fuera del efecto, login conserva cuatro grupos de cuerpo.
+QA compara medidas/render contra landing en1440/731/390/320 y texto200%,
+y exige posición/dimensiones constantes desde SSR hasta hidratar y recargar.
+La marca va arriba a la izquierda, fuera de cargas/entradas; acciones y retorno
+se acomodan sin desplazarla. No añadir reglas CSS competidoras por orden de carga.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+## Posición de la marca web —19/10/2026
+
+Logo oficial junto a «entre huellas», arriba a la izquierda, con posición y
+márgenes de landing/onboarding. Mantener arriba en responsive y fuera del
+stagger, skeletons y columna del formulario. Revisar alineación, texto ampliado
+y estabilidad entre etapas; reutilizar cabecera/marca al adaptar recorridos.
+[ADR-076](decisiones/076-posicion-unificada-marca-web.md).
+
+
+## Reveal compartido web —19/10/2026
+
+No pintar cobertura crema antes de revelar. StaggerReveal usa el composable
+aprobado:850ms/90ms, blur18px y desplazamiento28px; cabecera persistente.
+Login/onboarding conservan sus grupos y parámetros. Probar fotogramas reales,
+movimiento reducido, contenido actualizado y QR sin JavaScript.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Onboarding web con referencia de Sader —19/10/2026
+
+OnboardingFlow de access: columna448px, izquierda, Inter local, título48/600,
+descripción18/500 y botones carbón/radio18px base/mínimo48px/flecha20px.
+PNG/textos/saltos originales de onboarding móvil. Stagger compartido550ms/90ms,
+offset56px, salida invertida antes de cambiar paso, press400ms y entrada doble rAF.
+Sin .reveal ni cobertura crema; orbe strong persistente, movimiento reducido sin
+esperas. Guardado con shimmer visible y error/reintento conservando tercer paso.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+
 ## Referencia web consolidada —19/10/2026
 
 Las [reglas web](REGLAS_UI_UX_WEB.md) contienen los valores vigentes. Las notas
@@ -8,8 +181,8 @@ fechadas anteriores son el historial; no recuperar sus medidas sustituidas.
 | Componente | Implementación vigente |
 | --- | --- |
 | Stagger de login | useStaggerReveal + vStaggerReveal; transiciones originales de sader-panel, doble rAF, will-change persistente,850ms/90ms, blur18px/offset−28px; CSSOM compatible con CSP. |
-| Icono de login | Entrada en wrapper exterior, hover1.05 interior; no reinicia al editar. |
-| TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X, cierre al tocar, entrada180ms. |
+| Marca de cabecera | SiteBrand/SiteHeader compartidos con landing, fuera del stagger; misma posición, color y escala responsive (ADR-077). |
+| TopToast | Glass claro, radio28px/blur18px, medallón32px/icono20px, texto14px/400 sin negrita, sin X. Entrada desde arriba480ms, descarte deslizando hacia arriba/salida240ms, retorno420ms; toque y teclado conservados (ADR-081). |
 | Retorno legal |36×36px, chevrón16px, circular glass/blur22px; variante local en LegalPage. |
 | Enlace legal derecho | Mínimo36px, padding8/12px, radio calc(.625rem + 8px), texto14px/500/línea20px, flecha16px. |
 | Fuente legal | DM Sans local, solo /terms y /privacy. |

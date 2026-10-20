@@ -6,6 +6,7 @@ import '../features/explore/presentation/view_models/explore_view_model.dart';
 import '../features/notifications/presentation/screens/inbox_screen.dart';
 import '../features/notifications/presentation/widgets/follow_target_button.dart';
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/explore/presentation/widgets/explore_map_button.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
 import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
 import '../features/case_timeline/presentation/screens/sighting_review_screen.dart';
@@ -47,6 +48,7 @@ import '../features/auth/presentation/view_models/recovery_access_view_model.dar
 import '../features/auth/domain/entities/recovery_access.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/widgets/profile_avatar.dart';
+import '../features/profile/presentation/view_models/profile_view_model.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/interest_zones/presentation/screens/interest_zones_screen.dart';
 import '../features/alert_preferences/presentation/screens/alert_preferences_screen.dart';
@@ -216,9 +218,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => HomeScreen(
+          onHomeRefresh: () async {
+            ref.read(profileViewModelProvider.notifier).retry();
+            await ref.read(profileViewModelProvider.future);
+          },
           onAlerts: () => context.push('/home/notifications'),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),
+          exploreFloatingAction: const ExploreMapButton(),
           exploreContent: ExploreSection(
             locationSearchBuilder: (label, onSelect) =>
                 PlaceSearchFields(initialLabel: label, onSelect: onSelect),
@@ -249,10 +256,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               context: context,
               key: state.pageKey,
               source: state.extra,
-              child: ExploreMapScreen(
-                locationSearchBuilder: (label, onSelect) =>
-                    PlaceSearchFields(initialLabel: label, onSelect: onSelect),
-              ),
+              child: const ExploreMapScreen(),
             ),
           ),
           GoRoute(

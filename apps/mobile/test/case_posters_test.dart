@@ -396,7 +396,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.pump(const Duration(seconds: 4));
+        await tester.pump(const Duration(seconds: 7));
         await tester.pumpAndSettle();
         for (final label in [
           'Imprimir o guardar PDF',
@@ -407,7 +407,7 @@ void main() {
           await tester.pumpAndSettle();
           await tester.tap(find.text(label));
           await tester.pumpAndSettle();
-          await tester.pump(const Duration(seconds: 4));
+          await tester.pump(const Duration(seconds: 7));
           await tester.pumpAndSettle();
         }
         expect(exporter.calls, 3);

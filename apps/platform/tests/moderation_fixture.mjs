@@ -3,7 +3,9 @@ import {productionFixture} from './server_fixture.mjs';
 export const moderator='11111111-1111-4111-8111-111111111145',ordinary='22222222-2222-4222-8222-222222222245',reportId='33333333-3333-4333-8333-333333333345';
 const resourceId='44444444-4444-4444-8444-444444444445';
 export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217])){
+ let logoutBarrier=null;
  let socialDenied=false,socialCancelled=false;const oauthCodes=new Map();
+ const onboarded=new Map();let completions=0,profileFailure=false;
  let revoked=false,hidden=false,ambiguous=false;const decisions=new Map(),accesses=[];let reportVersion=0,resourceVersion=0;
  const send=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
  async function handle(req,res){
@@ -24,8 +26,10 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217])){
    if(body.password!=='test-fixture-password'){send(res,{error_code:'invalid_credentials'},400);return true;}
    const allowed=body.email==='moderador@example.test';send(res,{access_token:(allowed?'m':'o').repeat(30),expires_in:3600,user:{id:allowed?moderator:ordinary}});return true;
   }
-  if(req.url==='/auth/v1/user'){send(res,{id:actor});return true;}
-  if(req.url?.startsWith('/auth/v1/logout')){send(res,{});return true;}
+  if(req.url==='/auth/v1/user'){send(res,{id:actor,email:actor===moderator?'moderador@example.test':'ordinario@example.test'});return true;}
+  if(req.url?.startsWith('/rest/v1/profiles?')){if(profileFailure){send(res,{},503);return true;}send(res,[{id:actor,display_name:actor===moderator?'Revisor de prueba':'Usuario de prueba',city:'Lima',onboarding_completed_at:onboarded.get(actor)===false?null:'2026-10-18T17:00:00Z'}]);return true;}
+  if(req.url==='/rest/v1/rpc/complete_onboarding'){for await(const b of req){}if(onboarded.get(actor)===false){completions++;onboarded.set(actor,true);}res.writeHead(204);res.end();return true;}
+  if(req.url?.startsWith('/auth/v1/logout')){const barrier=logoutBarrier;if(barrier){barrier.started();await barrier.wait;}send(res,{});return true;}
   if(req.url==='/rest/v1/rpc/read_qr_case'&&hidden){for await(const b of req){}send(res,{state:'unavailable'});return true;}
   if(!req.url?.includes('/rest/v1/rpc/')||!/(require_content_reviewer|list_moderation_reports|read_moderation_report|read_moderation_evidence|decide_content_report)$/.test(req.url))return false;
   const chunks=[];for await(const b of req)chunks.push(b);const input=JSON.parse(Buffer.concat(chunks).toString()||'{}');
@@ -43,5 +47,5 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217])){
   return true;
  }
  const server=await productionFixture(jpeg,{handle,env:{SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture_123456',MODERATION_SESSION_SECRET:'fixture-session-secret-only-not-a-production-key'}});
- return {...server,oauthDenied:value=>{socialDenied=value;},oauthCancelled:value=>{socialCancelled=value;},revoke:value=>{revoked=value;},ambiguousDecision:()=>{ambiguous=true;},decisions:()=>decisions.size,accesses:()=>accesses,hidden:()=>hidden};
+ return {...server,close:async()=>{logoutBarrier?.release();await server.close();},pauseLogout(){let started,release;const wait=new Promise(resolve=>{release=resolve;}),begun=new Promise(resolve=>{started=resolve;});logoutBarrier={wait,started,release};return {started:begun,release(){logoutBarrier=null;release();}};},setOnboarding:(actor,value)=>onboarded.set(actor,value),completions:()=>completions,profileFailure:value=>{profileFailure=value;},oauthDenied:value=>{socialDenied=value;},oauthCancelled:value=>{socialCancelled=value;},revoke:value=>{revoked=value;},ambiguousDecision:()=>{ambiguous=true;},decisions:()=>decisions.size,accesses:()=>accesses,hidden:()=>hidden};
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/liquid_navigation.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/state/home_view_state.dart';
 import 'package:flutter_application_entrehuellas/features/profile/presentation/view_models/profile_exit_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/auth/providers/auth_providers.dart';
@@ -49,6 +50,9 @@ void main() {
             ),
           ),
         );
+        expect(find.byType(CoverReveal), findsNothing);
+        await tester.pump(const Duration(milliseconds: 160));
+        expect(find.byType(CoverReveal), findsNothing);
         await tester.pumpAndSettle();
         final indicator = find.byKey(
           const ValueKey('navigation-active-indicator'),

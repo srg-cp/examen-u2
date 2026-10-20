@@ -9,7 +9,7 @@ class ProfileAvatar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(profileViewModelProvider);
-    final profile = !state.isLoading && !state.hasError
+    final profile = (!state.isLoading || state.isRefreshing) && !state.hasError
         ? state.asData?.value.profile
         : null;
     final parts = (profile?.displayName ?? '')

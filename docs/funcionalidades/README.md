@@ -1,5 +1,94 @@
 # Funcionalidades de Entre Huellas
 
+Explorar20/10: [panel minimizable hasta Ver ficha](explorar.md) y créditos
+compactos que acompañan su borde superior, según ADR-106. Paleta global intacta.
+
+Cartografía20/10: [acabado compartido móvil/web](cartografia-compartida.md),
+intermedio entre Reportar y Explorar, obligatorio en adaptadores comunes.
+Sustituye filtro local de Explorar; base/activación web según ADR-104.
+
+Explorar20/10: [mapa y resumen compacto](explorar.md) según diseño aprobado;
+miniatura mayor, descripción, detalles verticales y dos accesos a la ficha.
+Acabado azul compartido con navegación y símbolo oficial en pines. ADR-103.
+
+Móvil19/10: [fondo compartido](fondos-mobile.md) atenuado hacia blanco junto a la navegación, con luces superiores conservadas. ADR-102.
+
+Explorar19/10: [Mapa flotante](explorar.md) sustituye Lista/Mapa tras elegir
+la propuesta3; mismo mapa y consulta, espacio de listado recuperado. ADR-101.
+
+Explorar19/10: [controles compactos](explorar.md) con lugar/radio en línea e
+icono circular para filtros; área táctil48px, paneles existentes. ADR-100.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+Explorar móvil19/10: [mapa](explorar.md) con pines individuales separados
+visualmente, especie en el resumen y foto adaptable mayor, sin contador,
+selector entre coincidencias ni líneas de estado/conteo. ADR-099.
+
+Navegación móvil19/10: [Inicio](inicio.md) adopta el acabado azul y los efectos
+del botón de acceso de landing en selección activa y Reportar. ADR-098;
+validación local aprobada, revisión Android pendiente.
+
+Actualización móvil19/10: [Explorar](explorar.md) centraliza filtros en la sección
+principal y muestra el resumen del pin con Ver ficha en el panel del mapa.
+ADR-097; validación local aprobada y revisión Android del ajuste pendiente.
+
+Toast móvil19/10: [mismo acabado, entrada y descarte por gesto que la web](toast-mobile.md),
+en el componente compartido; ADR-096, sin cambios de backend ni nuevas historias.
+
+Títulos móvil19/10: [Explorar](explorar.md), [Mis mascotas](mascotas.md) y
+[fallback de Inicio](inicio.md) usan peso500 como Inicio web. CollectionHeader
+extiende el mismo ajuste a sus listados de casos/reportes.
+
+Inicio móvil, corrección19/10: [entrada suave del glass](fondos-mobile.md),
+con fade/desplazamiento del stagger y sin recorte progresivo. ADR-095.
+
+Corrección móvil19/10: [Inicio/glass](fondos-mobile.md) y [Explorar](explorar.md)
+con un solo stagger, sin cover previo ni paneles glass vacíos. ADR-094.
+
+Inicio móvil19/10: [glass estable y tarjeta de reunión](fondos-mobile.md),
+con imagen original de web y superficie fuera del stagger. ADR-093.
+
+Marca móvil19/10: [identidad visual](identidad-visual.md) usa el mismo lettering
+Arial de web en BrandWordmark/arranque, conservando símbolo oficial. ADR-092.
+
+Móvil19/10: [nubes en toda la altura con movimiento y tarjeta principal glass](fondos-mobile.md),
+reutilizando el material compartido; pausa accesible y por ruta oculta. ADR-091.
+
+Corrección móvil19/10: [fondo blanco con nubes azules](fondos-mobile.md) según
+referencia aportada; ADR-088 sustituye el degradado inicial de ADR-086.
+
+Acceso web19/10: [registro, verificación de correo y recuperación por código](acceso-web.md)
+implementados localmente, con capacidad recovery aislada; ADR-087. Demo SMTP real
+pendiente; no equivale a paridad global ni cierre de HU.
+
+Móvil19/10: [fondo frío compartido](fondos-mobile.md), con los mismos colores
+del resto de la web; arranque, shells y transiciones existentes. ADR-086.
+
+Cartografía móvil19/10: [Positron y crédito compartido](cartografia-mobile.md),
+con pines de marca conservados; ADR-084 sustituye ADR-054 para mapas CARTO.
+
+Acceso web19/10: [avisos de una sola vez y URL limpia](acceso-web.md); se retira
+reason consumido conservando parámetros de integración y fragmento.
+
+Toast web: [entrada superior y descarte por gesto](toast-web.md), compartido
+en todos sus consumidores actuales; ADR-081, validación local19/10/2026.
+
+Corrección19/10: reveal compartido sin cobertura opaca en [acceso](acceso-web.md),
+[moderación](moderacion-web.md), [QR](ficha-publica-qr.md) y
+[avistamientos web](avistamientos-web.md). ADR-075; evidencia local en ESTADO.
+
+Actualización19/10: [Acceso web](acceso-web.md) admite cuentas válidas sin rol de
+revisión, con bienvenida por cuenta e inicio real de cuenta. Moderación conserva
+permisos por operación y acceso desde gestión autorizada. /iniciar-sesion,
+/terminos y /privacidad son canónicas, con redirecciones antiguas.
+No se entrega paridad completa web/móvil ni administración; sin despliegue.
+
 Confirmación posterior18/10:030 aplicado por usuario. Moderación web conserva
 configuración/rol/login y demo real por verificar; no reaplicar030.
 
@@ -40,8 +129,9 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
-| [Documentos legales web](documentos-legales.md) | apps/platform | /terms y /privacy; ampliación explícita18/10, sin HU/issue nuevo |
-| [Acceso web](acceso-web.md) | apps/platform | /login separado; HU-14.3 / issue #45; validación local, demo remota pendiente |
+| [Fondos web compartidos](fondos-web.md) | apps/platform | Ajuste visual19/10/2026; toda la web excepto landing; sin HU/issue nuevo |
+| [Documentos legales web](documentos-legales.md) | apps/platform | /terminos y /privacidad, con redirecciones antiguas; sin HU/issue nuevo |
+| [Acceso web](acceso-web.md) | apps/platform | /iniciar-sesion, /bienvenida y /inicio; HU-01/RF-01,34 en web; conserva HU-14.3 / issue #45; demo real pendiente |
 | [Revisión y moderación web](moderacion-web.md) | apps/platform / SQL Supabase | HU-14.3; RF-22,33; issue #45;030/configuración/demo pendientes |
 | [Denuncias de contenido](denuncias-contenido.md) | content_reports / SQL Supabase | HU-14.1; RF-22; issue #43;029 confirmado; demo/integración pendientes |
 | [Cierre y recuperación](cierre-y-recuperacion.md) | case_closure / SQL Supabase | HU-13; RF-07; issue #13; 028 confirmado aplicado; demo/integración pendientes |

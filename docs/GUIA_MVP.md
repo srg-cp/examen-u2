@@ -1,5 +1,53 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Registro y recuperación web autorizados —19/10/2026
+
+El usuario autoriza completar los recorridos de acceso ya existentes en móvil:
+crear cuenta, verificar/reenviar código y recuperar/guardar nueva contraseña.
+Incremento web de HU-01/RF-01,34, sin nueva HU/issue ni cierre de #17/#18/#20/#22
+por arrastre (su evidencia móvil conserva su propio alcance). Las notas históricas
+de registro/recuperación web pendientes quedan sustituidas por esta implementación
+local. Conserva onboarding y gestión por permisos. [ADR-087](decisiones/087-registro-y-recuperacion-web.md),
+[ficha](funcionalidades/acceso-web.md). No añade perfil editable, baja/exportación,
+administración, SQL o despliegue; demo SMTP/Auth real pendiente.
+
+## Corrección compartida del reveal web —19/10/2026
+
+Corrección transversal de presentación en inicio, moderación, QR y avistamientos.
+Elimina la capa crema global, reutiliza el stagger aprobado y conserva contratos
+y alcance de las historias existentes. Sin nueva HU/issue ni cierre adicional.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Corrección visual de onboarding web —19/10/2026
+
+El usuario solicita composición/transición del onboarding de su sader-panel con
+ilustraciones/contenido de móvil Entre Huellas. Incremento visual HU-01/RF-01,34
+web; sin nueva HU/issue ni backend. Conserva tres pasos sin Omitir, cuenta
+compartida y RPC existente.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md)
+y [ficha](funcionalidades/acceso-web.md).
+
+## Acceso general e inicio web de usuario —19/10/2026
+
+El usuario aclara que platform debe ofrecer funciones de usuario junto con móvil,
+aprueba login común y espacios de gestión por permisos y autoriza proceder.
+Incremento de HU-01/RF-01,34 en web; conserva HU-14.3/RF-22,33 / issue #45.
+Entrega acceso de cuenta, bienvenida de tres pasos compartida por cuenta, inicio
+con perfil real/cierre y acceso autorizado a revisión. Rutas de acceso/legal
+migradas según ADR-072. [ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md)
+registra alcance y límites; [ficha](funcionalidades/acceso-web.md).
+No entrega todavía Explorar/mascotas/reportes/avisos/perfil editable ni
+registro/recuperación web o administración. Sin SQL, asignación de roles,
+Flutter, despliegue ni cierre de historias. Próximo incremento propuesto: Explorar web.
+
+## Convención de rutas web —19/10/2026
+
+El usuario aprueba rutas visibles en español, minúsculas y guiones, sin tildes
+ni ñ. [ADR-072](decisiones/072-rutas-web-en-espanol.md) registra nomenclatura,
+excepciones API/QR/integraciones y redirecciones compatibles al migrar.
+Incremento documental: no entrega nuevas pantallas ni migra las rutas actuales,
+no amplía historias ni crea HU/RF/issues. Aplicar en próximos recorridos web.
+
 ## Documentos legales del acceso —18/10/2026
 
 El usuario solicita animación del icono, orbe en login y enlaces de términos/
@@ -194,6 +242,37 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 ```
 
 ### S3 - Casos perdidos y encontrados
+
+Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: panel de mapa minimizable
+hasta Ver ficha, apertura50% y límite adaptable por contenido/texto; créditos
+compactos junto al panel. ADR-106, sin alcance/SQL/permisos nuevos.
+
+Refinamiento20/10 transversal de mapas existentes, HU-07.2/RF-13/issue #33:
+estilo intermedio Reportar/Explorar global móvil y web con adaptadores comunes,
+ADR-104. Sin nuevas operaciones ni paridad funcional web/móvil; no crea nuevas
+pantallas, historias o cambios SQL. Activación web del proveedor por entorno.
+
+Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: aplicar propuesta visual
+aprobada del mapa con resumen compacto, miniatura mayor, rasgos bajo nombre,
+dos accesos al mismo detalle y acabado azul compartido con navegación.
+Mapa sin disco gris del radio, pines con símbolo oficial. ADR-103 sustituye
+composición anterior, sin ampliación del MVP ni nuevas operaciones/backend.
+
+Refinamiento19/10 HU-07.1/07.2, RF-13, issues #32/#33: acceso flotante Mapa
+sustituye Lista/Mapa, según propuesta3 elegida por el usuario. Consulta, ruta
+y retorno conservados; sin ampliación del MVP. ADR-101.
+
+Corrección19/10 de HU-07.1/07.2, RF-13, issues #32/#33: resumen del mapa con
+especie y foto mayor adaptable, sin raza/estado/conteo textual. Pines individuales
+separados visualmente ante solapamiento; no cambia coordenadas, filtros o permisos.
+Sin agrupación/contador/selector de coincidencias. Mismo alcance y backend;
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+Refinamiento19/10 de HU-07.1/HU-07.2, RF-13, issues #32/#33: filtros y Ubicación
+solo en Explorar; mapa consume la misma búsqueda y muestra el resumen del pin
+en el panel con Ver ficha. Sustituye filtros inferiores y callout, conserva
+consulta/paginación/permisos y no amplía el MVP. Validación local aprobada;
+revisión Android del ajuste pendiente. [ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
 
 Refinamiento18/10 de HU-07.2/RF-13/issue #33: pines de only-black.svg y vista
 previa fotográfica con tamaño/fecha mediante lectura pública por caso. Raza

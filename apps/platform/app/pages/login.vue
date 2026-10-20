@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LoginScreen from '../features/moderation/presentation/screens/LoginScreen.vue';
-useHead({ title: 'Iniciar sesión · Entre Huellas', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] });
+const route = useRoute();
+await navigateTo({ path: '/iniciar-sesion', query: route.query, hash: route.hash }, { redirectCode: 308, replace: true });
 </script>
-<template><AmbientPageShell intensity="strong"><LoginScreen /></AmbientPageShell></template>
+<template><span /></template>

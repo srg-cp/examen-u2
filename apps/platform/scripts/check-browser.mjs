@@ -39,7 +39,8 @@ try {
   assert.equal(await page.getByRole('heading', { name: 'Luna', exact: true }).count(), 1);
   server.fail(false); await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
   await page.waitForFunction(() => document.querySelector('#view').getAttribute('aria-busy') === 'false');
-  await page.getByRole('button', { name: 'Cerrar aviso' }).click();
+  assert.equal(await page.getByRole('button', { name: 'Cerrar aviso' }).count(), 0, 'Retry closes its toast before refreshing');
+  assert.equal(await page.locator('.case').evaluate(el => [...el.children].every(child => getComputedStyle(child).opacity === '1')), true, 'Refresh preserves revealed content');
   await page.setViewportSize({ width: 1280, height: 900 }); await page.goto(`${origin}/c/${slug}`);
   await page.locator('.pet-photo').evaluate(img => img.decode()); await noOverflow();
   await page.screenshot({ path: new URL('desktop.png', output).pathname.replace(/^\/(\w:)/, '$1'), fullPage: true, animations: 'disabled' });

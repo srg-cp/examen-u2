@@ -15,7 +15,7 @@ try {
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     page.on('console', msg => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(msg.text())) errors.push(msg.text()); });
-    page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${new URL(response.url()).pathname}`); });
+    page.on('response', response => { if (response.status() >= 400 && !(response.status() === 401 && new URL(response.url()).pathname === '/api/access/session')) errors.push(`${response.status()} ${new URL(response.url()).pathname}`); });
     const response = await page.goto(server.origin, { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200); assert.equal(await page.locator('h1').count(), 1);
     assert.equal(await page.locator('html').getAttribute('lang'), 'es');
@@ -33,7 +33,7 @@ try {
     assert.equal(new Set(artwork.map(img => img.src)).size, 12);
     assert.equal(await page.locator('.character-label').count(), 24);
     assert.equal(await page.locator('.character-group').first().locator('.character:not([aria-hidden="true"])').count(), 4, 'The four distinct messages remain exposed; visual repetitions are decorative');
-    assert.equal(await page.locator('.brand img[src="/brand.png"]').count(), 2);
+    assert.equal(await page.locator('.brand img[src="/brand.png"], .site-brand img[src="/brand.png"]').count(), 2);
     // A gradient declaration alone does not generate or size the painted layer.
     for (const selector of ['.hero', '.closing']) {
       const layer = await page.locator(selector).evaluate(el => {

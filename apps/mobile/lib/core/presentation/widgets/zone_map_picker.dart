@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../config/map_config.dart';
+import 'map_attribution.dart';
+import 'map_style.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
 class ZoneMapPicker extends StatefulWidget {
@@ -16,8 +18,12 @@ class ZoneMapPicker extends StatefulWidget {
     this.readOnly = false,
     this.fitRadius = false,
     this.showCenterMarker = true,
+    this.showRadius = true,
+    this.showAttribution = true,
+    this.attributionTopInset = 0,
     this.readOnlyNavigation = false,
     this.markers = const [],
+    this.markerLayer,
     this.height = viewportHeight,
     this.borderRadius = 22,
     this.cameraPadding = const EdgeInsets.all(24),
@@ -28,11 +34,16 @@ class ZoneMapPicker extends StatefulWidget {
   final double? latitude;
   final double? longitude;
   final int radiusMeters;
-  final bool readOnly, showCenterMarker, fitRadius;
+  final bool readOnly, showCenterMarker, fitRadius, showRadius;
+  final double attributionTopInset;
+  final bool showAttribution;
 
   /// Result maps can be explored without changing the selected search center.
   final bool readOnlyNavigation;
   final List<Marker> markers;
+
+  /// Optional visual layer for result maps with camera-dependent placement.
+  final Widget? markerLayer;
   final double height;
   final double borderRadius;
   final EdgeInsets cameraPadding;
@@ -124,6 +135,13 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
   @override
   Widget build(BuildContext context) {
     final attempt = _attempt;
+    final tiles = TileLayer(
+      urlTemplate: MapConfig.tileUrl,
+      tileProvider: _tiles,
+      userAgentPackageName: 'com.example.flutter_application_entrehuellas',
+      panBuffer: 0,
+      errorTileCallback: (_, _, _) => _failure(attempt),
+    );
     final point = widget.latitude == null || widget.longitude == null
         ? null
         : LatLng(widget.latitude!, widget.longitude!);
@@ -155,7 +173,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                   ),
                   minZoom: 3,
                   maxZoom: 18,
-                  backgroundColor: const Color(0xFFF5F5F7),
+                  backgroundColor: MapStyle.background,
                   onTap: (_, location) {
                     widget.onMapTap?.call();
                     if (!_failed && !widget.readOnly) {
@@ -167,15 +185,11 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                   },
                 ),
                 children: [
-                  TileLayer(
-                    urlTemplate: MapConfig.tileUrl,
-                    tileProvider: _tiles,
-                    userAgentPackageName:
-                        'com.example.flutter_application_entrehuellas',
-                    panBuffer: 0,
-                    errorTileCallback: (_, _, _) => _failure(attempt),
+                  ColorFiltered(
+                    colorFilter: MapStyle.tileColorFilter,
+                    child: tiles,
                   ),
-                  if (point != null)
+                  if (point != null && widget.showRadius)
                     CircleLayer(
                       circles: [
                         CircleMarker(
@@ -201,26 +215,39 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                         ),
                       ],
                     ),
-                  if (widget.markers.isNotEmpty)
+                  if (widget.markerLayer != null)
+                    widget.markerLayer!
+                  else if (widget.markers.isNotEmpty)
                     MarkerLayer(markers: widget.markers),
                 ],
               ),
             ),
           ),
-          if (_failed)
+          if ((MapConfig.usesCarto && widget.showAttribution) || _failed)
             Positioned(
               top: widget.borderRadius == 0
-                  ? MediaQuery.paddingOf(context).top + 8
+                  ? MediaQuery.paddingOf(context).top +
+                        8 +
+                        widget.attributionTopInset
                   : 8,
+              left: MapConfig.usesCarto ? 76 : 8,
               right: 8,
-              child: TextButton(
-                onPressed: () => setState(() {
-                  _failed = false;
-                  _mapReady = false;
-                  _attempt++;
-                  _tiles = _createTiles();
-                }),
-                child: const Text('Reintentar mapa'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (MapConfig.usesCarto && widget.showAttribution)
+                    const MapAttribution(),
+                  if (_failed)
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _failed = false;
+                        _mapReady = false;
+                        _attempt++;
+                        _tiles = _createTiles();
+                      }),
+                      child: const Text('Reintentar mapa'),
+                    ),
+                ],
               ),
             ),
         ],

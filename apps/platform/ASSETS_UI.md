@@ -1,5 +1,24 @@
 # Recursos de interfaz compartida
 
+Marca de cabecera19/10: SiteBrand/SiteHeader reutilizan /brand.png original
+con medidas/color/fuente de landing en todos los recorridos web (ADR-077).
+Sin nuevo recurso ni modificación de la marca del footer.
+
+## Inter e ilustraciones — solo onboarding web,19/10/2026
+
+- Inter variable100–900, latino con acentos, en public/fonts/inter-latin.woff2.
+  Misma familia del layout de sader-panel, autorizada por su referencia expresa
+  para /bienvenida; no cambia Arial del login ni DM Sans de legales.
+- CSS oficial: https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap
+- WOFF2: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+- Licencia SIL OFL en public/licenses/Inter-OFL.txt; origen:
+  https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt
+- public/images/onboarding/dog_waving.png, dog_with_map.png y dog_and_cat.png
+  son copias byte a byte de apps/mobile/assets/onboarding. Sin recorte,
+  recreación ni recompresión. Procedencia/prompts en el README móvil existente.
+- Archivos servidos desde el propio origen; sin petición a Google al navegar.
+  [ADR-074](../../docs/decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+
 ## DM Sans — solo páginas legales
 
 - Archivo: public/fonts/dm-sans-latin.woff2.

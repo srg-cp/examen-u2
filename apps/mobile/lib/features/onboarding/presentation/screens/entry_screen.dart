@@ -1,7 +1,7 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
-import '../../../../core/presentation/widgets/startup_reveal.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../view_models/entry_view_model.dart';
@@ -19,8 +19,7 @@ class EntryScreen extends ConsumerWidget {
       message: exit.hasError
           ? 'No pudimos cerrar sesión. Reintenta.'
           : 'No pudimos preparar tu cuenta. Revisa tu conexión e inténtalo de nuevo.',
-      child: Scaffold(
-        backgroundColor: StartupReveal.background,
+      child: AppScaffold(
         body: SafeArea(
           child: Center(
             child: flow.hasError

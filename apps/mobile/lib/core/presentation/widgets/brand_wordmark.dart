@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
 import 'brand_mark.dart';
+import 'brand_name.dart';
 
 class BrandWordmark extends StatelessWidget {
   const BrandWordmark({this.iconSize = 52, this.textSize = 22, super.key});
@@ -18,17 +18,8 @@ class BrandWordmark extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             BrandMark(size: iconSize),
-            const SizedBox(width: 12),
-            Text(
-              'Entre\nHuellas',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontFamily: AppTheme.fontFamily,
-                fontSize: textSize,
-                fontWeight: FontWeight.w800,
-                height: 0.95,
-                color: const Color(0xFF111111),
-              ),
-            ),
+            SizedBox(width: iconSize >= 76 ? 16 : 7),
+            BrandName(textSize: textSize),
           ],
         ),
       ),

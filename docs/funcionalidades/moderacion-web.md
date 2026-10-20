@@ -1,5 +1,55 @@
 # Revisión y moderación de denuncias en la web
 
+## Cierre web sin bloqueo remoto —19/10/2026
+
+/api/moderation/logout comparte la semántica de acceso: borra las cookies
+generales/anteriores y confirma localmente mientras Nitro completa el intento
+remoto mediante event.waitUntil. Se conserva limpieza de evidencia/estado,
+confirmación de salida con borradores, avisos entre pestañas y controles de origen.
+No promete revocación inmediata de JWT ni afecta sesiones móviles. Pruebas
+retienen Supabase y exigen llegar al login antes de liberar su respuesta.
+[ADR-082](../decisiones/082-cierre-web-sin-esperar-supabase.md), resultados en
+ESTADO; sin nuevos permisos, SQL o despliegue.
+
+## Política de acceso global —19/10/2026
+
+Moderación usa la misma política global de todas las páginas, con permiso de
+revisión comprobado antes de renderizar en servidor y montar en navegación
+cliente. Se retira moderation-access y su excepción de hidratación. Sin sesión
+no aparece shell/skeleton de moderación; sin permiso se dirige a /inicio con
+toast de denegación; onboarding pendiente va a /bienvenida. Las APIs mantienen
+su comprobación por operación, sin herencia de roles ni autoasignación.
+[ADR-079](../decisiones/079-politica-global-de-acceso-web.md), evidencia local en
+ESTADO. Fallos de backend conservan reintento; sin SQL ni despliegue nuevo.
+
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Reveal compartido —19/10/2026
+
+Sustituida la utilidad .reveal por StaggerReveal/useStaggerReveal sin capa crema.
+Conserva HTML/acciones, no repite entrada por edición/refresh; movimiento reducido
+inmediato. QR conserva lectura SSR sin JS. Sin cambios de datos/permisos.
+[ADR-075](../decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md); evidencia local en ESTADO,
+sin despliegue ni nuevo cierre de historia.
+
+## Acceso general y permiso independiente —19/10/2026
+
+Entrada común /iniciar-sesion → bienvenida por cuenta o /inicio. Revisar denuncias
+aparece al confirmar permiso; /moderacion permite volver al espacio de usuario.
+Acceso directo comprueba cuenta/bienvenida y rol antes de cargar denuncias.
+Un403 de moderación conserva la sesión general y vuelve a inicio. Cada operación
+sigue validando Auth/require_content_reviewer y permisos SQL, aun con enlace
+conocido o rol retirado. Sin rol administrativo nuevo, SQL, Flutter o despliegue.
+[ADR-073](../decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+QA Chrome fixture de cola/detalle/evidencia, decisión ambigua/reintento,
+restauración, cancelación, rol revocado/retorno, teclado y responsive aprobado.
+Pendiente demo real; las notas de login exclusivo describen el estado anterior.
+
 ## Acceso social web —18/10
 
 Google y Facebook disponibles en /login por solicitud del usuario; intercambio

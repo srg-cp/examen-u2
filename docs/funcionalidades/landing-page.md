@@ -1,5 +1,51 @@
 # Landing pública en la plataforma
 
+## Acceso preparado antes de pulsar —19/10/2026
+
+AccountViewModel consulta sesión en segundo plano al montar (SSR sigue público)
+y el enlace apunta al destino confirmado, con sus componentes precargados.
+Data reutiliza brevemente la consulta para guard/pantalla y agrupa concurrentes;
+no hay otra espera de sesión al clic preparado. Polling visible10s, foco y
+mensajes mantienen destino actualizado; recursos se liberan al salir. Sin sesión
+se conserva /iniciar-sesion y sin JS funciona redirección de servidor. No cachea
+permisos ni promete ausencia de espera antes de preparar/caducar. ADR-080 y ficha
+de acceso detallan invalidación/límites. Validación y pendientes en ESTADO.
+
+El enlace de acceso usa NavigationLink compartido: feedback inmediato con
+shimmer/aria-busy durante la comprobación y navegación, conservando texto/href
+y bloqueando clics repetidos. La latencia real de sesión permanece; no se monta
+login intermedio ni se adelanta autorización. Véase ficha de acceso/ESTADO.
+
+Regla ratificada19/10: marca arriba a la izquierda como landing, con color y
+medidas compartidos; conservar posición desde SSR hasta hidratación/recarga,
+sin saltos. [Norma completa](../REGLAS_UI_UX_WEB.md) y ADR-077.
+
+## Corrección del salto de cabecera al recargar —19/10/2026
+
+La hoja de cabecera compartida deja de declarar layout para .landing-page.
+Landing conserva su composición aprobada y la marca compartida; se elimina
+la competencia align-items:flex-start/center con igual especificidad que
+movía la marca3px durante hidratación. QA registra fotogramas de entrada y
+recarga en1440/731/390/320, producción y dev; evidencia final en ESTADO.
+Sin cambios de contenido, navegación o despliegue.
+
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Enlaces de acceso y documentos reales —19/10/2026
+
+La acción de cabecera Iniciar sesión conduce a /iniciar-sesion; el footer enlaza
+a /privacidad y /terminos. Composición/ilustraciones y demás acciones conservadas.
+No se prometen operaciones de mascotas/reportes aún pendientes en web.
+[Ficha de acceso](acceso-web.md) y
+[ADR-073](../decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+Sin persistencia/permisos nuevos; navegación landing→login verificada con fixture.
+Sin despliegue.
+
 ## Consolidación de reglas UI/UX web — 18/10/2026
 
 Se consolida REGLAS_UI_UX_WEB con fondo general blanco/celeste, fondo exterior

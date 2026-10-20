@@ -1,5 +1,213 @@
 # Arquitectura de Entre Huellas
 
+Explorar20/10, ADR-106: preview reporta altura real del resumen tras layout;
+ExploreCaseMap calcula mínimo adaptable y compone atribución junto al borde
+del panel mediante sus controladores. ZoneMapPicker.showAttribution permite
+esta composición externa, sin cambio de paleta/global ni operaciones. Créditos
+compactos reutilizan componente/lifecycle existentes. Sin dominio/data nuevos.
+
+Cartografía global20/10, ADR-104: MapStyle obligatorio en ZoneMapPicker, sin
+override desde Explorar. Web extrae LocationMap de SightingMap a componentes
+compartidos; wrapper adapta coordenadas a SightingPoint. CSS/SVG locales solo
+filtran teselas, con matriz equivalente probada. Configuración pública de
+teselas separada de secretos de backend; CSP restringe host CARTO. Mismos
+dominio/casos de uso y coordenadas. Sustituye notas previas de filtro opcional.
+
+Mapa20/10, ADR-103: NavigationAccentSurface se extrae a core/presentation y se
+comparte entre navegación y flecha del resumen, sin imports entre features.
+ExploreMapPreviewContent compone resumen/acciones/detalles; pantalla conserva
+navegación y bloquea aperturas duplicadas. ZoneMapPicker recibe showRadius=false
+y attributionTopInset solo para resultados; valores por defecto conservados.
+Sin cambios de dominio/data/SQL; rasgos de la proyección pública existente.
+Refinamiento20/10: ZoneMapPicker recibe tileColorFilter opcional solo para
+teselas. Explorar aplica paleta neutra clara y acerca cámara al seleccionar;
+cabecera reutiliza GlassSurface. Otros consumidores conservan sus valores.
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+Mapa flotante19/10: router inyecta ExploreMapButton en exploreFloatingAction de
+HomeScreen. Home posiciona el slot fuera del scroll solo en Explorar; widget
+explore observa su ViewModel y abre ruta existente con OriginPageSource real.
+Sin imports de presentación entre features ni nuevos dominio/data. ADR-101.
+
+## Mapa: selección por caso y separación visual de pines —19/10/2026
+
+ExploreCaseMap selecciona por identidad de caso, sin grupo por coordenadas.
+ExploreMapPins consume entidades públicas y cámara de flutter_map para colocar
+objetivos independientes en píxeles, sin editar datos. ZoneMapPicker compone
+markerLayer opcional como slot visual, conservando markers/mapas de edición.
+Preview reutiliza especie de ExploreCase y foto4:3; pantalla retira estado/conteo
+redundantes. Mismos ViewModels/casos de uso, sin cambios de dominio/data/SQL.
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+## Explorar: filtro único y resumen inferior —19/10/2026
+
+ExploreSection conserva el editor; ExploreMapScreen observa ExploreViewModel
+sin acciones de filtrado ni slot de places. ExploreCaseMap mantiene selección,
+cámara y panel visual, renderiza ExploreMapCasePreview con scroll exterior y
+Ver ficha. El preview consume el mismo ViewModel/caso de uso de lectura pública.
+Paginación/refresh y query siguen compartidos con la lista; sin dominio/data/SQL
+nuevos. ADR-097 sustituye el editor inferior y callout de ADR-056/062.
+
+Corrección ADR-095: preserveBackdrop reutiliza fade/desplazamiento de stagger
+sin ImageFiltered de entrada. GlassSurface parametriza mezcla del backdrop;
+Inicio usa src bajo opacidad, los demás consumidores conservan srcOver.
+
+## Entrada única de secciones móviles —19/10/2026
+
+Inicio y Explorar usan un solo stagger sin cover previo. Home no anima por
+segunda vez el contenido de las funcionalidades reales. preserveBackdrop de
+StaggerRevealItem revela glass/contenido juntos por recorte y conserva composición
+de BackdropFilter. Estado de consultas y ViewModels intactos; ADR-094.
+
+## Lettering móvil de marca —19/10/2026
+
+BrandName de core/presentation renderiza contornos SVG de Arial de la marca web,
+sin fuente remota/SDK ni cambios al tema de texto general. BrandWordmark y arranque
+lo reutilizan. Recurso estático registrado en pubspec; símbolo oficial conservado.
+Generador local sin dependencias runtime nuevas. ADR-092.
+
+## Registro y recuperación web por código —19/10/2026
+
+CredentialScreen → CredentialViewModel → casos de uso concretos de credentials.ts
+→ CredentialRepository. Bootstrap inyecta HttpCredentialRepository; Nitro compone
+ServerCredentialRepository/CredentialSource/AccountSource por petición. Cifrado
+del flujo en infraestructura y cookies/HTTP en utilidades de composición.
+Registro confirmado establece sesión general revalidada, con onboarding por cuenta.
+Recovery permanece en cookie temporal aislada; política única SSR/cliente protege
+restablecer contraseña sin permitir cuenta/moderación. Sin SQL, SDK cliente o
+tokens en payload SSR. [ADR-087](decisiones/087-registro-y-recuperacion-web.md).
+
+## Fondo de presentación móvil —19/10/2026
+
+AppPageBackground pinta un fondo blanco con nubes radiales azules animadas a
+distintas alturas (ADR-091 sustituye distribución estática de ADR-088). Controlador
+local con pausa accesible/TickerMode, repintado aislado y liberación al desmontar.
+HomeContent reutiliza GlassSurface en su tarjeta principal, sin nuevo material.
+AppScaffold de core/presentation lo compone detrás del Scaffold transparente,
+fuera del ajuste de teclado. Pantallas existentes y EntityScreenShell lo reutilizan;
+CoverReveal y OriginPageTransition comparten el mismo fondo. No cambia contratos,
+dominio, data, providers ni bootstrap; sin dependencia de presentación web. ADR-086.
+
+## Cartografía móvil configurable —19/10/2026
+
+ZoneMapPicker mantiene flutter_map y recibe la URL pública de cartografía desde
+MapConfig/MAP_TILE_URL. La configuración local selecciona CARTO Positron raster
+light_all; sin define permanece el valor OSM de desarrollo. MapAttribution es
+presentación compartida con enlaces/feedback, activada solo para el host CARTO,
+sin dependencias de SDK de negocio o cambios de dominio/data. Clave en JSON local
+ignorado, sin copia versionada. Pines, coordenadas y contratos conservados; ADR-084.
+
+## Ciclo de vida del cierre web —19/10/2026
+
+Los handlers logout de access/moderation confirman el borrado de cookies sin
+esperar la red de Supabase. Componen el caso de uso existente por petición y
+registran su promesa con event.waitUntil de Nitro; sin promesa suelta, worker
+o caché nueva. Dominio/repositorios/fuentes conservan logout remoto scope local
+con timeout5s. El éxito HTTP acredita cierre local, incluso con configuración
+remota ausente; no equivale a revocación de JWT ni entrega duradera.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md).
+
+## Preparación y reutilización breve de sesión —19/10/2026
+
+Landing prepara destino con AccountViewModel/AccessAccount y precarga componentes.
+Bootstrap inyecta AccountSessionTransport a repositorios HTTP de la aplicación:
+deduplica GET de sesión y reutiliza máximo15s/vencimiento (401 máximo5s), sin
+persistir, serializar ni compartir entre peticiones SSR. Data mantiene esta
+responsabilidad; ViewModels siguen independientes. Mutaciones, mensajes, foco,
+visibilidad y401/409 invalidan; permisos/API no se cachean. Una respuesta anterior
+invalidada se descarta y el guard comprueba identidad una vez más. ADR-080 detalla
+límites y limpieza; sustituye notas previas sin reutilización de sesión.
+
+## Política global de navegación y acceso —19/10/2026
+
+route_policy.ts registra todas las páginas y comparte clasificación/regla de
+etapa entre session-entry (previo al HTML) y access.global (previo al montaje).
+Reemplaza account-access/guest-access/moderation-access y sus referencias por
+página. ReadManagementAccess valida el permiso de moderación también antes de
+renderizar/montar. Landing/QR/legales y fallback conservan acceso público.
+pages:extend rechaza rutas/alias sin política y el test arquitectónico contrasta
+el inventario de páginas. Puente antiguo conserva destinos internos registrados;
+APIs mantienen autorización independiente, sin datos privados SSR ni singleton.
+[ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye la selección
+de guards por ruta descrita en las notas históricas siguientes.
+
+## Redirección del acceso antes de renderizar —19/10/2026
+
+Corrección posterior del mismo19/10: session-entry también intercepta /inicio
+y /bienvenida para que una cuenta sin sesión no renderice su shell/skeleton.
+account-access comprueba antes del montaje en navegación cliente. Las cuentas
+válidas redirigen según onboarding; los errores de backend conservan reintento.
+El puente puede usar entry=unavailable para renderizar únicamente el shell de
+reintento sin bucles, siempre sin datos privados y sin conceder autorización.
+
+session-entry valida eh_access mediante AccessAccount/Auth/perfil y responde302
+a /inicio o /bienvenida antes del HTML de login. Cookie cifrada HttpOnly/path /
+sustituye path /api; /api/access/entry recupera sesiones anteriores y termina
+el salto anónimo mediante un marcador sin autoridad. guest-access valida antes
+de montar en navegación cliente. Sin datos privados SSR ni singleton de cuenta;
+cierre limpia ambos paths y las APIs conservan autorización. Fallos de backend
+mantienen sesión y reintento en /inicio. [ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md)
+sustituye los detalles anteriores de path/comprobación al montar de ADR-073.
+
+## Implementación de marca web común —19/10/2026
+
+SiteBrand/SiteHeader en componentes compartidos, CSS único site-brand.css.
+Landing y funcionalidades los componen sin importar UI de otras features.
+Fuente/color/medidas explícitas, cabecera fuera de contenido/animaciones,
+retorno glass debajo de la marca. Sin cambios de dominio o móvil.
+[ADR-077](decisiones/077-marca-web-compartida-referencia-landing.md).
+
+
+## Marca web en cabecera —19/10/2026
+
+Norma de presentación ADR-076: logo/texto arriba a la izquierda como landing
+y onboarding, en todos los recorridos web y responsive, fuera del cuerpo y
+sus animaciones/cargas. Reutilizar cabecera/marca; sin cambios de dominio,
+permisos o móvil. [Decisión](decisiones/076-posicion-unificada-marca-web.md).
+
+
+## Entrada web sin cobertura opaca —19/10/2026
+
+StaggerReveal compone el composable compartido, aplica estilos mediante CSSOM
+y conserva div/article/section/form originales. Sustituye ocho grupos legados
+de inicio/moderación/QR/avistamientos; se elimina .reveal del CSS global.
+Solo anima hijos de la entrada, sin replay por edición/refresh. Hoja noscript
+externa mantiene QR legible sin JavaScript con CSP vigente.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+## Presentación de bienvenida web —19/10/2026
+
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md) registra
+OnboardingFlow como widget de access, separado del inicio de cuenta.
+Adapta composición/Inter/botones y salida→entrada de sader-panel con PNG/textos
+idénticos a onboarding móvil. Sin .reveal ni cobertura crema; cuatro grupos
+del stagger compartido, timers cancelables y movimiento reducido. La confirmación
+de guardado precede a la salida final. ViewModel/RPC/sesión/permisos sin cambios.
+
+## Acceso general web e inicio de cuenta —19/10/2026
+
+[ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md) separa
+access de moderation. /iniciar-sesion admite cuentas válidas, /bienvenida aplica
+los tres pasos hasta completar la RPC por cuenta y /inicio consulta datos reales
+del perfil con JWT/RLS. El permiso de revisión se consulta aparte y se vuelve a
+comprobar en cada API de moderación. Sin él, la cuenta conserva uso normal.
+Gestión exclusiva web; sin rol administrativo nuevo ni paridad completa todavía.
+Sesión general HttpOnly/cifrada/path /api, secreto servidor existente y
+vencimiento máximo1h sin refresh token. SSR sin datos privados.
+/login, /terms y /privacy redirigen308 a sus equivalentes españoles; callback
+OAuth/API/QR conservados. Sin cambios SQL ni Flutter.
+
+## Convención de rutas web —19/10/2026
+
+La navegación visible usa español, minúsculas y guiones, sin tildes ni ñ.
+[ADR-072](decisiones/072-rutas-web-en-espanol.md) fija nombres objetivo y
+transición compatible: /login→/iniciar-sesion, /terms→/terminos y
+/privacy→/privacidad, con redirecciones y parámetros necesarios al migrar.
+La raíz / y QR /c/:token se conservan; código, SQL y endpoints internos pueden
+seguir en inglés. Callbacks OAuth/deep links no se renombran por esta regla.
+Login y legales migrados por ADR-073; las rutas anteriores conservan redirecciones.
+
 ## Acceso web separado —18/10
 
 /login separa el formulario de /moderacion. AccessViewModel de presentación

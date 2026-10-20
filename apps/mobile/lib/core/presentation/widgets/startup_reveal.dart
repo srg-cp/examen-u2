@@ -1,11 +1,12 @@
+import 'app_scaffold.dart';
 import 'package:flutter/material.dart';
 
 import 'brand_mark.dart';
+import 'brand_name.dart';
 
 /// Runs once per app mount, before mounting the router's destination animations.
 class StartupReveal extends StatefulWidget {
   const StartupReveal({required this.child, super.key});
-  static const background = Colors.white;
   final Widget child;
 
   @override
@@ -51,8 +52,7 @@ class _StartupRevealState extends State<StartupReveal>
   @override
   Widget build(BuildContext context) {
     if (_finished) return widget.child;
-    return Scaffold(
-      backgroundColor: StartupReveal.background,
+    return AppScaffold(
       body: Semantics(
         label: 'Entre Huellas. Iniciando aplicación',
         child: ExcludeSemantics(
@@ -96,20 +96,7 @@ class _StartupRevealState extends State<StartupReveal>
                                           opacity: Curves.easeOut.transform(
                                             progress,
                                           ),
-                                          child: Text(
-                                            'Entre\nHuellas',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                  fontSize: 36,
-                                                  fontWeight: FontWeight.w800,
-                                                  height: .95,
-                                                  color: const Color(
-                                                    0xFF111111,
-                                                  ),
-                                                ),
-                                          ),
+                                          child: const BrandName(textSize: 36),
                                         ),
                                       ),
                                     ),

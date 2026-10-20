@@ -1,5 +1,20 @@
 # Ficha pública QR
 
+## Marca compartida con landing —19/10/2026
+
+Cabecera usa SiteBrand/SiteHeader con la misma posición, color, fuente y tamaños
+adaptables de landing, también en responsive y fuera del stagger. Sin cambios
+de negocio, permisos o persistencia. Validación local en ESTADO; sin despliegue.
+[ADR-077](../decisiones/077-marca-web-compartida-referencia-landing.md).
+
+## Reveal compartido —19/10/2026
+
+Sustituida la utilidad .reveal por StaggerReveal/useStaggerReveal sin capa crema.
+Conserva HTML/acciones, no repite entrada por edición/refresh; movimiento reducido
+inmediato. QR conserva lectura SSR sin JS. Sin cambios de datos/permisos.
+[ADR-075](../decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md); evidencia local en ESTADO,
+sin despliegue ni nuevo cierre de historia.
+
 **Auditoría de seguimiento18/10:** HU-09/#9 en Done:022/023 y generación/lectura QR confirmadas; migración Vue integrada y avistamientos web posteriores aceptados. El lector pendiente de desplegar es una nota histórica. Impresión/escaneo físicos y exportación nativa conservan sus criterios en HU-08/#34/#35.
 
 Incremento18/10/2026: ficha activa integra el [formulario de avistamientos web](avistamientos-web.md)

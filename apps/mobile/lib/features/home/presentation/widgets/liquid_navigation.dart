@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/glass_surface.dart';
+import '../../../../core/presentation/widgets/navigation_accent_surface.dart';
 import '../state/home_view_state.dart';
 
-class LiquidNavigation extends StatelessWidget {
+class LiquidNavigation extends StatefulWidget {
   const LiquidNavigation({
     required this.selected,
     required this.onSelect,
@@ -20,6 +21,14 @@ class LiquidNavigation extends StatelessWidget {
   ];
 
   @override
+  State<LiquidNavigation> createState() => _LiquidNavigationState();
+}
+
+class _LiquidNavigationState extends State<LiquidNavigation> {
+  HomeSection? _hovered;
+  HomeSection? _pressed;
+
+  @override
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(
@@ -33,8 +42,8 @@ class LiquidNavigation extends StatelessWidget {
                 final rtl = Directionality.of(context) == TextDirection.rtl;
                 return TweenAnimationBuilder<double>(
                   tween: Tween(
-                    begin: selected.index.toDouble(),
-                    end: selected.index.toDouble(),
+                    begin: widget.selected.index.toDouble(),
+                    end: widget.selected.index.toDouble(),
                   ),
                   duration: MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
@@ -52,12 +61,12 @@ class LiquidNavigation extends StatelessWidget {
                         width: slotWidth,
                         height: 52,
                         child: IgnorePointer(
-                          child: DecoratedBox(
+                          child: NavigationAccentSurface(
                             key: const ValueKey('navigation-active-indicator'),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF111111),
-                              borderRadius: BorderRadius.circular(28),
-                            ),
+                            engaged:
+                                _hovered == widget.selected ||
+                                _pressed == widget.selected,
+                            child: const SizedBox.expand(),
                           ),
                         ),
                       ),
@@ -66,11 +75,12 @@ class LiquidNavigation extends StatelessWidget {
                           for (final section in HomeSection.values)
                             Expanded(
                               child: Semantics(
-                                label: labels[section.index],
-                                selected: selected == section,
+                                label: LiquidNavigation.labels[section.index],
+                                selected: widget.selected == section,
                                 button: true,
                                 child: Tooltip(
-                                  message: labels[section.index],
+                                  message:
+                                      LiquidNavigation.labels[section.index],
                                   excludeFromSemantics: true,
                                   child: Material(
                                     color: Colors.transparent,
@@ -82,11 +92,21 @@ class LiquidNavigation extends StatelessWidget {
                                           const WidgetStatePropertyAll(
                                             Colors.transparent,
                                           ),
-                                      onTap: () => onSelect(section),
+                                      onHover: (value) => setState(() {
+                                        _hovered = value ? section : null;
+                                      }),
+                                      onFocusChange: (value) => setState(() {
+                                        _hovered = value ? section : null;
+                                      }),
+                                      onHighlightChanged: (value) =>
+                                          setState(() {
+                                            _pressed = value ? section : null;
+                                          }),
+                                      onTap: () => widget.onSelect(section),
                                       child: SizedBox(
                                         height: 52,
                                         child: Icon(
-                                          icons[section.index],
+                                          LiquidNavigation.icons[section.index],
                                           size: 24,
                                           color: Color.lerp(
                                             const Color(0xFF6E6E73),
@@ -117,7 +137,7 @@ class LiquidNavigation extends StatelessWidget {
       Builder(
         builder: (source) => IconButton(
           tooltip: 'Reportar',
-          onPressed: () => onReport(source),
+          onPressed: () => widget.onReport(source),
           style: IconButton.styleFrom(
             backgroundColor: const Color(0xFF111111),
             foregroundColor: Colors.white,

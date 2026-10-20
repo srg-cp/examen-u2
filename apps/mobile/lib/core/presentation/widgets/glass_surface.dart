@@ -3,9 +3,17 @@ import 'package:flutter/material.dart';
 
 /// Neutral glass with a bounded backdrop blur and a directional polished rim.
 class GlassSurface extends StatelessWidget {
-  const GlassSurface({required this.child, this.radius = 36, super.key});
+  const GlassSurface({
+    required this.child,
+    this.radius = 36,
+    this.backdropBlendMode = BlendMode.srcOver,
+    super.key,
+  });
   final Widget child;
   final double radius;
+
+  /// Use src when an ancestor opacity layer composites the glass entrance.
+  final BlendMode backdropBlendMode;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
@@ -27,6 +35,7 @@ class GlassSurface extends StatelessWidget {
     child: ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
+        blendMode: backdropBlendMode,
         filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: CustomPaint(
           foregroundPainter: _GlassRim(radius),

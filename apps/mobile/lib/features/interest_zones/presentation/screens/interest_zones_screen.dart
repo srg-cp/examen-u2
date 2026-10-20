@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
@@ -83,8 +84,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) back();
         },
-        child: Scaffold(
-          backgroundColor: Colors.white,
+        child: AppScaffold(
           body: ScrollSafeArea(
             top: false,
             child: Center(

@@ -41,6 +41,11 @@ void main() {
   testWidgets('Render login and onboarding for visual inspection', (
     tester,
   ) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('plugins.flutter.io/path_provider'),
+          (_) async => Directory.systemTemp.path,
+        );
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     tester.view.padding = const FakeViewPadding(top: 24, bottom: 24);
@@ -344,6 +349,14 @@ void main() {
     await tester.tap(find.text('Comenzar'));
     await tester.pumpAndSettle();
     await capture('home');
+    final reunion = find.image(
+      const AssetImage('assets/illustrations/reunion.png'),
+    );
+    await tester.ensureVisible(reunion);
+    await tester.pumpAndSettle();
+    await capture('home_reunion');
+    Scrollable.of(tester.element(reunion)).position.jumpTo(0);
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Explorar'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 160));
@@ -355,7 +368,7 @@ void main() {
     await tester.tap(find.byTooltip('Reportar'));
     await tester.pumpAndSettle();
     await capture('home_report');
-    await tester.tap(find.text('Cerrar'));
+    await tester.tap(find.byTooltip('Volver'));
     await tester.pumpAndSettle();
     profile.pendingRead = Completer<void>();
     container.invalidate(profileViewModelProvider);

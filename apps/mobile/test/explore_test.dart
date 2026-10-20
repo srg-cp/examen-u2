@@ -15,6 +15,7 @@ import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/filter_choice_group.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/filter_expansion.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_case_grid.dart';
+import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_map_button.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -163,6 +164,7 @@ void main() {
                 data: MediaQueryData(disableAnimations: reduced),
                 child: const HomeScreen(
                   profileAvatar: SizedBox(width: 48, height: 48),
+                  exploreFloatingAction: ExploreMapButton(),
                   exploreContent: ExploreSection(),
                 ),
               ),
@@ -185,7 +187,8 @@ void main() {
             (widget) => widget is AuthStageTransition && widget.enabled,
           ),
         );
-        expect(entrances, findsOneWidget);
+        expect(entrances, findsNothing);
+        expect(find.byType(CoverReveal), findsNothing);
         expect(
           find.ancestor(
             of: skeleton,
@@ -197,6 +200,7 @@ void main() {
         );
         for (var frame = 0; frame < 90; frame++) {
           await tester.pump(const Duration(milliseconds: 16));
+          expect(find.byType(CoverReveal), findsNothing);
           expect(tester.state(skeleton), same(shimmerState));
           expect(repo.calls, hasLength(1));
         }
@@ -262,6 +266,7 @@ void main() {
                 key: boundary,
                 child: const HomeScreen(
                   profileAvatar: SizedBox.square(dimension: 48),
+                  exploreFloatingAction: ExploreMapButton(),
                   exploreContent: ExploreSection(),
                   petsContent: PetsSection(),
                 ),
@@ -631,6 +636,7 @@ void main() {
               path: '/home',
               builder: (_, _) => HomeScreen(
                 profileAvatar: const SizedBox(width: 40),
+                exploreFloatingAction: ExploreMapButton(),
                 exploreContent: ExploreSection(
                   locationSearchBuilder: (label, onSelect) => PlaceSearchFields(
                     initialLabel: label,
@@ -690,6 +696,8 @@ void main() {
         expect(find.text('Reintentar'), findsOneWidget);
         expect(find.byType(CollectionEmptyState), findsNothing);
         await capture(tester, key, small, 'error');
+        await tester.pump(const Duration(seconds: 7));
+        await tester.pumpAndSettle();
         await tester.ensureVisible(find.text('Reintentar'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Reintentar'));
@@ -709,8 +717,16 @@ void main() {
           expect(first.left, 12);
           expect(second.right, tester.view.physicalSize.width - 12);
         }
-        await tester.ensureVisible(find.text('Filtrar casos'));
+        await tester.ensureVisible(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
+        final filterButton = tester.getRect(find.byTooltip('Filtrar casos'));
+        expect(filterButton.size, const Size(48, 48));
+        expect(find.text('Filtrar casos'), findsNothing);
+        final locationButton = tester.getRect(
+          find.byKey(const ValueKey('explore-location-filter')),
+        );
+        expect(locationButton.width, greaterThan(filterButton.width));
+        if (!small) expect(locationButton.height, 48);
         tester
             .state<ScrollableState>(find.byType(Scrollable).first)
             .position
@@ -736,10 +752,10 @@ void main() {
         await tester.ensureVisible(cards.first);
         await tester.pumpAndSettle();
         await capture(tester, key, small, 'card');
-        await tester.ensureVisible(find.text('Filtrar casos'));
+        await tester.ensureVisible(find.byTooltip('Filtrar casos'));
         final collectionBounds = tester.getRect(cards.first);
         final callsBeforePanel = repo.calls.length;
-        await tester.tap(find.text('Filtrar casos'));
+        await tester.tap(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
         expect(tester.getRect(cards.first).top, collectionBounds.top);
         expect(find.byType(Dialog), findsNothing);
@@ -758,13 +774,13 @@ void main() {
               .value,
           ExploreKind.lost,
         );
-        await tester.ensureVisible(find.text('Filtrar casos'));
+        await tester.ensureVisible(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Filtrar casos'));
+        await tester.tap(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
         expect(find.byType(Dialog), findsNothing);
         expect(repo.calls.length, callsBeforePanel);
-        await tester.tap(find.text('Filtrar casos'));
+        await tester.tap(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
         expect(
           tester
@@ -829,7 +845,7 @@ void main() {
         await tester.pumpAndSettle();
         // HTTP tile requests are intentionally unavailable in widget tests.
         // Allow the shared, temporary failure toast to complete before tapping.
-        await tester.pump(const Duration(seconds: 4));
+        await tester.pump(const Duration(seconds: 7));
         await tester.pumpAndSettle();
         await capture(tester, key, small, 'zone');
         await tester.ensureVisible(find.text('Aplicar ubicación'));
@@ -863,7 +879,7 @@ void main() {
         expect(find.byType(Dialog), findsNothing);
         expect(tester.getRect(cards.first).size, collectionBounds.size);
         expect(find.byType(FilterChoiceGroup<ExploreKind>), findsNothing);
-        await tester.tap(find.text('Filtrar casos'));
+        await tester.tap(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
         expect(
           tester
@@ -873,9 +889,9 @@ void main() {
               .value,
           ExploreKind.lost,
         );
-        await tester.ensureVisible(find.text('Filtrar casos'));
+        await tester.ensureVisible(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Filtrar casos'));
+        await tester.tap(find.byTooltip('Filtrar casos'));
         await tester.pumpAndSettle();
         expect(find.byType(Dialog), findsNothing);
         repo.empty = true;

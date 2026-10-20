@@ -8,9 +8,8 @@ import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
-import '../../../../core/presentation/widgets/cover_reveal.dart';
 import '../../../../core/presentation/widgets/origin_page_transition.dart';
-import '../../../../core/presentation/widgets/two_option_filter.dart';
+
 import '../../domain/entities/explore_page.dart';
 import '../view_models/explore_view_model.dart';
 import 'explore_filters.dart';
@@ -66,12 +65,9 @@ class ExploreSection extends ConsumerWidget {
         ),
       ),
       const SizedBox(height: 12),
-      AuthStageTransition(
-        stage: 'content',
-        startCovered: true,
-        builder: (play) => StaggerReveal(
+      Builder(
+        builder: (_) => StaggerReveal(
           count: 1,
-          play: play,
           child: StaggerRevealItem(order: 0, child: content),
         ),
       ),
@@ -136,52 +132,6 @@ class ExploreSection extends ConsumerWidget {
                       ),
                     ),
                   const SizedBox(height: 16),
-                  if (data != null) ...[
-                    TwoOptionFilter(
-                      secondSelected: false,
-                      onChanged: null,
-                      onOptionPressed: data.busy
-                          ? null
-                          : (map, source) {
-                              if (!map) return;
-                              final box =
-                                  source.findRenderObject() as RenderBox?;
-                              final navigator = Navigator.of(
-                                source,
-                              ).context.findRenderObject();
-                              final bounds = box == null
-                                  ? null
-                                  : box.localToGlobal(
-                                          Offset.zero,
-                                          ancestor: navigator,
-                                        ) &
-                                        box.size;
-                              source.push(
-                                '/home/explore-map',
-                                extra: bounds == null
-                                    ? null
-                                    : OriginPageSource(
-                                        bounds: bounds,
-                                        color: const Color(0xFFE5E5EA),
-                                        radius: 26,
-                                        child: const Center(
-                                          child: Text(
-                                            'Mapa',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                              );
-                            },
-                      firstLabel: 'Lista',
-                      secondLabel: 'Mapa',
-                      indicatorKey: const ValueKey('explore-view-indicator'),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
                   if (async.isLoading)
                     const LoadingShimmer(
                       isLoading: true,

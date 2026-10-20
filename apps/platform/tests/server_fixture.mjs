@@ -33,7 +33,7 @@ export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 21
   backend.listen(0, '127.0.0.1'); await once(backend, 'listening');
   const reservation = createServer(); reservation.listen(0, '127.0.0.1'); await once(reservation, 'listening');
   const port = reservation.address().port; await new Promise(resolve => reservation.close(resolve));
-  const env = { ...process.env, HOST: '127.0.0.1', PORT: String(port), NITRO_HOST: '127.0.0.1', NITRO_PORT: String(port), NODE_ENV: 'production',
+  const env = { ...process.env, HOST: '127.0.0.1', PORT: String(port), NITRO_HOST: '127.0.0.1', NITRO_PORT: String(port), NODE_ENV: 'production', NUXT_PUBLIC_MAP_TILE_URL: 'https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=test-map-key',
     SUPABASE_URL: `http://127.0.0.1:${backend.address().port}`, SUPABASE_SERVER_KEY: 'sb_secret_test-private-canary', TRUSTED_PROXY_IPS: '', PUBLIC_WEB_ORIGIN: `http://127.0.0.1:${port}`, ...(options.env || {}) };
   const child = spawn(process.execPath, ['.output/server/index.mjs'], { cwd: fileURLToPath(new URL('../', import.meta.url)), env, stdio: ['ignore', 'pipe', 'pipe'] });
   let logs = ''; child.stderr.on('data', b => { logs += b; });

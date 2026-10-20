@@ -1,5 +1,1350 @@
 # Estado del proyecto
 
+## Explorar: movimiento más suave del panel —20/10/2026
+
+Por petición del usuario, sustituir snap lineal por acomodo easeInOutCubic al
+soltar, con duración320–540ms según recorrido. Pasadas rápidas avanzan en su
+dirección; liberaciones lentas van a la parada cercana. Mismos límites mínimo
+adaptable/50%/90%, Ver ficha accesible y créditos acompañando el panel. Durante
+arrastre sigue al dedo sin tween; retorno de resistencia con resorte amortiguado
+1/190/28. No cortar la inercia de contenidos ni activar acomodo por simples
+toques. Nuevos gestos invalidan callbacks pendientes, con mounted/dispose.
+Reduced mantiene acciones inmediatas y sin acomodo autónomo. Refinamiento de
+ADR-106 / HU-07.2 / RF-13 / issue #33; sin dominio/data/SQL nuevos.
+
+Validación:6 pruebas de mapa con proveedor CARTO de fixture y10 de arquitectura
+aprobadas. La regresión de movimiento comprueba posición intermedia tras100ms
+y llegada a la parada al soltar despacio, además de los gestos de minimización,
+resistencia, selección, ficha, créditos, pan y altura pequeña/texto2 existentes.
+Formato correcto, análisis Flutter completo sin incidencias y diff limpio.
+Siguiente paso: comprobar sensación de movimiento en Android físico; las pruebas
+de frames no sustituyen esa revisión. Sin APK, instalación o despliegue.
+
+## Inicio: accesos negros con contenido blanco —20/10/2026
+
+Por nueva instrucción del usuario, Reportar/Mis reportes/Mis mascotas usan
+fondo negro #111111 y texto/iconos blancos. Texto recupera peso600 original y
+se retira el refuerzo de iconos. Tamaños compactos conservados; origen visual
+de apertura de Reportar actualizado al negro. Sin cambios de alcance o permisos.
+Validación: formato/análisis completos limpios;11 comprobaciones de
+arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+overflow. Captura normal revisada. Siguiente paso: revisión visual Android.
+
+## Inicio: actualizar al jalar hacia abajo —20/10/2026
+
+Por petición del usuario, Inicio habilita el PullToRefresh compartido, con
+el mismo indicador glass/gesto/retorno de Explorar y Mis mascotas. Recarga
+real del perfil de cabecera mediante su ViewModel/caso de uso existente;
+tarjetas e ilustración siguen siendo contenido fijo. Router inyecta callback,
+sin imports entre presentaciones. HomeViewModel bloquea duplicados y descarta
+errores tardíos al cambiar sección; toast superior con Reintentar ante fallo.
+Avatar conserva información durante refresh explícito de la misma identidad.
+Sin retrasos simulados, navegación nueva, SQL, permisos o ampliación de HU.
+
+Validación: formato/análisis completos limpios;14 pruebas de recarga de
+Inicio/Mascotas/arquitectura y8 de perfil aprobadas. Incluyen consulta real de
+perfil, conservación de iniciales, gesto/espera/duplicados, destino propio de
+Explorar, error/reintento y respuesta tardía. Dos pruebas antiguas de perfil
+esperaban cierre del toast a4s; ajustadas a6500ms y su animación de salida.
+Siguiente paso: comprobar el gesto y la consulta autenticada en Android.
+
+## Inicio: accesos con azul más intenso y mayor grosor —20/10/2026
+
+Por petición del usuario, Reportar/Mis reportes/Mis mascotas usan azul #2887EF
+en texto e iconos, conservando fondo gris y tamaño compacto. Texto700 (antes600)
+y refuerzo horizontal de iconos0.25px por lado, sin blur. Sin cambios de rutas,
+dominio, permisos o alcance. Formato/análisis completos limpios;11 comprobaciones
+de arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+overflow. Captura normal revisada. Siguiente paso: revisión visual Android.
+
+## Inicio: título mayor con degradado de referencia —20/10/2026
+
+Por nueva referencia del usuario, título Poppins32 (antes26), «Su regreso»
+gris400 y «empieza contigo» peso600 con degradado horizontal #459FF6→#75C9EF.
+ShaderMask local sobre la segunda frase; sin fondo glass. Dos textos con
+ajuste natural/ampliación y una etiqueta semántica completa, stagger conservado.
+Sin cambios de alcance o arquitectura. Descripción permanece bajo ilustración.
+Validación: formato/análisis limpios;11 comprobaciones de arquitectura/captura
+aprobadas. Renders390×844/texto1 y320×350/texto2 revisados sin overflow;
+texto ampliado puede repartir palabras entre líneas. Captura no acredita imagen.
+Siguiente paso: revisión visual Android.
+
+## Inicio: título libre y descripción junto a ilustración —20/10/2026
+
+Por instrucción del usuario se retira GlassSurface del título «Su regreso
+empieza contigo» y se aumenta de23 a26, conservando Poppins, pesos, colores,
+salto y stagger. La descripción se mueve debajo del perro/gato dentro de
+HomeReunionCard, con la imagen3:2 y glass existentes. Cerca de ti conserva glass.
+Sin cambio de alcance, dominio, datos o permisos.
+Validación: formato/análisis completos limpios y11 comprobaciones de
+arquitectura/captura aprobadas; renders390×844/texto1 y320×350/texto2 revisados
+sin desbordamientos. La captura no acredita el render de la ilustración.
+Siguiente paso: revisión visual en Android con el asset real.
+
+## Inicio: glass en Cerca de ti —20/10/2026
+
+Por petición del usuario, HomeNotice reutiliza GlassSurface/radio26 en la
+tarjeta «Explora cerca de ti», como el título principal y la ilustración.
+Conserva contenido/padding y acción Explorar; entrada con preserveBackdrop
+para mantener el material glass. También aplica al fallback que usa HomeNotice.
+Sin cambios de alcance, datos o permisos.
+Validación: formato y análisis completo limpios;11 comprobaciones de
+arquitectura/captura aprobadas, tamaños390×844/texto1 y320×350/texto2 sin
+desbordamientos. Captura normal revisada. Siguiente paso: revisión en Android.
+
+## Inicio móvil: tarjeta y accesos compactos —20/10/2026
+
+Por instrucción del usuario se retiran la huella sobre «Su regreso» y el
+enlace «Conoce Mis mascotas». Corrección del usuario: Reportar, Mis reportes y
+Mis mascotas conservan fondo gris #F5F5F7; solo iconos/textos usan azul #459FF6,
+igual que «empieza contigo».
+Padding vertical16 (antes20), iconos25 (antes28), separación10 (antes12) y
+texto12.5 (antes13); ampliación y columna adaptable conservadas. Origen visual
+de apertura de Reportar conserva el fondo gris. Sin cambio de alcance o permisos.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y11
+comprobaciones aprobadas (arquitectura y captura específica de Inicio).
+Renders390×844/texto1 y320×350/texto2 revisados, sin desbordamientos.
+La captura aísla contenido y no acredita la imagen de reencuentro ni Android.
+Siguiente paso: revisar el ajuste en Android.
+
+## Explorar: panel minimizable y créditos junto al borde —20/10/2026
+
+Por instrucción del usuario, permitir bajar el panel hasta Ver ficha completo,
+antes del separador de Detalles. Apertura50% (o mínimo accesible si requiere
+más), máximo90% y mínimo según altura real del resumen/botón +tirador32 +inset
+inferior+12. Sin selección22%; contenido excepcional mantiene scroll. Medición
+solo en presentación, con callback tras layout y comprobación mounted.
+
+MapAttribution.compact usa fuente8/objetivos48 y fondo estrecho a la derecha,
+aproximadamente8px sobre el panel, acompañando extensión/resistencia. Créditos
+enlazados/semántica completa conservados, elipsis/tooltip con texto ampliado.
+ZoneMapPicker omite su crédito superior solo porque ExploreCaseMap lo compone
+en la nueva posición. Cámara reserva espacio adicional para evitar tapar pines;
+título central se retira si falta altura, retorno conservado hasta expansión.
+Otros mapas y paleta global intactos. [ADR-106](decisiones/106-mapa-panel-minimizable-y-creditos-compactos.md),
+[ficha](funcionalidades/explorar.md). HU-07.2 / RF-13 / issue #33.
+
+Validación:17 pruebas mapa/selector/arquitectura aprobadas con CARTO de fixture,
+AMBIENT_BACKGROUND_MOTION=false y capturas activadas. Regresión por gesto en
+390×844 y320×350/texto2: Ver ficha completo, Detalles fuera del área visible,
+créditos sobre panel, retorno/selección/pan/ficha y reintentos conservados.
+Análisis completo sin incidencias; último análisis de archivos intervenidos y
+formato correctos. Renders minimizados normal/pequeño revisados: crédito pequeño
+y sin superposición con retorno. Teselas neutras, sin acreditar proveedor real.
+Siguiente paso: revisión Android del gesto/posición. Sin APK, instalación,
+SQL, despliegue o cierre de historia; cambios previos de Inicio conservados.
+
+## Tipografía del título de Inicio móvil —20/10/2026
+
+Por referencia explícita del usuario, «Su regreso» usa Poppins regular/gris y
+«empieza contigo» seminegrita/azul, separados por salto de línea, tamaño23 y
+altura1.25. Fuentes400/600 incluidas con licencia OFL, sin descarga en ejecución.
+Excepción local a la fuente del sistema en [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+Tarjeta glass, acciones y entrada conservadas; sin cambio de alcance de HU.
+
+Validación: formato correcto y análisis Flutter completo sin incidencias.
+Home/arquitectura:15 comprobaciones aprobadas y2 fallos por timeout de
+pumpAndSettle con el fondo animado continuo. La herramienta general de
+capturas presenta el mismo bloqueo. Se añade captura específica
+tool/capture_home_title.dart con fuentes reales y movimiento reducido:
+aprobada en390×844/texto1 y320×350/texto2, sin desbordamientos. Título revisado
+en build/ui-preview/home-title/normal.png y small.png; la frase crece y se
+reparte en más líneas al ampliar texto. Estas capturas aíslan el contenido.
+
+Siguiente paso: revisión visual Android y adaptación de las esperas de las
+pruebas generales al fondo continuo. Sin APK, instalación ni despliegue.
+
+## Cartografía global con acabado intermedio —20/10/2026
+
+Por instrucción del usuario, todos los mapas móviles/web usan el punto medio
+entre Reportar original y el filtro anterior de Explorar:50% color fuente y50%
+acabado anterior. MapStyle en core/presentation se aplica obligatoriamente en
+ZoneMapPicker; retirar filtro/override local de Explorar. Incluye selectores,
+reportes, ubicaciones, avistamientos/revisión y fichas/previas móviles.
+
+Web extrae LocationMap compartido: SightingMap solo adapta el contrato de punto.
+Matriz equivalente en SVG/CSS local únicamente sobre teselas. Usa la misma base
+CARTO Positron mediante NUXT_PUBLIC_MAP_TILE_URL, configurada en .env ignorado
+desde la URL móvil, sin versionar la clave pública de teselas. CSP permite solo
+host CARTO en imágenes externas; créditos OSM/CARTO enlazados fuera del filtro.
+Selección, radios, pines, datos y permisos conservados. No crea Explorar web.
+[ADR-104](decisiones/104-cartografia-global-mobile-web.md),
+[ficha](funcionalidades/cartografia-compartida.md). Regla registrada también en
+AGENTS, arquitectura y normas UI móvil/web; comprobaciones previenen bypass y
+divergencia numérica de matrices. Sin SQL ni nuevas operaciones de producto.
+
+Validación:17 pruebas Flutter mapa/selector/arquitectura aprobadas; formato y
+análisis completo sin incidencias.55 pruebas web y26 de servidor de producción
+aprobadas; typecheck y build correctos. Build aislado .nuxt-map-style para
+conservar el servidor de desarrollo activo; no se detuvo el proceso del usuario.
+QA navegador1440/731/390/320/1920 y320×350/texto200% aprobada: selección manual,
+GPS denegado, foto/reintento ambiguo, CSP/hidratación, créditos y píxel filtrado
+realmente pintado sobre tesela fixture. Captura del mapa web revisada. Las
+capturas no acreditan apariencia/red real del proveedor en producción.
+
+Siguiente paso: revisión de mapas reales Android/web; configurar la URL pública
+de teselas en el entorno web publicado y desplegar cuando se autorice. El
+fallback OSM móvil sin configuración también recibe el filtro, pero no equivale
+a la base Positron configurada. Sin APK, instalación, despliegue o historia cerrada.
+
+## Panel del mapa al50% —20/10/2026
+
+Elección explícita del usuario: inicio y mínimo50%, ya que60% resulta demasiado
+alto. Selección, colapso, cámara y resistencia acompañan el nuevo mínimo;
+máximo90% y contenido desplazable conservados. La fecha puede requerir scroll.
+ADR-103 / HU-07.2 / RF-13 / issue #33, sin cambios de alcance o backend.
+
+Validación:6 pruebas de mapa aprobadas, con acceso a fecha mediante scroll,
+retorno/selección y320×350/texto2. Análisis de pantalla/widget sin incidencias
+y formato correcto. Siguiente paso: revisión visual Android de la altura50%.
+Sin APK, instalación o despliegue.
+
+## Cartografía casi neutra según segunda captura —20/10/2026
+
+El usuario corrige el amarillo hueso excesivo y aporta una referencia blanco
+grisáceo apenas cálido. Ajustar solo filtro de teselas: luminancia92%, mezcla8%
+hacia blanco y azul−4; gris245→#F6F6F2 y blanco→#FFFFFB. Recupera contraste
+frente al aclarado18% anterior. Pines/créditos, foto, glass y panel60–90%
+conservados. Refinamiento de ADR-103 / HU-07.2 / RF-13 / issue #33.
+
+Validación:6 pruebas de mapa aprobadas, análisis del widget sin incidencias,
+formato correcto y captura normal revisada con teselas neutras. Siguiente paso:
+revisión visual sobre cartografía real Android. Sin APK, instalación o despliegue.
+
+## Panel del mapa más alto al abrir y colapsar —20/10/2026
+
+Por instrucción del usuario, altura inicial y mínima de45 a60% para evitar
+que la fecha quede recortada tras ampliar foto/espaciados. Máximo90%, cámara,
+selección, colapso y resistencia alineados con el nuevo mínimo. Conserva scroll
+para pantallas pequeñas/texto ampliado. ADR-103 / HU-07.2 / RF-13 / issue #33.
+
+Validación:6 pruebas de mapa aprobadas, incluida regresión que comprueba fecha
+completa sobre el área del sistema con16px de margen a390×844; también cubren
+320×350/texto2. Análisis de pantalla/widget sin incidencias, formato correcto
+y captura normal revisada con todos los datos visibles. Siguiente paso:
+revisión física Android. Sin APK, instalación, despliegue o cambios de backend.
+
+## Espaciado de Detalles del caso —20/10/2026
+
+Por comparación explícita de capturas del usuario, aumentar separación del
+resumen del mapa: separador con padding vertical16 (antes12), título→datos16
+(antes10) y16 entre filas (antes8). Mantener textos, etiqueta/valor, iconos,
+foto y acciones; panel permite scroll. Refinamiento de ADR-103 / HU-07.2 /
+RF-13 / issue #33, sin cambio de alcance o backend.
+
+Validación:6 pruebas de mapa aprobadas, análisis del widget sin incidencias y
+formato correcto. Captura del panel expandido revisada, con filas más separadas;
+pruebas incluyen320×350/texto2. Siguiente paso: revisión visual Android del gap.
+Sin APK, instalación ni despliegue.
+
+## Color amarillo hueso del mapa —20/10/2026
+
+Corrección explícita del usuario: sustituir el gris neutro de Explorar por
+amarillo hueso suave. Filtro solo en teselas: gris245 se convierte en #F7F5EB
+y blanco en #FFFDF3, manteniendo contraste de calles/textos y pines/créditos
+sin filtrar. Foto112px, cabecera glass, cámara y consulta conservadas.
+Refinamiento de ADR-103 / HU-07.2 / RF-13 / issue #33, sin cambio de alcance.
+
+Validación:6 pruebas de mapa aprobadas, análisis del archivo sin incidencias,
+formato correcto y capturas regeneradas; normal revisada con teselas neutras.
+Siguiente paso: revisión visual del tinte sobre cartografía real en Android.
+Sin APK, instalación o despliegue.
+
+## Refinamiento del mapa, foto y cabecera glass —20/10/2026
+
+Por nueva petición del usuario, foto del resumen de80 a112px y título Explorar
+en GlassSurface/radio24/padding22×12, con centrado y retirada al expandir intactos.
+Cartografía desaturada y aclarada18% solo en teselas; pines oficiales/créditos
+conservan contraste. Selección acerca hasta zoom15 desde una vista más amplia,
+sin alejar zoom superior ni cambiar búsqueda/ubicaciones públicas; pan/zoom libre.
+ZoneMapPicker recibe tileColorFilter opcional; mapas restantes sin filtro.
+Refinamiento de [ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md)
+y [ficha](funcionalidades/explorar.md), HU-07.2 / RF-13 / issue #33.
+
+Validación:16 pruebas de mapa/selector de ubicación/arquitectura aprobadas en
+serie con AMBIENT_BACKGROUND_MOTION=false, formato correcto y análisis completo
+sin incidencias. Capturas390×844 y320×350/texto2 revisadas: foto mayor/cabecera
+glass y scroll disponibles; fecha/detalles pueden requerir desplazar el panel.
+Las teselas de fixture no acreditan calles reales. Siguiente paso: revisión
+visual Android del proveedor configurado. Sin APK, instalación ni despliegue.
+
+## Mapa y resumen compacto aprobados —20/10/2026
+
+Implementada la propuesta visual aprobada por el usuario: mapa despejado sin
+disco gris del radio, pines con silueta de ubicación/símbolo oficial y selección
+negra/blanca. Panel45–90% con foto80×80, nombre/rasgos, flecha azul y Ver ficha
+gris; tamaño/especie/fecha en vertical tras separador. Acabado azul extraído
+a NavigationAccentSurface de core y compartido con navegación, sin duplicación
+ni imports entre features. Ambos botones abren el detalle desde su origen real;
+bloqueo durante navegación evita aperturas duplicadas. Créditos conservados bajo
+cabecera, consulta/radio público intactos, sin SQL ni nuevas operaciones.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md),
+[ficha](funcionalidades/explorar.md). HU-07.2 / RF-13 / issue #33.
+
+Validación: formato y git diff --check correctos; flutter analyze --no-pub sin
+incidencias.43 pruebas aprobadas en serie de mapa, preview, Home, arquitectura,
+selector de ubicación y Explorar con AMBIENT_BACKGROUND_MOTION=false. Incluyen
+ambas acciones, coordenadas/consulta conservadas, reintento, permisos de lectura
+por sesión, retorno, pines independientes y320×350/texto2. La ejecución inicial
+se interrumpió por falta de memoria; las ejecuciones separadas finalizaron bien.
+Capturas390×844 y320×350/texto2 revisadas: resumen/datos verticales legibles,
+scroll al ampliar texto/altura reducida. Teselas neutras de fixture: no acredita
+apariencia de cartografía remota. Siguiente paso: revisión visual en Android con
+el proveedor configurado. Sin APK, instalación, despliegue ni cierre de historia.
+
+## Panel del mapa con estado compartido —19/10/2026
+
+Por petición del usuario, el panel de Explorar sin pin seleccionado reutiliza
+CollectionEmptyState, como el vacío del listado: huella, título y descripción
+centrados. Con resultados indica Selecciona un pin; sin resultados confirmados,
+No encontramos casos. Conserva instrucciones específicas de ubicación/reintento,
+resumen al seleccionar, panel desplazable y consulta compartida.
+HU-07.2 / RF-13 / issue #33, sin cambio de alcance ni backend.
+
+Validación: formato, flutter analyze --no-pub sin incidencias y15 pruebas de
+mapa/arquitectura aprobadas con AMBIENT_BACKGROUND_MOTION=false. Capturas
+390×844 y320×350/texto2 revisadas; en altura pequeña el contenido requiere
+expandir/desplazar el panel. Teselas de fixture, sin validar cartografía remota.
+Siguiente paso: revisión visual en Android físico; sin APK ni despliegue.
+
+## Fondo móvil más tenue abajo —19/10/2026
+
+Por instrucción del usuario, AppPageBackground conserva las luces del tercio
+superior y atenúa progresivamente el celeste hasta casi blanco en navegación.
+Velo dentro del painter, antes del contenido; movimiento y glass conservados.
+[ADR-102](decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md),
+[ficha](funcionalidades/fondos-mobile.md). Sin HU/issue nuevo ni cambio de alcance.
+
+Validación: formato correcto, flutter analyze sin incidencias y18 comprobaciones
+aprobadas (fondo animado, Home, arquitectura y captura UI), con
+AMBIENT_BACKGROUND_MOTION=false; el test de movimiento fuerza animate:true.
+Renders de Inicio390×844 y320×350/texto2 regenerados y revisados: zona inferior
+más blanca y cabecera conservada. git diff --check correcto.
+Siguiente paso: revisión visual en Android físico; no se generó ni instaló APK.
+
+## Mapa flotante en Explorar —19/10/2026
+
+Por elección del usuario de la propuesta3 se retira Lista/Mapa. Mapa es una
+cápsula con GlassSurface, icono y etiqueta, fija sobre la navegación con20px
+de separación. Solo Explorar; carga/error inicial sin botón y busy bloqueado.
+Router compone ExploreMapButton en el slot de Home, sin imports entre
+presentaciones. Padding final200px más crecimiento de texto/inset permite
+retirar la última tarjeta de debajo del botón. Mismo origen/retorno y consulta.
+[ADR-101](decisiones/101-mapa-acceso-flotante-explorar.md),
+[ficha](funcionalidades/explorar.md). HU-07.1/07.2, RF-13, issues #32/#33.
+
+Validación:36 pruebas Home/Explorar/arquitectura/mapa aprobadas con
+AMBIENT_BACKGROUND_MOTION=false. Normal/pequeño/texto2, scroll fijo y retorno,
+sin consultas adicionales al abrir. Formato y análisis completo sin incidencias;
+git diff --check correcto. Capturas390×844 y320×350/texto2 revisadas;
+datos/fotos de fixture no acreditan backend remoto. En altura pequeña el botón
+se superpone al contenido durante el scroll, como la navegación; el padding
+final permite descubrir la última tarjeta/acción.
+Siguiente paso: revisión física Android. Sin APK, instalación o despliegue.
+
+## Explorar: fila compacta de ubicación y filtros —19/10/2026
+
+Ubicación usa el ancho disponible con lugar/radio en línea; Filtrar casos es
+un icono circular48×48 con tooltip y semántica, sin chevrón ni texto visible.
+Fila48px a tamaño normal; texto ampliado puede aumentar Ubicación, sin reducir
+fuente. Área táctil mínima48, paneles/animaciones/borradores/Aplicar conservados.
+FilterExpansion reutiliza su variante compacta y SelectionPillSurface permite
+omitir el padding exterior; otros selectores conservan sus valores por defecto.
+[ADR-100](decisiones/100-explorar-controles-compactos.md),
+[ficha](funcionalidades/explorar.md). Sin backend, permisos o alcance nuevos.
+
+Validación:25 pruebas Explorar/arquitectura/navegación de mascotas aprobadas,
+incluyendo dimensiones48px, texto2, descarte/Aplicar y consulta conservada.
+Formato correcto y análisis completo sin incidencias. Capturas390×844 y
+320×350/texto2 de listado/paneles revisadas; teselas de red no disponibles
+en el entorno de pruebas, sin acreditar cartografía real.
+Siguiente paso: revisión física Android. Sin APK/despliegue.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+## Mapa: especie, foto mayor y pines individuales —19/10/2026
+
+Corrección explícita del usuario: tipo de mascota en lugar de raza; foto4:3
+a ancho completo en lugar de altura136px; retirar Abierto/Resuelto y conteo de
+casos/ubicaciones del panel. Cada caso tiene su pin, con separación en píxeles
+ante solapamientos y sin contador/selector1 de2. La cámara recalcula la posición
+visual con zoom/giro; no se alteran coordenadas públicas, filtros o radio.
+Ver ficha y resumen seleccionados por identidad compuesta; se conservan carga,
+reintento, paginación, retorno y panel accesible. ADR-099; sin SQL, permisos o
+activación remota nuevos; HU-07.1/07.2, RF-13, issues #32/#33.
+
+Validación:22 pruebas de mapa/preview público/arquitectura/ZoneMapPicker aprobadas
+con AMBIENT_BACKGROUND_MOTION=false; giro45°, zoom12/18, coincidencias exactas,
+cercanía, objetivos táctiles separados, apertura individual y especie/fallback.
+Análisis completo limpio y formato correcto. Capturas390×844 y320×350/texto2
+con movimiento reducido y panel expandido revisadas con fotos/teselas de fixture.
+No equivalen a evidencia remota. Siguiente paso: revisar el ajuste en Android
+con datos reales y concentración elevada de casos; sin APK ni despliegue nuevos.
+
+## Navegación móvil con acabado de landing —19/10/2026
+
+La opción activa y Reportar de LiquidNavigation usan el degradado azul, brillo
+superior, sombras y efectos de Iniciar sesión de landing. Hover/foco/pulsación:
+elevación2px y oscurecimiento3% en200ms; movimiento reducido sin elevación ni
+transición. Mantiene glass exterior, destinos, tamaños y deslizamiento320ms.
+Trabajo previo conservado. [ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md),
+[ficha](funcionalidades/inicio.md).
+
+Validación:16 comprobaciones existentes de Home/arquitectura aprobadas con
+AMBIENT_BACKGROUND_MOTION=false; formato y flutter analyze sin incidencias.
+Capturas390/320px con texto2 en tamaño pequeño revisadas, sombras habilitadas.
+Siguiente paso: revisión visual/táctil en Android. Sin APK, instalación ni
+despliegue; sin cambios de producto/backend ni cierre de historias.
+
+## Filtros solo en Explorar y resumen inferior del mapa —19/10/2026
+
+Por aprobación del usuario, Mapa retira el editor/Aplicar filtros y muestra el
+resumen público del pin seleccionado con Ver ficha. Filtrar casos/Ubicación
+permanecen en Explorar. Sin callout duplicado; coincidencias anterior/siguiente,
+panel42–90%, retorno glass, carga/reintento, paginación y filtros conservados.
+El preview usa scroll exterior; CTA fijo cuando cabe, por scroll en altura
+reducida/texto2. No cambia SQL, permisos ni dominio. ADR-097; HU-07.1/07.2,
+RF-13, issues #32/#33, sin cambios de estado en GitHub ni despliegue.
+
+Validación: formato, flutter analyze --no-pub completo sin incidencias y19
+pruebas focalizadas mapa/preview/arquitectura aprobadas. Verifican filtros no
+predeterminados compartidos, ausencia de editor, selección, Ver ficha, refresh,
+paginación/retorno, coincidencias y accesibilidad en390×844 y320×350/texto2 con
+movimiento reducido. Capturas con fixture revisadas en build/ui-preview/explore-map.
+La espera de pruebas avanza frames acotados porque AppPageBackground tiene
+animación continua; no se espera a que todos sus tickers queden inactivos.
+Siguiente paso: revisar el nuevo recorrido en Android con datos reales. Sin
+APK, instalación ni confirmación remota nueva; trabajo local anterior conservado.
+
+## Toast móvil igual al web, con descarte por gesto —19/10/2026
+
+ConfirmationToastHost compartido adopta texto14/peso400, acción subrayada,
+entrada desde fuera del viewport480ms, retorno420ms y salida superior240ms.
+Sigue el dedo/ratón; descarta hacia arriba y retorna con gesto corto/cancelado,
+con resistencia hacia abajo. Texto extenso conserva scroll y gesto en el icono.
+6500ms como web, pausados al sostener. Mantiene toque/teclado/Escape, semántica,
+reintento y exclusión de hosts anidados. Reemplazo durante arrastre libera el
+aviso anterior e impide timers/callbacks tardíos. Movimiento reducido conservado.
+
+Validación:33 comprobaciones de toast/arquitectura/preferencias/avatar/harness
+y54 de consumidores (perdidos/encontrados, validación/salida del editor de mascotas,
+carteles y Explorar) aprobadas con AMBIENT_BACKGROUND_MOTION=false; movimiento
+del toast activo. Formato verificado, flutter analyze sin incidencias y
+git diff --check aprobado. Capturas390×844/320×350/texto2 y entrada/arrastre/retorno en
+apps/mobile/build/ui-preview/mobile-toast revisadas. Suite general no completada:
+timeouts con fondo continuo, límite de hilos/memoria y fallos observados en
+origin_page_transition_test ajenos al toast. No se declara suite global verde.
+Sin APK/instalación/despliegue ni cambios de datos/permisos. Siguiente paso:
+revisión del gesto en dispositivo Android/iPhone y resolver la regresión global
+de transiciones en su propio incremento. [ADR-096](decisiones/096-toast-mobile-igual-web.md),
+[ficha](funcionalidades/toast-mobile.md).
+
+## Títulos de sección móvil en peso500 —19/10/2026
+
+Por petición explícita del usuario, CollectionHeader pasa de700 a500 como el
+título de Inicio web: Explorar, Mis mascotas y listados de casos/reportes que
+reutilizan la cabecera. Fallback de Home ajustado al mismo peso. Tamaño32,
+color, adaptación y operaciones conservados. Fichas y regla visual actualizadas.
+
+Formato correcto y análisis focalizado de los dos archivos sin incidencias.
+El análisis completo y la ejecución conjunta de Home/Explorar/Mascotas/listados
+se interrumpieron por falta de memoria de Dart. Reintento secuencial de listados
+no valida el cambio: pumpAndSettle agota su espera. Sin nuevas pruebas añadidas.
+Siguiente paso: revisión visual en Android y repetir suite con entorno estable;
+sin APK ni instalación nueva, ni cierre de historias.
+
+## Restaurar stagger suave de Inicio —19/10/2026
+
+El usuario rechaza el recorte progresivo de094. Se recuperan fade y desplazamiento
+de28px con el mismo timeline/curva850ms/90ms del stagger; preserveBackdrop solo
+excluye ImageFiltered de entrada sobre el glass. Superficie/contenido aparecen
+juntos, sin panel vacío ni barrido. GlassSurface parametriza backdropBlendMode;
+las tarjetas de Inicio usan src para su capa de opacidad; otros usos conservados.
+Una entrada sin cover permanece en Inicio/Explorar. ADR-095; sin cambios de
+contenido, consultas, permisos, SQL o historias.
+
+Formato correcto,34 regresiones aprobadas y análisis sin incidencias. Verifican
+entrada conjunta, desplazamiento sin cambio de tamaño, resultado estable y
+única entrada de Explorar. Siguiente paso: verificar sensación en Android con
+el usuario. Sin APK/instalación ni revisión física nueva.
+
+## Corrección de doble entrada en Inicio y Explorar —19/10/2026
+
+Por capturas del usuario se retira el cover previo a stagger en estas dos
+secciones. Inicio conserva cuatro grupos; Home no añade entrada activa sobre
+Explorar/Mascotas reales. Explorar usa una sola línea temporal para skeleton y
+datos sin reiniciar al completar consulta. Las tarjetas glass se revelan junto
+al contenido mediante preserveBackdrop/ClipRect, sin blur/opacidad del material
+ni paneles vacíos al principio. Glass final, cabecera/navegación y movimiento
+reducido conservados. ADR-094 sustituye esta parte de093; sin cambios de otras
+pantallas, datos, consultas, permisos, SQL, HU/issue nuevos o cierre de historias.
+
+Validación:34 pruebas de glass/Inicio/Explorar/stagger/arquitectura aprobadas.
+Regresión visual confirma tarjeta inicialmente oculta, ribete revelado idéntico
+al final y acción Mis mascotas;90 frames de Explorar con un stagger, cero covers,
+una consulta y misma instancia de skeleton, con/sin movimiento reducido. Fondo
+ambiental fijado para regresiones. Formato correcto y análisis sin incidencias.
+Sin APK ni
+ejecución Android nueva; siguiente paso: verificar entrada en dispositivo.
+
+## Glass estable al entrar e ilustración de reunión en Inicio —19/10/2026
+
+Por capturas del usuario, se retira GlassSurface del efecto ImageFiltered/Opacity
+de entrada: la superficie principal envuelve ahora el stagger de su contenido.
+Conserva material/radio26/padding22/acción. El fondo animado sigue reflejándose,
+sin aplicar un acabado temporal distinto al glass. HomeReunionCard añade el PNG
+original de platform/images/landing/reunion.png en card glass3:2, sin recorte,
+con etiqueta accesible y sin acción ficticia. Copia verificada por SHA256 idéntico.
+Ubicada entre accesos rápidos y Cerca de ti; cuatro grupos de entrada. Sin cambios
+web, datos, permisos, SQL, HU/issue nuevos ni cierre de historias. ADR-093.
+
+Validación:18 comprobaciones aprobadas de Inicio/arquitectura/harness y regresión
+visual nueva que compara píxeles del ribete y geometría durante/final de entrada,
+asset presente y acción Mis mascotas conservada. Análisis sin incidencias.
+Harness actualizado repetido y aprobado; home.png y home_reunion.png revisadas,
+con las mascotas completas, fondo transparente y sin recorte. Capturas pequeñas
+con texto2 del mismo harness conservadas sin overflow. Formato/análisis finales
+sin incidencias. Sin instalación/APK
+ni revisión Android nueva. Siguiente paso: inspección visual del nuevo card y
+revisión del usuario tras reiniciar para incorporar el asset.
+
+## Lettering móvil igual al de la web —19/10/2026
+
+Por petición explícita, BrandWordmark y StartupReveal comparten BrandName con
+lettering «entre huellas»: contornos de Arial regular equivalentes al peso500
+disponible en web, #171918, tracking−.05em y dos líneas para el layout móvil.
+Gap7px compacto/16px grande. Icono oficial verificado idéntico por SHA256 entre
+app_icon.png y /brand.png. Se retira sans-serif800/mayúsculas de ambas variantes.
+SVG de paths sin fuente instalada/remota; script local de exportación añadido,
+sin dependencias runtime nuevas. Tamaño gráfico explícito y etiqueta accesible
+conservados; cuerpo de textos y ampliación ajenos a la marca no cambian.
+ADR-092, reglas, diseño y ficha identidad-visual actualizados. Sin cambios web,
+launcher, dominio, datos, permisos o nuevas HU/issue/cierres.
+
+Validación:30 comprobaciones de arranque/Inicio/app/onboarding/arquitectura y
+harness visual aprobadas. Formato correcto y análisis sin incidencias. Capturas
+acceso/Inicio normal/pequeño revisadas en apps/mobile/build/ui-preview. Se ajustó
+la geometría gráfica para evitar overflow de onboarding en320×350/texto2.
+Sin nueva instalación Android; siguiente paso: revisar capturas y abrir la app
+con asset nuevo tras detener/iniciar. No se genera APK ni se despliega.
+
+## Hover glass web con mayor presencia —19/10/2026
+
+El usuario considera casi imperceptible el primer hover. Se refuerza el borde
+a#8FA9C4, el ribete interior de1 a2px y el reflejo blanco/azul. Sin halo exterior,
+cambios de tamaño o alteración de foco/error/táctil/disabled/readonly.
+ADR-090, regla web y ficha de acceso actualizadas con la corrección.
+
+Validación: build .nuxt-input-hover correcto; QA Chrome fixture verifica nueva
+intensidad/borde, geometría estable y estados anteriores conservados. Captura
+hover-desktop.png en apps/mobile/build/ui-preview/web-input-hover regenerada y
+revisada. Sin errores JavaScript; git diff --check correcto. Sin despliegue.
+Siguiente paso: revisión visual del usuario sobre la intensidad actual.
+
+## Nubes móviles en toda la altura y tarjeta glass —19/10/2026
+
+Por nueva referencia del usuario, «Su regreso empieza contigo» usa GlassSurface
+compartido/radio26 en lugar de gris opaco, conservando padding22, textos y acción.
+AppPageBackground distribuye cinco nubes azules por todo el viewport y las mueve
+con trayectorias suaves cerradas de24s. Pintura aislada por RepaintBoundary sin
+reconstruir contenido; controlador pausado con movimiento reducido/TickerMode y
+liberado al desmontar. Conserva insets/scroll/teclado y capas de transición.
+ADR-091 sustituye distribución estática de ADR-088. Sin cambios de web, datos,
+permisos, SQL, HU/RF/issue nuevos ni cierre de historias.
+
+Validación:30 comprobaciones aprobadas de Inicio/arranque/reveal/arquitectura,
+harness visual y test nuevo significativo de movimiento real de píxeles, contenido
+sin rebuild, pausa/reanudación y liberación. Regresiones/capturas fijan solo la
+animación ambiental mediante AMBIENT_BACKGROUND_MOTION=false; el test nuevo
+fuerza animate:true. Comando CI/README actualizados, sin ejecución remota de CI.
+Análisis sin incidencias; capturas390×844 y320×350/texto2 revisadas en
+apps/mobile/build/ui-preview (home.png muestra tarjeta glass y fondo completo).
+Sin nueva ejecución Android/APK. Pendiente revisar fluidez/coste del blur y
+sensación del movimiento en dispositivo; renders no acreditan ese rendimiento.
+Siguiente paso: revisión visual del usuario con ejecución móvil actualizada.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-091](decisiones/091-nubes-mobile-animadas-y-tarjeta-glass.md).
+
+## Hover glass fino en campos web —19/10/2026
+
+Por petición del usuario, los campos compartidos de reader-shell tienen hover
+con borde tenue#CAD6E3, reflejo blanco/azulado y luz inset1px, sin halo exterior.
+Solo puntero fino con hover y campos habilitados/editables sin foco ni error;
+foco interior/errores conservados. Sin cambios de geometría/padding/fondo base.
+Transición180ms de borde/sombra; movimiento reducido elimina transición.
+Landing, controles checkbox/radio/range/file y dispositivos táctiles conservados.
+[ADR-090](decisiones/090-hover-glass-interior-campos-web.md), regla/ficha actualizadas.
+
+Validación: build Nuxt aprobado (.nuxt-input-hover); Chrome de producción con
+fixture verifica hover/borde/reflejo interior, geometría idéntica, prioridad de
+foco/error, exclusión disabled/readonly y ausencia de hover en contexto táctil.
+Movimiento reducido comprobado; sin errores JavaScript. Captura escritorio
+revisada en apps/mobile/build/ui-preview/web-input-hover/hover-desktop.png.
+git diff --check correcto. Sin tests permanentes nuevos para este ajuste CSS.
+Sin SQL, Flutter, operaciones remotas, despliegue o cierre de HU. Siguiente paso:
+revisión visual del usuario sobre la intensidad del reflejo.
+
+## Foco interior en campos web —19/10/2026
+
+Por referencia explícita del usuario, el contorno de foco de los campos crece
+hacia dentro: outline2px con offset−2px, sin aro exterior ni cambios de geometría.
+Regla compartida en reader-shell para inputs de texto, textarea y select;
+retirados overrides exteriores de acceso, moderación y avistamientos. Se mantiene
+azul#3C537B y rojo#B53F48 cuando aria-invalid=true. :where evita que las exclusiones
+de tipos ganen especificidad al estado de error. Botones/enlaces, controles
+checkbox/radio/range/file y landing conservan su foco. Sin cambios de negocio.
+[ADR-089](decisiones/089-foco-interior-inputs-web.md), regla web y ficha actualizadas.
+
+Validación local: build Nuxt correcto (.nuxt-input-focus); QA Chrome de producción
+con fixture a1440/390 verifica foco interior2px por clic/teclado, geometría y
+padding idénticos antes/después, error rojo y herencia en login/registro/moderación.
+Sin errores JavaScript. Captura móvil revisada en apps/mobile/build/ui-preview/
+web-input-focus/login-focus-390.png. git diff --check correcto. Avistamientos
+verificado por retirada del override y herencia CSS; sin envío real nuevo.
+Sin SQL, Flutter, despliegue ni cambios de Auth/SMTP. Siguiente paso: revisión
+visual del usuario sobre el foco interior.
+
+## Corrección del fondo móvil según referencia —19/10/2026
+
+El usuario rechaza el degradado vertical y aporta referencia de pantallas de
+envíos. AppPageBackground ahora pinta blanco con nubes azules difuminadas arriba,
+aperturas blancas y reflejo frío tenue inferior izquierdo. Radiales proporcionales
+al viewport, estáticos y sin dependencia/bitmap. Alcance compartido y superficies
+conservados; CoverReveal y OriginPageTransition reutilizan el nuevo fondo.
+ADR-088 sustituye la paleta de ADR-086; web/landing conservadas. Sin operaciones,
+permisos, SQL, HU/issue nuevos ni cierre de historias.
+
+Validación:22 comprobaciones existentes de arranque/reveal/arquitectura y harness
+visual aprobadas. Capturas acceso/onboarding/Inicio/perfil revisadas en
+apps/mobile/build/ui-preview, con390×844 y320×350/texto2. Formato correcto y
+análisis final sin incidencias.
+Sin instalación ni revisión Android de este ajuste; render local no certifica
+identidad exacta con la captura ni aprobación del usuario. Siguiente paso:
+revisar el fondo en su ejecución móvil actualizada.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-088](decisiones/088-fondo-mobile-nubes-azules-referencia.md).
+
+## Registro, verificación y recuperación web completos en local —19/10/2026
+
+Por autorización del usuario se trasladan los recorridos de acceso móvil a web:
+Crear cuenta (nombre/correo/contraseña/confirmación), código6 con reenvío60s,
+recuperar acceso por código y guardar nueva contraseña. Enlaces reales en login;
+/crear-cuenta y /recuperar-contrasena con política guest, /restablecer-contrasena
+con recovery en la política única SSR/cliente. Registro confirmado entra al
+onboarding por cuenta; autoconfirmación Auth también compatible. Misma cuenta,
+full_name y perfil existentes, sin autoasignar roles.
+
+CredentialScreen observa CredentialViewModel y casos de uso concretos;
+HTTP/Auth tras repositorios/fuentes por petición. Recuperación usa cookie cifrada
+HttpOnly eh_credentials con propósito/AAD propio, id/espera/vencimiento y token
+solo en servidor/cookie. Nunca establece eh_access al verificar recovery;
+API general/moderación y páginas de cuenta siguen inaccesibles con esa capacidad.
+Reset revalida identidad y vencimiento antes de PUT Auth. Progreso sin tokens
+en JSON y sin datos de usuario en SSR. Pendiente máximo30min, reset máximo10min
+limitado por JWT; no se afirma el vencimiento remoto del código. Cancelar/confirmar
+retiran cookie; login/logout/OAuth confirmado limpian flujos anteriores. Conflicto
+de pestaña no borra el flujo nuevo. Sin reintentos automáticos de escrituras.
+
+UI mantiene fondo/orbe, marca responsive compartida, retorno glass sobre scroll,
+StaggerReveal, skeleton, shimmer de acciones y toast superior/invalid/shake.
+Recargar restaura etapa; falla de red conserva datos y permite reintentar.
+Mensajes de registro/recuperación no confirman existencia del correo.
+
+Validación local: typecheck y build Nuxt con .nuxt-credentials;54 pruebas unitarias/
+arquitectura y26 de servidor aprobadas (8 unitarias y5 de producción nuevas).
+Chrome fixture prueba registro inválido/coincidencia, código rechazado y correcto,
+restauración al recargar, llegada a onboarding; recuperación, nueva contraseña,
+fallo/reintento de guardado, éxito y login con nueva clave, cancelación, bloqueo
+de dobles envíos/shimmer y reset protegido SSR/SPA sin montar campos sin capacidad.
+18 capturas en apps/mobile/build/ui-preview/web-credentials a1440/390/320 con
+texto200%; revisados registro móvil y reset pequeño con texto ampliado. Sin
+overflow/CSP/hidratación/JavaScript. QA Chrome de acceso anterior también aprobado:
+Google/Facebook PKCE fixture, cuenta/revisión, permisos/revocación, expiración,
+onboarding, logout entre pestañas y responsive1920/1440/731/390/320/texto200%.
+git diff --check correcto.
+
+Documentados [ADR-087](decisiones/087-registro-y-recuperacion-web.md), reglas,
+arquitectura, guía, ficha/índice de acceso y desarrollo. Incremento HU-01/RF-01,34,
+sin nueva HU/issue ni cierre de historia. Sin SQL, cambios de Flutter propios de
+este incremento, variables nuevas, modificación Auth/SMTP remota o publicación.
+Trabajo paralelo móvil conservado. No acredita paridad global de funcionalidades.
+
+Pendiente demo con correo real y configuración efectiva de Auth: registro/correo
+habilitados, OTP6, SMTP y plantillas existentes con .Token. Ningún correo real
+enviado en las pruebas. Una respuesta perdida tras consumir código o actualizar
+clave puede requerir volver al login/reenvío; no se promete rollback ni revocación
+inmediata de JWT al cerrar localmente. Sin bloqueo de implementación local.
+Siguiente paso: probar ambos correos y el acceso final con una cuenta de desarrollo.
+
+## Fondo móvil con la regla de la web interior —19/10/2026
+
+Por instrucción del usuario se sustituye el fondo blanco exterior móvil por
+#E5EFFF → #F5F7FA55% → #FFFFFF. AppPageBackground/AppScaffold compartidos cubren
+las12 composiciones existentes de Scaffold: arranque Flutter, preparación de
+cuenta, acceso/registro/contraseña, onboarding, Inicio, perfil, preferencias,
+ubicaciones, EntityScreenShell y mapa inmersivo cuando no lo cubre la cartografía.
+Fondo fuera de áreas seguras y del ajuste de teclado; scroll conserva viewport.
+CoverReveal y expansión desde origen usan paleta compartida. Campos, tarjetas,
+fotos, mapas, paneles y splash nativo conservados. Sin orbes nuevos, SQL, dominio,
+datos, permisos o cambios web. ADR-086, reglas y ficha fondos-mobile actualizados;
+sin nueva HU/issue ni cierre de historias.
+
+Validación:53 pruebas existentes focalizadas de acceso/Inicio/app/onboarding/
+arranque/transiciones/creación de reportes/arquitectura aprobadas, más1 harness
+visual aprobado (54 en total). Formato de lib y harness correcto; análisis sin
+incidencias. Capturas de acceso, onboarding, Inicio y perfil revisadas en
+apps/mobile/build/ui-preview, incluyendo320×350/texto2 y390×844. El harness
+se actualiza para usar el retorno Volver real del reporte y simular path_provider;
+sin modificar navegación de producto. Sin pruebas nuevas de negocio.
+Emulador Android detectado al cierre; no se instaló/adjuntó una ejecución ni se
+generó APK. La evidencia es Flutter test/render local, sin backend real.
+Siguiente paso: revisar el fondo en la ejecución Android actualizada del usuario.
+[Ficha](funcionalidades/fondos-mobile.md), [ADR-086](decisiones/086-fondo-mobile-compartido-frio.md).
+
+## Marca grande en login responsive —19/10/2026
+
+Por captura explícita del usuario, login hasta600px reutiliza SiteHeader/SiteBrand
+con logo76px, texto2rem en dos líneas, gap16px y padding superior52px/lateral24px.
+El título queda32px debajo de la cabecera; se retira el centrado vertical móvil.
+Excepción local a ADR-076/077: marca fuera del formulario/stagger, escritorio
+y otros recorridos conservados. Fondo frío y orbe sin cambios. Ancho min-content
+del texto permite ampliación sin overflow. [ADR-085](decisiones/085-marca-responsive-login.md),
+regla web y ficha de acceso actualizadas; incremento visual HU-01 sin cierre.
+
+Validación local: typecheck y build Nuxt correctos (.nuxt-login-responsive).
+QA Chrome de marca compartida actualizado para la excepción móvil y aprobado
+en1440/731/601/600/390/320 y texto200%, incluyendo acceso, bienvenida, inicio,
+moderación, QR, legales y landing como referencia; sin overflow/CSP/hidratación.
+Comprobación adicional con animación activa confirma geometría de marca estable
+desde SSR, durante hidratación y recarga en320/390/600/601/1440. Capturas revisadas
+en apps/mobile/build/ui-preview/web-brand/login-reference-390.png y
+login-320-enlarged.png. git diff --check aprobado. Backend fixture local;
+sin SQL, Flutter, publicación o cambios de autenticación. Sin bloqueo local.
+Siguiente paso: revisión visual del usuario en su dispositivo.
+
+## Cartografía móvil clara con Positron —19/10/2026
+
+Por solicitud del usuario se activa CARTO Positron desde MAP_TILE_URL local,
+conservando flutter_map y los pines del logo. Clave existente comprobada sin
+imprimirla ni versionarla: descarga HTTPS200/image/png de una tesela real de Lima,
+inspeccionada visualmente. ZoneMapPicker incorpora crédito discreto superior con
+enlaces separados OpenStreetMap/CARTO, texto adaptable, separación del retorno y
+reintento debajo. Fallo al abrir enlaces usa toast compartido. La confirmación del
+usuario tras configurar la clave autoriza el crédito: ADR-084 sustituye ADR-054
+solo en estos mapas; buscador y web conservados. Sin SQL, permisos o consultas
+nuevas, ni cambios a coordenadas, pines o historial de HU-07/RF-13.
+
+Validación: formato correcto,14 pruebas existentes de mapa/selección/reintento/
+navegación y arquitectura aprobadas con URL CARTO sin clave y teselas simuladas.
+Renders390×844 y320×350/texto2 revisados; corregida una intercepción del pin por
+el crédito en tamaño pequeño. No acreditan cartografía real dentro de Flutter.
+Análisis estático final sin incidencias.
+Sin Android conectado (flutter devices solo muestra
+Windows/Chrome/Edge); pendiente comprobar el estilo dentro de Android tras un
+reinicio completo con dart-defines locales. No se genera APK ni se despliega.
+Siguiente paso: revisión en dispositivo de Explorar y selección de ubicación.
+[Ficha](funcionalidades/cartografia-mobile.md), [ADR-084](decisiones/084-mapa-mobile-claro-carto-positron.md).
+
+## Fondo web frío fuera de landing —19/10/2026
+
+Por instrucción del usuario y referencia aportada, el fondo exterior compartido
+usa azul pastel #E5EFFF → gris frío #F5F7FA al55% → blanco #FFFFFF, sin amarillo.
+WebShell declara la base; AmbientPageShell y LegalPage dejan de sobrescribirla.
+Aplicado a acceso, bienvenida, inicio, moderación, legales, QR y avistamientos
+por su shell compartido. BackgroundGlowOrb conserva colores, intensidad,
+animaciones, máscaras y movimiento reducido. Landing conserva su CSS/fondos
+propios; no se modifican superficies de tarjetas, campos, fotos o mapas.
+[ADR-083](decisiones/083-fondo-web-frio-fuera-de-landing.md),
+[ficha](funcionalidades/fondos-web.md) y regla web actualizadas.
+
+Validación local: typecheck y build Nuxt correctos con NUXT_BUILD_DIR aislado
+.nuxt-background;46 pruebas existentes aprobadas; git diff --check correcto.
+Chrome de producción con backend fixture comprobó el mismo degradado calculado
+en login/bienvenida/inicio/moderación/términos/privacidad/QR a1440×1000 y390×844,
+sin overflow horizontal ni errores CSP/hidratación/JavaScript.14 capturas en
+apps/mobile/build/ui-preview/web-background; revisados visualmente login móvil
+y moderación escritorio. Colores del orbe verificados y fondo crema de landing
+conservado. No se añaden tests permanentes para este ajuste CSS reversible.
+
+Sin bloqueo local, SQL, Flutter, despliegue o cierre de historias. La revisión
+de avistamientos se limita a su herencia del WebShell, sin envío nuevo.
+Siguiente paso: revisión visual del usuario; no acredita publicación remota.
+
+## Avisos web de una sola vez y URL limpia —19/10/2026
+
+Por autorización del usuario, login consume los motivos signed-out, expired,
+forbidden, oauth-failed y oauth-cancelled; inicio consume forbidden. Tras comprobar
+la sesión se reemplaza la entrada actual del router, retirando solo reason
+reconocido y mostrando el toast compartido. Recargar o volver desde legales no
+repite el aviso consumido. Parámetros ajenos (incluidos repetidos) y fragmento
+se conservan; el guard también conserva el fragmento al retirar entry=checked.
+No cambia autorización, callbacks OAuth, política SSR ni comprobación por operación.
+Los parámetros desconocidos no se interpretan como avisos. La limpieza requiere
+JavaScript; en SSR se mantiene el transporte existente hasta la hidratación.
+Sin SQL, Flutter, variables nuevas, despliegue ni cierre de HU-01/HU-14.3.
+
+Validación local: typecheck y build de Nuxt correctos;46 pruebas unitarias/
+arquitectura y21 de servidor aprobadas. Chrome sobre build de producción y backend
+fixture verifica los cinco motivos, alias /login, URL limpia sin entrada adicional
+en historial, parámetros repetidos/fragmento, navegación sobre la misma pantalla,
+recarga/volver, cierre de cuenta/moderación y denegación SSR/SPA sin montar revisión.
+Sin errores CSP/hidratación. No se usaron cuentas remotas ni se publicó.
+Siguiente paso: comprobar el recorrido con la configuración real antes de publicar.
+
+
+
+## Cierre de sesión web sin espera de Supabase —19/10/2026
+
+El usuario autoriza corregir la demora al cerrar sesión. Ambos endpoints web
+preparaban el borrado de cookies pero esperaban hasta5s a Supabase antes de
+enviar la respuesta. Ahora /api/access/logout y /api/moderation/logout borran
+eh_access en / y /api y eh_moderation, registran el caso de uso remoto con
+event.waitUntil de Nitro y responden {signedOut:true} sin esperar esa red.
+La confirmación acredita cierre local; si falta configuración remota también
+se borran cookies. Controles de origen/método siguen activos y rechazos no
+envían headers de borrado. Dominio/repositorios/fuentes conservan timeout5s,
+scope local y semántica remota; sin promesa suelta ni worker/servicio nuevo.
+Cliente conserva limpieza de datos, invalidación de preparación, avisos entre
+pestañas y espera la respuesta HTTP de borrado antes de salir al login.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md), reglas, arquitectura,
+fichas y guía de desarrollo actualizadas. Misma HU-01/HU-14.3, sin cierre de HU.
+
+Validación local: typecheck/build aislado .nuxt-logout aprobados,46 pruebas
+unitarias/arquitectura y21 de servidor aprobadas. Nuevos tests retienen el logout
+de Supabase y reciben200/cookies borradas antes de liberar ese trabajo en ambos
+endpoints; cubren configuración ausente y rechazo cross-origin. Chrome de política
+global también llega al login desde cuenta y moderación mientras Supabase sigue
+retenido (límite2s), con cookies/datos privados retirados, recarga posterior sin
+sesión y sin errores CSP/hidratación. Suite Chrome de moderación completa aprobada.
+Suite Chrome de acceso completa aprobada: logout entre pestañas, caducidad,
+onboarding, recuperación de conexión/permisos, OAuth fixture y responsive/texto200%.
+git diff --check aprobado. Evidencia con backend fixture, no medición remota.
+
+Sin SQL, Flutter, cambios de variables ni despliegue. Sin bloqueo local.
+El intento remoto depende del proceso/timeout y no es entrega duradera frente
+a reinicios; JWT emitidos conservan su vencimiento anterior y no se cierran
+sesiones móviles. La salida aún requiere red al servidor web. Siguiente paso:
+comprobar la sensación de cierre en el navegador real del usuario.
+
+## Toast web con entrada superior y descarte por gesto —19/10/2026
+
+TopToast compartido baja desde fuera del viewport y permite arrastrar hacia
+arriba con dedo/ratón para descartarlo. Gesto corto/cancelado vuelve a posición;
+hacia abajo ofrece resistencia. Entrada480ms, retorno420ms y salida240ms,
+sin transiciones con movimiento reducido. Mantiene toque, teclado/Escape,
+roles, reintento y expiración6500ms (pausada al sostener); arrastrar no dispara
+callbacks. Capturas y QA de producción con fixture:1920/1440/731/390/320 y
+texto200%, ratón/touch CDP, entrada, retorno/cancelación, reintento, teclado,
+expiración y movimiento reducido, sin overflow horizontal/CSP/hidratación.
+typecheck, build (NUXT_BUILD_DIR=.nuxt-toast para conservar dev activo) y46
+pruebas aprobados. Render320/texto200% revisado. Sin despliegue ni cambios
+remotos. Siguiente paso: comprobar sensación del gesto en Safari/iPhone físico.
+[ADR-081](decisiones/081-toast-web-deslizable.md), [ficha](funcionalidades/toast-web.md).
+
+## Acceso preparado desde landing, sin repetir la consulta al clic —19/10/2026
+
+Por autorización del usuario se sustituye la solución de solo feedback por
+preparación previa. Landing consulta mediante AccountViewModel/AccessAccount
+en segundo plano y precarga los componentes del destino. Iniciar sesión apunta
+a /inicio, /bienvenida o /iniciar-sesion antes del clic. AccountSessionTransport
+en data agrupa lecturas y reutiliza la respuesta para middleware/pantalla dentro
+de la misma app cliente, máximo15s/expiración (401 confirmado máximo5s). Sin
+singleton de servidor, datos privados SSR, almacenamiento persistente o permisos
+cacheados. Bootstrap lo inyecta también a moderación para invalidar su logout.
+
+La landing visible actualiza cada10s, foco/visibilidad y mensajes entre pestañas;
+se liberan timers/listeners/canal al salir. Mutaciones invalidan antes y después,
+401/409 y eventos de identidad descartan la preparación. Las respuestas anteriores
+en vuelo se rechazan; el guard vuelve a comprobar una sola vez si hubo conflicto
+por broadcast, resolviendo una carrera observada al cerrar sesión. Operaciones
+y permisos siguen autorizándose en servidor. Si se pulsa antes de preparar,
+caducó o falla la conexión puede haber espera real, con feedback existente.
+[ADR-080](decisiones/080-preparar-acceso-desde-landing.md), reglas, arquitectura,
+guía de desarrollo y fichas actualizadas; misma HU-01/RF-01,34, sin cierre.
+
+Validación local: typecheck y build aislado aprobados;46 pruebas unitarias y
+arquitectónicas y19 de servidor aprobadas. Nuevas pruebas cubren deduplicación,
+TTL/vencimiento,401/fallos, aislamiento por app y carreras con cambios de cuenta.
+Chrome global comprueba que preparación/guard/llegada comparten una consulta
+si el clic es temprano. Con href preparado bloquea nuevas consultas de sesión
+y exige llegar a /inicio o /bienvenida con datos correctos: cero consultas nuevas
+de sesión durante el salto. Comprueba además que un broadcast tras logout
+descarta el destino anterior y lleva al login sin montar cuenta.
+
+Suites Chrome de acceso y moderación completas aprobadas (caducidad, pestañas,
+logout, onboarding/reintento, permisos/revocación, operaciones/evidencia/OAuth
+fixture). Landing completa aprobada: responsive/texto200%, navegación SPA/QR,
+SSR sin JS y marca/estilos sin cambios, sin overflow ni errores CSP/hidratación.
+El401 de preparación anónima es esperado en QA de landing. git diff --check pasa.
+
+Sin bloqueos locales; evidencia de backend fixture, no medición de latencia
+remota. Sin SQL, Flutter, variables o despliegue. Siguiente paso: revisar el clic
+desde landing con la sesión real del usuario y desplegar solo si se autoriza.
+
+## Navegación con feedback inmediato durante la comprobación —19/10/2026
+
+El usuario detecta que Iniciar sesión parece no responder desde landing mientras
+el middleware global espera la API y resuelve /inicio. Vue Router mantiene la
+página actual hasta resolver el destino; faltaba feedback de trabajo en el enlace.
+NavigationLink compartido conserva href, texto, clases y navegación nativa,
+muestra el shimmer existente con aria-busy inmediatamente y bloquea clic repetido
+hasta resolver navegación/redirecciones. finally limpia al terminar/fallar;
+movimiento reducido usa brillo estático. Landing, cuenta, acceso, legales y
+moderación reutilizan el componente. No elimina la latencia del backend ni
+introduce caché de sesión/permisos o una pantalla intermedia. Marca sin cambios.
+
+Validación: typecheck, build y43 pruebas unitarias/arquitectura aprobadas.
+Chrome de política global aprobado con respuesta retenida: feedback visible
+antes de responder, mismo texto, doble clic sin consulta adicional y llegada a
+/inicio sin login intermedio. Recorre inventario SSR/SPA, cookie anterior, permisos,
+logout, conexión503, enlace externo y sin JS; sin errores CSP/hidratación.
+Suite Chrome de acceso completa aprobada también: onboarding, permisos,
+caducidad, pestañas, OAuth fixture y responsive/texto200% sin overflow.
+Sin SQL, Flutter, variables ni despliegue. Backend fixture; siguiente paso:
+revisar la respuesta visual al clic en la sesión real del usuario.
+
+## Puente de acceso bloqueado al llegar desde otro sitio —19/10/2026
+
+La captura del usuario muestra JSON forbidden en /api/access/entry al entrar a
+/inicio. Causa reproducida: Fetch Metadata conserva cross-site a través de las
+redirecciones y el filtro general API rechazaba el puente. Las pruebas previas
+cubrían navegación directa/SPA pero no un enlace desde otro sitio.
+security permite exclusivamente GET/HEAD navigate/document en ese endpoint de
+redirección interna, sin relajar cookies Strict ni autorización. Fetch/XHR,
+iframes, escrituras y otras API conservan rechazo cross-site. ADR-079 y ficha
+de acceso actualizados. No cambia la política global de las páginas.
+
+Validación: typecheck y build aprobados;19 pruebas de servidor aprobadas, con
+headers reales mediante HTTP (Node fetch sobrescribe Sec-Fetch-Mode). Chrome
+recorre un enlace desde un origen externo antes del inventario completo SSR/SPA:
+llega al login sin forbidden, sin pantallas privadas/skeleton y sin errores
+CSP/hidratación. Sin SQL, Flutter, variables ni despliegue. Backend fixture;
+siguiente paso: volver a abrir /inicio en el navegador del usuario.
+
+## Política global de acceso en todas las rutas —19/10/2026
+
+Por corrección explícita del usuario, el acceso se aplica a toda la navegación
+mediante route_policy compartida, session-entry de servidor y access.global.
+Se retiran account-access, guest-access y moderation-access y su selección desde
+las páginas. Toda página/alias debe declarar su política: pages:extend rechaza
+omisiones en Nuxt y la comprobación arquitectónica contrasta el inventario real.
+Clasificación única de públicas, acceso, cuenta, onboarding y revisión con permiso.
+Sin sesión no se renderiza/monta ninguna ruta protegida ni su skeleton antes
+del login; el permiso de moderación también se consulta antes del HTML/montaje.
+Landing, legales, QR, redirecciones antiguas y fallback mantienen acceso público.
+Las APIs conservan autorización por operación y SSR no publica datos privados.
+Puente de cookie antigua conserva únicamente destinos de cuenta registrados,
+sin aceptar retornos externos. Backend fallido mantiene los reintentos existentes.
+[ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye los guards
+particulares de ADR-078; AGENTS, reglas, arquitectura y fichas actualizados.
+Sin ampliación del MVP ni cierre de HU-01/HU-14.3.
+
+Validación local: typecheck y build aislado aprobados;43 pruebas unitarias y
+arquitectónicas y18 de servidor de producción aprobadas. El test de inventario
+comprueba rechazo de una página sin política. Servidor recorre todas las rutas
+registradas y comprueba permisos, onboarding, revocación y destinos del puente.
+Chrome check-session-entry-browser recorre el inventario completo SSR/SPA,
+observando ausencia de montajes privados tras logout y de moderación sin permiso;
+incluye aliases, QR, legales, cookies anteriores, fallo503/reintento y acceso sin JS.
+Suites Chrome completas de acceso y moderación aprobadas: operaciones/evidencia,
+reintentos ambiguos, revocación, pestañas/caducidad, onboarding, OAuth fixture,
+responsive y texto200%, sin overflow ni errores CSP/hidratación.
+
+Sin bloqueos locales ni cambios de SQL/Flutter/configuración remota/despliegue.
+Evidencia con backend fixture; siguiente paso: revisión del usuario con su sesión
+real y, si se autoriza, despliegue del conjunto. No confirma el entorno publicado.
+
+## Inicio y bienvenida sin skeleton al entrar sin sesión —19/10/2026
+
+El usuario detecta el caso omitido por la corrección anterior: /inicio todavía
+montaba AccountScreen y su skeleton antes de comprobar sesión en onMounted.
+session-entry ahora intercepta /inicio y /bienvenida antes de renderizar;
+account-access comprueba mediante ViewModel/caso de uso antes del montaje SPA.
+Tras logout, ambas rutas llegan al formulario sin mostrar shell/skeleton de
+cuenta. Una sesión válida también redirige según onboarding antes de renderizar
+una ruta incorrecta. No se publican perfiles/tokens en HTML ni se cambia la
+autorización de las APIs. ADR-078 y ficha de acceso actualizadas, sin ampliar HU.
+
+La recuperación de cookies antiguas mantiene su reintento ante fallo de backend:
+entry=unavailable permite únicamente el shell vacío de /inicio para evitar
+bucles al volver al puente; nunca concede sesión ni acceso a datos.
+
+Validación local: tipos y build aislado .nuxt-session-entry aprobados;42 pruebas
+unitarias/arquitectura y17 de servidor aprobadas. Chrome comprueba ausencia de
+montaje de AccountScreen/skeleton tras logout en /inicio y /bienvenida, apertura
+directa, recarga y navegación SPA, además de cookie antigua/fallo503/reintento,
+onboarding y login previo sin regresión. Sin errores CSP/hidratación.
+La simulación de caducidad de check-access-browser usa un vencimiento temporal
+real compartido por las consultas, en lugar de invalidar tras una sola lectura:
+la comprobación previa y la pantalla pueden consultar la misma sesión válida.
+Suite completa check-access-browser aprobada tras ese ajuste: caducidad,
+logout entre pestañas, onboarding/reintento, permisos, OAuth fixture y responsive
+con texto200%, sin overflow, errores CSP ni desajustes de hidratación.
+
+Sin SQL, Flutter, variables nuevas ni despliegue. Evidencia con backend fixture;
+pendiente comprobar la sesión real del usuario. Siguiente paso: revisar ambas
+rutas tras cerrar sesión en el navegador del usuario.
+
+## Acceso web sin login intermedio —19/10/2026
+
+Por solicitud del usuario, /iniciar-sesion comprueba sesión en servidor y
+responde302 a /inicio o /bienvenida antes de generar HTML de login. Navegación
+cliente espera al ViewModel antes de montar. Sin formulario ni skeleton de
+acceso intermedio; la carga de datos del destino conserva su comportamiento.
+eh_access HttpOnly/cifrada pasa a path /; /api/access/entry recupera las cookies
+anteriores /api con validación real, sin renovar el vencimiento. El salto anónimo
+termina con entry=checked (sin autoridad), retirado por cliente conservando reason.
+El cierre elimina ambos paths. Cookie inválida se limpia; fallos de backend
+conservan sesión y van a /inicio con su reintento existente.
+[ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md),
+[ficha](funcionalidades/acceso-web.md). Misma HU-01/RF-01,34, sin cierre de historia.
+
+Validación local: typecheck aprobado,42 pruebas unitarias/arquitectura y16 de
+servidor de producción aprobadas; build Nuxt aprobado con directorio aislado
+.nuxt-session-entry para conservar el dev server del usuario en5173.
+Chrome check-session-entry-browser confirma ausencia de montaje de login en
+SSR/SPA y recuperación de cookie /api, destinos por onboarding, sesión sin JS,
+logout/recarga y sin errores CSP/hidratación. check-access-browser completo
+aprobado: acceso ordinario/revisor, onboarding persistido/reintento, revocación,
+logout entre pestañas, expiración, fallos de conexión/gestión, OAuth fixture y
+responsive1920/1440/731/390/320 con texto200% sin overflow.
+
+Sin bloqueos locales. Backend fixture: no acredita cuentas/configuración remotas.
+Sin SQL, Flutter, cambios de entorno, publicación ni despliegue.
+Siguiente paso: comprobar la entrada con la sesión real del usuario; para la web
+publicada requiere desplegar estos cambios mediante autorización correspondiente.
+
+## Regla ratificada: ubicación y estabilidad de marca —19/10/2026
+
+El usuario solicita registrar como norma el resultado corregido de landing.
+REGLAS_UI_UX_WEB precisa ubicación superior izquierda, márgenes responsive,
+logo y texto en línea, color/fuente/medidas de referencia y estabilidad desde
+SSR hasta hidratación/recarga; fuera de contenido, skeletons y stagger.
+AGENTS, ADR-077 y guía de diseño refuerzan la misma condición; las acciones
+se acomodan sin mover o tapar la marca. Actualización documental: no cambia
+código ni repite pruebas de aplicación. Enlaces locales/diff comprobados;
+la evidencia de navegador del incremento anterior sigue registrada debajo.
+Siguiente paso: exigir estas comprobaciones al modificar cualquier cabecera.
+
+## Landing: cabecera estable durante recarga e hidratación —19/10/2026
+
+El usuario detecta un descenso leve tras cargar. Se reproduce en build de
+producción y servidor dev5173: logo y texto pasan de y8px a y11px en1440px.
+CSS compartido y landing declaran align-items distintos con igual especificidad;
+el orden de hojas cambia durante hidratación. Las pruebas previas solo comparaban
+el estado final y no detectaron esta regresión introducida al compartir cabecera.
+
+Se retiran los selectores de layout .landing-page .site-header de la hoja
+compartida: la composición de la cabecera landing queda gobernada por su CSS
+aprobado, sin regla competidora. SiteBrand/SiteHeader y las medidas/color comunes
+se conservan; reader-shell conserva su layout de cabecera. Sin cambios de
+negocio ni datos. Nueva prueba captura fotogramas desde SSR hasta hidratación
+y recarga completa, comparando marca, altura de cabecera y origen del hero.
+Falla antes con el desplazamiento8→11px y pasa tras corregirlo. Build y
+Chrome aprobados: primer render, hidratación y recarga estable en1440/731/390/320,
+tanto producción como dev5173. También pasan paridad de marca entre pantallas
+y suite completa de landing (responsive/texto200%, SPA, SSR/no-JS y CSP).
+Sin despliegue. Siguiente paso: revisión del usuario en su navegador.
+
+## Marca web alineada con landing —19/10/2026
+
+El usuario señala que registrar ADR-076 no corrigió diferencias reales.
+Se implementan SiteBrand/SiteHeader compartidos por landing, login, onboarding,
+inicio, moderación, QR/avistamientos y legales. Coinciden posición, color, fuente,
+peso, espaciados y tamaños adaptables con landing; se retiran marcas por
+funcionalidad. Login lleva marca arriba y conserva cuatro grupos de contenido.
+Legales conserva scroll interior; retorno glass se ubica bajo cabecera cuando
+hay withBack. Móvil/autenticación/roles/datos conservados. ADR-077/normas/fichas
+actualizados. Typecheck/build,42 pruebas unitarias/dependencias y14 de servidor
+pasan. Chrome compara posición/color/fuente/peso/espaciado/interlineado/logo
+contra landing en1440/731/390/320 y texto200%, sin overflow. Suites de acceso,
+login recargado (cuatro grupos), onboarding, moderación, legales y landing pasan,
+incluyendo SSR/no-JS, navegación y CSP/hidratación. Capturas revisadas en
+apps/mobile/build/ui-preview/web-brand (fixtures); sin sesión real del usuario.
+Al retirar reglas antiguas se detectó y restauró la grilla móvil de Inicio;
+la comparación posterior y QA responsive confirman el resultado final.
+Sin despliegue. Siguiente paso: revisión visual local del usuario.
+
+
+## Regla de posición del logo web —19/10/2026
+
+El usuario pide formalizar logo + texto «entre huellas» en la misma posición
+superior de landing y onboarding, también en responsive. ADR-076 y normas
+UI/AGENTS/diseño/arquitectura registran cabecera superior izquierda, márgenes
+de referencia, fuera de contenido/stagger/skeleton y estable entre etapas.
+Incluye acceso y gestión; no cambia móvil. Incremento documental, sin cambios
+de código ni afirmación de adaptación global. Validación: enlaces y diff.
+Siguiente paso: aplicar/revisar esta norma al adaptar las cabeceras existentes.
+
+
+## Corrección definitiva del bloque gris en Inicio —19/10/2026
+
+El ajuste anterior solo cambió la forma del skeleton; seguía mostrándolo y no
+resolvió la petición. Se elimina ManagementSkeleton y sus estilos/import.
+La comprobación de acceso opcional a gestión no monta ni reserva un panel de
+carga bajo las tarjetas. Inicio muestra contenido real; gestión se añade solo
+con permiso confirmado. aria-busy anuncia la consulta sin bloque visual.
+El skeleton inicial de sesión conserva su función mientras no hay cuenta leída.
+
+Si la consulta falla, el toast y la acción real de reintento permanecen. Durante
+el reintento se conserva el botón con LoadingShimmer, bloqueando doble envío;
+el ViewModel limpia managementFailed al confirmar, sin sustituirlo por un panel.
+No cambian SQL, permisos, sesión, móvil ni autorización de cada API.
+
+La nueva regresión Chrome falla con el build anterior al detectar cinco nodos
+de placeholder. Ahora exige cero nodos grises durante todos los fotogramas con
+las tarjetas montadas, tanto al iniciar sesión como al recargar /inicio, con
+la respuesta de permisos retenida, y verifica320px/texto200% y movimiento reducido.
+Typecheck/build y42 pruebas unitarias/dependencias pasan. Chrome verifica
+entrada y recarga con respuesta retenida sin placeholders en los fotogramas;
+captura revisada shared-stagger/reload-management-pending.png. Suite completa
+de acceso Chrome aprobada: cuentas normales/revisor, roles, revocación, errores
+y reintentos, responsive y texto200%, sin errores CSP/hidratación.
+Sin uso de credenciales reales ni despliegue. Siguiente paso: revisión local.
+
+## Inicio: skeleton de permisos con forma y entrada correctas —19/10/2026
+
+El bloque gris bajo las tarjetas era ContentSkeleton de checkingManagement:
+reutilizaba una silueta de ficha con foto300px y se montaba fuera del stagger,
+por lo que aparecía antes de las tarjetas todavía transparentes. Se sustituye
+por ManagementSkeleton de access: resumen de líneas/acción dentro de un panel,
+con las formas shimmer compartidas, semántica de consulta y sin texto de carga.
+Carga, gestión autorizada y reintento forman parte de la grilla/reveal de Inicio;
+el panel ocupa ambas columnas y usa su separación24px, sin margen duplicado.
+No cambia consultas, permisos ni ViewModel; una cuenta sin rol retira el panel
+al confirmar la consulta. Sin demora artificial, ocultar carga o bloquear Inicio.
+
+Validación: typecheck/build y Chrome con permisos retenidos deliberadamente:
+panel menor200px en escritorio, después de las tarjetas en el stagger, separación
+real24px,320px/texto200% sin overflow y retiro al confirmar sin ocultar tarjetas.
+Suite completa de acceso en Chrome aprobada (cuentas, roles, reintentos,
+onboarding,1920/1440/731/390/320 y texto200%, sin fallos CSP/hidratación). Capturas
+locales shared-stagger/management-loading*.png con fixture. Sin cuenta real,
+SQL, Flutter ni despliegue. Siguiente paso: revisión visual local del usuario.
+
+## Reveal web: eliminación de la cobertura crema compartida —19/10/2026
+
+El rectángulo reportado en /inicio procedía de .reveal::before en main.css:
+una capa #fffbeF animada antes del contenido. Se retiran la utilidad global,
+el pseudo-elemento y los keyframes cover/arrive. Ocho grupos de inicio,
+moderación, ficha QR y formulario/confirmación de avistamientos pasan al
+componente StaggerReveal, que reutiliza useStaggerReveal sin pintar coberturas.
+Login/onboarding conservan los parámetros aprobados del mismo composable.
+
+El componente conserva etiquetas HTML y eventos, captura los hijos de cada
+entrada y no reproduce el efecto por edición/refresh. Movimiento reducido
+inmediato; hoja externa noscript permite leer el QR SSR sin JavaScript bajo
+la CSP existente. Sin cambios de negocio, servidor, SQL, permisos ni Flutter.
+ADR-075 actualiza normas, arquitectura y fichas afectadas. Guardia automática
+impide recuperar .reveal y la utilidad antigua.
+
+Validación local: typecheck y build completos;41 pruebas unitarias/dependencias
+y14 de servidor pasan. Chrome: fotogramas reales del inicio sin pseudo-capa,
+stagger/resize/texto200%/movimiento reducido, QR activo/neutro sin JS; suites
+completas de acceso, onboarding, moderación, avistamientos y lector QR pasan,
+incluyendo formularios, galería, actualización sin replay, reintentos y CSP.
+La primera captura de fotogramas terminaba antes del estado final: se amplió
+su ventana. La prueba antigua del lector esperaba cerrar un toast que el
+reintento ya cierra; se corrigió la aserción al comportamiento compartido actual.
+Captura revisada en apps/mobile/build/ui-preview/shared-stagger/home.png con
+cuenta fixture. No se utilizaron credenciales ni sesión real del usuario.
+
+Siguiente paso: revisión del usuario en su navegador local. Sin despliegue,
+commit ni nuevo cierre de historia.
+
+## Onboarding: imágenes mayores y corrección de finalización204 —19/10/2026
+
+El usuario pide ampliar ilustraciones y reporta toast de error al terminar.
+La imagen pasa de máximo288px a todo el ancho de columna (448px base escritorio,
+ancho disponible móvil), conservando PNG/proporción y cabecera superior.
+
+Se reproduce defecto de AccountSource: el éxito HTTP204 sin contenido de una RPC
+void se trataba como unavailable por exigir body/getReader. Se acepta204 solo
+para complete_onboarding; estados de error se clasifican antes de leer cuerpo.
+Repositorio/VM siguen leyendo perfil real y exigiendo onboarding_completed_at
+antes de confirmar navegación. Sin éxito optimista, cambios SQL o permisos.
+La fixture anterior200/null no cubría este caso; ahora devuelve204. Dos nuevas
+regresiones fallan antes y pasan tras la corrección. Esto explica un guardado
+potencialmente confirmado seguido de toast erróneo; no se capturó la petición de
+la sesión real del usuario ni se usaron sus credenciales.
+
+Validación:40 pruebas unitarias/dependencias, typecheck/build, servidor construido
+y Chrome de onboarding/acceso con fixture204. Se comprueba ancho real de imagen,
+recorridos completos de guardado/reintento, responsive y texto200% sin overflow.
+Ficha y regla visual actualizadas. Sin Flutter, cambios remotos o despliegue.
+Siguiente paso: confirmar con la cuenta real; si ya quedó guardado, recargar
+consulta el perfil y dirige a inicio sin repetir onboarding.
+
+## Marca del onboarding en cabecera de página —19/10/2026
+
+El usuario aclara que logo/texto van bien arriba como en landing, también en
+responsive. La marca pasa de OnboardingFlow a la cabecera de AccountScreen,
+fuera de la columna centrada de pasos, con márgenes/padding de landing.
+La cabecera permanece en el flujo superior de la página; el cuerpo ocupa
+el espacio restante, sin superposición ni altura extra de viewport.
+Conserva logo52px, texto, transiciones, avance único y guardado existentes.
+ADR-074/regla web/ficha actualizados. Sin SQL, Flutter, permisos o despliegue.
+
+Validación: typecheck/build y QA Chrome de onboarding con fixture, posición
+superior/alineación de marca entre pasos y en1440/390/320×350/320 texto200%,
+sin overflow/CSP/hidratación. Capturas en build/ui-preview/web-onboarding de móvil.
+Pendiente revisión visual del usuario.
+
+## Onboarding: marca superior y avance único —19/10/2026
+
+Por solicitud del usuario se retiran Anterior y los tres puntos visibles de
+/bienvenida. Se añade logo oficial52px y texto entre huellas sobre la ilustración,
+fuera del stagger, persistentes entre pasos. Continúa con Continuar/Comenzar;
+anuncio accesible del paso sin indicador visual. Sin cambios a las tres etapas,
+imágenes/textos móviles, sesión, RPC, permisos o Flutter. Se conserva guardado
+con shimmer/error/reintento y movimiento reducido; sin despliegue.
+ADR-074, regla web y ficha de acceso actualizadas.
+
+Validación: typecheck/build y QA Chrome con fixture para onboarding/acceso,
+incluidos ausencia de controles retirados, marca estable, avance/guardado,
+movimiento reducido, desmontaje y320px/texto200%. Capturas en
+apps/mobile/build/ui-preview/web-onboarding; revisión visual del usuario pendiente.
+
+## Onboarding web con referencia de sader-panel —19/10/2026
+
+Por corrección del usuario se sustituye la presentación provisional de /bienvenida.
+La clase global .reveal generaba el rectángulo crema y lo repetía al cambiar paso;
+se retira solo de onboarding. OnboardingFlow reutiliza useStaggerReveal:
+cuatro grupos550ms/90ms, blur18px/offset56px, salida inferior en orden invertido,
+cambio tras820ms y nueva entrada; press400ms y bloqueo de clics repetidos.
+Orbe strong continuo, movimiento reducido sin efectos/esperas, incluso al
+cambiar preferencia durante salida. Timers/listeners/callbacks se limpian al salir.
+El guardado mantiene contenido/shimmer visible y solo sale tras confirmación;
+error conserva tercer paso y reintento sin repetir entrada.
+
+Composición de WelcomeStep de sader-panel: ancho448px, izquierda, Inter local,
+título48/600, descripción18/500 y botón carbón/radio18px base/mínimo48px/flecha20px.
+Móvil alineado abajo con margen60px; escritorio centrado. Se conservan tres pasos,
+textos/saltos y PNG móviles originales, copiados byte a byte en public/images/
+onboarding. Sin cabecera/footer extra ni configuración de apariencia de Sader.
+Inter con OFL local; no peticiones a Google al navegar. AccountViewModel,
+complete_onboarding, sesión, permisos y Flutter sin cambios.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md) registra
+excepciones locales a Arial/cápsula/cover; reglas/guía/ficha/recursos actualizados.
+
+Validación: typecheck/build y38 pruebas unitarias/dependencias aprobados;14 de
+servidor construido aprobadas. Chrome fixture de onboarding comprueba tiempos/
+estilos reales, salida/entrada/anterior/siguiente/doble clic, imágenes idénticas,
+guardado visible/error/reintento, movimiento reducido/cambio en salida y desmontaje.
+Regresión de acceso/OAuth/roles/sesión aprobada. Capturas1440/390/320×350/320 con
+texto200% revisadas, sin overflow/CSP/hidratación. Renders en
+apps/mobile/build/ui-preview/web-onboarding. La revisión ampliada detecta el
+skip-link asomando por ocultación fija−100px: se oculta ahora por su propia
+altura, conserva foco/teclado y se comprueba con texto200%.
+Verificados36 enlaces documentales nuevos/actualizados y git diff --check.
+
+Sin SQL, configuración remota, despliegue o cierre de historia. Pendiente revisión
+visual del usuario y comprobación con su cuenta real; las pruebas fixture no
+certifican proveedores ni entorno remoto.
+
+## Acceso general web, bienvenida e inicio de cuenta —19/10/2026
+
+Por autorización del usuario se separa autenticación general de moderación.
+/iniciar-sesion admite cuenta válida por correo/Google/Facebook sin exigir rol;
+/bienvenida aplica tres pasos sin Omitir y guarda complete_onboarding por cuenta,
+compartido con móvil. /inicio consulta nombre/correo/ciudad reales y permite
+cerrar sesión; gestión solo al confirmar permiso. /moderacion conserva control
+por operación y retorno a inicio; quitar rol no bloquea uso normal.
+Landing conecta acceso y legales; /login, /terms y /privacy redirigen308 a
+/iniciar-sesion, /terminos y /privacidad con parámetros conservados.
+
+access contiene dominio/casos de uso, DTO/repositorios/fuente REST/ViewModel y
+pantallas propios. Sesión general HttpOnly/cifrada/path /api, máximo1h sin refresh,
+secreto servidor existente; SSR sin datos privados. PKCE conserva callback/API
+anteriores y crea sesión general. Onboarding/gestión validan identidad esperada.
+Se retiran adaptadores sociales anteriores de moderación. Prueba de dependencias
+ampliada para impedir imports de data/presentation entre funcionalidades.
+[ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md) registra
+la decisión y alcance; reglas/guía/configuración/fichas actualizadas.
+
+Validación local: typecheck y build Nuxt aprobados;38 pruebas unitarias/arquitectura
+y14 de servidor construido. Chrome con fixtures: cuenta normal/revisora,
+onboarding con reintento/persistencia, permisos revocados conservando cuenta,
+cierre entre pestañas, expiración, errores/reintentos, OAuth Google/Facebook,
+destinos fijos y redirecciones; sin errores CSP/hidratación. Se corrigió el
+desajuste detectado al redirigir una visita SSR antes del montaje.
+QA de moderación completo (evidencia, decisiones/reintentos/restauración,
+cancelación), legales/SSR sin JS y stagger aprobado. Inicio/bienvenida/acceso
+en1920/1440/731/390/320 con texto200% sin overflow; capturas revisadas en
+apps/mobile/build/ui-preview/web-access. Sin SQL nuevo ni cambios Flutter.
+QA adicional de landing y toast aprobado;25 enlaces Markdown nuevos/actualizados
+verificados y git diff --check aprobado. Revisión final añade regresión para
+descartar cierre de sesión recibido tras disposición; total38+14 pruebas.
+
+Límites: inicio es consulta de cuenta; Explorar/mascotas/reportes/avisos/perfil
+editable, registro/recuperación web y administración siguen pendientes. Sin datos
+simulados ni rutas vacías; no se afirma paridad completa. Pruebas fixture no
+certifican cuentas/proveedores/allowlist/HTTPS reales. No se asignan roles,
+configura Auth remoto, despliega ni cierra historias.
+Siguiente paso: validar acceso real del usuario en5173 y entregar un siguiente
+recorrido completo de usuario (Explorar web propuesto).
+
+## Regla de rutas web en español —19/10/2026
+
+Por instrucción del usuario se registra ADR-072: navegación visible en español,
+minúsculas y guiones, sin tildes ni ñ; código/SQL/endpoints internos pueden seguir
+en inglés. Mantener raíz / y contrato QR /c/:token; callbacks OAuth y deep links
+no se renombran por esta regla. Al migrar /login, /terms y /privacy, conservar
+redirecciones hacia /iniciar-sesion, /terminos y /privacidad con parámetros
+necesarios del flujo y destinos internos seguros.
+
+AGENTS, reglas de arquitectura/UI web, arquitectura, guía y fichas de acceso/legal
+enlazan la decisión. Cambio exclusivamente documental: rutas actuales, permisos
+y despliegue conservan su estado. Verificación de enlaces nuevos, coherencia
+con páginas existentes y git diff --check; sin build/pruebas de aplicación.
+Siguiente paso: aplicar la convención en próximos incrementos y migrar rutas
+existentes con pruebas de navegación/retornos; no crear páginas vacías.
+
+## Acceso local: puerto real y salida a proveedores —19/10/2026
+
+Capturas del usuario identifican http://127.0.0.1:3000/login. Se reproduce
+OAuth start403/invalid_request desde ese origen; el mismo proceso acepta5173
+y genera callback5173. Al actualizar .env.local, Nuxt se reinicia y pasa a
+escuchar5173, acorde con el comando dev del proyecto. Se deja
+PUBLIC_WEB_ORIGIN=http://127.0.0.1:5173 y se verifica la instancia en ese puerto:
+Google/Facebook start200, callback5173; las URLs generadas llegan a Supabase
+y reciben302 hacia accounts.google.com y www.facebook.com respectivamente.
+No se introducen IDs/secretos de proveedores en Nuxt: pertenecen al servicio
+Supabase Auth autohospedado. La habilitación y redirección no demuestran la
+validez completa de credenciales ni allowlist de retorno tras autenticarse.
+
+El aviso de credenciales de la captura es forbidden de moderación; puede proceder
+del control de rol o del rechazo de origen (ambos403), por lo que la captura sola
+no confirma contraseña válida ni rol faltante. No se asignan permisos ni se
+prueba con credenciales del usuario. Sin cambios de código, SQL o despliegue.
+Siguiente paso: abrir5173 y comprobar recorrido real de proveedor/retorno con
+cuenta autorizada. El503 publicado documentado abajo es una observación separada.
+
+## Diagnóstico de acceso web —19/10/2026
+
+El usuario informa «No pudimos conectar». Comprobación del dominio publicado:
+GET /login devuelve200 y GET /api/moderation/session sin cookie devuelve401
+(esperado); POST /api/moderation/oauth/start con origen correcto, JSON válido y
+Google devuelve503/unavailable. Esta última ruta no contacta al proveedor ni a
+Supabase: apunta a configuración de acceso ausente/inválida en el proceso
+publicado. Pendiente inspeccionar variables/logs de Dokploy; sin acceso a su
+configuración no se confirma la variable concreta. No se modifica el despliegue.
+
+En .env.local se detecta el origen de producción usado para pruebas HTTP locales:
+el POST local devuelve403/invalid_request. Se corrige solo PUBLIC_WEB_ORIGIN a
+http://127.0.0.1:5173, conservando credenciales. Verificación con runtime construido
+existente y entorno explícito: inicio Google/Facebook200, callback local, cookie
+HttpOnly sin Secure sobre HTTP; origen externo sigue403. Lectura pública de Auth
+con la clave local devuelve200 y proveedores email/Google/Facebook habilitados.
+Esto no acredita login con cuenta real, callback autorizado remotamente ni rol.
+Sin cambios de código, SQL, autenticación remota o nuevo build. Guía local y ficha
+actualizadas; git diff --check aprobado. Siguiente paso: revisar configuración
+del servicio publicado y verificar acceso completo con una cuenta autorizada.
+
 ## Reglas UI/UX consolidadas —19/10/2026
 
 Por solicitud del usuario, se consolidan REGLAS_UI_UX_WEB, REGLAS_UI_UX y

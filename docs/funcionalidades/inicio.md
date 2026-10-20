@@ -1,5 +1,95 @@
 # Inicio y navegación
 
+20/10/2026, acabado vigente de accesos: Reportar/Mis reportes/Mis mascotas con
+fondo negro #111111, iconos y texto blancos, peso600 original y sin refuerzo
+de iconos. Tamaños compactos y destinos conservados; apertura de Reportar
+parte del negro real. Sustituye el azul/gris de las notas anteriores. Sin
+nuevos datos, permisos o activación. Formato/análisis limpios;11 comprobaciones
+de arquitectura/captura aprobadas, normal y pequeño/texto2 sin overflow.
+Captura normal revisada; pendiente revisión visual Android.
+
+20/10/2026: Inicio también permite actualizar al jalar desde el borde superior
+y soltar al alcanzar el umbral, con PullToRefresh/indicador glass compartidos.
+Recarga el perfil real de cabecera; contenido editorial e ilustración fijos.
+Router inyecta el callback del ViewModel de perfil; HomeViewModel coordina
+duplicados, errores seguros y descarte al cambiar sección. Toast superior con
+Reintentar; avatar conservado durante refresh de la misma cuenta. Explorar y
+Mis mascotas mantienen sus callbacks propios. Sin nuevas tablas/permisos o
+activación.14 pruebas de recarga/arquitectura y8 de perfil aprobadas, análisis
+limpio. Pendiente gesto/consulta autenticada Android. Actualiza el alcance de
+[ADR-048](../decisiones/048-actualizar-listas-al-jalar.md), sin cierre de HU.
+
+20/10/2026, accesos vigentes: Reportar/Mis reportes/Mis mascotas usan texto700
+y azul #2887EF en texto/iconos, con refuerzo horizontal de iconos0.25px por lado.
+Conservan fondo gris, tamaños, destinos y ampliación. Sin nuevos datos, permisos
+o activación. Formato/análisis limpios y11 comprobaciones de arquitectura/captura
+aprobadas; renders normal/pequeño sin overflow, normal revisado. Android pendiente.
+
+20/10/2026, título vigente tras nueva referencia: Poppins32 (antes26), primera
+frase gris400 y segunda600 con degradado horizontal azul #459FF6→celeste #75C9EF.
+Sin glass. ShaderMask solo en «empieza contigo»; ampliación, ajuste natural,
+etiqueta accesible completa y stagger conservados. Sin nueva persistencia,
+permisos o activación. Formato/análisis limpios;11 comprobaciones aprobadas,
+renders390×844/texto1 y320×350/texto2 revisados sin overflow. Android pendiente.
+
+20/10/2026, composición vigente: título «Su regreso empieza contigo» sin
+glass, Poppins26 (antes23), mismos pesos/colores y ampliación del sistema.
+La descripción «Una comunidad…» se muestra debajo del perro/gato en la misma
+HomeReunionCard glass, conservando imagen3:2. Cerca de ti mantiene glass.
+Sin nuevas reglas, permisos, persistencia o activación. Formato/análisis
+limpios y11 comprobaciones de arquitectura/captura aprobadas; renders normal
+y pequeño/texto2 revisados sin overflow. Pendiente revisión Android con imagen.
+
+20/10/2026: «Explora cerca de ti» reutiliza GlassSurface/radio26 mediante
+HomeNotice, igual que las otras tarjetas glass de Inicio. Conserva textos,
+padding y acceso real a Explorar; entrada preserveBackdrop. El fallback que
+usa HomeNotice comparte el acabado. Sin nueva persistencia, permisos,
+dependencias o activación. Formato/análisis limpios y11 comprobaciones de
+arquitectura/captura aprobadas; tamaños normal y pequeño/texto2 sin overflow.
+Captura normal revisada; pendiente validación visual Android.
+
+20/10/2026, ajuste posterior: se retiran la huella superior de la tarjeta
+principal y «Conoce Mis mascotas». Los accesos Reportar/Mis reportes/Mis mascotas
+conservan fondo gris #F5F5F7 y usan iconos/texto #459FF6 como el énfasis del título
+(corrección explícita del usuario: el azul no corresponde al fondo);
+padding vertical16, iconos25, separación10 y texto12.5. Mantienen destinos,
+ampliación y columna adaptable; apertura de Reportar desde su color real.
+Sin nuevas reglas de dominio, persistencia, permisos o activación.
+Formato/análisis limpios y11 comprobaciones de arquitectura/captura aprobadas;
+renders390×844/texto1 y320×350/texto2 revisados sin overflow. Captura aislada
+del contenido; pendiente revisión visual Android.
+
+20/10/2026: título principal con el estilo de la referencia del usuario:
+Poppins local23/altura1.25; «Su regreso» gris/peso400 y «empieza contigo»
+azul/peso600, con salto entre ambos. Aproximación tipográfica a la captura,
+no identificación de su fuente. Ajuste natural con texto ampliado y frase
+accesible completa. No requiere activación, persistencia o permisos nuevos.
+[ADR-105](../decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+Validación: análisis limpio; captura específica390×844/texto1 y320×350/texto2
+aprobada y revisada. Suite Home/arquitectura:15 pasan,2 timeout al esperar
+el fin del fondo continuo; captura general también bloqueada por esa espera.
+Pendiente revisión visual Android; evidencia completa en ESTADO.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+19/10/2026: opción activa y Reportar comparten un acabado local equivalente
+a Iniciar sesión de landing: degradado azul, brillo y sombras suaves,
+hover/foco/pulsación con elevación2px y oscurecimiento3% en200ms. Movimiento
+reducido aplica solo color inmediato. Conserva glass, destinos, origen real
+de Reportar, áreas52/64 y selección deslizante320ms. No requiere activación,
+persistencia ni permisos nuevos.16 comprobaciones de Home/arquitectura y
+análisis aprobados; renders390/320 con texto2 revisados. Pendiente revisión
+Android. [ADR-098](../decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
+19/10/2026: los títulos de fallback Explorar/Mis mascotas usan peso500, igual
+que CollectionHeader en las secciones reales, por petición del usuario.
+Sin cambios de navegación. Revisión visual Android pendiente.
+
 18/10/2026: la campana Alertas abre la bandeja persistente HU-12, sustituyendo
 el aviso de indisponibilidad. Callback compuesto en router; HomeScreen no
 importa presentación de notifications. [Ficha](seguimiento-y-alertas.md).

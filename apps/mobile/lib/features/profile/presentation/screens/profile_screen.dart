@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +26,7 @@ class ProfileScreen extends ConsumerWidget {
       message: 'No se pudo cerrar la sesión. Reintenta.',
       isError: true,
       noticeId: exit.error,
-      child: Scaffold(
-        backgroundColor: Colors.white,
+      child: AppScaffold(
         body: ScrollSafeArea(
           top: false,
           child: Center(

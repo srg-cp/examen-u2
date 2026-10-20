@@ -1,5 +1,81 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Cartografía global20/10, ADR-104:** mapas mediante adaptadores compartidos:
+ZoneMapPicker/MapStyle en core/presentation móvil y LocationMap en app/components
+web. Sin matrices/SDK/mapas independientes por funcionalidad. Filtrar solo
+teselas, sin alterar dominio, coordenadas, permisos, pines o créditos. Regla
+intermedia Reportar/Explorar común a ambas plataformas, con comprobación de
+paridad de matrices. [ADR-104](decisiones/104-cartografia-global-mobile-web.md).
+
+**Registro/recuperación web —19/10/2026:** CredentialViewModel consume casos
+de uso de dominio; HTTP/Auth detrás de repositorios/fuentes y composición por
+petición. Política global incorpora recovery para la capacidad temporal de
+cambio de contraseña. Cookie eh_credentials cifrada con propósito/AAD distintos;
+verificar recovery no establece sesión general ni permisos. Sin tokens en JSON,
+SSR o cliente. Registro confirmado conserva onboarding. [ADR-087](decisiones/087-registro-y-recuperacion-web.md).
+
+**Cierre web sin bloquear por Supabase —19/10/2026:** endpoints confirman primero
+el borrado de cookies y vinculan el intento remoto al ciclo Nitro event.waitUntil.
+Conservar casos de uso/fuentes y controles de origen; no afirmar revocación
+remota ni entrega duradera por una confirmación local.
+[ADR-082](decisiones/082-cierre-web-sin-esperar-supabase.md).
+
+**Acceso preparado desde landing —19/10/2026:** preparación mediante ViewModel
+y caso de uso; reutilización breve y deduplicación en data, por aplicación del
+navegador, sin singleton de servidor ni payload SSR privado. Invalidar por
+cambios de sesión/foco y vencimiento; permisos y operaciones no se cachean.
+[ADR-080](decisiones/080-preparar-acceso-desde-landing.md).
+
+**Acceso global a todas las rutas web —19/10/2026:** política compartida única
+para servidor y middleware cliente global; sin guards elegidos por pantalla.
+Clasificar cada página/alias como pública, acceso, cuenta, onboarding o permiso
+implementado. Build y comprobación arquitectónica rechazan páginas sin política.
+Validar antes del HTML/montaje para evitar pantallas/skeletons de rutas que no
+corresponden. Públicas/QR/legales conservan anonimato y APIs autorizan cada
+operación. [ADR-079](decisiones/079-politica-global-de-acceso-web.md) sustituye
+los guards particulares descritos en las notas anteriores de ADR-078.
+
+**Entrada web con sesión activa —19/10/2026:** /iniciar-sesion valida en servidor
+antes de renderizar y redirige al destino de cuenta/onboarding. Cookie HttpOnly
+cifrada con path /, transición de cookies anteriores sin exponer credenciales
+ni perfiles en SSR; navegación cliente espera al caso de uso/ViewModel.
+Sin login ni skeleton de acceso intermedio; los datos del destino conservan su
+carga. Autorización por operación intacta. [ADR-078](decisiones/078-acceso-web-redireccion-servidor-sin-login-intermedio.md).
+La misma comprobación previa aplica a /inicio y /bienvenida: sin sesión no
+renderizar ni montar shell/skeleton de cuenta antes de ir al login. Distinguir
+fallo de backend de sesión ausente y conservar el reintento existente.
+
+**Reveal web compartido —19/10/2026:** retirar la utilidad .reveal y su capa
+opaca. StaggerReveal reutiliza useStaggerReveal para entradas generales, conserva
+HTML/eventos y no repite entrada por edición/refresh. Respetar movimiento
+reducido y QR SSR sin JS/CSP. Flutter y clip-path de landing conservados.
+[ADR-075](decisiones/075-reveal-web-compartido-sin-cobertura-opaca.md).
+
+**Onboarding web —19/10/2026:** por instrucción del usuario, presentación de
+/bienvenida adapta sader-panel con contenido/PNG originales de móvil.
+OnboardingFlow compone estado y acciones del ViewModel; transiciones y timers
+son presentación, sin alterar RPC, sesión o permisos. Excepción visual local
+a cover/cápsula/Arial, con movimiento reducido y limpieza obligatorios.
+[ADR-074](decisiones/074-onboarding-web-referencia-sader-y-mobile.md).
+
+**Acceso general web —19/10/2026:** una cuenta válida puede entrar sin permiso
+de moderación; onboarding por cuenta y datos compartidos con móvil. Separar
+autenticación de autorización por operación y conservar espacios de gestión
+web con permisos diferenciados, sin herencia implícita administrador/moderador.
+access y moderation colaboran mediante sesión de servidor/contratos de dominio,
+sin imports de data/presentation entre funcionalidades. No crear páginas vacías
+ni afirmar paridad web/móvil completa. Véase
+[ADR-073](decisiones/073-acceso-general-web-y-gestion-por-permisos.md).
+
+**Rutas web en español —19/10/2026:** la navegación visible de apps/platform
+usa español, minúsculas y guiones, sin tildes ni ñ. Al migrar rutas existentes,
+conservar redirecciones y parámetros necesarios; /login, /terms y /privacy
+tienen como objetivos /iniciar-sesion, /terminos y /privacidad. Mantener raíz /
+y QR /c/:token. Código/SQL/endpoints internos pueden seguir en inglés;
+callbacks OAuth y deep links no cambian por esta convención. No crear rutas
+vacías ni relajar autorización. Login y legales migrados; otros recorridos al implementarse:
+[ADR-072](decisiones/072-rutas-web-en-espanol.md).
+
 **Administración solo web —18/10/2026:** por instrucción expresa del usuario,
 administración/moderación viven exclusivamente en `apps/platform`. Flutter
 conserva operaciones de usuario como denunciar; no incorpora pantallas, menús,

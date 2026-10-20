@@ -33,14 +33,23 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
   assets:
     - assets/fonts/Roboto-Regular.ttf
     - assets/fonts/Roboto-Bold.ttf
     - assets/branding/app_icon.png
+    - assets/branding/wordmark.svg
     - assets/branding/only-black.svg
     - assets/branding/google_g.png
     - assets/onboarding/dog_waving.png
     - assets/onboarding/dog_with_map.png
     - assets/onboarding/dog_and_cat.png
     - assets/illustrations/community_pets.png
+    - assets/illustrations/reunion.png
     - assets/illustrations/dog_with_envelope.png

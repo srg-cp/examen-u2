@@ -1,3 +1,4 @@
+import 'app_scaffold.dart';
 import 'scroll_safe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -58,8 +59,7 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.white,
+  Widget build(BuildContext context) => AppScaffold(
     body: ScrollSafeArea(
       top: false,
       lightNavigationIcons: widget.immersive,

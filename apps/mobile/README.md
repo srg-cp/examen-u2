@@ -27,6 +27,13 @@ Por terminal, el arranque configurado es:
 flutter run --dart-define-from-file=config/supabase.local.json
 ```
 
+El mapa claro usa CARTO Positron cuando `MAP_TILE_URL` del JSON local apunta a
+`https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=TU_API_KEY`.
+Sustituir el marcador por la clave de mapas de CARTO; no versionar el archivo local.
+La app muestra los créditos enlazados del proveedor y conserva los pines de marca.
+Detener e iniciar la ejecución tras cambiar la URL; hot reload no actualiza
+dart-defines. Sin este valor se conserva el mapa OSM estándar de desarrollo.
+
 ## Comprobaciones
 
 El icono del launcher Android utiliza los originales de `logo`. Regeneración e instrucciones de instalación en [logo/README.md](../logo/README.md).
@@ -34,8 +41,13 @@ El icono del launcher Android utiliza los originales de `logo`. Regeneración e 
 ```powershell
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze --no-pub
-flutter test --no-pub
+flutter test --no-pub --dart-define=AMBIENT_BACKGROUND_MOTION=false
 ```
+
+Las nubes del fondo tienen movimiento ambiental continuo. Las regresiones y
+capturas lo fijan con `AMBIENT_BACKGROUND_MOTION=false` para esperar solo las
+transiciones de contenido. En la app está activado por defecto y se detiene
+con movimiento reducido o al quedar la ruta fuera de TickerMode.
 
 La base implementa navegación, arranque, sesión, ingreso y registro por correo. Perfil y recuperación siguen dentro de HU-01. Consultar [ESTADO.md](../../docs/ESTADO.md) para resultados de pruebas y pendientes de Android/Supabase.
 

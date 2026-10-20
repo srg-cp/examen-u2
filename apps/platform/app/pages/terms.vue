@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LegalPage from '../features/legal/presentation/screens/LegalPage.vue';
-useHead({title:'Términos de servicio · Entre Huellas'});
+const route = useRoute();
+await navigateTo({ path: '/terminos', query: route.query, hash: route.hash }, { redirectCode: 308, replace: true });
 </script>
-<template><LegalPage kind="terms" /></template>
+<template><span /></template>

@@ -1,5 +1,12 @@
-import { moderation,moderationError,clearModerationCookie } from '../../utils/moderation';
-export default defineEventHandler(async event=>{
-  try{const services=moderation(event,false);clearModerationCookie(event);await services.access.logout();return {signedOut:true};}
-  catch(error){clearModerationCookie(event);return moderationError(event,error);}
+import { moderation,clearModerationCookie } from '../../utils/moderation';
+import { clearAccountCookie } from '../../utils/account';
+import { clearCredentialCookie } from '../../utils/credentials';
+export default defineEventHandler(event=>{
+  clearModerationCookie(event);clearAccountCookie(event);
+  clearCredentialCookie(event);
+  try {
+    const services=moderation(event,false);
+    event.waitUntil(services.access.logout().catch(()=>{console.warn('[moderation] Remote sign-out did not complete.');}));
+  } catch { console.warn('[moderation] Remote sign-out could not be scheduled.'); }
+  return {signedOut:true};
 });

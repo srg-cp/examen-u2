@@ -4,15 +4,16 @@ import LegalIcon from '../widgets/LegalIcon.vue';
 useHead({link:[{rel:'preload',as:'font',type:'font/woff2',href:'/fonts/dm-sans-latin.woff2',crossorigin:'anonymous'}]});
 const props=defineProps<{ kind:'terms'|'privacy' }>();
 const document=computed(()=>legalDocuments[props.kind]);
-const other=computed(()=>props.kind==='terms'?{to:'/privacy',label:'Política de privacidad'}:{to:'/terms',label:'Términos de servicio'});
+const other=computed(()=>props.kind==='terms'?{to:'/privacidad',label:'Política de privacidad'}:{to:'/terminos',label:'Términos de servicio'});
 </script>
 <template>
   <AmbientPageShell class="legal-shell" intensity="medium">
+    <SiteHeader />
     <main id="view" class="legal-scroll">
       <div class="legal-document">
         <nav class="legal-toolbar" aria-label="Navegación del documento">
-          <GlassNavigationButton label="Volver al inicio de sesión" @navigate="navigateTo('/login')" />
-          <NuxtLink class="legal-switch" :to="other.to"><span>{{other.label}}</span><LegalIcon name="arrow-right" /></NuxtLink>
+          <GlassNavigationButton label="Volver al inicio de sesión" @navigate="navigateTo('/iniciar-sesion')" />
+          <NavigationLink class="legal-switch" :to="other.to"><span>{{other.label}}</span><LegalIcon name="arrow-right" /></NavigationLink>
         </nav>
         <header class="legal-heading">
           <h1>{{document.title}}</h1>
@@ -29,7 +30,7 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacy',label:'Política de
         </article>
         <footer class="legal-footer">
           <p>© 2026 Entre Huellas. Todos los derechos reservados.</p>
-          <div><a href="mailto:sergiotlv51@gmail.com">Contactar</a><span aria-hidden="true">·</span><NuxtLink :to="other.to">{{other.label}}</NuxtLink><span aria-hidden="true">·</span><NuxtLink to="/login">Inicio de sesión</NuxtLink></div>
+          <div><a href="mailto:sergiotlv51@gmail.com">Contactar</a><span aria-hidden="true">·</span><NavigationLink :to="other.to">{{other.label}}</NavigationLink><span aria-hidden="true">·</span><NavigationLink to="/iniciar-sesion">Inicio de sesión</NavigationLink></div>
         </footer>
       </div>
     </main>
@@ -38,10 +39,10 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacy',label:'Política de
 <style scoped>
 @font-face{font-family:'DM Sans';font-style:normal;font-weight:100 1000;font-display:swap;src:url('/fonts/dm-sans-latin.woff2') format('woff2')}
 
-.reader-shell.legal-shell{font-family:'DM Sans',Arial,sans-serif;font-optical-sizing:auto;height:100svh;min-height:0;display:block;background:#fbfdff}
+.reader-shell.legal-shell{font-family:'DM Sans',Arial,sans-serif;font-optical-sizing:auto;height:100svh;min-height:0;display:flex;flex-direction:column;align-items:stretch}
 .reader-shell.legal-shell :deep(.background-glow){position:fixed;inset:0;mask-image:none}
 .reader-shell.legal-shell :deep(.background-glow__viewport){position:absolute;inset:0;height:100%}
-.reader-shell .legal-scroll{width:100%;max-width:none;height:100%;margin:0;padding:48px 16px;overflow:auto;scrollbar-gutter:stable}
+.reader-shell .legal-scroll{width:100%;max-width:none;height:auto;min-height:0;flex:1;margin:0;padding:48px 16px;overflow:auto;scrollbar-gutter:stable}
 .legal-document{position:relative;isolation:isolate;max-width:896px;min-width:0;margin:0 auto;padding:24px}
 .legal-document::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;backdrop-filter:blur(10px);mask-image:linear-gradient(to bottom,transparent 0%,#000 5%,#000 95%,transparent 100%),linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-composite:intersect}
 .legal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0;padding-bottom:24px;margin-bottom:32px;border-bottom:1px solid #dfe5eb}
