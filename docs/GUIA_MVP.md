@@ -243,6 +243,31 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: panel de mapa minimizable
+hasta Ver ficha, apertura50% y límite adaptable por contenido/texto; créditos
+compactos junto al panel. ADR-106, sin alcance/SQL/permisos nuevos.
+
+Refinamiento20/10 transversal de mapas existentes, HU-07.2/RF-13/issue #33:
+estilo intermedio Reportar/Explorar global móvil y web con adaptadores comunes,
+ADR-104. Sin nuevas operaciones ni paridad funcional web/móvil; no crea nuevas
+pantallas, historias o cambios SQL. Activación web del proveedor por entorno.
+
+Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: aplicar propuesta visual
+aprobada del mapa con resumen compacto, miniatura mayor, rasgos bajo nombre,
+dos accesos al mismo detalle y acabado azul compartido con navegación.
+Mapa sin disco gris del radio, pines con símbolo oficial. ADR-103 sustituye
+composición anterior, sin ampliación del MVP ni nuevas operaciones/backend.
+
+Refinamiento19/10 HU-07.1/07.2, RF-13, issues #32/#33: acceso flotante Mapa
+sustituye Lista/Mapa, según propuesta3 elegida por el usuario. Consulta, ruta
+y retorno conservados; sin ampliación del MVP. ADR-101.
+
+Corrección19/10 de HU-07.1/07.2, RF-13, issues #32/#33: resumen del mapa con
+especie y foto mayor adaptable, sin raza/estado/conteo textual. Pines individuales
+separados visualmente ante solapamiento; no cambia coordenadas, filtros o permisos.
+Sin agrupación/contador/selector de coincidencias. Mismo alcance y backend;
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
 Refinamiento19/10 de HU-07.1/HU-07.2, RF-13, issues #32/#33: filtros y Ubicación
 solo en Explorar; mapa consume la misma búsqueda y muestra el resumen del pin
 en el panel con Ver ficha. Sustituye filtros inferiores y callout, conserva

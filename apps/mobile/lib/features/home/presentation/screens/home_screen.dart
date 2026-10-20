@@ -15,12 +15,14 @@ class HomeScreen extends ConsumerWidget {
     required this.profileAvatar,
     this.petsContent,
     this.exploreContent,
+    this.exploreFloatingAction,
     this.onAlerts,
     super.key,
   });
   final Widget profileAvatar;
   final Widget? petsContent;
   final Widget? exploreContent;
+  final Widget? exploreFloatingAction;
   final VoidCallback? onAlerts;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -85,14 +87,25 @@ class HomeScreen extends ConsumerWidget {
                                   state.section == HomeSection.explore
                                       ? 12
                                       : 24,
-                                  ScrollSafeArea.bottomPadding(context, 130),
+                                  ScrollSafeArea.bottomPadding(
+                                    context,
+                                    state.section == HomeSection.explore &&
+                                            exploreFloatingAction != null
+                                        ? 200 +
+                                              (MediaQuery.textScalerOf(
+                                                        context,
+                                                      ).scale(14) -
+                                                      14)
+                                                  .clamp(0, double.infinity)
+                                        : 130,
+                                  ),
                                 ),
                                 child: state.section == HomeSection.home
                                     ? HomeContent(
                                         onSelect: model.select,
                                         onReport: (source) => openLostReport(
                                           source,
-                                          color: const Color(0xFFF5F5F7),
+                                          color: const Color(0xFF459FF6),
                                           radius: 22,
                                         ),
                                       )
@@ -150,6 +163,13 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  if (state.section == HomeSection.explore &&
+                      exploreFloatingAction != null)
+                    Positioned(
+                      right: 16,
+                      bottom: ScrollSafeArea.bottomPadding(context, 100),
+                      child: exploreFloatingAction!,
+                    ),
                   Positioned(
                     left: 16,
                     right: 16,

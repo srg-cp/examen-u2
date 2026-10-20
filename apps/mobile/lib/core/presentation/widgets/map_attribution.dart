@@ -6,7 +6,8 @@ import '../../theme/app_theme.dart';
 
 /// Visible credits for CARTO's basemap, independent of product markers.
 class MapAttribution extends StatefulWidget {
-  const MapAttribution({super.key});
+  const MapAttribution({this.compact = false, super.key});
+  final bool compact;
 
   @override
   State<MapAttribution> createState() => _MapAttributionState();
@@ -33,14 +34,37 @@ class _MapAttributionState extends State<MapAttribution> {
     style: TextButton.styleFrom(
       foregroundColor: const Color(0xFF454545),
       minimumSize: const Size(48, 48),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      textStyle: const TextStyle(
+      padding: EdgeInsets.symmetric(horizontal: widget.compact ? 2 : 4),
+      textStyle: TextStyle(
         fontFamily: AppTheme.fontFamily,
-        fontSize: 10,
+        fontSize: widget.compact ? 8 : 10,
         height: 1.2,
       ),
     ),
-    child: Text(label, textAlign: TextAlign.end),
+    child: Tooltip(
+      message: label,
+      excludeFromSemantics: true,
+      child: Text(
+        label,
+        textAlign: TextAlign.end,
+        maxLines: widget.compact ? 1 : null,
+        overflow: widget.compact ? TextOverflow.ellipsis : null,
+        semanticsLabel: label,
+      ),
+    ),
+  );
+
+  Widget _credits() => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Flexible(
+        child: _credit(
+          '© OpenStreetMap contributors',
+          'https://www.openstreetmap.org/copyright',
+        ),
+      ),
+      _credit('© CARTO', 'https://carto.com/attribution/'),
+    ],
   );
 
   @override
@@ -50,20 +74,27 @@ class _MapAttributionState extends State<MapAttribution> {
     message: 'No se pudo abrir el enlace. Reintenta.',
     isError: true,
     child: Material(
-      color: const Color(0xEFFFFFFF),
-      borderRadius: BorderRadius.circular(12),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: _credit(
-              '© OpenStreetMap contributors',
-              'https://www.openstreetmap.org/copyright',
-            ),
-          ),
-          _credit('© CARTO', 'https://carto.com/attribution/'),
-        ],
-      ),
+      color: widget.compact ? Colors.transparent : const Color(0xEFFFFFFF),
+      borderRadius: BorderRadius.circular(widget.compact ? 8 : 12),
+      child: widget.compact
+          ? Stack(
+              children: [
+                Positioned.fill(
+                  child: Center(
+                    child: Container(
+                      height:
+                          MediaQuery.textScalerOf(context).scale(8) * 1.2 + 8,
+                      decoration: BoxDecoration(
+                        color: const Color(0xEFFFFFFF),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                _credits(),
+              ],
+            )
+          : _credits(),
     ),
   );
 }

@@ -4,6 +4,30 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('All mobile maps share the global tile style adapter', () {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))) {
+      final path = file.path.replaceAll('\\', '/');
+      if (path.endsWith('/core/presentation/widgets/zone_map_picker.dart')) {
+        continue;
+      }
+      expect(
+        RegExp(
+          r'\b(?:FlutterMap|TileLayer)\s*\(',
+        ).hasMatch(file.readAsStringSync()),
+        isFalse,
+        reason: path,
+      );
+    }
+    final adapter = File(
+      'lib/core/presentation/widgets/zone_map_picker.dart',
+    ).readAsStringSync();
+    expect(adapter, contains('colorFilter: MapStyle.tileColorFilter'));
+    expect(adapter, isNot(contains('this.tileColorFilter')));
+  });
   test('Feature and core boundaries reject presentation/data bypasses', () {
     expect(
       crossesFeatureBoundary(

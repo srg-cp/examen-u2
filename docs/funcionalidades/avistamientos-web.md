@@ -115,3 +115,8 @@ secundario/crema5.48:1, azul/celeste5.03:1. El texto blanco sobre el degradado
 azul aprobado da1.97–3.62:1 (centro2.78:1), por debajo de4.5:1 para texto normal.
 Se conserva la referencia cromática explícita de ADR-063; su adaptación accesible
 queda como pendiente visual concreto, sin declarar AA. Registro hu10-contrast.log.
+Cartografía20/10, ADR-104: SightingMap adapta el punto de producto a LocationMap
+compartido. Base Positron y acabado intermedio global móvil/web, créditos
+OSM/CARTO enlazados y filtro solo en teselas. Selección manual/GPS, validación,
+privacidad y reintento conservados. Configurar NUXT_PUBLIC_MAP_TILE_URL por
+entorno; ver [cartografía compartida](cartografia-compartida.md).

@@ -1,5 +1,73 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Explorar20/10, ADR-106:** apertura50% y máximo90%, mínimo adaptable a resumen
+y Ver ficha antes del separador, con inset inferior+12 libres. Texto ampliado
+puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
+(fuente8, objetivos48) a la derecha justo sobre el panel y acompañando su gesto.
+Reservar retorno; retirar título central si falta espacio. Sustituye mínimo50%
+y crédito superior de ADR-103/084 solo aquí, sin cambiar paleta global ADR-104.
+
+**Título de Inicio móvil20/10, ADR-105:** por referencia explícita del usuario,
+«Su regreso» usa Poppins400/gris #454746 y «empieza contigo» Poppins600/azul
+#459FF6, en líneas separadas, tamaño23/altura1.25 y ampliación del sistema.
+Excepción local a la fuente del sistema; fuentes incluidas con licencia OFL.
+Resto de componentes/tipografía conservados. [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+
+**Todos los mapas,20/10, ADR-104:** acabado intermedio50/50 entre color original
+de Reportar y anterior Explorar. Solo teselas, con base Positron configurada y
+matriz compartida obligatoria; pines/radios/créditos/controles fuera del filtro.
+Aplica móvil y web, incluidos mapas nuevos; sustituye estilo exclusivo de
+Explorar y variantes anteriores. Panel/cámara siguen siendo propios del flujo.
+
+**Mapa20/10, ADR-103:** aplicar la propuesta ImageGen aprobada: mapa claro sin
+disco del radio, pines con símbolo oficial y selección negra/blanca, panel50–90%
+con miniatura112×112, nombre/rasgos, flecha azul compartida con navegación y Ver
+ficha gris. Ambos abren detalle; datos en vertical después del separador.
+Sustituye foto4:3/fila horizontal/CTA fijo y mínimo42% de ADR-099/097/061.
+Conservar créditos, consultas, scroll, toast/shimmer y accesibilidad.
+Refinamiento20/10: Explorar en cápsula GlassSurface/radio24; teselas blanco grisáceo
+con calidez leve (claro orientativo #F6F6F2), sin afectar símbolo/créditos, y zoom mínimo15 al seleccionar
+desde una vista más amplia. Foto112px, scroll con texto ampliado.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md).
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+**Mapa flotante19/10, ADR-101:** sustituir Lista/Mapa en Explorar por cápsula
+Mapa con GlassSurface/radio26, icono22 y texto14/600. Fija derecha16,
+bottom100 más inset; mínimo48px y20px sobre navegación. Padding final200 más
+crecimiento del texto/inset; no repetir entrada al desplazar. Mantener origen
+real, consulta/scroll, movimiento reducido y carga/bloqueo existentes.
+[ADR-101](decisiones/101-mapa-acceso-flotante-explorar.md).
+
+**Explorar compacto19/10, ADR-100:** Ubicación aprovecha el ancho y muestra
+lugar/radio en línea, con tooltip completo para el lugar elidido. Filtrar casos
+usa solo tune en círculo48×48, sin etiqueta visible/chevrón, con nombre accesible,
+tooltip y estado expandido. Fila48px con texto normal; permitir crecer con texto
+ampliado. Área táctil mínima48, paneles y efectos compartidos conservados.
+[ADR-100](decisiones/100-explorar-controles-compactos.md).
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+**Mapa móvil19/10, corrección ADR-099:** tipo de mascota (Perro/Gato/Otra
+especie), sin raza. Foto4:3 a ancho completo adaptable, sin altura fija136px.
+Sin líneas Abierto/Resuelto ni conteo de casos/ubicaciones en el panel. Cada
+caso tiene su pin; separar visualmente objetivos solapados, sin agrupación,
+contador o selector1 de2. Conservar coordenadas públicas y búsqueda reales,
+Ver ficha, paginación/reintento, panel/retorno y accesibilidad. Sustituye esos
+puntos de ADR-062/097; [ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+**Navegación móvil19/10, ADR-098:** opción activa y Reportar usan el acabado
+de Iniciar sesión de landing: cápsula azul75BFFF/459FF6/2887EF, brillo superior
+y sombras. Hover/foco/pulsación: elevación2px y oscurecimiento3% en200ms.
+Movimiento reducido sin elevación ni transición. Conservar glass, tamaños,
+iconos y deslizamiento320ms. Excepción visual limitada a estos acentos.
+[ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
 **Explorar móvil19/10, ADR-097:** filtros y ubicación se editan solo desde
 Explorar. El mapa muestra el resumen público del pin en su panel inferior y
 Ver ficha abre el detalle existente; sin tarjeta duplicada junto al punto.

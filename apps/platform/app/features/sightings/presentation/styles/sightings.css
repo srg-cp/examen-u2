@@ -12,12 +12,7 @@
 .reader-shell .photo-choice { cursor: pointer; overflow-wrap: anywhere; display: block; }
 .reader-shell .photo-choice input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); border: 0; }
 .reader-shell .photo-choice:focus-within { outline: 3px solid #2c87ce; outline-offset: 5px; }
-.reader-shell .sighting-map-wrap { position: relative; min-width: 0; border: 2px solid transparent; border-radius: 24px; overflow: hidden; }
-.reader-shell .sighting-map { height: 300px; width: 100%; background: #f5f5f7; z-index: 0; }
-.reader-shell .map-placeholder { height: 300px; width: 100%; }
-.reader-shell .sighting-map-wrap .map-placeholder { position: absolute; inset: 0; z-index: 1; }
-.reader-shell .sighting-map .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; background: #ffffffde; }
-.reader-shell .invalid input, .reader-shell .invalid textarea, .reader-shell .sighting-map-wrap.invalid { border-color: #c53434; }
+.reader-shell .invalid input, .reader-shell .invalid textarea { border-color: #c53434; }
 .reader-shell .shake { animation: field-shake 320ms ease-in-out; }
 .reader-shell .sighting-confirmation { display: grid; gap: 16px; }
 @keyframes field-shake { 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }

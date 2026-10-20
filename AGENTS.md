@@ -19,6 +19,15 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Cartografía global20/10/2026: todos los mapas móviles/web usan el acabado
+  intermedio entre Reportar original y Explorar, según
+  [ADR-104](docs/decisiones/104-cartografia-global-mobile-web.md). Reutilizar
+  ZoneMapPicker/MapStyle en Flutter y LocationMap/maps.css/map-style.svg en Nuxt;
+  sin filtros por funcionalidad ni mapas que eludan adaptadores compartidos.
+  Solo teselas, manteniendo contraste de pines/radios/créditos, datos, permisos,
+  selección y reintentos. Configurar la misma base Positron en ambos entornos;
+  ninguna credencial de backend en URL pública de cartografía.
+
 - Registro y recuperación web por código (19/10/2026): seguir ADR-087.
   /crear-cuenta y /recuperar-contrasena usan política guest;
   /restablecer-contrasena usa recovery en la política global SSR/cliente.

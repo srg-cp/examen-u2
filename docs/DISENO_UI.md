@@ -1,5 +1,77 @@
 # Diseño de la interfaz: implementación y revisión
 
+Explorar20/10, ADR-106: mínimo =32 de tirador + altura real resumen/Ver ficha +
+inset inferior+12, dividido por viewport (18–85%); sin selección22%. Apertura50%
+o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:
+fuente8/escalable, ribete claro estrecho, objetivos48; derecha8/izquierda84,
+crédito visual aproximadamente8px sobre panel, sigue extensión/resistencia.
+Título central se retira en altura insuficiente; retorno conservado.
+
+Título de Inicio móvil20/10: referencia tipográfica del usuario aplicada con
+Poppins local, tamaño23/altura1.25. «Su regreso» gris #454746/peso400 y salto
+de línea antes de «empieza contigo», azul #459FF6/peso600. Text.rich sin altura
+fija ni truncamiento; ampliación y etiqueta accesible completa conservadas.
+Excepción local documentada en [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+
+Cartografía vigente20/10, ADR-104: todos los mapas móviles/web comparten el
+punto medio50/50 entre fuente original de Reportar y filtro anterior de Explorar.
+Conservar color parcial y claridad leve; MapStyle Flutter y SVG sRGB Nuxt con
+paridad numérica. Solo teselas; marca/pines, círculos, créditos y controles
+sin filtro. Usar adaptadores compartidos; revisar fuentes reales y text scale.
+
+Mapa20/10, ADR-103: resumen compacto con foto112×112/radio18, nombre20/600 y
+rasgos14 hasta dos líneas; sin tipo de reporte debajo del nombre. Flecha48
+con NavigationAccentSurface de core, compartido con LiquidNavigation. Ver ficha
+gris/radio12/alto mínimo48 y detalles verticales tras separador.
+Detalles: separador con padding vertical16, título→datos16 y gap16 entre
+Tamaño/Especie/Fecha, según captura aprobada; etiqueta/valor conservados.
+Panel50–90%, contenido desplazable y tirador32. Sin disco gris del radio; créditos bajo
+cabecera y símbolo oficial en pines de ubicación. Selección negra/blanca.
+Sustituye las dimensiones anteriores del resumen; consulta/radio real intactos.
+Refinamiento20/10: título centrado con GlassSurface/radio24/padding22×12.
+Teselas blanco grisáceo con calidez leve (claro orientativo #F6F6F2), con pines/créditos intactos; selección acerca
+a zoom15 si estaba más lejos, sin alejar una cámara ya más próxima.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md).
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+Mapa flotante19/10: elección3 sustituye fila Lista/Mapa; GlassSurface/radio26,
+padding18/12, icono22 +8 + texto14/600, mínimo48. Posición derecha16/bottom100
+más inset,20 sobre barra. Scroll reserva200 más ampliación de texto/inset.
+Origen real y retorno conservados; ADR-101, revisión física Android pendiente.
+
+Explorar compacto19/10: fila con Ubicación expandida y botón tune48×48 a la
+derecha, separación8. Lugar y radio en línea; lugar elidido con tooltip completo.
+FilterExpansion.compact conserva48 táctiles sin padding exterior y6 verticales
+interiores. Variante iconOnly con tooltip/semántica y estado expandido, sin
+chevrón/texto. Altura normal48, adaptable a texto2. Paneles y estilos compartidos
+conservados. [ADR-100](decisiones/100-explorar-controles-compactos.md).
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+## Mapa: pines individuales y foto mayor —19/10/2026
+
+ADR-099: reemplazar raza por especie disponible (Perro/Gato/Otra especie), con
+fallback Tipo no registrado. Foto a ancho completo4:3, sin136px fijos. Sin estado
+ni conteo textual del mapa en el panel. ExploreMapPins separa objetivos48px con
+paso56px, preferencia horizontal y proyección de cámara; sin contador ni flechas
+entre casos. Zoom/giro recalculan la presentación, conservando coordenadas y
+consulta. Mantener scroll, CTA y panel42–90%. Capturas normales/pequeñas y panel
+expandido revisados; Android del ajuste pendiente.
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
+Navegación móvil19/10: LiquidNavigation comparte el acabado de Iniciar sesión
+de landing entre selección activa y Reportar. Gradiente vertical75BFFF/459FF6
+al48%/2887EF, brillo blanco superior y sombras azules7/20 y2/5. Interacción
+hover/foco/pulsación200ms, elevación2px y brillo97%; con movimiento reducido,
+color inmediato y posición fija. Glass y geometría existentes;
+selección320ms conservada. [ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
 ## Resumen inferior del mapa móvil —19/10/2026
 
 Filtros/Ubicación solo en Explorar. ExploreCaseMap coloca la vista previa

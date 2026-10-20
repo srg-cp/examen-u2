@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// White background with slowly drifting blue clouds across the full viewport.
+/// Drifting blue clouds on white, fading towards the bottom of the viewport.
 class AppPageBackground extends StatefulWidget {
   const AppPageBackground({
     required this.child,
@@ -154,6 +154,18 @@ class _CloudBackgroundPainter extends CustomPainter {
       ),
       const Color(0x99CDDDF0),
       5.6,
+    );
+    // Keep the upper clouds intact and soften the background behind navigation.
+    // Paint before the child so content and glass retain their own colors.
+    canvas.drawRect(
+      bounds,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x00FFFFFF), Color(0x00FFFFFF), Color(0xF5FFFFFF)],
+          stops: [0, .3, 1],
+        ).createShader(bounds),
     );
     canvas.restore();
   }

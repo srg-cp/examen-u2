@@ -1,5 +1,104 @@
 # Explorar: lista y mapa de casos
 
+**Panel vigente20/10, ADR-106:** puede bajarse hasta resumen/Ver ficha completo,
+antes del separador. Mínimo según altura real +tirador32 +inset inferior+12;
+apertura50% o mínimo si requiere más con texto ampliado, máximo90%. Scroll,
+resistencia, selección y ficha conservados. Créditos fuente8/objetivos48 arriba
+del panel a la derecha, siguiendo su posición; tooltip/nombre completo si se
+elide al ampliar texto. Título central se retira si falta espacio, retorno
+conservado. Sustituye mínimo50%/atribución superior de notas anteriores.
+Sin cambios de persistencia/permisos/activación; paleta global ADR-104 intacta.
+Validación de ADR-106:17 pruebas de mapa/selector/arquitectura aprobadas con
+teselas CARTO de fixture, análisis limpio y renders390×844/320×350/texto2
+revisados. Gesto minimiza conservando Ver ficha visible y crédito sobre panel;
+selección/pan/retorno comprobados. Revisión física Android pendiente.
+
+Cartografía vigente20/10, ADR-104: acabado intermedio Reportar/Explorar global
+móvil/web desde adaptadores comunes. Se retira la matriz exclusiva de Explorar;
+ver [ficha compartida](cartografia-compartida.md). Panel50–90% conservado.
+
+Color vigente20/10: segunda captura aportada sustituye el amarillo hueso por
+blanco grisáceo apenas cálido (#F6F6F2 en gris245, blanco #FFFFFB). Contraste
+de teselas mayor que el filtro anterior; símbolo oficial/créditos sin filtro.
+
+**Diseño vigente20/10, ADR-103:** mapa sin disco del radio, pines de ubicación
+con símbolo oficial y selección negra/blanca. Panel50–90% con miniatura112×112,
+nombre y rasgos públicos como descripción (se omite si falta), flecha circular
+azul con acabado compartido de navegación y Ver ficha gris. Ambos abren la misma
+ficha desde su origen, con bloqueo de aperturas duplicadas; detalles verticales
+de tamaño/especie/fecha.
+Elección final20/10: inicio/mínimo50%, sustituyendo60% por ser demasiado alto.
+Cámara/colapso/selección acompañan la altura; fecha accesible mediante scroll
+cuando no cabe. Revisión física Android pendiente.
+Validación del ajuste50%:6 pruebas de mapa aprobadas y análisis de pantalla/widget
+sin incidencias; conserva acceso por scroll también con texto ampliado.
+Espaciado corregido20/10:16px desde título a datos y entre filas, separador
+con16px verticales por lado; conservar agrupación etiqueta/valor y scroll.
+Conserva consulta por radio, permisos, paginación, toast/reintento, shimmer,
+vacío y scroll. Sin activación o persistencia nuevas.
+Refinamiento posterior20/10: título Explorar en cápsula glass, foto112px y mapa
+blanco grisáceo apenas cálido (claro orientativo #F6F6F2) solo en teselas. Seleccionar acerca a zoom15 desde vistas
+más amplias, conservando zoom superior y navegación manual; consulta intacta.
+Corrección de color20/10: amarillo hueso en lugar del gris; claro #F7F5EB y
+blancos #FFFDF3.6 pruebas de mapa y análisis del archivo aprobados; captura
+normal revisada con teselas neutras, cartografía real en Android pendiente.
+Validación del refinamiento:16 pruebas de mapa/selector/arquitectura aprobadas,
+análisis limpio y capturas normales/texto2 revisadas con teselas neutras. Foto
+mayor puede requerir scroll para leer la fecha en el panel mínimo. Pendiente
+comprobar aspecto de calles reales en Android, sin nueva activación remota.
+Sustituye foto4:3, fila horizontal, CTA fijo y mínimo42% de notas previas.
+[ADR-103](../decisiones/103-mapa-resumen-compacto-referencia-aprobada.md).
+
+Validación de ADR-103:43 pruebas de mapa/preview/Home/arquitectura/selector de
+ubicación/Explorar aprobadas en serie, formato/diff correctos y análisis limpio.
+Renders390×844 y320×350/texto2 revisados con teselas neutras; cartografía real y
+revisión visual Android pendientes. No implica cierre de HU-07.2/issue #33.
+
+Panel sin selección19/10/2026: reutiliza CollectionEmptyState de core con la
+misma huella88, título20/semibold y descripción16 del vacío del listado.
+Con resultados: Selecciona un pin y la instrucción de ver el resumen; con vacío
+confirmado: No encontramos casos y sugerencia de ajustar ubicación/filtros.
+Conserva instrucciones específicas cuando falta ubicación o procede reintentar,
+scroll/expansión42–90% y resumen/Ver ficha al seleccionar. Sin persistencia,
+permisos o activación nuevos. Análisis limpio y15 pruebas de mapa/arquitectura
+aprobadas; capturas normales/pequeñas con texto2 revisadas. Android pendiente.
+
+**Acceso Mapa vigente19/10, ADR-101:** se retira la fila Lista/Mapa. Cápsula
+glass flotante Mapa sobre la navegación, fija al desplazar, mínimo48px y20px
+de separación de la barra. Padding final permite descubrir la última tarjeta.
+Solo Explorar con estado consultado; busy bloqueado, sin acceso durante carga
+inicial/error sin datos. Mismo mapa, filtros/resultados, expansión desde el
+botón real y retorno con scroll conservado. Router compone slot visual de Home,
+sin dependencia de presentación entre módulos ni nueva activación/persistencia.
+Validación:36 pruebas de Home/Explorar/mapa/arquitectura aprobadas; análisis
+completo, formato y diff correctos. Capturas normales/pequeñas con texto2
+revisadas; revisión física Android pendiente.
+[ADR-101](../decisiones/101-mapa-acceso-flotante-explorar.md).
+
+**Controles compactos19/10, ADR-100:** Ubicación muestra lugar/radio en línea
+y ocupa el espacio restante junto al icono circular Filtrar casos48×48, sin
+texto visible ni chevrón. Tooltip/nombre accesible y estado expandido conservados.
+Fila48px con texto normal; lugar largo elidido con tooltip completo, texto
+ampliado aumenta altura cuando hace falta. Mantiene áreas táctiles48px,
+paneles de ancho completo, borradores, cierre/Aplicar y shimmer/reintento.
+Sin nuevas dependencias, persistencia, permisos o activación.25 pruebas de
+Explorar/arquitectura/navegación de mascotas aprobadas; análisis y formato
+correctos, capturas normales/pequeñas revisadas. Revisión física Android pendiente.
+[ADR-100](../decisiones/100-explorar-controles-compactos.md).
+
+**Corrección vigente19/10, ADR-099:** el resumen del mapa muestra el tipo de
+mascota (Perro/Gato/Otra especie), no raza; fallback seguro si falta. Foto mayor,
+a ancho completo4:3, sin altura136px. Se retiran Abierto/Resuelto y conteo de
+casos/ubicaciones del panel. Cada caso tiene su propio pin; los solapamientos
+se separan en píxeles sin cambiar coordenadas públicas ni consulta. Sin contador,
+1 de2 o flechas; tocar un pin actualiza su resumen y Ver ficha abre su detalle.
+Filtros en Explorar, scroll/panel, paginación/reintento y permisos conservados.
+Sin activación remota o nueva persistencia.22 pruebas mapa/preview/arquitectura/
+ZoneMapPicker aprobadas; análisis completo y formato correctos; capturas390×844
+y320×350/texto2 revisadas. Android de este ajuste pendiente.
+[ADR-099](../decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md)
+sustituye las menciones a raza/agrupación/contador/estado del resumen anteriores.
+
 **Recorrido vigente19/10 (ADR-097):** configurar filtros y Ubicación únicamente
 en Explorar; Mapa muestra la misma consulta. Al tocar un pin, su resumen público
 aparece en el panel inferior (foto, nombre, tamaño, raza no registrada, fecha y

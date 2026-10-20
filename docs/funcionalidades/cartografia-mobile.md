@@ -1,5 +1,15 @@
 # Cartografía móvil compartida
 
+Excepción de posición20/10, ADR-106: Explorar compone MapAttribution.compact
+fuente8/objetivos48 justo sobre el panel, derecha, acompañando su gesto. Los
+demás mapas conservan crédito superior/fuente10. Enlaces/reintento y paleta
+global compartidos; no se permite ocultar la atribución sin reemplazo.
+
+Regla vigente20/10: [cartografía compartida móvil/web](cartografia-compartida.md)
+y ADR-104. ZoneMapPicker aplica MapStyle a todas las teselas: mezcla50/50 entre
+color original de Reportar y acabado anterior de Explorar. Pines/radios/créditos
+sin filtrar; configuración/proveedor de las notas siguientes conservados.
+
 Implementación local19/10/2026: CARTO Positron mediante MAP_TILE_URL, referencia
 clara del usuario y pines de marca conservados. Ajuste de HU-07/RF-13, sin historia
 nueva ni cierre de las existentes. [ADR-084](../decisiones/084-mapa-mobile-claro-carto-positron.md).

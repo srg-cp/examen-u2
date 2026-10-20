@@ -1,5 +1,7 @@
 # Fondo compartido de la aplicación móvil
 
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
 Corrección posterior ADR-095: el usuario rechaza el recorte de094. Las tarjetas
 recuperan fade/desplazamiento del stagger compartido, sin blur de entrada sobre
 glass; backdropBlendMode src compone el material en la capa de opacidad. Una

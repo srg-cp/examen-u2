@@ -1,5 +1,12 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+**Cartografía global20/10, ADR-104:** mapas mediante adaptadores compartidos:
+ZoneMapPicker/MapStyle en core/presentation móvil y LocationMap en app/components
+web. Sin matrices/SDK/mapas independientes por funcionalidad. Filtrar solo
+teselas, sin alterar dominio, coordenadas, permisos, pines o créditos. Regla
+intermedia Reportar/Explorar común a ambas plataformas, con comprobación de
+paridad de matrices. [ADR-104](decisiones/104-cartografia-global-mobile-web.md).
+
 **Registro/recuperación web —19/10/2026:** CredentialViewModel consume casos
 de uso de dominio; HTTP/Auth detrás de repositorios/fuentes y composición por
 petición. Política global incorpora recovery para la capacidad temporal de

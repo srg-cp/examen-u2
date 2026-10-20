@@ -1,5 +1,45 @@
 # Arquitectura de Entre Huellas
 
+Explorar20/10, ADR-106: preview reporta altura real del resumen tras layout;
+ExploreCaseMap calcula mínimo adaptable y compone atribución junto al borde
+del panel mediante sus controladores. ZoneMapPicker.showAttribution permite
+esta composición externa, sin cambio de paleta/global ni operaciones. Créditos
+compactos reutilizan componente/lifecycle existentes. Sin dominio/data nuevos.
+
+Cartografía global20/10, ADR-104: MapStyle obligatorio en ZoneMapPicker, sin
+override desde Explorar. Web extrae LocationMap de SightingMap a componentes
+compartidos; wrapper adapta coordenadas a SightingPoint. CSS/SVG locales solo
+filtran teselas, con matriz equivalente probada. Configuración pública de
+teselas separada de secretos de backend; CSP restringe host CARTO. Mismos
+dominio/casos de uso y coordenadas. Sustituye notas previas de filtro opcional.
+
+Mapa20/10, ADR-103: NavigationAccentSurface se extrae a core/presentation y se
+comparte entre navegación y flecha del resumen, sin imports entre features.
+ExploreMapPreviewContent compone resumen/acciones/detalles; pantalla conserva
+navegación y bloquea aperturas duplicadas. ZoneMapPicker recibe showRadius=false
+y attributionTopInset solo para resultados; valores por defecto conservados.
+Sin cambios de dominio/data/SQL; rasgos de la proyección pública existente.
+Refinamiento20/10: ZoneMapPicker recibe tileColorFilter opcional solo para
+teselas. Explorar aplica paleta neutra clara y acerca cámara al seleccionar;
+cabecera reutiliza GlassSurface. Otros consumidores conservan sus valores.
+
+Corrección19/10/2026: el fondo móvil conserva las luces del tercio superior y atenúa progresivamente el celeste hasta casi blanco junto a la navegación. El velo se pinta dentro de AppPageBackground antes del contenido; conserva movimiento, glass, viewport y accesibilidad. Véase docs/decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md.
+
+Mapa flotante19/10: router inyecta ExploreMapButton en exploreFloatingAction de
+HomeScreen. Home posiciona el slot fuera del scroll solo en Explorar; widget
+explore observa su ViewModel y abre ruta existente con OriginPageSource real.
+Sin imports de presentación entre features ni nuevos dominio/data. ADR-101.
+
+## Mapa: selección por caso y separación visual de pines —19/10/2026
+
+ExploreCaseMap selecciona por identidad de caso, sin grupo por coordenadas.
+ExploreMapPins consume entidades públicas y cámara de flutter_map para colocar
+objetivos independientes en píxeles, sin editar datos. ZoneMapPicker compone
+markerLayer opcional como slot visual, conservando markers/mapas de edición.
+Preview reutiliza especie de ExploreCase y foto4:3; pantalla retira estado/conteo
+redundantes. Mismos ViewModels/casos de uso, sin cambios de dominio/data/SQL.
+[ADR-099](decisiones/099-mapa-pines-individuales-y-resumen-fotografico.md).
+
 ## Explorar: filtro único y resumen inferior —19/10/2026
 
 ExploreSection conserva el editor; ExploreMapScreen observa ExploreViewModel

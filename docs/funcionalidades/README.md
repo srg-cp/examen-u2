@@ -1,5 +1,39 @@
 # Funcionalidades de Entre Huellas
 
+Explorar20/10: [panel minimizable hasta Ver ficha](explorar.md) y créditos
+compactos que acompañan su borde superior, según ADR-106. Paleta global intacta.
+
+Cartografía20/10: [acabado compartido móvil/web](cartografia-compartida.md),
+intermedio entre Reportar y Explorar, obligatorio en adaptadores comunes.
+Sustituye filtro local de Explorar; base/activación web según ADR-104.
+
+Explorar20/10: [mapa y resumen compacto](explorar.md) según diseño aprobado;
+miniatura mayor, descripción, detalles verticales y dos accesos a la ficha.
+Acabado azul compartido con navegación y símbolo oficial en pines. ADR-103.
+
+Móvil19/10: [fondo compartido](fondos-mobile.md) atenuado hacia blanco junto a la navegación, con luces superiores conservadas. ADR-102.
+
+Explorar19/10: [Mapa flotante](explorar.md) sustituye Lista/Mapa tras elegir
+la propuesta3; mismo mapa y consulta, espacio de listado recuperado. ADR-101.
+
+Explorar19/10: [controles compactos](explorar.md) con lugar/radio en línea e
+icono circular para filtros; área táctil48px, paneles existentes. ADR-100.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+Explorar móvil19/10: [mapa](explorar.md) con pines individuales separados
+visualmente, especie en el resumen y foto adaptable mayor, sin contador,
+selector entre coincidencias ni líneas de estado/conteo. ADR-099.
+
+Navegación móvil19/10: [Inicio](inicio.md) adopta el acabado azul y los efectos
+del botón de acceso de landing en selección activa y Reportar. ADR-098;
+validación local aprobada, revisión Android pendiente.
+
 Actualización móvil19/10: [Explorar](explorar.md) centraliza filtros en la sección
 principal y muestra el resumen del pin con Ver ficha en el panel del mapa.
 ADR-097; validación local aprobada y revisión Android del ajuste pendiente.

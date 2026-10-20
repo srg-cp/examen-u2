@@ -20,6 +20,7 @@ class FilterExpansion<T> extends StatefulWidget {
     this.panelWidth,
     this.alignPanelToEnd = false,
     this.compact = false,
+    this.iconOnly = false,
     this.showLeadingIcon = true,
     this.placement = FilterPanelPlacement.below,
     super.key,
@@ -32,7 +33,7 @@ class FilterExpansion<T> extends StatefulWidget {
   final IconData icon;
   final double? panelWidth;
   final bool alignPanelToEnd;
-  final bool compact, showLeadingIcon;
+  final bool compact, showLeadingIcon, iconOnly;
   final FilterPanelPlacement placement;
   @override
   State<FilterExpansion<T>> createState() => _FilterExpansionState<T>();
@@ -163,10 +164,14 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                   ? title
                   : Tooltip(
                       message: '${widget.label} · ${widget.subtitle}',
-                      child: Column(
+                      child: Flex(
+                        direction: widget.compact
+                            ? Axis.horizontal
+                            : Axis.vertical,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          title,
+                          if (widget.compact) Flexible(child: title) else title,
+                          if (widget.compact) const SizedBox(width: 8),
                           Text(
                             widget.subtitle!,
                             textAlign: TextAlign.center,
@@ -183,7 +188,10 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                   color: foreground,
                 ),
               );
-              return SelectionPillSurface(
+              final trigger = SelectionPillSurface(
+                padding: widget.compact
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.all(6),
                 child: Material(
                   // Follow the shared timeline without a second implicit animation.
                   animationDuration: Duration.zero,
@@ -205,9 +213,17 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                       child: Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: widget.compact ? 8 : 16,
-                          vertical: 12,
+                          vertical: widget.compact ? 6 : 12,
                         ),
-                        child: !widget.showLeadingIcon
+                        child: widget.iconOnly
+                            ? Center(
+                                child: Icon(
+                                  widget.icon,
+                                  size: 20,
+                                  color: foreground,
+                                ),
+                              )
+                            : !widget.showLeadingIcon && !widget.compact
                             ? Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -239,6 +255,19 @@ class _FilterExpansionState<T> extends State<FilterExpansion<T>>
                   ),
                 ),
               );
+              return widget.iconOnly
+                  ? Tooltip(
+                      message: widget.label,
+                      excludeFromSemantics: true,
+                      child: Semantics(
+                        label: widget.label,
+                        button: true,
+                        enabled: widget.enabled,
+                        expanded: _open,
+                        child: trigger,
+                      ),
+                    )
+                  : trigger;
             },
           ),
         ),

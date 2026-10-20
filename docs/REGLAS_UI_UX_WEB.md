@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Cartografía global20/10, ADR-104:** todos los mapas usan LocationMap compartido,
+Positron configurado y matriz sRGB equivalente a MapStyle móvil. Acabado50/50
+entre Reportar original y Explorar anterior; sin estilos por funcionalidad.
+maps.css/map-style.svg filtran solo teselas, no pines/controles/créditos. Mantener
+selección manual, reintento, CSP y coordenadas/privacidad de cada recorrido.
+
 ## Hover glass fino de campos —19/10/2026
 
 Por petición del usuario, inputs de texto/textarea/select comparten hover con

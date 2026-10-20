@@ -19,7 +19,7 @@ export default defineEventHandler(event => {
   });
   const nonce = randomBytes(18).toString('base64'); event.context.cspNonce = nonce;
   if (!import.meta.dev) setHeader(event, 'Content-Security-Policy',
-    `default-src 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`);
+    `default-src 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' https://basemaps.cartocdn.com; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`);
   const nativeSubmission = event.method === 'POST' && /^\/api\/app\/cases\/(lost|found)\/[0-9a-f-]{36}\/sightings$/.test(path);
   const oauthCallback = event.method==='GET' && path==='/api/moderation/oauth/callback';
   // Redirects keep the initiating site's Fetch Metadata. The entry bridge is

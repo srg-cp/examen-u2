@@ -6,6 +6,7 @@ import '../features/explore/presentation/view_models/explore_view_model.dart';
 import '../features/notifications/presentation/screens/inbox_screen.dart';
 import '../features/notifications/presentation/widgets/follow_target_button.dart';
 import '../features/explore/presentation/widgets/explore_section.dart';
+import '../features/explore/presentation/widgets/explore_map_button.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
 import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
 import '../features/case_timeline/presentation/screens/sighting_review_screen.dart';
@@ -219,6 +220,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           onAlerts: () => context.push('/home/notifications'),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),
+          exploreFloatingAction: const ExploreMapButton(),
           exploreContent: ExploreSection(
             locationSearchBuilder: (label, onSelect) =>
                 PlaceSearchFields(initialLabel: label, onSelect: onSelect),

@@ -1,5 +1,314 @@
 # Estado del proyecto
 
+## Inicio móvil: tarjeta y accesos compactos —20/10/2026
+
+Por instrucción del usuario se retiran la huella sobre «Su regreso» y el
+enlace «Conoce Mis mascotas». Reportar, Mis reportes y Mis mascotas usan fondo
+azul #459FF6, igual que «empieza contigo», con iconos/textos oscuros.
+Padding vertical16 (antes20), iconos25 (antes28), separación10 (antes12) y
+texto12.5 (antes13); ampliación y columna adaptable conservadas. Origen visual
+de apertura de Reportar actualizado al azul. Sin cambio de alcance o permisos.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y11
+comprobaciones aprobadas (arquitectura y captura específica de Inicio).
+Renders390×844/texto1 y320×350/texto2 revisados, sin desbordamientos.
+La captura aísla contenido y no acredita la imagen de reencuentro ni Android.
+Siguiente paso: revisar el ajuste en Android.
+
+## Explorar: panel minimizable y créditos junto al borde —20/10/2026
+
+Por instrucción del usuario, permitir bajar el panel hasta Ver ficha completo,
+antes del separador de Detalles. Apertura50% (o mínimo accesible si requiere
+más), máximo90% y mínimo según altura real del resumen/botón +tirador32 +inset
+inferior+12. Sin selección22%; contenido excepcional mantiene scroll. Medición
+solo en presentación, con callback tras layout y comprobación mounted.
+
+MapAttribution.compact usa fuente8/objetivos48 y fondo estrecho a la derecha,
+aproximadamente8px sobre el panel, acompañando extensión/resistencia. Créditos
+enlazados/semántica completa conservados, elipsis/tooltip con texto ampliado.
+ZoneMapPicker omite su crédito superior solo porque ExploreCaseMap lo compone
+en la nueva posición. Cámara reserva espacio adicional para evitar tapar pines;
+título central se retira si falta altura, retorno conservado hasta expansión.
+Otros mapas y paleta global intactos. [ADR-106](decisiones/106-mapa-panel-minimizable-y-creditos-compactos.md),
+[ficha](funcionalidades/explorar.md). HU-07.2 / RF-13 / issue #33.
+
+Validación:17 pruebas mapa/selector/arquitectura aprobadas con CARTO de fixture,
+AMBIENT_BACKGROUND_MOTION=false y capturas activadas. Regresión por gesto en
+390×844 y320×350/texto2: Ver ficha completo, Detalles fuera del área visible,
+créditos sobre panel, retorno/selección/pan/ficha y reintentos conservados.
+Análisis completo sin incidencias; último análisis de archivos intervenidos y
+formato correctos. Renders minimizados normal/pequeño revisados: crédito pequeño
+y sin superposición con retorno. Teselas neutras, sin acreditar proveedor real.
+Siguiente paso: revisión Android del gesto/posición. Sin APK, instalación,
+SQL, despliegue o cierre de historia; cambios previos de Inicio conservados.
+
+## Tipografía del título de Inicio móvil —20/10/2026
+
+Por referencia explícita del usuario, «Su regreso» usa Poppins regular/gris y
+«empieza contigo» seminegrita/azul, separados por salto de línea, tamaño23 y
+altura1.25. Fuentes400/600 incluidas con licencia OFL, sin descarga en ejecución.
+Excepción local a la fuente del sistema en [ADR-105](decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+Tarjeta glass, acciones y entrada conservadas; sin cambio de alcance de HU.
+
+Validación: formato correcto y análisis Flutter completo sin incidencias.
+Home/arquitectura:15 comprobaciones aprobadas y2 fallos por timeout de
+pumpAndSettle con el fondo animado continuo. La herramienta general de
+capturas presenta el mismo bloqueo. Se añade captura específica
+tool/capture_home_title.dart con fuentes reales y movimiento reducido:
+aprobada en390×844/texto1 y320×350/texto2, sin desbordamientos. Título revisado
+en build/ui-preview/home-title/normal.png y small.png; la frase crece y se
+reparte en más líneas al ampliar texto. Estas capturas aíslan el contenido.
+
+Siguiente paso: revisión visual Android y adaptación de las esperas de las
+pruebas generales al fondo continuo. Sin APK, instalación ni despliegue.
+
+## Cartografía global con acabado intermedio —20/10/2026
+
+Por instrucción del usuario, todos los mapas móviles/web usan el punto medio
+entre Reportar original y el filtro anterior de Explorar:50% color fuente y50%
+acabado anterior. MapStyle en core/presentation se aplica obligatoriamente en
+ZoneMapPicker; retirar filtro/override local de Explorar. Incluye selectores,
+reportes, ubicaciones, avistamientos/revisión y fichas/previas móviles.
+
+Web extrae LocationMap compartido: SightingMap solo adapta el contrato de punto.
+Matriz equivalente en SVG/CSS local únicamente sobre teselas. Usa la misma base
+CARTO Positron mediante NUXT_PUBLIC_MAP_TILE_URL, configurada en .env ignorado
+desde la URL móvil, sin versionar la clave pública de teselas. CSP permite solo
+host CARTO en imágenes externas; créditos OSM/CARTO enlazados fuera del filtro.
+Selección, radios, pines, datos y permisos conservados. No crea Explorar web.
+[ADR-104](decisiones/104-cartografia-global-mobile-web.md),
+[ficha](funcionalidades/cartografia-compartida.md). Regla registrada también en
+AGENTS, arquitectura y normas UI móvil/web; comprobaciones previenen bypass y
+divergencia numérica de matrices. Sin SQL ni nuevas operaciones de producto.
+
+Validación:17 pruebas Flutter mapa/selector/arquitectura aprobadas; formato y
+análisis completo sin incidencias.55 pruebas web y26 de servidor de producción
+aprobadas; typecheck y build correctos. Build aislado .nuxt-map-style para
+conservar el servidor de desarrollo activo; no se detuvo el proceso del usuario.
+QA navegador1440/731/390/320/1920 y320×350/texto200% aprobada: selección manual,
+GPS denegado, foto/reintento ambiguo, CSP/hidratación, créditos y píxel filtrado
+realmente pintado sobre tesela fixture. Captura del mapa web revisada. Las
+capturas no acreditan apariencia/red real del proveedor en producción.
+
+Siguiente paso: revisión de mapas reales Android/web; configurar la URL pública
+de teselas en el entorno web publicado y desplegar cuando se autorice. El
+fallback OSM móvil sin configuración también recibe el filtro, pero no equivale
+a la base Positron configurada. Sin APK, instalación, despliegue o historia cerrada.
+
+## Panel del mapa al50% —20/10/2026
+
+Elección explícita del usuario: inicio y mínimo50%, ya que60% resulta demasiado
+alto. Selección, colapso, cámara y resistencia acompañan el nuevo mínimo;
+máximo90% y contenido desplazable conservados. La fecha puede requerir scroll.
+ADR-103 / HU-07.2 / RF-13 / issue #33, sin cambios de alcance o backend.
+
+Validación:6 pruebas de mapa aprobadas, con acceso a fecha mediante scroll,
+retorno/selección y320×350/texto2. Análisis de pantalla/widget sin incidencias
+y formato correcto. Siguiente paso: revisión visual Android de la altura50%.
+Sin APK, instalación o despliegue.
+
+## Cartografía casi neutra según segunda captura —20/10/2026
+
+El usuario corrige el amarillo hueso excesivo y aporta una referencia blanco
+grisáceo apenas cálido. Ajustar solo filtro de teselas: luminancia92%, mezcla8%
+hacia blanco y azul−4; gris245→#F6F6F2 y blanco→#FFFFFB. Recupera contraste
+frente al aclarado18% anterior. Pines/créditos, foto, glass y panel60–90%
+conservados. Refinamiento de ADR-103 / HU-07.2 / RF-13 / issue #33.
+
+Validación:6 pruebas de mapa aprobadas, análisis del widget sin incidencias,
+formato correcto y captura normal revisada con teselas neutras. Siguiente paso:
+revisión visual sobre cartografía real Android. Sin APK, instalación o despliegue.
+
+## Panel del mapa más alto al abrir y colapsar —20/10/2026
+
+Por instrucción del usuario, altura inicial y mínima de45 a60% para evitar
+que la fecha quede recortada tras ampliar foto/espaciados. Máximo90%, cámara,
+selección, colapso y resistencia alineados con el nuevo mínimo. Conserva scroll
+para pantallas pequeñas/texto ampliado. ADR-103 / HU-07.2 / RF-13 / issue #33.
+
+Validación:6 pruebas de mapa aprobadas, incluida regresión que comprueba fecha
+completa sobre el área del sistema con16px de margen a390×844; también cubren
+320×350/texto2. Análisis de pantalla/widget sin incidencias, formato correcto
+y captura normal revisada con todos los datos visibles. Siguiente paso:
+revisión física Android. Sin APK, instalación, despliegue o cambios de backend.
+
+## Espaciado de Detalles del caso —20/10/2026
+
+Por comparación explícita de capturas del usuario, aumentar separación del
+resumen del mapa: separador con padding vertical16 (antes12), título→datos16
+(antes10) y16 entre filas (antes8). Mantener textos, etiqueta/valor, iconos,
+foto y acciones; panel permite scroll. Refinamiento de ADR-103 / HU-07.2 /
+RF-13 / issue #33, sin cambio de alcance o backend.
+
+Validación:6 pruebas de mapa aprobadas, análisis del widget sin incidencias y
+formato correcto. Captura del panel expandido revisada, con filas más separadas;
+pruebas incluyen320×350/texto2. Siguiente paso: revisión visual Android del gap.
+Sin APK, instalación ni despliegue.
+
+## Color amarillo hueso del mapa —20/10/2026
+
+Corrección explícita del usuario: sustituir el gris neutro de Explorar por
+amarillo hueso suave. Filtro solo en teselas: gris245 se convierte en #F7F5EB
+y blanco en #FFFDF3, manteniendo contraste de calles/textos y pines/créditos
+sin filtrar. Foto112px, cabecera glass, cámara y consulta conservadas.
+Refinamiento de ADR-103 / HU-07.2 / RF-13 / issue #33, sin cambio de alcance.
+
+Validación:6 pruebas de mapa aprobadas, análisis del archivo sin incidencias,
+formato correcto y capturas regeneradas; normal revisada con teselas neutras.
+Siguiente paso: revisión visual del tinte sobre cartografía real en Android.
+Sin APK, instalación o despliegue.
+
+## Refinamiento del mapa, foto y cabecera glass —20/10/2026
+
+Por nueva petición del usuario, foto del resumen de80 a112px y título Explorar
+en GlassSurface/radio24/padding22×12, con centrado y retirada al expandir intactos.
+Cartografía desaturada y aclarada18% solo en teselas; pines oficiales/créditos
+conservan contraste. Selección acerca hasta zoom15 desde una vista más amplia,
+sin alejar zoom superior ni cambiar búsqueda/ubicaciones públicas; pan/zoom libre.
+ZoneMapPicker recibe tileColorFilter opcional; mapas restantes sin filtro.
+Refinamiento de [ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md)
+y [ficha](funcionalidades/explorar.md), HU-07.2 / RF-13 / issue #33.
+
+Validación:16 pruebas de mapa/selector de ubicación/arquitectura aprobadas en
+serie con AMBIENT_BACKGROUND_MOTION=false, formato correcto y análisis completo
+sin incidencias. Capturas390×844 y320×350/texto2 revisadas: foto mayor/cabecera
+glass y scroll disponibles; fecha/detalles pueden requerir desplazar el panel.
+Las teselas de fixture no acreditan calles reales. Siguiente paso: revisión
+visual Android del proveedor configurado. Sin APK, instalación ni despliegue.
+
+## Mapa y resumen compacto aprobados —20/10/2026
+
+Implementada la propuesta visual aprobada por el usuario: mapa despejado sin
+disco gris del radio, pines con silueta de ubicación/símbolo oficial y selección
+negra/blanca. Panel45–90% con foto80×80, nombre/rasgos, flecha azul y Ver ficha
+gris; tamaño/especie/fecha en vertical tras separador. Acabado azul extraído
+a NavigationAccentSurface de core y compartido con navegación, sin duplicación
+ni imports entre features. Ambos botones abren el detalle desde su origen real;
+bloqueo durante navegación evita aperturas duplicadas. Créditos conservados bajo
+cabecera, consulta/radio público intactos, sin SQL ni nuevas operaciones.
+[ADR-103](decisiones/103-mapa-resumen-compacto-referencia-aprobada.md),
+[ficha](funcionalidades/explorar.md). HU-07.2 / RF-13 / issue #33.
+
+Validación: formato y git diff --check correctos; flutter analyze --no-pub sin
+incidencias.43 pruebas aprobadas en serie de mapa, preview, Home, arquitectura,
+selector de ubicación y Explorar con AMBIENT_BACKGROUND_MOTION=false. Incluyen
+ambas acciones, coordenadas/consulta conservadas, reintento, permisos de lectura
+por sesión, retorno, pines independientes y320×350/texto2. La ejecución inicial
+se interrumpió por falta de memoria; las ejecuciones separadas finalizaron bien.
+Capturas390×844 y320×350/texto2 revisadas: resumen/datos verticales legibles,
+scroll al ampliar texto/altura reducida. Teselas neutras de fixture: no acredita
+apariencia de cartografía remota. Siguiente paso: revisión visual en Android con
+el proveedor configurado. Sin APK, instalación, despliegue ni cierre de historia.
+
+## Panel del mapa con estado compartido —19/10/2026
+
+Por petición del usuario, el panel de Explorar sin pin seleccionado reutiliza
+CollectionEmptyState, como el vacío del listado: huella, título y descripción
+centrados. Con resultados indica Selecciona un pin; sin resultados confirmados,
+No encontramos casos. Conserva instrucciones específicas de ubicación/reintento,
+resumen al seleccionar, panel desplazable y consulta compartida.
+HU-07.2 / RF-13 / issue #33, sin cambio de alcance ni backend.
+
+Validación: formato, flutter analyze --no-pub sin incidencias y15 pruebas de
+mapa/arquitectura aprobadas con AMBIENT_BACKGROUND_MOTION=false. Capturas
+390×844 y320×350/texto2 revisadas; en altura pequeña el contenido requiere
+expandir/desplazar el panel. Teselas de fixture, sin validar cartografía remota.
+Siguiente paso: revisión visual en Android físico; sin APK ni despliegue.
+
+## Fondo móvil más tenue abajo —19/10/2026
+
+Por instrucción del usuario, AppPageBackground conserva las luces del tercio
+superior y atenúa progresivamente el celeste hasta casi blanco en navegación.
+Velo dentro del painter, antes del contenido; movimiento y glass conservados.
+[ADR-102](decisiones/102-fondo-mobile-atenuado-hacia-navegacion.md),
+[ficha](funcionalidades/fondos-mobile.md). Sin HU/issue nuevo ni cambio de alcance.
+
+Validación: formato correcto, flutter analyze sin incidencias y18 comprobaciones
+aprobadas (fondo animado, Home, arquitectura y captura UI), con
+AMBIENT_BACKGROUND_MOTION=false; el test de movimiento fuerza animate:true.
+Renders de Inicio390×844 y320×350/texto2 regenerados y revisados: zona inferior
+más blanca y cabecera conservada. git diff --check correcto.
+Siguiente paso: revisión visual en Android físico; no se generó ni instaló APK.
+
+## Mapa flotante en Explorar —19/10/2026
+
+Por elección del usuario de la propuesta3 se retira Lista/Mapa. Mapa es una
+cápsula con GlassSurface, icono y etiqueta, fija sobre la navegación con20px
+de separación. Solo Explorar; carga/error inicial sin botón y busy bloqueado.
+Router compone ExploreMapButton en el slot de Home, sin imports entre
+presentaciones. Padding final200px más crecimiento de texto/inset permite
+retirar la última tarjeta de debajo del botón. Mismo origen/retorno y consulta.
+[ADR-101](decisiones/101-mapa-acceso-flotante-explorar.md),
+[ficha](funcionalidades/explorar.md). HU-07.1/07.2, RF-13, issues #32/#33.
+
+Validación:36 pruebas Home/Explorar/arquitectura/mapa aprobadas con
+AMBIENT_BACKGROUND_MOTION=false. Normal/pequeño/texto2, scroll fijo y retorno,
+sin consultas adicionales al abrir. Formato y análisis completo sin incidencias;
+git diff --check correcto. Capturas390×844 y320×350/texto2 revisadas;
+datos/fotos de fixture no acreditan backend remoto. En altura pequeña el botón
+se superpone al contenido durante el scroll, como la navegación; el padding
+final permite descubrir la última tarjeta/acción.
+Siguiente paso: revisión física Android. Sin APK, instalación o despliegue.
+
+## Explorar: fila compacta de ubicación y filtros —19/10/2026
+
+Ubicación usa el ancho disponible con lugar/radio en línea; Filtrar casos es
+un icono circular48×48 con tooltip y semántica, sin chevrón ni texto visible.
+Fila48px a tamaño normal; texto ampliado puede aumentar Ubicación, sin reducir
+fuente. Área táctil mínima48, paneles/animaciones/borradores/Aplicar conservados.
+FilterExpansion reutiliza su variante compacta y SelectionPillSurface permite
+omitir el padding exterior; otros selectores conservan sus valores por defecto.
+[ADR-100](decisiones/100-explorar-controles-compactos.md),
+[ficha](funcionalidades/explorar.md). Sin backend, permisos o alcance nuevos.
+
+Validación:25 pruebas Explorar/arquitectura/navegación de mascotas aprobadas,
+incluyendo dimensiones48px, texto2, descarte/Aplicar y consulta conservada.
+Formato correcto y análisis completo sin incidencias. Capturas390×844 y
+320×350/texto2 de listado/paneles revisadas; teselas de red no disponibles
+en el entorno de pruebas, sin acreditar cartografía real.
+Siguiente paso: revisión física Android. Sin APK/despliegue.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+## Mapa: especie, foto mayor y pines individuales —19/10/2026
+
+Corrección explícita del usuario: tipo de mascota en lugar de raza; foto4:3
+a ancho completo en lugar de altura136px; retirar Abierto/Resuelto y conteo de
+casos/ubicaciones del panel. Cada caso tiene su pin, con separación en píxeles
+ante solapamientos y sin contador/selector1 de2. La cámara recalcula la posición
+visual con zoom/giro; no se alteran coordenadas públicas, filtros o radio.
+Ver ficha y resumen seleccionados por identidad compuesta; se conservan carga,
+reintento, paginación, retorno y panel accesible. ADR-099; sin SQL, permisos o
+activación remota nuevos; HU-07.1/07.2, RF-13, issues #32/#33.
+
+Validación:22 pruebas de mapa/preview público/arquitectura/ZoneMapPicker aprobadas
+con AMBIENT_BACKGROUND_MOTION=false; giro45°, zoom12/18, coincidencias exactas,
+cercanía, objetivos táctiles separados, apertura individual y especie/fallback.
+Análisis completo limpio y formato correcto. Capturas390×844 y320×350/texto2
+con movimiento reducido y panel expandido revisadas con fotos/teselas de fixture.
+No equivalen a evidencia remota. Siguiente paso: revisar el ajuste en Android
+con datos reales y concentración elevada de casos; sin APK ni despliegue nuevos.
+
+## Navegación móvil con acabado de landing —19/10/2026
+
+La opción activa y Reportar de LiquidNavigation usan el degradado azul, brillo
+superior, sombras y efectos de Iniciar sesión de landing. Hover/foco/pulsación:
+elevación2px y oscurecimiento3% en200ms; movimiento reducido sin elevación ni
+transición. Mantiene glass exterior, destinos, tamaños y deslizamiento320ms.
+Trabajo previo conservado. [ADR-098](decisiones/098-navegacion-mobile-acabado-boton-landing.md),
+[ficha](funcionalidades/inicio.md).
+
+Validación:16 comprobaciones existentes de Home/arquitectura aprobadas con
+AMBIENT_BACKGROUND_MOTION=false; formato y flutter analyze sin incidencias.
+Capturas390/320px con texto2 en tamaño pequeño revisadas, sombras habilitadas.
+Siguiente paso: revisión visual/táctil en Android. Sin APK, instalación ni
+despliegue; sin cambios de producto/backend ni cierre de historias.
+
 ## Filtros solo en Explorar y resumen inferior del mapa —19/10/2026
 
 Por aprobación del usuario, Mapa retira el editor/Aplicar filtros y muestra el

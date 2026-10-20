@@ -61,7 +61,7 @@ class _ExploreFiltersState extends State<ExploreFilters> {
         applying: widget.applying,
         panelWidth: constraints.maxWidth,
         compact: true,
-        showLeadingIcon: showLeadingIcons,
+        iconOnly: true,
         alignPanelToEnd: true,
         editorBuilder: (context, confirm) =>
             ExploreFilterEditor(initial: _selection, onConfirm: confirm),
@@ -93,15 +93,12 @@ class _ExploreFiltersState extends State<ExploreFilters> {
         ),
         onApply: _apply,
       );
-      return IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: zone),
-            const SizedBox(width: 8),
-            Expanded(child: filters),
-          ],
-        ),
+      return Row(
+        children: [
+          Expanded(child: zone),
+          const SizedBox(width: 8),
+          SizedBox.square(dimension: 48, child: filters),
+        ],
       );
     },
   );

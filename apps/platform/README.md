@@ -161,3 +161,11 @@ audit completo/runtime antes de distribuir nuevas versiones.
 Se retiró el atlas del mockup: `public/images/landing` contiene siete PNG RGBA independientes generados individualmente con imagegen. Componentes Vue y CSS dibujan la UI; el logo oficial sigue siendo `/brand.png`. Consultar [prompts y procedencia](LANDING_ASSETS.md). La animación aprobada del hero se conserva. Los PNG priorizan detalle y alfa; no se ha medido rendimiento de red móvil real ni Core Web Vitals. Los recursos se cargan de forma diferida salvo hero y se reutilizan por URL. El incremento no publica ni hace redeploy.
 
 Actualización posterior de marca/diversidad17/10: diez ilustraciones con mascotas y pañuelos variados. El emblema blanco se genera dentro de la tela, usando only-black.svg como referencia; no hay capas de logos superpuestas. La marca usa /brand.png actualizado y el favicon /brand-icon.png; /brand.svg conserva el vector oficial disponible. Ver LANDING_ASSETS.md para prompts finales y procedencia. No se añaden dependencias ni se modifica el hero aprobado.
+Cartografía global20/10, ADR-104: configurar `NUXT_PUBLIC_MAP_TILE_URL` con la
+misma URL CARTO Positron de `MAP_TILE_URL` móvil. Es configuración visible del
+proveedor de teselas; nunca usar tokens/secretos de Supabase en ella. El ejemplo
+contiene `API_KEY`, sin credenciales reales. La URL local ya está en `.env`
+ignorado; para producción añadir la variable del entorno y desplegar/reiniciar.
+Todos los mapas web reutilizan `LocationMap` y el acabado intermedio común a
+móvil. Sin variable válida se conserva el fallo/reintento, no un mapa simulado.
+[Ficha compartida](../../docs/funcionalidades/cartografia-compartida.md).

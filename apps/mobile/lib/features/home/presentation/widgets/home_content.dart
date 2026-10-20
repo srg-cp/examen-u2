@@ -29,18 +29,26 @@ class HomeContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.pets_outlined,
-                  size: 32,
-                  color: Color(0xFF111111),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Su regreso empieza contigo',
+                const Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: 'Su regreso\n'),
+                      TextSpan(
+                        text: 'empieza contigo',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF459FF6),
+                        ),
+                      ),
+                    ],
+                  ),
+                  semanticsLabel: 'Su regreso empieza contigo',
                   style: TextStyle(
+                    fontFamily: 'Poppins',
                     fontSize: 23,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF111111),
+                    height: 1.25,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF454746),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -50,16 +58,6 @@ class HomeContent extends StatelessWidget {
                     fontSize: 16,
                     height: 1.4,
                     color: Color(0xFF6E6E73),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton.icon(
-                  onPressed: () => onSelect(HomeSection.pets),
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                  label: const Text('Conoce Mis mascotas'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF111111),
-                    padding: EdgeInsets.zero,
                   ),
                 ),
               ],
@@ -164,24 +162,24 @@ class HomeQuickAction extends StatelessWidget {
   final ValueChanged<BuildContext> onTap;
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0xFFF5F5F7),
+    color: const Color(0xFF459FF6),
     borderRadius: BorderRadius.circular(22),
     child: InkWell(
       borderRadius: BorderRadius.circular(22),
       onTap: () => onTap(context),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
         child: SizedBox(
           width: double.infinity,
           child: Column(
             children: [
-              Icon(icon, size: 28, color: const Color(0xFF111111)),
-              const SizedBox(height: 12),
+              Icon(icon, size: 25, color: const Color(0xFF111111)),
+              const SizedBox(height: 10),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF111111),
                 ),

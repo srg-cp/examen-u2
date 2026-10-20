@@ -15,6 +15,25 @@ async function sources(path) {
   return files;
 }
 
+test('All maps use shared adapters and the same mobile/web tile palette', async () => {
+  for (const [path, source] of await sources(new URL('../app/', import.meta.url))) {
+    if (path.endsWith('/components/LocationMap.vue')) continue;
+    assert.doesNotMatch(source, /from ['"]leaflet['"]|import\(['"]leaflet['"]\)|\bL\.map\(/, path);
+  }
+  const adapter = await readFile(new URL('../app/components/LocationMap.vue', import.meta.url), 'utf8');
+  assert.match(adapter, /config\.public\.mapTileUrl/);
+  assert.match(adapter, /map-attribution/);
+  const dart = await readFile(new URL('../../mobile/lib/core/presentation/widgets/map_style.dart', import.meta.url), 'utf8');
+  const svg = await readFile(new URL('../public/map-style.svg', import.meta.url), 'utf8');
+  const mobile = dart.match(/ColorFilter\.matrix\(\[([\s\S]*?)\]\)/)[1].split(',').map(s => s.trim()).filter(Boolean).map(Number);
+  const web = svg.match(/values="([\s\S]*?)"/)[1].trim().split(/\s+/).map(Number);
+  assert.equal(mobile.length, 20); assert.equal(web.length, 20);
+  for (let i = 0; i < mobile.length; i++) assert.ok(Math.abs(mobile[i] / (i % 5 === 4 ? 255 : 1) - web[i]) < 1e-10, `Matrix differs at ${i}`);
+  assert.match(svg, /color-interpolation-filters="sRGB"/);
+  const css = await readFile(new URL('../app/assets/maps.css', import.meta.url), 'utf8');
+  assert.match(css, /\.leaflet-tile-pane\s*\{\s*filter: url\('\/map-style\.svg#cartography'\)/);
+});
+
 test('All pages share the global access policy; new pages cannot bypass registration', async () => {
   const pages = await sources(new URL('../app/pages/', import.meta.url));
   const patterns = pages.map(([path, source]) => {

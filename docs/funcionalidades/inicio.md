@@ -1,5 +1,42 @@
 # Inicio y navegación
 
+20/10/2026, ajuste posterior: se retiran la huella superior de la tarjeta
+principal y «Conoce Mis mascotas». Los accesos Reportar/Mis reportes/Mis mascotas
+usan fondo #459FF6 como el énfasis del título, con iconos y texto oscuros;
+padding vertical16, iconos25, separación10 y texto12.5. Mantienen destinos,
+ampliación y columna adaptable; apertura de Reportar desde su color real.
+Sin nuevas reglas de dominio, persistencia, permisos o activación.
+Formato/análisis limpios y11 comprobaciones de arquitectura/captura aprobadas;
+renders390×844/texto1 y320×350/texto2 revisados sin overflow. Captura aislada
+del contenido; pendiente revisión visual Android.
+
+20/10/2026: título principal con el estilo de la referencia del usuario:
+Poppins local23/altura1.25; «Su regreso» gris/peso400 y «empieza contigo»
+azul/peso600, con salto entre ambos. Aproximación tipográfica a la captura,
+no identificación de su fuente. Ajuste natural con texto ampliado y frase
+accesible completa. No requiere activación, persistencia o permisos nuevos.
+[ADR-105](../decisiones/105-titulo-inicio-mobile-referencia-tipografica.md).
+Validación: análisis limpio; captura específica390×844/texto1 y320×350/texto2
+aprobada y revisada. Suite Home/arquitectura:15 pasan,2 timeout al esperar
+el fin del fondo continuo; captura general también bloqueada por esa espera.
+Pendiente revisión visual Android; evidencia completa en ESTADO.
+
+Corrección posterior19/10/2026 del usuario: Reportar (nueve puntos) vuelve
+a su IconButton circular negro #111111 original, de64px y puntos blancos,
+sin degradado, brillo ni sombra azul. El acabado de landing y sus efectos
+se conservan únicamente en la selección activa de la barra.
+Validación: formato, análisis completo y7 pruebas de Home aprobados.
+Pendiente revisión visual Android.
+
+19/10/2026: opción activa y Reportar comparten un acabado local equivalente
+a Iniciar sesión de landing: degradado azul, brillo y sombras suaves,
+hover/foco/pulsación con elevación2px y oscurecimiento3% en200ms. Movimiento
+reducido aplica solo color inmediato. Conserva glass, destinos, origen real
+de Reportar, áreas52/64 y selección deslizante320ms. No requiere activación,
+persistencia ni permisos nuevos.16 comprobaciones de Home/arquitectura y
+análisis aprobados; renders390/320 con texto2 revisados. Pendiente revisión
+Android. [ADR-098](../decisiones/098-navegacion-mobile-acabado-boton-landing.md).
+
 19/10/2026: los títulos de fallback Explorar/Mis mascotas usan peso500, igual
 que CollectionHeader en las secciones reales, por petición del usuario.
 Sin cambios de navegación. Revisión visual Android pendiente.
