@@ -5,26 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/presentation/widgets/zone_map_picker.dart';
-import '../../../../core/presentation/widgets/entity_card_surface.dart';
+import '../../../../core/presentation/widgets/primary_action_button_style.dart';
 import '../../domain/entities/explore_page.dart';
 import '../../domain/entities/explore_query.dart';
-import '../../../places/domain/entities/search_place.dart';
 
-typedef MapFilterBuilder =
-    Widget Function(
-      BuildContext,
-      ScrollController,
-      Widget,
-      SearchPlace Function()?,
-    );
-
-/// Full viewport map: filters in its sheet, selected case beside its public pin.
+/// Full viewport map with the selected public case in its bottom sheet.
 class ExploreCaseMap extends StatefulWidget {
   const ExploreCaseMap({
     required this.items,
     required this.query,
     required this.onOpen,
-    required this.filterBuilder,
+    this.trailing = const [],
+    this.emptyMessage,
     this.createTileProvider,
     this.previewBuilder,
     super.key,
@@ -32,7 +24,8 @@ class ExploreCaseMap extends StatefulWidget {
   final List<ExploreCase> items;
   final ExploreQuery query;
   final void Function(ExploreCase, BuildContext)? onOpen;
-  final MapFilterBuilder filterBuilder;
+  final List<Widget> trailing;
+  final String? emptyMessage;
   final TileProvider Function()? createTileProvider;
   final Widget Function(ExploreCase)? previewBuilder;
   @override
@@ -67,6 +60,18 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
   final _map = MapController();
   (double, double)? _selected;
   String? _selectedCaseKey;
+  ScrollController? _summaryScroll;
+
+  void _resetSummaryScroll() {
+    final scroll = _summaryScroll;
+    if (scroll != null && scroll.hasClients) scroll.jumpTo(0);
+  }
+
+  void _showCase(ExploreCase item) {
+    setState(() => _selectedCaseKey = item.key);
+    _resetSummaryScroll();
+  }
+
   void _moveSheet(double size) {
     if (!_sheet.isAttached) return;
     if (MediaQuery.disableAnimationsOf(context)) {
@@ -114,12 +119,6 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
     final index = foundIndex < 0 ? 0 : foundIndex;
     final item = selected.isEmpty ? null : selected[index];
     final media = MediaQuery.of(context);
-    double previewHeight(int count) => math.min(
-      math.max(256.0, 136 + media.textScaler.scale(12) * 5 + 56) +
-          (count > 1 ? 48 : 0),
-      math.max(120.0, media.size.height * .58 - media.padding.top - 88),
-    );
-    final bubbleHeight = previewHeight(selected.length);
     return LayoutBuilder(
       builder: (context, constraints) {
         void select((double, double) point, List<ExploreCase> values) {
@@ -127,6 +126,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
             _selected = point;
             _selectedCaseKey = values.first.key;
           });
+          _resetSummaryScroll();
           _moveSheet(.42);
           _map.fitCamera(
             CameraFit.coordinates(
@@ -137,9 +137,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
                 24,
                 math.min(
                   constraints.maxHeight - media.padding.top - 24,
-                  constraints.maxHeight * .42 +
-                      previewHeight(values.length) +
-                      32,
+                  constraints.maxHeight * .42 + 32,
                 ),
               ),
               maxZoom: _map.camera.zoom,
@@ -196,90 +194,6 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
                           ),
                         ),
                       ),
-                    if (item != null)
-                      Marker(
-                        key: ValueKey(('callout', item.key)),
-                        point: LatLng(item.latitude, item.longitude),
-                        width: math.min(330, constraints.maxWidth - 32),
-                        height: bubbleHeight + 32,
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 32),
-                          child: Material(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22),
-                            elevation: 3,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Builder(
-                                    builder: (source) => Semantics(
-                                      button: true,
-                                      label:
-                                          'Abrir caso ${item.name.isEmpty ? 'Sin nombre' : item.name}',
-                                      child: EntityCardSurface(
-                                        onTap: widget.onOpen == null
-                                            ? null
-                                            : () =>
-                                                  widget.onOpen!(item, source),
-                                        child:
-                                            widget.previewBuilder?.call(item) ??
-                                            ExploreMapPreviewContent(
-                                              item: item,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (selected.length > 1)
-                                  SizedBox(
-                                    height: 48,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          tooltip: 'Caso anterior',
-                                          onPressed: index == 0
-                                              ? null
-                                              : () => setState(
-                                                  () => _selectedCaseKey =
-                                                      selected[index - 1].key,
-                                                ),
-                                          icon: const Icon(
-                                            Icons.chevron_left_rounded,
-                                          ),
-                                        ),
-                                        Flexible(
-                                          child: Text(
-                                            '${index + 1} de ${selected.length}',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          tooltip: 'Caso siguiente',
-                                          onPressed:
-                                              index == selected.length - 1
-                                              ? null
-                                              : () => setState(
-                                                  () => _selectedCaseKey =
-                                                      selected[index + 1].key,
-                                                ),
-                                          icon: const Icon(
-                                            Icons.chevron_right_rounded,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               )
@@ -295,43 +209,158 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
               snap: !media.disableAnimations,
               snapSizes: const [.42, .9],
               shouldCloseOnMinExtent: false,
-              builder: (context, scroll) => AnimatedBuilder(
-                animation: _pullOffset,
-                builder: (context, child) => Transform.translate(
-                  offset: Offset(0, _pullOffset.value),
-                  child: child,
-                ),
-                child: Material(
-                  key: const ValueKey('map-filters-surface'),
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(28),
+              builder: (context, scroll) {
+                _summaryScroll = scroll;
+                return AnimatedBuilder(
+                  animation: _pullOffset,
+                  builder: (context, child) => Transform.translate(
+                    offset: Offset(0, _pullOffset.value),
+                    child: child,
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: _handleScroll,
-                    child: widget.filterBuilder(
-                      context,
-                      scroll,
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _MapSheetHandle(
-                          onExpand: () => _moveSheet(.9),
-                          onCollapse: () => _moveSheet(.42),
-                        ),
+                  child: Material(
+                    key: const ValueKey('map-case-surface'),
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(28),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: _handleScroll,
+                      child: LayoutBuilder(
+                        builder: (context, sheetConstraints) {
+                          final sticky =
+                              item != null &&
+                              sheetConstraints.maxHeight >
+                                  media.textScaler.scale(18) * 1.5 +
+                                      36 +
+                                      media.padding.bottom +
+                                      12 +
+                                      96;
+                          final action = item == null
+                              ? const SizedBox.shrink()
+                              : Padding(
+                                  padding: EdgeInsets.fromLTRB(
+                                    16,
+                                    8,
+                                    16,
+                                    media.padding.bottom + 12,
+                                  ),
+                                  child: Builder(
+                                    builder: (source) => FilledButton(
+                                      style: primaryActionButtonStyle(context),
+                                      onPressed: widget.onOpen == null
+                                          ? null
+                                          : () => widget.onOpen!(item, source),
+                                      child: const Text('Ver ficha'),
+                                    ),
+                                  ),
+                                );
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: CustomScrollView(
+                                  controller: scroll,
+                                  slivers: [
+                                    SliverPersistentHeader(
+                                      pinned: true,
+                                      delegate: _MapSheetHandle(
+                                        onExpand: () => _moveSheet(.9),
+                                        onCollapse: () => _moveSheet(.42),
+                                      ),
+                                    ),
+                                    SliverToBoxAdapter(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          if (item == null)
+                                            Padding(
+                                              padding: const EdgeInsets.all(24),
+                                              child: Text(
+                                                widget.items.isEmpty
+                                                    ? widget.emptyMessage ??
+                                                          'No hay casos para mostrar en el mapa. Ajusta la búsqueda desde Explorar.'
+                                                    : 'Selecciona un pin para ver el resumen del caso.',
+                                              ),
+                                            )
+                                          else ...[
+                                            if (selected.length > 1)
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  IconButton(
+                                                    tooltip: 'Caso anterior',
+                                                    onPressed: index == 0
+                                                        ? null
+                                                        : () => _showCase(
+                                                            selected[index - 1],
+                                                          ),
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .chevron_left_rounded,
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      '${index + 1} de ${selected.length}',
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    tooltip: 'Caso siguiente',
+                                                    onPressed:
+                                                        index ==
+                                                            selected.length - 1
+                                                        ? null
+                                                        : () => _showCase(
+                                                            selected[index + 1],
+                                                          ),
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .chevron_right_rounded,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            widget.previewBuilder?.call(item) ??
+                                                ExploreMapPreviewContent(
+                                                  item: item,
+                                                  scrollable: false,
+                                                ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 8,
+                                                  ),
+                                              child: Text(
+                                                item.status ==
+                                                        ExploreStatus.resolved
+                                                    ? 'Resuelto'
+                                                    : 'Abierto',
+                                              ),
+                                            ),
+                                            if (!sticky) action,
+                                          ],
+                                          ...widget.trailing,
+                                          SizedBox(
+                                            height: media.padding.bottom + 16,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (sticky) action,
+                            ],
+                          );
+                        },
                       ),
-                      widget.query.latitude == null ||
-                              widget.query.longitude == null
-                          ? null
-                          : () => SearchPlace(
-                              label: '',
-                              latitude: _map.camera.center.latitude,
-                              longitude: _map.camera.center.longitude,
-                            ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         );
@@ -355,7 +384,7 @@ class _MapSheetHandle extends SliverPersistentHeaderDelegate {
   ) => Material(
     color: Colors.white,
     child: Semantics(
-      label: 'Desliza para ampliar o reducir los filtros',
+      label: 'Desliza para ampliar o reducir el resumen',
       onIncrease: onExpand,
       onDecrease: onCollapse,
       child: Center(

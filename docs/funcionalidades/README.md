@@ -1,5 +1,22 @@
 # Funcionalidades de Entre Huellas
 
+Actualización móvil19/10: [Explorar](explorar.md) centraliza filtros en la sección
+principal y muestra el resumen del pin con Ver ficha en el panel del mapa.
+ADR-097; validación local aprobada y revisión Android del ajuste pendiente.
+
+Toast móvil19/10: [mismo acabado, entrada y descarte por gesto que la web](toast-mobile.md),
+en el componente compartido; ADR-096, sin cambios de backend ni nuevas historias.
+
+Títulos móvil19/10: [Explorar](explorar.md), [Mis mascotas](mascotas.md) y
+[fallback de Inicio](inicio.md) usan peso500 como Inicio web. CollectionHeader
+extiende el mismo ajuste a sus listados de casos/reportes.
+
+Inicio móvil, corrección19/10: [entrada suave del glass](fondos-mobile.md),
+con fade/desplazamiento del stagger y sin recorte progresivo. ADR-095.
+
+Corrección móvil19/10: [Inicio/glass](fondos-mobile.md) y [Explorar](explorar.md)
+con un solo stagger, sin cover previo ni paneles glass vacíos. ADR-094.
+
 Inicio móvil19/10: [glass estable y tarjeta de reunión](fondos-mobile.md),
 con imagen original de web y superficie fuera del stagger. ADR-093.
 

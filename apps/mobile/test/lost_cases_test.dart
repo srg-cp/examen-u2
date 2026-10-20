@@ -846,7 +846,8 @@ void main() {
         await tester.runAsync(model.publish);
         await tester.pumpAndSettle();
         expect(find.text(photoError), findsOneWidget);
-        await tester.pump(const Duration(seconds: 4));
+        await tester.pump(const Duration(seconds: 7));
+        await tester.pumpAndSettle();
         expect(find.text(photoError), findsNothing);
         cases.failure = null;
         cases.loseResponse = true;

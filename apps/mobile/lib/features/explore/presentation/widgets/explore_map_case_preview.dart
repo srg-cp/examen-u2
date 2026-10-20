@@ -10,8 +10,13 @@ import '../../domain/entities/explore_query.dart';
 import '../view_models/explore_case_preview_view_model.dart';
 
 class ExploreMapCasePreview extends ConsumerWidget {
-  const ExploreMapCasePreview({required this.item, super.key});
+  const ExploreMapCasePreview({
+    required this.item,
+    this.scrollable = true,
+    super.key,
+  });
   final ExploreCase item;
+  final bool scrollable;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +31,7 @@ class ExploreMapCasePreview extends ConsumerWidget {
       onAction: () => ref.invalidate(provider),
       child: ExploreMapPreviewContent(
         item: item,
+        scrollable: scrollable,
         detail: state.asData?.value,
         loading: state.isLoading,
         failed: state.hasError,
@@ -34,18 +40,19 @@ class ExploreMapCasePreview extends ConsumerWidget {
   }
 }
 
-/// The tooltip uses the same photo renderer as the public case cards.
+/// Public case summary sharing the photo renderer used by case cards.
 class ExploreMapPreviewContent extends StatelessWidget {
   const ExploreMapPreviewContent({
     required this.item,
     this.detail,
     this.loading = false,
     this.failed = false,
+    this.scrollable = true,
     super.key,
   });
   final ExploreCase item;
   final ExploreCasePreview? detail;
-  final bool loading, failed;
+  final bool loading, failed, scrollable;
 
   @override
   Widget build(BuildContext context) {
@@ -62,97 +69,96 @@ class ExploreMapPreviewContent extends StatelessWidget {
       'large' => 'Grande',
       _ => failed ? 'Tamaño no disponible' : 'Tamaño no registrado',
     };
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            key: const ValueKey('map-preview-photo'),
-            height: 136,
-            child: photo == null
-                ? const ColoredBox(
-                    color: Color(0xFFE5E5EA),
-                    child: Center(child: Icon(Icons.pets_outlined)),
-                  )
-                : CasePhotoView.network(
-                    photo,
-                    semanticLabel: 'Foto principal del caso',
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  item.name.isEmpty ? 'Sin nombre' : item.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          key: const ValueKey('map-preview-photo'),
+          height: 136,
+          child: photo == null
+              ? const ColoredBox(
+                  color: Color(0xFFE5E5EA),
+                  child: Center(child: Icon(Icons.pets_outlined)),
+                )
+              : CasePhotoView.network(
+                  photo,
+                  semanticLabel: 'Foto principal del caso',
                 ),
-                const SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final scaledWidth =
-                        MediaQuery.textScalerOf(context).scale(12) * 7;
-                    final columnWidth = (constraints.maxWidth - 16) / 3;
-                    final factWidth = columnWidth < scaledWidth
-                        ? scaledWidth
-                        : columnWidth;
-                    return SingleChildScrollView(
-                      key: const ValueKey('map-preview-facts'),
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: factWidth,
-                            child: _PreviewFact(
-                              icon: Icons.straighten_rounded,
-                              value: loading
-                                  ? const LoadingShimmer(
-                                      isLoading: true,
-                                      isAction: false,
-                                      loadingLabel:
-                                          'Consultando detalles del caso',
-                                      child: SizedBox(
-                                        height: 14,
-                                        child: ColoredBox(
-                                          color: Color(0xFFE5E5EA),
-                                        ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                item.name.isEmpty ? 'Sin nombre' : item.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final scaledWidth =
+                      MediaQuery.textScalerOf(context).scale(12) * 7;
+                  final columnWidth = (constraints.maxWidth - 16) / 3;
+                  final factWidth = columnWidth < scaledWidth
+                      ? scaledWidth
+                      : columnWidth;
+                  return SingleChildScrollView(
+                    key: const ValueKey('map-preview-facts'),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: factWidth,
+                          child: _PreviewFact(
+                            icon: Icons.straighten_rounded,
+                            value: loading
+                                ? const LoadingShimmer(
+                                    isLoading: true,
+                                    isAction: false,
+                                    loadingLabel:
+                                        'Consultando detalles del caso',
+                                    child: SizedBox(
+                                      height: 14,
+                                      child: ColoredBox(
+                                        color: Color(0xFFE5E5EA),
                                       ),
-                                    )
-                                  : Text(size),
-                            ),
+                                    ),
+                                  )
+                                : Text(size),
                           ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: factWidth,
-                            child: const _PreviewFact(
-                              icon: Icons.pets_outlined,
-                              value: Text('Raza no registrada'),
-                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: factWidth,
+                          child: const _PreviewFact(
+                            icon: Icons.pets_outlined,
+                            value: Text('Raza no registrada'),
                           ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: factWidth,
-                            child: _PreviewFact(
-                              icon: Icons.calendar_today_outlined,
-                              value: Text('$event: $date'),
-                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: factWidth,
+                          child: _PreviewFact(
+                            icon: Icons.calendar_today_outlined,
+                            value: Text('$event: $date'),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
+    return scrollable ? SingleChildScrollView(child: content) : content;
   }
 }
 

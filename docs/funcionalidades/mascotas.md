@@ -1,5 +1,9 @@
 # Registro, edición y ciclo de vida de mascotas
 
+19/10/2026: título Mis mascotas en peso500 mediante CollectionHeader compartido,
+por petición del usuario para igualar el peso de Inicio web. Tamaño32 y
+composición existentes conservados. Revisión visual Android pendiente.
+
 **Seguimiento18/10:** HU-03/#3 y HU-03.1/#28, HU-03.2/#29 en Done y cerradas
 en GitHub tras corregir la clasificación cuestionada por el usuario. Registro,
 consulta y edición con fotos implementados e integrados; las notas históricas de

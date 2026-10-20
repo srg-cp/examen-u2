@@ -1,5 +1,28 @@
 # Explorar: lista y mapa de casos
 
+**Recorrido vigente19/10 (ADR-097):** configurar filtros y Ubicación únicamente
+en Explorar; Mapa muestra la misma consulta. Al tocar un pin, su resumen público
+aparece en el panel inferior (foto, nombre, tamaño, raza no registrada, fecha y
+estado) con Ver ficha hacia el detalle existente. Sin callout duplicado ni editor
+inferior. Coincidencias anterior/siguiente,42–90%, CTA fijo cuando cabe o por
+scroll en altura pequeña, retorno, paginación/reintento y refresco conservados.
+Sin selección se pide elegir un pin. Filtros/resultados se conservan al volver.
+Persistencia/permisos/dependencias sin cambios; sin nueva activación remota.
+19 pruebas mapa/preview/arquitectura, análisis completo limpio y capturas locales
+normales/pequeñas con texto2 revisadas. Android de este cambio pendiente.
+[ADR-097](../decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md)
+sustituye la disposición anterior de filtros/callout descrita abajo.
+
+19/10/2026: título Explorar en peso500 mediante CollectionHeader compartido,
+por petición del usuario para igualar el peso de Inicio web. Tamaño32 y
+composición existentes conservados. Revisión visual Android pendiente.
+
+Corrección19/10 (ADR-094): entrada única de sección, sin cover previo ni timeline
+exterior activo desde Inicio. Skeleton y resolución de consulta conservan el
+stagger ya iniciado; no nuevo envío ni vacío intermedio por transición. Regresión
+de90 frames confirma una consulta y misma instancia de shimmer, con/sin movimiento
+reducido. Sin cambios de filtros/datos/permisos; Android del ajuste pendiente.
+
 Ajuste visual19/10: [cartografía móvil](cartografia-mobile.md) usa CARTO Positron
 en la configuración local, con crédito enlazado compartido y pines originales
 conservados. No cambia filtros, permisos ni consultas. ADR-084; revisión Android

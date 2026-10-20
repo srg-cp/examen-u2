@@ -4,7 +4,6 @@ import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
-import '../../../../core/presentation/widgets/cover_reveal.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../view_models/home_view_model.dart';
 import '../state/home_view_state.dart';
@@ -72,15 +71,11 @@ class HomeScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          AuthStageTransition(
-                            enabled: animateContent,
-                            stage: state.section,
-                            startCovered: true,
-                            builder: (play) => StaggerReveal(
+                          Builder(
+                            builder: (_) => StaggerReveal(
                               enabled: animateContent,
                               key: ValueKey(state.section),
                               count: state.section == HomeSection.home ? 4 : 2,
-                              play: play,
                               child: Padding(
                                 padding: EdgeInsets.fromLTRB(
                                   state.section == HomeSection.explore
@@ -120,7 +115,7 @@ class HomeScreen extends ConsumerWidget {
                                                   : 'Mis mascotas',
                                               style: const TextStyle(
                                                 fontSize: 32,
-                                                fontWeight: FontWeight.w700,
+                                                fontWeight: FontWeight.w500,
                                                 color: Color(0xFF111111),
                                               ),
                                             ),

@@ -1,5 +1,16 @@
 # Fondo compartido de la aplicación móvil
 
+Corrección posterior ADR-095: el usuario rechaza el recorte de094. Las tarjetas
+recuperan fade/desplazamiento del stagger compartido, sin blur de entrada sobre
+glass; backdropBlendMode src compone el material en la capa de opacidad. Una
+entrada y superficies/contenido conjuntos conservados. Validación en ESTADO.
+
+Corrección posterior19/10 (ADR-094): Inicio y Explorar tienen una sola entrada
+stagger sin cover previo. Glass y contenido aparecen juntos por recorte mediante
+preserveBackdrop, sin paneles vacíos ni filtros de entrada sobre el material.
+Sustituye la separación superficie/contenido de093, conservando glass final y
+reunión. 34 regresiones aprobadas; detalles y límites en ESTADO.
+
 Corrección19/10 (ADR-093): glass principal fuera del efecto de blur/opacidad de
 entrada, solo contenido animado; material y geometría estables. Se añade tarjeta
 HomeReunionCard con PNG idéntico al original web, imagen3:2 contenida y etiqueta

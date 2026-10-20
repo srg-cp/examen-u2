@@ -1,10 +1,38 @@
 # Entre Huellas: regla de oro de UI y UX
 
-**Glass de Inicio19/10:** superficie/ribete de tarjetas glass fuera de
-StaggerRevealItem; animar su contenido para evitar variar el material durante
-la entrada. Mantener el aspecto final, radios y geometría. HomeReunionCard usa
+**Explorar móvil19/10, ADR-097:** filtros y ubicación se editan solo desde
+Explorar. El mapa muestra el resumen público del pin en su panel inferior y
+Ver ficha abre el detalle existente; sin tarjeta duplicada junto al punto.
+Foto/nombre/tamaño/raza/fecha/estado, coincidencias anterior/siguiente y scroll
+del panel. CTA fijo cuando cabe, dentro del scroll en altura pequeña/texto2;
+sin selección no hay CTA. Conservar42–90%, resistencia, retorno glass,
+movimiento reducido, paginación y consulta compartida. Sustituye los filtros
+de ADR-056/061 y la ubicación del preview de ADR-062.
+[ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
+
+**Toast móvil igual al web —19/10/2026:** ConfirmationToastHost conserva glass
+y tamaños de TopToast; texto14/peso400 y acción subrayada. Entrada desde fuera
+del borde superior480ms, descarte hacia arriba240ms y retorno420ms. Gesto con
+dedo/ratón, resistencia hacia abajo y scroll en mensajes extensos.6500ms de
+duración, pausada al sostener; mantener toque/teclado/reintento y limpieza.
+Movimiento reducido sin transiciones. Sustituye entrada180ms/peso600/duración
+3–6s de móvil. [ADR-096](decisiones/096-toast-mobile-igual-web.md).
+
+**Títulos de sección móvil19/10:** CollectionHeader usa peso500, como el título
+de Inicio web, por petición del usuario. Aplica a Explorar, Mis mascotas y los
+listados que comparten cabecera. El fallback de Home conserva el mismo peso;
+tamaño32, color y adaptación existentes se mantienen.
+
+**Entrada Inicio/Explorar19/10:** un único stagger, sin cover previo en estas
+dos secciones. Explorar conserva su timeline propio sin otro activo desde Home.
+Las tarjetas glass usan StaggerRevealItem/preserveBackdrop: fade y desplazamiento
+compartidos, sin recorte progresivo ni ImageFiltered sobre el material. GlassSurface
+usa backdropBlendMode src en estas tarjetas para componer la opacidad. ADR-095
+sustituye el recorte de094; superficie y contenido entran juntos.
+Aspecto final/radios/geometría conservados. ADR-094 sustituye esta parte de093.
+HomeReunionCard usa
 reunion.png original de web, imagen3:2 contenida en card glass entre accesos
-rápidos y Cerca de ti, sin acción ficticia. Inicio tiene cuatro grupos. ADR-093.
+rápidos y Cerca de ti, sin acción ficticia. Inicio tiene cuatro grupos.
 
 **Marca móvil19/10:** por instrucción del usuario, lettering igual al web:
 «entre huellas», Arial/peso CSS500, #171918, tracking−.05em. Reutilizar BrandName

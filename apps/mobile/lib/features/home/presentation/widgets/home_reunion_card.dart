@@ -8,10 +8,12 @@ class HomeReunionCard extends StatelessWidget {
   const HomeReunionCard({super.key});
 
   @override
-  Widget build(BuildContext context) => GlassSurface(
-    radius: 26,
-    child: StaggerRevealItem(
-      order: 2,
+  Widget build(BuildContext context) => StaggerRevealItem(
+    order: 2,
+    preserveBackdrop: true,
+    child: GlassSurface(
+      radius: 26,
+      backdropBlendMode: BlendMode.src,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: AspectRatio(

@@ -1,9 +1,31 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Resumen inferior del mapa móvil —19/10/2026
+
+Filtros/Ubicación solo en Explorar. ExploreCaseMap coloca la vista previa
+pública dentro del panel42–90%, sin callout junto al pin. Tirador persistente,
+foto arriba, nombre/fila de datos debajo y estado; Ver ficha fijo si cabe y
+alcanzable por scroll en altura reducida. Sin selección, instrucción para tocar
+un pin. Coincidencias con anterior/siguiente; cámara sin efectos en la consulta.
+Capturas390×844 y320×350/texto2 revisadas; Android del nuevo recorrido pendiente.
+[ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
+
+## Toast móvil con referencia web —19/10/2026
+
+ConfirmationToastHost adopta entrada480ms desde fuera del viewport, retorno420ms,
+salida superior240ms y gesto de TopToast; texto14/400/1.4 y acción subrayada mínima44.
+Conservar glass/blur18/radio28, icono32/20, máximo360/márgenes24 y safe-area+12.
+6500ms con pausa al sostener. Scroll/texto2, toque/teclado/semántica y movimiento
+reducido conservados. Revisar capturas de entrada/arrastre/retorno y320×350/texto2.
+[ADR-096](decisiones/096-toast-mobile-igual-web.md), [ficha](funcionalidades/toast-mobile.md).
+
 ## Glass estable y reunión en Inicio —19/10/2026
 
-GlassSurface envuelve StaggerRevealItem en las tarjetas de Inicio, de modo que
-el material no recibe blur/opacidad de entrada; solo entra el contenido.
+Corrección ADR-095: las tarjetas de Inicio entran con StaggerRevealItem y
+preserveBackdrop: fade/desplazamiento habituales, sin recorte ni blur de entrada
+del material. GlassSurface usa blendMode src en la capa de opacidad de estas
+tarjetas. Inicio/Explorar omiten cover previo y tienen un solo
+timeline activo; no reiniciar por datos de consulta o refresh.
 Conservar radio26 y padding22 de la tarjeta principal. HomeReunionCard añade
 el PNG original de landing, contenido3:2/padding12, sin recortar mascotas ni
 acciones inventadas. Secuencia: tarjeta principal, accesos rápidos, reunión,

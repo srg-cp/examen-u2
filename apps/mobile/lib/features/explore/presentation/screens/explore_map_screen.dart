@@ -11,16 +11,9 @@ import '../view_models/explore_view_model.dart';
 import '../widgets/explore_case_map.dart';
 import '../widgets/explore_map_case_preview.dart';
 import '../../domain/entities/explore_page.dart';
-import '../state/explore_filter_selection.dart';
-import '../widgets/explore_filter_editor.dart';
 
 class ExploreMapScreen extends ConsumerStatefulWidget {
-  const ExploreMapScreen({
-    this.createTileProvider,
-    this.locationSearchBuilder,
-    super.key,
-  });
-  final LocationSearchBuilder? locationSearchBuilder;
+  const ExploreMapScreen({this.createTileProvider, super.key});
   final TileProvider Function()? createTileProvider;
 
   @override
@@ -93,61 +86,49 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
                     key: ValueKey(data.owner),
                     items: data.items,
                     query: data.query,
+                    emptyMessage: data.failed || data.busy
+                        ? 'Puedes volver a Explorar para ajustar la búsqueda.'
+                        : data.needsLocation
+                        ? 'Elige una ubicación desde Explorar para ver casos cercanos.'
+                        : null,
                     onOpen: data.busy ? null : openCase,
                     createTileProvider: widget.createTileProvider,
                     previewBuilder: (item) => ExploreMapCasePreview(
                       key: ValueKey(item.key),
                       item: item,
+                      scrollable: false,
                     ),
-                    filterBuilder: (context, scroll, handle, readCenter) =>
-                        ExploreFilterEditor(
-                          key: ValueKey((data.owner, data.query)),
-                          initial: ExploreFilterSelection.fromQuery(
-                            data.query,
-                            label: data.locationLabel,
-                            centerName: data.centerName,
+                    trailing: [
+                      const SizedBox(height: 16),
+                      if (!data.failed && !data.busy)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            data.needsLocation
+                                ? 'Elige una ubicación desde Explorar para ver casos cercanos.'
+                                : '${data.items.length} casos consultados · Ubicaciones aproximadas',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E73),
+                            ),
                           ),
-                          allFilters: true,
-                          showMap: false,
-                          busy: data.busy,
-                          applying: data.applying,
-                          scrollController: scroll,
-                          headerSliver: handle,
-                          locationSearchBuilder: widget.locationSearchBuilder,
-                          onUseCurrentLocation: vm.locateForFilter,
-                          onUseMapCenter: readCenter,
-                          onConfirm: vm.applySelection,
-                          trailing: [
-                            const SizedBox(height: 16),
-                            if (!data.failed && !data.busy)
-                              Text(
-                                data.needsLocation
-                                    ? 'Elige una ubicación para ver casos cercanos.'
-                                    : '${data.items.length} casos consultados · Ubicaciones aproximadas',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF6E6E73),
-                                ),
-                              ),
-                            if (data.failed || data.cursor != null)
-                              LoadingShimmer(
-                                isLoading: data.appending,
-                                loadingLabel: 'Consultando más casos',
-                                child: TextButton(
-                                  onPressed: data.busy
-                                      ? null
-                                      : data.failed && data.cursor == null
-                                      ? vm.refresh
-                                      : vm.more,
-                                  child: Text(
-                                    data.failed
-                                        ? 'Reintentar'
-                                        : 'Ver más casos',
-                                  ),
-                                ),
-                              ),
-                          ],
                         ),
+                      if (data.failed || data.cursor != null)
+                        LoadingShimmer(
+                          isLoading: data.appending,
+                          loadingLabel: 'Consultando más casos',
+                          child: TextButton(
+                            onPressed: data.busy
+                                ? null
+                                : data.failed && data.cursor == null
+                                ? vm.refresh
+                                : vm.more,
+                            child: Text(
+                              data.failed ? 'Reintentar' : 'Ver más casos',
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               Positioned(

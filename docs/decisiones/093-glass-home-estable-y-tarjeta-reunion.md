@@ -1,5 +1,9 @@
 # ADR-093: glass estable en Inicio y tarjeta de reunión
 
+Corrección posterior: ADR-094 sustituye la entrada de solo contenido por recorte
+de superficie/contenido juntos y retira cover en Inicio/Explorar. Conserva el
+acabado final e imagen; evita mostrar paneles vacíos antes del stagger.
+
 Fecha:19/10/2026, America/Lima. Estado: implementado localmente por petición del usuario.
 
 El usuario detecta que la tarjeta principal cambia de acabado al entrar y pide

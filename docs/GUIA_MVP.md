@@ -243,6 +243,12 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 
 ### S3 - Casos perdidos y encontrados
 
+Refinamiento19/10 de HU-07.1/HU-07.2, RF-13, issues #32/#33: filtros y Ubicación
+solo en Explorar; mapa consume la misma búsqueda y muestra el resumen del pin
+en el panel con Ver ficha. Sustituye filtros inferiores y callout, conserva
+consulta/paginación/permisos y no amplía el MVP. Validación local aprobada;
+revisión Android del ajuste pendiente. [ADR-097](decisiones/097-explorar-filtros-unicos-y-resumen-en-mapa.md).
+
 Refinamiento18/10 de HU-07.2/RF-13/issue #33: pines de only-black.svg y vista
 previa fotográfica con tamaño/fecha mediante lectura pública por caso. Raza
 ausente en el producto se indica como no registrada; capturarla/persistirla no

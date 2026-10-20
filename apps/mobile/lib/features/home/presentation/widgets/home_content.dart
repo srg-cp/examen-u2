@@ -18,10 +18,12 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      GlassSurface(
-        radius: 26,
-        child: StaggerRevealItem(
-          order: 0,
+      StaggerRevealItem(
+        order: 0,
+        preserveBackdrop: true,
+        child: GlassSurface(
+          radius: 26,
+          backdropBlendMode: BlendMode.src,
           child: Padding(
             padding: const EdgeInsets.all(22),
             child: Column(

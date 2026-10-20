@@ -1,5 +1,9 @@
 # Inicio y navegación
 
+19/10/2026: los títulos de fallback Explorar/Mis mascotas usan peso500, igual
+que CollectionHeader en las secciones reales, por petición del usuario.
+Sin cambios de navegación. Revisión visual Android pendiente.
+
 18/10/2026: la campana Alertas abre la bandeja persistente HU-12, sustituyendo
 el aviso de indisponibilidad. Callback compuesto en router; HomeScreen no
 importa presentación de notifications. [Ficha](seguimiento-y-alertas.md).

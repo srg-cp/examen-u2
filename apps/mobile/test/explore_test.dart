@@ -185,7 +185,8 @@ void main() {
             (widget) => widget is AuthStageTransition && widget.enabled,
           ),
         );
-        expect(entrances, findsOneWidget);
+        expect(entrances, findsNothing);
+        expect(find.byType(CoverReveal), findsNothing);
         expect(
           find.ancestor(
             of: skeleton,
@@ -197,6 +198,7 @@ void main() {
         );
         for (var frame = 0; frame < 90; frame++) {
           await tester.pump(const Duration(milliseconds: 16));
+          expect(find.byType(CoverReveal), findsNothing);
           expect(tester.state(skeleton), same(shimmerState));
           expect(repo.calls, hasLength(1));
         }
@@ -829,7 +831,7 @@ void main() {
         await tester.pumpAndSettle();
         // HTTP tile requests are intentionally unavailable in widget tests.
         // Allow the shared, temporary failure toast to complete before tapping.
-        await tester.pump(const Duration(seconds: 4));
+        await tester.pump(const Duration(seconds: 7));
         await tester.pumpAndSettle();
         await capture(tester, key, small, 'zone');
         await tester.ensureVisible(find.text('Aplicar ubicación'));

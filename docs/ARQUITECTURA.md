@@ -1,5 +1,25 @@
 # Arquitectura de Entre Huellas
 
+## Explorar: filtro único y resumen inferior —19/10/2026
+
+ExploreSection conserva el editor; ExploreMapScreen observa ExploreViewModel
+sin acciones de filtrado ni slot de places. ExploreCaseMap mantiene selección,
+cámara y panel visual, renderiza ExploreMapCasePreview con scroll exterior y
+Ver ficha. El preview consume el mismo ViewModel/caso de uso de lectura pública.
+Paginación/refresh y query siguen compartidos con la lista; sin dominio/data/SQL
+nuevos. ADR-097 sustituye el editor inferior y callout de ADR-056/062.
+
+Corrección ADR-095: preserveBackdrop reutiliza fade/desplazamiento de stagger
+sin ImageFiltered de entrada. GlassSurface parametriza mezcla del backdrop;
+Inicio usa src bajo opacidad, los demás consumidores conservan srcOver.
+
+## Entrada única de secciones móviles —19/10/2026
+
+Inicio y Explorar usan un solo stagger sin cover previo. Home no anima por
+segunda vez el contenido de las funcionalidades reales. preserveBackdrop de
+StaggerRevealItem revela glass/contenido juntos por recorte y conserva composición
+de BackdropFilter. Estado de consultas y ViewModels intactos; ADR-094.
+
 ## Lettering móvil de marca —19/10/2026
 
 BrandName de core/presentation renderiza contornos SVG de Arial de la marca web,

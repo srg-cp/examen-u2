@@ -249,10 +249,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               context: context,
               key: state.pageKey,
               source: state.extra,
-              child: ExploreMapScreen(
-                locationSearchBuilder: (label, onSelect) =>
-                    PlaceSearchFields(initialLabel: label, onSelect: onSelect),
-              ),
+              child: const ExploreMapScreen(),
             ),
           ),
           GoRoute(

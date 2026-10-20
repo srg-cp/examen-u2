@@ -229,7 +229,7 @@ void main() {
           await saving;
           pets.pending = null;
           await tester.pumpAndSettle();
-          await tester.pump(const Duration(seconds: 4));
+          await tester.pump(const Duration(seconds: 7));
           await tester.pumpAndSettle();
           await tester.tap(find.byTooltip('Volver a mis mascotas'));
           await tester.pumpAndSettle();

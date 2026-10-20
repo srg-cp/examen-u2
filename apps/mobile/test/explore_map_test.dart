@@ -9,8 +9,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_application_entrehuellas/app/navigation/entity_editor_page.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_page_transition.dart';
-import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_filter_editor.dart';
-import 'package:flutter_application_entrehuellas/features/explore/presentation/state/explore_filter_selection.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/widgets/explore_section.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/screens/explore_map_screen.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
@@ -179,26 +177,43 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         final container = ProviderScope.containerOf(
           tester.element(find.byType(ExploreSection)),
         );
+        final location = container
+            .read(exploreViewModelProvider)
+            .requireValue
+            .query;
+        await container
+            .read(exploreViewModelProvider.notifier)
+            .apply(
+              kind: ExploreKind.lost,
+              species: ExploreSpecies.dog,
+              status: ExploreStatus.active,
+              days: 7,
+              latitude: location.latitude,
+              longitude: location.longitude,
+              radiusMeters: location.radiusMeters,
+            );
+        await settleMap(tester);
         final initial = container.read(exploreViewModelProvider).requireValue;
+        final searchCount = repo.calls.length;
         await tester.ensureVisible(find.text('Mapa'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         final option = find
             .ancestor(of: find.text('Mapa'), matching: find.byType(InkWell))
             .first;
         final bounds = tester.getRect(option);
         await tester.tap(find.text('Mapa'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(find.byType(ExploreMapScreen), findsOneWidget);
         expect(source!.bounds, bounds);
         expect(
           container.read(exploreViewModelProvider).requireValue.query,
           same(initial.query),
         );
-        expect(repo.calls, hasLength(1));
+        expect(repo.calls, hasLength(searchCount));
         expect(
           container.read(exploreViewModelProvider).requireValue.items,
           same(initial.items),
@@ -239,7 +254,7 @@ void main() {
             .opacity;
         final backTop = tester.getTopLeft(back).dy;
         sheet.controller!.jumpTo(.9);
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(backOpacity(), 0);
         if (!reduced) expect(tester.getTopLeft(back).dy, lessThan(backTop));
         await capturePanel(
@@ -248,14 +263,14 @@ void main() {
           reduced ? 'small-expanded' : 'normal-expanded',
         );
         sheet.controller!.jumpTo(.42);
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(backOpacity(), 1);
         expect(tester.getTopLeft(back).dy, backTop);
-        final surface = find.byKey(const ValueKey('map-filters-surface'));
+        final surface = find.byKey(const ValueKey('map-case-surface'));
         final normalTop = tester.getTopLeft(surface).dy;
         final drag = await tester.startGesture(
           tester.getCenter(
-            find.bySemanticsLabel('Desliza para ampliar o reducir los filtros'),
+            find.bySemanticsLabel('Desliza para ampliar o reducir el resumen'),
           ),
         );
         await drag.moveBy(const Offset(0, 100));
@@ -269,36 +284,27 @@ void main() {
           );
         }
         await drag.up();
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(tester.getTopLeft(surface).dy, closeTo(normalTop, .01));
         expect(sheet.controller!.size, closeTo(.42, .001));
         await tester.drag(
-          find.bySemanticsLabel('Desliza para ampliar o reducir los filtros'),
+          find.bySemanticsLabel('Desliza para ampliar o reducir el resumen'),
           Offset(0, -tester.view.physicalSize.height * .5),
         );
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(sheet.controller!.size, greaterThan(before));
         expect(find.text('Abrir caso'), findsNothing);
-        await Scrollable.ensureVisible(
-          tester.element(find.text('Perdidas')),
-          alignment: .5,
+        expect(find.text('Aplicar filtros'), findsNothing);
+        expect(find.text('Perdidas'), findsNothing);
+        expect(
+          find.text('Selecciona un pin para ver el resumen del caso.'),
+          findsOneWidget,
         );
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Perdidas'));
-        await tester.pumpAndSettle();
-        expect(repo.calls, hasLength(1));
-        await tester.tap(find.text('Aplicar filtros'));
-        await tester.pumpAndSettle();
-        expect(repo.calls, hasLength(2));
-        expect(repo.calls.last.$2.kind, ExploreKind.lost);
-        final applied = container
-            .read(exploreViewModelProvider)
-            .requireValue
-            .query;
+        final applied = initial.query;
         sheet.controller!.jumpTo(.42);
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         await tester.tap(find.byTooltip('Seleccionar caso'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(find.text('Abrir caso'), findsNothing);
         expect(find.text('Mediano'), findsOneWidget);
         expect(find.text('Raza no registrada'), findsOneWidget);
@@ -325,41 +331,41 @@ void main() {
         expect(sizeIcon.dy, closeTo(dateIcon.dy, .01));
         expect(sizeIcon.dx, lessThan(dateIcon.dx));
         expect(
-          tester.getBottomLeft(find.byType(ExploreMapPreviewContent)).dy,
-          lessThanOrEqualTo(
-            tester
-                .getTopLeft(find.byKey(const ValueKey('map-filters-surface')))
-                .dy,
-          ),
+          tester.getTopLeft(find.byType(ExploreMapPreviewContent)).dy,
+          greaterThanOrEqualTo(tester.getTopLeft(surface).dy),
         );
-        await Scrollable.ensureVisible(tester.element(find.text(dateLabel)));
-        await tester.pumpAndSettle();
-        expect(
-          tester.getBottomLeft(find.text(dateLabel)).dy,
-          lessThanOrEqualTo(
-            tester.getBottomLeft(find.byType(ExploreMapPreviewContent)).dy,
-          ),
-        );
-        await Scrollable.ensureVisible(tester.element(find.text('Luna')));
-        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Ver ficha'));
+        await settleMap(tester);
         expect(find.byType(ExploreMapPin), findsOneWidget);
         await capturePanel(
           tester,
           boundary,
           reduced ? 'small-preview-photo' : 'normal-preview-photo',
         );
-        await tester.tap(find.text('Luna'));
-        await tester.pumpAndSettle();
+        await tester.tap(find.text('Ver ficha'));
+        await settleMap(tester);
         expect(find.text('Volver al mapa one'), findsOneWidget);
         await tester.tap(find.text('Volver al mapa one'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(find.byType(ExploreMapScreen), findsOneWidget);
-        expect(repo.calls, hasLength(3));
+        expect(repo.calls, hasLength(searchCount + 1));
+        await tester.ensureVisible(find.text('Ver más casos'));
+        await settleMap(tester);
+        await tester.tap(find.text('Ver más casos'));
+        await settleMap(tester);
+        expect(repo.calls, hasLength(searchCount + 2));
+        expect(repo.calls.last.$3, 'page-2');
+        expect(
+          container.read(exploreViewModelProvider).requireValue.query,
+          same(applied),
+        );
+        sheet.controller!.jumpTo(.42);
+        await settleMap(tester);
         await tester.tap(find.byTooltip('Volver a Explorar'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(find.byType(ExploreMapScreen), findsNothing);
         expect(find.text('Explorar'), findsOneWidget);
-        expect(repo.calls, hasLength(3));
+        expect(repo.calls, hasLength(searchCount + 2));
         expect(
           container.read(exploreViewModelProvider).requireValue.query,
           same(applied),
@@ -422,15 +428,6 @@ void main() {
                       items: items,
                       query: query,
                       createTileProvider: () => _MemoryTiles(tileBytes),
-                      filterBuilder: (_, scroll, handle, _) =>
-                          ExploreFilterEditor(
-                            initial: ExploreFilterSelection.fromQuery(query),
-                            allFilters: true,
-                            showMap: false,
-                            scrollController: scroll,
-                            headerSliver: handle,
-                            onConfirm: (_) {},
-                          ),
                       onOpen: (value, _) => opened.add(value.key),
                     ),
                   ),
@@ -439,7 +436,7 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         final picker = tester.widget<ZoneMapPicker>(find.byType(ZoneMapPicker));
         expect(picker.readOnly, true);
         expect(picker.readOnlyNavigation, true);
@@ -453,7 +450,7 @@ void main() {
         );
         await tester.ensureVisible(find.byTooltip('Ver 2 casos'));
         await tester.tap(find.byTooltip('Ver 2 casos'));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         final sheet = tester.widget<DraggableScrollableSheet>(
           find.byType(DraggableScrollableSheet),
         );
@@ -469,23 +466,25 @@ void main() {
               tester.element(find.byTooltip('Caso siguiente')),
               alignment: .5,
             );
-            await tester.pumpAndSettle();
+            await settleMap(tester);
             await tester.tap(find.byTooltip('Caso siguiente'));
-            await tester.pumpAndSettle();
+            await settleMap(tester);
             expect(find.text('Luna'), findsNothing);
           } else {
             expect(find.text('Sol'), findsNothing);
           }
           expect(find.text(name), findsOneWidget);
           expect(find.text('Abrir caso'), findsNothing);
-          await tester.pumpAndSettle();
-          await Scrollable.ensureVisible(tester.element(find.text(name)));
-          await tester.pumpAndSettle();
-          await tester.tap(find.text(name));
+          await settleMap(tester);
+          await Scrollable.ensureVisible(
+            tester.element(find.text('Ver ficha')),
+          );
+          await settleMap(tester);
+          await tester.tap(find.text('Ver ficha'));
         }
         expect(opened, ['lost:same', 'found:same']);
         sheet.controller!.jumpTo(.42);
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         if (const bool.fromEnvironment('CAPTURE_EXPLORE_MAP')) {
           await tester.runAsync(() async {
             final image =
@@ -507,9 +506,9 @@ void main() {
           tester.element(find.byType(TileLayer)),
         ).camera.center;
         sheet.controller!.jumpTo(.42);
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         await tester.dragFrom(const Offset(100, 80), const Offset(60, 0));
-        await tester.pumpAndSettle();
+        await settleMap(tester);
         expect(
           MapController.of(
             tester.element(find.byType(TileLayer)),
@@ -520,7 +519,7 @@ void main() {
         expect(picker.longitude, query.longitude);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
-        await tester.pumpAndSettle();
+        await settleMap(tester);
       },
     );
   }
@@ -558,4 +557,12 @@ Future<void> capturePanel(
     ).writeAsBytes(bytes!.buffer.asUint8List());
     image.dispose();
   });
+}
+
+// AppPageBackground animates continuously; advance route, sheet and reveal
+// frames explicitly rather than waiting for every ticker to become idle.
+Future<void> settleMap(WidgetTester tester) async {
+  for (var frame = 0; frame < 90; frame++) {
+    await tester.pump(const Duration(milliseconds: 20));
+  }
 }

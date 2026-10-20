@@ -8,7 +8,6 @@ import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
-import '../../../../core/presentation/widgets/cover_reveal.dart';
 import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../../../../core/presentation/widgets/two_option_filter.dart';
 import '../../domain/entities/explore_page.dart';
@@ -66,12 +65,9 @@ class ExploreSection extends ConsumerWidget {
         ),
       ),
       const SizedBox(height: 12),
-      AuthStageTransition(
-        stage: 'content',
-        startCovered: true,
-        builder: (play) => StaggerReveal(
+      Builder(
+        builder: (_) => StaggerReveal(
           count: 1,
-          play: play,
           child: StaggerRevealItem(order: 0, child: content),
         ),
       ),

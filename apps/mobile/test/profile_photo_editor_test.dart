@@ -68,7 +68,8 @@ void main() {
       expect(find.text('Foto actualizada'), findsNothing);
       expect(photos.choices, 1);
       expect(photos.uploads, 1);
-      await tester.pump(const Duration(seconds: 4));
+      await tester.pump(const Duration(seconds: 7));
+      await tester.pumpAndSettle();
       expect(find.text(failure), findsNothing);
       photos.fail = false;
       photos.pending = Completer<void>();

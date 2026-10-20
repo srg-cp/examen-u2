@@ -1,5 +1,96 @@
 # Estado del proyecto
 
+## Filtros solo en Explorar y resumen inferior del mapa —19/10/2026
+
+Por aprobación del usuario, Mapa retira el editor/Aplicar filtros y muestra el
+resumen público del pin seleccionado con Ver ficha. Filtrar casos/Ubicación
+permanecen en Explorar. Sin callout duplicado; coincidencias anterior/siguiente,
+panel42–90%, retorno glass, carga/reintento, paginación y filtros conservados.
+El preview usa scroll exterior; CTA fijo cuando cabe, por scroll en altura
+reducida/texto2. No cambia SQL, permisos ni dominio. ADR-097; HU-07.1/07.2,
+RF-13, issues #32/#33, sin cambios de estado en GitHub ni despliegue.
+
+Validación: formato, flutter analyze --no-pub completo sin incidencias y19
+pruebas focalizadas mapa/preview/arquitectura aprobadas. Verifican filtros no
+predeterminados compartidos, ausencia de editor, selección, Ver ficha, refresh,
+paginación/retorno, coincidencias y accesibilidad en390×844 y320×350/texto2 con
+movimiento reducido. Capturas con fixture revisadas en build/ui-preview/explore-map.
+La espera de pruebas avanza frames acotados porque AppPageBackground tiene
+animación continua; no se espera a que todos sus tickers queden inactivos.
+Siguiente paso: revisar el nuevo recorrido en Android con datos reales. Sin
+APK, instalación ni confirmación remota nueva; trabajo local anterior conservado.
+
+## Toast móvil igual al web, con descarte por gesto —19/10/2026
+
+ConfirmationToastHost compartido adopta texto14/peso400, acción subrayada,
+entrada desde fuera del viewport480ms, retorno420ms y salida superior240ms.
+Sigue el dedo/ratón; descarta hacia arriba y retorna con gesto corto/cancelado,
+con resistencia hacia abajo. Texto extenso conserva scroll y gesto en el icono.
+6500ms como web, pausados al sostener. Mantiene toque/teclado/Escape, semántica,
+reintento y exclusión de hosts anidados. Reemplazo durante arrastre libera el
+aviso anterior e impide timers/callbacks tardíos. Movimiento reducido conservado.
+
+Validación:33 comprobaciones de toast/arquitectura/preferencias/avatar/harness
+y54 de consumidores (perdidos/encontrados, validación/salida del editor de mascotas,
+carteles y Explorar) aprobadas con AMBIENT_BACKGROUND_MOTION=false; movimiento
+del toast activo. Formato verificado, flutter analyze sin incidencias y
+git diff --check aprobado. Capturas390×844/320×350/texto2 y entrada/arrastre/retorno en
+apps/mobile/build/ui-preview/mobile-toast revisadas. Suite general no completada:
+timeouts con fondo continuo, límite de hilos/memoria y fallos observados en
+origin_page_transition_test ajenos al toast. No se declara suite global verde.
+Sin APK/instalación/despliegue ni cambios de datos/permisos. Siguiente paso:
+revisión del gesto en dispositivo Android/iPhone y resolver la regresión global
+de transiciones en su propio incremento. [ADR-096](decisiones/096-toast-mobile-igual-web.md),
+[ficha](funcionalidades/toast-mobile.md).
+
+## Títulos de sección móvil en peso500 —19/10/2026
+
+Por petición explícita del usuario, CollectionHeader pasa de700 a500 como el
+título de Inicio web: Explorar, Mis mascotas y listados de casos/reportes que
+reutilizan la cabecera. Fallback de Home ajustado al mismo peso. Tamaño32,
+color, adaptación y operaciones conservados. Fichas y regla visual actualizadas.
+
+Formato correcto y análisis focalizado de los dos archivos sin incidencias.
+El análisis completo y la ejecución conjunta de Home/Explorar/Mascotas/listados
+se interrumpieron por falta de memoria de Dart. Reintento secuencial de listados
+no valida el cambio: pumpAndSettle agota su espera. Sin nuevas pruebas añadidas.
+Siguiente paso: revisión visual en Android y repetir suite con entorno estable;
+sin APK ni instalación nueva, ni cierre de historias.
+
+## Restaurar stagger suave de Inicio —19/10/2026
+
+El usuario rechaza el recorte progresivo de094. Se recuperan fade y desplazamiento
+de28px con el mismo timeline/curva850ms/90ms del stagger; preserveBackdrop solo
+excluye ImageFiltered de entrada sobre el glass. Superficie/contenido aparecen
+juntos, sin panel vacío ni barrido. GlassSurface parametriza backdropBlendMode;
+las tarjetas de Inicio usan src para su capa de opacidad; otros usos conservados.
+Una entrada sin cover permanece en Inicio/Explorar. ADR-095; sin cambios de
+contenido, consultas, permisos, SQL o historias.
+
+Formato correcto,34 regresiones aprobadas y análisis sin incidencias. Verifican
+entrada conjunta, desplazamiento sin cambio de tamaño, resultado estable y
+única entrada de Explorar. Siguiente paso: verificar sensación en Android con
+el usuario. Sin APK/instalación ni revisión física nueva.
+
+## Corrección de doble entrada en Inicio y Explorar —19/10/2026
+
+Por capturas del usuario se retira el cover previo a stagger en estas dos
+secciones. Inicio conserva cuatro grupos; Home no añade entrada activa sobre
+Explorar/Mascotas reales. Explorar usa una sola línea temporal para skeleton y
+datos sin reiniciar al completar consulta. Las tarjetas glass se revelan junto
+al contenido mediante preserveBackdrop/ClipRect, sin blur/opacidad del material
+ni paneles vacíos al principio. Glass final, cabecera/navegación y movimiento
+reducido conservados. ADR-094 sustituye esta parte de093; sin cambios de otras
+pantallas, datos, consultas, permisos, SQL, HU/issue nuevos o cierre de historias.
+
+Validación:34 pruebas de glass/Inicio/Explorar/stagger/arquitectura aprobadas.
+Regresión visual confirma tarjeta inicialmente oculta, ribete revelado idéntico
+al final y acción Mis mascotas;90 frames de Explorar con un stagger, cero covers,
+una consulta y misma instancia de skeleton, con/sin movimiento reducido. Fondo
+ambiental fijado para regresiones. Formato correcto y análisis sin incidencias.
+Sin APK ni
+ejecución Android nueva; siguiente paso: verificar entrada en dispositivo.
+
 ## Glass estable al entrar e ilustración de reunión en Inicio —19/10/2026
 
 Por capturas del usuario, se retira GlassSurface del efecto ImageFiltered/Opacity
