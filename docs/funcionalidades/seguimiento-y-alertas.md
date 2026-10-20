@@ -1,5 +1,11 @@
 # Seguimiento y alertas
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Refinamiento móvil20/10/2026:** la campana entrega sus límites reales respecto
 al Navigator y su identidad visual mediante OriginPageSource. Alertas reutiliza
 entityEditorPage/OriginPageTransition: expansión320ms y retorno260ms al origen,

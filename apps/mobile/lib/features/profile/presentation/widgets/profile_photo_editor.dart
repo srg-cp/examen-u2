@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -113,14 +114,7 @@ class _ProfilePhotoEditorState extends ConsumerState<ProfilePhotoEditor> {
               ),
               const SizedBox(width: 16),
               const Expanded(
-                child: Text(
-                  'Perfil',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF111111),
-                  ),
-                ),
+                child: Text('Perfil', style: AppTypography.primaryTitle),
               ),
             ],
           ),

@@ -34,6 +34,67 @@ class HomeAccess implements AccessRepository {
 void main() {
   for (final reduced in [false, true]) {
     testWidgets(
+      'Navigation keeps sliding through Explore with floating map action; reduced=$reduced',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: MediaQuery(
+                data: MediaQueryData(disableAnimations: reduced),
+                child: const HomeScreen(
+                  profileAvatar: SizedBox.square(dimension: 48),
+                  petsContent: SizedBox(height: 100),
+                  exploreContent: SizedBox(height: 100),
+                  exploreFloatingAction: Text('Mapa'),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final navigationState = tester.state(find.byType(LiquidNavigation));
+        final indicator = find.byKey(
+          const ValueKey('navigation-active-indicator'),
+        );
+        for (final label in [
+          'Explorar',
+          'Mis mascotas',
+          'Explorar',
+          'Inicio',
+        ]) {
+          final start = tester.getCenter(indicator).dx;
+          final target = tester.getCenter(find.byTooltip(label)).dx;
+          await tester.tap(find.byTooltip(label));
+          await tester.pump();
+          expect(
+            tester.state(find.byType(LiquidNavigation)),
+            same(navigationState),
+          );
+          expect(
+            find.text('Mapa'),
+            label == 'Explorar' ? findsOneWidget : findsNothing,
+          );
+          if (reduced) {
+            expect(tester.getCenter(indicator).dx, closeTo(target, 1));
+          } else {
+            expect(tester.getCenter(indicator).dx, closeTo(start, 1));
+            await tester.pump(const Duration(milliseconds: 160));
+            expect(
+              tester.getCenter(indicator).dx,
+              allOf(
+                greaterThan(start < target ? start : target),
+                lessThan(start > target ? start : target),
+              ),
+            );
+          }
+          await tester.pumpAndSettle();
+          expect(tester.getCenter(indicator).dx, closeTo(target, 1));
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
       'Home keeps navigation animation when switching sections; reduced=$reduced',
       (tester) async {
         await tester.pumpWidget(

@@ -1,5 +1,11 @@
 # Perfil y fotografía de cuenta
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 20/10/2026: el gesto de actualización de Inicio recarga el perfil mediante
 ProfileViewModel.retry/ReadProfile existentes, esperando el resultado real.
 Avatar conserva información durante refresh explícito de la misma cuenta;

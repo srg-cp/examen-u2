@@ -1,5 +1,22 @@
 # Registro, edición y ciclo de vida de mascotas
 
+Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
+la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
+comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
+por centrado vertical. Regresión de navegación con fuentes reales en390×844
+y320×350/texto2 aprobada. Sin cambio de tipografía, datos o permisos.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
+Título de sección20/10/2026: «Mis mascotas» pasa a peso400 y gris #454746,
+como «Su regreso», conservando sans-serif del sistema y tamaño32. Estilo
+compartido con Explorar; sustituye el peso500 indicado el19/10 para este título.
+Sin cambios de datos/permisos; revisión visual Android pendiente.
+
 Corrección20/10/2026: Especie y Sexo (opcional) reutilizan AppSelectField con
 una sola entrada: apertura del panel y después stagger, sin cortina interior
 azul/blanca. Se conserva cabecera, selección, desconocido, cancelación, scroll,

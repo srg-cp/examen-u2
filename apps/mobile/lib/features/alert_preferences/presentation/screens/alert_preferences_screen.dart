@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../domain/failures/preference_failure.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
@@ -74,11 +75,7 @@ class AlertPreferencesScreen extends ConsumerWidget {
                         children: [
                           const Text(
                             'Preferencias de alertas',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF111111),
-                            ),
+                            style: AppTypography.primaryTitle,
                           ),
                           const SizedBox(height: 20),
                           AuthStageTransition(

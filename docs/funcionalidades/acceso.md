@@ -1,5 +1,11 @@
 # Acceso y recuperación de contraseña
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Auditoría de seguimiento18/10:** #17/#18/#20/#22 en Done: registro, login correo, sesión y recuperación entregados e integrados; se corrigen los motivos genéricos de implementación local/sin PR. #19 Google permanece In progress por retorno OAuth Android abierto/cerrado sin evidencia concreta. Su callback público18/10 ya es correcto; no reiterar el arreglo de ruta duplicada del7/10. Facebook sigue con activación propia pendiente y no se da por entregado por esta auditoría.
 
 Módulo: `auth`. Trazabilidad: HU-01 / RF-01,34; [issue #1 y subtareas](../backlog/001-HU-01.md).

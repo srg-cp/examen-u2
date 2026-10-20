@@ -1,5 +1,15 @@
 # Funcionalidades de Entre Huellas
 
+Móvil20/10: [títulos de las secciones alineados con Inicio](identidad-visual.md),
+sin centrado vertical según la altura del botón. Refinamiento de ADR-111.
+
+Títulos20/10: [regla Poppins400/32/gris para móvil y web](identidad-visual.md),
+incluido [Guardados](casos-guardados.md); ADR-111.
+
+Reportes20/10: [confirmación de salida rápida](busquedas-y-avisos.md), popup
+compartido160ms sin expansión desde origen; refinamiento de ADR-006.
+
+
 Explorar20/10: [panel minimizable hasta Ver ficha](explorar.md) y créditos
 compactos que acompañan su borde superior, según ADR-106. Paleta global intacta.
 Refinamiento de movimiento: impulso al soltar y detención al nuevo contacto;

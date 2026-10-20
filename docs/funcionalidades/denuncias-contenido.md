@@ -1,5 +1,11 @@
 # Denunciar contenido
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Continuación HU-14.3:** la revisión/decisión por moderadores se implementa solo
 en la [plataforma web](moderacion-web.md). El móvil conserva este flujo de
 usuario, sin administración.030 añade auditoría a lecturas privilegiadas y

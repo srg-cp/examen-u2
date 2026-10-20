@@ -1,3 +1,4 @@
+import '../../theme/app_typography.dart';
 import 'app_scaffold.dart';
 import 'scroll_safe_area.dart';
 import 'package:flutter/material.dart';
@@ -113,14 +114,7 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
         if (!widget.immersive &&
             widget.header == null &&
             widget.title != null) ...[
-          Text(
-            widget.title!,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF111111),
-            ),
-          ),
+          Text(widget.title!, style: AppTypography.primaryTitle),
           const SizedBox(height: 28),
         ],
         if (!widget.immersive && widget.persistentHeader != null) ...[

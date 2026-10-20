@@ -1,5 +1,114 @@
 # Estado del proyecto
 
+## Ver ficha: nombre sin cápsula blanca —20/10/2026
+
+Por corrección explícita del usuario se retira GlassSurface/ColoredBox y padding
+añadidos bajo el nombre en CasePublicationPreview. Nombre directamente sobre la
+fotografía, conservando Poppins400/32/gris, ajuste de texto, panel y operaciones.
+ADR-111, norma UI y fichas actualizadas; sin cambios de datos/permisos o alcance.
+
+Validación: formato correcto, flutter analyze sin incidencias y4/4 pruebas del
+preview aprobadas en390×844 y320×350/texto2, con movimiento normal/reducido y
+acciones/scroll accesibles. Captura390 revisada sin fondo blanco; renders en
+apps/mobile/build/ui-preview/publication-preview y logs preview-no-title-background-*
+en apps/mobile/build. Siguiente paso: revisión Android físico; sin APK ni despliegue.
+
+## Títulos de las secciones alineados con Inicio —20/10/2026
+
+Corregido el centrado vertical de CollectionHeader: la fila ancla sus hijos
+arriba, conservando altura mínima56 y espacio de acciones. Explorar y Mis
+mascotas comparten origen superior/lateral con «Su regreso»; se elimina la
+bajada8 con texto normal. Se reutiliza la cabecera en los demás listados,
+sin offsets negativos ni ajustes por pantalla. Tipografía Poppins y datos/
+permisos intactos. Refinamiento de ADR-111 y regla UI; fichas actualizadas.
+
+Validación: regresión integrada en Home reproduce antes el desfase92→100 y
+pasa después, con fuentes reales y navegación entre secciones en390×844 y
+320×350/texto2. Suite de títulos, Inicio, listados, carga de mascotas y
+arquitectura37/37 aprobada; formato correcto y flutter analyze sin incidencias.
+Capturas en apps/mobile/build/ui-preview/primary-titles y logs title-alignment-*
+en apps/mobile/build. Siguiente paso: revisión Android físico; sin APK ni despliegue.
+
+## Títulos principales Poppins en móvil y web —20/10/2026
+
+Regla explícita del usuario, ADR-111: Poppins Regular400, base32, gris #454746,
+altura1.25 y tracking0 para títulos de pantalla/página/etapa. AppTypography y
+typography.css centralizan el contrato; mismo Regular local/OFL en ambas apps.
+Incluye Guardados, listados, acceso/onboarding, perfil/preferencias/ubicaciones,
+fichas, landing h1, cuenta/moderación, QR/avistamientos y legales. Retirados los
+overrides de títulos por recorrido; texto ampliado con ajuste y scroll. La marca
+oficial y el remate azul600 de Inicio conservan su estilo. El nombre sobre foto
+usa superficie clara para contraste; ilustraciones del hero ajustadas al título32
+para evitar solapar la descripción. No unifica márgenes/altura de cabeceras.
+
+Regla registrada en AGENTS, normas UI móvil/web, DISENO_UI, guía y fichas enlazadas.
+Sin nuevas HU/RF/issues ni cambio de dominio/data/SQL/permisos o cierre de historias.
+
+Validación final: formato correcto, flutter analyze sin incidencias y70/70 pruebas
+de layouts, preview, Inicio, acceso, listados, arquitectura, perfil, mascotas y
+entrada de preferencias aprobadas con AMBIENT_BACKGROUND_MOTION=false.
+Seis layouts nuevos usan fuentes reales en390×844 y320×350/texto2, con acciones
+alcanzables. Preview verifica también nombre largo completo y ambos modos de
+movimiento. Primera pasada detectó expectativas antiguas de truncado/sombra y
+un gesto de prueba con posición fija; adaptados al nuevo título y scroll real.
+La captura nueva se corrigió para ejecutar rasterización fuera del reloj de prueba.
+
+Web: typecheck/build correctos,56/56 pruebas aprobadas, incluida paridad de tokens
+y archivo de fuente móvil/web. Chrome verificó30 layouts de10 páginas, texto200%,
+QR sin JS, ausencia de overflow/CSP/hidratación y fuente local cargada; QA existente
+de onboarding también aprobada con su nueva tipografía y flujos intactos.
+Capturas revisadas en apps/mobile/build/ui-preview/primary-titles y
+publication-preview; logs primary-titles-{format,analyze,final-tests},
+primary-web-{build,tests} en apps/mobile/build. Siguiente paso: revisión física
+Android y dispositivos reales; sin APK, publicación ni despliegue.
+
+## Títulos de Explorar y Mis mascotas —20/10/2026
+
+Por petición del usuario, ambos títulos usan peso400 y gris #454746, como
+«Su regreso», conservando fuente del sistema, tamaño32 y adaptación accesible.
+CollectionHeader permite compartir el estilo entre ambas secciones sin cambiar
+los demás listados. El fallback de Home también conserva esta coherencia.
+Sin cambios de alcance, dominio, datos o permisos. Fichas: funcionalidades/explorar.md
+y funcionalidades/mascotas.md. Formato correcto y flutter analyze completo sin
+incidencias. Sin pruebas nuevas por tratarse de un ajuste tipográfico; siguiente
+paso: revisión visual en Android. Sin APK ni despliegue.
+
+## Navegación móvil: arrastre al pasar por Explorar —20/10/2026
+
+Corregida la pérdida de animación Inicio→Explorar→Mis mascotas y vuelta.
+Insertar/retirar el botón flotante Mapa desplazaba el Positioned sin clave de
+la barra y desmontaba LiquidNavigation. Clave estable en ese contenedor
+conserva estado y tween320ms; movimiento reducido inmediato. Solo presentación,
+sin cambios de alcance, dominio, datos o permisos. Ficha: funcionalidades/inicio.md.
+
+Validación: las dos nuevas regresiones integradas fallaron antes del ajuste
+por desmontaje y pasan después; comprueban ambos sentidos con Mapa, identidad
+y posiciones inicial/intermedia/final. Suite Home/refresh de Inicio y mascotas/
+arquitectura/consistencia27/27 aprobada con AMBIENT_BACKGROUND_MOTION=false;
+formato correcto y flutter analyze completo sin incidencias.
+Siguiente paso: revisar animación en Android físico; sin APK ni despliegue.
+
+## Confirmación de salida: popup rápido —20/10/2026
+
+Corregido «¿Salir del reporte?» y las confirmaciones compartidas sin origen:
+PopupDialogTransition funde superficie y contenido juntos con escala uniforme
+.96→1 en160ms al abrir/cerrar. Retira cuadro central expandido y texto tardío;
+sin desplazamiento desde retorno. Conserva layout/acciones, scroll, insets y
+movimiento reducido inmediato. Confirmaciones con origen explícito conservan
+OriginDialogTransition/320ms. Refinamiento de ADR-006, HU-05/RF-05 y HU-06/RF-06;
+sin cambios de dominio/data/SQL ni ampliación de alcance.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y34/34
+pruebas de confirmaciones, morph con origen, arquitectura, consistencia y entrada
+real de reportes aprobadas con AMBIENT_BACKGROUND_MOTION=false. Dos regresiones
+verifican entrada completa a160ms, escala mínima96%, cierre y movimiento reducido.
+Renders390×844 y320×350/texto2 revisados en build/ui-preview/confirmations;
+acciones alcanzables con scroll. Log: apps/mobile/build/popup-confirmation-tests.log.
+Primeros intentos detectaron un nombre de archivo de prueba inexistente y un
+finder demasiado amplio en la nueva prueba; corregidos antes de la suite final.
+Siguiente paso: revisar sensación de apertura/cierre en Android autenticado;
+sin APK ni despliegue ni cierre de historias.
+
 ## Alertas: expansión desde campana y vacío compartido —20/10/2026
 
 La campana de Inicio entrega OriginPageSource con sus límites reales relativos

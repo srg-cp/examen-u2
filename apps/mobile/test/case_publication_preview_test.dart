@@ -180,6 +180,10 @@ void main() {
           );
           expect(name.maxLines, 2);
           expect(name.overflow, TextOverflow.ellipsis);
+          expect(name.style?.fontFamily, isNull);
+          expect(name.style?.fontSize, 48);
+          expect(name.style?.fontWeight, FontWeight.w800);
+          expect(name.style?.color, Colors.white);
           expect(name.style?.shadows, isNotEmpty);
           expect(find.text('Desaparición'), findsOneWidget);
           await shot('collapsed');
@@ -190,8 +194,18 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.bySemanticsLabel('Foto 2 de 2'), findsOneWidget);
           if (small) {
+            final handle = find.byKey(const ValueKey('case-sheet-handle'));
+            await tester.scrollUntilVisible(
+              handle,
+              200,
+              scrollable: find.descendant(
+                of: find.byType(CustomScrollView),
+                matching: find.byType(Scrollable),
+              ),
+            );
+            await tester.pumpAndSettle();
             await tester.dragFrom(
-              const Offset(160, 230),
+              tester.getCenter(handle),
               const Offset(0, -220),
             );
           } else {

@@ -19,6 +19,18 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
 
 ## Implementación
 
+- Excepción local a ADR-111,20/10/2026: el nombre sobre fotografía de la ficha
+  del caso (CasePublicationPreview) conserva fuente del sistema, blanco48/800,
+  sombra suave y dos líneas con elipsis; sin cápsula blanca. Los demás títulos
+  conservan Poppins400/32/gris.
+
+- Títulos principales de móvil/web: Poppins Regular400, tamaño base32, gris
+  #454746, interlineado1.25 y tracking0. Reutilizar AppTypography.primaryTitle
+  y typography.css; fuente local, texto ampliado y ajuste de líneas. Incluye
+  Guardados/acceso/onboarding/landing/legales; marca oficial y énfasis azul600
+  de Inicio conservados. Sin overrides por funcionalidad. Seguir
+  [ADR-111](docs/decisiones/111-titulos-principales-poppins-mobile-web.md).
+
 - Cartografía global20/10/2026: todos los mapas móviles/web usan el acabado
   intermedio entre Reportar original y Explorar, según
   [ADR-104](docs/decisiones/104-cartografia-global-mobile-web.md). Reutilizar

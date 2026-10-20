@@ -1,5 +1,12 @@
 # Arquitectura de Entre Huellas
 
+Tipografía20/10, ADR-111: AppTypography.primaryTitle en core/theme es el contrato
+de títulos principales móvil (Poppins400/32/#454746/1.25/tracking0), consumido por
+tema, shells y cabeceras específicas. Nuxt registra typography.css global con
+tokens equivalentes y Poppins Regular local idéntico; h1 hereda sin overrides por
+recorrido. Marca/cuerpo y fronteras de dominio/data conservados. Prueba de paridad
+de tokens/fuente, revisión de layouts normales/ampliados y normas UI compartidas.
+
 Explorar20/10, ADR-106: preview reporta altura real del resumen tras layout;
 ExploreCaseMap calcula mínimo adaptable y compone atribución junto al borde
 del panel mediante sus controladores. ZoneMapPicker.showAttribution permite

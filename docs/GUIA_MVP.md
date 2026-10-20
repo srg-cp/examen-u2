@@ -1,5 +1,12 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Tipografía compartida móvil/web —20/10/2026
+
+Por instrucción explícita, todos los títulos principales adoptan Poppins400/32/
+#454746 según [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+Incremento transversal de presentación de funcionalidades existentes; sin nueva
+HU/RF/issue ni cierre de historias o despliegue por arrastre.
+
 ## Registro y recuperación web autorizados —19/10/2026
 
 El usuario autoriza completar los recorridos de acceso ya existentes en móvil:

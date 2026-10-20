@@ -1,0 +1,26 @@
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins/Poppins-Regular.ttf') format('truetype');
+}
+
+:root {
+  --primary-title-family: 'Poppins', sans-serif;
+  --primary-title-size: 2rem;
+  --primary-title-weight: 400;
+  --primary-title-color: #454746;
+  --primary-title-line-height: 1.25;
+}
+
+/* Page and step headings, including the landing hero. Keep brand/subtitles separate. */
+:is(.reader-shell, .landing-page) h1 {
+  font-family: var(--primary-title-family);
+  font-size: var(--primary-title-size);
+  font-weight: var(--primary-title-weight);
+  color: var(--primary-title-color);
+  line-height: var(--primary-title-line-height);
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}

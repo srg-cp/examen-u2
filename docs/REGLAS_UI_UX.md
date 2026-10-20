@@ -1,5 +1,41 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Ver ficha móvil20/10: nombre de mascota directamente sobre la fotografía,
+sin cápsula blanca añadida al aplicar la tipografía principal (ADR-111).
+
+Alineación móvil20/10, ajuste ADR-111: títulos de CollectionHeader alineados al
+borde superior de su fila, sin centrado vertical según la altura de la acción.
+Explorar y Mis mascotas comparten el origen superior/lateral de «Su regreso».
+Conservar altura mínima56, reserva de botones y adaptación con texto ampliado.
+
+**Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
+gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
+AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.
+Permitir ajuste de líneas y ampliación accesible, sin overrides de tamaño/peso/color
+por pantalla. Aplica también a Guardados, acceso, onboarding, landing y legales.
+Marca oficial y remate azul600 de «empieza contigo» conservados; subtítulos,
+diálogos, tarjetas, controles y PDF conservan su jerarquía. Sustituye reglas
+anteriores de tipografía de títulos. Véase [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+
+Títulos móviles20/10, corrección del usuario: «Explorar» y «Mis mascotas» usan
+peso400 y gris #454746, como «Su regreso». Conservan fuente sans-serif del
+sistema, tamaño32 y ampliación accesible. CollectionHeader comparte este estilo
+solo para estas secciones; los demás listados conservan su estilo anterior.
+Sustituye para ambas secciones la indicación de peso500 del19/10.
+
+Confirmaciones móviles20/10: sin origen explícito (incluido «¿Salir del reporte?»),
+popup rápido160ms con fundido y escala uniforme .96→1; superficie/texto juntos,
+sin expansión desde cuadro central ni contenido tardío. Movimiento reducido
+inmediato. Confirmaciones con tarjeta de origen explícita conservan morph320ms.
+Refinamiento de ADR-006; composición/acciones compartidas conservadas.
+
+
 Corrección posterior20/10 del usuario para Inicio: título sin GlassSurface,
 tamaño32 tras nueva referencia (antes26/23); Poppins/pesos de ADR-105 conservados.
 «Su regreso» gris #454746; «empieza contigo» degradado horizontal #459FF6→#75C9EF.

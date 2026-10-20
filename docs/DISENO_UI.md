@@ -1,5 +1,14 @@
 # Diseño de la interfaz: implementación y revisión
 
+**Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
+gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
+AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.
+Permitir ajuste de líneas y ampliación accesible, sin overrides de tamaño/peso/color
+por pantalla. Aplica también a Guardados, acceso, onboarding, landing y legales.
+Marca oficial y remate azul600 de «empieza contigo» conservados; subtítulos,
+diálogos, tarjetas, controles y PDF conservan su jerarquía. Sustituye reglas
+anteriores de tipografía de títulos. Véase [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+
 Inicio, corrección posterior20/10: título Poppins32 sin contenedor glass,
 mismos pesos de ADR-105. Primera frase gris #454746; segunda con ShaderMask
 horizontal #459FF6→#75C9EF según nueva captura. Descripción16/1.4 debajo del perro/gato dentro

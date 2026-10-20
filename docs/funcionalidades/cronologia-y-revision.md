@@ -1,5 +1,11 @@
 # Cronología y revisión de avistamientos
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Seguimiento actualizado:** HU-11.1/#38 y HU-11.2/#39 aceptadas explícitamente por el usuario el18/10/2026; ambas y la épica #11 están en Done y cerradas en GitHub, verificado por API. Código integrado en main mediante PR60 y CI aprobado. La aceptación funcional sustituye el pendiente de aceptación de las notas anteriores; no se presenta como inspección remota independiente de cada escenario.
 
 Confirmación operativa18/10: tras aplicar026 y recibir los pasos de validación

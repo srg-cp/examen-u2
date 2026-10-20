@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
@@ -187,11 +188,8 @@ class HomeScreen extends ConsumerWidget {
                                                         HomeSection.explore
                                                     ? 'Explorar'
                                                     : 'Mis mascotas',
-                                                style: const TextStyle(
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF111111),
-                                                ),
+                                                style:
+                                                    AppTypography.primaryTitle,
                                               ),
                                             ),
                                             const SizedBox(height: 24),
@@ -232,6 +230,8 @@ class HomeScreen extends ConsumerWidget {
                         child: exploreFloatingAction!,
                       ),
                     Positioned(
+                      // Keep the bar mounted when Explore inserts its map action.
+                      key: const ValueKey('home-navigation'),
                       left: 16,
                       right: 16,
                       bottom: ScrollSafeArea.bottomPadding(context, 16),

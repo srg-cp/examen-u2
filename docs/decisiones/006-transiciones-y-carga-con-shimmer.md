@@ -1,5 +1,14 @@
 # ADR-006: transiciones de etapa y carga con shimmer
 
+Refinamiento20/10/2026, confirmación de salida: por petición del usuario,
+confirmActionDialog sin origen usa PopupDialogTransition (fundido y escala
+uniforme .96→1,160ms al abrir/cerrar). Superficie y contenido aparecen juntos,
+sin cuadro vacío, medición post-frame ni aparición tardía del texto. Conserva
+SafeArea/insets, ancho máximo420, radio28, scroll, semántica y acciones.
+Movimiento reducido inmediato. Solo las confirmaciones con origen explícito
+conservan OriginDialogTransition/320ms; la navegación de páginas no cambia.
+
+
 Fecha: 8 de octubre de 2026. Estado: aceptada por instrucción del usuario.
 
 ## Contexto

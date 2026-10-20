@@ -15,6 +15,28 @@ async function sources(path) {
   return files;
 }
 
+test('Primary titles share the mobile/web typography and local font', async () => {
+  const mobile = await readFile(new URL('../../mobile/lib/core/theme/app_typography.dart', import.meta.url), 'utf8');
+  const web = await readFile(new URL('../app/assets/typography.css', import.meta.url), 'utf8');
+  const size = Number(mobile.match(/fontSize: (\d+)/)[1]);
+  const weight = mobile.match(/fontWeight: FontWeight\.w(\d+)/)[1];
+  const color = mobile.match(/Color\(0xFF([\dA-Fa-f]{6})\)/)[1].toLowerCase();
+  assert.match(mobile, /fontFamily: 'Poppins'/);
+  assert.ok(web.includes(`--primary-title-size: ${size / 16}rem`));
+  assert.ok(web.includes(`--primary-title-weight: ${weight}`));
+  assert.ok(web.includes(`--primary-title-color: #${color}`));
+  assert.match(web, /:is\(\.reader-shell, \.landing-page\) h1/);
+  const mobileFont = await readFile(new URL('../../mobile/assets/fonts/Poppins-Regular.ttf', import.meta.url));
+  const webFont = await readFile(new URL('../public/fonts/poppins/Poppins-Regular.ttf', import.meta.url));
+  assert.ok(mobileFont.equals(webFont), 'Both platforms must ship the same font');
+  const config = await readFile(new URL('../nuxt.config.ts', import.meta.url), 'utf8');
+  assert.match(config, /~\/assets\/typography\.css/);
+  for (const file of ['collection_header', 'entity_screen_shell', 'app_page_layout']) {
+    const source = await readFile(new URL('../../mobile/lib/core/presentation/widgets/' + file + '.dart', import.meta.url), 'utf8');
+    assert.match(source, /AppTypography\.primaryTitle/, file);
+  }
+});
+
 test('All maps use shared adapters and the same mobile/web tile palette', async () => {
   for (const [path, source] of await sources(new URL('../app/', import.meta.url))) {
     if (path.endsWith('/components/LocationMap.vue')) continue;

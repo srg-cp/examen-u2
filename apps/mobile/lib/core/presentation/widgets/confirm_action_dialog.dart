@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'origin_dialog_transition.dart';
+import 'popup_dialog_transition.dart';
 
 Future<bool> confirmActionDialog(
   BuildContext context, {
@@ -19,14 +20,16 @@ Future<bool> confirmActionDialog(
       barrierColor: Colors.black54,
       transitionDuration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 320),
+          : Duration(milliseconds: origin == null ? 160 : 320),
       transitionBuilder: (context, animation, secondaryAnimation, child) =>
-          OriginDialogTransition(
-            animation: animation,
-            origin: origin,
-            source: source,
-            child: child,
-          ),
+          origin == null
+          ? PopupDialogTransition(animation: animation, child: child)
+          : OriginDialogTransition(
+              animation: animation,
+              origin: origin,
+              source: source,
+              child: child,
+            ),
       pageBuilder: (context, animation, secondaryAnimation) => Semantics(
         scopesRoute: true,
         namesRoute: true,

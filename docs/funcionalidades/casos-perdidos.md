@@ -1,5 +1,22 @@
 # Casos de mascotas perdidas
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Corrección20/10/2026: nombre principal de Ver ficha directamente sobre la
+fotografía, sin cápsula blanca ni padding añadido. CasePublicationPreview
+conserva Poppins400/32/gris, texto completo y scroll. Ajuste solicitado por el
+usuario; sin cambios de datos, permisos o acciones.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-05/#5 en Done: publicación propia integrada,013 confirmado, pruebas existentes y casos/fotos reales consultados posteriormente. El alcance ADR-034 se conserva; no se ejecuta una publicación nueva por actualizar Projects.
 
 Ampliación del16 de octubre: marcador glass superior derecho para Guardar caso/Quitar de guardados, compuesto por router con [saved_cases](casos-guardados.md). Estado operativo/permisos conservados. Requiere020; formato/análisis sin incidencias, sin pruebas ejecutadas ni activación remota. [ADR-050](../decisiones/050-casos-guardados-por-cuenta.md).

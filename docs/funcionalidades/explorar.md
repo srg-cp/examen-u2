@@ -1,5 +1,33 @@
 # Explorar: lista y mapa de casos
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Corrección20/10/2026: nombre principal de Ver ficha directamente sobre la
+fotografía, sin cápsula blanca ni padding añadido. CasePublicationPreview
+conserva Poppins400/32/gris, texto completo y scroll. Ajuste solicitado por el
+usuario; sin cambios de datos, permisos o acciones.
+
+Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
+la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
+comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
+por centrado vertical. Regresión de navegación con fuentes reales en390×844
+y320×350/texto2 aprobada. Sin cambio de tipografía, datos o permisos.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
+Título de sección20/10/2026: «Explorar» usa sans-serif del sistema, tamaño32,
+peso400 y gris #454746, por petición del usuario para igualar «Su regreso».
+Estilo compartido con Mis mascotas; conserva geometría y texto ampliado.
+Sin cambios de datos/permisos; revisión visual Android pendiente.
+
 **Panel vigente20/10, ADR-106:** puede bajarse hasta resumen/Ver ficha completo,
 antes del separador. Mínimo según altura real +tirador32 +inset inferior+12;
 apertura50% o mínimo si requiere más con texto ampliado, máximo90%. Scroll,

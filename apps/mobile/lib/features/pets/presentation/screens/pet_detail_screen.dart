@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import '../../domain/failures/pet_failure.dart';
 import '../../../../core/presentation/widgets/photo_gallery_strip.dart';
 import 'package:flutter/material.dart';
@@ -172,14 +173,7 @@ class _PetIdentity extends ConsumerWidget {
         const SizedBox(height: 20),
         Semantics(
           header: true,
-          child: Text(
-            pet.fields.name,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF111111),
-            ),
-          ),
+          child: Text(pet.fields.name, style: AppTypography.primaryTitle),
         ),
       ],
     );

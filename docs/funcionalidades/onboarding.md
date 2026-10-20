@@ -1,5 +1,11 @@
 # Onboarding por cuenta
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-01.5/#21 en Done: tres etapas sin Omitir, RPC/persistencia por cuenta y reintento implementados e integrados; pruebas existentes aprobadas. No se ejecuta una nueva finalización de cuenta por este cambio de seguimiento.
 
 Módulo: `onboarding`. Decisión: [ADR-004](../decisiones/004-onboarding-por-cuenta.md).

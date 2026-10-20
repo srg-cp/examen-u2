@@ -1,3 +1,4 @@
+import '../../theme/app_typography.dart';
 import 'scroll_safe_area.dart';
 import 'dart:math' as math;
 
@@ -81,13 +82,7 @@ class AppPageLayout extends StatelessWidget {
                                   title!,
                                   key: const ValueKey('auth-title'),
                                   textAlign: TextAlign.left,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
-                                      ?.copyWith(
-                                        fontSize: 48,
-                                        color: const Color(0xFF111111),
-                                      ),
+                                  style: AppTypography.primaryTitle,
                                 ),
                               ),
                               const SizedBox(height: 20),

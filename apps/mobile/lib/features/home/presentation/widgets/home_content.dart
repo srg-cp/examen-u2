@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +25,7 @@ class HomeContent extends StatelessWidget {
           label: 'Su regreso empieza contigo',
           excludeSemantics: true,
           child: DefaultTextStyle.merge(
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 32,
-              height: 1.25,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF454746),
-            ),
+            style: AppTypography.primaryTitle,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -241,10 +236,7 @@ void showHomeInfo(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-        ),
+        Text(title, style: AppTypography.primaryTitle),
         const SizedBox(height: 16),
         Text(
           description,
