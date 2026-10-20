@@ -5,4 +5,7 @@ class MapConfig {
     'MAP_TILE_URL',
     defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   );
+
+  static bool get usesCarto =>
+      Uri.tryParse(tileUrl)?.host == 'basemaps.cartocdn.com';
 }

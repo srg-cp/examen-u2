@@ -1,5 +1,26 @@
 # Entre Huellas: reglas de UI y UX web
 
+## Excepción responsive de marca en login —19/10/2026
+
+Por referencia explícita del usuario, el login hasta600px muestra el logo76px
+y «entre huellas» en dos líneas a2rem, con gap16px, margen superior52px y lateral24px.
+El título queda32px después de la cabecera. Reutilizar SiteHeader/SiteBrand;
+marca fuera del formulario/stagger, estable desde SSR. Esta excepción sustituye
+la línea única y medidas de ADR-076/077 solo en login móvil. Escritorio, landing
+y demás pantallas conservan su marca actual. [ADR-085](decisiones/085-marca-responsive-login.md).
+
+## Fondo exterior frío fuera de landing —19/10/2026
+
+Por instrucción explícita del usuario, todas las rutas salvo landing usan una
+base compartida azul pastel `#E5EFFF` → gris frío `#F5F7FA` al55% → blanco
+`#FFFFFF`. Sin crema en el fondo exterior. WebShell declara `--page-background`;
+AmbientPageShell y legales lo heredan. Conservar BackgroundGlowOrb y sus luces,
+intensidades, máscaras, movimiento y accesibilidad donde ya se usa.
+Landing conserva sus fondos actuales; tarjetas/campos/mapas/fotos no cambian.
+Esta instrucción sustituye los fondos crema anteriores fuera de landing.
+[ADR-083](decisiones/083-fondo-web-frio-fuera-de-landing.md),
+[ficha](funcionalidades/fondos-web.md).
+
 ## Toast deslizable —19/10/2026
 
 Por instrucción del usuario, TopToast entra desde fuera del viewport superior

@@ -27,6 +27,13 @@ Por terminal, el arranque configurado es:
 flutter run --dart-define-from-file=config/supabase.local.json
 ```
 
+El mapa claro usa CARTO Positron cuando `MAP_TILE_URL` del JSON local apunta a
+`https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=TU_API_KEY`.
+Sustituir el marcador por la clave de mapas de CARTO; no versionar el archivo local.
+La app muestra los créditos enlazados del proveedor y conserva los pines de marca.
+Detener e iniciar la ejecución tras cambiar la URL; hot reload no actualiza
+dart-defines. Sin este valor se conserva el mapa OSM estándar de desarrollo.
+
 ## Comprobaciones
 
 El icono del launcher Android utiliza los originales de `logo`. Regeneración e instrucciones de instalación en [logo/README.md](../logo/README.md).

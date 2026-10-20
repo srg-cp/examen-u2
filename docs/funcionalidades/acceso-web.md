@@ -1,5 +1,16 @@
 # Acceso web
 
+## Login responsive con marca grande —19/10/2026
+
+Hasta600px, la cabecera compartida presenta logo76px y texto «entre huellas»
+en dos líneas, con título próximo, según captura elegida por el usuario.
+Mantiene marca fuera del formulario/stagger y estilos definidos desde SSR.
+Escritorio, fondo frío y orbe conservados. Sin cambios de campos, sesión,
+persistencia, permisos, errores/reintentos, dependencias o activación.
+Incremento visual de HU-01, sin nueva HU/issue ni cierre. Validación local y
+revisión visual pendiente del usuario en ESTADO.
+[ADR-085](../decisiones/085-marca-responsive-login.md).
+
 ## Avisos web de una sola vez y URL limpia —19/10/2026
 
 Por autorización del usuario, login consume los motivos signed-out, expired,

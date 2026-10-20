@@ -1,5 +1,10 @@
 # Explorar: lista y mapa de casos
 
+Ajuste visual19/10: [cartografía móvil](cartografia-mobile.md) usa CARTO Positron
+en la configuración local, con crédito enlazado compartido y pines originales
+conservados. No cambia filtros, permisos ni consultas. ADR-084; revisión Android
+del nuevo estilo pendiente, independiente de la evidencia funcional anterior.
+
 **Auditoría de seguimiento18/10:** HU-07/#7, lista #32 y mapa #33 en Done: integración y recorrido Android/Supabase real del16/10 con3 casos y filtro Gato, más pruebas/CI. No se conserva un genérico Android aún no revisado; volumen/QA ampliado queda como tal. Guardados offline #49 no está implementado.
 
 Revisión18/10 durante HU-10.1:33 pruebas focalizadas mapa/preview/Explorar/

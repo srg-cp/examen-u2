@@ -6,3 +6,9 @@
 .reader-shell.with-back .glass-navigation{top:max(80px,calc(env(safe-area-inset-top) + 80px))}
 @media(max-width:850px) and (min-width:601px){.reader-shell .site-header{min-height:34px;padding-block:3px}.reader-shell .site-header>.site-brand{margin-top:max(0px,calc((34px - clamp(25px,3.3vw,42px))/2 - 3px))}}
 @media(max-width:600px){.reader-shell .site-header{width:calc(100% - 28px);min-height:76px;padding:12px 2px;gap:8px}.reader-shell .site-brand,.landing-page .site-brand{font-size:20px}.site-brand img{width:30px}.reader-shell .site-header>.site-brand{margin-top:7px}}
+@media(max-width:600px){
+  .reader-shell .site-header.login-header{width:100%;min-height:0;margin:0;padding:52px 24px 0}
+  .reader-shell .login-header>.site-brand{margin-top:0;gap:16px;font-size:2rem;line-height:.95;white-space:normal;flex-shrink:1}
+  .reader-shell .login-header>.site-brand img{width:76px}
+  .reader-shell .login-header>.site-brand span{width:min-content}
+}

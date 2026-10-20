@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Cartografía móvil19/10:** CARTO Positron configurado por el usuario conserva
+los pines de marca y muestra créditos enlazados legibles arriba a la derecha,
+con retorno separado y reintento debajo. La confirmación actual sustituye la
+retirada de ADR-054 únicamente para mapas CARTO, sin créditos nuevos en Photon.
+Texto adaptable, áreas táctiles y toast ante fallo de enlaces; ADR-084.
+
 **Marca web compartida —19/10/2026:** usar posición, color y medidas reales
 de landing con SiteBrand/SiteHeader, también en login/onboarding y responsive.
 Cuerpo de pantallas/móvil conserva su referencia.

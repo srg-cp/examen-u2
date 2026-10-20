@@ -1,5 +1,14 @@
 # Arquitectura de Entre Huellas
 
+## Cartografía móvil configurable —19/10/2026
+
+ZoneMapPicker mantiene flutter_map y recibe la URL pública de cartografía desde
+MapConfig/MAP_TILE_URL. La configuración local selecciona CARTO Positron raster
+light_all; sin define permanece el valor OSM de desarrollo. MapAttribution es
+presentación compartida con enlaces/feedback, activada solo para el host CARTO,
+sin dependencias de SDK de negocio o cambios de dominio/data. Clave en JSON local
+ignorado, sin copia versionada. Pines, coordenadas y contratos conservados; ADR-084.
+
 ## Ciclo de vida del cierre web —19/10/2026
 
 Los handlers logout de access/moderation confirman el borrado de cookies sin

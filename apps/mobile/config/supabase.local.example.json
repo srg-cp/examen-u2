@@ -3,5 +3,6 @@
   "SUPABASE_PUBLISHABLE_KEY": "",
   "EMAIL_OTP_VALIDITY_MINUTES": 15,
   "PUBLIC_CASE_WEB_URL": "https://entrehuellas.kormind.com",
-  "PUBLIC_CASE_WEB_READY": false
+  "PUBLIC_CASE_WEB_READY": false,
+  "MAP_TILE_URL": "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=API_KEY"
 }

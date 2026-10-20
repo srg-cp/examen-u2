@@ -1,5 +1,74 @@
 # Estado del proyecto
 
+## Marca grande en login responsive —19/10/2026
+
+Por captura explícita del usuario, login hasta600px reutiliza SiteHeader/SiteBrand
+con logo76px, texto2rem en dos líneas, gap16px y padding superior52px/lateral24px.
+El título queda32px debajo de la cabecera; se retira el centrado vertical móvil.
+Excepción local a ADR-076/077: marca fuera del formulario/stagger, escritorio
+y otros recorridos conservados. Fondo frío y orbe sin cambios. Ancho min-content
+del texto permite ampliación sin overflow. [ADR-085](decisiones/085-marca-responsive-login.md),
+regla web y ficha de acceso actualizadas; incremento visual HU-01 sin cierre.
+
+Validación local: typecheck y build Nuxt correctos (.nuxt-login-responsive).
+QA Chrome de marca compartida actualizado para la excepción móvil y aprobado
+en1440/731/601/600/390/320 y texto200%, incluyendo acceso, bienvenida, inicio,
+moderación, QR, legales y landing como referencia; sin overflow/CSP/hidratación.
+Comprobación adicional con animación activa confirma geometría de marca estable
+desde SSR, durante hidratación y recarga en320/390/600/601/1440. Capturas revisadas
+en apps/mobile/build/ui-preview/web-brand/login-reference-390.png y
+login-320-enlarged.png. git diff --check aprobado. Backend fixture local;
+sin SQL, Flutter, publicación o cambios de autenticación. Sin bloqueo local.
+Siguiente paso: revisión visual del usuario en su dispositivo.
+
+## Cartografía móvil clara con Positron —19/10/2026
+
+Por solicitud del usuario se activa CARTO Positron desde MAP_TILE_URL local,
+conservando flutter_map y los pines del logo. Clave existente comprobada sin
+imprimirla ni versionarla: descarga HTTPS200/image/png de una tesela real de Lima,
+inspeccionada visualmente. ZoneMapPicker incorpora crédito discreto superior con
+enlaces separados OpenStreetMap/CARTO, texto adaptable, separación del retorno y
+reintento debajo. Fallo al abrir enlaces usa toast compartido. La confirmación del
+usuario tras configurar la clave autoriza el crédito: ADR-084 sustituye ADR-054
+solo en estos mapas; buscador y web conservados. Sin SQL, permisos o consultas
+nuevas, ni cambios a coordenadas, pines o historial de HU-07/RF-13.
+
+Validación: formato correcto,14 pruebas existentes de mapa/selección/reintento/
+navegación y arquitectura aprobadas con URL CARTO sin clave y teselas simuladas.
+Renders390×844 y320×350/texto2 revisados; corregida una intercepción del pin por
+el crédito en tamaño pequeño. No acreditan cartografía real dentro de Flutter.
+Análisis estático final sin incidencias.
+Sin Android conectado (flutter devices solo muestra
+Windows/Chrome/Edge); pendiente comprobar el estilo dentro de Android tras un
+reinicio completo con dart-defines locales. No se genera APK ni se despliega.
+Siguiente paso: revisión en dispositivo de Explorar y selección de ubicación.
+[Ficha](funcionalidades/cartografia-mobile.md), [ADR-084](decisiones/084-mapa-mobile-claro-carto-positron.md).
+
+## Fondo web frío fuera de landing —19/10/2026
+
+Por instrucción del usuario y referencia aportada, el fondo exterior compartido
+usa azul pastel #E5EFFF → gris frío #F5F7FA al55% → blanco #FFFFFF, sin amarillo.
+WebShell declara la base; AmbientPageShell y LegalPage dejan de sobrescribirla.
+Aplicado a acceso, bienvenida, inicio, moderación, legales, QR y avistamientos
+por su shell compartido. BackgroundGlowOrb conserva colores, intensidad,
+animaciones, máscaras y movimiento reducido. Landing conserva su CSS/fondos
+propios; no se modifican superficies de tarjetas, campos, fotos o mapas.
+[ADR-083](decisiones/083-fondo-web-frio-fuera-de-landing.md),
+[ficha](funcionalidades/fondos-web.md) y regla web actualizadas.
+
+Validación local: typecheck y build Nuxt correctos con NUXT_BUILD_DIR aislado
+.nuxt-background;46 pruebas existentes aprobadas; git diff --check correcto.
+Chrome de producción con backend fixture comprobó el mismo degradado calculado
+en login/bienvenida/inicio/moderación/términos/privacidad/QR a1440×1000 y390×844,
+sin overflow horizontal ni errores CSP/hidratación/JavaScript.14 capturas en
+apps/mobile/build/ui-preview/web-background; revisados visualmente login móvil
+y moderación escritorio. Colores del orbe verificados y fondo crema de landing
+conservado. No se añaden tests permanentes para este ajuste CSS reversible.
+
+Sin bloqueo local, SQL, Flutter, despliegue o cierre de historias. La revisión
+de avistamientos se limita a su herencia del WebShell, sin envío nuevo.
+Siguiente paso: revisión visual del usuario; no acredita publicación remota.
+
 ## Avisos web de una sola vez y URL limpia —19/10/2026
 
 Por autorización del usuario, login consume los motivos signed-out, expired,

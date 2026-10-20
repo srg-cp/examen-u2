@@ -19,7 +19,7 @@
 .reader-shell .login-field.shake{animation:login-shake .28s ease-in-out}
 .reader-shell .login-form .login-submit{margin-top:10px;min-height:64px;font-size:1.0625rem;background:#111111;color:#ffffff;box-shadow:none;text-shadow:none}
 @keyframes login-shake{25%,75%{transform:translateX(-4px)}50%{transform:translateX(4px)}}
-@media(max-width:600px){.reader-shell .login-screen{padding:40px 24px}}
+@media(max-width:600px){.reader-shell .login-screen{margin:0 auto;padding:32px 24px 40px}}
 @media(max-height:600px){.reader-shell .login-screen{padding-top:28px;padding-bottom:28px}}
 @media(prefers-reduced-motion:reduce){.reader-shell .login-field.shake{animation:none}.reader-shell .login-field-label{transition:none}}
 

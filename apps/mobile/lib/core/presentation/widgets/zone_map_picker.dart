@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../config/map_config.dart';
+import 'map_attribution.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
 class ZoneMapPicker extends StatefulWidget {
@@ -207,20 +208,28 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
               ),
             ),
           ),
-          if (_failed)
+          if (MapConfig.usesCarto || _failed)
             Positioned(
               top: widget.borderRadius == 0
                   ? MediaQuery.paddingOf(context).top + 8
                   : 8,
+              left: MapConfig.usesCarto ? 76 : 8,
               right: 8,
-              child: TextButton(
-                onPressed: () => setState(() {
-                  _failed = false;
-                  _mapReady = false;
-                  _attempt++;
-                  _tiles = _createTiles();
-                }),
-                child: const Text('Reintentar mapa'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (MapConfig.usesCarto) const MapAttribution(),
+                  if (_failed)
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _failed = false;
+                        _mapReady = false;
+                        _attempt++;
+                        _tiles = _createTiles();
+                      }),
+                      child: const Text('Reintentar mapa'),
+                    ),
+                ],
               ),
             ),
         ],

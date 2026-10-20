@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+Cartografía móvil19/10: [Positron y crédito compartido](cartografia-mobile.md),
+con pines de marca conservados; ADR-084 sustituye ADR-054 para mapas CARTO.
+
 Acceso web19/10: [avisos de una sola vez y URL limpia](acceso-web.md); se retira
 reason consumido conservando parámetros de integración y fragmento.
 
@@ -56,6 +59,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 
 | Funcionalidad | Módulo Flutter | Trazabilidad |
 | --- | --- | --- |
+| [Fondos web compartidos](fondos-web.md) | apps/platform | Ajuste visual19/10/2026; toda la web excepto landing; sin HU/issue nuevo |
 | [Documentos legales web](documentos-legales.md) | apps/platform | /terminos y /privacidad, con redirecciones antiguas; sin HU/issue nuevo |
 | [Acceso web](acceso-web.md) | apps/platform | /iniciar-sesion, /bienvenida y /inicio; HU-01/RF-01,34 en web; conserva HU-14.3 / issue #45; demo real pendiente |
 | [Revisión y moderación web](moderacion-web.md) | apps/platform / SQL Supabase | HU-14.3; RF-22,33; issue #45;030/configuración/demo pendientes |

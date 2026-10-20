@@ -536,7 +536,16 @@ La dependencia de mapa incorpora caché nativa/path_provider: reconstruir e inst
 
 Con A: crear dos zonas, editar radio, cancelar otra edición, reiniciar y comprobar persistencia; provocar fallo de red y reintentar con el mismo borrador; eliminar y repetir después de pérdida de respuesta. Con B/anónimo: lectura/escritura de A deben rechazarse. Ejecutar `database/tests/009_interest_zone_permissions.sql` en desarrollo para RLS/grants y guardias del servidor; sus pruebas de fixture no sustituyen las cuentas reales en la app.
 
-Mapa de desarrollo: OSM estándar y User-Agent de app, caché HTTP de flutter_map y sin descargas offline/precarga. Proveedor sustituible con `MAP_TILE_URL` al compilar. Por instrucción explícita del usuario del 15 de octubre de 2026 se retiraron el texto y el enlace de atribución de la UI compartida, junto con `MAP_ATTRIBUTION`/`MAP_ATTRIBUTION_URL`. El servicio actual exige atribución visible: queda pendiente resolver proveedor/condiciones antes de distribuir; esta retirada visual no acredita cumplimiento del proveedor. Cartografía real y comportamiento Android todavía no verificados; el mapa tiene reintento/alternativa manual. Preferencias HU-02.2 y push HU-12 siguen pendientes.
+Actualización19/10/2026: configuración local del usuario selecciona CARTO Positron
+mediante `MAP_TILE_URL` con formato
+`https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=TU_API_KEY`.
+Guardar la clave solo en `apps/mobile/config/supabase.local.json`, ignorado por Git,
+y reiniciar con `--dart-define-from-file=config/supabase.local.json`; hot reload
+no actualiza valores de compilación. Sin define sigue OSM estándar de desarrollo.
+La autorización actual permite los créditos enlazados CARTO/OpenStreetMap en el
+mapa compartido y sustituye ADR-054 solo para ese proveedor (ADR-084). Caché HTTP,
+User-Agent y ausencia de descarga offline/precarga conservados. Tesela real
+verificada con200/image/png; revisión del estilo en Android pendiente.
 
 ## Preferencias de alertas
 
