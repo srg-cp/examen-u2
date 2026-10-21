@@ -1,5 +1,46 @@
 # Estado del proyecto
 
+## Navegación web sin esperas repetidas —20/10/2026
+
+Por petición del usuario, corregida la pausa al cambiar secciones. AccountScreen
+ya no emite un cambio de identidad en cada montaje, que invalidaba la caché de
+su propia pestaña. Bootstrap reutiliza la proyección vigente de15s para iniciar
+ViewModel/repositorio ligados al actor después de hidratar, sin skeleton ni
+segunda lectura de sesión tras la política global. La hidratación inicial
+conserva el estado SSR; vencimiento, foco, avisos y cambios de cuenta mantienen
+invalidación. Gestión se consulta solo en Inicio. No se cachean permisos ni se
+elimina autorización por operación.
+
+NavigationLink prepara código/sesión por intención; la barra prepara código de
+sus destinos. Ruta exacta activa no repite consultas. StaggerReveal general usa
+240ms/35ms, máximo140ms de retraso, sin blur ni entrada superpuesta a la expansión
+desde origen. Onboarding/login conservan parámetros propios. Identidad/perfil
+y requisitos de Reportar se leen en paralelo sin exponer resultados antes de
+validación. ADR-121, arquitectura, reglas, guía y tres fichas actualizadas.
+
+Comparación local de builds anterior/posterior en Chrome con backend fixture y
+250ms añadidos a cada lectura de sesión: seis cambios provocaban seis consultas
+extra; ahora cero dentro del plazo vigente. Mediana clic→encabezado visible de
+339,5ms a51ms (aproximadamente85% menos); primera navegación posterior156ms,
+restantes40–69ms. Estas cifras incluyen automatización y no acreditan producción
+ni latencia real de Supabase. Evidencia JSON/captura revisada en
+apps/mobile/build/ui-preview/web-navigation-performance; script reproducible
+apps/platform/scripts/check-navigation-performance-browser.mjs. La comparación
+usa encabezados, no los tiempos de contenido del registro anterior.
+
+Validación local: build Nuxt/typecheck,62/62 pruebas unitarias/arquitectura y
+28/28 de servidor aprobadas. QA Chrome de rendimiento comprueba TTL real15s,
+invalidación, recarga/hidratación y ausencia de errores; regresión de acceso,
+onboarding/reintento, roles, logout entre pestañas y recuperación completa con
+mascotas/fotos/cuatro reportes aprobada. Stagger comprueba fotogramas reales,
+retrasos35ms, texto200%, movimiento reducido y QR sin JS. Renders1440/390/320
+y otros anchos en scripts existentes, sin overflow/CSP/hidratación.
+
+Sin SQL, despliegue ni acciones GitHub. Siguiente paso: revisión del usuario en
+su navegador y medición en producción/dispositivos físicos cuando se autorice
+publicar. La latencia de las operaciones y la revalidación tras vencer15s siguen
+dependiendo de la red; no se promete navegación instantánea en toda condición.
+
 ## Barra web sin elevación al hover —20/10/2026
 
 Por corrección explícita con captura, retirado translateY(-2px) del acento en

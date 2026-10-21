@@ -1,5 +1,12 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Respuesta de navegación20/10, ADR-121:** entrada general StaggerReveal240ms,
+separación35ms y retraso máximo140ms, sin blur ni doble entrada durante expansión
+desde origen. Onboarding/login conservan parámetros propios. Reutilizar sesión
+vigente solo después de hidratar; conservar política global, marca/barra estables,
+movimiento reducido y QR legible sin JavaScript. No emitir cambios de cuenta por
+montar una sección. [Decisión](decisiones/121-navegacion-web-sin-esperas-repetidas.md).
+
 **Corrección posterior20/10:** el acento seleccionado de la barra web tampoco
 se eleva al hover/foco/presión: retirar translateY(-2px). Conserva brillo,
 deslizamiento de selección y retorno horizontal al arrastrar. Sustituye la

@@ -1,5 +1,13 @@
 # Transiciones web desde origen y navegación liquid
 
+Respuesta20/10, [ADR-121](../decisiones/121-navegacion-web-sin-esperas-repetidas.md):
+StaggerReveal general pasa a240ms/35ms con retraso máximo140ms y sin blur, hasta
+380ms de entrada completa independientemente del número de tarjetas. Durante
+una expansión desde origen no inicia otra entrada superpuesta. Los parámetros
+propios de onboarding/login y las duraciones320/260ms de origen se conservan.
+Preload de rutas por intención y código de la barra preparados sin datos privados.
+Sigue respetando movimiento reducido, QR sin JS, guards y formularios pendientes.
+
 Incremento visual del 20/10/2026. [ADR-119](../decisiones/119-animaciones-web-desde-origen-y-navegacion-liquid.md).
 
 ## Qué hace y recorrido

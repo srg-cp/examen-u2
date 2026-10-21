@@ -2,8 +2,7 @@ import { AccessFailure } from '../domain/access.ts';
 import type { AccountRepository, SocialProvider, SocialSignInRepository } from '../domain/access.ts';
 import { accountSessionDto } from './account_session_dto.ts';
 export class HttpAccountRepository implements AccountRepository, SocialSignInRepository {
-  private actor = '';
-  constructor(private readonly fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init)) {}
+  constructor(private readonly fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init), private actor = '') {}
   private async call(path: string, body?: unknown, bind = false): Promise<unknown> {
     try {
       const response = await this.fetcher('/api/access/' + path, {

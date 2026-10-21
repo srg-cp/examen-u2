@@ -1,5 +1,13 @@
 # Acceso web
 
+Navegación20/10, ADR-121: bootstrap puede iniciar el ViewModel con la proyección
+vigente del transporte solo después de hidratar, vinculando actor en HTTP.
+No aumenta el plazo15s ni serializa estado privado en SSR. La política global
+sigue comprobando cada destino, los permisos no se cachean y los avisos de
+sesión/foco/visibilidad conservan invalidación. Montar una sección no representa
+un cambio de identidad. El vencimiento se programa también con estado inicial.
+Identidad y perfil se leen en paralelo sin devolver datos antes de validar ambos.
+
 Diagnóstico20/10: producción rechazaba el Origin HTTPS antes de Auth y aceptaba
 http://127.0.0.1:5173 (POST vacío403 frente a422, sin credenciales). Configurar
 PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com en runtime de producción y

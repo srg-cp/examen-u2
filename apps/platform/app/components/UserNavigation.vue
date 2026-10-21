@@ -33,6 +33,8 @@ function preventDragNavigation(event: MouseEvent) {
   if (dragged && event.detail !== 0) { event.preventDefault();event.stopPropagation();dragged = false; }
 }
 onMounted(() => {
+  // Custom links keep real anchors; prepare only code, never private payloads.
+  for (const path of [...sections,'/reportar']) void preloadRouteComponents(path, useRouter()).catch(() => {});
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   reducedMotion.addEventListener('change',resetElastic);
   window.addEventListener('pointerup',finishPush);

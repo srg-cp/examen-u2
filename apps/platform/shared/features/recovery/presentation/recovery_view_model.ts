@@ -14,7 +14,7 @@ export class RecoveryViewModel {
     this.update({ refreshing: !this.state.loading, failure: null });
     try {
       if (section === 'explore') { const page = await this.explore.execute(query, more ? this.state.cursor : null); if (generation === this.generation) this.update({ items: more ? [...this.state.items, ...page.items.filter(p => !this.state.items.some(i => i.id === p.id && i.source === p.source))] : page.items, cursor: page.cursor }); }
-      else { const pets = await this.readPets.execute(); const targets = section === 'report' ? await this.searches.execute() : []; if (generation === this.generation) this.update({ pets, targets }); }
+      else { const [pets, targets] = await Promise.all([this.readPets.execute(), section === 'report' ? this.searches.execute() : Promise.resolve([])]); if (generation === this.generation) this.update({ pets, targets }); }
     } catch (e) { if (generation === this.generation) this.fail(e); }
     finally { if (generation === this.generation) this.update({ loading: false, refreshing: false }); }
   }

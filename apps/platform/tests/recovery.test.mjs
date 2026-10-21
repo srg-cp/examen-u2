@@ -4,6 +4,18 @@ import { ExploreCases, SaveMyPet, PublishRecoveryReport, RecoveryFailure, ReadMy
 import { RecoveryViewModel } from '../shared/features/recovery/presentation/recovery_view_model.ts';
 const id='55555555-5555-4555-8555-555555555555', photo='66666666-6666-4666-8666-666666666666';
 const report={id,kind:'own_loss',petId:id,petVersion:1,targetId:null,communityTarget:false,occurredAt:'2026-10-19T12:00:00.000Z',latitude:-12,longitude:-77,place:'Parque',species:'',speciesDetail:'',size:'',sex:'',traits:'',photoIds:[photo]};
+
+test('Report prerequisites run together and late responses cannot restore disposed account data', async () => {
+ let finishPets, finishTargets;
+ const repository = { pets: () => new Promise(resolve => { finishPets = resolve; }), targets: () => new Promise(resolve => { finishTargets = resolve; }) };
+ const drafts = {};
+ const vm = new RecoveryViewModel(new ExploreCases(repository),new ReadMyPets(repository),new SaveMyPet(repository),new AddPetPhoto(repository),new ReadOpenSearches(repository),new PublishRecoveryReport(repository),new ReadReportDraft(drafts),new SaveReportDraft(drafts),new ClearReportDraft(drafts));
+ const load = vm.load('report');
+ assert.equal(typeof finishPets, 'function'); assert.equal(typeof finishTargets, 'function');
+ finishPets([{ id }]); await Promise.resolve(); assert.equal(vm.state.loading, true);
+ vm.dispose(); finishTargets([{ id }]); await load;
+ assert.deepEqual(vm.state.pets, []); assert.deepEqual(vm.state.targets, []);
+});
 test('Web operations reject missing pet metadata, invalid filters and invalid reports before repository writes',async()=>{
  let writes=0;const repository={savePet:async()=>writes++,publish:async()=>writes++,explore:async()=>writes++};
  const save=new SaveMyPet(repository);

@@ -12,7 +12,9 @@ export class AccountViewModel {
   private managementGeneration = 0;
   private disposed = false;
   private listeners = new Set<(value: AccountState) => void>();
-  constructor(private readonly access: AccessAccount, private readonly social: StartAccountSocialSignIn, private readonly onboarding: CompleteAccountOnboarding, private readonly management: ReadManagementAccess) {}
+  constructor(private readonly access: AccessAccount, private readonly social: StartAccountSocialSignIn, private readonly onboarding: CompleteAccountOnboarding, private readonly management: ReadManagementAccess, prepared: AccountSession | null = null) {
+    if (prepared && prepared.expiresAt > Date.now()) this.state = Object.freeze({ ...initial(), checking: false, session: prepared });
+  }
   subscribe(listener: (value: AccountState) => void) { this.listeners.add(listener); listener(this.state); return () => { this.listeners.delete(listener); }; }
   private emit(patch: Partial<AccountState>) {
     if (this.disposed) return;

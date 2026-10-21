@@ -1,5 +1,10 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+Navegación web20/10, ADR-121: reutilizar únicamente la preparación vigente de
+data, inyectada por bootstrap en navegación cliente después de hidratar; conservar
+política global y revalidación por operación. No invalidar identidad por montar
+una sección ni cachear permisos. [Decisión](decisiones/121-navegacion-web-sin-esperas-repetidas.md).
+
 Hero landing20/10: ADR-120 registra la excepción explícita a ADR-111 para
 #hero-title, con tipografía/composición originales. Solo presentación; SEO,
 dominio, datos y permisos conservados. [Decisión](decisiones/120-restaurar-hero-original-landing.md).

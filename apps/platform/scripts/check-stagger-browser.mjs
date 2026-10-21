@@ -46,7 +46,7 @@ try {
   assert.ok(frames.some(f => f.opacity.some(v => v > 0 && v < 1)), 'Must observe actual transition frames');
   assert.ok(frames.every(f => ['none', 'normal'].includes(f.before)), 'No opaque pseudo-element at any entrance frame');
   assert.ok(frames.every(f => f.placeholders === 0), 'No grey permission placeholder at any entrance frame');
-  assert.ok(frames.some(f => f.delay[0].split(',')[0].trim() === '0s' && f.delay[1].split(',')[0].trim() === '0.09s'), 'Shared stagger ordering');
+  assert.ok(frames.some(f => f.delay[0].split(',')[0].trim() === '0s' && f.delay[1].split(',')[0].trim() === '0.035s'), 'Fast shared stagger ordering');
   assert.equal(await page.locator('.reveal').count(), 0);
   async function noPermissionPlaceholder() {
     assert.equal(await page.locator('.account-main .skeleton, .account-grid .shape, .account-management-skeleton').count(), 0, 'No grey permission placeholder while the real account is visible');

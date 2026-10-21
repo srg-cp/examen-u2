@@ -1,5 +1,10 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+Respuesta web20/10: mejora autorizada de navegación existente, ADR-121. Elimina
+invalidación por montaje, reutiliza preparación vigente y acorta entrada general;
+sin nuevas HU/RF/issues, cierre de historias ni despliegue. Validación y límites
+en [navegación web](funcionalidades/navegacion-web.md).
+
 Segunda mejora SEO20/10: recursos adaptables del hero y vista previa social ligera,
 manteniendo diseño ADR-120; sin nuevas HU/RF/issues ni despliegue. Dominio propio
 por marca, sin promesa de ranking por.app. [Resultados](funcionalidades/landing-page.md).

@@ -1,5 +1,16 @@
 # Navegación de usuario y recuperación web
 
+Mejora20/10, [ADR-121](../decisiones/121-navegacion-web-sin-esperas-repetidas.md):
+los montajes dejan de invalidar su propia sesión; reutilización estricta de15s
+después de la política global, sin skeleton repetido al navegar. Código preparado
+en la barra y por intención en enlaces. Gestión se consulta solo en Inicio;
+mascotas/búsquedas del reporte se leen en paralelo. Cada operación conserva su
+autorización real. Expirar, cambiar de cuenta o fallar siguen validación/reintento;
+sin datos privados preparados para destinos no visitados. SSR/hidratación conservan
+estado inicial coincidente y la primera carga real mantiene skeleton.
+QA reproducible: scripts/check-navigation-performance-browser.mjs; resultados
+antes/después en apps/mobile/build/ui-preview/web-navigation-performance.
+
 Implementación local del 20/10/2026. [ADR-118](../decisiones/118-navegacion-web-y-recorridos-de-recuperacion.md).
 
 ## Qué hace y recorrido

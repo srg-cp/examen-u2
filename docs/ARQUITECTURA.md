@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+Navegación web20/10, ADR-121: AccountSessionTransport expone su proyección vigente
+solo a composición; bootstrap inicializa ViewModel/repositorio ligados al actor
+después de hidratar. Sin nueva caché, perfil en SSR ni cambios de política global.
+Montajes no emiten avisos de identidad. Preload de código/intención en componentes
+compartidos; lecturas independientes en paralelo. [Decisión](decisiones/121-navegacion-web-sin-esperas-repetidas.md).
+
 Hero landing20/10, ADR-120: typography.css excluye #hero-title de Poppins global;
 landing.css recupera sus valores y mascotas previos a1fc1bd1. Solo presentación,
 sin cambios SEO/dominio/data/permisos. Excepción explícita pedida por el usuario.

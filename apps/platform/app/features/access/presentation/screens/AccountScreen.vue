@@ -53,8 +53,8 @@ watch(() => state.value.session, async (session, previous) => {
     }
     leaving = true; channel?.postMessage({ actor: session.actor }); await navigateTo('/inicio', { replace: true });
   }
-  else if (!props.onboarding) await model.loadManagementAccess();
-});
+  else if (!props.onboarding && route.path === '/inicio') await model.loadManagementAccess();
+}, { immediate:true });
 watch(() => [state.value.checking, state.value.session] as const, async ([checking, session]) => {
   if (!session && !checking && !signingOut && !leaving && ['unauthenticated', 'conflict'].includes(state.value.failure?.kind || '')) {
     leaving = true; await navigateTo('/iniciar-sesion?reason=expired', { replace: true }); return;
@@ -74,8 +74,11 @@ onMounted(async () => {
     if (event.data?.actor && event.data.actor === state.value.session?.actor) return;
     toast.value?.close(); model.invalidate(); model.checkSession();
   };
-  await model.checkSession();
-  if (state.value.session) channel?.postMessage({ actor: state.value.session.actor });
+  // The global route policy already checked this identity. Reuse only the
+  // transport's still-fresh browser snapshot; direct SSR loads still check.
+  if (!state.value.session) await model.checkSession();
+  // Only identity mutations broadcast. Announcing an ordinary page mount
+  // invalidated this browser's own transport and defeated its short reuse.
   noticesReady = true;
   await showRouteNotice();
 });

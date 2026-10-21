@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+Respuesta web20/10: [navegación](navegacion-web.md), [acceso](acceso-web.md) y
+[transiciones](transiciones-web.md) eliminan esperas repetidas según ADR-121;
+medición local con backend fixture, sin confirmación remota ni despliegue.
+
 Hero20/10: [landing](landing-page.md) recupera título grande y mascotas de la
 referencia original, por petición explícita. Excepción ADR-120 a ADR-111.
 

@@ -1,3 +1,4 @@
+import { accountSessionDto } from './account_session_dto.ts';
 // Short-lived, per-browser-app transport reuse. Never persisted or serialized.
 export class AccountSessionTransport {
   private generation = 0;
@@ -5,6 +6,10 @@ export class AccountSessionTransport {
   private pending: Promise<{ body: string; status: number }> | null = null;
   constructor(private readonly fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init), private readonly now = Date.now) {}
   invalidate() { ++this.generation; this.cached = null; this.pending = null; }
+  preparedSession() {
+    if (!this.cached || this.cached.status !== 200 || this.now() >= this.cached.until) return null;
+    try { return accountSessionDto(JSON.parse(this.cached.body)); } catch { return null; }
+  }
   fetch: typeof fetch = async (input, init) => {
     const path = String(input);
     const sessionRead = path === '/api/access/session' && (!init?.method || init.method === 'GET');
