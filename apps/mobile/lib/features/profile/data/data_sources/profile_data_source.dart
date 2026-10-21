@@ -15,5 +15,6 @@ abstract interface class ProfileDataSource {
     String userId, {
     required String? displayName,
     required String? city,
+    required String? contactPhone,
   });
 }

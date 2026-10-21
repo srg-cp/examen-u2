@@ -52,11 +52,15 @@ void main() {
           calls++;
           expect(request.url.path, '/rest/v1/profiles');
           expect(request.url.queryParameters['id'], 'eq.owner');
-          expect(request.url.queryParameters['select'], 'id,display_name,city');
+          expect(
+            request.url.queryParameters['select'],
+            'id,display_name,city,contact_phone',
+          );
           if (request.method == 'PATCH') {
             expect(jsonDecode(request.body), {
               'display_name': 'Ana',
               'city': 'Cusco',
+              'contact_phone': '+51900000000',
             });
             expect(
               request.headers['prefer'],
@@ -81,6 +85,7 @@ void main() {
               'id': 'owner',
               'display_name': 'Ana',
               'city': request.method == 'PATCH' ? 'Cusco' : 'Lima',
+              'contact_phone': '+51900000000',
             }),
             200,
             headers: headers,
@@ -112,7 +117,9 @@ void main() {
           email: 'test@example.invalid',
           password: 'fake-password',
         );
-        expect((await repo.read('owner')).city, 'Lima');
+        final read = await repo.read('owner');
+        expect(read.city, 'Lima');
+        expect(read.contactPhone, '+51900000000');
         expect(
           (await repo.read('owner')).avatarUri?.toString(),
           failure ? null : 'https://images.example.invalid/avatar.png',
@@ -130,7 +137,12 @@ void main() {
         expect(calls, 2);
         if (failure) {
           await expectLater(
-            repo.update('owner', displayName: 'Ana', city: 'Cusco'),
+            repo.update(
+              'owner',
+              displayName: 'Ana',
+              city: 'Cusco',
+              contactPhone: '+51900000000',
+            ),
             throwsA(
               isA<ProfileFailure>().having(
                 (e) => e.kind,
@@ -145,6 +157,7 @@ void main() {
               'owner',
               displayName: 'Ana',
               city: 'Cusco',
+              contactPhone: '+51900000000',
             )).city,
             'Cusco',
           );

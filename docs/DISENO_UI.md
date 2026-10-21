@@ -1,5 +1,9 @@
 # Diseño de la interfaz: implementación y revisión
 
+Perfil20/10, ADR-116: Celular de contacto opcional reutiliza AppTextField/ShakeField/espaciado20 existente, teclado telefónico y privacidad visible. Sugerencia por caso sin activar consentimiento ni foto; toast superior y guardado conjunto con shimmer real.
+
+Compartir ficha20/10, ADR-115: panel inferior blanco opaco/radio28/tirador, sin glass ni X. Copiar enlace azul/icono blanco, WhatsApp verde y Facebook azul arriba; Descargar/Denunciar en círculos grises contiguos solo iconos, tooltip y semántica. Gesto/toque fuera/Atrás para cerrar; scroll con texto ampliado. Cabecera conserva glass y sitúa título en fila propia bajo380px o texto ampliado, evitando solapamiento con Compartir/Guardar. [Ficha](funcionalidades/compartir-ficha.md).
+
 Corrección de fidelidad20/10, ADR-113: etiqueta Perdido a la derecha del nombre en una fila centrada; paginación debajo y al centro. GlassSurfaceFinish.frosted para tarjetas de ficha y controles de contacto: un ribete blanco, sombra difusa y gradiente traslúcido perla/celeste; sin relleno gris adicional ni contorno oscuro doble. Polished sigue por defecto en navegación y consumidores anteriores. Adaptar etiquetas largas/texto ampliado con apilado y foto más alta.
 
 Ficha pública móvil20/10: [tarjetas glass aprobadas](funcionalidades/ficha-publica-mobile.md), ADR-113. Radio28, margen16, foto redondeada con nombre blanco48/800, navegación glass52 y mapa propio. Título de navegación Poppins400/20/gris por referencia explícita; texto ampliado usa título32 en fila propia. [Contacto autorizado por caso](funcionalidades/contacto-reportante.md), ADR-114. ImmersivePhotoSheet continúa en las vistas previas, conservado para reutilización.

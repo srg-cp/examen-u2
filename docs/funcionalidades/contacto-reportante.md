@@ -1,5 +1,9 @@
 # Contacto del reportante por caso
 
+Actualización20/10, ADR-116: sugerencia del celular privado del perfil únicamente
+al autor mediante read_case_contact.suggested_phone. Requiere patch033 después de032;
+031 ya contiene el contacto/consentimiento por caso. Sin contacto automático.
+
 Refinamiento visual20/10 de ADR-113: tarjeta y controles SMS/teléfono usan el acabado frosted compartido, con iconos azules22 y objetivos52. Se suavizan borde y sombra para acercarlos al mockup; datos, consentimiento y operaciones permanecen iguales.
 
 Ampliación explícita20/10 de HU-05/06/07 y RF-05/06/13, sin issue nuevo ni cierre
@@ -10,7 +14,7 @@ de historias. Implementación local, activación remota pendiente. [ADR-114](../
 Después de publicar, el autor abre su ficha y elige Compartir mi contacto.
 Activa Compartir contacto en esta ficha; indica nombre público2–80 caracteres
 y teléfono internacional (+ y8–15 dígitos). Puede usar el nombre sugerido de su
-propio perfil; no se obtiene teléfono ni se activa consentimiento automáticamente.
+propio perfil y, con el incremento033, su celular privado como sugerencia; no se activa consentimiento automáticamente. Cambiar/eliminar el celular del perfil no modifica el número ya publicado en esta ficha.
 Compartir mi foto de perfil es independiente y desactivado inicialmente. Se
 usa la foto almacenada actual si existe; en otro caso, inicial del nombre real.
 Guardar contacto no vuelve a publicar el caso ni cambia sus campos.

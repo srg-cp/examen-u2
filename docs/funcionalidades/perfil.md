@@ -1,5 +1,17 @@
 # Perfil y fotografía de cuenta
 
+Celular20/10, [ADR-116](../decisiones/116-celular-privado-perfil-y-sugerencia-contacto.md):
+campo opcional privado con código de país (+ y8–15 dígitos). Normaliza espacios,
+guiones/paréntesis; vacío elimina el valor. Se guarda con nombre/ciudad y se conserva
+al cambiar foto, descartar, reintentar y cambiar sesión según el estado existente.
+No es un número verificado por SMS. La instrucción de privacidad permanece visible.
+
+Sirve como sugerencia al autor en [Contacto del reportante](contacto-reportante.md),
+sin activar publicación/foto automáticamente. Modificar/eliminar el celular del
+perfil no modifica contactos ya publicados; se editan/retiran por ficha.
+Plan033/fuentes112–114, patch033 después de032 (contacto por caso requiere031).
+Activación remota y Android físico pendientes. Pruebas/resultados en ESTADO.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y
@@ -28,7 +40,7 @@ Módulo: `profile`. HU-01.7 / RF-01; [issue #23](../backlog/023-HU-01.7.md).
 ## Qué hace y cómo se usa
 
 Desde el avatar se accede al perfil. Permite consultar el correo de la sesión,
-editar nombre visible y ciudad, elegir una foto propia desde galería y acceder
+editar nombre visible, ciudad y celular de contacto opcional, elegir una foto propia desde galería y acceder
 a zonas de interés y preferencias de alertas. El correo es de solo lectura.
 La fotografía de cuenta es independiente de las fotos de cada mascota.
 
@@ -36,7 +48,7 @@ La fotografía de cuenta es independiente de las fotos de cada mascota.
 
 Nombre y ciudad son opcionales, de hasta120 puntos de código Unicode cada uno;
 se recortan extremos y un vacío se guarda como null. UpdateProfile escribe
-solo esos campos y comprueba que la fila confirmada corresponda a la cuenta.
+nombre, ciudad y celular y comprueba que la fila confirmada corresponda a la cuenta.
 No permite editar propietario, roles ni finalización de onboarding.
 
 La selección de imagen se normaliza a JPEG y se limita a2MiB. El avatar se
@@ -45,8 +57,8 @@ de una selección interrumpida se vincula a la misma cuenta. No se transfieren
 pendientes de imagen a otro usuario al cambiar sesión.
 
 Carga inicial mediante skeleton; refresco conserva contenido con progreso fino.
-Errores de formulario contextuales; foto de perfil usa toast superior según
-ADR-009. El éxito se anuncia tras confirmación. Los cambios se conservan para
+Errores, validación y resultados usan toast superior compartido y ShakeField según
+ADR-027. El éxito se anuncia tras confirmación. Los cambios se conservan para
 reintentar cuando corresponde y se descartan resultados tardíos de otra identidad.
 
 ## Dependencias y validación

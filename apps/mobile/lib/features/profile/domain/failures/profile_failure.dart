@@ -5,6 +5,7 @@ enum ProfileFailureKind {
   forbidden,
   invalidName,
   invalidCity,
+  invalidPhone,
   invalidPhoto,
 }
 

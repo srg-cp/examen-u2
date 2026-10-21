@@ -1,5 +1,7 @@
 # Carteles PDF y QR
 
+Ampliación20/10, ADR-115: [Compartir ficha](compartir-ficha.md) permite difusión/descarga de la proyección pública por otros lectores autorizados mediante prepare_case_share/plan032. No altera el permiso de autor de prepare_case_poster ni el generador PDF; reutiliza el mismo enlace QR y respeta revocación. Activación032/Android pendientes, sin cierre de HU.
+
 **Auditoría de seguimiento18/10:** HU-08/#8 y #34/#35 siguen In progress por criterios concretos: impresión/escaneo físico y guardar/compartir/cancelar mediante hojas nativas Android. Generación/lector022/023 ya están confirmados; no mantener la web no disponible como bloqueo genérico.
 
 Actualización16 octubre: [lector público HU-09](ficha-publica-qr.md) implementado

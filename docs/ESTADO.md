@@ -1,5 +1,107 @@
 # Estado del proyecto
 
+## Celular privado de perfil y sugerencia del reportante —20/10/2026
+
+Completado el recorrido solicitado: Perfil permite guardar/eliminar celular de
+contacto opcional, con teclado telefónico, autofill y código de país. Reutiliza
+AppTextField/ShakeField/espaciado existentes y feedback en toast superior. Formato
++ y8–15 dígitos; normaliza espacios, guiones y paréntesis. Sin inferir números ni
+verificación de titularidad SMS. Guardado junto con nombre/ciudad; estado conserva
+borrador ante fallo, cambio de foto/ciudad y bloqueo durante envío; Descartar,
+relectura y cambio de identidad mantienen las garantías existentes.
+
+AccountProfile/DTO, contratos, fuente Supabase, UpdateProfile, ViewModel/estado y
+ProfileEditor ampliados. read_case_contact incorpora suggested_phone solo para
+el autor desde profiles.contact_phone privado. case_contacts consume su propia
+proyección y precarga la sugerencia sin activar contacto/foto. Editar/eliminar
+el número del perfil no altera contactos publicados; se gestionan en cada ficha.
+No amplía proyecciones QR anónimas/PDF/sociales ni acceso a perfiles ajenos.
+
+El contacto por caso ya está preparado en patch031, aún pendiente de activación.
+Nuevo plan033/fuentes112–114, migración20261020003300_profile_contact_phone.sql y
+patch033 generados mediante Build-ProfileContactPhonePatch/Build-Migration y
+Build-RunAll. Aplicar solo pendientes en orden030→031→032→033. Se añade columna
+nullable con restricción de formato, grants por columna/RLS propia y sugerencia
+autorizada. No se reescriben SQL031/032 ni se insertan datos en cuentas reales.
+El validador de run_all admite la nueva columna/estructura sin debilitar rechazo
+de tipo o nulabilidad incompatibles; se verifica repetición sin pérdida de datos.
+
+ADR-116, ficha perfil/contacto e índice, guía HU-01/05/06/07 RF-01/05/06/13,
+arquitectura/diseño, AGENTS y README SQL/patchs actualizados. Sin nueva HU/issue
+ni cierre adicional de historias. Trabajo previo de compartir conservado.
+
+Validación: formato/diff correctos, flutter analyze sin incidencias y39/39 pruebas
+Flutter aprobadas (perfil, SDK simulado, foto, contacto, arquitectura y navegación
+de perfil/casos). Normalización/rechazo/borrado/reintento/cambio de identidad,
+consentimiento desactivado, sugerencia restringida al autor y preservación al
+cambiar foto/ciudad. Renders revisados390px normal y320px/texto2, scroll y sin
+overflow; fixtures en apps/mobile/build/ui-preview/profile-contact.
+SQL/PostGIS local:45/45 pruebas aprobadas en la suite completa. Incluye formato
+autoritativo, aislamiento entre dos cuentas, rechazo anónimo, sugerencia solo al
+autor, consentimiento/retirada, número publicado independiente del perfil y
+repetición del patch033/bundle completo conservando datos y permisos.
+
+Logs profile-contact-verified-tests, profile-contact-final-analyze y
+profile-contact-final-sql en apps/mobile/build. Pendiente aplicar SQL remoto
+031/032/033 después de030 y verificar persistencia, consentimiento, foto y
+teclado/autofill en Android físico. No se ha desplegado SQL, web o APK ni
+realizado acciones GitHub. Siguiente paso: activación de los patches pendientes
+y prueba con dos cuentas en el entorno real.
+
+## Compartir ficha: panel blanco sin X —20/10/2026
+
+Implementado el diseño aprobado: botón glass junto a Guardar, panel inferior
+blanco opaco con tirador, sin glass ni X por corrección explícita. Copiar enlace
+en círculo azul/icono blanco, WhatsApp y Facebook con etiquetas; Descargar y
+Denunciar son dos círculos grises contiguos solo con iconos, tooltip y semántica.
+Cierra por arrastre, toque fuera o Atrás. Scroll/área segura/texto ampliado y
+movimiento reducido; cabecera bajo380px reserva título en otra fila para evitar
+solapamiento de los tres controles. Denunciar sale del panel al formulario real
+del mismo caso y sustituye el botón largo del cuerpo de estas fichas.
+
+case_posters incorpora entidad/contrato/SharePublicCase, ViewModel/estado propios,
+repositorio y fuentes RPC/plataforma; reutiliza DTO y PDF saneado existentes.
+Bootstrap/main inyectan implementaciones y Clipboard como callback para conservar
+la frontera sin Flutter en data. No se relajó la comprobación arquitectónica.
+WhatsApp/Facebook abren el destino externo con solo la URL pública; usuario elige
+si envía/publica. Descargar abre impresión/Guardar como PDF, con cancelación sin
+confirmación falsa de guardado. Toast superior/shimmer solo por operación real,
+bloqueo de doble acción y descarte de resultados de otra cuenta.
+
+Plan032/fuentes110–111, RPC prepare_case_share autenticada y patch/migración
+20261020003200_case_sharing.sql generados con Build-Migration,
+Build-CaseSharingPatch y Build-RunAll. Autor derivado del caso aun si comparte un
+lector ajeno; slug estable sin reactivar revocación. Exige búsqueda activa,
+visible y con foto comprobada por el lector QR. Avisos vinculados/custodia,
+cerradas/ocultas/eliminadas o sin foto no generan enlaces ficticios; Denunciar
+permanece disponible. prepare_case_poster sigue exclusivo del autor. Sin nuevos
+grants directos, contactos en QR/PDF, SDK social, dependencias o permisos de rol.
+La revisión/sesión/enlace se validan otra vez antes de entregar al dispositivo.
+
+ADR-115, ficha compartir-ficha, índice, ficha móvil/carteles, arquitectura,
+normas, diseño, AGENTS, guía y README de datos/patchs actualizados. Referencia
+visual en mockups/compartir-ficha-referencia.png; su X se elimina por la corrección
+posterior del usuario. Ampliación explícita HU-07/HU-08, RF-08/13/37, sin issue
+nuevo ni cierre de historias. ImmersivePhotoSheet conservado.
+
+Validación final: formato correcto, flutter analyze sin incidencias y63/63 pruebas
+Flutter aprobadas: repositorio/URL/configuración/revisión/PDF, doble acción/cambio
+de cuenta, panel normal/pequeño con texto2, movimiento normal/reducido, ausencia
+de X/etiquetas inferiores, cierre por los tres medios, denuncia real, reserva de
+cabecera360px, fichas, carga, carteles, recuperación y arquitectura.
+SQL/PostGIS local45/45: incluye compartir por lector ajeno, propiedad intacta,
+idempotencia, revocación/cierre/moderación y repetición de migración/bundle.
+
+Renders revisados en apps/mobile/build/ui-preview/case-sharing, con fuentes reales,
+fixtures y teselas simuladas; no acredita el proveedor cartográfico por red.
+Logs case-sharing-final-{analyze,tests}, case-sharing-layout-final y
+case-sharing-sql-suite en apps/mobile/build. Generación sin reescribir SQL previo.
+Pendiente activar032 después de031 y comprobar Clipboard, WhatsApp/Facebook,
+enlace QR y guardar/cancelar PDF en Android físico. Se reutiliza la configuración
+pública ya existente; no se afirma que la web QR previamente confirmada esté caída.
+Sin despliegue, APK o GitHub. Siguiente paso: activación remota autorizada y prueba
+física. Cambios existentes conservados.
+
 ## Ficha pública: fidelidad de Perdido y glass —20/10/2026
 
 Por corrección explícita del usuario, la etiqueta del caso se coloca a la derecha

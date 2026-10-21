@@ -17,7 +17,7 @@ class FoundDetailScreen extends ConsumerWidget {
     this.posterAction,
     this.timelineAction,
     this.followAction,
-    this.reportAction,
+    this.shareActionBuilder,
     super.key,
   });
   final Widget? savedAction;
@@ -25,13 +25,28 @@ class FoundDetailScreen extends ConsumerWidget {
   final Widget? posterAction;
   final Widget? timelineAction;
   final Widget? followAction;
-  final Widget? reportAction;
+  final Widget Function(String, String)? shareActionBuilder;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(publicFoundViewModelProvider(id));
     final model = ref.read(publicFoundViewModelProvider(id).notifier);
     return CasePublicScreenShell(
+      shareAction:
+          !state.isLoading &&
+              !state.hasError &&
+              state.asData?.value.value != null
+          ? shareActionBuilder?.call(
+              state.requireValue.value!.speciesDetail ??
+                  foundSpeciesLabel(state.requireValue.value!.species),
+              switch (state.requireValue.value!.reportKind) {
+                'possible_loss' => 'Posiblemente perdida',
+                'sighting' => 'Avistamiento',
+                'with_reporter' => 'Encontrada',
+                _ => 'Reporte',
+              },
+            )
+          : null,
       trailingAction:
           !state.isLoading &&
               !state.hasError &&
@@ -86,7 +101,6 @@ class FoundDetailScreen extends ConsumerWidget {
                           'legacy_found',
                         ].contains(state.requireValue.value!.reportKind))
                       followAction!,
-                    if (reportAction != null) reportAction!,
                     if ((state.requireValue.value!.canGeneratePoster ||
                             state.requireValue.value!.canResolve) &&
                         posterAction != null)

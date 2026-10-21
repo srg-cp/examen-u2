@@ -48,6 +48,9 @@ Future<void> main() async {
         sightingRepositoryProvider.overrideWithValue(
           bootstrap.sightingRepository,
         ),
+        caseShareRepositoryProvider.overrideWithValue(
+          bootstrap.caseShareRepository,
+        ),
         casePosterRepositoryProvider.overrideWithValue(
           bootstrap.casePosterRepository,
         ),

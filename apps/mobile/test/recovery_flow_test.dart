@@ -222,11 +222,11 @@ void main() {
         expect(timeline.target.community, true);
         router.pop();
         await tester.pumpAndSettle();
-        await tester.ensureVisible(
-          find.text('Denunciar contenido', skipOffstage: false),
-        );
+        await tester.tap(find.byTooltip('Compartir ficha'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Denunciar contenido', skipOffstage: false));
+        await tester.ensureVisible(find.byTooltip('Denunciar contenido'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Denunciar contenido'));
         await tester.pumpAndSettle();
         expect(find.byType(ContentReportScreen), findsOneWidget);
         final reportScreen = tester.widget<ContentReportScreen>(

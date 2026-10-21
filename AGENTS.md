@@ -1,5 +1,9 @@
 # Entre Huellas: instrucciones del proyecto
 
+Celular20/10, ADR-116: profiles.contact_phone es privado/opcional; solo se sugiere al autor por read_case_contact. Guardar perfil no publica contacto ni modifica los ya compartidos. Mantener consentimiento por caso/foto y plan033 después de032.
+
+Compartir ficha20/10, ADR-115: botón junto a Guardar; panel blanco opaco, sin glass ni X por instrucción explícita. Copiar enlace azul/icono blanco, WhatsApp y Facebook con etiquetas; Descargar/Denunciar son dos círculos grises contiguos sin texto visible, con tooltip/semántica. Compartir/descargar usa solo el enlace QR público activo y autorizado (plan032), sin dar permisos de autor a otros lectores.
+
 Ficha pública móvil20/10, ADR-113/114: consultas usan CasePublicCards con tarjetas glass según mockup aprobado; conservar ImmersivePhotoSheet en vistas previas y para reutilización futura. Título compacto de navegación Poppins400/20/gris por aprobación explícita; con texto ampliado título32 en fila propia. Nombre sobre foto blanco48/800. Contacto del autor por caso con consentimiento y RPC protegidas (plan031), sin ampliar perfiles privados/QR.
 
 Conservación20/10, ADR-112: el componente `CasePublicationPreview` se renombra a `ImmersivePhotoSheet` (Ficha fotográfica inmersiva). Conservarlo para reutilización futura, también cuando se sustituya el diseño de Ver ficha. Las reglas anteriores de su nombre blanco48/800 siguen vigentes. Véase docs/funcionalidades/ficha-fotografica-inmersiva.md.

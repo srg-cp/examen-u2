@@ -1,5 +1,7 @@
 # Ficha pública móvil por tarjetas glass
 
+Compartir20/10, ADR-115: acceso junto a Guardar, con [panel blanco sin X](compartir-ficha.md). Denunciar se traslada al icono del panel; las demás operaciones del cuerpo permanecen. Descargar usa el PDF público existente; enlaces públicos de búsquedas activas por RPC nueva032. Título en fila propia bajo380px o con texto ampliado para reservar los tres controles.
+
 Refinamiento20/10 por corrección visual del usuario: etiqueta del caso a la derecha del nombre y centrada verticalmente en la misma fila; puntos de galería centrados debajo. Con texto ampliado o etiqueta larga se apilan y la foto crece. Tarjetas y controles de contacto usan GlassSurfaceFinish.frosted (ribete blanco único, sombra suave y tono perla/celeste traslúcido), sin doble borde oscuro ni relleno gris adicional. Volver/guardar e ImmersivePhotoSheet conservan su acabado. Renders comparados con el mockup; ver validación en ESTADO.
 
 Incremento20/10 de HU-05/06/07, RF-05/06/13. Implementado localmente según

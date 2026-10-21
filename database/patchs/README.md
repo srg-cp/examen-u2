@@ -1,5 +1,9 @@
 # Patches manuales de Supabase
 
+Celular privado20/10: 033_patch_profile_contact_phone.sql después de032, añade profiles.contact_phone y sugerencia al autor. Contacto por caso está en031 y compartir en032; aplicar solo pendientes en orden. Generado con Build-ProfileContactPhonePatch, no editar independientemente.
+
+Difusión20/10: [032_patch_case_sharing.sql](032_patch_case_sharing.sql), generado mediante Build-CaseSharingPatch.ps1. Ejecutar íntegro después de031 cuando se autorice activar la nueva RPC; no reaplicar patches anteriores. Validación local en ESTADO, sin despliegue remoto.
+
 Contacto por caso20/10: [031_patch_case_contacts.sql](031_patch_case_contacts.sql), generado con Build-CaseContactsPatch.ps1. Ejecutar íntegro después de030 cuando se autorice activar el backend. No reaplicar patches anteriores. Validación local/limitaciones en docs/ESTADO.md; no aplicado remotamente.
 
 **Confirmación posterior18/10:**030 aplicado por el usuario, sin inspección

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_application_entrehuellas/features/case_contacts/data/models/case_contact_dto.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class FakeContactRepository implements CaseContactRepository {
     canEdit: owner == 'one',
     version: version,
     suggestedName: owner == 'one' ? 'Lucía Torres' : '',
+    suggestedPhone: owner == 'one' ? '+51911111111' : '',
   );
   @override
   Future<CaseContactAccess> save(
@@ -66,6 +68,24 @@ class FakeContactRepository implements CaseContactRepository {
 }
 
 void main() {
+  test(
+    'Private profile suggestions are accepted only in the author projection',
+    () {
+      final owner = CaseContactDto.fromMap({
+        'can_edit': true,
+        'suggested_phone': '+51900000000',
+      });
+      expect(owner.suggestedPhone, '+51900000000');
+      final viewer = CaseContactDto.fromMap({
+        'can_edit': false,
+        'suggested_name': 'Private',
+        'suggested_phone': '+51900000000',
+      });
+      expect(viewer.suggestedPhone, isEmpty);
+      expect(viewer.suggestedName, isEmpty);
+    },
+  );
+
   test(
     'Contact validation normalizes before persistence; no unconsented fields',
     () async {
@@ -267,17 +287,34 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Compartir mi contacto'));
         await tester.pumpAndSettle();
-        // A fresh contact has no automatic consent or phone.
+        // A profile phone is only a suggestion; neither consent is automatic.
         final consent = find.widgetWithText(
           SwitchListTile,
           'Compartir contacto en esta ficha',
         );
+        expect(tester.widget<SwitchListTile>(consent).value, isFalse);
+        expect(repo.contact, isNull);
         await tester.ensureVisible(consent);
         await tester.tap(consent);
         await tester.pumpAndSettle();
         final phone = find.widgetWithText(
           AppTextField,
           'Teléfono con código de país',
+        );
+        expect(
+          tester.widget<AppTextField>(phone).controller.text,
+          '+51911111111',
+        );
+        expect(
+          tester
+              .widget<SwitchListTile>(
+                find.widgetWithText(
+                  SwitchListTile,
+                  'Compartir mi foto de perfil',
+                ),
+              )
+              .value,
+          isFalse,
         );
         await tester.ensureVisible(phone);
         await tester.enterText(

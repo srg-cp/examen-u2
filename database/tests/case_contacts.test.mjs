@@ -6,6 +6,7 @@ import {postgis} from '@electric-sql/pglite-postgis';
 
 const bundle=await readFile(new URL('../run_all.sql',import.meta.url),'utf8');
 const patch=await readFile(new URL('../../supabase/migrations/20261020003100_case_contacts.sql',import.meta.url),'utf8');
+const phonePatch=await readFile(new URL('../../supabase/migrations/20261020003300_profile_contact_phone.sql',import.meta.url),'utf8');
 const owner='11111111-1111-4111-8111-111111111131',other='22222222-2222-4222-8222-222222222231';
 const pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb31',target='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa31';
 
@@ -33,11 +34,27 @@ for(const source of ['lost','found'])test(`Case contact consent, isolation, retr
  assert.equal((await avatar()).length,0);
  await assert.rejects(save(),/contact_forbidden/);
  await assert.rejects(db.query('select * from public.case_contacts'),/permission denied/);
+ await actor(owner);
+ assert.equal((await read()).suggested_phone,null);
+ await db.query('update public.profiles set contact_phone=$1 where id=$2',['+51911111111',owner]);
+ assert.equal((await read()).suggested_phone,'+51911111111');
+ for(const invalid of ['', '900000000', '+012345678', '+123', '+1234567890123456', '+51900000000\n']) await assert.rejects(db.query('update public.profiles set contact_phone=$1 where id=$2',[invalid,owner]),/profiles_contact_phone_format/);
+ assert.equal((await read()).contact,null);
+ await actor(other);
+ assert.equal((await read()).suggested_phone,null);
+ assert.equal((await db.query('select contact_phone from public.profiles where id=$1',[owner])).rows.length,0);
+ assert.equal((await db.query('update public.profiles set contact_phone=$1 where id=$2 returning id',['+51922222222',owner])).rows.length,0);
  await actor(owner);assert.equal((await read()).suggested_name,'Nombre privado');assert.equal((await read()).version,0);
  await assert.rejects(save(true,0,'A'),/contact_invalid/);
  await assert.rejects(save(true,0,'Lucía','51900000000'),/contact_invalid/);
  const saved=await save();assert.equal(saved.version,1);assert.equal(saved.contact.phone,'+51900000000');assert.ok(saved.contact.avatar_path);
- assert.deepEqual(await save(),saved); // response-lost retry
+ await db.query('update public.profiles set contact_phone=$1 where id=$2',['+51933333333',owner]);
+ assert.equal((await read()).contact.phone,'+51900000000');
+ assert.equal((await read()).suggested_phone,'+51933333333');
+ await db.query('update public.profiles set contact_phone=null where id=$1',[owner]);
+ assert.equal((await read()).suggested_phone,null);
+ assert.equal((await read()).contact.phone,'+51900000000');
+ assert.deepEqual(await save(),{...saved,suggested_phone:null}); // response-lost retry
  await assert.rejects(save(true,0,'Otro nombre'),/contact_conflict/);
  await actor(other);const shared=await read();assert.equal(shared.contact.display_name,'Lucía Torres');assert.equal(shared.can_edit,false);assert.equal(shared.version,0);assert.equal(shared.suggested_name,null);
  assert.equal((await avatar()).length,1);
@@ -56,7 +73,7 @@ for(const source of ['lost','found'])test(`Case contact consent, isolation, retr
  await db.exec('reset role');await db.query(`update public.${source==='lost'?'lost_cases':'found_cases'} set status='resolved' where id=$1`,[target]);
  await actor(other);assert.equal((await read()).contact,null);
  await actor(owner);await save(false,3);
- await db.exec('reset role');await db.exec(patch);await db.exec(patch);await db.exec(bundle);
+ await db.exec('reset role');await db.exec(patch);await db.exec(phonePatch);await db.exec(phonePatch);await db.exec(bundle);
  await actor(other);assert.equal((await read()).contact,null);
- await db.exec('reset role');await db.exec('set role anon');await assert.rejects(read(),/permission denied/);
+ await db.exec('reset role');await db.exec('set role anon');await assert.rejects(read(),/permission denied/);await assert.rejects(db.query('select contact_phone from public.profiles'),/permission denied/);
 });

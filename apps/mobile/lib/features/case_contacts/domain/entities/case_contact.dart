@@ -25,11 +25,13 @@ class CaseContactAccess {
     this.canEdit = false,
     this.version = 0,
     this.suggestedName = '',
+    this.suggestedPhone = '',
   });
   final CaseContact? contact;
   final bool canEdit;
   final int version;
   final String suggestedName;
+  final String suggestedPhone;
 }
 
 class CaseContactDraft {

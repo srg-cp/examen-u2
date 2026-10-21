@@ -14,6 +14,7 @@ class CasePublicScreenShell extends StatelessWidget {
     required this.child,
     required this.loading,
     this.trailingAction,
+    this.shareAction,
     this.notice,
     this.noticeId,
     this.onBack,
@@ -22,6 +23,7 @@ class CasePublicScreenShell extends StatelessWidget {
 
   final Widget child;
   final Widget? trailingAction;
+  final Widget? shareAction;
   final bool loading;
   final String? notice;
   final Object? noticeId;
@@ -42,6 +44,7 @@ class CasePublicScreenShell extends StatelessWidget {
               builder: (context, constraints) {
                 final top = MediaQuery.paddingOf(context).top + 4;
                 final largeText =
+                    constraints.maxWidth < 380 ||
                     MediaQuery.textScalerOf(context).scale(20) > 26;
                 return Stack(
                   fit: StackFit.expand,
@@ -121,6 +124,10 @@ class CasePublicScreenShell extends StatelessWidget {
                                     : context.go('/home'),
                           ),
                           const Spacer(),
+                          if (shareAction != null) ...[
+                            shareAction!,
+                            const SizedBox(width: 8),
+                          ],
                           SizedBox(
                             width: 52,
                             height: 52,

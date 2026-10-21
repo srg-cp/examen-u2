@@ -3,6 +3,7 @@ class CaseContactDto {
     required this.canEdit,
     required this.version,
     required this.suggestedName,
+    this.suggestedPhone = '',
     this.name,
     this.phone,
     this.sharePhoto = false,
@@ -26,7 +27,12 @@ class CaseContactDto {
     return CaseContactDto(
       canEdit: row['can_edit'] == true,
       version: (row['version'] as num?)?.toInt() ?? 0,
-      suggestedName: row['suggested_name'] as String? ?? '',
+      suggestedName: row['can_edit'] == true
+          ? row['suggested_name'] as String? ?? ''
+          : '',
+      suggestedPhone: row['can_edit'] == true
+          ? row['suggested_phone'] as String? ?? ''
+          : '',
       name: name,
       phone: phone,
       sharePhoto: c?['share_photo'] == true,
@@ -42,6 +48,7 @@ class CaseContactDto {
   final bool canEdit, sharePhoto;
   final int version;
   final String suggestedName;
+  final String suggestedPhone;
   final String? name, phone;
   final Uri? avatarUri;
 }

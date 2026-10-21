@@ -19,6 +19,7 @@ class CaseContactRepositoryImpl implements CaseContactRepository {
         canEdit: dto.canEdit,
         version: dto.version,
         suggestedName: dto.suggestedName,
+        suggestedPhone: dto.suggestedPhone,
         contact: dto.name == null
             ? null
             : CaseContact(

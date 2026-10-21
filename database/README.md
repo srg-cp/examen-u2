@@ -1,5 +1,9 @@
 # Base de datos de Entre Huellas
 
+Celular privado20/10: plan033/fuentes112–114, patch033/migración20261020003300_profile_contact_phone.sql. Nullable text con formato internacional y grants por columna/RLS propia; read_case_contact sugiere solo al autor. Build-ProfileContactPhonePatch/Build-RunAll; después de032, sin reescribir031. Hosted pendiente.
+
+Compartir ficha20/10: plan032/fuentes110–111, migración20261020003200_case_sharing.sql y patch032 generados con Build-CaseSharingPatch/Build-RunAll. RPC autenticada prepara solo búsquedas activas/visibles con foto validada por el lector QR; dueño real y slug estable, sin reactivar enlaces revocados ni permisos de autor. [Ficha](../docs/funcionalidades/compartir-ficha.md). Activación remota pendiente.
+
 Contacto autorizado20/10: plan031/fuentes106–109 y migración20261020003100_case_contacts.sql, después de030. Tabla privada/RLS y RPC por autor/versionado, lectura solo con caso activo visible; foto opcional en Storage con permiso SELECT acotado, sin ampliar escrituras. Generar Build-CaseContactsPatch/Build-RunAll. Validación local en ESTADO; activación hosted pendiente. [Ficha](../docs/funcionalidades/contacto-reportante.md).
 
 HU-14.3/#45: fuentes102–105/plan030, migración y patch030 generados mediante

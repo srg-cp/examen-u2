@@ -216,7 +216,9 @@ class _ContactEditorState extends State<_ContactEditor> {
         widget.value.access.contact?.name ?? widget.value.access.suggestedName,
   );
   late final _phone = TextEditingController(
-    text: widget.value.access.contact?.phone ?? '',
+    text:
+        widget.value.access.contact?.phone ??
+        widget.value.access.suggestedPhone,
   );
   @override
   void dispose() {

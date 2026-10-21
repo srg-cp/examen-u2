@@ -30,6 +30,7 @@ class FakeProfile implements ProfileRepository {
     String userId, {
     required String? displayName,
     required String? city,
+    required String? contactPhone,
   }) async {
     updates++;
     await pendingUpdate?.future;
@@ -38,6 +39,7 @@ class FakeProfile implements ProfileRepository {
       userId: userId,
       displayName: displayName,
       city: city,
+      contactPhone: contactPhone,
       email: profiles[userId]?.email ?? 'ana@example.invalid',
       avatarUri: profiles[userId]?.avatarUri,
     );

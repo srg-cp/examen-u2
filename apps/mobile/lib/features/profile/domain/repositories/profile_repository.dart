@@ -9,5 +9,6 @@ abstract interface class ProfileRepository {
     String userId, {
     required String? displayName,
     required String? city,
+    required String? contactPhone,
   });
 }

@@ -1,3 +1,4 @@
+import '../features/case_posters/presentation/widgets/case_share_button.dart';
 import '../features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import '../features/content_reports/presentation/screens/content_report_screen.dart';
 import '../features/content_reports/presentation/widgets/report_content_button.dart';
@@ -338,8 +339,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                 contact: CaseContactPanel(
                   target: (source: 'found', id: state.pathParameters['id']!),
                 ),
-                reportAction: ReportContentButton(
-                  target: (kind: 'found', id: state.pathParameters['id']!),
+                shareActionBuilder: (name, event) => CaseShareButton(
+                  target: PosterCase(
+                    PosterSource.found,
+                    state.pathParameters['id']!,
+                  ),
+                  title: name,
+                  eventLabel: event,
+                  onReport: () => context.push(
+                    '/home/denounce/found/${state.pathParameters['id']}',
+                  ),
                 ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(
@@ -413,8 +422,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                 contact: CaseContactPanel(
                   target: (source: 'lost', id: state.pathParameters['id']!),
                 ),
-                reportAction: ReportContentButton(
-                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                shareActionBuilder: (name, event) => CaseShareButton(
+                  target: PosterCase(
+                    PosterSource.lost,
+                    state.pathParameters['id']!,
+                  ),
+                  title: name,
+                  eventLabel: event,
+                  onReport: () => context.push(
+                    '/home/denounce/lost/${state.pathParameters['id']}',
+                  ),
                 ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(

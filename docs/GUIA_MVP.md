@@ -1,5 +1,7 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+Incremento20/10 autorizado de HU-01 y HU-05/06/07, RF-01/05/06/13: celular privado opcional en perfil y sugerencia al autor al autorizar contacto por caso (ADR-116). Plan033 después de032/031, sin nueva historia/issue ni cierre adicional. No publicación automática ni contacto anónimo/QR/PDF; hosted y Android pendientes.
+
 ## Tipografía compartida móvil/web —20/10/2026
 
 Por instrucción explícita, todos los títulos principales adoptan Poppins400/32/
@@ -320,6 +322,9 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+Ampliación explícita20/10 de HU-07/HU-08, RF-08/13/37: Compartir ficha abre panel blanco sin X; copiar enlace, WhatsApp, Facebook y PDF público por lectores autorizados de búsquedas activas. Denunciar reutiliza el formulario existente. RPC prepare_case_share/plan032, sin otorgar permisos de autor o modificar el contrato QR. Activación remota y prueba de aplicaciones Android pendientes; ADR-115. Sin issue nuevo ni cierre de historias.
+
 
 18/10/2026, HU-10.2 / RF-11 / issue #37: envío Android desde ficha abierta,
 fecha/hora real, comentario/foto opcionales, GPS con alternativa manual y galería

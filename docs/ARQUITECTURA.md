@@ -1,5 +1,9 @@
 # Arquitectura de Entre Huellas
 
+Celular20/10, ADR-116: profile transporta contactPhone mediante entidad/DTO, contratos, UpdateProfile y ViewModel. read_case_contact sugiere el valor privado solo al autor mediante su propia proyección; sin imports de otra presentación/data ni publicación automática. Plan033/fuentes112–114 después de032.
+
+Compartir ficha20/10, ADR-115: case_posters añade SharePublicCase/CaseShareRepository/ViewModel y fuentes RPC/plataforma. Reutiliza DTO y generador PDF público; Clipboard se inyecta desde bootstrap como callback, sin Flutter en data. Router compone CaseShareButton por builder y callback de denuncia, sin imports entre presentaciones. RPC prepare_case_share/plan032 autoriza lectores de búsquedas activas, con dueño real, enlace estable y sin reactivar revocaciones.
+
 Refinamiento de presentación20/10, ADR-113: GlassSurface incorpora GlassSurfaceFinish.frosted, reutilizado por CasePublicGlassCard y controles de contacto. El valor polished por defecto mantiene los consumidores anteriores. CasePublicCards separa caption adaptable (nombre/estado en fila y paginación centrada) sin cambiar dominio, datos, mapas o acciones.
 
 Ficha pública20/10, ADR-113/114: CasePublicCards y CasePublicScreenShell componen tarjetas glass y navegación compartida; ImmersivePhotoSheet se conserva en vistas previas. case_contacts separa dominio/casos de uso/repositorio/DTO/fuente/ViewModel; router inyecta su panel por slot y bootstrap/main sus dependencias. Plan031 protege consentimiento y foto por caso; no amplía QR ni perfiles privados.

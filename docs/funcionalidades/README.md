@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+Celular20/10: [Perfil](perfil.md) incorpora número privado opcional y [Contacto del reportante](contacto-reportante.md) lo sugiere solo al autor, con consentimiento por ficha. ADR-116/plan033 después de032; activación remota pendiente.
+
+20/10: [Compartir ficha pública](compartir-ficha.md), panel blanco sin X con Copiar enlace/WhatsApp/Facebook y dos iconos grises Descargar/Denunciar. Difusión y PDF para lectores autorizados de búsquedas activas; plan032 requiere activación remota. ADR-115, sin cierre de historias.
+
 Ficha pública20/10: [corrección de posición de Perdido y acabado glass](ficha-publica-mobile.md), con frosted compartido y paginación centrada; refinamiento ADR-113. Validación visual normal/pequeña y preservación del glass anterior en ESTADO.
 
 Ficha pública móvil20/10: [nuevo diseño por tarjetas glass](ficha-publica-mobile.md) y [contacto del reportante con permiso por caso](contacto-reportante.md), ADR-113/114. Diseño implementado localmente; contacto requiere activación031. El [patrón inmersivo](ficha-fotografica-inmersiva.md) se conserva en vistas previas.

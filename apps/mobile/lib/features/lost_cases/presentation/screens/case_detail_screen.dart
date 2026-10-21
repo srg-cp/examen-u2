@@ -17,7 +17,7 @@ class CaseDetailScreen extends ConsumerWidget {
     this.posterAction,
     this.timelineAction,
     this.followAction,
-    this.reportAction,
+    this.shareActionBuilder,
     super.key,
   });
   final Widget? savedAction;
@@ -25,7 +25,7 @@ class CaseDetailScreen extends ConsumerWidget {
   final Widget? posterAction;
   final Widget? timelineAction;
   final Widget? followAction;
-  final Widget? reportAction;
+  final Widget Function(String, String)? shareActionBuilder;
   final String id;
   final Widget Function(PublicLostCase, VoidCallback)? recoveryActions;
   @override
@@ -33,6 +33,15 @@ class CaseDetailScreen extends ConsumerWidget {
     final state = ref.watch(publicCaseViewModelProvider(id));
     final model = ref.read(publicCaseViewModelProvider(id).notifier);
     return CasePublicScreenShell(
+      shareAction:
+          !state.isLoading &&
+              !state.hasError &&
+              state.asData?.value.value != null
+          ? shareActionBuilder?.call(
+              state.requireValue.value!.fields.name,
+              'Mascota perdida',
+            )
+          : null,
       trailingAction:
           !state.isLoading &&
               !state.hasError &&
@@ -85,7 +94,6 @@ class CaseDetailScreen extends ConsumerWidget {
                       posterAction!,
                     if (recoveryActions != null)
                       recoveryActions!(state.requireValue.value!, model.retry),
-                    if (reportAction != null) reportAction!,
                     if (state.requireValue.refreshFailed)
                       TextButton(
                         onPressed: state.requireValue.refreshing

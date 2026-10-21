@@ -1,5 +1,7 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Panel Compartir ficha20/10, ADR-115: blanco opaco sin glass ni X, según corrección explícita. Las tres opciones superiores conservan etiquetas; Descargar/Denunciar solo iconos en dos círculos grises. Mantener tooltip/semántica, cierre por gesto/toque fuera/Atrás y movimiento reducido; controles de cabecera glass existentes.
+
 Fidelidad de la ficha20/10, refinamiento ADR-113: Perdido acompaña al nombre en la misma fila, a su derecha; paginación centrada debajo. Material frosted compartido para tarjetas/contacto, ribete blanco único y sombras suaves. No aplicar el contorno doble metálico a estas tarjetas; volver/guardar conservan su glass anterior. Etiquetas largas y texto ampliado se apilan sin recortar el estado.
 
 Ficha pública móvil20/10, ADR-113: CasePublicCards sustituye el layout inmersivo solo al consultar casos. GlassSurface gris perla, navegación compartida52, nombre blanco48/800 y título de navegación Poppins400/20/gris según mockup aprobado (con texto ampliado título32 en fila propia); excepción local a ADR-111. ImmersivePhotoSheet sigue conservado en vistas previas. Contacto real por consentimiento y permisos, ADR-114; sin datos simulados en producción.

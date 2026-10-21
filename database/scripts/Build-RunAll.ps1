@@ -89,6 +89,10 @@ if (($moderationPlan.sources -join '|') -ne 'tables/102_content_moderation.sql|f
 & (Join-Path $PSScriptRoot 'Build-ModerationPatch.ps1')
 $contactPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/031_case_contacts.json') -Raw | ConvertFrom-Json
 & (Join-Path $PSScriptRoot 'Build-Migration.ps1') -Plan 'migration_plans/031_case_contacts.json'
+$sharingPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/032_case_sharing.json') -Raw | ConvertFrom-Json
+& (Join-Path $PSScriptRoot 'Build-CaseSharingPatch.ps1')
+$profilePhonePlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/033_profile_contact_phone.json') -Raw | ConvertFrom-Json
+& (Join-Path $PSScriptRoot 'Build-ProfileContactPhonePatch.ps1')
 function Protect-Creation([string]$Condition, [string]$Sql) {
     return 'do $run_all_object$' + "`n" + 'begin' + "`n" +
         "    if $Condition then`n$Sql`n    end if;`n" +
@@ -136,10 +140,13 @@ begin
     if profile_table is not null then
         if not exists (select 1 from pg_catalog.pg_class where oid = profile_table and relkind = 'r')
            or (select count(*) from pg_catalog.pg_attribute
-               where attrelid = profile_table and attnum > 0 and not attisdropped) not in (5, 6)
+               where attrelid = profile_table and attnum > 0 and not attisdropped) not in (5, 6, 7)
            or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
                and attnum > 0 and not attisdropped and attname not in
-               ('id','display_name','city','created_at','updated_at','onboarding_completed_at'))
+               ('id','display_name','city','created_at','updated_at','onboarding_completed_at','contact_phone'))
+           or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
+               and attname = 'contact_phone' and not attisdropped
+               and (atttypid <> 'text'::regtype or attnotnull))
            or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
                and attname = 'onboarding_completed_at' and not attisdropped
                and (atttypid <> 'timestamp with time zone'::regtype or attnotnull))
@@ -219,7 +226,7 @@ foreach ($relativePath in $expectedSources) {
         default { $lines.Add($sql) } # Reviewed repeatable grants and ON CONFLICT DO NOTHING backfill.
     }
 }
-foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources) + @($lostCasesPlan.sources) + @($foundCasesPlan.sources) + @($lostCaseLockTimeoutPlan.sources) + @($caseCollectionsPlan.sources) + @($foundCaseLockTimeoutPlan.sources) + @($recoveryPlan.sources) + @($explorePlan.sources) + @($savedCasesPlan.sources) + @($savedCasesListPlan.sources) + @($postersPlan.sources) + @($publicQrPlan.sources) + @($publicSightingsPlan.sources) + @($appSightingsPlan.sources) + @($timelinePlan.sources) + @($notificationsPlan.sources) + @($closurePlan.sources) + @($reportsPlan.sources) + @($moderationPlan.sources) + @($contactPlan.sources))) {
+foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources) + @($lostCasesPlan.sources) + @($foundCasesPlan.sources) + @($lostCaseLockTimeoutPlan.sources) + @($caseCollectionsPlan.sources) + @($foundCaseLockTimeoutPlan.sources) + @($recoveryPlan.sources) + @($explorePlan.sources) + @($savedCasesPlan.sources) + @($savedCasesListPlan.sources) + @($postersPlan.sources) + @($publicQrPlan.sources) + @($publicSightingsPlan.sources) + @($appSightingsPlan.sources) + @($timelinePlan.sources) + @($notificationsPlan.sources) + @($closurePlan.sources) + @($reportsPlan.sources) + @($moderationPlan.sources) + @($contactPlan.sources) + @($sharingPlan.sources) + @($profilePhonePlan.sources))) {
     $sql = [IO.File]::ReadAllText((Join-Path $databaseRoot $relativePath)).Replace("`r`n", "`n").TrimEnd()
     $hashAlgorithm = [Security.Cryptography.SHA256]::Create()
     try { $hash = [BitConverter]::ToString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($sql + "`n"))).Replace('-', '').ToLowerInvariant() }
@@ -231,4 +238,4 @@ $lines.Add("`ncommit;")
 $outputPath = Join-Path $databaseRoot 'run_all.sql'
 $content = ($lines -join "`n") + "`n"
 [IO.File]::WriteAllText($outputPath, $content, (New-Object Text.UTF8Encoding($false)))
-Write-Output 'Generado database/run_all.sql con perfiles, mascotas, casos, QR, avistamientos, cronología, alertas y contactos (001-010,012-109; fuente011 sustituida).'
+Write-Output 'Generado database/run_all.sql con perfiles, mascotas, casos, QR, avistamientos, cronología, alertas y contactos (001-010,012-114; fuente011 sustituida).'

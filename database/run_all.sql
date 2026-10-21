@@ -12,10 +12,13 @@ begin
     if profile_table is not null then
         if not exists (select 1 from pg_catalog.pg_class where oid = profile_table and relkind = 'r')
            or (select count(*) from pg_catalog.pg_attribute
-               where attrelid = profile_table and attnum > 0 and not attisdropped) not in (5, 6)
+               where attrelid = profile_table and attnum > 0 and not attisdropped) not in (5, 6, 7)
            or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
                and attnum > 0 and not attisdropped and attname not in
-               ('id','display_name','city','created_at','updated_at','onboarding_completed_at'))
+               ('id','display_name','city','created_at','updated_at','onboarding_completed_at','contact_phone'))
+           or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
+               and attname = 'contact_phone' and not attisdropped
+               and (atttypid <> 'text'::regtype or attnotnull))
            or exists (select 1 from pg_catalog.pg_attribute where attrelid = profile_table
                and attname = 'onboarding_completed_at' and not attisdropped
                and (atttypid <> 'timestamp with time zone'::regtype or attnotnull))
@@ -3697,5 +3700,83 @@ revoke all on function public.read_case_contact(text,uuid) from public,anon,auth
 revoke all on function public.set_case_contact(text,uuid,boolean,text,text,boolean,bigint) from public,anon,authenticated;
 revoke all on function public.can_read_case_contact_avatar(text) from public,anon,authenticated;
 grant execute on function public.read_case_contact(text,uuid),public.set_case_contact(text,uuid,boolean,text,text,boolean,bigint),public.can_read_case_contact_avatar(text) to authenticated;
+
+-- Source: database/functions/110_prepare_case_share.sql | normalized SHA256: 2f2be7c47d52cec4f012fce7bccb7f918710c03d0037fd7f225d403625d21b88
+-- Sharing a visible public search does not confer ownership or poster commands.
+create or replace function public.prepare_case_share(p_source text,p_id uuid)
+returns jsonb language plpgsql security definer set search_path='' set lock_timeout='3s' set statement_timeout='8s' as $$
+declare v_owner uuid;v_status text;v_deleted timestamptz;v_kind text;v_data jsonb;
+ v_slug text;v_revoked timestamptz;v_projection jsonb;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='share_forbidden';end if;
+ if p_source is null or p_source not in ('lost','found') or p_id is null then raise exception using errcode='23514',message='share_invalid';end if;
+ if p_source='lost' then
+  select owner_id,status,deleted_at into v_owner,v_status,v_deleted from public.lost_cases where id=p_id for share;
+  v_kind:='own_loss';
+  select r into v_data from public.read_recovery_pet_case(p_id) r;
+ else
+  select owner_id,status,deleted_at,report_kind into v_owner,v_status,v_deleted,v_kind from public.found_cases where id=p_id for share;
+  select r into v_data from public.read_recovery_report(p_id) r;
+ end if;
+ if v_owner is null or v_deleted is not null or v_status<>'active' or v_kind not in ('own_loss','possible_loss','legacy_found')
+ or v_data is null or jsonb_array_length(v_data->'photos')=0 then raise exception using errcode='23514',message='share_unavailable';end if;
+ insert into public.case_public_links(case_source,case_id,owner_id) values(p_source,p_id,v_owner)
+ on conflict(case_source,case_id) do nothing;
+ select public_slug,revoked_at into v_slug,v_revoked from public.case_public_links where case_source=p_source and case_id=p_id and owner_id=v_owner for share;
+ if v_slug is null or v_revoked is not null then raise exception using errcode='42501',message='share_forbidden';end if;
+ -- Same public reader/verified photo checks as the actual shared destination.
+ if public.read_qr_case(v_slug)->>'state'<>'active' then raise exception using errcode='23514',message='share_unavailable';end if;
+ v_projection:=jsonb_build_object('source',p_source,'id',p_id,'public_slug',v_slug,'report_kind',v_kind,
+  'name',coalesce(v_data->>'pet_name',''),'species',v_data->>'species','species_detail',v_data->>'species_detail',
+  'size',v_data->>'size','sex',v_data->>'sex','traits',v_data->>'traits','occurred_at',v_data->'occurred_at',
+  'photo_path',v_data->'photos'->0->>'path');
+ return v_projection||jsonb_build_object('revision',md5(v_projection::text));
+end;
+$$;
+
+-- Source: database/grants/111_case_share_permissions.sql | normalized SHA256: ca31738b96170e7efd2f9fb47f3893e7e295eea98ccf2e442b89d6f6f5a6e759
+revoke all on function public.prepare_case_share(text,uuid) from public,anon,authenticated;
+grant execute on function public.prepare_case_share(text,uuid) to authenticated;
+
+-- Source: database/tables/112_profile_contact_phone.sql | normalized SHA256: d0f879fa1835c8e559acb08d308021883ed16db5bbc5023136f3d592f0704574
+-- Private optional contact number; existing accounts remain without a number.
+alter table public.profiles add column if not exists contact_phone text;
+do $profile_phone$
+begin
+ if not exists(select 1 from pg_catalog.pg_constraint where conrelid='public.profiles'::regclass and conname='profiles_contact_phone_format') then
+  alter table public.profiles add constraint profiles_contact_phone_format
+   check(contact_phone is null or (char_length(contact_phone) between 9 and 16 and contact_phone ~ '^\+[1-9][0-9]{7,14}$'));
+ end if;
+end;
+$profile_phone$;
+
+-- Source: database/functions/113_case_contact_profile_suggestion.sql | normalized SHA256: b22a92723dcb954774a23ffaa697e7840017ca97b8e3a8b178590462f48ddd95
+-- Suggest private profile data only to the case author. Consent remains per case.
+create or replace function public.read_case_contact(p_source text,p_id uuid)
+returns jsonb language plpgsql stable security definer set search_path='' set statement_timeout='5s' as $$
+declare v_owner uuid; v_contact public.case_contacts; v_visible boolean; v_data jsonb;
+begin
+ if auth.uid() is null then raise exception using errcode='42501',message='contact_forbidden';end if;
+ if p_source='lost' then select owner_id into v_owner from public.lost_cases where id=p_id and deleted_at is null;
+ elsif p_source='found' then select owner_id into v_owner from public.found_cases where id=p_id and deleted_at is null;
+ else raise exception using errcode='23514',message='contact_invalid';end if;
+ v_visible:=public.case_contact_visible(p_source,p_id);
+ select * into v_contact from public.case_contacts where case_source=p_source and case_id=p_id;
+ if v_visible and v_contact.enabled and v_contact.owner_id=v_owner then
+  v_data:=jsonb_build_object('display_name',v_contact.display_name,'phone',v_contact.phone,'share_photo',v_contact.share_photo,
+   'avatar_path',case when v_contact.share_photo and exists(select 1 from storage.objects where bucket_id='profile-avatars' and name=v_owner::text||'/avatar.jpg') then v_owner::text||'/avatar.jpg' end);
+ end if;
+ return jsonb_build_object('contact',v_data,'can_edit',coalesce(v_owner=auth.uid(),false),
+  'version',case when v_owner=auth.uid() then coalesce(v_contact.version,0) else 0 end,
+  'suggested_name',case when v_owner=auth.uid() then (select display_name from public.profiles where id=auth.uid()) end,
+  'suggested_phone',case when v_owner=auth.uid() then (select contact_phone from public.profiles where id=auth.uid()) end);
+end;
+$$;
+
+-- Source: database/grants/114_profile_contact_phone_permissions.sql | normalized SHA256: b1eefe7a3b571bf83a14130530215d2819e33f7fa2e5df25960ae78b98fd4cfe
+-- Existing owner RLS applies to this column; no public or peer profile access.
+grant select(contact_phone), update(contact_phone) on public.profiles to authenticated;
+revoke all on function public.read_case_contact(text,uuid) from public,anon;
+grant execute on function public.read_case_contact(text,uuid) to authenticated;
 
 commit;
