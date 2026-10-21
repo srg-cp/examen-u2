@@ -1,5 +1,17 @@
 # Arquitectura de Entre Huellas
 
+Hero landing20/10, ADR-120: typography.css excluye #hero-title de Poppins global;
+landing.css recupera sus valores y mascotas previos a1fc1bd1. Solo presentación,
+sin cambios SEO/dominio/data/permisos. Excepción explícita pedida por el usuario.
+
+Movimiento web20/10, ADR-119: plugin navigation_motion compone estado visual por
+aplicación, sin payload SSR. UserNavigation persiste fuera de NuxtPage; AccountScreen
+la habilita tras sesión/bienvenida, sin alterar política de acceso. Controlador
+origin_transition + OriginTransitionHost/OriginActionButton colaboran mediante
+callbacks de presentación y NavigationLink origin; sin negocio, repositorios o
+imports entre features. DOM decorativo temporal sin campos/formularios, liberado
+al terminar o cambiar identidad. [Ficha](funcionalidades/transiciones-web.md).
+
 Web20/10, ADR-118: páginas componen AccountScreen por slot y RecoveryScreen,
 sin imports de presentación entre funcionalidades. UserNavigation compartido
 contiene cuatro rutas account de la política global. RecoveryViewModel consume

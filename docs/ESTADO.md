@@ -1,5 +1,148 @@
 # Estado del proyecto
 
+## Segunda revisión SEO sin cambiar el hero aprobado —20/10/2026
+
+Comprobación HTTPS de producción:200 con título antiguo, sin JSON-LD ni tarjeta
+summary_large_image. Las mejoras locales previas aún no están publicadas.
+La extensión.app no garantiza mejor ranking; dominio propio recomendado por
+claridad de marca, con migración permanente documentada para cuando esté activo.
+
+Nuevo incremento: variantes WebP320/640 para hero por viewport/densidad, con fuente
+completa y PNG de respaldo conservados. No cambia texto, CSS o composición de
+ADR-120. Variante social JPEG1200×630 de la ilustración pública aprobada,89.933
+bytes frente a3.628.600 anteriores, con Open Graph/JSON-LD coherentes. Generación
+reproducible en el script existente; sin dependencias, SQL ni endpoints nuevos.
+
+Validación: build/typecheck correctos,59/59 pruebas unitarias/arquitectura y28/28
+de servidor aprobadas. QA Chrome1440/731/390/320, texto200 %, sin JS, animaciones,
+FAQ/teclado/anclas, CSP/hidratación y QR aprobado. A1440px DPR1/2/3 el navegador
+elige320/640/completo; fuente Arial, tamaño100.8px y color #171918 conservados.
+Peso conjunto de hero:186.122/702.904/2.604.418 bytes según densidad. DPR1 reduce
+92,9 % respecto a WebP completos; no implica igual reducción de toda la página.
+Capturas en ui-preview/landing-vue y logs platform-seo-next-* en apps/mobile/build.
+
+Pendiente: despliegue autorizado, propiedad/Search Console/sitemap, indexación y
+Core Web Vitals reales. No se afirman puntuaciones Lighthouse, posiciones o
+tráfico sin medir. Siguiente paso: publicar y comprobar la portada real antes
+de migrar dominio. Se mantiene el trabajo local anterior y no se realiza push.
+
+## Título original de landing restaurado —20/10/2026
+
+Por petición explícita con dos capturas, recuperados del padre de1fc1bd1 los
+valores originales del hero: Arial500/#171918, line-height1.02, tracking−0.055em,
+clamp42px/7vw/108px y móvil32–48px, junto con mascotas laterales62–148px y offsets
+previos. La reducción provenía de la unificación de títulos ADR-111; no de una
+necesidad de SEO. La afirmación anterior de conservación de tipografía en el
+relevo de SEO era incorrecta: las capturas de aquel QA ya mostraban el hero reducido.
+
+typography.css excluye solo #hero-title; los demás h1 conservan Poppins. ADR-120,
+AGENTS, normas, diseño, arquitectura, guía y ficha/índice registran la excepción
+explícita. Metadatos SEO, imágenes WebP y demás cambios locales conservados.
+
+Validación: build Nuxt correcto,59/59 pruebas unitarias/arquitectura aprobadas;
+QA Chrome de landing1440/731/390/320, texto200 %, animaciones/movimiento reducido,
+SSR/FAQ sin JS y navegación QR aprobado, sin overflow ni errores CSP/hidratación.
+Captura desktop-top revisada: vuelve el título grande oscuro de la referencia.
+Logs platform-hero-* en apps/mobile/build; capturas en ui-preview/landing-vue.
+Sin despliegue. Siguiente paso: revisión visual del usuario antes de publicar.
+
+## SEO de landing y futura migración de dominio —20/10/2026
+
+Revisión de producción por HTTPS: portada200, HTML SSR con título/description/
+canonical, robots200 y sitemap200 del dominio entrehuellas.kormind.com.
+Faltaban imagen social, og:url/identidad estructurada y configuración unificada
+del dominio; las doce ilustraciones PNG originales sumaban27.134.705 bytes.
+No se consultó Search Console ni se midieron rankings/Core Web Vitals reales.
+
+Implementación local: título/descripción orientados a mascotas perdidas/encontradas,
+apoyo del hero explícito, Open Graph/Twitter con ilustración pública existente y
+JSON-LD WebSite/Organization/WebPage bajo nonce CSP. NUXT_PUBLIC_SITE_URL centraliza
+canonical/social/JSON-LD/robots/sitemap y admite cambio en runtime; HTTPS validado
+sin depender de Host, cabeceras reenviadas o campañas. El dominio actual permanece
+predeterminado. Sitemap solo incluye portada; QR/cuenta/legales conservan noindex,
+autorización y proyecciones. Sin datos privados ni disponibilidad/valoraciones falsas.
+
+WebP sin pérdida y picture con respaldo PNG reducen las doce ilustraciones a
+15.165.652 bytes (−44,1 %). Script reproducible verifica alfa y todos los RGB
+visibles; conserva PNG, dimensiones y lazy loading. Picture usa display:contents
+para conservar las ventanas aprobadas; revisión de capturas confirma encuadre.
+
+Validación final local: build Nuxt, typecheck,59/59 pruebas unitarias/arquitectura
+y28/28 de servidor aprobadas. Pruebas comprueban JSON-LD/nonce/imagen, URL canonical
+sin campañas, cambio a entrehuellas.app en runtime sin residuos del dominio anterior,
+Host ajeno ignorado y noindex privado conservado. QA Chrome pasa1440/731/390/320,
+texto200 %, movimiento reducido/animaciones, FAQ/teclado/anclas, navegación QR y
+SSR sin JS; WebP realmente seleccionado, sin overflow ni errores CSP/hidratación.
+Capturas revisadas en apps/mobile/build/ui-preview/landing-vue; logs platform-seo-*
+en apps/mobile/build. No acredita rendimiento de usuarios reales ni indexación.
+
+Ficha landing/índice, guía, desarrollo y ejemplo de entorno actualizados con
+activación y pasos DNS/HTTPS, redirecciones permanentes, OAuth/orígenes/cookies
+y Search Console para la futura migración. Cambios previos de navegación conservados.
+Sin SQL, compras, push, despliegue ni acciones remotas de configuración.
+Siguiente paso: publicar este incremento autorizado en una tarea de despliegue,
+verificar HTML/robots/sitemap reales y registrar la propiedad en Search Console.
+
+## Barra solo con iconos y animaciones móviles reutilizadas en web —20/10/2026
+
+Corregida la adaptación por petición del usuario: desaparecen las etiquetas
+visibles también en escritorio, conservando aria-label/title/foco. La barra vive
+fuera de NuxtPage y conserva instancia/posición entre las cuatro rutas de cuenta;
+se habilita tras confirmar sesión/bienvenida. El indicador azul único se desliza
+320ms con la curva móvil; los iconos interpolan gris/blanco según su posición.
+Hover/foco/presión elevan el acento2px/200ms. Glass/ribete/sombra refinados según
+GlassSurface y NavigationAccentSurface; Reportar sigue negro con nueve puntos.
+
+Nuevo controlador origin_transition y OriginTransitionHost/OriginActionButton,
+compuestos por plugin navigation_motion. NavigationLink opta con origin. Se
+aplican a Reportar, Registrar/Editar mascota y revisión autorizada desde Inicio;
+retorno de ruta y cierre local invierten el efecto. Entrada320ms/retorno260ms,
+origen hasta45% y contenido desde65%, según OriginPageTransition móvil. Marca y
+barra permanecen fuera. Entrada directa/recarga no simulan un origen; los guards
+de autorización y cambios pendientes siguen siendo los existentes.
+
+La transición espera el montaje de Nuxt y opera dentro de su shell. Mantiene
+una copia visual anterior transitoria/inerta, sin campos de formulario, scripts,
+IDs, diálogos o avisos; se libera al completar/cancelar y no se guarda en el
+registro de retorno, SSR o almacenamiento. Cambio de identidad cancela y limpia;
+resize/orientación/movimiento reducido/desmontaje liberan máscara, inert,
+animaciones y frames. CSS/WAAPI/CSSOM conservan la CSP estricta, sin unsafe-inline.
+
+Validación local: build y typecheck correctos,58/58 pruebas unitarias/arquitectura
+y27/27 de servidor. QA Chrome nuevo comprueba fotogramas del indicador y expansión,
+contenido tardío, continuidad real del nodo de barra, retorno de ruta/local,
+cabecera estable, descarte cancelado, resize, movimiento reducido y cierre de
+sesión a mitad de efecto sin datos anteriores visibles. Capturas revisadas en
+apps/mobile/build/ui-preview/web-navigation-motion; sin errores CSP/hidratación.
+Regresión Chrome de recuperación y acceso, con backend fixture y renders
+1440/390/320/texto200%, documentada en sus scripts. No acredita pruebas remotas.
+
+ADR-119, ficha transiciones-web/índice, navegación web, reglas visuales, diseño,
+arquitectura, guía y desarrollo actualizados. Sin SQL/backend/Flutter ni nuevas
+dependencias. El dev server existente se conservó y producción se verificó con
+NUXT_BUILD_DIR aislado; logs web-motion-build/tests/server-tests en apps/mobile/build.
+Pendiente revisión del usuario y gestos/foco en navegadores físicos. No se ha
+desplegado ni realizado acciones GitHub. Siguiente paso: revisar estos efectos
+en el recorrido real antes de publicar.
+
+## Diagnóstico de acceso denegado en producción —20/10/2026
+
+Comprobado en https://entrehuellas.kormind.com: POST vacío a /api/access/login,
+sin credenciales/cookies, devuelve403 invalid_request con Origin del sitio HTTPS,
+pero422 invalid con Origin http://127.0.0.1:5173. Confirma que producción acepta
+el origen de desarrollo; el middleware rechaza antes de autenticar en Supabase.
+No es una denegación por rol ni evidencia de contraseña incorrecta. También se
+rechazan HTTPS con barra final y HTTP del dominio. Sin cuentas reales ni cambios
+remotos realizados.
+
+Corrección operativa pendiente: configurar PUBLIC_WEB_ORIGIN exactamente como
+https://entrehuellas.kormind.com en el entorno de ejecución de producción y
+reiniciar/recrear el contenedor para que el proceso reciba el nuevo valor.
+Desarrollo conserva http://127.0.0.1:5173. No se relaja CSRF, cookies o permisos.
+Tras aplicar, repetir petición vacía: origen HTTPS debe producir422 invalid y
+localhost403 invalid_request; después verificar acceso real. No requiere SQL
+ni cambio de código. No se ha confirmado aún la corrección remota.
+
 ## Navegación de cuenta y recuperación web —20/10/2026
 
 Implementado el alcance confirmado por el usuario: barra estilo móvil con

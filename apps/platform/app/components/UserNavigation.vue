@@ -1,40 +1,63 @@
 <script setup lang="ts">
+const route = useRoute(),motion = useNuxtApp().$originTransition;
+const sections = ['/inicio','/explorar','/mis-mascotas'];
+const selected = ref(Math.max(0,sections.indexOf(route.path)));
+const engaged = ref<number|null>(null);
+const capsule = useTemplateRef('capsule');
+let frame = 0;
+function settleColors() { capsule.value?.querySelectorAll<HTMLElement>('.user-navigation-item').forEach(item => { item.style.removeProperty('color'); }); }
+function trackColors() {
+  const indicator = capsule.value?.querySelector<HTMLElement>('.user-navigation-indicator');
+  if (!indicator) return;
+  const width = indicator.getBoundingClientRect().width;
+  const position = width ? Math.abs(new DOMMatrixReadOnly(getComputedStyle(indicator).transform).m41) / width : selected.value;
+  capsule.value?.querySelectorAll<HTMLElement>('.user-navigation-item').forEach((item,index) => {
+    const strength = Math.max(0,1-Math.abs(position-index));
+    item.style.color = `rgb(${[110,110,115].map(channel => Math.round(channel+(255-channel)*strength)).join(',')})`;
+  });
+  if (indicator.getAnimations().some(a => a.playState === 'running')) frame = requestAnimationFrame(trackColors);
+}
+watch(selected,() => { cancelAnimationFrame(frame);frame = requestAnimationFrame(trackColors); },{flush:'post'});
+onBeforeUnmount(() => cancelAnimationFrame(frame));
+watch(() => route.path,path => { const index = sections.indexOf(path); if (index >= 0) selected.value = index; });
 </script>
 
 <template>
   <nav class="user-navigation" aria-label="Navegación de usuario">
-    <div class="user-navigation-capsule">
-      <NavigationLink to="/inicio" class="user-navigation-item" title="Inicio">
+    <div ref="capsule" class="user-navigation-capsule" :data-section="selected" :class="{ 'user-navigation-engaged':engaged === selected }" :aria-busy="motion.busy.value" @pointerleave="engaged = null">
+      <div class="user-navigation-indicator" aria-hidden="true" @transitionend="settleColors" @transitioncancel="settleColors"><span /></div>
+      <NavigationLink to="/inicio" class="user-navigation-item" title="Inicio" aria-label="Inicio" @pointerenter="engaged = 0" @focus="engaged = 0" @blur="engaged = null" @pointerdown="engaged = 0" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" stroke-linejoin="round" /></svg>
-        <span>Inicio</span>
       </NavigationLink>
-      <NavigationLink to="/explorar" class="user-navigation-item" title="Explorar">
+      <NavigationLink to="/explorar" class="user-navigation-item" title="Explorar" aria-label="Explorar" @pointerenter="engaged = 1" @focus="engaged = 1" @blur="engaged = null" @pointerdown="engaged = 1" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m16 8-3 5-5 3 3-5Z" stroke-linejoin="round" /></svg>
-        <span>Explorar</span>
       </NavigationLink>
-      <NavigationLink to="/mis-mascotas" class="user-navigation-item" title="Mis mascotas">
+      <NavigationLink to="/mis-mascotas" class="user-navigation-item" title="Mis mascotas" aria-label="Mis mascotas" @pointerenter="engaged = 2" @focus="engaged = 2" @blur="engaged = null" @pointerdown="engaged = 2" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="6" cy="8" rx="2" ry="3" transform="rotate(-25 6 8)" /><ellipse cx="18" cy="8" rx="2" ry="3" transform="rotate(25 18 8)" /><ellipse cx="10" cy="5" rx="1.5" ry="2.5" /><ellipse cx="14" cy="5" rx="1.5" ry="2.5" /><path d="M12 12c-3 0-7 5-5 7 1 2 3 0 5 0s4 2 5 0c2-2-2-7-5-7Z" /></svg>
-        <span>Mis mascotas</span>
       </NavigationLink>
     </div>
-    <NavigationLink to="/reportar" class="user-navigation-report" aria-label="Reportar" title="Reportar">
+    <NavigationLink to="/reportar" origin class="user-navigation-report" aria-label="Reportar" title="Reportar">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle v-for="n in 9" :key="n" :cx="4 + ((n - 1) % 3) * 8" :cy="4 + Math.floor((n - 1) / 3) * 8" r="2.2" /></svg>
     </NavigationLink>
   </nav>
 </template>
 
 <style scoped>
-.user-navigation{position:fixed;z-index:10;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:max-content;max-width:calc(100% - 32px);margin-inline:auto;display:flex;align-items:center;gap:12px}
-.user-navigation-capsule{display:flex;min-width:0;padding:6px;border:1px solid #fff;border-radius:999px;background:#ffffffeb;box-shadow:inset 0 1px 2px #fff,0 6px 24px #3c537b14}
-.user-navigation-item{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:88px;min-height:52px;padding:8px 18px;border-radius:999px;text-decoration:none;color:#65656c;transition:background .2s ease,color .2s ease,transform .2s ease}
-.user-navigation-item[aria-current=page]{color:#fff;background:linear-gradient(180deg,#75bfff 0%,#459ff6 48%,#2887ef 100%);box-shadow:inset 0 1px 2px #ffffff80,0 7px 20px #2887ef40}
+.user-navigation{position:fixed;z-index:10;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(480px,calc(100% - 32px));margin-inline:auto;display:flex;align-items:center;gap:12px}
+.user-navigation-capsule{position:relative;display:flex;flex:1;min-width:0;padding:6px;border:1px solid #ffffffb3;border-radius:999px;background:#ffffffeb;box-shadow:inset 0 0 0 1px #ffffff50,inset 0 -1px 1px #24282a12,0 8px 24px #24282a24,0 1px 3px #1111110f}
+.user-navigation-indicator{position:absolute;inset-block-start:6px;inset-inline-start:6px;width:calc((100% - 12px) / 3);height:52px;pointer-events:none;transition:transform 320ms cubic-bezier(.645,.045,.355,1)}
+.user-navigation-indicator span{display:block;width:100%;height:100%;border-radius:999px;background:linear-gradient(180deg,#75bfff 0%,#459ff6 48%,#2887ef 100%);box-shadow:inset 0 1px 2px #ffffff80,0 7px 20px #2887ef40,0 2px 5px #2887ef1a;transition:transform 200ms ease,filter 200ms ease}
+.user-navigation-capsule[data-section="1"] .user-navigation-indicator{transform:translateX(100%)}
+.user-navigation-capsule[data-section="2"] .user-navigation-indicator{transform:translateX(200%)}
+:dir(rtl) .user-navigation-capsule[data-section="1"] .user-navigation-indicator{transform:translateX(-100%)}
+:dir(rtl) .user-navigation-capsule[data-section="2"] .user-navigation-indicator{transform:translateX(-200%)}
+.user-navigation-engaged .user-navigation-indicator span{transform:translateY(-2px);filter:brightness(.97)}
+.user-navigation-item{position:relative;display:grid;place-items:center;flex:1;min-width:0;height:52px;border-radius:999px;text-decoration:none;color:#6e6e73}
+.user-navigation-capsule[data-section="0"] .user-navigation-item:nth-of-type(1),.user-navigation-capsule[data-section="1"] .user-navigation-item:nth-of-type(2),.user-navigation-capsule[data-section="2"] .user-navigation-item:nth-of-type(3){color:#fff}
 .user-navigation svg{display:block;width:24px;height:24px;flex-shrink:0}
-.user-navigation-item span{font-size:.75rem;line-height:1.25;text-align:center;overflow-wrap:anywhere}
 .user-navigation-report{display:grid;place-items:center;flex-shrink:0;width:64px;height:64px;border-radius:50%;background:#111;color:#fff;text-decoration:none}
-.user-navigation-report[aria-current=page]{background:linear-gradient(180deg,#75bfff,#2887ef);box-shadow:0 7px 20px #2887ef40}
-@supports(backdrop-filter:blur(16px)){.user-navigation-capsule{background:#ffffffb8;backdrop-filter:blur(20px) saturate(1.3)}}
-@media(hover:hover) and (pointer:fine){.user-navigation-item:hover{background-color:#edf5fa}.user-navigation-item[aria-current=page]:hover{transform:translateY(-2px)}.user-navigation-report:hover{filter:brightness(1.15)}}
-@media(max-width:600px){.user-navigation{width:calc(100% - 32px)}.user-navigation-capsule{flex:1}.user-navigation-item{min-width:0;padding-inline:8px}.user-navigation-item span{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
+@supports(backdrop-filter:blur(16px)){.user-navigation-capsule{background:linear-gradient(135deg,#ffffff99 0%,#f5f5f733 35%,#ffffff18 65%,#e5e5ea42 100%);backdrop-filter:blur(22px)}}
+@media(hover:hover) and (pointer:fine){.user-navigation-report:hover{filter:brightness(1.15)}}
 @media(max-width:360px){.user-navigation{gap:8px}.user-navigation-report{width:56px;height:56px}}
-@media(prefers-reduced-motion:reduce){.user-navigation-item{transition:none}.user-navigation-item[aria-current=page]:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.user-navigation-item,.user-navigation-indicator,.user-navigation-indicator span{transition:none}.user-navigation-engaged .user-navigation-indicator span{transform:none}}
 </style>

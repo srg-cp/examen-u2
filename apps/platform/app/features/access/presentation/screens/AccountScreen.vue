@@ -8,6 +8,11 @@ const unsubscribe = model.subscribe(value => { state.value = value; });
 const toast = useTemplateRef('toast');
 const consumeNotice = useRouteNotice();
 const route = useRoute();
+const navigation = useNuxtApp().$navigationActor,motion = useNuxtApp().$originTransition;
+watch(() => [state.value.session,state.value.checking] as const,([session,checking]) => {
+  if (session?.profile.onboardingCompleted && !props.onboarding) navigation.value = session.actor;
+  else if (!checking) { navigation.value = null; motion.clear(); }
+},{ immediate:true });
 const onboardingView = useTemplateRef('onboardingView');
 const nextStep = () => model.nextStep();
 useHead(() => props.onboarding ? { link: [
@@ -83,7 +88,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
       <ActionButton v-if="state.session || state.busy" :working="state.busy && !onboarding" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton>
     </SiteHeader>
     <TopToast ref="toast" />
-    <main id="view" class="account-main">
+    <main id="view" class="account-main" data-origin-content :class="{ 'origin-content-pending':motion.pending.value === route.path }" :inert="motion.pending.value === route.path">
       <ContentSkeleton v-if="state.checking" label="Consultando tu cuenta" />
       <template v-else-if="state.session">
         <OnboardingFlow v-if="onboarding" ref="onboardingView" :step="state.step" :busy="state.busy" :on-next="nextStep" />
@@ -112,7 +117,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
             </section>
             <section v-if="state.canReview" class="account-management account-panel" aria-labelledby="management-title">
               <div><p class="eyebrow">Herramientas de gestión</p><h2 id="management-title">Cuidamos la comunidad</h2><p>Revisa las denuncias y ayuda a mantener un espacio seguro.</p></div>
-              <NavigationLink to="/moderacion" class="secondary">Revisar denuncias</NavigationLink>
+              <NavigationLink to="/moderacion" origin class="secondary">Revisar denuncias</NavigationLink>
             </section>
             <ActionButton v-else-if="state.managementFailed" class="account-management-retry" :working="state.checkingManagement" @click="model.loadManagementAccess()">Reintentar acceso a gestión</ActionButton>
           </StaggerReveal>
@@ -123,7 +128,6 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
       <ContentSkeleton v-else label="Abriendo inicio de sesión" />
     </main>
     <footer v-if="!onboarding" class="account-footer"><NavigationLink to="/terminos">Términos de servicio</NavigationLink><NavigationLink to="/privacidad">Privacidad</NavigationLink></footer>
-    <UserNavigation v-if="!onboarding && state.session?.profile.onboardingCompleted" />
   </div>
 </template>
 

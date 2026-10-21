@@ -52,11 +52,46 @@ test('Landing SSR is public, works without product requests and keeps crawler po
   assert.match(html, /Más huellas juntas/); assert.match(html, /<title>Entre Huellas/); assert.match(html, /name="description"/);
   assert.equal((html.match(/<details[\s>]/g) || []).length, 4);
   assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.kormind.com\/"/);
+  assert.match(html, /<title>Entre Huellas \| Mascotas perdidas y encontradas<\/title>/);
+  assert.match(html, /property="og:site_name" content="Entre Huellas"/);
+  assert.match(html, /property="og:url" content="https:\/\/entrehuellas.kormind.com\/"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.equal((html.match(/<h1[\s>]/g) || []).length, 1);
+  const schemaTag = html.match(/<script\b([^>]*type="application\/ld\+json"[^>]*)>([\s\S]*?)<\/script>/);
+  assert.ok(schemaTag); const schema = JSON.parse(schemaTag[2]);
+  assert.deepEqual(schema['@graph'].map(item => item['@type']), ['Organization', 'WebSite', 'WebPage']);
+  const nonce = /nonce-([^']+)/.exec(response.headers.get('content-security-policy'))?.[1];
+  assert.ok(nonce); assert.ok(schemaTag[1].includes(`nonce="${nonce}"`));
+  const socialImage = html.match(/property="og:image" content="([^"]+)"/)[1];
+  const imageResponse = await fetch(server.origin + new URL(socialImage).pathname);
+  assert.equal(imageResponse.status, 200); assert.match(imageResponse.headers.get('content-type'), /image\/jpeg/);
+  const imageMetadata = await sharp(Buffer.from(await imageResponse.arrayBuffer())).metadata();
+  assert.equal(imageMetadata.width, 1200); assert.equal(imageMetadata.height, 630);
   assert.equal(server.reads(), 0, 'Landing must not query cases or Supabase');
   assert.doesNotMatch(html, /sb_secret_test-private-canary|photo_objects|v-html|noindex/);
   const robots = await (await fetch(server.origin + '/robots.txt')).text(); assert.match(robots, /Disallow: \/c\//); assert.match(robots, /Disallow: \/admin\//);
   const sitemap = await (await fetch(server.origin + '/sitemap.xml')).text(); assert.equal((sitemap.match(/<loc>/g) || []).length, 1); assert.doesNotMatch(sitemap, /\/c\/|\/admin\/|\/api\//);
   const qr = await fetch(`${server.origin}/c/unknown`); assert.match(qr.headers.get('x-robots-tag'), /noindex/);
+});
+
+test('SEO domain changes at runtime consistently and ignores request Host overrides', async t => {
+  const origin = 'https://entrehuellas.app';
+  const server = await productionFixture(undefined, { env: { NUXT_PUBLIC_SITE_URL: origin } }); t.after(server.close);
+  const html = await (await fetch(server.origin + '/?utm_source=community', { headers: { 'X-Forwarded-Host': 'attacker.example' } })).text();
+  assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.app\/"/);
+  assert.match(html, /property="og:url" content="https:\/\/entrehuellas.app\/"/);
+  assert.match(html, /property="og:image" content="https:\/\/entrehuellas.app\/images\/landing\/social-reunion.jpg"/);
+  const schema = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1]);
+  for (const item of schema['@graph']) assert.equal(item.url, origin + '/');
+  const robots = await (await fetch(server.origin + '/robots.txt')).text();
+  const sitemap = await (await fetch(server.origin + '/sitemap.xml')).text();
+  assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
+  assert.ok(sitemap.includes(`<loc>${origin}/</loc>`));
+  assert.doesNotMatch(html + robots + sitemap, /entrehuellas\.kormind\.com|attacker\.example/);
+  for (const path of ['/iniciar-sesion', '/privacidad', '/terminos', '/c/unknown']) {
+    assert.match((await fetch(server.origin + path)).headers.get('x-robots-tag'), /noindex/);
+  }
+  assert.equal(server.reads(), 0);
 });
 test('Built Nuxt SSR, API and photo proxy preserve public contracts and never expose server credentials/paths', async t => {
   const server = await productionFixture(); t.after(server.close);

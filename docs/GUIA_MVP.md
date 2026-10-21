@@ -1,5 +1,25 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+Segunda mejora SEO20/10: recursos adaptables del hero y vista previa social ligera,
+manteniendo diseño ADR-120; sin nuevas HU/RF/issues ni despliegue. Dominio propio
+por marca, sin promesa de ranking por.app. [Resultados](funcionalidades/landing-page.md).
+
+Hero20/10: restauración explícita de la referencia original de landing según
+capturas del usuario, ADR-120. Excepción local a la unificación de títulos;
+sin nuevas HU/RF/issues, cambios de SEO ni despliegue.
+
+SEO20/10: mejora autorizada de la landing existente, sin nuevas HU/RF/issues ni
+cierre de historias. Metadatos descriptivos, identidad estructurada, dominio SEO
+configurable y WebP sin pérdida; conserva privacidad QR/cuenta y composición.
+[Activación, migración futura y límites](funcionalidades/landing-page.md).
+No incluye compra de dominio, publicación ni gestión de Search Console.
+
+Corrección visual20/10, ADR-119: usuario exige barra solo con iconos y trasladar
+efectos móviles a componentes reutilizables web. Se implementan indicador liquid
+persistente y expansión/retorno desde origen en los recorridos existentes;
+sin nuevas HU/RF/issues, backend, SQL, despliegue o cierre de historias.
+[Alcance y validación](funcionalidades/transiciones-web.md).
+
 ## Navegación y recuperación web autorizadas —20/10/2026
 
 El usuario solicita la barra de móvil y confirma incorporar Explorar, Mis mascotas

@@ -1,5 +1,9 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Hero landing20/10, ADR-120: el usuario restaura su título original grande,
+Arial500/#171918/1.02/tracking−0.055em, adaptable hasta108px y móvil32–48px,
+con mascotas laterales originales. Excepción local a ADR-111; resto sin cambios.
+
 Panel Compartir ficha20/10, ADR-115: blanco opaco sin glass ni X, según corrección explícita. Las tres opciones superiores conservan etiquetas; Descargar/Denunciar solo iconos en dos círculos grises. Mantener tooltip/semántica, cierre por gesto/toque fuera/Atrás y movimiento reducido; controles de cabecera glass existentes.
 
 Fidelidad de la ficha20/10, refinamiento ADR-113: Perdido acompaña al nombre en la misma fila, a su derecha; paginación centrada debajo. Material frosted compartido para tarjetas/contacto, ribete blanco único y sombras suaves. No aplicar el contorno doble metálico a estas tarjetas; volver/guardar conservan su glass anterior. Etiquetas largas y texto ampliado se apilan sin recortar el estado.

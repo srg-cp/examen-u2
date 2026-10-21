@@ -1,5 +1,11 @@
 # Acceso web
 
+Diagnóstico20/10: producción rechazaba el Origin HTTPS antes de Auth y aceptaba
+http://127.0.0.1:5173 (POST vacío403 frente a422, sin credenciales). Configurar
+PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com en runtime de producción y
+reiniciar/recrear contenedor; desarrollo conserva su origen local. Corrección
+remota pendiente, sin cambiar CSRF/roles/SQL. Evidencia en ESTADO.
+
 20/10, ADR-118: Inicio comparte la barra de cuenta con /explorar, /mis-mascotas
 y /reportar, protegidas por la política global. AccountScreen ofrece un slot
 compuesto por páginas para conservar cabecera, sesión, logout y onboarding sin

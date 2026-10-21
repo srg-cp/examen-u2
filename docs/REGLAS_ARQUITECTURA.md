@@ -1,5 +1,9 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+Hero landing20/10: ADR-120 registra la excepción explícita a ADR-111 para
+#hero-title, con tipografía/composición originales. Solo presentación; SEO,
+dominio, datos y permisos conservados. [Decisión](decisiones/120-restaurar-hero-original-landing.md).
+
 **Cartografía global20/10, ADR-104:** mapas mediante adaptadores compartidos:
 ZoneMapPicker/MapStyle en core/presentation móvil y LocationMap en app/components
 web. Sin matrices/SDK/mapas independientes por funcionalidad. Filtrar solo

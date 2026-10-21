@@ -1,0 +1,96 @@
+import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
+import { fileURLToPath,pathToFileURL } from 'node:url';
+import { recoveryFixture } from '../tests/recovery_fixture.mjs';
+const { chromium } = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
+const browser = await chromium.launch({ executablePath:process.env.CHROME_PATH,headless:true });
+const server = await recoveryFixture();
+const output = new URL('../../mobile/build/ui-preview/web-navigation-motion/',import.meta.url);
+await mkdir(output,{ recursive:true });
+try {
+  const context = await browser.newContext({ viewport:{width:390,height:844},reducedMotion:'no-preference' });
+  const page = await context.newPage(),errors = [];
+  page.setDefaultTimeout(15000);
+  page.on('pageerror',e => { errors.push(e.message);console.log('Page error:',e.message); });
+  page.on('console',m => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(m.text())) errors.push(m.text()); });
+  await page.route('https://basemaps.cartocdn.com/**',r => r.fulfill({ status:200,contentType:'image/jpeg',body:server.jpeg }));
+  const nav = page.getByRole('navigation',{ name:'Navegación de usuario' });
+  const idle = () => page.waitForFunction(() => !document.querySelector('.origin-transition-active') && !document.querySelector('main[inert]'));
+  async function freeze(progress) {
+    await page.locator('.origin-transition-active').waitFor();
+    await page.evaluate(value => {
+      for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) { a.pause();a.currentTime = Number(a.effect.getTiming().duration)*value; }
+    },progress);
+  }
+  async function finish() {
+    await page.evaluate(() => { for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) a.finish(); });
+    await idle();
+    assert.equal(await page.locator('.origin-transition-previous > *').count(),0,'Transient previous content must be released');
+  }
+  const shot = name => page.screenshot({ path:fileURLToPath(new URL(name+'.png',output)) });
+  await page.goto(server.origin+'/iniciar-sesion');
+  assert.equal(await nav.count(),0);
+  await page.getByLabel('Correo',{exact:true}).fill('ordinario@example.test');
+  await page.getByLabel('Contraseña',{exact:true}).fill('test-fixture-password');
+  await page.getByLabel('Contraseña',{exact:true}).press('Enter');
+  await page.waitForURL('**/inicio');await nav.waitFor();
+  assert.equal((await nav.textContent()).trim(),'','Navigation must be icon-only at every width');
+  const bar = await nav.elementHandle();
+  await nav.getByRole('link',{name:'Explorar',exact:true}).click();
+  await page.waitForURL('**/explorar');
+  await page.locator('.user-navigation-capsule[data-section="1"]').waitFor();
+  const progress = await page.locator('.user-navigation-indicator').evaluate(el => {
+    const transition = el.getAnimations().find(a => a.transitionProperty === 'transform');
+    if (!transition) return null;
+    transition.pause();transition.currentTime = 160;
+    return { x:new DOMMatrixReadOnly(getComputedStyle(el).transform).m41,width:el.getBoundingClientRect().width };
+  });
+  assert.ok(progress && progress.x > 0 && progress.x < progress.width,'Blue indicator must travel, not jump');
+  assert.equal(await bar.evaluate(el => el === document.querySelector('.user-navigation')),true,'Bar must persist between pages');
+  await shot('indicator-halfway');
+  await page.locator('.user-navigation-indicator').evaluate(el => el.getAnimations().forEach(a => a.finish()));
+  await nav.getByRole('link',{name:'Mis mascotas',exact:true}).click();
+  await page.waitForURL('**/mis-mascotas');await page.getByRole('heading',{name:'Luna',exact:true}).waitFor();
+  const brand = await page.locator('.account-brand').boundingBox(),source = await nav.getByRole('link',{name:'Reportar',exact:true}).boundingBox();
+  await nav.getByRole('link',{name:'Reportar',exact:true}).click();await page.waitForURL('**/reportar');
+  await freeze(.3);
+  const expanded = await page.locator('.origin-transition-surface').boundingBox();
+  assert.ok(expanded.width > source.width && expanded.width < 390);
+  assert.equal(await page.locator('main').evaluate(el => el.inert),true);
+  assert.ok(Number(await page.locator('main').evaluate(el => getComputedStyle(el).opacity)) < .01);
+  const duringBrand = await page.locator('.account-brand').boundingBox();
+  assert.deepEqual(duringBrand,brand,'Brand remains outside the transition');
+  await shot('report-origin-30');
+  await page.evaluate(() => { for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) a.currentTime = Number(a.effect.getTiming().duration)*.85; });
+  assert.ok(Number(await page.locator('main').evaluate(el => getComputedStyle(el).opacity)) > 0);
+  await shot('report-origin-85');await finish();
+  await page.goBack();await page.waitForURL('**/mis-mascotas');await freeze(.5);await shot('report-return-halfway');await finish();
+  await page.getByRole('button',{name:'Registrar mascota',exact:true}).click();await freeze(.35);await shot('pet-origin');await finish();
+  await page.getByRole('button',{name:'Cancelar',exact:true}).click();await freeze(.5);await finish();
+  // A cancelled dirty-form guard keeps the old route, content and focus usable.
+  await page.getByRole('button',{name:'Registrar mascota',exact:true}).click();await idle();
+  await page.getByLabel('Nombre',{exact:true}).fill('Borrador');
+  await nav.getByRole('link',{name:'Reportar',exact:true}).click();
+  await page.getByRole('dialog').getByRole('button',{name:'Cancelar',exact:true}).click();
+  await idle();assert.ok(page.url().includes('/mis-mascotas'));assert.equal(await page.getByLabel('Nombre',{exact:true}).inputValue(),'Borrador');
+  await page.getByRole('button',{name:'Cancelar',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Salir',exact:true}).click();await idle();
+  // Resizing or changing reduced motion midway releases mask and inert state.
+  await nav.getByRole('link',{name:'Reportar',exact:true}).click();await freeze(.2);await page.setViewportSize({width:320,height:640});await idle();
+  await nav.getByRole('link',{name:'Mis mascotas',exact:true}).click();await page.waitForURL('**/mis-mascotas');await page.getByRole('button',{name:'Registrar mascota',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Registrar mascota',exact:true}).click();await freeze(.2);await page.emulateMedia({reducedMotion:'reduce'});await idle();
+  await page.getByRole('button',{name:'Cancelar',exact:true}).click();await idle();
+  await nav.getByRole('link',{name:'Reportar',exact:true}).click();await page.waitForURL('**/reportar');await idle();assert.equal(await page.locator('.origin-transition-active').count(),0);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await nav.getByRole('link',{name:'Mis mascotas',exact:true}).click();await page.waitForURL('**/mis-mascotas');
+  await page.getByRole('button',{name:'Registrar mascota',exact:true}).click();await freeze(.3);
+  await page.evaluate(async () => {
+    await fetch('/api/access/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const channel = new BroadcastChannel('eh-access');channel.postMessage('changed');channel.close();
+  });
+  await page.waitForURL('**/iniciar-sesion*');await idle();assert.equal(await nav.count(),0);
+  assert.equal(await page.getByText('Luna',{exact:true}).count(),0,'Identity change must remove previous-account content');
+  assert.deepEqual(errors,[]);
+  await context.close();
+  console.log('Navigation motion Chrome QA passed: icon-only bar, persistent sliding indicator, origin expansion/content timing, reverse, brand stability, local editor reuse, cancelled navigation, resize, reduced motion, no overflow/CSP/hydration errors. Fixture only.');
+} finally { await browser.close();await server.close(); }

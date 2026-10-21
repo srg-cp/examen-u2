@@ -14,8 +14,8 @@
   --primary-title-line-height: 1.25;
 }
 
-/* Page and step headings, including the landing hero. Keep brand/subtitles separate. */
-:is(.reader-shell, .landing-page) h1 {
+/* Page/step headings. The approved landing hero preserves its own typography (ADR-120). */
+:is(.reader-shell, .landing-page) h1:not(#hero-title) {
   font-family: var(--primary-title-family);
   font-size: var(--primary-title-size);
   font-weight: var(--primary-title-weight);

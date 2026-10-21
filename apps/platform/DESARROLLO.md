@@ -1,5 +1,24 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## SEO de landing —20/10/2026
+
+El mismo script de optimización genera hero-*-320/640.webp para srcset/sizes y
+social-reunion.jpg1200×630 para Open Graph/JSON-LD. Versionar estos derivados
+al sustituir originales. Hero completo/PNG siguen disponibles; CSS y título
+original conservados. El JPEG social no sustituye ilustraciones visibles.
+
+NUXT_PUBLIC_SITE_URL define el origen HTTPS público para canonical, tarjetas
+sociales, JSON-LD, robots y sitemap; predeterminado https://entrehuellas.kormind.com.
+Se puede sustituir al arrancar producción sin recompilar. PUBLIC_WEB_ORIGIN
+conserva su responsabilidad independiente de origen permitido para operaciones.
+No usar Host para deducir la identidad SEO ni apuntar al dominio futuro antes
+de activarlo. [Migración y validación](../../docs/funcionalidades/landing-page.md).
+
+Tras sustituir PNG de landing, ejecutar `node scripts/optimize-landing-images.mjs`
+y versionar sus WebP; el script verifica píxeles visibles y alfa sin pérdida.
+Picture conserva los PNG originales como respaldo. Docker no necesita regenerar
+imágenes ni incorporar scripts adicionales en runtime.
+
 ## Registro y recuperación por código —19/10/2026
 
 El login incorpora /crear-cuenta y /recuperar-contrasena; el código verificado
@@ -195,6 +214,16 @@ fixture, sin contactar Google/Facebook reales. Formulario estable, sin skeleton
 inicial ni texto de cuentas autorizadas.
 
 ## Navegación y recuperación web —20/10/2026
+
+Animaciones: `node scripts/check-navigation-motion-browser.mjs` usa las mismas
+variables PLAYWRIGHT_MODULE/CHROME_PATH y backend fixture. Comprueba fotogramas
+del indicador, expansión/retorno, continuidad de cabecera, editor compartido,
+descarte cancelado, resize, movimiento reducido y cierre de sesión durante el
+efecto. Capturas en apps/mobile/build/ui-preview/web-navigation-motion.
+Si hay un dev server activo, verificar con NUXT_BUILD_DIR separado (por ejemplo
+../mobile/build/platform-motion-nuxt) y NUXT_IGNORE_LOCK=1; no limpiar su .nuxt ni
+detener el proceso. Los enlaces con origin y OriginActionButton reutilizan el
+controlador del plugin navigation_motion, sin cambiar lógica de las features.
 
 `node scripts/check-recovery-browser.mjs` requiere build vigente,
 PLAYWRIGHT_MODULE y CHROME_PATH como las demás comprobaciones. Levanta backend

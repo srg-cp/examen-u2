@@ -2,6 +2,11 @@
 
 Fecha:20/10/2026. Estado: aceptada por instrucción explícita del usuario.
 
+Excepción posterior explícita: [ADR-120](120-restaurar-hero-original-landing.md)
+restaura solo #hero-title de landing a su composición original Arial500,
+oscuro y tamaño adaptable hasta108px, con mascotas laterales originales.
+Sustituye para este título las reglas generales indicadas a continuación.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

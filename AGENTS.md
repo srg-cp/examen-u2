@@ -1,5 +1,10 @@
 # Entre Huellas: instrucciones del proyecto
 
+Hero landing20/10, ADR-120: por instrucción explícita, #hero-title recupera Arial,
+peso500, #171918, line-height1.02, tracking−0.055em, tamaño adaptable42–108px
+(móvil32–48px) y mascotas laterales originales. Excepción local a ADR-111;
+los demás títulos conservan Poppins400/32/gris. No reducirlo por cambios de SEO.
+
 Celular20/10, ADR-116: profiles.contact_phone es privado/opcional; solo se sugiere al autor por read_case_contact. Guardar perfil no publica contacto ni modifica los ya compartidos. Mantener consentimiento por caso/foto y plan033 después de032.
 
 Compartir ficha20/10, ADR-115: botón junto a Guardar; panel blanco opaco, sin glass ni X por instrucción explícita. Copiar enlace azul/icono blanco, WhatsApp y Facebook con etiquetas; Descargar/Denunciar son dos círculos grises contiguos sin texto visible, con tooltip/semántica. Compartir/descargar usa solo el enlace QR público activo y autorizado (plan032), sin dar permisos de autor a otros lectores.

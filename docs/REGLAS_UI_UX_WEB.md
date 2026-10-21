@@ -1,5 +1,20 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Hero landing20/10, ADR-120:** excepción explícita posterior a ADR-111 solo para
+#hero-title: Arial500/#171918/1.02/tracking−0.055em, clamp42px/7vw/108px;
+móvil clamp32px/8.5vw/48px. Mascotas laterales y composición originales recuperadas.
+Los demás títulos conservan Poppins. No cambiar el hero al optimizar SEO.
+
+**Animaciones y barra20/10, ADR-119:** solo iconos en todos los anchos, con
+tooltip/semántica. Barra persistente e indicador único deslizante320ms con
+interpolación de iconos; elevación2px/200ms según móvil. OriginTransitionHost y
+OriginActionButton/NavigationLink origin reutilizan expansión real320ms y
+retorno260ms, origen hasta45% y contenido desde65%. Marca fuera del efecto.
+Sin origen ficticio en recarga/directa, sin cobertura global ni cambios en acceso.
+Cancelar/resize/identidad/movimiento reducido limpian máscara/inert/frames.
+[Ficha](funcionalidades/transiciones-web.md). Sustituye las etiquetas y selección
+estática iniciales de ADR-118; stagger general conserva ADR-075.
+
 **Navegación de cuenta20/10, ADR-118:** Inicio/Explorar/Mis mascotas/Reportar
 comparten cápsula glass flotante, selección azul y círculo Reportar de nueve puntos
 basados en móvil. Marca en SiteHeader; nombres accesibles/tooltip/foco, área segura,

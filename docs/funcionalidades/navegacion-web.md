@@ -7,8 +7,11 @@ Implementación local del 20/10/2026. [ADR-118](../decisiones/118-navegacion-web
 Tras login y bienvenida por cuenta, Inicio, Explorar, Mis mascotas y Reportar
 comparten barra inferior flotante basada en LiquidNavigation móvil. Cápsula
 glass, selección azul, círculo de nueve puntos, nombres accesibles/tooltip,
-foco por teclado y movimiento reducido. En escritorio incluye etiquetas; en
-móvil se conservan en semántica para aprovechar el ancho. Cabecera/marca estable.
+foco por teclado y movimiento reducido. Por corrección explícita, solo iconos
+en todos los anchos; nombres en semántica/tooltip. Cabecera/marca estable.
+El indicador se desplaza con la barra persistente y Reportar se expande desde el
+botón. [Transiciones reutilizables](transiciones-web.md), ADR-119, sustituyen
+las etiquetas de escritorio y el cambio estático de selección de ADR-118.
 El usuario puede desplazar todos los controles y legales por encima de la barra.
 
 - Explorar: consulta real, filtros de tipo/especie/estado y Ver más con cursor.

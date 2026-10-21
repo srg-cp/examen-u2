@@ -70,7 +70,7 @@ const questions = [
         <LandingPawTrail />
         <p class="eyebrow">Recuperación colaborativa</p>
         <div class="hero-heading"><LandingArt name="hero-dog" class="hero-dog" /><h1 id="hero-title">Más huellas juntas.<br>Más caminos<br>de vuelta a casa.</h1><LandingArt name="hero-cat" class="hero-cat" /></div>
-        <p class="hero-description">Conectamos a quienes buscan, encuentran y quieren ayudar.</p>
+        <p class="hero-description">Conectamos a quienes buscan mascotas perdidas, encuentran una y quieren ayudar.</p>
         <LandingActions />
         <ul class="hero-values"><li><LandingIcon name="report" />Reporta</li><li><LandingIcon name="share" />Comparte</li><li><LandingIcon name="heart" />Colabora</li></ul>
       </section>

@@ -5,6 +5,14 @@ import { posix } from 'node:path';
 import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts';
 import { configuration } from '../server/infrastructure/config.ts';
 import { routePolicies, routeAccess, sessionRedirect, accountDestination, assertRegisteredRoutes } from '../shared/routing/route_policy.ts';
+import { siteOrigin } from '../shared/seo/site_metadata.ts';
+
+test('SEO identity accepts only a configured HTTPS origin, never arbitrary URL content', () => {
+  assert.equal(siteOrigin('https://entrehuellas.app/'), 'https://entrehuellas.app');
+  for (const value of ['http://entrehuellas.app', 'https://user:password@entrehuellas.app', 'https://entrehuellas.app/path', 'https://entrehuellas.app/?redirect=evil', 'https://entrehuellas.app/#fragment', '//attacker.example', 'javascript:alert(1)']) {
+    assert.throws(() => siteOrigin(value));
+  }
+});
 async function sources(path) {
   const files = [];
   for (const item of await readdir(path, { withFileTypes: true })) {

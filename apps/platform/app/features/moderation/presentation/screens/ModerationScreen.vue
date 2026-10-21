@@ -2,6 +2,7 @@
 import '../styles/moderation.css';
 import DecisionOptions from '../widgets/DecisionOptions.vue';
 const emit=defineEmits<{detail:[visible:boolean]}>();
+const originMotion = useNuxtApp().$originTransition,originRoute = useRoute();
 const model=useNuxtApp().$moderationModel(),state=shallowRef(model.state),unsubscribe=model.subscribe(value=>{state.value=value;});
 const toast=useTemplateRef('toast'),heading=useTemplateRef('heading');
 const accessProblem=ref(false);
@@ -48,7 +49,7 @@ onBeforeRouteLeave(async()=>await canLeave());
 onBeforeUnmount(()=>{++accessCheck;unsubscribe();model.dispose();channel?.close();clearTimeout(expiry);window.removeEventListener('beforeunload',beforeUnload);answer(false);});
 </script>
 <template>
-  <main id="view" class="moderation-screen">
+  <main id="view" class="moderation-screen" data-origin-content :class="{ 'origin-content-pending':originMotion.pending.value === originRoute.path }" :inert="originMotion.pending.value === originRoute.path">
     <header class="moderation-header"><div><p class="eyebrow">Cuidamos la comunidad</p><h1 ref="heading" tabindex="-1">{{state.stage==='detail'?'Revisar denuncia':'Denuncias'}}</h1></div><NavigationLink class="text-button" to="/inicio">Volver a Entre Huellas</NavigationLink><ActionButton v-if="state.session" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton></header>
     <TopToast ref="toast" />
     <section v-if="accessProblem"><ActionButton @click="checkAccess()">Reintentar conexión</ActionButton></section>

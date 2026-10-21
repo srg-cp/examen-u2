@@ -1,5 +1,16 @@
 # Funcionalidades de Entre Huellas
 
+Hero20/10: [landing](landing-page.md) recupera título grande y mascotas de la
+referencia original, por petición explícita. Excepción ADR-120 a ADR-111.
+
+SEO20/10: [landing pública](landing-page.md), identidad SSR, dominio configurable
+y WebP sin pérdida. Incluye migración futura a entrehuellas.app;
+publicación e indexación real pendientes.
+
+Web20/10: [transiciones desde origen y navegación liquid](transiciones-web.md),
+barra solo con iconos, indicador deslizante y expansión/retorno compartidos con
+la referencia móvil. ADR-119; evidencia local y dispositivos físicos pendientes.
+
 Web20/10: [barra de navegación y recorridos de recuperación](navegacion-web.md),
 Inicio/Explorar/Mis mascotas/Reportar, datos compartidos y operaciones autorizadas.
 ADR-118; implementación/QA local, integración remota pendiente.

@@ -1,5 +1,15 @@
 # Diseño de la interfaz: implementación y revisión
 
+Hero landing20/10, ADR-120: recuperar primera captura del usuario, con Arial500,
+oscuro #171918, tamaño42–108px (móvil32–48px), line-height1.02 y tracking−0.055em.
+Mascotas laterales originales; #hero-title queda fuera de Poppins global.
+
+Animaciones web20/10, ADR-119: iconos sin texto visible, cápsula azul deslizante
+320ms con iconos gris/blanco y elevación del acento2px. Barra fuera de NuxtPage
+para conservar continuidad; origen compartido320/260ms en Reportar y editor de
+mascota, con retorno y cabecera estable. Movimiento reducido/cancelación/resize
+liberan interacción; [ficha](funcionalidades/transiciones-web.md).
+
 Navegación web20/10, ADR-118: cápsula glass flotante de Inicio/Explorar/Mis mascotas
 y círculo Reportar de nueve puntos, selección degradada azul basada en móvil.
 Semántica/foco/tooltip, área segura, espacio de scroll y texto ampliado; marca

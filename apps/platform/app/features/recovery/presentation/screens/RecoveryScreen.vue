@@ -7,6 +7,7 @@ const props = defineProps<{ actor:string; section:'explore'|'pets'|'report' }>()
 const model = useNuxtApp().$recoveryModel(props.actor), state = shallowRef(model.state);
 const unsubscribe = model.subscribe(value => { state.value = value; });
 const toast = useTemplateRef('toast');
+const motion = useNuxtApp().$originTransition;
 const query = reactive({ kind:'all',species:'all',status:'active' });
 const editor = ref(false), petId = ref(''), version = ref(0);
 const blank = (): AnimalForm => ({ name:'',species:'',speciesDetail:'',size:'',sex:'male',ageMonths:'',traits:'' });
@@ -73,7 +74,7 @@ async function remember() {
 const confirm = shallowRef<{ resolve:(value:boolean)=>void }|null>(null);
 function ask() { return new Promise<boolean>(resolve => { confirm.value = { resolve }; }); }
 function answer(value:boolean) { const pending = confirm.value; confirm.value = null; pending?.resolve(value); }
-async function cancelEditor() { if (state.value.busy || (dirty.value && !await ask())) return; editor.value = false; }
+async function cancelEditor() { if (state.value.busy || (dirty.value && !await ask())) return; await motion.closeLocal(() => { editor.value = false; }); }
 onBeforeRouteLeave(async () => !state.value.busy && !photoBusy.value && !savingDraft.value && (!dirty.value || await ask()));
 const beforeUnload = (event: BeforeUnloadEvent) => { if (dirty.value || state.value.busy) event.preventDefault(); };
 onMounted(async () => {
@@ -126,11 +127,11 @@ function imageFailed(event: Event) { (event.target as HTMLImageElement).hidden =
           <div class="recovery-actions"><ActionButton type="submit" variant="primary" :working="state.busy">Guardar mascota</ActionButton><ActionButton :disabled="state.busy" @click="cancelEditor">Cancelar</ActionButton></div>
         </form>
         <template v-else>
-          <div class="recovery-actions"><ActionButton variant="primary" :disabled="blocked" @click="editPet()">Registrar mascota</ActionButton><ActionButton :working="state.refreshing" :disabled="blocked" @click="load()">Actualizar</ActionButton></div>
+          <div class="recovery-actions"><OriginActionButton variant="primary" :disabled="blocked" :action="() => editPet()">Registrar mascota</OriginActionButton><ActionButton :working="state.refreshing" :disabled="blocked" @click="load()">Actualizar</ActionButton></div>
           <StaggerReveal v-if="state.pets.length" as="div" class="recovery-cards">
             <article v-for="p in state.pets" :key="p.id" class="recovery-card">
               <div class="recovery-photo"><img v-if="p.photoIds.length" :key="p.photoIds.join()" :src="photoUrl('pet',p.id)" alt="" loading="lazy" @error="imageFailed" /><span v-else>{{ speciesLabel(p.species) }}</span></div>
-              <div class="recovery-card-body"><h2>{{ p.name }}</h2><p class="privacy">{{ speciesLabel(p.species) }}<template v-if="p.ageMonths !== null"> · {{ p.ageMonths }} meses</template></p><p class="recovery-traits">{{ p.traits }}</p><div class="recovery-actions"><ActionButton :disabled="blocked" @click="editPet(p)">Editar</ActionButton><label class="secondary recovery-file" :class="{ working:state.busy && uploadPetId === p.id }">Añadir foto<input type="file" accept="image/jpeg,image/png,image/webp" :disabled="blocked || !!pendingPetPhoto || p.photoIds.length >= 3" :aria-label="'Añadir foto de ' + p.name" @change="selectFiles($event,p)" /></label><ActionButton v-if="pendingPetPhoto?.pet === p.id" :working="state.busy" @click="retryPetPhoto">Reintentar foto</ActionButton></div><p v-if="p.photoIds.length" class="privacy">{{ p.photoIds.length }} de 3 fotos</p></div>
+              <div class="recovery-card-body"><h2>{{ p.name }}</h2><p class="privacy">{{ speciesLabel(p.species) }}<template v-if="p.ageMonths !== null"> · {{ p.ageMonths }} meses</template></p><p class="recovery-traits">{{ p.traits }}</p><div class="recovery-actions"><OriginActionButton :disabled="blocked" :action="() => editPet(p)">Editar</OriginActionButton><label class="secondary recovery-file" :class="{ working:state.busy && uploadPetId === p.id }">Añadir foto<input type="file" accept="image/jpeg,image/png,image/webp" :disabled="blocked || !!pendingPetPhoto || p.photoIds.length >= 3" :aria-label="'Añadir foto de ' + p.name" @change="selectFiles($event,p)" /></label><ActionButton v-if="pendingPetPhoto?.pet === p.id" :working="state.busy" @click="retryPetPhoto">Reintentar foto</ActionButton></div><p v-if="p.photoIds.length" class="privacy">{{ p.photoIds.length }} de 3 fotos</p></div>
             </article>
           </StaggerReveal>
           <p v-else-if="!state.failure" class="recovery-empty">Todavía no has registrado mascotas.</p>

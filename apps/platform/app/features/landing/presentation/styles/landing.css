@@ -423,17 +423,25 @@ html:has(.landing-page) {
   width: fit-content;
   margin: 12px auto 10px;
 }
+.landing-page .hero h1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(42px, 7vw, 108px);
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
 .landing-page .hero-dog {
   position: absolute !important;
-  width: clamp(36px, 5vw, 72px);
-  left: clamp(-96px, -7vw, -60px);
+  width: clamp(62px, 10vw, 148px);
+  left: clamp(-170px, -12vw, -76px);
   top: 18%;
   border-radius: 20%;
 }
 .landing-page .hero-cat {
   position: absolute !important;
-  width: clamp(36px, 5vw, 72px);
-  right: clamp(-96px, -7vw, -60px);
+  width: clamp(62px, 10vw, 148px);
+  right: clamp(-170px, -12vw, -76px);
   top: 37%;
   border-radius: 20%;
 }
@@ -473,6 +481,9 @@ html:has(.landing-page) {
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+}
+.landing-page .art picture {
+  display: contents;
 }
 .landing-page .character-strip {
   isolation: isolate;
@@ -1115,6 +1126,9 @@ html:has(.landing-page) {
   }
   .landing-page .hero-heading {
     margin: 20px auto 18px;
+  }
+  .landing-page .hero h1 {
+    font-size: clamp(32px, 8.5vw, 48px);
   }
   .landing-page .hero-dog {
     width: 36px;
