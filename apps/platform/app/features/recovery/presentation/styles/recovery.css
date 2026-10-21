@@ -1,4 +1,6 @@
 .reader-shell .recovery-screen{width:100%;min-width:0}
+.reader-shell .recovery-navigation{position:sticky;top:max(16px,env(safe-area-inset-top));z-index:5;display:flex;justify-content:flex-end;margin-bottom:16px;pointer-events:none}
+.reader-shell .recovery-navigation .glass-navigation{position:static;width:52px;height:52px;flex-shrink:0;pointer-events:auto}
 .reader-shell .recovery-content{position:relative;isolation:isolate}
 .reader-shell .recovery-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .reader-shell .recovery-fields label{display:flex;flex-direction:column;gap:10px;min-width:0;font-size:.95rem;line-height:1.4;color:#454746}

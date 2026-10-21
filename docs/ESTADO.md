@@ -1,5 +1,25 @@
 # Estado del proyecto
 
+## Cierre de Reportar web —20/10/2026
+
+El recorrido abierto desde los nueve puntos incorpora X circular glass sticky,
+mediante GlassNavigationButton compartido. Vuelve a la sección de cuenta de
+origen; sin origen de cuenta, a Inicio. Mantiene el guard de cambios sin guardar,
+el bloqueo durante operaciones y la transición de retorno existente.
+Validación: typecheck correcto,12/12 pruebas de recuperación/arquitectura y
+git diff --check correctos. Pendiente QA visual/interacción en navegador;
+sin publicación. Siguiente paso: revisar cierre limpio, cancelar/confirmar
+salida con cambios y entrada directa en navegador.
+
+## Barra web sin tooltip —20/10/2026
+
+Por petición explícita, retirado title de Inicio, Explorar, Mis mascotas y
+Reportar en UserNavigation. Se conservan aria-label, foco y efectos existentes.
+Regla web y fichas de navegación/transiciones actualizadas.
+Validación: npm run typecheck y git diff --check correctos. Sin despliegue;
+pendiente comprobación visual del hover en navegador y publicación autorizada.
+Siguiente paso: comprobar la barra en la web al actualizar la versión.
+
 ## Segunda revisión SEO sin cambiar el hero aprobado —20/10/2026
 
 Comprobación HTTPS de producción:200 con título antiguo, sin JSON-LD ni tarjeta

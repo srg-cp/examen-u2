@@ -4,7 +4,7 @@ Incremento visual del 20/10/2026. [ADR-119](../decisiones/119-animaciones-web-de
 
 ## Qué hace y recorrido
 
-La barra de cuenta usa solo iconos en todos los tamaños, con tooltip/nombre
+La barra de cuenta usa solo iconos en todos los tamaños, con nombre
 accesible. Una cápsula azul compartida se desplaza entre Inicio, Explorar y Mis
 mascotas en 320 ms; el color de cada icono sigue su distancia al indicador, incluso
 al pasar por la sección intermedia. Hover/foco/presión elevan el acento 2 px.

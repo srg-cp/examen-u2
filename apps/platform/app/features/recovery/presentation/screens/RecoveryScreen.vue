@@ -8,6 +8,7 @@ const model = useNuxtApp().$recoveryModel(props.actor), state = shallowRef(model
 const unsubscribe = model.subscribe(value => { state.value = value; });
 const toast = useTemplateRef('toast');
 const motion = useNuxtApp().$originTransition;
+const router = useRouter();
 const query = reactive({ kind:'all',species:'all',status:'active' });
 const editor = ref(false), petId = ref(''), version = ref(0);
 const blank = (): AnimalForm => ({ name:'',species:'',speciesDetail:'',size:'',sex:'male',ageMonths:'',traits:'' });
@@ -75,6 +76,12 @@ const confirm = shallowRef<{ resolve:(value:boolean)=>void }|null>(null);
 function ask() { return new Promise<boolean>(resolve => { confirm.value = { resolve }; }); }
 function answer(value:boolean) { const pending = confirm.value; confirm.value = null; pending?.resolve(value); }
 async function cancelEditor() { if (state.value.busy || (dirty.value && !await ask())) return; await motion.closeLocal(() => { editor.value = false; }); }
+function closeReport() {
+  if (state.value.busy || photoBusy.value || savingDraft.value || confirm.value || motion.busy.value) return;
+  const previous = router.options.history.state.back;
+  if (typeof previous === 'string' && ['/inicio','/explorar','/mis-mascotas'].includes(previous.split('?')[0]!)) router.back();
+  else void navigateTo('/inicio', { replace:true });
+}
 onBeforeRouteLeave(async () => !state.value.busy && !photoBusy.value && !savingDraft.value && (!dirty.value || await ask()));
 const beforeUnload = (event: BeforeUnloadEvent) => { if (dirty.value || state.value.busy) event.preventDefault(); };
 onMounted(async () => {
@@ -102,6 +109,7 @@ function imageFailed(event: Event) { (event.target as HTMLImageElement).hidden =
 <template>
   <section class="recovery-screen">
     <TopToast ref="toast" />
+    <div v-if="section === 'report'" class="recovery-navigation"><GlassNavigationButton close label="Cerrar reporte" :disabled="state.busy || photoBusy || savingDraft || !!confirm || motion.busy.value" @navigate="closeReport" /></div>
     <header class="account-welcome"><p class="eyebrow">Cada huella cuenta</p><h1>{{ title }}</h1><p v-if="section === 'explore'">Ayuda a encontrar su camino de vuelta a casa.</p><p v-else-if="section === 'pets' && !editor">Tus mascotas, contigo en web y móvil.</p></header>
     <ContentSkeleton v-if="state.loading" label="Consultando información" />
     <div v-else class="recovery-content" :class="{ refreshing:state.refreshing }" :aria-busy="state.refreshing">

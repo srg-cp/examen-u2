@@ -26,17 +26,17 @@ watch(() => route.path,path => { const index = sections.indexOf(path); if (index
   <nav class="user-navigation" aria-label="Navegación de usuario">
     <div ref="capsule" class="user-navigation-capsule" :data-section="selected" :class="{ 'user-navigation-engaged':engaged === selected }" :aria-busy="motion.busy.value" @pointerleave="engaged = null">
       <div class="user-navigation-indicator" aria-hidden="true" @transitionend="settleColors" @transitioncancel="settleColors"><span /></div>
-      <NavigationLink to="/inicio" class="user-navigation-item" title="Inicio" aria-label="Inicio" @pointerenter="engaged = 0" @focus="engaged = 0" @blur="engaged = null" @pointerdown="engaged = 0" @pointerup="engaged = null" @pointercancel="engaged = null">
+      <NavigationLink to="/inicio" class="user-navigation-item" aria-label="Inicio" @pointerenter="engaged = 0" @focus="engaged = 0" @blur="engaged = null" @pointerdown="engaged = 0" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" stroke-linejoin="round" /></svg>
       </NavigationLink>
-      <NavigationLink to="/explorar" class="user-navigation-item" title="Explorar" aria-label="Explorar" @pointerenter="engaged = 1" @focus="engaged = 1" @blur="engaged = null" @pointerdown="engaged = 1" @pointerup="engaged = null" @pointercancel="engaged = null">
+      <NavigationLink to="/explorar" class="user-navigation-item" aria-label="Explorar" @pointerenter="engaged = 1" @focus="engaged = 1" @blur="engaged = null" @pointerdown="engaged = 1" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m16 8-3 5-5 3 3-5Z" stroke-linejoin="round" /></svg>
       </NavigationLink>
-      <NavigationLink to="/mis-mascotas" class="user-navigation-item" title="Mis mascotas" aria-label="Mis mascotas" @pointerenter="engaged = 2" @focus="engaged = 2" @blur="engaged = null" @pointerdown="engaged = 2" @pointerup="engaged = null" @pointercancel="engaged = null">
+      <NavigationLink to="/mis-mascotas" class="user-navigation-item" aria-label="Mis mascotas" @pointerenter="engaged = 2" @focus="engaged = 2" @blur="engaged = null" @pointerdown="engaged = 2" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="6" cy="8" rx="2" ry="3" transform="rotate(-25 6 8)" /><ellipse cx="18" cy="8" rx="2" ry="3" transform="rotate(25 18 8)" /><ellipse cx="10" cy="5" rx="1.5" ry="2.5" /><ellipse cx="14" cy="5" rx="1.5" ry="2.5" /><path d="M12 12c-3 0-7 5-5 7 1 2 3 0 5 0s4 2 5 0c2-2-2-7-5-7Z" /></svg>
       </NavigationLink>
     </div>
-    <NavigationLink to="/reportar" origin class="user-navigation-report" aria-label="Reportar" title="Reportar">
+    <NavigationLink to="/reportar" origin class="user-navigation-report" aria-label="Reportar">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle v-for="n in 9" :key="n" :cx="4 + ((n - 1) % 3) * 8" :cy="4 + Math.floor((n - 1) / 3) * 8" r="2.2" /></svg>
     </NavigationLink>
   </nav>

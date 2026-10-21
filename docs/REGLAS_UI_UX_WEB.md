@@ -1,5 +1,10 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Barra web20/10, corrección explícita:** Inicio/Explorar/Mis mascotas/Reportar
+conservan iconos y nombres accesibles mediante aria-label, sin atributo title ni
+tooltip al mantener el puntero. Sustituye solo el requisito de tooltip de la
+barra en ADR-118/119; los demás controles conservan sus reglas.
+
 **Hero landing20/10, ADR-120:** excepción explícita posterior a ADR-111 solo para
 #hero-title: Arial500/#171918/1.02/tracking−0.055em, clamp42px/7vw/108px;
 móvil clamp32px/8.5vw/48px. Mascotas laterales y composición originales recuperadas.
