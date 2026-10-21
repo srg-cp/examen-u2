@@ -1,5 +1,13 @@
 # Diseño de la interfaz: implementación y revisión
 
+Navegación web20/10, ADR-118: cápsula glass flotante de Inicio/Explorar/Mis mascotas
+y círculo Reportar de nueve puntos, selección degradada azul basada en móvil.
+Semántica/foco/tooltip, área segura, espacio de scroll y texto ampliado; marca
+superior conservada. Formularios reutilizan mapa/toast/skeleton/shimmer; acciones
+apiladas en móvil. [Ficha](funcionalidades/navegacion-web.md).
+
+Teléfono20/10, ADR-117: bandera vectorial y prefijo seleccionables junto al número nacional, con AppFieldSurface compartido; apilado en ancho/texto ampliado. Panel blanco con búsqueda española y scroll integral ante teclado, sin X. Vacíos con Perú inicial; número existente conserva prefijo, compartidos ambiguos muestran globo. Semántica país/prefijo y controles48.
+
 Perfil20/10, ADR-116: Celular de contacto opcional reutiliza AppTextField/ShakeField/espaciado20 existente, teclado telefónico y privacidad visible. Sugerencia por caso sin activar consentimiento ni foto; toast superior y guardado conjunto con shimmer real.
 
 Compartir ficha20/10, ADR-115: panel inferior blanco opaco/radio28/tirador, sin glass ni X. Copiar enlace azul/icono blanco, WhatsApp verde y Facebook azul arriba; Descargar/Denunciar en círculos grises contiguos solo iconos, tooltip y semántica. Gesto/toque fuera/Atrás para cerrar; scroll con texto ampliado. Cabecera conserva glass y sitúa título en fila propia bajo380px o texto ampliado, evitando solapamiento con Compartir/Guardar. [Ficha](funcionalidades/compartir-ficha.md).

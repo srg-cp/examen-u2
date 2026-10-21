@@ -1,5 +1,7 @@
 # Perfil y fotografía de cuenta
 
+Selector20/10, ADR-117: el celular usa bandera/prefijo y número nacional separados mediante InternationalPhoneField compartido. Perú inicial para vacíos, búsqueda por país/ISO/prefijo y pegado internacional. Guarda el mismo número completo privado; sin nuevo SQL. Prefijos compartidos sin país identificado muestran globo hasta elegir. Validación y Android en ESTADO.
+
 Celular20/10, [ADR-116](../decisiones/116-celular-privado-perfil-y-sugerencia-contacto.md):
 campo opcional privado con código de país (+ y8–15 dígitos). Normaliza espacios,
 guiones/paréntesis; vacío elimina el valor. Se guarda con nombre/ciudad y se conserva

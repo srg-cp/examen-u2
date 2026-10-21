@@ -1,5 +1,12 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Navegación de cuenta20/10, ADR-118:** Inicio/Explorar/Mis mascotas/Reportar
+comparten cápsula glass flotante, selección azul y círculo Reportar de nueve puntos
+basados en móvil. Marca en SiteHeader; nombres accesibles/tooltip/foco, área segura,
+espacio final de scroll y movimiento reducido. Solo recorridos implementados;
+gestión sigue en Inicio con permiso. Acceso/onboarding/públicas/QR no incorporan
+la barra de cuenta. [Ficha](funcionalidades/navegacion-web.md).
+
 **Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
 gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
 AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.

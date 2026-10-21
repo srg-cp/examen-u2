@@ -1,5 +1,15 @@
 # Arquitectura de Entre Huellas
 
+Web20/10, ADR-118: páginas componen AccountScreen por slot y RecoveryScreen,
+sin imports de presentación entre funcionalidades. UserNavigation compartido
+contiene cuatro rutas account de la política global. RecoveryViewModel consume
+casos de uso concretos; HTTP/IndexedDB y fuentes RPC/Edge/Storage quedan en data,
+compuestas por plugin/utilidades Nitro. Revalidación por operación con JWT privado,
+proyecciones explícitas y fotografías en proxy de mismo origen. Sin SQL nuevo.
+[Alcance y validación](funcionalidades/navegacion-web.md).
+
+Selector telefónico20/10, ADR-117: InternationalPhoneField en core/presentation se reutiliza en profile y case_contacts. Catálogo country_picker y banderas circle_flags encapsulados en presentación; controller externo conserva número completo, sin cambios de dominio/data/SQL ni imports entre funcionalidades.
+
 Celular20/10, ADR-116: profile transporta contactPhone mediante entidad/DTO, contratos, UpdateProfile y ViewModel. read_case_contact sugiere el valor privado solo al autor mediante su propia proyección; sin imports de otra presentación/data ni publicación automática. Plan033/fuentes112–114 después de032.
 
 Compartir ficha20/10, ADR-115: case_posters añade SharePublicCase/CaseShareRepository/ViewModel y fuentes RPC/plataforma. Reutiliza DTO y generador PDF público; Clipboard se inyecta desde bootstrap como callback, sin Flutter en data. Router compone CaseShareButton por builder y callback de denuncia, sin imports entre presentaciones. RPC prepare_case_share/plan032 autoriza lectores de búsquedas activas, con dueño real, enlace estable y sin reactivar revocaciones.

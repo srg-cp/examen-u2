@@ -2,13 +2,14 @@ import {createHash,randomBytes} from 'node:crypto';
 import {productionFixture} from './server_fixture.mjs';
 export const moderator='11111111-1111-4111-8111-111111111145',ordinary='22222222-2222-4222-8222-222222222245',reportId='33333333-3333-4333-8333-333333333345';
 const resourceId='44444444-4444-4444-8444-444444444445';
-export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217])){
+export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),options={}){
  let logoutBarrier=null;
  let socialDenied=false,socialCancelled=false;const oauthCodes=new Map();
  const onboarded=new Map();let completions=0,profileFailure=false;
  let revoked=false,hidden=false,ambiguous=false;const decisions=new Map(),accesses=[];let reportVersion=0,resourceVersion=0;
  const send=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
  async function handle(req,res){
+  if(options.handle&&await options.handle(req,res))return true;
   const actor=req.headers.authorization==='Bearer '+'m'.repeat(30)?moderator:ordinary;
   if(req.url?.startsWith('/auth/v1/authorize?')){
    const url=new URL(req.url,'http://fixture'),callback=new URL(url.searchParams.get('redirect_to'));

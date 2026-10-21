@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
@@ -304,7 +305,12 @@ void main() {
     testWidgets(
       'Profile fields persist through save error and remain reachable; small=$small',
       (tester) async {
-        await tester.runAsync(loadFonts);
+        await tester.runAsync(() async {
+          await loadFonts();
+          await const SvgAssetLoader(
+            'packages/circle_flags/assets/svg/pe.svg',
+          ).loadBytes(null);
+        });
         await tester.runAsync(
           () => container.read(profileViewModelProvider.future),
         );
@@ -347,7 +353,7 @@ void main() {
         await tester.pump();
         final phone = find.byType(TextField).at(2);
         await tester.ensureVisible(phone);
-        await tester.enterText(phone, '+51 900 000 000');
+        await tester.enterText(phone, '900 000 000');
         await tester.pump();
         repo.failUpdate = true;
         await tester.ensureVisible(find.text('Guardar cambios'));

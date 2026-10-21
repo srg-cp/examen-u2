@@ -193,3 +193,13 @@ Misma configuración de moderación, más allowlist web en Supabase según
 docs/CONFIGURACION. check-login-browser.mjs recorre ambos proveedores mediante
 fixture, sin contactar Google/Facebook reales. Formulario estable, sin skeleton
 inicial ni texto de cuentas autorizadas.
+
+## Navegación y recuperación web —20/10/2026
+
+`node scripts/check-recovery-browser.mjs` requiere build vigente,
+PLAYWRIGHT_MODULE y CHROME_PATH como las demás comprobaciones. Levanta backend
+fixture local: barra, filtros, alta/edición/foto de mascotas, cuatro reportes,
+borrador/reintento y renders 1440/390/320/texto200%. No modifica Supabase real.
+`npm test` incluye dominio/ViewModel de recovery y `npm run test:server` sus
+contratos de sesión/onboarding, origen, actor, proyección y deduplicación.
+Ver docs/funcionalidades/navegacion-web.md para alcance e integración pendiente.

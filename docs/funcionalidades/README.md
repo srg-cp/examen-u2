@@ -1,5 +1,11 @@
 # Funcionalidades de Entre Huellas
 
+Web20/10: [barra de navegación y recorridos de recuperación](navegacion-web.md),
+Inicio/Explorar/Mis mascotas/Reportar, datos compartidos y operaciones autorizadas.
+ADR-118; implementación/QA local, integración remota pendiente.
+
+Entrada telefónica20/10: Perfil y Contacto del reportante comparten selector de país con bandera y prefijo (ADR-117). Búsqueda local en español y número nacional; contrato internacional/privacidad intactos, sin SQL adicional.
+
 Celular20/10: [Perfil](perfil.md) incorpora número privado opcional y [Contacto del reportante](contacto-reportante.md) lo sugiere solo al autor, con consentimiento por ficha. ADR-116/plan033 después de032; activación remota pendiente.
 
 20/10: [Compartir ficha pública](compartir-ficha.md), panel blanco sin X con Copiar enlace/WhatsApp/Facebook y dos iconos grises Descargar/Denunciar. Difusión y PDF para lectores autorizados de búsquedas activas; plan032 requiere activación remota. ADR-115, sin cierre de historias.

@@ -2,6 +2,7 @@ import '../../../../core/presentation/widgets/failure_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/international_phone_field.dart';
 import '../../../../core/presentation/widgets/app_field_surface.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/primary_action_button_style.dart';
@@ -186,15 +187,10 @@ class _ProfileFieldsState extends State<_ProfileFields> {
         ShakeField(
           errorId: state.errorId,
           hasError: phoneError,
-          child: AppTextField(
+          child: InternationalPhoneField(
             label: 'Celular de contacto (opcional)',
-            hint: '+51 999 999 999',
-            icon: Icons.phone_outlined,
             controller: _phone,
             enabled: !state.isBusy,
-            keyboardType: TextInputType.phone,
-            textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.telephoneNumber],
             invalid: phoneError,
             onChanged: (value) => widget.onEdit(contactPhone: value),
             onSubmitted: (_) {
@@ -204,7 +200,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
         ),
         const SizedBox(height: 12),
         const Text(
-          'Incluye el código de país. Se guarda en privado; tú eliges en qué fichas compartirlo. Cambiarlo aquí no modifica contactos ya publicados.',
+          'Elige el país y escribe tu número. Se guarda en privado; tú eliges en qué fichas compartirlo. Cambiarlo aquí no modifica contactos ya publicados.',
           style: TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF626975)),
         ),
         const SizedBox(height: 24),

@@ -1,5 +1,99 @@
 # Estado del proyecto
 
+## Navegación de cuenta y recuperación web —20/10/2026
+
+Implementado el alcance confirmado por el usuario: barra estilo móvil con
+Inicio/Explorar/Mis mascotas y Reportar independiente. Cápsula glass flotante,
+selección azul, nueve puntos, etiquetas en escritorio/semántica móvil, foco,
+tooltip y área segura. La marca permanece en la cabecera. Se reserva scroll
+final para acceder a contenido/legales por encima de la barra.
+
+Nuevas rutas account de la política única SSR/cliente. Explorar consulta RPC
+existente con filtros tipo/especie/estado y cursor. Mis mascotas consulta registros
+propios, permite alta/edición con validación y añadir foto mediante Edge existente.
+Reportar publica pérdida propia, posible pérdida, avistamiento y custodia: selección
+de mascota o búsqueda real, fecha/hora, referencia privada, LocationMap y fotos
+verificadas. Los envíos ambiguos conservan UUID/datos y reintentan sin duplicar;
+foto de mascota pendiente también conserva ID/bytes para reintento.
+
+Guardar borrador es local/explícito en IndexedDB por cuenta, con fotos y UUID,
+restaurable hasta siete días y eliminación tras confirmación cuando el navegador
+lo permite. No publica ni sincroniza automáticamente. Toast superior, invalid/
+shake, skeleton inicial y shimmer conservando contenido durante refresh. Salida
+con cambios sin guardar se confirma. Botones apilados en móvil/texto ampliado.
+
+AccountScreen expone slot; las páginas componen recovery sin imports entre
+presentaciones. RecoveryViewModel consume casos de uso/contratos propios; HTTP,
+IndexedDB y fuentes RPC/Edge/Storage en data; composición plugin/Nitro. APIs
+revalidan cuenta/onboarding, actor esperado y origen; publicable/JWT de usuario
+solo en servidor. Fotos recodificadas sin EXIF y proxy con sesión/proyección
+permitida. No se envían rutas Storage, token, referencia exacta o teléfono en
+tarjetas públicas. Consultas Explorar limitadas como lecturas, sin consumir el
+cupo de publicaciones. SQL/RLS/Edge existentes conservados; sin migración nueva.
+
+Validación final local: typecheck y build Nuxt correctos;58/58 pruebas de
+dominio/arquitectura y27/27 de servidor aprobadas. Chrome sobre build de producción
+con backend fixture: cuatro entradas, filtros, mascota alta/edición/foto, cuatro
+tipos de reporte, restauración de borrador y reintento ambiguo sin duplicados.
+Regresión de acceso Chrome completa aprobada: onboarding, roles/revocación,
+reintentos, logout entre pestañas, expiración y OAuth simulado. Renders revisados
+1440/390/320 y texto200%, sin overflow ni errores CSP/hidratación. Logs
+web-recovery-build/tests/server-tests en apps/mobile/build y capturas en
+apps/mobile/build/ui-preview/web-recovery. No equivale a validar RLS remota.
+
+ADR-118, ficha navegacion-web/índice, acceso-web, arquitectura/diseño/regla web,
+guía y desarrollo actualizados. Límite actual: Explorar en lista, hasta100 mascotas
+activas propias, alta/edición/adición de fotos; sin mapa de resultados, ficha web
+autenticada completa, archivo/baja/gestión de galería ni paridad global móvil.
+Pendiente integración Supabase/Edge con dos cuentas reales y revisión en
+dispositivos físicos. No se publicó web/SQL ni se realizaron acciones GitHub;
+trabajo móvil concurrente del selector telefónico conservado. Siguiente paso:
+comprobar estos recorridos con la configuración y datos reales antes de publicar.
+
+## Selector de país con bandera para teléfonos —20/10/2026
+
+Implementado InternationalPhoneField compartido en Perfil y Contacto del
+reportante: bandera vectorial/prefijo seleccionable y entrada del número nacional.
+Panel blanco con tirador, sin X, búsqueda local en español por nombre sin tildes,
+ISO o prefijo; cierre por toque fuera/Atrás/arrastre. Perú/+51 inicialmente en
+campos vacíos; elegir país sin número no crea un valor. En ancho pequeño/texto2
+se apilan selector y número. Scroll integral del panel con teclado/área segura y
+movimiento reducido. Nombre y prefijo accesibles; objetivos del selector48px.
+
+country_picker2.0.28 aporta catálogo/localización y circle_flags5.0.1 los SVG
+locales, dibujados mediante flutter_svg existente. Se evita depender de emojis
+o del loader propio de banderas, que no completaba su precarga en pruebas.
+Versiones fijadas y lock actualizado; sin red, permisos de dispositivo o GPS/IP.
+No se guardan países ISO separados ni se deduce un país de un prefijo ambiguo:
+globo/prefijo hasta elegir; una elección explícita compatible se conserva en
+el formulario. Valores con prefijo desconocido se mantienen completos.
+
+Controller externo/VM/dominio/SQL conservan el contrato internacional. Pegado de
+número completo no duplica prefijo, cambio de país conserva parte nacional,
+ceros iniciales conservados y vacío sigue vacío. Campos existentes no se
+reescriben al montar/cancelar/recargar. Disabled/busy bloquean controles; listeners,
+controller interno y foco se liberan. Conserva validación + y8–15 dígitos, toast
+superior/ShakeField, privacidad y consentimiento independiente por caso/foto.
+No añade patch: siguen pendientes los anteriores031/032/033 y Android físico.
+
+ADR-117, fichas perfil/contacto e índice, arquitectura/diseño y guía actualizados.
+Refinamiento HU-01/05/06/07 RF-01/05/06/13 sin nueva HU/issue ni cierre de historia.
+Cambios ajenos en web conservados.
+
+Validación:31/31 pruebas Flutter aprobadas (selector, perfil/contacto, navegación
+y arquitectura); formato/diff correctos. Incluyen búsqueda por nombre/ISO/prefijo,
+país sin número, pegado completo, borrado, nacional sin prefijo, cambio de país,
+compartidos/desconocidos, ceros, control deshabilitado/cancelación, cambio de
+controller y liberación; panel390 y320/texto2 con teclado simulado sin overflow.
+Renders revisados en apps/mobile/build/ui-preview/country-phone y profile-contact,
+con SVG reales precargados para la captura y fuentes locales.
+flutter analyze sin incidencias (64.4s).
+
+Logs country-phone-final-tests y country-phone-final-analyze en apps/mobile/build.
+No se repite SQL por este cambio de presentación; no hay despliegue, APK o GitHub.
+Pendientes teclado/autofill/banderas/selector en Android físico y activación de
+los patches anteriores. Siguiente paso: prueba física del recorrido de contacto.
+
 ## Celular privado de perfil y sugerencia del reportante —20/10/2026
 
 Completado el recorrido solicitado: Perfil permite guardar/eliminar celular de

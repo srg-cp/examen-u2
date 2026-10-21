@@ -80,9 +80,6 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
   <div class="account-layout" :class="{ 'onboarding-layout': onboarding }">
     <SiteHeader v-if="onboarding" class="onboarding-header" brand-class="onboarding-brand" />
     <SiteHeader v-else class="account-header" brand-class="account-brand">
-      <nav v-if="state.session?.profile.onboardingCompleted" aria-label="Navegación de usuario">
-        <NavigationLink to="/inicio" aria-current="page">Inicio</NavigationLink>
-      </nav>
       <ActionButton v-if="state.session || state.busy" :working="state.busy && !onboarding" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton>
     </SiteHeader>
     <TopToast ref="toast" />
@@ -91,6 +88,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
       <template v-else-if="state.session">
         <OnboardingFlow v-if="onboarding" ref="onboardingView" :step="state.step" :busy="state.busy" :on-next="nextStep" />
         <template v-else-if="state.session.profile.onboardingCompleted">
+          <slot :session="state.session">
           <header class="account-welcome">
             <p class="eyebrow">Más caminos de vuelta a casa</p>
             <h1>{{ state.session.profile.displayName ? 'Hola, ' + state.session.profile.displayName : 'Bienvenido a Entre Huellas' }}</h1>
@@ -118,12 +116,14 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
             </section>
             <ActionButton v-else-if="state.managementFailed" class="account-management-retry" :working="state.checkingManagement" @click="model.loadManagementAccess()">Reintentar acceso a gestión</ActionButton>
           </StaggerReveal>
+          </slot>
         </template>
       </template>
       <ActionButton v-else-if="state.failure" :working="state.busy" @click="model.checkSession()">Reintentar conexión</ActionButton>
       <ContentSkeleton v-else label="Abriendo inicio de sesión" />
     </main>
     <footer v-if="!onboarding" class="account-footer"><NavigationLink to="/terminos">Términos de servicio</NavigationLink><NavigationLink to="/privacidad">Privacidad</NavigationLink></footer>
+    <UserNavigation v-if="!onboarding && state.session?.profile.onboardingCompleted" />
   </div>
 </template>
 

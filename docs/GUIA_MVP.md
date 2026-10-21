@@ -1,5 +1,17 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+## Navegación y recuperación web autorizadas —20/10/2026
+
+El usuario solicita la barra de móvil y confirma incorporar Explorar, Mis mascotas
+y Reportar. Incremento web de funciones existentes HU-03/04/05/06/07/10,
+RF-03/05/06/11/13;
+sin nuevas HU/issues ni cierre por arrastre. Entrega lista filtrada/paginada,
+mascotas propias alta/edición/fotos y cuatro tipos de reporte con mapa/borrador.
+Sustituye la pendiente histórica de estos recorridos en ADR-073; no implica
+paridad completa ni ampliar seguimiento/administración. [ADR-118](decisiones/118-navegacion-web-y-recorridos-de-recuperacion.md)
+y [ficha con límites y validación](funcionalidades/navegacion-web.md).
+Sin SQL nuevo, despliegue o acciones GitHub; integración remota pendiente.
+
 Incremento20/10 autorizado de HU-01 y HU-05/06/07, RF-01/05/06/13: celular privado opcional en perfil y sugerencia al autor al autorizar contacto por caso (ADR-116). Plan033 después de032/031, sin nueva historia/issue ni cierre adicional. No publicación automática ni contacto anónimo/QR/PDF; hosted y Android pendientes.
 
 ## Tipografía compartida móvil/web —20/10/2026
@@ -235,6 +247,8 @@ Prompt:
 ```text
 Implementa S1 de Entre Huellas según docs/GUIA_MVP.md: HU-01, RF-01 y RF-34. Lee AGENTS.md y docs/ESTADO.md. Usa Supabase Auth y repositorios; versiona esquema y políticas. Implementa cuenta y sesión con criterios verificables. Si faltan URL/configuración del proyecto, solicita solo lo necesario y avanza con código, migraciones y pruebas independientes. Actualiza el estado con la demo y la validación real.
 ```
+
+Refinamiento20/10 de HU-01/05/06/07, RF-01/05/06/13: selector de país con bandera/prefijo en perfil y contacto por caso, ADR-117. Número nacional separado y búsqueda local; mismo contrato internacional y consentimiento, sin SQL adicional ni nueva HU/issue.
 
 ### S2 - Mascotas, fotos y zonas
 

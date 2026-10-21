@@ -1,5 +1,12 @@
 # Acceso web
 
+20/10, ADR-118: Inicio comparte la barra de cuenta con /explorar, /mis-mascotas
+y /reportar, protegidas por la política global. AccountScreen ofrece un slot
+compuesto por páginas para conservar cabecera, sesión, logout y onboarding sin
+importar otra presentación. Gestión continúa en Inicio por permiso.
+[Recorridos implementados y límites](navegacion-web.md); las pendientes históricas
+de estas tres secciones quedan sustituidas dentro del alcance de esa ficha.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

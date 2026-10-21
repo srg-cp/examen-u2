@@ -1,6 +1,4 @@
 .reader-shell .account-layout{width:100%;min-height:100svh}
-.reader-shell .account-header nav{margin-left:auto}
-.reader-shell .account-header nav a{display:inline-block;border-radius:999px;padding:12px 20px;text-decoration:none;background:#edf5fa;color:#3c537b}
 .reader-shell .account-header>button{margin-left:auto;min-height:48px;padding:12px 20px;font-size:.95rem}
 .reader-shell .account-main{max-width:1160px;min-height:65svh;padding:40px 24px 64px}
 .reader-shell .account-welcome{max-width:780px;margin-bottom:36px}
@@ -19,7 +17,7 @@
 .reader-shell .account-management{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;background:#ffffffbf}
 .reader-shell .account-management-retry{grid-column:1/-1;justify-self:start}
 .reader-shell .account-management p{margin-bottom:8px}
-.reader-shell .account-footer{max-width:1112px;display:flex;justify-content:center;flex-wrap:wrap;gap:16px 24px}
+.reader-shell .account-footer{max-width:1112px;display:flex;justify-content:center;flex-wrap:wrap;gap:16px 24px;padding-bottom:calc(160px + env(safe-area-inset-bottom,0px))}
 @media(max-width:700px){.reader-shell .account-grid{grid-template-columns:minmax(0,1fr)}.reader-shell .account-main{padding-top:24px}}
-@media(max-width:360px){.reader-shell .account-main{padding-inline:16px}.reader-shell .account-panel{padding:22px}.reader-shell .account-header nav{margin-left:0}}
+@media(max-width:360px){.reader-shell .account-main{padding-inline:16px}.reader-shell .account-panel{padding:22px}}
 

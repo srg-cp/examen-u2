@@ -1,5 +1,7 @@
 # Contacto del reportante por caso
 
+Selector20/10, ADR-117: teléfono de contacto usa InternationalPhoneField compartido con Perfil, bandera/prefijo y número nacional, búsqueda local en español. Conserva sugerencia completa, consentimiento por caso/foto, reintentos y formato SQL; no requiere otro patch.
+
 Actualización20/10, ADR-116: sugerencia del celular privado del perfil únicamente
 al autor mediante read_case_contact.suggested_phone. Requiere patch033 después de032;
 031 ya contiene el contacto/consentimiento por caso. Sin contacto automático.

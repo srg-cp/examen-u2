@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/international_phone_field.dart';
 import '../../../../core/presentation/widgets/case_public_cards.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/glass_navigation_button.dart';
@@ -273,11 +274,9 @@ class _ContactEditorState extends State<_ContactEditor> {
           ShakeField(
             errorId: v.notice,
             hasError: v.issue == CaseContactFailureKind.invalid,
-            child: AppTextField(
-              label: 'Teléfono con código de país',
-              hint: '+51',
+            child: InternationalPhoneField(
+              label: 'Teléfono de contacto',
               controller: _phone,
-              keyboardType: TextInputType.phone,
               enabled: !locked,
               invalid: v.issue == CaseContactFailureKind.invalid,
             ),

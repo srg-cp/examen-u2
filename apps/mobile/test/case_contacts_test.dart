@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/international_phone_field.dart';
 import 'package:flutter_application_entrehuellas/features/case_contacts/data/models/case_contact_dto.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -8,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/app_text_field.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter_application_entrehuellas/features/case_contacts/domain/entities/case_contact.dart';
 import 'package:flutter_application_entrehuellas/features/case_contacts/domain/repositories/case_contact_repository.dart';
@@ -298,11 +298,11 @@ void main() {
         await tester.tap(consent);
         await tester.pumpAndSettle();
         final phone = find.widgetWithText(
-          AppTextField,
-          'Teléfono con código de país',
+          InternationalPhoneField,
+          'Teléfono de contacto',
         );
         expect(
-          tester.widget<AppTextField>(phone).controller.text,
+          tester.widget<InternationalPhoneField>(phone).controller.text,
           '+51911111111',
         );
         expect(
@@ -319,7 +319,7 @@ void main() {
         await tester.ensureVisible(phone);
         await tester.enterText(
           find.descendant(of: phone, matching: find.byType(TextField)),
-          '+51 900 000 000',
+          '900 000 000',
         );
         final button = find.widgetWithText(FilledButton, 'Guardar contacto');
         await tester.ensureVisible(button);
