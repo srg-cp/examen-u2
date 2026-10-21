@@ -11,6 +11,13 @@ foco por teclado y movimiento reducido. Por corrección explícita, solo iconos
 en todos los anchos; nombres en semántica. Por petición explícita del20/10,
 sin tooltip al mantener el puntero sobre los cuatro controles de la barra web.
 Cabecera/marca estable.
+Corrección posterior20/10: selección sin elevación al hover/foco/presión;
+conserva brillo y foco accesible. Se retira translateY(-2px) del acento.
+Por ajuste posterior del20/10, el conjunto mide como máximo304px, con opciones
+aproximadamente71×52px. Por corrección posterior, sin impulso horizontal al
+hover; al arrastrar, el acento acompaña hasta8px y regresa en480ms al soltar. Deslizar
+no navega ni cambia la selección. Se respeta movimiento reducido y se limpian
+gestos/animaciones al cancelar, cambiar ruta o desmontar.
 El indicador se desplaza con la barra persistente y Reportar se expande desde el
 botón. [Transiciones reutilizables](transiciones-web.md), ADR-119, sustituyen
 las etiquetas de escritorio y el cambio estático de selección de ADR-118.

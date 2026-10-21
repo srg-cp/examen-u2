@@ -1,5 +1,16 @@
 # Entre Huellas: reglas de UI y UX web
 
+**Corrección posterior20/10:** el acento seleccionado de la barra web tampoco
+se eleva al hover/foco/presión: retirar translateY(-2px). Conserva brillo,
+deslizamiento de selección y retorno horizontal al arrastrar. Sustituye la
+elevación de ADR-119 solo en UserNavigation; no cambia botones de otros flujos.
+
+**Barra compacta20/10, refinamiento explícito de ADR-119:** ancho conjunto máximo
+304px; las tres opciones mantienen altura52px y ancho aproximado71px. Por
+corrección posterior, sin impulso horizontal al hover. Arrastre horizontal
+hasta8px con retorno480ms al soltar, sin cambiar selección ni activar enlaces.
+Movimiento reducido sin impulso; conservar limpieza, foco y semántica existentes.
+
 **Barra web20/10, corrección explícita:** Inicio/Explorar/Mis mascotas/Reportar
 conservan iconos y nombres accesibles mediante aria-label, sin atributo title ni
 tooltip al mantener el puntero. Sustituye solo el requisito de tooltip de la

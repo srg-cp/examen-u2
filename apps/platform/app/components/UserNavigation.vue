@@ -5,6 +5,39 @@ const selected = ref(Math.max(0,sections.indexOf(route.path)));
 const engaged = ref<number|null>(null);
 const capsule = useTemplateRef('capsule');
 let frame = 0;
+let gesture: { id:number; x:number; y:number } | undefined;
+let dragged = false;
+let reducedMotion: MediaQueryList | undefined;
+const selectionSurface = () => capsule.value?.querySelector<HTMLElement>('.user-navigation-indicator span');
+function resetElastic() {
+  selectionSurface()?.style.removeProperty('translate');
+  gesture = undefined;
+}
+function startPush(event: PointerEvent) {
+  if (!event.isPrimary || event.button !== 0) return;
+  resetElastic();
+  dragged = false;
+  gesture = { id:event.pointerId,x:event.clientX,y:event.clientY };
+}
+function dragPush(event: PointerEvent) {
+  if (!gesture || gesture.id !== event.pointerId) return;
+  const dx = event.clientX-gesture.x,dy = event.clientY-gesture.y;
+  if (!dragged && Math.abs(dy) > Math.abs(dx)) { resetElastic();return; }
+  if (Math.abs(dx) > 10) dragged = true;
+  if (!dragged || reducedMotion?.matches) return;
+  const surface = selectionSurface();
+  if (surface) surface.style.translate = `${Math.max(-8,Math.min(8,dx*.18))}px`;
+}
+function finishPush() { resetElastic();engaged.value = null; }
+function preventDragNavigation(event: MouseEvent) {
+  if (dragged && event.detail !== 0) { event.preventDefault();event.stopPropagation();dragged = false; }
+}
+onMounted(() => {
+  reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  reducedMotion.addEventListener('change',resetElastic);
+  window.addEventListener('pointerup',finishPush);
+  window.addEventListener('pointercancel',finishPush);
+});
 function settleColors() { capsule.value?.querySelectorAll<HTMLElement>('.user-navigation-item').forEach(item => { item.style.removeProperty('color'); }); }
 function trackColors() {
   const indicator = capsule.value?.querySelector<HTMLElement>('.user-navigation-indicator');
@@ -18,13 +51,19 @@ function trackColors() {
   if (indicator.getAnimations().some(a => a.playState === 'running')) frame = requestAnimationFrame(trackColors);
 }
 watch(selected,() => { cancelAnimationFrame(frame);frame = requestAnimationFrame(trackColors); },{flush:'post'});
-onBeforeUnmount(() => cancelAnimationFrame(frame));
-watch(() => route.path,path => { const index = sections.indexOf(path); if (index >= 0) selected.value = index; });
+onBeforeUnmount(() => {
+  cancelAnimationFrame(frame);
+  resetElastic();
+  reducedMotion?.removeEventListener('change',resetElastic);
+  window.removeEventListener('pointerup',finishPush);
+  window.removeEventListener('pointercancel',finishPush);
+});
+watch(() => route.path,path => { resetElastic();const index = sections.indexOf(path); if (index >= 0) selected.value = index; });
 </script>
 
 <template>
   <nav class="user-navigation" aria-label="Navegación de usuario">
-    <div ref="capsule" class="user-navigation-capsule" :data-section="selected" :class="{ 'user-navigation-engaged':engaged === selected }" :aria-busy="motion.busy.value" @pointerleave="engaged = null">
+    <div ref="capsule" class="user-navigation-capsule" :data-section="selected" :class="{ 'user-navigation-engaged':engaged === selected }" :aria-busy="motion.busy.value" @pointerdown="startPush" @pointermove="dragPush" @pointerleave="finishPush" @click.capture="preventDragNavigation" @dragstart.prevent>
       <div class="user-navigation-indicator" aria-hidden="true" @transitionend="settleColors" @transitioncancel="settleColors"><span /></div>
       <NavigationLink to="/inicio" class="user-navigation-item" aria-label="Inicio" @pointerenter="engaged = 0" @focus="engaged = 0" @blur="engaged = null" @pointerdown="engaged = 0" @pointerup="engaged = null" @pointercancel="engaged = null">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" stroke-linejoin="round" /></svg>
@@ -43,15 +82,15 @@ watch(() => route.path,path => { const index = sections.indexOf(path); if (index
 </template>
 
 <style scoped>
-.user-navigation{position:fixed;z-index:10;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(480px,calc(100% - 32px));margin-inline:auto;display:flex;align-items:center;gap:12px}
-.user-navigation-capsule{position:relative;display:flex;flex:1;min-width:0;padding:6px;border:1px solid #ffffffb3;border-radius:999px;background:#ffffffeb;box-shadow:inset 0 0 0 1px #ffffff50,inset 0 -1px 1px #24282a12,0 8px 24px #24282a24,0 1px 3px #1111110f}
+.user-navigation{position:fixed;z-index:10;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(304px,calc(100% - 32px));margin-inline:auto;display:flex;align-items:center;gap:12px}
+.user-navigation-capsule{position:relative;display:flex;flex:1;min-width:0;padding:6px;border:1px solid #ffffffb3;border-radius:999px;background:#ffffffeb;box-shadow:inset 0 0 0 1px #ffffff50,inset 0 -1px 1px #24282a12,0 8px 24px #24282a24,0 1px 3px #1111110f;touch-action:pan-y;user-select:none}
 .user-navigation-indicator{position:absolute;inset-block-start:6px;inset-inline-start:6px;width:calc((100% - 12px) / 3);height:52px;pointer-events:none;transition:transform 320ms cubic-bezier(.645,.045,.355,1)}
-.user-navigation-indicator span{display:block;width:100%;height:100%;border-radius:999px;background:linear-gradient(180deg,#75bfff 0%,#459ff6 48%,#2887ef 100%);box-shadow:inset 0 1px 2px #ffffff80,0 7px 20px #2887ef40,0 2px 5px #2887ef1a;transition:transform 200ms ease,filter 200ms ease}
+.user-navigation-indicator span{display:block;width:100%;height:100%;border-radius:999px;background:linear-gradient(180deg,#75bfff 0%,#459ff6 48%,#2887ef 100%);box-shadow:inset 0 1px 2px #ffffff80,0 7px 20px #2887ef40,0 2px 5px #2887ef1a;transition:filter 200ms ease,translate 480ms cubic-bezier(.22,1.4,.36,1)}
 .user-navigation-capsule[data-section="1"] .user-navigation-indicator{transform:translateX(100%)}
 .user-navigation-capsule[data-section="2"] .user-navigation-indicator{transform:translateX(200%)}
 :dir(rtl) .user-navigation-capsule[data-section="1"] .user-navigation-indicator{transform:translateX(-100%)}
 :dir(rtl) .user-navigation-capsule[data-section="2"] .user-navigation-indicator{transform:translateX(-200%)}
-.user-navigation-engaged .user-navigation-indicator span{transform:translateY(-2px);filter:brightness(.97)}
+.user-navigation-engaged .user-navigation-indicator span{filter:brightness(.97)}
 .user-navigation-item{position:relative;display:grid;place-items:center;flex:1;min-width:0;height:52px;border-radius:999px;text-decoration:none;color:#6e6e73}
 .user-navigation-capsule[data-section="0"] .user-navigation-item:nth-of-type(1),.user-navigation-capsule[data-section="1"] .user-navigation-item:nth-of-type(2),.user-navigation-capsule[data-section="2"] .user-navigation-item:nth-of-type(3){color:#fff}
 .user-navigation svg{display:block;width:24px;height:24px;flex-shrink:0}
@@ -59,5 +98,5 @@ watch(() => route.path,path => { const index = sections.indexOf(path); if (index
 @supports(backdrop-filter:blur(16px)){.user-navigation-capsule{background:linear-gradient(135deg,#ffffff99 0%,#f5f5f733 35%,#ffffff18 65%,#e5e5ea42 100%);backdrop-filter:blur(22px)}}
 @media(hover:hover) and (pointer:fine){.user-navigation-report:hover{filter:brightness(1.15)}}
 @media(max-width:360px){.user-navigation{gap:8px}.user-navigation-report{width:56px;height:56px}}
-@media(prefers-reduced-motion:reduce){.user-navigation-item,.user-navigation-indicator,.user-navigation-indicator span{transition:none}.user-navigation-engaged .user-navigation-indicator span{transform:none}}
+@media(prefers-reduced-motion:reduce){.user-navigation-item,.user-navigation-indicator,.user-navigation-indicator span{transition:none}}
 </style>

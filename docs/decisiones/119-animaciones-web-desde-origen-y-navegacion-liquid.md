@@ -2,6 +2,17 @@
 
 Fecha: 20/10/2026, America/Lima. Estado: aceptada por instrucción explícita.
 
+Corrección posterior20/10: el usuario retira también la elevación del acento al
+hover. UserNavigation elimina translateY(-2px) en hover/foco/presión; conserva
+brillo, foco accesible, selección deslizante y arrastre horizontal con retorno.
+Esta corrección sustituye la elevación descrita inicialmente a continuación.
+
+Refinamiento posterior del20/10, también explícito: barra máxima304px para
+opciones más redondeadas (aproximadamente71×52px). Por corrección posterior del
+usuario, se retira el impulso horizontal al hover. Arrastre hasta8px con retorno
+480ms al soltar, sin activar destinos. Movimiento reducido elimina este efecto extra;
+conservar deslizamiento de selección, elevación, enlaces y limpieza existentes.
+
 ## Contexto
 
 El usuario corrige la primera adaptación web: la barra móvil no tiene etiquetas

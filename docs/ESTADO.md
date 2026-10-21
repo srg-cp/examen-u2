@@ -1,5 +1,41 @@
 # Estado del proyecto
 
+## Barra web sin elevación al hover —20/10/2026
+
+Por corrección explícita con captura, retirado translateY(-2px) del acento en
+UserNavigation, también en foco/presión. Conserva brillo, tamaño compacto,
+selección deslizante y arrastre con retorno. Reglas y fichas actualizadas.
+Validación: typecheck/build y QA Chrome con backend fixture correctos, incluida
+igualdad de posición vertical antes/durante hover de la opción seleccionada;
+regresión de navegación, arrastre y movimiento reducido aprobada. Sin despliegue.
+Siguiente paso: revisión del gesto en dispositivo físico.
+
+## Retirado el impulso al hover de la barra web —20/10/2026
+
+Por corrección del usuario, eliminado previewPush y su animación horizontal al
+pasar el puntero. Se conserva el ancho compacto304px, el arrastre con retorno y
+el deslizamiento al seleccionar sección. Reglas y fichas actualizadas.
+Validación: typecheck/build y QA Chrome con backend fixture correctos; hover sin
+impulso, arrastre con retorno, navegación y movimiento reducido comprobados.
+Sin despliegue. Siguiente paso: revisión táctil en dispositivo físico.
+
+## Barra web compacta y retorno elástico —20/10/2026
+
+Por petición explícita, UserNavigation limita el conjunto a304px (antes480px).
+Las tres opciones miden aproximadamente71×52px, más redondeadas; se conservan
+glass, iconos, selección azul y Reportar. Hover impulsa el acento hasta6px y
+vuelve en480ms. Arrastre horizontal lo desplaza hasta8px y al soltar retorna;
+un arrastre no activa enlaces. Movimiento reducido elimina el desplazamiento
+extra; cambio de ruta, cancelación y desmontaje limpian el gesto/animación.
+
+Validación: typecheck/build correctos,59/59 pruebas, git diff --check y QA Chrome
+con backend fixture aprobados. Renders1920/1440/731/390/320, áreas táctiles≥48px,
+impulso/retorno, arrastre sin navegar, movimiento reducido y regresión de
+transiciones, sin errores CSP/hidratación. Captura390 revisada visualmente;
+evidencia en apps/mobile/build/ui-preview/web-navigation-motion/compact-*.png.
+Sin despliegue. Siguiente paso: revisar sensación del gesto en dispositivo físico
+y publicar cuando se autorice; la evidencia local no confirma integración remota.
+
 ## Cierre de Reportar web —20/10/2026
 
 El recorrido abierto desde los nueve puntos incorpora X circular glass sticky,

@@ -36,6 +36,37 @@ try {
   await page.waitForURL('**/inicio');await nav.waitFor();
   assert.equal((await nav.textContent()).trim(),'','Navigation must be icon-only at every width');
   const bar = await nav.elementHandle();
+  const surface = page.locator('.user-navigation-indicator span');
+  const elasticX = () => surface.evaluate(el => parseFloat(getComputedStyle(el).translate) || 0);
+  for (const width of [1920,1440,731,390,320]) {
+    await page.setViewportSize({width,height:844});
+    const bounds = await nav.boundingBox();
+    assert.ok(bounds.width <= 304 && bounds.x >= 0 && bounds.x+bounds.width <= width,'Compact navigation fits viewport');
+    const item = await nav.getByRole('link',{name:'Inicio',exact:true}).boundingBox();
+    assert.ok(item.width >= 48 && item.width <= 73 && item.height >= 48,'Rounded options retain touch area');
+    await shot('compact-'+width);
+  }
+  await page.setViewportSize({width:390,height:844});
+  await page.mouse.move(10,10);
+  const restingY = (await surface.boundingBox()).y;
+  await nav.getByRole('link',{name:'Inicio',exact:true}).hover();
+  await page.waitForTimeout(250);
+  assert.equal((await surface.boundingBox()).y,restingY,'Hover must not lift selected surface');
+  await nav.getByRole('link',{name:'Explorar',exact:true}).hover();
+  assert.equal(await surface.evaluate(el => el.getAnimations().some(a => a.effect.getKeyframes().some(k => k.translate))),false,'Hover must not start an elastic impulse');
+  assert.equal(await elasticX(),0,'Hover keeps selection in place');
+  const home = await nav.getByRole('link',{name:'Inicio',exact:true}).boundingBox();
+  await page.mouse.move(home.x+home.width/2,home.y+home.height/2);
+  await page.mouse.down();await page.mouse.move(home.x+home.width/2+22,home.y+home.height/2,{steps:4});
+  await page.waitForTimeout(120);
+  assert.ok(await elasticX() > 0,'Drag pushes selection slightly');
+  await page.mouse.up();await page.waitForTimeout(550);
+  assert.equal(await elasticX(),0,'Release restores selection');
+  assert.ok(page.url().endsWith('/inicio'),'Dragging does not activate a destination');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await nav.getByRole('link',{name:'Explorar',exact:true}).hover();
+  assert.equal(await elasticX(),0,'Reduced motion disables elastic impulse');
+  await page.emulateMedia({reducedMotion:'no-preference'});
   await nav.getByRole('link',{name:'Explorar',exact:true}).click();
   await page.waitForURL('**/explorar');
   await page.locator('.user-navigation-capsule[data-section="1"]').waitFor();

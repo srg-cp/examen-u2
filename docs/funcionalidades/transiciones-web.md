@@ -7,8 +7,18 @@ Incremento visual del 20/10/2026. [ADR-119](../decisiones/119-animaciones-web-de
 La barra de cuenta usa solo iconos en todos los tamaños, con nombre
 accesible. Una cápsula azul compartida se desplaza entre Inicio, Explorar y Mis
 mascotas en 320 ms; el color de cada icono sigue su distancia al indicador, incluso
-al pasar por la sección intermedia. Hover/foco/presión elevan el acento 2 px.
+al pasar por la sección intermedia. Por corrección posterior del usuario,
+hover/foco/presión conservan el brillo sin elevar el acento.
 Reportar conserva sus nueve puntos blancos en círculo negro independiente.
+
+Refinamiento explícito del20/10: barra máxima304px y opciones aproximadamente
+71×52px. Por corrección posterior, se retira el impulso horizontal al hover.
+Arrastrar horizontalmente permite hasta8px antes de regresar en480ms al soltar.
+El gesto no navega; clic/toque conservan los enlaces reales. CSS translate de la
+superficie interior separa este efecto del desplazamiento320ms del indicador y
+del brillo interactivo. Movimiento reducido lo desactiva; cancelación/ruta/desmontaje
+liberan animaciones. QA Chrome comprueba ausencia de impulso al hover y arrastre con retorno
+en el script existente, con renders1920/1440/731/390/320 y backend fixture.
 
 Reportar se abre transformando la superficie del botón hasta el área de contenido
 bajo la marca. Del 0 al 45% se desvanece el icono de origen; del 65 al 100% aparece
