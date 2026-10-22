@@ -1,5 +1,42 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Patrón reutilizable aprobado: expansión desde origen
+
+[Guía de uso y revisión](patrones-ui-ux/expansion-desde-origen.md), aprobada
+visualmente por el usuario el21/10/2026 en Reportar web. Define superficie
+que se estira desde el control, identidad sin estiramiento, fullscreen,
+transformación del contenido y retorno; incluye parámetros, componentes,
+ejemplos de integración, accesibilidad y comprobaciones. Es la referencia
+para reutilizar esta animación sin recrearla por funcionalidad.
+
+Los apuntes cronológicos siguientes conservan el historial; el contrato actual
+es ADR-128 y la guía enlazada, sin ocultar el cuerpo hasta100% ni aplicar blur
+a la superficie/icono.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+Origen de navegación web21/10, instrucción posterior ADR-125: reemplazo por
+GSAP Flip/PrettyModal de Sader (0.7s), sin clonar páginas; cuerpo oculto hasta
+terminar apertura y componente cerrado oculto hasta commit de ruta. Excepción
+explícita a ADR-124 solo en ese motor; Perfil/Alertas y Flutter conservados.
+[Contrato vigente](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+Paridad obligatoria21/10, ADR-124: animaciones equivalentes móvil/web comparten
+efecto, origen, sentido, duración, curvas, fases y retorno; solo geometría
+responsive adaptable. Perfil/Alertas web:320/260ms desde avatar/campana reales,
+easeInOutCubic, fuente hasta45%, contenido desde65% con easeOutCubic y escala
+según ancho. Revisar fotogramas de entrada/salida con movimiento normal,
+además de reducido, foco y limpieza; capturas finales no prueban paridad.
+[Contrato](decisiones/124-paridad-animaciones-mobile-web.md).
+
 Hero landing20/10, ADR-120: recuperar primera captura del usuario, con Arial500,
 oscuro #171918, tamaño42–108px (móvil32–48px), line-height1.02 y tracking−0.055em.
 Mascotas laterales originales; #hero-title queda fuera de Poppins global.

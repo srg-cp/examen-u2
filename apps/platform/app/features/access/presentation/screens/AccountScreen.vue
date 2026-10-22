@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import '../styles/account.css';
 import OnboardingFlow from '../widgets/OnboardingFlow.vue';
+import HomeContent from '../widgets/HomeContent.vue';
+import AccountProfile from '../widgets/AccountProfile.vue';
 const props = withDefaults(defineProps<{ onboarding?: boolean }>(), { onboarding: false });
 const model = useNuxtApp().$accessModel();
 const state = shallowRef(model.state);
@@ -88,38 +90,22 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
   <div class="account-layout" :class="{ 'onboarding-layout': onboarding }">
     <SiteHeader v-if="onboarding" class="onboarding-header" brand-class="onboarding-brand" />
     <SiteHeader v-else class="account-header" brand-class="account-brand">
-      <ActionButton v-if="state.session || state.busy" :working="state.busy && !onboarding" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton>
+      <div v-if="state.session || state.busy" class="account-header-actions">
+        <template v-if="state.session?.profile.onboardingCompleted"><slot name="alerts" :session="state.session" /><AccountProfile :key="state.session.actor" :session="state.session" /></template>
+        <GlassSurface as="button" type="button" class="account-icon account-logout" :class="{working:state.busy}" :disabled="state.busy" :aria-busy="state.busy" aria-label="Cerrar sesión" title="Cerrar sesión" @click="logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H4v16h5M14 8l4 4-4 4M8 12h12" /></svg></GlassSurface>
+      </div>
     </SiteHeader>
     <TopToast ref="toast" />
-    <main id="view" class="account-main" data-origin-content :class="{ 'origin-content-pending':motion.pending.value === route.path }" :inert="motion.pending.value === route.path">
+    <OriginPageSurface id="view" class="account-main">
       <ContentSkeleton v-if="state.checking" label="Consultando tu cuenta" />
       <template v-else-if="state.session">
         <OnboardingFlow v-if="onboarding" ref="onboardingView" :step="state.step" :busy="state.busy" :on-next="nextStep" />
         <template v-else-if="state.session.profile.onboardingCompleted">
           <slot :session="state.session">
-          <header class="account-welcome">
-            <p class="eyebrow">Más caminos de vuelta a casa</p>
-            <h1>{{ state.session.profile.displayName ? 'Hola, ' + state.session.profile.displayName : 'Bienvenido a Entre Huellas' }}</h1>
-            <p>Una comunidad para ayudar a que vuelvan.</p>
-          </header>
           <StaggerReveal as="div" class="account-grid" :aria-busy="state.checkingManagement">
-            <section class="account-panel" aria-labelledby="account-title">
-              <h2 id="account-title">Tu cuenta</h2>
-              <dl>
-                <div><dt>Nombre</dt><dd>{{ state.session.profile.displayName || 'Sin registrar' }}</dd></div>
-                <div><dt>Correo</dt><dd>{{ state.session.email || 'No disponible' }}</dd></div>
-                <div><dt>Ciudad</dt><dd>{{ state.session.profile.city || 'Sin registrar' }}</dd></div>
-              </dl>
-              <p class="privacy">Tu cuenta y la bienvenida completada se comparten con la aplicación móvil.</p>
-            </section>
-            <section class="account-panel account-community" aria-labelledby="community-title">
-              <img src="/images/landing/pets-home.png" width="280" height="200" alt="" />
-              <h2 id="community-title">Cada huella suma</h2>
-              <p>Conoce cómo colaboramos en la búsqueda y el reencuentro de mascotas.</p>
-              <NavigationLink to="/" class="secondary">Conoce el proyecto</NavigationLink>
-            </section>
+            <HomeContent />
             <section v-if="state.canReview" class="account-management account-panel" aria-labelledby="management-title">
-              <div><p class="eyebrow">Herramientas de gestión</p><h2 id="management-title">Cuidamos la comunidad</h2><p>Revisa las denuncias y ayuda a mantener un espacio seguro.</p></div>
+              <div><h2 id="management-title">Cuidamos la comunidad</h2><p>Revisa las denuncias y ayuda a mantener un espacio seguro.</p></div>
               <NavigationLink to="/moderacion" origin class="secondary">Revisar denuncias</NavigationLink>
             </section>
             <ActionButton v-else-if="state.managementFailed" class="account-management-retry" :working="state.checkingManagement" @click="model.loadManagementAccess()">Reintentar acceso a gestión</ActionButton>
@@ -129,8 +115,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
       </template>
       <ActionButton v-else-if="state.failure" :working="state.busy" @click="model.checkSession()">Reintentar conexión</ActionButton>
       <ContentSkeleton v-else label="Abriendo inicio de sesión" />
-    </main>
-    <footer v-if="!onboarding" class="account-footer"><NavigationLink to="/terminos">Términos de servicio</NavigationLink><NavigationLink to="/privacidad">Privacidad</NavigationLink></footer>
+    </OriginPageSurface>
   </div>
 </template>
 

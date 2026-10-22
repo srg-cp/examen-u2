@@ -15,15 +15,15 @@ try {
   page.on('console',m => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(m.text())) errors.push(m.text()); });
   await page.route('https://basemaps.cartocdn.com/**',r => r.fulfill({ status:200,contentType:'image/jpeg',body:server.jpeg }));
   const nav = page.getByRole('navigation',{ name:'Navegación de usuario' });
-  const idle = () => page.waitForFunction(() => !document.querySelector('.origin-transition-active') && !document.querySelector('main[inert]'));
+  const idle = () => page.waitForFunction(() => !document.querySelector('[data-origin-animating], main[inert], .user-navigation [aria-busy="true"]'));
   async function freeze(progress) {
-    await page.locator('.origin-transition-active').waitFor();
+    await page.waitForFunction(() => !!document.querySelector('[data-origin-animating]')?._flip);
     await page.evaluate(value => {
-      for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) { a.pause();a.currentTime = Number(a.effect.getTiming().duration)*value; }
+      document.querySelector('[data-origin-animating]')._flip.pause().progress(value);
     },progress);
   }
   async function finish() {
-    await page.evaluate(() => { for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) a.finish(); });
+    await page.evaluate(() => { document.querySelector('[data-origin-animating]')?._flip.progress(1); });
     await idle();
     assert.equal(await page.locator('.origin-transition-previous > *').count(),0,'Transient previous content must be released');
   }
@@ -82,20 +82,20 @@ try {
   await page.locator('.user-navigation-indicator').evaluate(el => el.getAnimations().forEach(a => a.finish()));
   await nav.getByRole('link',{name:'Mis mascotas',exact:true}).click();
   await page.waitForURL('**/mis-mascotas');await page.getByRole('heading',{name:'Luna',exact:true}).waitFor();
-  const brand = await page.locator('.account-brand').boundingBox(),source = await nav.getByRole('link',{name:'Reportar',exact:true}).boundingBox();
+  const brand = await page.locator('.account-brand:not([data-origin-underlay] *)').boundingBox(),source = await nav.getByRole('link',{name:'Reportar',exact:true}).boundingBox();
   await nav.getByRole('link',{name:'Reportar',exact:true}).click();await page.waitForURL('**/reportar');
   await freeze(.3);
-  const expanded = await page.locator('.origin-transition-surface').boundingBox();
+  const expanded = await page.locator('main[data-origin-content]:not([data-origin-underlay] *)').boundingBox();
   assert.ok(expanded.width > source.width && expanded.width < 390);
-  assert.equal(await page.locator('main').evaluate(el => el.inert),true);
-  assert.ok(Number(await page.locator('main').evaluate(el => getComputedStyle(el).opacity)) < .01);
-  const duringBrand = await page.locator('.account-brand').boundingBox();
+  assert.equal(await page.locator('main[data-origin-content]:not([data-origin-underlay] *)').evaluate(el => el.inert),true);
+  assert.equal(await page.locator('main[data-origin-content]:not([data-origin-underlay] *) > .origin-page-body').evaluate(el => getComputedStyle(el).visibility),'visible');
+  const duringBrand = await page.locator('.account-brand:not([data-origin-underlay] *)').boundingBox();
   assert.deepEqual(duringBrand,brand,'Brand remains outside the transition');
   await shot('report-origin-30');
-  await page.evaluate(() => { for (const a of document.getAnimations()) if (a.effect?.target instanceof Element && (a.effect.target.closest('.origin-transition-host') || a.effect.target.matches('[data-origin-content]'))) a.currentTime = Number(a.effect.getTiming().duration)*.85; });
-  assert.ok(Number(await page.locator('main').evaluate(el => getComputedStyle(el).opacity)) > 0);
+  await page.evaluate(() => { document.querySelector('[data-origin-animating]')._flip.progress(.85); });
+  assert.equal(await page.locator('main[data-origin-content]:not([data-origin-underlay] *) > .origin-page-body').evaluate(el => getComputedStyle(el).visibility),'visible','Content scales within the expanding surface');
   await shot('report-origin-85');await finish();
-  await page.goBack();await page.waitForURL('**/mis-mascotas');await freeze(.5);await shot('report-return-halfway');await finish();
+  const back=page.goBack();await freeze(.5);await shot('report-return-halfway');await finish();await back;await page.waitForURL('**/mis-mascotas');
   await page.getByRole('button',{name:'Registrar mascota',exact:true}).click();await freeze(.35);await shot('pet-origin');await finish();
   await page.getByRole('button',{name:'Cancelar',exact:true}).click();await freeze(.5);await finish();
   // A cancelled dirty-form guard keeps the old route, content and focus usable.

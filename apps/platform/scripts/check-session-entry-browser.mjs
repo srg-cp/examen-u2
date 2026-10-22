@@ -80,7 +80,7 @@ try {
   await entryLink.evaluate(el => el.click());
   assert.equal(sessionRequests, 1, 'Repeated click must not start another session check');
   releaseSession(); await page.waitForURL('**/inicio');
-  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
   assert.equal(sessionRequests, 1, 'Preparation, guard redirects and account screen share one session read');
   await page.unroute('**/api/access/session');
   for (const completed of [true, false]) {
@@ -98,7 +98,7 @@ try {
     await page.getByRole('link', { name: 'Iniciar sesión', exact: true }).click();
     await page.waitForURL('**/' + (completed ? 'inicio' : 'bienvenida'));
     assert.equal(await page.evaluate(() => window.loginWasMounted), false, 'SPA must never mount login');
-    await page.getByRole('heading', { name: completed ? 'Tu cuenta' : 'Cada huella importa', exact: true }).waitFor();
+    await page.getByRole('heading', { name: completed ? 'Su regreso empieza contigo' : 'Cada huella importa', exact: true }).waitFor();
     assert.equal(blockingReads, 0, 'Prepared click and arrival must not wait on another session API request');
     await page.unroute('**/api/access/session');
   }
@@ -188,7 +188,7 @@ try {
   await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).waitFor();
   server.profileFailure(false);
   await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click();
-  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
   await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio');
   await page.locator('#notice').filter({ hasText: 'no tiene permiso' }).waitFor({ state: 'visible' });
   await page.reload(); await page.waitForLoadState('networkidle');

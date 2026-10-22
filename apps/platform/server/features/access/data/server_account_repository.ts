@@ -40,6 +40,7 @@ export class ServerAccountRepository implements AccountRepository {
     return this.source.exchange(code, verifier).then(value => this.establish(value));
   }
   async logout() { const s = this.established; this.established = null; if (s) await this.source.logout(s.token); }
+  async avatar() { const {session}=await this.identity();return this.source.avatar(session.token,session.actor); }
   async completeOnboarding() {
     const { session } = await this.identity();
     await this.source.completeOnboarding(session.token);

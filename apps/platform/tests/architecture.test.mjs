@@ -6,6 +6,24 @@ import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts
 import { configuration } from '../server/infrastructure/config.ts';
 import { routePolicies, routeAccess, sessionRedirect, accountDestination, assertRegisteredRoutes } from '../shared/routing/route_policy.ts';
 import { siteOrigin } from '../shared/seo/site_metadata.ts';
+import { ORIGIN_ENTER_MS,ORIGIN_EXIT_MS,ORIGIN_SOURCE_END,ORIGIN_CONTENT_START,originMotionFrame } from '../app/utils/origin_motion_contract.ts';
+
+test('Mobile and web profile/dialog origin transitions share timing, curves and source/content phases',async()=>{
+  const mobile=await readFile(new URL('../../mobile/lib/core/presentation/widgets/origin_page_transition.dart',import.meta.url),'utf8');
+  const router=await readFile(new URL('../../mobile/lib/app/router.dart',import.meta.url),'utf8');
+  const entity=await readFile(new URL('../../mobile/lib/app/navigation/entity_editor_page.dart',import.meta.url),'utf8');
+  for(const source of [router.slice(router.indexOf("path: 'profile'")),entity]){
+    assert.match(source,new RegExp(`transitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_ENTER_MS}`));
+    assert.match(source,new RegExp(`reverseTransitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_EXIT_MS}`));
+  }
+  assert.match(mobile,/Curves\.easeInOutCubic/);assert.match(mobile,/Interval\(\.65, 1, curve: Curves\.easeOutCubic\)/);
+  assert.match(mobile,/Interval\(\s*0,\s*\.45,/);
+  assert.equal(ORIGIN_SOURCE_END,.45);assert.equal(ORIGIN_CONTENT_START,.65);
+  assert.deepEqual(originMotionFrame(0),{shape:0,source:1,content:0});
+  assert.equal(originMotionFrame(.45).source,0);assert.equal(originMotionFrame(.65).content,0);
+  assert.ok(Math.abs(originMotionFrame(.5).shape-.516875)<.002);
+  assert.deepEqual(originMotionFrame(1),{shape:1,source:0,content:1});
+});
 
 test('SEO identity accepts only a configured HTTPS origin, never arbitrary URL content', () => {
   assert.equal(siteOrigin('https://entrehuellas.app/'), 'https://entrehuellas.app');

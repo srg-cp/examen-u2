@@ -1,5 +1,547 @@
 # Estado del proyecto
 
+## Pines y detalles del selector web según móvil —21/10/2026
+
+Por instrucción explícita, comparados ZoneMapPicker/CaseLocationFields y
+SightingScreen con LocationMap. ADR-104 solo igualaba teselas/filtro: web aún
+mostraba círculo negro, zoom14, alto300/radio24, créditos inferiores y controles
+propios de Leaflet. [ADR-129](decisiones/129-paridad-visual-de-mapas-mobile-web.md)
+registra la referencia móvil para los recorridos equivalentes.
+
+LocationMap ahora usa location_on negro36 centrado, zoom12, alto280/radio22,
+créditos arriba8 con objetivos48 y fuente ampliable. Eliminados controles+/− y
+botón Usar centro del mapa; flechas y Enter/Espacio conservan selección por teclado.
+Reportar pérdidas conserva radio0; avisos sighting/with_reporter y SightingMap
+QR usan200m, relleno111111/34 de255 y borde2. Misma matriz de color solo sobre
+teselas, punto privado sin cambios y toast/reintento existentes. Bloqueo de
+interacción durante envío y ResizeObserver con limpieza al desmontar para
+expansión/resize. Sin SQL, nuevos paquetes, despliegue ni modificación Flutter.
+
+Validación:71 pruebas aprobadas, typecheck y build Nuxt correctos usando
+.nuxt-map-parity-qa. QA Chrome del build para avistamiento QR, Reportar y carga
+progresiva aprobada: pin36, altura/radio reales, círculo/color/borde, teclado,
+selección, crédito, filtro pintado, GPS denegado, reintento de envío ambiguo,
+cuatro tipos de reporte y recuperación de borrador. Responsive1440/731/390/320/1920
+y texto200%, sin overflow ni errores CSP/hidratación. El script de carga tenía
+un selector ambiguo por los dos accesos Reportar de Inicio; acotado a navegación
+y repetido correctamente. Capturas revisadas en apps/mobile/build/ui-preview/
+public-sightings/map-mobile-parity.png y evidencia responsive en web-recovery.
+
+Límite: backend y teselas fixture; no confirma red/proveedor reales ni aprobación
+visual del usuario. Próximo paso: contrastar Android/web con Positron real.
+Explorar web mantiene lista; el mapa de resultados con pines de marca de móvil
+todavía no existe en web. No afirmar paridad funcional global o historia cerrada.
+Ficha de cartografía/índice y regla UI web actualizados; trabajo local previo conservado.
+
+## Animación aprobada y documentada como patrón UI/UX —21/10/2026
+
+El usuario confirma aprobación visual de la animación de Reportar y pide
+documentarla para reutilización. Creada la [guía del patrón](patrones-ui-ux/expansion-desde-origen.md):
+experiencia, usos, parámetros/fases de apertura y retorno, componentes
+compartidos, ejemplos reales de ruta/editor local, accesibilidad, limpieza
+y criterios de revisión. Enlazada desde reglas UI/UX general/web, DISENO_UI,
+índice de funcionalidades, ficha de transiciones, ADR-128 y AGENTS.
+
+Solo documentación; no se alteran código ni parámetros de la animación.
+Verificados enlaces locales y coherencia con componentes/estilos existentes;
+no se repiten build o pruebas de navegador por este cambio documental.
+La validación técnica anterior conserva sus límites: Chrome con fixture;
+Safari/Firefox/físico y cada integración futura requieren su revisión.
+Sin nuevas HU/RF, cierre de historias, migración global ni despliegue.
+
+## Botón móvil que se transforma dentro del fullscreen de Sader —21/10/2026
+
+Por petición explícita, combinado el origen móvil con el motor web ya aprobado.
+Se revisó OriginPageTransition Flutter: color/radio fuente, identidad centrada
+con tamaño original y opacidad hasta45%, invertida al cerrar. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md)
+registra la combinación: GSAP/CustomEase0.7s y fullscreen de Sader conservados;
+superficie negra visible desde el comienzo, icono sin estiramiento y radio visual
+que vuelve al círculo. Fade/blur de Sader solo sobre el cuerpo de destino.
+
+Captura únicamente icono/etiqueta del control en memoria; sin clonar páginas ni
+formularios. Identidad aria-hidden, compensación por eje de escala y retirada
+al finalizar/cancelar; control original oculto temporalmente y restaurado.
+Se corrigió interpolación de radio con unidades mixtas que dejaba esquinas:
+radio calculado en coordenadas visuales como ClipRRect móvil. Marca, navegación,
+ruta anterior detrás, guards, reducido y limpieza de cuenta conservados.
+
+Validación:71 pruebas, typecheck y build correctos. QA Chrome del build aprobada
+por nueve puntos y acceso de Inicio en1852/1255/390/320: icono conserva tamaño
+en apertura/cierre (tolerancia0.6px), fuente termina45%, reaparece antes de
+llegar al botón y termina circular; identidad temporal retirada y control
+restaurado. Fullscreen, fade/blur del cuerpo, geometría, contenido sin salto,
+reaperturas, reducido y aviso de viewport aprobados. Regresión de navegación
+aprobada con editores locales, borrador cancelado, resize e identidad.
+Dev5173 aprobado1255 y320/texto200% por ambos accesos. Revisadas capturas de
+apertura5/15% y cierre95% en apps/mobile/build/ui-preview/web-origin-sader.
+Documentación y reglas actualizadas; sin despliegue, SQL, permisos o ampliación
+funcional. Pendientes confirmación visual del usuario y Safari/Firefox/físico.
+Sin modificar Flutter/Perfil/Alertas ni afirmar paridad global.
+
+## Expansión fullscreen y fases originales de PrettyModal —21/10/2026
+
+El usuario aprueba la sección anterior detrás pero pide cubrir toda la pantalla
+y copiar la transformación progresiva de Sader. Revisados pretty-modal.tsx,
+SectionModal y globals.css: SectionModal usa pretty-modal-fullscreen; la entrada
+combina Flip0.7s con opacity0/blur10px→1/0 en500ms y cubic-bezier(0.56,0.27,0,1).
+[ADR-127](decisiones/127-origen-fullscreen-y-fases-prettymodal-sader.md) sustituye
+el destino main y la entrada sin fade de ADR-126; no inventa una espera al50%.
+
+La superficie real ahora ocupa100dvw/100dvh durante morph, sin max-width de
+columna. Cuerpo situado en sus coordenadas finales, con espaciador vacío que
+conserva altura/scroll; se restauran sin salto al terminar/cancelar. Eliminados
+relleno negro y radio interpolados propios. Se copian apertura/cierre CSS de
+PrettyModal; Vue integra el efecto con rutas/guards y DOM saliente retenido.
+Marca/barra estables, colores propios, reducido, resize e identidad conservados.
+
+Validación local Chrome: typecheck,71 pruebas y build correctos. QA del build
+por ambos accesos en1852/1255/390/320: rect inicial, fade/blur original,
+destino completo a los cuatro bordes, contenido escalado, sección anterior
+detrás, ausencia de salto del título al restaurar, cierre, reaperturas y
+reducido; duración real687–705ms. Regresión de navegación aprobada con marca,
+editores locales, borrador cancelado, resize e identidad. Dev5173 aprobado
+1255/390 por ambos accesos;320/texto200% comprueba además duración500ms y curva
+CSS exacta. Capturas en apps/mobile/build/ui-preview/web-origin-sader revisadas.
+Documentación y reglas actualizadas; sin SQL, permisos, despliegue ni cambio
+de alcance funcional. Confirmación visual del usuario y Safari/Firefox/físico
+pendientes; sin auditoría global ni modificación de Perfil/Alertas o Flutter.
+
+## Contenido que crece dentro del origen y sección anterior detrás —21/10/2026
+
+El usuario precisa el contrato: no retirar la sección actual al abrir y no
+esperar a terminar para mostrar el formulario. [ADR-126](decisiones/126-contenido-dentro-de-expansion-y-ruta-anterior-visible.md)
+sustituye la fase de cuerpo oculto de ADR-125. NuxtPage conserva el DOM real
+saliente mediante leave de Vue, fijo en su posición, inert y aria-hidden;
+la nueva ruta tiene fondo exterior transparente durante apertura. Flip escala
+la superficie real con su título/campos/mapa visibles desde0%, recortados por
+su mismo contorno y fondo opaco, sin transparentar la vista anterior a través
+del formulario. Al terminar se retira la ruta anterior, sin otro reveal.
+Sin clones ni otra instancia del formulario; acceso/guards/datos conservados.
+
+Validación: typecheck,71 pruebas y build correctos. QA Chrome del build aprobada
+en1852/1255/390/320 por nueve puntos y acceso de Inicio: rect inicial del botón,
+contenido visible desde0%, título escalado, sección anterior retenida, fotogramas
+0/2/5/10/15/45/99/100%, duración real687–706ms, cierre, reaperturas, aviso de
+viewport y reducido. Regresión de navegación aprobada: marca, editor local,
+borrador cancelado, resize real, reducido e identidad. Capturas revisadas en
+apps/mobile/build/ui-preview/web-origin-sader; en45% se ve Reportar dentro de
+la expansión y la sección anterior fuera del contorno. Dev5173 aprobado1255
+por ambos accesos y320/texto200% también aprobado con fixture.
+Documentación, reglas e índice actualizados; sin cambios de alcance funcional,
+SQL, permisos ni despliegue. Confirmación visual del usuario y otros navegadores/
+dispositivo físico pendientes; sin afirmación de auditoría global.
+
+## Cancelación prematura al abrir una ruta desde origen —21/10/2026
+
+El usuario sigue observando entrada instantánea y cierre animado. Se amplía
+QA para medir duración y crecimiento sin pausar GSAP. Un aviso inducido de
+visualViewport.resize durante entrada reproduce el salto: el listener llamaba
+cancel/finish y mostraba el formulario a21ms, aunque no cambiase el tamaño.
+Esto demuestra una causa posible del síntoma; no hay trazas del navegador
+del usuario para atribuirle ese evento concreto.
+
+OriginTransitionHost compara ahora tamaño de ventana, altura visual y escala:
+avisos sin cambio real o de ancho visual por scrollbar no terminan Flip.
+Resize real, teclado/zoom, movimiento reducido e identidad conservan limpieza.
+La ruta mantiene su contrato de acceso y contenido oculto hasta finalizar;
+sin convertir Reportar en modal ni cambiar tiempos/curva. ADR-125 y ficha
+actualizados. Validación dev5173 en1255/390 con aviso inducido aprobada;
+typecheck,71 pruebas y build correctos. Regresión de navegación del build
+aprobada, incluido resize real, borrador cancelado y cambio de identidad.
+QA del build aprobada desde ambos accesos en1852/1255/390/320: duración real
+observada684–708ms, crecimiento, formulario oculto, aviso inducido, capturas
+iniciales, retorno y reducido. En320 el acceso rectangular crece principalmente
+en altura; se comprueba área, no duplicación del ancho. Confirmación visual del usuario y
+Safari/Firefox/dispositivo físico pendientes; sin despliegue ni auditoría global.
+
+## Forma del botón visible desde el primer fotograma —21/10/2026
+
+Nueva observación del usuario: seguía sin percibirse el nacimiento desde el
+botón. La validación anterior comprobaba geometría y contraste intermedio,
+pero no detectaba que el keyframe de apertura ocultaba la superficie con
+opacidad0 y blur10px. Se elimina ese fade/blur de entrada: opacidad1 y sin
+desenfoque, según la variante shell de Sader. Se mantienen Flip, curva0.7s,
+radio/color reales, disolución del relleno y cuerpo oculto hasta finalizar.
+ADR-125 y ficha de transiciones actualizadas; sin cambio de alcance funcional.
+
+Prueba ampliada con fotogramas0/2/5/10/15%, opacidad1, sin blur y relleno
+visible, además de contenido oculto hasta99%. Capturas revisadas del círculo
+de nueve puntos y del acceso rectangular. Dev5173 aprobado en1255/390;
+build aprobado por ambos disparadores en1852/1255/390/320 con retorno,
+reaperturas y movimiento reducido. Regresión de navegación aprobada, incluidos
+borrador cancelado, resize e identidad. Typecheck,71 pruebas y build correctos.
+Solo evidencia local en Chrome con fixture; pendiente confirmación visual del
+usuario y Safari/Firefox/dispositivo físico. Sin despliegue ni auditoría global.
+
+## Apertura de Reportar perceptible —21/10/2026
+
+El usuario precisa que se refiere a la apertura de Reportar. Causa confirmada:
+el cuerpo permanecía oculto y su superficie pintaba el mismo degradado del fondo,
+por lo que GSAP movía geometría que no contrastaba. Ahora se captura únicamente
+color/radio del control, junto a su rect, y el componente real nace con ese relleno.
+Flip conserva curva/duración; el relleno se disuelve linealmente en la misma
+timeline hasta transparencia para llegar al fondo real sin salto de color.
+El formulario sigue oculto hasta completar apertura y no se clonan pantallas.
+
+QA de origen añade contraste efectivo del relleno y opacidad durante apertura,
+sin limitarse a matrices/rects. Sincroniza también el keyframe CSS con GSAP para
+capturar el fotograma45%; revisado con superficie visible. Validación dev5173
+con fixture por ambos accesos a1255/390; QA del build aprobada en1852/1255/390/320,
+incluidos apertura/cierre, contraste, contenido oculto hasta100%, ausencia de
+copias, reducido y reaperturas. Regresión de navegación aprobada (borrador,
+resize, retorno e identidad).71 pruebas, typecheck y build correctos.
+Sin despliegue; Safari/Firefox/físico pendientes, sin auditoría global.
+
+## Motor de origen sustituido por código de Sader —21/10/2026
+
+Por instrucción explícita reiterada, reemplazado el motor de navegación desde
+origen: GSAP3.15.0 y código de PrettyModal (Flip.getState/from/to, scale:true,
+CustomEase original,0.7s y sus keyframes). OriginPageSurface es el componente
+vivo; su cuerpo permanece oculto hasta terminar. Eliminados clonado de Inicio,
+hold/previous, superficie paralela y WAAPI manual. El cierre anima antes de
+desmontar/cambiar ruta y permanece oculto hasta el commit, sin destello al
+restaurar estilos. [ADR-125](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md)
+registra la excepción explícita a tiempos/fases de ADR-124 solo en este motor.
+Perfil/Alertas y Flutter conservados. Los apartados siguientes describen el
+historial de las aproximaciones retiradas, no el motor vigente.
+
+QA Chrome en dev5173 y build con APIs/backend fixture: nueve puntos y acceso
+negro de Inicio en1852/1255/390/320; rect inicial coincide con control real,
+duración0.7s, cuerpo oculto incluso99%, visible al100%,0 copias/capas antiguas,
+cierre con componente montado, reaperturas reales y reducido. Texto200% a320px
+comprobado por ambos accesos. Capturas de0/45/99/100% y cierre revisadas en
+apps/mobile/build/ui-preview/web-origin-sader. Typecheck,71/71 pruebas y build
+aislado correctos. Regresión check-navigation-motion-browser.mjs aprobada:
+barra/marca, retorno local/ruta, cancelación de borrador, resize, reducido e
+identidad. check-dialog-motion-browser.mjs confirma Perfil/Alertas conservados,
+incluidos foco, texto200%, resize/reducido/desmontaje y reproducción real.
+
+Sin datos/sesión/backend reales, despliegue, cambios de SQL, operaciones o cierre
+de historias. Siguiente paso: revisión del usuario en su pestaña y Safari/Firefox/
+dispositivo físico. No acredita auditoría global de animaciones.
+
+## Contenido crece desde el origen con FLIP real —21/10/2026
+
+Nueva corrección tras captura e instrucción reiterada del usuario. Los ajustes
+anteriores mantenían el cuerpo con escala .98→1 en su posición final: el recorte
+por sí solo no cumplía el movimiento solicitado. OriginTransitionHost ahora
+traslada y escala superficie y contenido vivo con la misma matriz, siguiendo
+PrettyModal/ExpandIntactModal de sader-panel. Layout final medido una vez e
+invertido al rect real; radios/icono compensados,320/260ms y fases conservados.
+La fuente no se limita a nueve puntos: también el acceso negro Reportar de Inicio.
+Al montar se eliminan capas huérfanas de versiones anteriores durante HMR.
+
+QA Chrome ejecutado contra el servidor existente127.0.0.1:5173, con APIs
+interceptadas hacia backend fixture (sin datos/cookies/operaciones de la cuenta
+real). Ambos disparadores en1852/1440/390/320: primer fotograma coincide con su
+rect, cuerpo y superficie tienen la misma escala en0/15/45/65/75/85%, no hay
+formulario visible antes del movimiento ni contenido antes65%. Escala inicial
+de nueve puntos a1852px:0.0345572 horizontal y0.0820513 vertical, en lugar de.98.
+Dos fotogramas de preparación por caso,0 vacíos; tres reaperturas por caso,
+retorno/reducido y limpieza correctos. Capturas first-frame/opening/content en
+apps/mobile/build/ui-preview/web-origin-continuity, con prefijos nine/shortcut.
+Typecheck y build aislados correctos,71/71 pruebas aprobadas. La misma QA de
+ocho combinaciones pasa también contra el build de producción; regresión
+check-navigation-motion-browser.mjs aprobada (retorno local/ruta, cancelación,
+resize, movimiento reducido, cambio de cuenta y estabilidad de marca/barra).
+Sin despliegue ni auditoría global; pendiente revisión del usuario en su pestaña
+y Safari/Firefox/dispositivo físico.
+
+## Expansión de Reportar sin accesos de Inicio superpuestos —21/10/2026
+
+Corrección tras captura del usuario: la validación anterior comprobaba cobertura,
+pero no descartaba mezcla de contenido anterior y destino. Se revisan PrettyModal
+y ExpandIntactModal de sader-panel y se adapta su principio de superficie y
+contenido recortados juntos, sin introducir React/GSAP ni cambiar320/260ms.
+El formulario se recorta al rect animado; el host se vincula al shell del destino
+real y sale de él al terminar. El controlador espera el montaje real hasta2s
+(salida limpia ante fallo/cambio de ruta/actor) y retira la copia anterior por
+referencia aunque su contenedor haya cambiado. Permisos y datos conservados.
+
+Validación local: typecheck,71/71 pruebas y build aislado correctos. Chrome
+check-origin-continuity-browser.mjs ampliado a1852/1440/390/320, apertura/fase
+de contenido/cierre, límites geométricos del recorte y ausencia de accesos
+clonados/hosts huérfanos; tres reaperturas por ancho y movimiento reducido.
+Cobertura previa:2 fotogramas por ancho,0 vacíos. Capturas desktop/móvil revisadas
+en apps/mobile/build/ui-preview/web-origin-continuity. Regresión
+check-navigation-motion-browser.mjs correcta: retorno local/ruta, cancelación,
+resize, cambio de cuenta, marca y fases. Backend fixture; sin despliegue ni
+verificación Safari/Firefox/dispositivo físico. Siguiente paso: revisión del
+usuario en su instancia; no constituye auditoría global de animaciones.
+
+## Expansión web sin fotogramas vacíos —21/10/2026
+
+Corregido el parpadeo del botón de nueve puntos al entrar en Reportar: la copia
+decorativa saneada de la pantalla anterior se monta antes de navegar, fuera de
+NuxtPage, y se transfiere al host cuando la expansión está lista. Cubre también
+los dos requestAnimationFrame de preparación; no modifica320/260ms, curvas,
+fases, origen/destino ni retorno. Limpieza al completar/cancelar, cambiar actor,
+resize, preferencia reducida o desmontaje; copia inerte, sin persistencia nueva.
+
+Validación local: typecheck,71/71 pruebas y build aislado .nuxt-origin-flicker
+correctos. Chrome check-origin-continuity-browser.mjs registra2 fotogramas de
+espera y0 descubiertos en cada ancho1440/390/320; capturas de apertura/cierre
+revisadas, retorno y modo reducido correctos. check-navigation-motion-browser.mjs
+pasa expansión/fases, retorno local/ruta, marca, navegación cancelada, resize,
+modo reducido y cambio de cuenta. Evidencia con backend fixture en
+apps/mobile/build/ui-preview/web-origin-continuity. Sin despliegue; siguiente
+paso: revisión del usuario y Safari/Firefox/dispositivos físicos. No acredita
+auditoría global de animaciones.
+
+## Barra web estable al cambiar el scroll —21/10/2026
+
+Corregido el salto horizontal de la navegación al aparecer/desaparecer el
+scroll vertical por carga de contenido o bloqueo del scroll en paneles.
+main.css reserva el canal mediante scrollbar-gutter:stable en html; conserva
+la barra persistente, selección animada, dimensiones y reglas de acceso.
+
+QA local reproducible: scripts/check-navigation-stability-browser.mjs, Chrome
+con scrollbar clásica visible (sin --hide-scrollbars). Antes: salto7,5px;
+después: variación0px en posición/tamaño a1440/390/320, con navegación,
+lecturas demoradas, contenido largo y apertura/cierre de Perfil.71/71 pruebas,
+typecheck y build aislado aprobados sin detener el dev server. Build conserva
+avisos preexistentes de BigInt/target y deprecación de exports de Vue.
+Sin despliegue. Siguiente paso: comprobar Safari/Firefox y dispositivos físicos.
+
+## Regla global de animaciones y corrección Perfil/Alertas —21/10/2026
+
+Por instrucción explícita del usuario, AGENTS y reglas UI/UX móvil/web exigen
+que las animaciones equivalentes coincidan en efecto, origen/destino, sentido,
+duración, curvas, fases y retorno. Solo se adapta geometría final al viewport;
+divergencias necesitan instrucción expresa y registro. ADR-124, arquitectura,
+guía, diseño y fichas actualizados. La regla es global; esta entrega verifica
+Perfil/Alertas y no acredita auditoría de todas las animaciones existentes.
+
+Se corrige la omisión previa de GlassDialog: apertura desde avatar/campana real
+320ms y contracción al mismo control260ms. origin_motion_contract centraliza
+duraciones/curvas/fases móviles; origin_dialog_motion aplica progresión Flutter
+easeInOutCubic, fuente hasta45%, contenido desde65%/easeOutCubic y escala según
+ancho. Perfil no fabrica icono de fuente; Alertas conserva solo SVG decorativo.
+Contenido y diálogo permanecen hasta finalizar salida. Se conserva el panel
+glass responsive; operaciones, sesión, permisos y backend sin cambios.
+
+Interacción inerte durante expansión, Escape disponible, foco al control
+después del cierre. Resize/preferencia/desmontaje cancelan animaciones y limpian
+estilos temporales/nodos/inert/scroll. Apertura/cierre rápidos y respuestas
+tardías no dejan overlays bloqueados ni contenido invisible.
+
+Validación: typecheck/build aislado correctos y71/71 pruebas aprobadas,
+incluida paridad automática contra las rutas/intervalos/curvas Dart. QA normal
+check-dialog-motion-browser.mjs pasa tiempos y fotogramas reales de apertura/
+contenido/cierre, origen exacto, foco/marca,1440/390/320/texto200%, resize,
+preferencia reducida en vivo, cierre durante apertura, recarga/desmontaje y
+reproducción a tiempo real. Capturas mobile de apertura/contenido/cierre
+revisadas en apps/mobile/build/ui-preview/web-dialog-motion. Las capturas se
+toman del viewport sin redimensionarlo para no interrumpir la animación.
+Regresiones check-inbox-browser.mjs, check-home-browser.mjs y
+check-navigation-motion-browser.mjs aprobadas con fixtures, sin errores CSP/
+hidratación ni overflow. Diff-check limpio.
+
+Sin cambios Flutter, datos, dependencias ni despliegue. Próximo paso: revisión
+del usuario en desarrollo y comprobación en Safari/Firefox/dispositivos físicos.
+
+## Cabecera Home completa: usuario, alertas y glass —21/10/2026
+
+Corrección posterior solicitada por el usuario: cabecera de cuenta con campana,
+avatar privado/iniciales y logout circular accesible. Avatar abre Tu cuenta con
+nombre/correo/ciudad reales; sustituye el desplegable inferior anterior. Las
+iniciales se conservan mientras llega la foto o si no existe. Proxy JPEG propio
+valida cuenta/onboarding/actor, ruta del dueño y tamaño2MiB; no expone Storage,
+URL firmada, teléfono o token. Edición/foto de perfil web no incluida.
+
+Campana compuesta por slots de las cuatro páginas; no importa presentación
+entre funcionalidades. NotificationBell/InboxViewModel/ReadInbox y
+MarkNotificationRead consumen repositorios/DTO HTTP y servidor con InboxSource.
+Lectura/páginas/mark usan RPC de plan027 y JWT de usuario, previa validación de
+sesión/onboarding/X-Account-Actor por operación. POST exige origen y mantiene
+protecciones globales. IDs bigint como cadenas; proyección sin owner/caso/contacto.
+Skeleton/fallo/vacío distintos, refresh con shimmer, lectura confirmada tras
+servidor, retry de lectura idempotente y página fallida. Cambio/expiración de
+identidad y desmontaje descartan datos/respuestas tardías. Sin push/seguimiento/
+preferencias web, enlaces ficticios a casos ni nuevas migraciones/Flutter.
+
+GlassSurface unifica degradado neutro, blur22, ribete y sombra polished móvil
+en tarjetas/controles; GlassDialog comparte panel, backdrop, cierre exterior/X/
+Escape, foco y limpieza de scroll. Marca y navegación persistentes conservadas.
+
+Validación final local: build aislado .nuxt-home-review, typecheck,70/70 pruebas
+unitarias/arquitectura y29/29 de servidor aprobados. Nueva integración prueba
+anónimo, otra cuenta/actor, Origin, onboarding, lectura idempotente, privacidad
+del DTO, error frente a vacío y avatar autorizado/faltante. QA Chrome de
+check-inbox-browser.mjs cubre1440/390/320/texto200%, cabecera, foto/iniciales,
+perfil/Escape/scroll, glass, bandeja lazy/skeleton/errores/reintentos/páginas,
+lectura persistida y aislamiento al cambiar cuenta. Capturas mobile/perfil/
+bandeja revisadas en apps/mobile/build/ui-preview/web-inbox. Regresiones
+check-home-browser.mjs, check-stagger-browser.mjs y check-access-browser.mjs
+aprobadas con fixtures, sin errores CSP/hidratación ni overflow. Diff-check limpio.
+
+Guía, arquitectura, reglas UI web e índice/fichas actualizados. Sin despliegue;
+próximo paso: revisión del usuario y comprobación con backend real, Safari/
+Firefox/dispositivos físicos. No se afirma recepción push ni integración remota.
+
+## Inicio de platform con diseño de móvil —21/10/2026
+
+Por petición del usuario, AccountScreen compone HomeContent de presentación
+con el diseño vigente de Home móvil: título Poppins32/gris y remate azul600,
+accesos negros, ilustración original3:2 y descripción en glass26, Cerca de ti
+con tarjeta glass y enlace a Explorar. Escritorio en dos columnas; responsive
+en secuencia móvil y apilado de accesos en ancho reducido. Poppins600 local
+copiado del mismo recurso móvil con su licencia existente.
+
+Cuenta real conservada en desplegable nativo accesible; gestión/retry dependen
+del permiso existente. Reportar conserva expansión/retorno desde origen.
+Explorar sustituye Mis reportes entre los accesos porque no hay listado propio
+web implementado; no se crean rutas vacías ni se promete geolocalización móvil.
+Sin cambios de dominio, datos, onboarding, política de acceso ni SQL/Flutter.
+
+Validación: typecheck y64/64 pruebas aprobados; build correcto con directorio
+aislado .nuxt-home-review, sin detener el dev server ni eludir su lock.
+Chrome check-home-browser.mjs pasa1440/390/320/texto200%, imagen/fuente, cuenta
+por teclado, tres destinos/retorno, ausencia del pie legal, redirect anónimo
+y gestión por rol. Capturas desktop/mobile/text200 revisadas en
+apps/mobile/build/ui-preview/web-home. Regresiones check-stagger-browser.mjs
+y check-access-browser.mjs aprobadas: entrada real, permisos pendientes,
+movimiento reducido, QR sin JS, acceso/onboarding, retry, roles y logout.
+Diff-check sin errores. Documentadas reglas web y fichas de Inicio/acceso/
+navegación. Sin despliegue; próximo paso: revisión del usuario y backend real,
+Safari/Firefox/dispositivos físicos. Sustituye el build pendiente del ajuste
+anterior de cabeceras/pie de cuenta; los cambios anteriores se mantienen.
+
+## Cabeceras y pie de cuenta simplificados —21/10/2026
+
+Por petición explícita, retiradas las frases decorativas sobre títulos en
+Inicio («Más caminos de vuelta a casa»), Explorar/Mis mascotas/Reportar
+(«Cada huella cuenta»), Moderación y tarjeta de gestión. Eliminado el pie de
+Términos/Privacidad de AccountScreen, compartido por las secciones autenticadas.
+El espacio inferior pasa al contenido para conservar acceso sobre la barra
+flotante. Enlaces legales públicos/login/registro y etiquetas de tipo/estado
+se conservan. Sin cambios de dominio, datos, sesión ni permisos.
+
+Validación local: typecheck y64/64 pruebas aprobados. Build intentado pero
+rechazado por el lock del servidor Nuxt de desarrollo activo en127.0.0.1:5173;
+se conserva ese proceso. Revisión visual responsive y build pendientes.
+Reglas web y fichas de navegación/acceso/moderación/legales actualizadas.
+Sin despliegue. Siguiente paso: revisión visual del usuario y build cuando
+el servidor de desarrollo no esté utilizando el directorio de Nuxt.
+
+## Reportar con carga por componente —21/10/2026
+
+Por autorización del usuario, Reportar ya no oculta el formulario completo hasta
+recibir mascotas/búsquedas. Tras la política de acceso, monta campos y mapa e
+inicia en paralelo lecturas remotas y borrador local. La restauración local
+deshabilita brevemente la edición para no sobrescribirla; las consultas remotas
+solo afectan sus selectores, con FieldSkeleton compartido. RecoveryViewModel
+entrega cada resultado al llegar y mantiene readiness/fallo/petición por fuente.
+Fallo no equivale a vacío; retry específico, deduplicado, conserva lo escrito.
+
+Publicar espera solo la lista pertinente al tipo de reporte, con validación y
+autorización existentes. Guardar borrador antes de recibir metadata conserva
+las referencias, versión y fotos restauradas. Respuestas tardías se descartan
+al desmontar o confirmar publicación; reintento ambiguo conserva su payload.
+Explorar/Mis mascotas, política global, sesión preparada y animación conservados.
+
+Validación: typecheck/build y64/64 pruebas correctos. QA Chrome con fixtures pasa
+check-report-loading-browser.mjs: mascotas/búsquedas/módulo Leaflet retenidos,
+inputs utilizables, selectores/mapa independientes, error/retry de una sola
+fuente, borrador editado/guardado antes de recibir listas con IDs/version/fotos
+íntegros y390/320 sin overflow/CSP/hidratación. Captura revisada en
+apps/mobile/build/ui-preview/web-report-loading/fields-before-data.png.
+Regresión check-recovery-browser.mjs confirma crear/editar/foto, filtros, cuatro
+tipos de reporte, borrador y retry ambiguo, incluido texto200%. Diff-check correcto.
+
+ADR-123, arquitectura, reglas, guía y ficha actualizadas. Sin caché, SQL,
+endpoints, permisos, Flutter ni despliegue nuevos. No se ha medido la latencia
+real del backend; la validación de acceso aún puede esperar su respuesta.
+Siguiente paso: revisión del usuario y validación remota/Safari/Firefox/físicos.
+
+## Etiqueta y borde de inputs/textarea —21/10/2026
+
+Corregido TextField compartido a partir de las capturas del usuario: la etiqueta
+ya no pinta un rectángulo opaco sobre el degradado. Un fieldset/legend decorativo
+con aria-hidden recorta la muesca real del borde; el label/for permanece visible
+y transparente. Campo vacío sin foco mantiene el contorno cerrado; al enfocar
+o conservar texto tras blur abre la muesca. Foco/error tienen un único trazo;
+retirado el ribete/fondo de hover heredado. Etiquetas largas reservan sus líneas
+adicionales y no se superponen al valor con texto200%; base48px conservada.
+
+Validación local: build, typecheck,62/62 pruebas y diff-check correctos.
+Chrome QA de TextField pasa input/textarea vacíos, hover, foco, texto/blur,
+invalid,390/320/texto200% y etiqueta larga sin superposición. Capturas revisadas
+en apps/mobile/build/ui-preview/web-text-field. También pasaron QA de controles,
+avistamientos QR y moderación; después del ajuste final de espacio/rem se
+repitieron TextField y QR. Sin errores de página/CSP/hidratación ni overflow
+horizontal en estos escenarios. ADR-122/ficha/desarrollo actualizados.
+
+Sin cambios de dominio, datos, permisos o Flutter ni despliegue. Siguiente paso:
+revisión del usuario; Safari/Firefox y dispositivos físicos siguen pendientes.
+
+## Tema celeste en los controles adaptados de Sader —21/10/2026
+
+Por petición del usuario, fields.css sustituye colores neutros fijos por roles
+CSS compartidos: superficies celestes suaves, selección #D6E8FF/texto #244C75,
+hover #E5F2FA, foco #2C87CE, loader #2887EF y error #B53F48. Aplica a inputs,
+selectores, paneles, calendario/hora y línea superior; conserva las dimensiones,
+animaciones y comportamiento anteriores. Sin selector de temas, cambios de
+dominio/datos, otras pieles ni Flutter. Refinamiento documentado en ADR-122.
+
+Validación: build correcto; check-fields-browser.mjs pasa con backend fixture,
+comprobando colores reales de selección/calendario/hora/foco/loader, morph,
+teclado, búsqueda, movimiento reducido,1920/1440/731/390/320 y texto200%, sin
+errores CSP/hidratación ni overflow horizontal. Capturas revisadas en web-fields.
+Contrastes calculados de pares locales: selección7.12:1, texto secundario5.44:1,
+hover4.81:1 y foco3.64:1; no equivalen a una auditoría global. Diff-check correcto.
+Pendiente: revisión del usuario y Safari/Firefox/dispositivos físicos; sin despliegue.
+
+## Línea superior que seguía cargando —21/10/2026
+
+Corregido el ciclo de vida del loader reportado por el usuario. NuxtPage recibía
+una función inline nueva en cada render de app.vue; Nuxt observa esa identidad
+y podía emitir page:loading:start al actualizar cabecera/navegación sin otra
+carga pendiente. pageKey ahora conserva una referencia estable. TopLoadingBar
+deja de iniciar una segunda vez desde beforeEach y termina también al confirmar
+la ruta y en page:finish, además del cierre normal/error. No modifica el diseño
+de la línea, política de acceso ni preparación de sesión.
+
+Validación local: build, typecheck y62/62 pruebas correctos. Nueva regresión
+check-top-loading-browser.mjs pasa Chrome con fixture: login/montaje de barra,
+recarga autenticada, cambios de sección, consulta de acceso retenida (loader
+visible durante trabajo real), query/hash/ruta duplicada, guard abortado,
+redirección por sesión y legales. Tras cada escenario la línea queda oculta,
+sin errores de página. Sin despliegue ni comprobación Safari/Firefox.
+
+Siguiente paso: comprobar el recorrido original del usuario en su navegador.
+
+## Controles web compartidos desde sader-panel —21/10/2026
+
+Por petición explícita, adaptados FieldSelect, inputs con etiqueta flotante/inset,
+calendario y selector horario como componentes reutilizables de apps/platform.
+MorphPanel comparte expansión centrada desde el control, radio32px,
+apertura420ms/cierre300ms, curva power3.out y blur12px. Piel local Inter y
+medidas/colores/iconos de la referencia; crecimiento natural con texto ampliado.
+Sustituidos controles en filtros, mascotas, reportes, avistamientos y motivo de
+moderación. Retirados estilos antiguos que contaminaban campos y buscador.
+TopLoadingBar reproduce el segmento40%/670ms en línea4px superior durante
+navegación real, incluida espera de política de acceso, con cierre por éxito,
+cancelación/error y pulso sin desplazamiento en movimiento reducido.
+Excepción explícita a ADR-027 solo para esta línea de navegación web.
+
+Validación final local: typecheck correcto;62/62 pruebas; build correcto con
+NUXT_BUILD_DIR=.nuxt-fields-validation, conservando el servidor dev existente;
+git diff --check sin errores. Chrome QA de fields/recovery/sightings/moderación
+correcto con fixtures: frames de morph/blur, búsqueda sin tildes, teclado/foco,
+loader durante consulta de sesión retenida, fecha/hora local hasta23:59,
+1920/1440/731/390/320 y texto200%/movimiento reducido. Formularios confirman
+persistencia/reintentos de los cuatro tipos de reporte, mascota/foto/borrador,
+avistamiento anónimo/EXIF y decisiones autorizadas. Sin fallos de hidratación,
+CSP ni overflow horizontal en los escenarios comprobados. Capturas revisadas en
+apps/mobile/build/ui-preview/web-fields, web-recovery, public-sightings y moderation-web.
+
+ADR-122, reglas de arquitectura/UI, guía y fichas actualizadas. Sin cambios
+de dominio/data/SQL, permisos, Flutter, backend remoto ni despliegue. No cierra
+historias ni acredita equivalencia píxel a píxel en todos los navegadores.
+Siguiente paso: revisión del usuario y validación Safari/Firefox/dispositivos
+físicos; integración remota de los recorridos sigue pendiente según sus fichas.
+
 ## Navegación web sin esperas repetidas —20/10/2026
 
 Por petición del usuario, corregida la pausa al cambiar secciones. AccountScreen

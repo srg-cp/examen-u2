@@ -1,5 +1,10 @@
 # Seguimiento y alertas
 
+21/10: [bandeja web](notificaciones-web.md) desde la campana de cuenta, con
+consulta, paginación y lectura persistida sobre las RPC de plan027. Sin nuevo
+SQL, push/seguimiento/preferencias web ni cierre de historias; evidencia local
+y límites en su ficha y ESTADO.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

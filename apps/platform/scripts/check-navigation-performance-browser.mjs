@@ -23,14 +23,14 @@ try {
  await page.getByLabel('Contraseña',{ exact:true }).press('Enter');
  await page.waitForURL('**/inicio');
  const nav = page.getByRole('navigation',{ name:'Navegación de usuario' });
- await nav.waitFor(); await page.getByRole('heading',{ name:/Hola,/ }).waitFor();
+ await nav.waitFor(); await page.getByRole('heading',{ name:'Su regreso empieza contigo' }).waitFor();
  await page.waitForTimeout(150);
  requests.length = 0;
  const metrics = [];
  for (const name of ['Explorar','Mis mascotas','Inicio','Explorar','Mis mascotas','Inicio']) {
   const start = performance.now();
   await nav.getByRole('link',{ name, exact:true }).click();
-  await page.getByRole('heading',{ name:name === 'Inicio' ? /Hola,/ : name, exact:name !== 'Inicio' }).waitFor();
+  await page.getByRole('heading',{ name:name === 'Inicio' ? 'Su regreso empieza contigo' : name, exact:true }).waitFor();
   const headingMs = Math.round(performance.now()-start);
   await page.waitForFunction(() => !document.querySelector('.skeleton') && !document.querySelector('.origin-transition-active'));
   metrics.push({ section:name, headingMs, contentMs:Math.round(performance.now()-start) });

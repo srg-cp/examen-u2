@@ -1,5 +1,21 @@
 # Perfil y fotografía de cuenta
 
+21/10: Perfil web recupera expansión/retorno desde el avatar,320/260ms,
+easeInOutCubic y fases de OriginPageTransition móvil, según regla global
+[ADR-124](../decisiones/124-paridad-animaciones-mobile-web.md). El contenido se
+conserva hasta finalizar cierre; foco/scroll y cancelaciones verificados con
+fotogramas normales, además de movimiento reducido. Consulta/datos intactos.
+
+21/10, web: cabecera de Inicio/Explorar/Mis mascotas/Reportar con avatar circular
+y panel glass Tu cuenta. Muestra nombre, correo y ciudad reales de sesión;
+consulta la foto almacenada en profile-avatars mediante proxy privado del mismo
+origen, sin URL firmada/token cliente ni publicación de teléfono/perfil. No
+espera esa foto para mostrar la cabecera; iniciales mientras llega o si falta.
+El proxy valida identidad/onboarding/actor y limita ruta/tamaño/JPEG. Sin foto
+guardada no usa URLs externas de redes sociales. Esta entrega es de consulta,
+no incorpora edición/foto/ciudad/teléfono web. Datos privados y consentimiento
+por caso conservados. Evidencia local en ESTADO; sin cambios SQL ni despliegue.
+
 Selector20/10, ADR-117: el celular usa bandera/prefijo y número nacional separados mediante InternationalPhoneField compartido. Perú inicial para vacíos, búsqueda por país/ISO/prefijo y pegado internacional. Guarda el mismo número completo privado; sin nuevo SQL. Prefijos compartidos sin país identificado muestran globo hasta elegir. Validación y Android en ESTADO.
 
 Celular20/10, [ADR-116](../decisiones/116-celular-privado-perfil-y-sugerencia-contacto.md):

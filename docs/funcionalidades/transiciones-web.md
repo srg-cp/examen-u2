@@ -1,81 +1,112 @@
 # Transiciones web desde origen y navegación liquid
 
-Respuesta20/10, [ADR-121](../decisiones/121-navegacion-web-sin-esperas-repetidas.md):
-StaggerReveal general pasa a240ms/35ms con retraso máximo140ms y sin blur, hasta
-380ms de entrada completa independientemente del número de tarjetas. Durante
-una expansión desde origen no inicia otra entrada superpuesta. Los parámetros
-propios de onboarding/login y las duraciones320/260ms de origen se conservan.
-Preload de rutas por intención y código de la barra preparados sin datos privados.
-Sigue respetando movimiento reducido, QR sin JS, guards y formularios pendientes.
-
-Incremento visual del 20/10/2026. [ADR-119](../decisiones/119-animaciones-web-desde-origen-y-navegacion-liquid.md).
+El usuario aprueba visualmente la animación de Reportar el21/10/2026 y pide
+documentarla para reutilización. [Guía de patrón UI/UX](../patrones-ui-ux/expansion-desde-origen.md):
+cuándo usarla, parámetros, piezas compartidas, ejemplos y criterios de revisión.
+Esta ficha conserva recorrido y evidencia de implementación; no sustituye la
+validación de cada nueva integración.
 
 ## Qué hace y recorrido
 
-La barra de cuenta usa solo iconos en todos los tamaños, con nombre
-accesible. Una cápsula azul compartida se desplaza entre Inicio, Explorar y Mis
-mascotas en 320 ms; el color de cada icono sigue su distancia al indicador, incluso
-al pasar por la sección intermedia. Por corrección posterior del usuario,
-hover/foco/presión conservan el brillo sin elevar el acento.
-Reportar conserva sus nueve puntos blancos en círculo negro independiente.
+Complemento vigente [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md):
+la superficie conserva el negro/radio del botón al nacer y regresar. Su icono
+se centra dentro y compensa scaleX/Y para conservar el tamaño original, como
+OriginPageTransition móvil. Fase fuente45% reutilizada de originMotionFrame,
+invertida al cerrar. El control original se oculta temporalmente y se restaura
+al finalizar/cancelar; solo se copia icono/etiqueta, nunca páginas/formularios.
+Fade/blur de Sader aplica al cuerpo, mientras superficie/identidad siguen
+visibles y sin blur. Radio visual compensado por eje para volver al círculo.
 
-Refinamiento explícito del20/10: barra máxima304px y opciones aproximadamente
-71×52px. Por corrección posterior, se retira el impulso horizontal al hover.
-Arrastrar horizontalmente permite hasta8px antes de regresar en480ms al soltar.
-El gesto no navega; clic/toque conservan los enlaces reales. CSS translate de la
-superficie interior separa este efecto del desplazamiento320ms del indicador y
-del brillo interactivo. Movimiento reducido lo desactiva; cancelación/ruta/desmontaje
-liberan animaciones. QA Chrome comprueba ausencia de impulso al hover y arrastre con retorno
-en el script existente, con renders1920/1440/731/390/320 y backend fixture.
+Por precisión explícita del usuario del21/10, la sección actual permanece
+visible detrás mientras el destino crece desde el botón. Título, campos y mapa
+se transforman dentro del contorno con el fade/blur de PrettyModal sobre el cuerpo,
+sin aparición diferida al terminar. [ADR-127](../decisiones/127-origen-fullscreen-y-fases-prettymodal-sader.md)
+sustituye la apertura sin fade y el destino limitado al main de ADR-126.
 
-Reportar se abre transformando la superficie del botón hasta el área de contenido
-bajo la marca. Del 0 al 45% se desvanece el icono de origen; del 65 al 100% aparece
-el contenido. Duraciones móvil: entrada 320 ms, retorno 260 ms. Registrar/Editar
-mascota reutilizan el mismo componente; cancelar editor revierte hacia su origen.
-También se aplica al enlace de revisión de Inicio, conservando permiso global.
+Reportar desde nueve puntos o acceso negro de Inicio conserva su ruta real.
+NuxtPage retiene el DOM saliente mediante el callback leave de Vue, fijo en su
+posición, inert y aria-hidden. La ruta entrante no pinta fondo exterior durante
+el morph; GSAP Flip escala su main real con overflow hidden hasta cubrir
+100dvw/100dvh, sin límites de columna. Al finalizar se
+libera leave y se retira la sección anterior. No hay clones ni snapshots de
+pantallas ni una segunda instancia del formulario. La marca y navegación
+permanecen fuera de la superficie transformada.
 
-## Componentes y reutilización
+El contenido nunca se revela en su posición final antes de tiempo: su geometría
+es hija de la misma transformación. El negro se transforma al degradado de
+página con la geometría de Sader; el fade/blur solo afecta al cuerpo. Un
+espaciador sin contenido conserva alto/scroll mientras el main ocupa viewport
+fijo; el cuerpo conserva sus coordenadas finales. Al restaurar estilos no hay
+otro reveal ni salto del contenido.
+Skeleton/datos reales siguen sus estados existentes; no se inventan datos ni se
+espera a que termine una consulta para animar.
 
-- app/utils/origin_transition.ts: controlador visual por aplicación, captura y
-  coordinación de aperturas locales/rutas, cancelación y registro de retorno.
-- OriginTransitionHost: superficie, fondo, identidad y capa decorativa anterior;
-  ubicación en el shell y revelado del contenido. Fuera de cabecera y navegación.
-- NavigationLink con origin: conserva enlaces reales, clic modificado, guards y
-  destino. Sin origen explícito, conserva el comportamiento normal.
-- OriginActionButton con action: ejecuta cambio local y anima la misma superficie;
-  closeLocal revierte al cerrar. No contiene reglas de negocio ni repositorios.
-- navigation_motion: composición/estado por aplicación; no se serializan nodos.
+Se conserva GSAP3.15.0, Flip.getState/from/to, scale:true, CustomEase original de
+PrettyModal/Sader y0.7s. Apertura copiada de globals.css: opacity0/blur10px a
+opacity1/blur0 en500ms cubic-bezier(0.56,0.27,0,1). No hay una espera inventada
+al50%: el cambio progresivo resulta de esos parámetros originales.
+Cerrar conserva sus keyframes y anima el componente antes de cambiar ruta; queda
+oculto hasta el commit para evitar destellos. Los guards de borrador se resuelven
+antes; cancelar conserva datos y no lanza contracción. Entrada directa/recarga no
+inventa un origen. Editores locales reutilizan el contenido escalado, sin retener
+una ruta distinta porque el cambio sucede dentro de la misma página.
 
-## Reglas, privacidad y persistencia
+## Reglas y componentes
 
-La barra permanece montada entre las rutas de cuenta para interpolar el indicador.
-Solo se habilita con cuenta y bienvenida confirmadas, y se oculta en rutas ajenas;
-la política global y los permisos de cada operación siguen siendo autoritativos.
-No se anima una entrada directa o recarga desde un origen ficticio.
+- OriginPageSurface: main real y body, contenido visible dentro del morph,
+  identidad por instancia e interacción bloqueada durante movimiento.
+- OriginTransitionHost: identidad visual del control y GSAP sobre la superficie entrante, excluyendo la ruta
+  retenida; layout final congelado y fondo opaco alineado al degradado de página.
+- origin_transition: captura rect/color/radio, coordina rutas/local, retiene y
+  libera leave. Sin persistir HTML ni payload SSR de nodos.
+- app.vue: hooks estables de NuxtPage para enter/leave, sin fade de ruta ni otra
+  política de autorización. CSS exterior transparente solo durante apertura.
+- navigation_motion, NavigationLink y OriginActionButton: guards/enlaces reales,
+  precarga y convenciones de clic modificado conservadas.
 
-La captura decorativa anterior es temporal, inerte y excluida de semántica. Retira
-formularios/campos, scripts, IDs, diálogos y avisos; no escribe almacenamiento,
-payload SSR ni caché. Se limpia tras la animación y no queda en el registro de
-retorno. Cambio de identidad cancela la capa y no anima datos de otra cuenta.
+ADR-125/126/127/128 registran la excepción web a ADR-124 para este motor:0.7s y
+fases de PrettyModal de Sader. Perfil/Alertas conservan320/260ms y sus fases móviles; Flutter y
+MorphPanel de campos no se modifican. No es paridad ni auditoría global.
 
-## Errores, accesibilidad y reintentos
+## Navegación liquid
 
-No cambia feedback, persistencia, RPC ni reintentos del producto. Las confirmaciones
-de salida mantienen el formulario y no reproducen una animación si se cancela.
-Destino inerte solo durante la expansión; cancelar, redimensionar, cambiar
-preferencia o desmontar libera máscaras/frames/animaciones y restaura interacción.
-Movimiento reducido elimina expansión/deslizamiento/elevación. Marca y barra
-permanecen estables y el contenido conserva su stagger compartido.
+Cápsula Inicio/Explorar/Mis mascotas: selección azul deslizante320ms y colores
+interpolados. Reportar: nueve puntos blancos en círculo negro independiente.
+Solo iconos/nombres accesibles; sin tooltip por instrucción posterior. Ancho
+máximo304px y opciones52px de alto. Sin impulso al hover; arrastre horizontal
+hasta8px con retorno480ms, sin navegar. Barra persistente con espacio de scroll,
+insets y sesión/bienvenida confirmadas. Reducido elimina esos efectos.
+
+## Persistencia, permisos y errores
+
+Solo presentación: operaciones, datos, ViewModels, borradores y permisos intactos.
+Política global valida acceso; las APIs autorizan cada operación. Ningún dato de
+backend ni secreto se añade al cliente. La vista saliente no admite interacción
+ni foco y se libera al terminar, fallar o cambiar identidad. Desmontaje libera
+callbacks, clases, estilos, referencias geométricas e inercia.
+
+Resize real, altura visual/escala, preferencia e identidad cancelan con limpieza.
+Avisos de visualViewport sin cambio real (incluido ancho por scrollbar) no
+terminan prematuramente el morph. Movimiento reducido omite expansión/retención.
 
 ## Activación y validación
 
-Sin variables nuevas, SQL, backend o dependencias. Requiere el build web con los
-componentes nuevos; no se ha publicado. La instancia de desarrollo existente se
-conservó, usando NUXT_BUILD_DIR aislado para verificar producción.
+Requiere gsap3.15.0 y build actualizado; sin SQL, variables nuevas, despliegue,
+nuevas HU/issues ni cierre de historias.
 
-scripts/check-navigation-motion-browser.mjs comprueba fotogramas intermedios del
-indicador y expansión, color/semántica, retorno de ruta/local, cabecera estable,
-cancelación de navegación con cambios, resize y movimiento reducido. Regresión
-de recuperación/acceso y pruebas habituales en ESTADO. Capturas en
-apps/mobile/build/ui-preview/web-navigation-motion. Pendiente revisión del usuario
-y comprobación táctil en navegadores físicos; evidencia local con backend fixture.
+check-origin-continuity-browser.mjs pausa la timeline GSAP real para capturar
+0/2/5/10/15/45/99/100% y cierre: rect inicial igual al control, parámetros
+fade/blur copiados, título escalado, destino al viewport completo, ruta anterior
+retenida detrás y retirada al terminar, sin salto de título al restaurar layout. Ejecuta además aperturas sin pausar, exige crecimiento y
+duración real >=600ms e inyecta un aviso de viewport sin cambio de tamaño.
+Tamaño original del icono constante en apertura/cierre, fuente hasta45%, retorno
+visible antes de llegar, radio circular y retirada de identidad al completar.
+Ambos disparadores,1852/1255/390/320, retorno, reaperturas y movimiento reducido.
+Capturas: apps/mobile/build/ui-preview/web-origin-sader.
+
+BROWSER_ORIGIN permite dev5173 con APIs interceptadas hacia fixture; sin sesión
+o datos reales. ORIGIN_WIDTHS y ORIGIN_TEXT_SCALE acotan viewport/texto ampliado.
+check-navigation-motion-browser.mjs revisa indicador, marca, retorno local/ruta,
+borrador cancelado, resize real, reducido e identidad; Perfil/Alertas conservan
+su QA aparte. Resultados y límites en ESTADO; aprobación visual del usuario
+confirmada para Reportar. Safari/Firefox/físico pendientes.

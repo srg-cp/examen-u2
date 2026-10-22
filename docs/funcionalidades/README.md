@@ -1,5 +1,47 @@
 # Funcionalidades de Entre Huellas
 
+Patrón UI/UX aprobado21/10: [Expansión desde origen con identidad del
+control](../patrones-ui-ux/expansion-desde-origen.md), con contrato visual,
+componentes, ejemplos y revisión para reutilizarlo en otros recorridos.
+Implementación/evidencia: [transiciones web](transiciones-web.md).
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+21/10, instrucción posterior: [origen de navegación sustituido por Sader/GSAP](transiciones-web.md),
+ADR-125; sin clonar pantallas y contenido solo al terminar apertura. Perfil/Alertas
+conservan ADR-124; excepción explícita y evidencia acotadas al motor intervenido.
+
+21/10: [paridad obligatoria de animaciones](transiciones-web.md), ADR-124;
+Perfil/Alertas web expanden y retornan desde avatar/campana con tiempos/curvas
+móviles. Verificación con fotogramas normales y movimiento reducido.
+
+21/10: [cabecera y bandeja de alertas web](notificaciones-web.md), con avatar,
+consulta de perfil y glass compartido con móvil. Lectura/paginación/marcar leída
+reales sobre plan027; sin push, edición de perfil o migraciones nuevas.
+
+21/10: [Inicio web](inicio.md) adopta el diseño de móvil con título azul,
+accesos negros, ilustración y Cerca de ti; cuenta desplegable y gestión por
+permiso. Build/typecheck/64 pruebas y QA Chrome responsive aprobados.
+
+21/10: [navegación de cuenta](navegacion-web.md) sin frases decorativas sobre
+títulos ni pie legal tras iniciar sesión; [legales](documentos-legales.md)
+conservan sus accesos públicos. Typecheck y64 pruebas aprobados; build/revisión
+visual pendientes según ESTADO.
+
+21/10: [Reportar web](navegacion-web.md) carga campos y dependencias por separado,
+con skeleton por selector y mapa, borrador íntegro y retry de cada fuente. ADR-123.
+
+21/10: [Controles web compartidos desde sader-panel](controles-web.md),
+FieldSelect/inputs/calendario/hora y línea de navegación superior. ADR-122.
+
 Respuesta web20/10: [navegación](navegacion-web.md), [acceso](acceso-web.md) y
 [transiciones](transiciones-web.md) eliminan esperas repetidas según ADR-121;
 medición local con backend fixture, sin confirmación remota ni despliegue.
@@ -49,7 +91,7 @@ compactos que acompañan su borde superior, según ADR-106. Paleta global intact
 Refinamiento de movimiento: impulso al soltar y detención al nuevo contacto;
 validación y revisión Android pendiente en la misma ficha.
 
-Cartografía20/10: [acabado compartido móvil/web](cartografia-compartida.md),
+Cartografía21/10: [acabado y detalles compartidos móvil/web](cartografia-compartida.md),
 intermedio entre Reportar y Explorar, obligatorio en adaptadores comunes.
 Sustituye filtro local de Explorar; base/activación web según ADR-104.
 

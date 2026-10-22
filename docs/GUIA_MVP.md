@@ -1,5 +1,45 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+21/10: instrucción posterior exige reemplazar el motor web desde origen por el
+código de Sader, sin clones de páginas y contenido solo al completar apertura.
+[ADR-125](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md) registra
+la excepción explícita de movimiento web; sin nuevas HU/RF/issues, alcance
+funcional, permisos/SQL, cambios de Flutter o cierre de historias.
+
+21/10: regla explícita de paridad móvil/web para animaciones equivalentes,
+[ADR-124](decisiones/124-paridad-animaciones-mobile-web.md). Se corrigen apertura
+y cierre de Perfil/Alertas web desde sus controles, conservando movimiento móvil.
+Sin nuevas HU/RF/issues, permisos, SQL ni operaciones; no es auditoría completa
+de otras animaciones ni cambio de la referencia Flutter.
+
+21/10: por petición del usuario, completar cabecera Home web con avatar/perfil
+de consulta (HU-01.7/RF-01/#23) y bandeja de alertas (HU-12.2/RF-17/#41) sobre
+los datos de cuenta existentes. Lectura/paginación/marcar leída; no amplía a
+push, preferencias/seguimiento web, edición de perfil ni paridad completa.
+Sin nueva HU/issue, migración o cierre de historias; validación local y límites
+en [notificaciones web](funcionalidades/notificaciones-web.md).
+
+Reportar web21/10: mejora autorizada de carga en los recorridos de recuperación
+existentes; campos y dependencias cargan de forma progresiva según ADR-123.
+Sin nuevas HU/RF/issues, funcionalidad de producto, SQL ni alcance Flutter.
+[Ficha](funcionalidades/navegacion-web.md).
+
+Controles web21/10: mejora visual autorizada de recorridos existentes de
+recuperación/mascotas/avistamientos/moderación; reutiliza componentes de Sader
+en Nuxt. Sin nuevas HU/RF/issues, alcance funcional, SQL ni Flutter.
+[ADR-122](decisiones/122-controles-web-reutilizables-desde-sader.md),
+[ficha y evidencia](funcionalidades/controles-web.md).
+
 Respuesta web20/10: mejora autorizada de navegación existente, ADR-121. Elimina
 invalidación por montaje, reutiliza preparación vigente y acorta entrada general;
 sin nuevas HU/RF/issues, cierre de historias ni despliegue. Validación y límites

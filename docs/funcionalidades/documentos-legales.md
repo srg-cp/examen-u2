@@ -1,5 +1,9 @@
 # Términos de servicio y política de privacidad web
 
+21/10: por petición explícita se retiran los enlaces del pie de cuenta tras
+iniciar sesión. Documentos y rutas públicas, enlaces de landing/login/registro
+y redirecciones existentes se mantienen; sin cambios de contenido ni permisos.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

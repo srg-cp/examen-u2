@@ -1,5 +1,11 @@
 # Avistamientos desde la web pública
 
+21/10, ADR-122: calendario/hora y comentario usan DateField/TimeField/TextField
+compartidos con [la piel y animaciones de Sader](controles-web.md). Fecha local,
+HH:mm, límites, punto privado y reintentos conservados. QA Chrome con fixture
+comprueba envío anónimo, metadatos eliminados, reintento ambiguo, responsive,
+texto200%, foco y CSP/hidratación sin errores; sin confirmación remota.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

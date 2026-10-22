@@ -51,7 +51,7 @@ try {
   async function noPermissionPlaceholder() {
     assert.equal(await page.locator('.account-main .skeleton, .account-grid .shape, .account-management-skeleton').count(), 0, 'No grey permission placeholder while the real account is visible');
     assert.equal(await page.locator('.account-grid').getAttribute('aria-busy'), 'true');
-    assert.equal(await page.locator('.account-grid > *').count(), 2, 'Only real account cards occupy the grid');
+    assert.equal(await page.locator('.account-grid > *').count(), 4, 'Home content remains visible while permissions are pending');
     assert.equal(await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).count(), 0, 'No permission assumed during lookup');
   }
   await noPermissionPlaceholder();
@@ -81,7 +81,7 @@ try {
   assert.equal(await page.locator('.account-grid').evaluate(el => [...el.children].every(e => getComputedStyle(e).opacity === '1')), true, 'Resize does not replay entrance');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload();
-  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
   assert.equal(await page.locator('.account-grid').evaluate(el => [...el.children].every(e => getComputedStyle(e).opacity === '1' && getComputedStyle(e).transitionDuration === '0s')), true);
   await context.close();
   const noJs = await browser.newContext({ javaScriptEnabled: false });

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   ssr: true,
-  css: ['~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css'],
+  css: ['~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css', '~/assets/fields.css'],
   runtimeConfig: { public: { mapTileUrl: '', siteUrl: 'https://entrehuellas.kormind.com' } },
   typescript: { strict: true },
   sourcemap: { server: false, client: false },

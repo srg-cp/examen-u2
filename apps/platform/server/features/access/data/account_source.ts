@@ -32,6 +32,21 @@ export class AccountSource {
   }
   completeOnboarding(token: string) { return this.request('/rest/v1/rpc/complete_onboarding', token, {}, true); }
   reviewer(token: string) { return this.request('/rest/v1/rpc/require_content_reviewer', token, {}); }
+  async avatar(token:string,actor:string):Promise<Uint8Array|null> {
+    try {
+      const response=await this.fetcher(this.config.url+'/storage/v1/object/authenticated/profile-avatars/'+encodeURIComponent(actor)+'/avatar.jpg',{
+        headers:{apikey:this.config.key,Authorization:'Bearer '+token},cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000),
+      });
+      if (!response.ok) { await response.body?.cancel();if ([400,404].includes(response.status)) return null;throw new AccessFailure(response.status===401?'unauthenticated':response.status===403?'forbidden':'unavailable'); }
+      const reader=response.body?.getReader();if (!reader) return null;
+      const chunks:Uint8Array[]=[];let size=0;
+      try { while (true) { const {done,value}=await reader.read();if (done) break;size+=value.length;if (size>2097152) throw new AccessFailure('unavailable');chunks.push(value); } }
+      finally { await reader.cancel().catch(()=>{}); }
+      const bytes=Buffer.concat(chunks);
+      if (bytes.length<3 || bytes[0]!==255 || bytes[1]!==216 || bytes[2]!==255) throw new AccessFailure('unavailable');
+      return bytes;
+    } catch(e) { throw e instanceof AccessFailure?e:new AccessFailure('unavailable'); }
+  }
   async logout(token: string) {
     try {
       await this.fetcher(this.config.url + '/auth/v1/logout?scope=local', { method: 'POST', headers: { apikey: this.config.key, Authorization: 'Bearer ' + token }, redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(5000) });

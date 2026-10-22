@@ -1,5 +1,21 @@
 # Acceso web
 
+21/10, cabecera completada: avatar con foto privada/iniciales abre Tu cuenta
+en panel glass. Campana compuesta desde las páginas permite consultar la
+[bandeja real](notificaciones-web.md). El cierre usa un icono circular glass
+con nombre accesible y tooltip; conserva la operación original. Se retira el
+desplegable inferior; política global, onboarding y permisos intactos.
+
+21/10: [Inicio web](inicio.md) adopta la composición de Inicio móvil, con
+accesos reales, ilustración y Cerca de ti. Tu cuenta se despliega por teclado
+o toque, conserva datos reales y no añade persistencia. Gestión/reintento
+continúan según permisos; sesión, onboarding y política global intactos.
+
+21/10: Inicio y tarjeta de gestión sin frases decorativas sobre los títulos.
+Se retira el pie legal del shell de cuenta compartido con las demás secciones;
+login/registro y documentos públicos conservan sus enlaces legales.
+Cambio de presentación, sin modificar sesión, onboarding ni permisos.
+
 Navegación20/10, ADR-121: bootstrap puede iniciar el ViewModel con la proyección
 vigente del transporte solo después de hidratar, vinculando actor en HTTP.
 No aumenta el plazo15s ni serializa estado privado en SSR. La política global

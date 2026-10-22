@@ -2,7 +2,6 @@
 import '../styles/moderation.css';
 import DecisionOptions from '../widgets/DecisionOptions.vue';
 const emit=defineEmits<{detail:[visible:boolean]}>();
-const originMotion = useNuxtApp().$originTransition,originRoute = useRoute();
 const model=useNuxtApp().$moderationModel(),state=shallowRef(model.state),unsubscribe=model.subscribe(value=>{state.value=value;});
 const toast=useTemplateRef('toast'),heading=useTemplateRef('heading');
 const accessProblem=ref(false);
@@ -35,7 +34,6 @@ let exitReason='';
 async function logout(){if(!await canLeave())return;exitReason='signed-out';await model.logout();channel?.postMessage('changed');}
 async function queue(){if(await canLeave())await model.load();}
 async function decide(){if(state.value.frozen||await ask('¿Guardar esta decisión?',state.value.action==='hide'?'El contenido dejará de mostrarse en las consultas públicas. Su estado operativo e historial se conservarán.':'La decisión y su motivo quedarán registrados. La visibilidad de un recurso vinculado seguirá respetando la de su búsqueda.','Guardar decisión'))await model.decide();}
-function editReason(event:Event){const input=event.target as HTMLTextAreaElement;const reason=[...input.value].slice(0,500).join('');input.value=reason;model.edit(reason);}
 function date(value:string){return new Intl.DateTimeFormat('es-PE',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}
 function kind(value:string){return value==='lost'?'Caso perdido':value==='found'?'Publicación o aviso':'Avistamiento';}
 function actionLabel(value:string){return value==='hide'?'Ocultar contenido':value==='show'?'Restaurar visibilidad':'Resolver sin cambiar visibilidad';}
@@ -49,8 +47,8 @@ onBeforeRouteLeave(async()=>await canLeave());
 onBeforeUnmount(()=>{++accessCheck;unsubscribe();model.dispose();channel?.close();clearTimeout(expiry);window.removeEventListener('beforeunload',beforeUnload);answer(false);});
 </script>
 <template>
-  <main id="view" class="moderation-screen" data-origin-content :class="{ 'origin-content-pending':originMotion.pending.value === originRoute.path }" :inert="originMotion.pending.value === originRoute.path">
-    <header class="moderation-header"><div><p class="eyebrow">Cuidamos la comunidad</p><h1 ref="heading" tabindex="-1">{{state.stage==='detail'?'Revisar denuncia':'Denuncias'}}</h1></div><NavigationLink class="text-button" to="/inicio">Volver a Entre Huellas</NavigationLink><ActionButton v-if="state.session" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton></header>
+  <OriginPageSurface id="view" class="moderation-screen">
+    <header class="moderation-header"><div><h1 ref="heading" tabindex="-1">{{state.stage==='detail'?'Revisar denuncia':'Denuncias'}}</h1></div><NavigationLink class="text-button" to="/inicio">Volver a Entre Huellas</NavigationLink><ActionButton v-if="state.session" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton></header>
     <TopToast ref="toast" />
     <section v-if="accessProblem"><ActionButton @click="checkAccess()">Reintentar conexión</ActionButton></section>
     <ContentSkeleton label="Consultando denuncias" v-else-if="state.stage==='checking'" />
@@ -79,7 +77,7 @@ onBeforeUnmount(()=>{++accessCheck;unsubscribe();model.dispose();channel?.close(
           <StaggerReveal as="div" v-if="state.receipt"><p>{{actionLabel(state.receipt.action)}}</p><p class="moderation-text">{{state.receipt.reason}}</p><p>{{date(state.receipt.decidedAt)}}</p><p class="privacy">El estado operativo del caso se conserva.</p><ActionButton @click="model.refreshDetail()">Consultar estado actual</ActionButton></StaggerReveal>
           <form v-else novalidate @submit.prevent="decide">
             <DecisionOptions :value="state.action" :disabled="blocked" @choose="model.edit(state.reason,$event)" />
-            <label :class="{invalid:state.failure?.kind==='invalid',shake:state.failure?.kind==='invalid'}" :data-notice="state.notice">Motivo de la decisión (obligatorio)<textarea :value="state.reason" rows="4" :disabled="blocked" :aria-invalid="state.failure?.kind==='invalid'" @input="editReason" /><span class="field-count">{{[...state.reason].length}}/500</span></label>
+            <TextField :model-value="state.reason" label="Motivo de la decisión (obligatorio)" multiline :maxlength="500" :disabled="blocked" :invalid="state.failure?.kind==='invalid'" :data-notice="state.notice" @update:model-value="model.edit([...$event].slice(0,500).join(''))" />
             <p class="privacy">Se guardan tu cuenta, el motivo y la fecha. Ocultar no cierra ni elimina el caso; restaurar sigue respetando la visibilidad de la búsqueda vinculada.</p>
             <ActionButton v-if="state.failure?.kind==='conflict'" :working="state.busy" @click="model.refreshDetail()">Consultar estado actual</ActionButton>
             <ActionButton v-else type="submit" variant="primary" :working="state.busy">{{state.frozen&&(!state.busy||state.retrying)?'Reintentar decisión':'Guardar decisión'}}</ActionButton>
@@ -90,5 +88,5 @@ onBeforeUnmount(()=>{++accessCheck;unsubscribe();model.dispose();channel?.close(
       <ActionButton v-else-if="state.failure" @click="model.refreshDetail()">Reintentar consulta</ActionButton>
     </section>
     <ConfirmationDialog :open="!!confirm" :title="confirm?.title||''" :description="confirm?.description||''" :action="confirm?.action||''" @answer="answer" />
-  </main>
+  </OriginPageSurface>
 </template>

@@ -1,5 +1,10 @@
 # ADR-119: animaciones web desde origen y navegación liquid
 
+**Instrucción posterior21/10:** el motor de navegación desde origen descrito
+aquí y sus aproximaciones se reemplazan por [ADR-125](125-origen-web-reemplazado-por-sader-gsap-flip.md).
+Se elimina el clonado/WAAPI y se usa PrettyModal/GSAP de Sader, contenido al100%.
+Las reglas de barra liquid que no interviene ADR-125 conservan su vigencia.
+
 Fecha: 20/10/2026, America/Lima. Estado: aceptada por instrucción explícita.
 
 Corrección posterior20/10: el usuario retira también la elevación del acento al
@@ -52,6 +57,26 @@ registro de retorno. Un cambio de identidad cancela y limpia el efecto. Nunca se
 capturan credenciales de acceso ni se reutiliza una copia entre cuentas.
 
 ## Consecuencias y validación
+
+### Corrección de implementación desde Sader —21/10/2026
+
+Por instrucción explícita reiterada del usuario, la expansión debe mover y
+escalar el contenido desde el origen; un fade con escala .98→1 en su posición
+final, aunque tenga recorte, no cumple. Se traslada la técnica FLIP de
+PrettyModal/ExpandIntactModal de sader-panel: medir el destino con su layout
+final e invertirlo al rect real del disparador, compartiendo traslación/escala
+entre superficie y cuerpo vivo. No se importan React/Framer/GSAP; WAAPI aplica
+la matriz equivalente y conserva320/260ms, curvas/fases de ADR-124.
+
+Los radios y el icono decorativo compensan la escala de la superficie. Ningún
+formulario se clona para el morph. El primer fotograma corresponde al botón,
+el contenido permanece oculto antes de65% y sigue creciendo cuando se revela.
+Al montar el host se retiran capas huérfanas de implementaciones anteriores
+para que HMR no perpetúe una copia antigua en una pestaña ya abierta.
+
+QA debe medir el primer fotograma y matrices comunes durante el crecimiento,
+no solo el recorte o estado final. Probar nueve puntos y acceso negro de Inicio
+en servidor de desarrollo y build, además de retorno/cancelación/reducido.
 
 Animaciones mediante CSS/WAAPI/CSSOM, compatibles con la CSP vigente sin unsafe-inline.
 Esperar montaje de la nueva página de Nuxt antes de adjuntar la superficie a su

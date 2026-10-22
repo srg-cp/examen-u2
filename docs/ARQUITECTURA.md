@@ -1,5 +1,57 @@
 # Arquitectura de Entre Huellas
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+Origen web21/10, ADR-125: OriginPageSurface conserva el cuerpo vivo oculto durante
+apertura y OriginTransitionHost ejecuta GSAP Flip/CustomEase de PrettyModal de
+Sader. Eliminados snapshots/hold/previous/WAAPI de navegación. El controlador
+retiene únicamente rect/control y coordina Flip.to antes de desmontar mediante
+hook visual compartido (sin política/guard de acceso nuevo). Solo presentación;
+estado/casos de uso/permisos intactos. [Decisión y excepción a ADR-124](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+Movimiento21/10, ADR-124: origin_motion_contract centraliza320/260ms y fases
+móviles; origin_dialog_motion reproduce las curvas/progresión de Flutter para
+GlassDialog. AccountProfile/NotificationBell entregan el control real sin
+infraestructura; el diálogo mantiene contenido hasta finalizar retorno y
+cancela WAAPI/estilos/nodos en resize/preferencia/desmontaje. Host de navegación
+consume las mismas constantes. Prueba de paridad contra Dart y QA de fotogramas.
+[Decisión global](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Cabecera/alertas web21/10: páginas de cuenta componen NotificationBell por slot
+de AccountScreen, sin imports de presentación entre funcionalidades. Notifications
+separa ReadInbox/MarkNotificationRead/contrato, DTO/repositorios HTTP y servidor,
+InboxSource y ViewModel. Plugin inyecta por actor; Nitro revalida cuenta/onboarding
+y actor antes de RPC existentes con JWT privado. AccountProfile usa proyección
+de sesión existente; ReadAccountAvatar/ServerAccountRepository/AccountSource
+protegen proxy privado de foto con ruta del actor y tamaño acotado. Sin foto,
+iniciales. GlassSurface/GlassDialog son presentación compartida sin negocio.
+Sin rutas nuevas ni cambios de SQL; [ficha](funcionalidades/notificaciones-web.md).
+
+Reportar web21/10, ADR-123: RecoveryViewModel entrega mascotas/búsquedas por
+fuente, con readiness/fallo/carga independientes, casos de uso existentes y
+descarte de respuestas tardías. RecoveryScreen inicia estas lecturas junto al
+borrador y monta el mapa sin esperar; FieldSkeleton limita el placeholder al
+selector pendiente. Metadatos de borrador conservados hasta lectura confirmada;
+sin caché/SQL/guard adicional. [Decisión](decisiones/123-carga-progresiva-reportar-web.md).
+
+Tema de controles21/10, refinamiento ADR-122: roles CSS locales --sf-* en
+fields.css comparten paleta celeste entre campos, selectores, panel y loader.
+Sin estado/persistencia de tema, lógica nueva ni dependencias entre features.
+
+Controles web21/10: FieldSelect/TextField/DateField/TimeField/DateTimeField en
+app/components y fields.css, adaptados de Sader por petición explícita.
+MorphPanel comparte top layer/FLIP y lifecycle con WAAPI, sin infraestructura
+ni negocio. TopLoadingBar observa navegación real; excepción local a ADR-027.
+[ADR-122](decisiones/122-controles-web-reutilizables-desde-sader.md).
+
 Navegación web20/10, ADR-121: AccountSessionTransport expone su proyección vigente
 solo a composición; bootstrap inicializa ViewModel/repositorio ligados al actor
 después de hidratar. Sin nueva caché, perfil en SSR ni cambios de política global.

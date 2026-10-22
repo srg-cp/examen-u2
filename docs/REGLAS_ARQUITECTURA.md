@@ -1,5 +1,39 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+Origen web21/10, instrucción posterior ADR-125: reemplazar el motor de navegación
+por GSAP Flip de Sader sobre el componente vivo, sin snapshots/clones de páginas.
+Contenido visible solo al terminar apertura0.7s; cierre antes de desmontar.
+Excepción explícita a tiempos/fases de ADR-124 en este motor web; Perfil/Alertas
+y Flutter conservados. [Alcance y validación](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+Animaciones21/10, ADR-124: contratos de movimiento equivalentes deben coincidir
+en móvil/web y verificarse con fotogramas de apertura/cierre normales y modo
+reducido. Parámetros/controladores son presentación compartida, sin negocio,
+repositorios ni imports entre presentaciones de funcionalidades. Origen real,
+retorno, duración/curvas/fases y lifecycle obligatorios. [Regla](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Reportar web21/10, ADR-123: estado/carga/fallo por recurso en ViewModel mediante
+los casos de uso existentes. La UI muestra campos estáticos tras acceso y
+skeleton solo en dependencias pendientes, sin confundir fallo con vacío ni
+descartar borradores por lecturas tardías. Operaciones autorizadas en servidor,
+sin caché adicional. [Decisión](decisiones/123-carga-progresiva-reportar-web.md).
+
+Controles web21/10, ADR-122: componentes compartidos de presentación adaptan
+Sader sin importar React ni reglas del otro producto. MorphPanel concentra
+geometría/animación/lifecycle; formularios conservan sus modelos y permisos.
+Por petición expresa, línea superior solo durante navegación web, excepción
+local a ADR-027. [Decisión](decisiones/122-controles-web-reutilizables-desde-sader.md).
+
 Navegación web20/10, ADR-121: reutilizar únicamente la preparación vigente de
 data, inyectada por bootstrap en navegación cliente después de hidratar; conservar
 política global y revalidación por operación. No invalidar identidad por montar

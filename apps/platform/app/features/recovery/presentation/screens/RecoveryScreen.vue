@@ -17,10 +17,13 @@ const kind = ref<ReportKind>('own_loss'), selectedPet = ref(''), selectedTarget 
 const point = ref<{ latitude:number;longitude:number }|null>(null), photos = shallowRef<readonly ReportPhoto[]>([]), fileNames = ref<string[]>([]);
 const photoBusy = ref(false), uploadPetId = ref(''), reportId = ref('');
 const savingDraft = ref(false), pendingPetPhoto = shallowRef<{ pet:string;photo:ReportPhoto }|null>(null);
+const restoringDraft = ref(props.section === 'report'), restoredDraft = shallowRef<ReportDraft|null>(null);
+let disposed = false;
 const savedPet = computed(() => state.value.pets.find(p => p.id === selectedPet.value));
 const invalid = computed(() => state.value.failure?.fields || []);
 const frozen = shallowRef<{ draft:ReportDraft;photos:readonly ReportPhoto[] }|null>(null);
-const blocked = computed(() => state.value.busy || photoBusy.value || savingDraft.value || !!frozen.value || !!state.value.receipt);
+const blocked = computed(() => restoringDraft.value || state.value.busy || photoBusy.value || savingDraft.value || !!frozen.value || !!state.value.receipt);
+const reportPrerequisitePending = computed(() => !frozen.value && (kind.value === 'own_loss' ? !state.value.petsReady || state.value.petsLoading : kind.value !== 'possible_loss' ? !state.value.targetsReady || state.value.targetsLoading : false));
 const dirty = computed(() => props.section === 'pets' ? !!pendingPetPhoto.value || (editor.value && JSON.stringify(animal.value) !== baseline.value) : props.section === 'report' && !state.value.receipt && !!(kind.value !== 'own_loss' || selectedPet.value || selectedTarget.value || localDate.value || place.value || point.value || photos.value.length || animal.value.traits || animal.value.species));
 const title = computed(() => props.section === 'explore' ? 'Explorar' : props.section === 'pets' ? editor.value ? version.value ? 'Editar mascota' : 'Registrar mascota' : 'Mis mascotas' : 'Reportar');
 const messages = { invalid:'Revisa los campos señalados. Completa la información y selecciona las fotos necesarias.',photo:'Elige imágenes JPEG, PNG o WebP de hasta 8 MB. Puedes usar hasta tres fotos.',unauthenticated:'Tu sesión terminó. Vuelve a iniciar sesión.',forbidden:'No tienes permiso para realizar esta operación.',conflict:'Los datos cambiaron. Actualiza la información antes de volver a enviarla.',unavailable:'No pudimos confirmar la operación. Conservamos tus datos para reintentar.' };
@@ -56,17 +59,22 @@ async function retryPetPhoto() {
 }
 function snapshot() {
   const target = state.value.targets.find(c => c.source + ':' + c.id === selectedTarget.value), a = animal.value;
+  // A restored reference remains part of the local draft while its remote
+  // metadata is pending. Do not erase it when saving independently edited text.
+  const previousPet = restoredDraft.value?.petId === selectedPet.value ? restoredDraft.value : null;
+  const previousTarget = restoredDraft.value && selectedTarget.value === (restoredDraft.value.communityTarget ? 'found:' : 'lost:') + restoredDraft.value.targetId ? restoredDraft.value : null;
   const date = new Date(localDate.value);
-  const draft: ReportDraft = { id:reportId.value,kind:kind.value,petId:savedPet.value?.id || null,petVersion:savedPet.value?.version || null,targetId:target?.id || null,communityTarget:target?.source === 'found',occurredAt:Number.isFinite(date.getTime()) ? date.toISOString() : '',latitude:point.value?.latitude ?? null,longitude:point.value?.longitude ?? null,place:place.value,species:a.species,speciesDetail:a.speciesDetail,size:a.size,sex:a.sex,traits:a.traits,photoIds:kind.value === 'own_loss' ? savedPet.value?.photoIds.slice(0,3) || [] : photos.value.map(p => p.id) };
+  const draft: ReportDraft = { id:reportId.value,kind:kind.value,petId:savedPet.value?.id || previousPet?.petId || null,petVersion:savedPet.value?.version ?? previousPet?.petVersion ?? null,targetId:target?.id || previousTarget?.targetId || null,communityTarget:target ? target.source === 'found' : previousTarget?.communityTarget ?? false,occurredAt:Number.isFinite(date.getTime()) ? date.toISOString() : '',latitude:point.value?.latitude ?? null,longitude:point.value?.longitude ?? null,place:place.value,species:a.species,speciesDetail:a.speciesDetail,size:a.size,sex:a.sex,traits:a.traits,photoIds:kind.value === 'own_loss' ? savedPet.value?.photoIds.slice(0,3) || previousPet?.photoIds || [] : photos.value.map(p => p.id) };
   return { draft,photos:kind.value === 'own_loss' ? [] : photos.value };
 }
 async function send() {
+  if (restoringDraft.value || reportPrerequisitePending.value) return;
   const value = frozen.value || snapshot();
   await model.send(value.draft,value.photos);
   if (state.value.failure && ['unavailable','conflict'].includes(state.value.failure.kind)) frozen.value = value;
 }
 async function remember() {
-  if (savingDraft.value || state.value.busy) return;
+  if (restoringDraft.value || savingDraft.value || state.value.busy) return;
   savingDraft.value = true;
   const value = frozen.value || snapshot();
   try { if (await model.remember({ ...value,frozen:!!frozen.value })) toast.value?.show('Borrador guardado en este navegador para tu cuenta.',null,false); }
@@ -86,20 +94,23 @@ onBeforeRouteLeave(async () => !state.value.busy && !photoBusy.value && !savingD
 const beforeUnload = (event: BeforeUnloadEvent) => { if (dirty.value || state.value.busy) event.preventDefault(); };
 onMounted(async () => {
   reportId.value = crypto.randomUUID(); window.addEventListener('beforeunload',beforeUnload);
+  // Start independent remote reads and map mounting before local draft I/O.
+  void load();
   if (props.section === 'report') {
     const saved = await model.restoreDraft();
+    if (disposed) return;
     if (saved) {
-      const d = saved.draft; reportId.value = d.id; kind.value = d.kind; selectedPet.value = d.petId || ''; selectedTarget.value = (d.communityTarget ? 'found:' : 'lost:') + (d.targetId || ''); place.value = d.place;
+      const d = saved.draft; restoredDraft.value = d; reportId.value = d.id; kind.value = d.kind; selectedPet.value = d.petId || ''; selectedTarget.value = (d.communityTarget ? 'found:' : 'lost:') + (d.targetId || ''); place.value = d.place;
       if (d.latitude !== null && d.longitude !== null) point.value = { latitude:d.latitude,longitude:d.longitude };
       if (d.occurredAt) { const date = new Date(d.occurredAt); if (Number.isFinite(date.getTime())) localDate.value = new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16); }
       animal.value = { ...blank(),species:d.species,speciesDetail:d.speciesDetail,size:d.size,sex:d.sex,traits:d.traits }; photos.value = saved.photos; fileNames.value = saved.photos.map((_,i) => 'Foto ' + (i+1));
       if (saved.frozen) frozen.value = { draft:d,photos:saved.photos };
       toast.value?.show('Restauramos tu borrador de este navegador.',null,false);
     }
+    restoringDraft.value = false;
   }
-  void load();
 });
-onBeforeUnmount(() => { unsubscribe(); model.dispose(); photos.value = []; frozen.value = null; pendingPetPhoto.value = null; answer(false); window.removeEventListener('beforeunload',beforeUnload); });
+onBeforeUnmount(() => { disposed = true; unsubscribe(); model.dispose(); photos.value = []; restoredDraft.value = null; frozen.value = null; pendingPetPhoto.value = null; answer(false); window.removeEventListener('beforeunload',beforeUnload); });
 const photoUrl = (source:string,id:string) => '/api/recovery/photo?source=' + source + '&id=' + id;
 const speciesLabel = (v:string) => ({ dog:'Perro',cat:'Gato',other:'Otra especie' }[v] || v);
 const kindLabel = (v:string) => ({ lost:'En búsqueda',found:'En custodia',sighting:'Avistamiento' }[v] || v);
@@ -110,14 +121,14 @@ function imageFailed(event: Event) { (event.target as HTMLImageElement).hidden =
   <section class="recovery-screen">
     <TopToast ref="toast" />
     <div v-if="section === 'report'" class="recovery-navigation"><GlassNavigationButton close label="Cerrar reporte" :disabled="state.busy || photoBusy || savingDraft || !!confirm || motion.busy.value" @navigate="closeReport" /></div>
-    <header class="account-welcome"><p class="eyebrow">Cada huella cuenta</p><h1>{{ title }}</h1><p v-if="section === 'explore'">Ayuda a encontrar su camino de vuelta a casa.</p><p v-else-if="section === 'pets' && !editor">Tus mascotas, contigo en web y móvil.</p></header>
-    <ContentSkeleton v-if="state.loading" label="Consultando información" />
+    <header class="account-welcome"><h1>{{ title }}</h1><p v-if="section === 'explore'">Ayuda a encontrar su camino de vuelta a casa.</p><p v-else-if="section === 'pets' && !editor">Tus mascotas, contigo en web y móvil.</p></header>
+    <ContentSkeleton v-if="state.loading && section !== 'report'" label="Consultando información" />
     <div v-else class="recovery-content" :class="{ refreshing:state.refreshing }" :aria-busy="state.refreshing">
       <template v-if="section === 'explore'">
         <form class="recovery-filters recovery-fields" @submit.prevent="load()">
-          <label>Tipo<select aria-label="Tipo" v-model="query.kind" :disabled="state.refreshing"><option value="all">Todos</option><option value="lost">En búsqueda</option><option value="found">En custodia</option><option value="sighting">Avistamientos</option></select></label>
-          <label>Especie<select aria-label="Especie" v-model="query.species" :disabled="state.refreshing"><option value="all">Todas</option><option value="dog">Perros</option><option value="cat">Gatos</option><option value="other">Otras especies</option></select></label>
-          <label>Estado<select aria-label="Estado" v-model="query.status" :disabled="state.refreshing"><option value="active">Activos</option><option value="resolved">Resueltos visibles para ti</option><option value="all">Todos los visibles</option></select></label>
+          <FieldSelect label="Tipo" v-model="query.kind" :disabled="state.refreshing" :options="[{value:'all',label:'Todos'},{value:'lost',label:'En búsqueda'},{value:'found',label:'En custodia'},{value:'sighting',label:'Avistamientos'}]" />
+          <FieldSelect label="Especie" v-model="query.species" :disabled="state.refreshing" :options="[{value:'all',label:'Todas'},{value:'dog',label:'Perros'},{value:'cat',label:'Gatos'},{value:'other',label:'Otras especies'}]" />
+          <FieldSelect label="Estado" v-model="query.status" :disabled="state.refreshing" :options="[{value:'active',label:'Activos'},{value:'resolved',label:'Resueltos visibles para ti'},{value:'all',label:'Todos los visibles'}]" />
           <ActionButton type="submit" variant="primary" :working="state.refreshing">Aplicar filtros</ActionButton>
         </form>
         <StaggerReveal v-if="state.items.length" as="div" class="recovery-cards">
@@ -149,24 +160,30 @@ function imageFailed(event: Event) { (event.target as HTMLImageElement).hidden =
         <div v-if="state.receipt" class="recovery-success"><h2>Reporte publicado</h2><p>Tu información ya está guardada en Entre Huellas.</p><NavigationLink to="/explorar" class="primary">Ir a Explorar</NavigationLink></div>
         <StaggerReveal v-else as="form" class="recovery-form" novalidate @submit.prevent="send">
           <div class="recovery-fields">
-            <label class="recovery-full">¿Cómo quieres ayudar?<select aria-label="¿Cómo quieres ayudar?" v-model="kind" :disabled="blocked"><option value="own_loss">Se perdió mi mascota</option><option value="possible_loss">Vi una mascota posiblemente perdida</option><option value="sighting">Vi una mascota que están buscando</option><option value="with_reporter">Tengo a una mascota que están buscando</option></select></label>
+            <FieldSelect class="recovery-full" label="¿Cómo quieres ayudar?" v-model="kind" :disabled="blocked" :options="[{value:'own_loss',label:'Se perdió mi mascota'},{value:'possible_loss',label:'Vi una mascota posiblemente perdida'},{value:'sighting',label:'Vi una mascota que están buscando'},{value:'with_reporter',label:'Tengo a una mascota que están buscando'}]" />
             <template v-if="kind === 'own_loss'">
-              <label class="recovery-full">Tu mascota<select aria-label="Tu mascota" v-model="selectedPet" :disabled="blocked" :aria-invalid="invalid.includes('pet') || invalid.includes('photos')"><option value="">Selecciona tu mascota</option><option v-for="p in state.pets" :key="p.id" :value="p.id">{{ p.name }}</option></select></label>
+              <FieldSkeleton v-if="!state.petsReady && !state.petsFailure" class="recovery-full" label="Tu mascota" />
+              <FieldSelect v-else-if="state.petsReady" class="recovery-full" :class="{refreshing:state.petsLoading}" :aria-busy="state.petsLoading" label="Tu mascota" v-model="selectedPet" :disabled="blocked || state.petsLoading" :invalid="invalid.includes('pet') || invalid.includes('photos')" :options="[{value:'',label:'Selecciona tu mascota'},...state.pets.map(p => ({value:p.id,label:p.name}))]" />
+              <div v-if="state.petsFailure" class="recovery-full"><ActionButton :working="state.petsLoading" :disabled="blocked" @click="model.loadReportSource('pets')">Reintentar mascotas</ActionButton></div>
               <p class="privacy recovery-full">Se publicarán hasta tres fotos verificadas de la mascota. Puedes añadirlas desde Mis mascotas.</p>
-              <NavigationLink v-if="!state.pets.length || (savedPet && !savedPet.photoIds.length)" to="/mis-mascotas" class="text-button">Registrar mascota o añadir fotos</NavigationLink>
+              <NavigationLink v-if="state.petsReady && (!state.pets.length || (savedPet && !savedPet.photoIds.length))" to="/mis-mascotas" class="text-button">Registrar mascota o añadir fotos</NavigationLink>
             </template>
-            <label v-else-if="kind !== 'possible_loss'" class="recovery-full">Búsqueda a la que ayudas<select aria-label="Búsqueda a la que ayudas" v-model="selectedTarget" :disabled="blocked" :aria-invalid="invalid.includes('target')"><option value="">Selecciona una búsqueda activa</option><option v-for="target in state.targets" :key="target.source + target.id" :value="target.source + ':' + target.id">{{ target.name || speciesLabel(target.species) }}</option></select></label>
-            <label>Fecha y hora<input v-model="localDate" type="datetime-local" :disabled="blocked" :aria-invalid="invalid.includes('occurredAt')" /></label>
-            <label>Referencia del lugar (privada)<input v-model="place" maxlength="120" :disabled="blocked" :aria-invalid="invalid.includes('place')" /></label>
+            <template v-else-if="kind !== 'possible_loss'">
+              <FieldSkeleton v-if="!state.targetsReady && !state.targetsFailure" class="recovery-full" label="Búsqueda a la que ayudas" />
+              <FieldSelect v-else-if="state.targetsReady" class="recovery-full" :class="{refreshing:state.targetsLoading}" :aria-busy="state.targetsLoading" label="Búsqueda a la que ayudas" v-model="selectedTarget" :disabled="blocked || state.targetsLoading" :invalid="invalid.includes('target')" :options="[{value:'',label:'Selecciona una búsqueda activa'},...state.targets.map(target => ({value:target.source + ':' + target.id,label:target.name || speciesLabel(target.species)}))]" />
+              <div v-if="state.targetsFailure" class="recovery-full"><ActionButton :working="state.targetsLoading" :disabled="blocked" @click="model.loadReportSource('targets')">Reintentar búsquedas</ActionButton></div>
+            </template>
+            <DateTimeField v-model="localDate" label="Fecha y hora" :disabled="blocked" :invalid="invalid.includes('occurredAt')" />
+            <TextField v-model="place" label="Referencia del lugar (privada)" :maxlength="120" :disabled="blocked" :invalid="invalid.includes('place')" />
           </div>
-          <div class="recovery-map"><h2>¿Dónde ocurrió?</h2><p class="privacy">Marca el lugar en el mapa. La ficha pública muestra una zona aproximada; la referencia exacta permanece privada.</p><LocationMap :center="{latitude:-12.0464,longitude:-77.0428}" :point="point" :disabled="blocked" :invalid="invalid.includes('point')" @choose="point = $event" @failed="retry => toast?.show('No pudimos mostrar el mapa. Puedes reintentar.',retry)" /></div>
+          <div class="recovery-map"><h2>¿Dónde ocurrió?</h2><p class="privacy">Marca el lugar en el mapa. La ficha pública muestra una zona aproximada; la referencia exacta permanece privada.</p><LocationMap :center="{latitude:-12.0464,longitude:-77.0428}" :point="point" :radius-meters="kind === 'sighting' || kind === 'with_reporter' ? 200 : 0" :disabled="blocked" :invalid="invalid.includes('point')" @choose="point = $event" @failed="retry => toast?.show('No pudimos mostrar el mapa. Puedes reintentar.',retry)" /></div>
           <AnimalFields v-if="kind === 'possible_loss'" v-model="animal" :disabled="blocked" :invalid="invalid" />
-          <div v-else-if="kind !== 'own_loss'" class="recovery-fields"><label class="recovery-full">¿Qué observaste?<span class="recovery-textarea"><textarea aria-label="¿Qué observaste?" v-model="animal.traits" maxlength="200" rows="4" :disabled="blocked" :aria-invalid="invalid.includes('traits')" /><span class="recovery-counter" aria-hidden="true">{{ animal.traits.length }}/200</span></span></label></div>
+          <div v-else-if="kind !== 'own_loss'" class="recovery-fields"><TextField v-model="animal.traits" class="recovery-full" label="¿Qué observaste?" multiline :maxlength="200" :disabled="blocked" :invalid="invalid.includes('traits')" /></div>
           <div v-if="kind !== 'own_loss'" class="recovery-upload"><label class="secondary recovery-file" :class="{ working:photoBusy,invalid:invalid.includes('photos') }">{{ kind === 'possible_loss' ? 'Elegir fotos' : 'Añadir fotos (opcional)' }}<input type="file" accept="image/jpeg,image/png,image/webp" multiple :disabled="blocked" aria-label="Fotos del reporte" @change="selectFiles($event)" /></label><p class="privacy">Hasta 3 fotos JPEG, PNG o WebP, de 8 MB cada una. Se eliminan los metadatos antes de publicar.</p><ul v-if="fileNames.length"><li v-for="name in fileNames" :key="name">{{ name }}</li></ul></div>
-          <div class="recovery-actions"><ActionButton type="submit" variant="primary" :working="state.busy" :disabled="photoBusy || savingDraft">{{ frozen ? 'Reintentar el mismo envío' : 'Publicar reporte' }}</ActionButton><ActionButton :working="savingDraft" :disabled="state.busy || photoBusy" @click="remember">Guardar borrador</ActionButton></div>
+          <div class="recovery-actions"><ActionButton type="submit" variant="primary" :working="state.busy" :disabled="restoringDraft || reportPrerequisitePending || photoBusy || savingDraft">{{ frozen ? 'Reintentar el mismo envío' : 'Publicar reporte' }}</ActionButton><ActionButton :working="savingDraft" :disabled="restoringDraft || state.busy || photoBusy" @click="remember">Guardar borrador</ActionButton></div>
         </StaggerReveal>
       </template>
-      <ActionButton v-if="state.failure && !editor && !state.receipt && !frozen" :working="state.refreshing" :disabled="state.busy" @click="load()">Actualizar información</ActionButton>
+      <ActionButton v-if="state.failure && !editor && !state.receipt && !frozen && (section !== 'report' || (!state.petsFailure && !state.targetsFailure))" :working="section === 'report' ? state.petsLoading || state.targetsLoading : state.refreshing" :disabled="state.busy" @click="load()">Actualizar información</ActionButton>
     </div>
     <ConfirmationDialog :open="!!confirm" title="¿Salir sin guardar?" description="Los cambios que todavía no guardaste se descartarán." action="Salir" @answer="answer" />
   </section>

@@ -1,5 +1,94 @@
 # Navegación de usuario y recuperación web
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+21/10, instrucción posterior ADR-125: sustituido el motor de origen de navegación
+por GSAP Flip de PrettyModal/Sader sobre el componente real. Sin copias de Inicio,
+hold/previous ni superficie paralela; formulario oculto hasta completar0.7s y
+contracción antes de desmontar. Las descripciones de aproximaciones anteriores
+que siguen son historial. [Contrato vigente y evidencia](transiciones-web.md).
+
+21/10, sustitución del mecanismo: Reportar ya no hace fade/escala.98
+en su posición final; cuerpo y superficie comparten FLIP desde el control real,
+como Sader. Primer fotograma y crecimiento comprobados en el dev5173 con backend
+fixture desde nueve puntos y acceso negro de Inicio,1852/1440/390/320. Limpieza
+de copias antiguas/HMR incluida. [Contrato y evidencia](transiciones-web.md).
+
+21/10, corrección posterior por captura del usuario: Reportar recorta contenido
+y expansión juntos, siguiendo el mecanismo revisado de Sader; espera montaje
+real y limpia la copia anterior por referencia. Host fuera del shell al quedar
+en reposo. QA1852/1440/390/320 con reaperturas reales y comprobación explícita
+de accesos de Inicio ausentes del reporte. [Detalle](transiciones-web.md).
+
+21/10, continuidad del botón de nueve puntos: copia decorativa preparada antes
+de navegar a Reportar, conservada durante el montaje del destino y transferida
+a la expansión sin fotogramas vacíos. Tiempos/fases y retorno conservados;
+limpieza ante cancelación/cambio de cuenta y movimiento reducido comprobados.
+[Detalle y evidencia local](transiciones-web.md#continuidad-al-abrir-reportar-21102026).
+
+21/10, estabilidad: html reserva el canal de scroll con scrollbar-gutter:stable
+en main.css. Evita que la barra centrada salte horizontalmente al cambiar la
+altura del contenido o bloquear el scroll desde Perfil/Alertas. Sin cambios de
+dominio, datos, permisos ni animación de selección. QA reproducible en
+scripts/check-navigation-stability-browser.mjs con scrollbar clásica visible:
+salto previo7,5px; después0px a1440/390/320 durante navegación, lecturas demoradas,
+contenido largo y apertura/cierre de Perfil.71 pruebas/typecheck/build aprobados;
+Safari/Firefox/dispositivos físicos pendientes. Sin despliegue.
+
+21/10, cabecera: Inicio/Explorar/Mis mascotas/Reportar comparten avatar/perfil,
+campana con [bandeja de alertas](notificaciones-web.md) e icono de logout.
+Composición por slots en páginas, marca estable y glass compartido con móvil;
+cuenta/alertas abren paneles nativos accesibles sin cambiar ruta ni descartar
+formularios. Escape/cierre devuelve foco y libera scroll. Cuenta ya no aparece
+como desplegable al final de Inicio.
+
+21/10: [Inicio](inicio.md) adapta el diseño móvil con título de dos líneas,
+accesos negros a Reportar/Explorar/Mis mascotas, ilustración y tarjetas glass.
+Reportar usa NavigationLink origin y conserva retorno a Inicio; los otros
+accesos reutilizan las rutas y política existentes. Sin rutas vacías nuevas.
+
+21/10: retiradas las frases decorativas sobre títulos de Inicio, Explorar,
+Mis mascotas, Reportar y gestión/moderación por petición del usuario.
+AccountScreen ya no muestra el pie de Términos/Privacidad; el contenido conserva
+espacio inferior para desplazarse por encima de la barra flotante. Etiquetas de
+tipo/estado del caso, persistencia, permisos y reintentos conservados.
+
+## Carga progresiva de Reportar —21/10/2026
+
+[ADR-123](../decisiones/123-carga-progresiva-reportar-web.md): después de comprobar
+acceso, se muestra el formulario e inicia mascotas, búsquedas y borrador local
+en paralelo. El mapa monta independientemente mediante LocationMap. Solo la
+restauración local deshabilita temporalmente los campos para no sobrescribir
+edición; las listas remotas no bloquean los inputs de texto/fecha/tipo.
+
+Cada selector muestra FieldSkeleton hasta su lectura confirmada; fallo tiene
+toast/reintento específico, sin presentarse como lista vacía. Los resultados se
+aplican por separado. Publicar espera únicamente la lista correspondiente al tipo
+de reporte; guardar borrador conserva referencias/versiones/fotos restauradas
+si la lista aún no llegó. Refresh conserva contenido; respuestas tardías no
+reaparecen tras desmontar ni afectan una publicación ya confirmada.
+
+VM/casos de uso/repositorios y autorización existentes, sin persistencia ni
+permisos nuevos.64 pruebas/typecheck/build y regresiones Chrome correctos;
+scripts/check-report-loading-browser.mjs retiene las tres dependencias y prueba
+campos usables, entrega independiente, retry aislado y borrador íntegro; capturas
+en apps/mobile/build/ui-preview/web-report-loading. QA recovery confirma los
+cuatro tipos/fotos/reintento ambiguo. Pendiente latencia real/Safari/Firefox/
+dispositivos físicos; sin despliegue ni cierre de historias.
+
+21/10, [ADR-122](../decisiones/122-controles-web-reutilizables-desde-sader.md):
+filtros, metadatos de mascotas y formularios de reportes consumen los
+[controles compartidos de Sader](controles-web.md). Línea superior durante
+navegación; modelos, persistencia, autorización y reintentos conservados.
+
 Mejora20/10, [ADR-121](../decisiones/121-navegacion-web-sin-esperas-repetidas.md):
 los montajes dejan de invalidar su propia sesión; reutilización estricta de15s
 después de la política global, sin skeleton repetido al navegar. Código preparado
@@ -32,7 +121,7 @@ gestos/animaciones al cancelar, cambiar ruta o desmontar.
 El indicador se desplaza con la barra persistente y Reportar se expande desde el
 botón. [Transiciones reutilizables](transiciones-web.md), ADR-119, sustituyen
 las etiquetas de escritorio y el cambio estático de selección de ADR-118.
-El usuario puede desplazar todos los controles y legales por encima de la barra.
+El usuario puede desplazar todos los controles por encima de la barra.
 Reportar incluye una X glass flotante para cerrar y regresar a Inicio, Explorar
 o Mis mascotas según el origen; entrada directa vuelve a Inicio. Reutiliza
 GlassNavigationButton y la transición de retorno existente. Si hay cambios,

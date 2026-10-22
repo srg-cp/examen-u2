@@ -1,5 +1,42 @@
 # Entre Huellas: instrucciones del proyecto
 
+Patrón UI/UX aprobado21/10: antes de reutilizar la expansión desde origen,
+consultar docs/patrones-ui-ux/expansion-desde-origen.md. Conservar el contrato
+ADR-128 y usar componentes/coordinador existentes; validar cada integración.
+Aprobación visual del usuario en Reportar web, sin migración global implícita.
+
+Origen web21/10, combinación explícita ADR-128: conservar fullscreen/GSAP Sader
+pero sumar identidad móvil al abrir/cerrar: superficie negra/radio del control
+se transforman, nueve puntos mantienen tamaño y se centran dentro, fase fuente
+hasta45% invertida al volver. Fade/blur de Sader solo al cuerpo, no a superficie
+ni icono; restaurar control y limpiar identidad en cancelación/fin/cambio de
+cuenta. Véase docs/decisiones/128-identidad-mobile-en-origen-web-fullscreen.md.
+
+Origen web21/10, precisión ADR-127: expansión al viewport completo, con fases
+originales de PrettyModal/Sader (Flip0.7s más entrada opacity0/blur10→1/0 en500ms,
+cubic-bezier(0.56,0.27,0,1)). Sustituye apertura sin fade y destino limitado al
+main de ADR-126; conservar sección anterior detrás, contenido dentro del morph,
+marca/barra estables, reducido y limpieza. Véase docs/decisiones/127-origen-fullscreen-y-fases-prettymodal-sader.md.
+
+Origen web21/10, precisión posterior ADR-126: conservar la sección anterior
+visible detrás durante apertura; el contenido nuevo se ve desde el inicio
+dentro de la superficie y escala con ella desde el botón. Sin reveal al final.
+Sustituye la fase de cuerpo oculto de ADR-125; mantener0.7s/CustomEase de Sader,
+sin clones de páginas, con acceso global, reducido y limpieza de identidad.
+Perfil/Alertas y Flutter conservados. Véase docs/decisiones/126-contenido-dentro-de-expansion-y-ruta-anterior-visible.md.
+
+Animaciones21/10, ADR-124, por instrucción explícita: las animaciones de un mismo
+recorrido en móvil y web deben coincidir en efecto, origen/destino, sentido,
+duración, curva, fases de contenido y retorno. No sustituir expansión por panel
+instantáneo/fade ni cambiar tiempos por plataforma. La geometría final puede
+adaptarse al viewport sin cambiar el contrato de movimiento. Respetar movimiento
+reducido en ambos, conservar foco/limpieza y comprobar fotogramas de apertura y
+cierre con movimiento normal. Cualquier divergencia requiere instrucción explícita
+del usuario y decisión documentada. Perfil/Alertas usan origen real320/260ms,
+easeInOutCubic, fuente hasta45% y contenido desde65%. Véase
+docs/decisiones/124-paridad-animaciones-mobile-web.md. No afirmar auditoría global
+de animaciones por validar solo estos recorridos.
+
 Hero landing20/10, ADR-120: por instrucción explícita, #hero-title recupera Arial,
 peso500, #171918, line-height1.02, tracking−0.055em, tamaño adaptable42–108px
 (móvil32–48px) y mascotas laterales originales. Excepción local a ADR-111;

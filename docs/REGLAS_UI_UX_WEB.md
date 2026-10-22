@@ -1,5 +1,94 @@
 # Entre Huellas: reglas de UI y UX web
 
+Mapas21/10, [ADR-129](decisiones/129-paridad-visual-de-mapas-mobile-web.md):
+por instrucción explícita, reproducir mapa, pines y detalles móviles en cada
+recorrido equivalente mediante LocationMap compartido. Referencia ZoneMapPicker:
+pin location_on36 centrado, viewport280/radio22/zoom12 y créditos superiores;
+radio0 en pérdidas y200m en avistamientos. Sin controles Leaflet ajenos al móvil.
+Pines de resultados con marca son distintos del selector; no afirmar mapa de
+Explorar web existente. Conservar teclado, texto ampliado, errores y privacidad.
+
+**Patrón aprobado21/10:** [Expansión desde origen con identidad del
+control](patrones-ui-ux/expansion-desde-origen.md). Reutilizar NavigationLink
+con origin / OriginActionButton, OriginPageSurface y el host/coordinador global;
+conservar fases, fullscreen y retorno. La guía fija cuándo usarlo y cómo validar
+otra integración. Aprobación visual del usuario para Reportar; no implica
+migración o auditoría global.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+**Origen web21/10, instrucción posterior ADR-125:** sustituir el motor de
+navegación por PrettyModal de Sader/GSAP Flip real; sin copias de Inicio ni
+superficies paralelas. El contenido aparece solo al terminar la apertura0.7s;
+contracción del componente vivo antes de desmontar. Excepción explícita a
+tiempos/fases de ADR-124 para este motor; Perfil/Alertas, campos y Flutter
+conservados. [Decisión](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+**Paridad de animaciones21/10, ADR-124:** cada recorrido equivalente conserva
+la animación móvil: efecto, origen/destino, duración, curvas, fases y retorno;
+no omitirla ni elegir otra por tratarse de web. Se adapta la geometría final,
+sin cambiar el movimiento. Perfil/Alertas expanden desde avatar/campana reales
+320ms y vuelven260ms, easeInOutCubic; contenido desde65%, fuente hasta45%.
+GlassDialog mantiene contenido hasta terminar salida. Verificar fotogramas con
+movimiento normal y reducido, foco/cancelación/scroll. [Regla global y alcance
+verificado](decisiones/124-paridad-animaciones-mobile-web.md).
+
+**Cabecera y glass de cuenta21/10:** completar la referencia Home móvil con
+campana Alertas y avatar circular (foto privada o iniciales), acceso real al
+perfil y cierre de sesión compacto. GlassSurface comparte acabado polished
+de móvil: blur22, degradado neutro, ribete y sombra; se reutiliza en controles,
+tarjetas de Inicio y bandeja. GlassDialog concentra panel, backdrop, teclado,
+foco y limpieza del scroll. Marca estable y fuera del stagger; sin pie legal.
+Las alertas muestran datos reales, skeleton/fallo/vacío distintos y lectura
+confirmada por servidor; sin contadores ni alertas inventadas.
+
+**Inicio web21/10:** por petición explícita, adaptar HomeContent móvil:
+«Su regreso / empieza contigo» con título global Poppins400/32 y énfasis600
+azul→celeste, accesos negros, ilustración original3:2 y tarjetas glass/radio26
+de comunidad y Cerca de ti. Escritorio en dos columnas; móvil en el orden
+título/accesos/ilustración/cercanía. Solo destinos web implementados:
+Reportar, Explorar y Mis mascotas. Cuenta desplegable y gestión por permiso;
+marca, navegación, stagger, texto ampliado y ausencia de pie legal conservados.
+
+**Cabeceras de cuenta21/10:** por petición explícita, retirar las frases
+decorativas sobre títulos en Inicio, Explorar, Mis mascotas, Reportar y
+Moderación, incluida la tarjeta de gestión. Sin pie de Términos/Privacidad
+en el shell autenticado; conservar espacio de scroll para la barra flotante.
+Los enlaces legales públicos y las etiquetas informativas de casos se mantienen.
+
+**Reportar progresivo21/10, ADR-123:** tras verificar acceso, el formulario
+aparece sin esperar las listas remotas; cada selector pendiente usa FieldSkeleton
+y el mapa su placeholder compartido. Conservar contenido confirmado durante
+refresh con shimmer, error por toast y reintento de la fuente concreta. No
+mostrar vacío hasta confirmarlo ni volver a animar el formulario al llegar datos.
+
+**Etiqueta de campos21/10, corrección ADR-122:** TextField mantiene label/for
+transparente y una muesca real en el contorno, sin parche sólido sobre el fondo
+degradado. Un solo trazo de foco/error; hover sin el ribete antiguo. Las etiquetas
+largas deben ajustar líneas y reservar espacio con texto ampliado sin tapar el valor.
+
+**Tema celeste de controles21/10, refinamiento ADR-122:** por petición expresa,
+fields.css centraliza roles --sf-* según la paleta de Entre Huellas: selección
+celeste/texto azul oscuro, hover/superficies celestes suaves, foco azul y línea
+superior azul. Sin colores neutros fijos por componente ni variantes por feature;
+mantener geometría/animaciones de Sader y rojo de error. Alcance de los controles
+adaptados, sin selector de tema ni cambio de títulos/landing/acceso/Flutter.
+
+**Controles Sader21/10, ADR-122:** por instrucción explícita, los formularios
+intervenidos usan la piel y animaciones de Sader mediante componentes compartidos,
+Inter local, controles48px/radio8px y panel morph32px. Línea superior4px durante
+navegación web: excepción local a la prohibición de barras. Toast/shimmer/skeleton,
+marca, títulos y acceso conservan sus contratos. Sin helpers de error bajo campos.
+[Contrato y alcance](funcionalidades/controles-web.md).
+
 **Respuesta de navegación20/10, ADR-121:** entrada general StaggerReveal240ms,
 separación35ms y retraso máximo140ms, sin blur ni doble entrada durante expansión
 desde origen. Onboarding/login conservan parámetros propios. Reutilizar sesión

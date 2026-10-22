@@ -1,5 +1,42 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Patrón aprobado y reutilizable21/10:** [Expansión desde origen con identidad
+del control](patrones-ui-ux/expansion-desde-origen.md). Referencia visual aprobada
+por el usuario en Reportar web; reutilizar el motor compartido, sus fases y
+retorno, con validación por recorrido. No sustituir por fade/panel instantáneo
+ni extender automáticamente a Perfil/Alertas o Flutter. La guía incluye
+integración, accesibilidad, limpieza y criterios de revisión.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+**Instrucción posterior21/10, ADR-125:** la navegación web desde origen reemplaza
+su motor por el código GSAP Flip de Sader, sin clonar páginas, con contenido
+oculto hasta completar apertura0.7s. Divergencia explícitamente solicitada respecto
+a ADR-124 solo en este motor; Perfil/Alertas y Flutter conservados.
+[Alcance](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+**Paridad obligatoria21/10, ADR-124:** por instrucción explícita, las animaciones
+equivalentes de móvil y web deben coincidir: efecto, origen/destino, sentido,
+duración, curvas, fases de contenido y retorno. No cambiar parámetros por
+plataforma ni sustituir una expansión por aparición instantánea/fade. Solo la
+geometría final se adapta al viewport. Comprobar apertura y cierre con fotogramas
+y movimiento normal, además de movimiento reducido, foco y limpieza. Divergencias
+solo por instrucción expresa y documentada del usuario. [Contrato y corrección
+de Perfil/Alertas](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Controles web21/10, ADR-122: petición explícita autoriza adaptar FieldSelect,
+inputs/calendario/hora y animaciones de Sader en Nuxt, incluidos radios/Inter
+locales. La línea superior durante navegación web es excepción a ADR-027;
+Flutter conserva sus reglas vigentes. [Ficha](funcionalidades/controles-web.md).
+
 Hero landing20/10, ADR-120: el usuario restaura su título original grande,
 Arial500/#171918/1.02/tracking−0.055em, adaptable hasta108px y móvil32–48px,
 con mascotas laterales originales. Excepción local a ADR-111; resto sin cambios.

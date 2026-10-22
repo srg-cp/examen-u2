@@ -39,7 +39,7 @@ try{
  await page.screenshot({path:fileURLToPath(new URL('desktop-queue.png',output)),fullPage:true});
  await page.getByRole('button',{name:'Revisar denuncia',exact:true}).click();await page.getByText('PRIVATE_REPORT_REASON',{exact:true}).waitFor();
  await page.getByLabel('Motivo de la decisión (obligatorio)').fill('Borrador que se conserva al cancelar.');await page.getByRole('button',{name:'Volver a denuncias'}).click();await page.getByRole('dialog').getByRole('button',{name:'Cancelar',exact:true}).click();assert.equal(await page.getByLabel('Motivo de la decisión (obligatorio)').inputValue(),'Borrador que se conserva al cancelar.');
- await page.getByLabel('Motivo de la decisión (obligatorio)').fill('');server.revoke(true);await page.getByRole('button',{name:'Volver a denuncias'}).click();await page.waitForURL('**/inicio');await page.getByRole('heading',{name:'Tu cuenta',exact:true}).waitFor();assert.equal(await page.getByText('PRIVATE_REPORT_REASON').count(),0);
+ await page.getByLabel('Motivo de la decisión (obligatorio)').fill('');server.revoke(true);await page.getByRole('button',{name:'Volver a denuncias'}).click();await page.waitForURL('**/inicio');await page.getByRole('heading',{name:'Su regreso empieza contigo',exact:true}).waitFor();assert.equal(await page.getByText('PRIVATE_REPORT_REASON').count(),0);
  await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement!==document.body),true);
  await page.goto(server.origin);assert.equal(await page.locator('h1').count(),1);await page.goto(server.origin+'/c/'+ 'a'.repeat(64));await page.locator('h1').waitFor();
  assert.deepEqual(errors,[]);await context.close();

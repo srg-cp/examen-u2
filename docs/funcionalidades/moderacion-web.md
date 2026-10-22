@@ -1,5 +1,15 @@
 # Revisión y moderación de denuncias en la web
 
+21/10: cabecera de Denuncias/Revisar denuncia sin frase decorativa superior,
+por petición del usuario. Motivo, tipo/fecha, avisos de privacidad, operaciones
+y autorización permanecen; solo cambia la presentación de la cabecera.
+
+21/10, ADR-122: el motivo utiliza TextField compartido con etiqueta flotante,
+contador y [piel Sader](controles-web.md). Conserva ViewModel, bloqueo/reintento
+y autorización de cada decisión. QA Chrome con fixture pasa denegación por rol,
+evidencia, decisión/reintento/restauración, cancelación, revocación, responsive,
+texto200%, teclado y CSP/hidratación. Sin confirmación remota.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y
