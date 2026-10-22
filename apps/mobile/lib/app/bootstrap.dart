@@ -1,3 +1,10 @@
+import '../features/case_posters/domain/repositories/case_share_repository.dart';
+import '../features/case_posters/data/repositories/case_share_repository_impl.dart';
+import '../features/case_posters/data/data_sources/supabase_case_share_source.dart';
+import '../features/case_posters/data/data_sources/native_case_share_action_source.dart';
+import '../features/case_contacts/domain/repositories/case_contact_repository.dart';
+import '../features/case_contacts/data/repositories/case_contact_repository_impl.dart';
+import '../features/case_contacts/data/data_sources/case_contact_source.dart';
 import '../features/content_reports/domain/repositories/content_report_repository.dart';
 import '../features/content_reports/data/repositories/content_report_repository_impl.dart';
 import '../features/content_reports/data/data_sources/content_report_source.dart';
@@ -18,7 +25,8 @@ import '../features/sightings/domain/repositories/sighting_repository.dart';
 import '../features/sightings/data/repositories/unavailable_sighting_repository.dart';
 import '../features/sightings/data/repositories/sighting_repository_impl.dart';
 import '../features/sightings/data/data_sources/sighting_source.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart'
+    show rootBundle, Clipboard, ClipboardData;
 import '../features/case_posters/domain/repositories/case_poster_repository.dart';
 import '../features/case_posters/data/repositories/unavailable_case_poster_repository.dart';
 import '../features/case_posters/data/repositories/case_poster_repository_impl.dart';
@@ -101,6 +109,8 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.caseShareRepository = const UnavailableCaseShareRepository(),
+    this.caseContactRepository = const UnavailableCaseContactRepository(),
     this.contentReportRepository = const UnavailableContentReportRepository(),
     this.caseClosureRepository = const UnavailableCaseClosureRepository(),
     this.notificationRepository = const UnavailableNotificationRepository(),
@@ -130,6 +140,7 @@ class AppBootstrap {
   });
 
   final CaseClosureRepository caseClosureRepository;
+  final CaseContactRepository caseContactRepository;
   final ContentReportRepository contentReportRepository;
   final StartupState state;
   final NotificationRepository notificationRepository;
@@ -137,6 +148,7 @@ class AppBootstrap {
   final CaseTimelineRepository caseTimelineRepository;
   final SightingRepository sightingRepository;
   final CasePosterRepository casePosterRepository;
+  final CaseShareRepository caseShareRepository;
   final AuthRepository authRepository;
   final AccessRepository accessRepository;
   final OnboardingRepository onboardingRepository;
@@ -215,8 +227,28 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           notificationRepository: NotificationRepositoryImpl(
             SupabaseNotificationSource(supabase.client),
           ),
+          caseShareRepository: CaseShareRepositoryImpl(
+            SupabaseCaseShareSource(supabase.client),
+            PdfPosterDocumentSource(
+              regularFont: () =>
+                  rootBundle.load('assets/fonts/Roboto-Regular.ttf'),
+              boldFont: () => rootBundle.load('assets/fonts/Roboto-Bold.ttf'),
+            ),
+            NativeCaseShareActionSource(
+              const NativePosterExportSource(),
+              copyText: (text) => Clipboard.setData(ClipboardData(text: text)),
+            ),
+            webBaseUrl: const String.fromEnvironment(
+              'PUBLIC_CASE_WEB_URL',
+              defaultValue: 'https://entrehuellas.kormind.com',
+            ),
+            publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
+          ),
           savedCasesRepository: SavedCasesRepositoryImpl(
             SupabaseSavedCasesDataSource(supabase.client),
+          ),
+          caseContactRepository: CaseContactRepositoryImpl(
+            CaseContactSource(supabase.client),
           ),
           currentLocationRepository: const CurrentLocationRepositoryImpl(
             DeviceLocationSource(),

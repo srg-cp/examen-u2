@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../domain/failures/preference_failure.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
@@ -63,7 +64,6 @@ class AlertPreferencesScreen extends ConsumerWidget {
                   fit: StackFit.expand,
                   children: [
                     SingleChildScrollView(
-                      key: ValueKey(data?.saved.ownerId ?? 'unavailable'),
                       padding: EdgeInsets.fromLTRB(
                         24,
                         MediaQuery.paddingOf(context).top + 80,
@@ -75,15 +75,11 @@ class AlertPreferencesScreen extends ConsumerWidget {
                         children: [
                           const Text(
                             'Preferencias de alertas',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF111111),
-                            ),
+                            style: AppTypography.primaryTitle,
                           ),
                           const SizedBox(height: 20),
                           AuthStageTransition(
-                            key: ValueKey(data?.saved.ownerId ?? 'unavailable'),
+                            enabled: !async.isLoading,
                             startCovered: true,
                             stage: 'preferences',
                             builder: (play) => ContentReveal(

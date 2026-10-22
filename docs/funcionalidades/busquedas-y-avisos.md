@@ -1,5 +1,34 @@
 # Búsquedas y avisos vinculados
 
+Actualización20/10, ADR-113/114: Ver ficha usa [tarjetas glass](ficha-publica-mobile.md), con [contacto del autor autorizado por caso](contacto-reportante.md). La publicación conserva vista previa ImmersivePhotoSheet. Contacto se registra/edita desde la ficha publicada y no repite publicación. Plan031/activación remota pendientes; alcance ampliado explícitamente en este chat.
+
+Conservación20/10, ADR-112: el diseño actual se llama **Ficha fotográfica inmersiva** (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), sin cambio visual ni funcional. [Contrato de reutilización](ficha-fotografica-inmersiva.md). Las referencias al nombre anterior designan el mismo componente. Nuevo diseño glass por tarjetas pendiente de otro incremento.
+
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Corrección20/10/2026: nombre principal de Ver ficha directamente sobre la
+fotografía, sin cápsula blanca ni padding añadido. CasePublicationPreview
+conserva Poppins400/32/gris, texto completo y scroll. Ajuste solicitado por el
+usuario; sin cambios de datos, permisos o acciones.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
+Salida del reporte20/10: confirmación compartida sin origen abre/cierra como
+popup160ms (fundido/escala leve), mostrando superficie y contenido juntos.
+Cancelar, X, barrera y Atrás conservan el borrador; Salir mantiene el descarte
+existente. Movimiento reducido inmediato, scroll/texto ampliado conservados.
+Sin cambios de persistencia/permisos ni ampliación de HU-05/HU-06.
+Validación visual Android pendiente; evidencia local en ESTADO.
+
+
 **Auditoría de seguimiento18/10:** HU-05/#5 y HU-06/#6 en Done por entrega integrada y evidencia posterior. HU-13/#13 sigue In progress por integración/028/demo pendientes; cerrar las publicaciones no da por activado el cierre nuevo.
 
 HU-10.2,18/10: la ficha abierta añade Reportar avistamiento mediante el módulo

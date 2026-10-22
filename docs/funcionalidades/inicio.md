@@ -1,5 +1,69 @@
 # Inicio y navegación
 
+21/10, corrección posterior del usuario: la cabecera incorpora campana real
+de [alertas web](notificaciones-web.md), avatar privado con iniciales como
+alternativa y panel de consulta de cuenta. Se retira el desplegable inferior
+Tu cuenta del incremento anterior. GlassSurface compartido extiende el acabado
+polished móvil a Inicio, controles, cuenta y bandeja; GlassDialog gestiona cierre,
+Escape, foco y scroll. Marca estable y cierre real por icono accesible.
+Las páginas componen alertas por slot sin imports entre presentaciones.
+Perfil editable/push/preferencias web siguen fuera de este incremento.
+
+## Inicio web con la composición móvil —21/10/2026
+
+Por petición explícita, /inicio de platform adapta el HomeContent móvil vigente:
+título «Su regreso empieza contigo» Poppins400/32 con remate600 y degradado
+#459FF6→#75C9EF, tres accesos negros, ilustración original de perro/gato3:2
+y descripción dentro de tarjeta glass/radio26, sección Cerca de ti con aviso
+glass y enlace real a Explorar. Dos columnas en escritorio, secuencia móvil
+en pantallas pequeñas y accesos apilados al necesitar más espacio.
+
+El widget HomeContent de acceso es presentación estática, compuesto por
+AccountScreen bajo su sesión/onboarding y StaggerReveal existentes. No importa
+otras funcionalidades ni añade ViewModel/caso de uso sin operaciones nuevas.
+Reportar conserva expansión/retorno desde origen; Explorar y Mis mascotas
+usan sus rutas existentes. Mis reportes, perfil editable y alertas móviles
+no se anuncian como implementados en web. La descripción de Explorar refleja
+la selección de zona web, sin prometer geolocalización automática móvil.
+
+Tu cuenta conserva nombre/correo/ciudad reales en details/summary accesible por
+teclado; no hay persistencia adicional del desplegable. Moderación y su retry
+se conservan por permiso, sin esperar gestión para mostrar el contenido.
+No reaparecen frases decorativas superiores ni pie legal autenticado.
+
+Validación local: build en .nuxt-home-review sin detener el dev server,
+typecheck y64 pruebas aprobados. check-home-browser.mjs confirma Chrome1440,
+390,320 y texto200%, imagen/fuente locales, abrir/cerrar cuenta por teclado,
+los tres accesos y retorno, redirect anónimo y gestión por rol con fixtures.
+Capturas desktop/mobile/text200 revisadas en apps/mobile/build/ui-preview/web-home.
+check-stagger-browser.mjs confirma entrada real y permisos pendientes sin
+skeletons, resize/movimiento reducido y QR sin JS. check-access-browser.mjs
+confirma login/onboarding/roles/logout/reintentos con el nuevo título.
+Sin despliegue; pendiente revisión del usuario, backend real, Safari/Firefox
+y dispositivos físicos.
+
+Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
+la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
+comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
+por centrado vertical. Regresión de navegación con fuentes reales en390×844
+y320×350/texto2 aprobada. Sin cambio de tipografía, datos o permisos.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
+20/10/2026: corregido el arrastre del indicador al pasar por Explorar. El
+Positioned de navegación tiene identidad estable en el Stack: insertar o
+retirar el acceso flotante Mapa no desmonta LiquidNavigation ni reinicia su
+tween. Conserva deslizamiento320ms, selección inmediata con movimiento
+reducido y destinos existentes. Sin nueva persistencia, permisos, dependencias
+o activación. Dos regresiones reproducen Inicio→Explorar→Mis mascotas y vuelta,
+con Mapa visible, identidad y posiciones inicial/intermedia/final. Fallaban
+antes del ajuste y pasan después; suite Home/refresh/arquitectura/consistencia
+27/27 aprobada y análisis completo sin incidencias. Revisión visual Android pendiente.
+
 20/10/2026, acabado vigente de accesos: Reportar/Mis reportes/Mis mascotas con
 fondo negro #111111, iconos y texto blancos, peso600 original y sin refuerzo
 de iconos. Tamaños compactos y destinos conservados; apertura de Reportar

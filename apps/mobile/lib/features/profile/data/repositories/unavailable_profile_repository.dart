@@ -12,5 +12,6 @@ final class UnavailableProfileRepository implements ProfileRepository {
     String userId, {
     required String? displayName,
     required String? city,
+    required String? contactPhone,
   }) async => throw const ProfileFailure(ProfileFailureKind.unavailable);
 }

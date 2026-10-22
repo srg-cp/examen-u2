@@ -1,6 +1,7 @@
 import '../../../../core/presentation/widgets/case_photo.dart';
 import '../../../../core/presentation/formatters/case_date_label.dart';
-import '../../../../core/presentation/widgets/case_publication_preview.dart';
+import '../../../../core/presentation/widgets/immersive_photo_sheet.dart';
+import '../../../../core/presentation/widgets/case_public_cards.dart';
 import '../../../../core/presentation/widgets/case_photo_failure.dart';
 import 'package:flutter/material.dart';
 import '../../../pets/domain/entities/pet.dart';
@@ -30,12 +31,58 @@ String caseFailureLabel(CaseFailureKind? kind) => switch (kind) {
 };
 
 class CasePublicContent extends StatelessWidget {
-  const CasePublicContent({required this.value, this.actions, super.key});
+  const CasePublicContent({
+    required this.value,
+    this.actions,
+    this.contact,
+    super.key,
+  });
   final PublicLostCase value;
   final Widget? actions;
+  final Widget? contact;
   @override
-  Widget build(BuildContext context) =>
-      CasePreviewContent(value: value, actions: actions, isPreview: false);
+  Widget build(BuildContext context) {
+    final f = value.fields;
+    return CasePublicCards(
+      key: ValueKey(value.id),
+      name: f.name,
+      eventLabel: value.status == 'active' ? 'Perdido' : 'Búsqueda cerrada',
+      photos: [
+        for (final photo in value.photos)
+          photo.uri == null
+              ? const CasePhotoFailure()
+              : CasePhotoView.network(
+                  photo.uri!,
+                  semanticLabel: 'Foto de ${f.name}',
+                ),
+      ],
+      facts: [
+        CasePublicFact('Especie', switch (f.species) {
+          PetSpecies.dog => 'Perro',
+          PetSpecies.cat => 'Gato',
+          _ => f.speciesDetail ?? 'Otra especie',
+        }),
+        if (f.sex != null)
+          CasePublicFact('Sexo', f.sex == PetSex.male ? 'Macho' : 'Hembra'),
+        if (f.size != null)
+          CasePublicFact('Tamaño', switch (f.size!) {
+            PetSize.small => 'Pequeño',
+            PetSize.medium => 'Mediano',
+            PetSize.large => 'Grande',
+          }),
+        if (f.ageMonths != null) CasePublicFact('Edad', '${f.ageMonths} meses'),
+      ],
+      description: f.traits ?? '',
+      occurredAt: 'Desaparición: ${caseDateLabel(value.occurredAt)}',
+      locationLabel: 'Ubicación de desaparición',
+      latitude: value.latitude,
+      longitude: value.longitude,
+      privacy:
+          'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
+      actions: actions,
+      contact: value.status == 'active' ? contact : null,
+    );
+  }
 }
 
 class CasePreviewContent extends StatelessWidget {
@@ -51,7 +98,7 @@ class CasePreviewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final f = value.fields;
-    return CasePublicationPreview(
+    return ImmersivePhotoSheet(
       name: f.name,
       latitude: value.latitude,
       longitude: value.longitude,

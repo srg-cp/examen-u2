@@ -7,6 +7,7 @@ final class ProfileDto {
     this.city,
     this.avatarUri,
     this.email,
+    this.contactPhone,
   });
   factory ProfileDto.fromMap(
     Map<String, dynamic> row, {
@@ -16,6 +17,7 @@ final class ProfileDto {
     id: row['id'] as String,
     displayName: row['display_name'] as String?,
     city: row['city'] as String?,
+    contactPhone: row['contact_phone'] as String?,
     avatarUri: avatarUri,
     email: email,
   );
@@ -24,11 +26,13 @@ final class ProfileDto {
   final String? city;
   final Uri? avatarUri;
   final String? email;
+  final String? contactPhone;
   AccountProfile toEntity() => AccountProfile(
     userId: id,
     displayName: displayName,
     city: city,
     avatarUri: avatarUri,
     email: email,
+    contactPhone: contactPhone,
   );
 }

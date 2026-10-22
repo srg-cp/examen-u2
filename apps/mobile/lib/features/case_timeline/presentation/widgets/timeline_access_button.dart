@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/presentation/widgets/collection_add_button.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../domain/entities/case_timeline.dart';
 import '../view_models/case_timeline_view_model.dart';
@@ -28,11 +28,20 @@ class TimelineAccessButton extends ConsumerWidget {
     if (value.asData?.value != true) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: CollectionAddButton(
-        label: 'Ver historial',
-        icon: Icons.history_rounded,
-        route:
-            '/home/timeline/${target.community ? 'found' : 'lost'}/${target.id}',
+      child: TextButton(
+        onPressed: () => context.push(
+          '/home/timeline/${target.community ? 'found' : 'lost'}/${target.id}',
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text('Ver seguimiento', textAlign: TextAlign.center),
+            ),
+            SizedBox(width: 6),
+            Icon(Icons.chevron_right_rounded),
+          ],
+        ),
       ),
     );
   }

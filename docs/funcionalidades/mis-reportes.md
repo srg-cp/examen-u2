@@ -1,5 +1,17 @@
 # Mis reportes
 
+Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
+la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
+comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
+por centrado vertical. Regresión de navegación con fuentes reales en390×844
+y320×350/texto2 aprobada. Sin cambio de tipografía, datos o permisos.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 Módulo: found_cases, colaboración por dominio con lost_cases. UI de entrada compuesta en app/router. HU-05/RF-05 e HU-06/RF-06; issues#5 y#6, sin cierre de historias.
 
 ## Qué hace y recorrido

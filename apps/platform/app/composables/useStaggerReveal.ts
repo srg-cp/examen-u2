@@ -70,9 +70,9 @@ export function useStaggerReveal(options: UseStaggerRevealOptions = {}) {
       transition: `opacity ${duration}ms ${easing}, filter ${duration}ms ${easing}, transform ${duration}ms ${easing}`,
       transitionDelay: `${delay}ms`,
       opacity: revealed.value ? 1 : 0,
-      filter: revealed.value ? 'blur(0px)' : `blur(${blur}px)`,
+      filter: blur === 0 ? 'none' : revealed.value ? 'blur(0px)' : `blur(${blur}px)`,
       transform: revealed.value ? 'translateY(0)' : `translateY(${hiddenY}px)`,
-      willChange: 'opacity, filter, transform',
+      willChange: blur === 0 ? 'opacity, transform' : 'opacity, filter, transform',
     };
   }
   const exitMs = duration + Math.max(0, (count ?? 1) - 1) * gap;

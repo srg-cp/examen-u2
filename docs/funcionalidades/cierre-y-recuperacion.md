@@ -1,5 +1,11 @@
 # Cierre y recuperación
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Actualización18/10:** el usuario confirma028 aplicado y autoriza pasar a HU-14.1. No se solicita reaplicarlo. Demo real/integración sin nueva evidencia; Firebase/FCM fuera del alcance.
 
 HU-13 / RF-07; issue #13. Implementado localmente en `case_closure` sobre el

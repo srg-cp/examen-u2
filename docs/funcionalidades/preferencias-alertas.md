@@ -1,5 +1,18 @@
 # Preferencias de alertas por cuenta
 
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
+Corrección20/10/2026: conservar la transición y el scroll al resolver la consulta,
+sin claves derivadas de datos pendientes. Skeleton sin cortina/stagger y resultado
+inmediato, sin segunda entrada. Selecciones, errores, reintentos y aislamiento
+entre cuentas conservados.24 regresiones nuevas compartidas con ubicaciones;
+suite ampliada61/61 con fondo animado desactivado para pumpAndSettle y análisis
+limpio. Evidencia y límites en [ESTADO](../ESTADO.md); revisión Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-02.2/#27 y épica #2 en Done: configuración por cuenta integrada,011 confirmado y validación HU-02 registrada. FCM es HU-12.3 pospuesta y no bloquea estas preferencias.027 ya está confirmado; seguimiento/bandeja conservan integración/demo propias pendientes.
 
 18/10/2026, instrucción del usuario: FCM/Firebase pospuestos (ADR-068).

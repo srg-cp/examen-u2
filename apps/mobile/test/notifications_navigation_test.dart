@@ -6,6 +6,7 @@ import 'package:flutter_application_entrehuellas/app/entre_huellas_app.dart';
 import 'package:flutter_application_entrehuellas/app/router.dart';
 import 'package:flutter_application_entrehuellas/core/config/startup_state.dart';
 import 'package:flutter_application_entrehuellas/core/config/startup_state_provider.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter_application_entrehuellas/features/auth/providers/auth_providers.dart';
 import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
@@ -71,12 +72,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(push.owners, isEmpty);
     expect(push.watches, 0);
+    final bell = tester.getRect(
+      find.widgetWithIcon(IconButton, Icons.notifications_none_rounded),
+    );
     await tester.tap(find.byTooltip('Alertas'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    final transition = tester.widget<OriginPageTransition>(
+      find.byType(OriginPageTransition).last,
+    );
+    expect(transition.origin, bell);
+    expect(transition.source?.bounds, bell);
+    final surface = tester.getRect(
+      find.byKey(const ValueKey('origin-surface')),
+    );
+    expect(surface.width, greaterThan(bell.width));
+    expect(surface.width, lessThan(tester.view.physicalSize.width));
     await tester.pumpAndSettle();
     expect(find.byType(InboxScreen), findsOneWidget);
     expect(find.text('Activar avisos en este teléfono'), findsNothing);
     expect(push.owners, isEmpty);
     expect(push.watches, 0);
+    c.read(routerProvider).pop();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    expect(find.byKey(const ValueKey('origin-surface')), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.byType(InboxScreen), findsNothing);
+    expect(find.byTooltip('Alertas'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

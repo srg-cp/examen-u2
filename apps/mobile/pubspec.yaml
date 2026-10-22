@@ -24,6 +24,8 @@ dependencies:
   printing: ^5.14.3
   share_plus: 11.1.0
   flutter_svg: 2.2.1
+  country_picker: 2.0.28
+  circle_flags: 5.0.1
 
 dev_dependencies:
   flutter_test:

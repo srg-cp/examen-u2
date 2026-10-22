@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/formatters/case_date_label.dart';
 import '../../../../core/presentation/widgets/entity_screen_shell.dart';
 import '../../../../core/presentation/widgets/entity_card_surface.dart';
+import '../../../../core/presentation/widgets/collection_empty_state.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
@@ -71,11 +72,11 @@ class InboxScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         if (data.items.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 24),
-                            child: Text(
-                              'Aún no tienes alertas. Sigue casos o zonas y activa tus preferencias para recibir novedades.',
-                            ),
+                          const CollectionEmptyState(
+                            title: 'Aún no tienes alertas',
+                            description:
+                                'Sigue casos o ubicaciones y activa tus preferencias para recibir novedades.',
+                            icon: Icons.notifications_none_rounded,
                           ),
                         for (final item in data.items)
                           Padding(

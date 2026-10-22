@@ -1,5 +1,22 @@
 # Casos de mascotas perdidas
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Corrección20/10/2026: nombre principal de Ver ficha directamente sobre la
+fotografía, sin cápsula blanca ni padding añadido. CasePublicationPreview
+conserva Poppins400/32/gris, texto completo y scroll. Ajuste solicitado por el
+usuario; sin cambios de datos, permisos o acciones.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-05/#5 en Done: publicación propia integrada,013 confirmado, pruebas existentes y casos/fotos reales consultados posteriormente. El alcance ADR-034 se conserva; no se ejecuta una publicación nueva por actualizar Projects.
 
 Ampliación del16 de octubre: marcador glass superior derecho para Guardar caso/Quitar de guardados, compuesto por router con [saved_cases](casos-guardados.md). Estado operativo/permisos conservados. Requiere020; formato/análisis sin incidencias, sin pruebas ejecutadas ni activación remota. [ADR-050](../decisiones/050-casos-guardados-por-cuenta.md).
@@ -170,3 +187,11 @@ Selección Mi mascota/Otra mascota corregida: misma pantalla, selector persisten
 ## Un único formulario — 12 de octubre de 2026
 
 Mascota a reportar sustituye Mi mascota/Otra mascota como pestañas. Elegir una ficha usa sus datos/fotos; No está en mis mascotas pide descripción sin registrarla como propia. Un único bloque fecha/hora/lugar/referencia conserva lo escrito al cambiar el origen, manteniendo datos/fotos de cada mascota separados. Vista previa/publicación y privacidad existentes. [ADR-038](../decisiones/038-formulario-unico-mascota-perdida.md) y [ficha conjunta](busquedas-y-avisos.md); Android remoto pendiente.
+
+## Búsqueda del lugar —20/10/2026
+
+Reportar añade el [buscador compartido](ubicaciones-buscador.md) antes del mapa,
+también para pérdida comunitaria. Elegir sugerencia de Perú marca/centra el punto
+privado, ajustable después en mapa. Búsqueda opcional, referencia independiente
+y mapa libre. Sin SQL/permisos nuevos;24 pruebas places/arquitectura/creación
+aprobadas. Android pendiente. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).

@@ -1,5 +1,91 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+21/10: instrucción posterior exige reemplazar el motor web desde origen por el
+código de Sader, sin clones de páginas y contenido solo al completar apertura.
+[ADR-125](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md) registra
+la excepción explícita de movimiento web; sin nuevas HU/RF/issues, alcance
+funcional, permisos/SQL, cambios de Flutter o cierre de historias.
+
+21/10: regla explícita de paridad móvil/web para animaciones equivalentes,
+[ADR-124](decisiones/124-paridad-animaciones-mobile-web.md). Se corrigen apertura
+y cierre de Perfil/Alertas web desde sus controles, conservando movimiento móvil.
+Sin nuevas HU/RF/issues, permisos, SQL ni operaciones; no es auditoría completa
+de otras animaciones ni cambio de la referencia Flutter.
+
+21/10: por petición del usuario, completar cabecera Home web con avatar/perfil
+de consulta (HU-01.7/RF-01/#23) y bandeja de alertas (HU-12.2/RF-17/#41) sobre
+los datos de cuenta existentes. Lectura/paginación/marcar leída; no amplía a
+push, preferencias/seguimiento web, edición de perfil ni paridad completa.
+Sin nueva HU/issue, migración o cierre de historias; validación local y límites
+en [notificaciones web](funcionalidades/notificaciones-web.md).
+
+Reportar web21/10: mejora autorizada de carga en los recorridos de recuperación
+existentes; campos y dependencias cargan de forma progresiva según ADR-123.
+Sin nuevas HU/RF/issues, funcionalidad de producto, SQL ni alcance Flutter.
+[Ficha](funcionalidades/navegacion-web.md).
+
+Controles web21/10: mejora visual autorizada de recorridos existentes de
+recuperación/mascotas/avistamientos/moderación; reutiliza componentes de Sader
+en Nuxt. Sin nuevas HU/RF/issues, alcance funcional, SQL ni Flutter.
+[ADR-122](decisiones/122-controles-web-reutilizables-desde-sader.md),
+[ficha y evidencia](funcionalidades/controles-web.md).
+
+Respuesta web20/10: mejora autorizada de navegación existente, ADR-121. Elimina
+invalidación por montaje, reutiliza preparación vigente y acorta entrada general;
+sin nuevas HU/RF/issues, cierre de historias ni despliegue. Validación y límites
+en [navegación web](funcionalidades/navegacion-web.md).
+
+Segunda mejora SEO20/10: recursos adaptables del hero y vista previa social ligera,
+manteniendo diseño ADR-120; sin nuevas HU/RF/issues ni despliegue. Dominio propio
+por marca, sin promesa de ranking por.app. [Resultados](funcionalidades/landing-page.md).
+
+Hero20/10: restauración explícita de la referencia original de landing según
+capturas del usuario, ADR-120. Excepción local a la unificación de títulos;
+sin nuevas HU/RF/issues, cambios de SEO ni despliegue.
+
+SEO20/10: mejora autorizada de la landing existente, sin nuevas HU/RF/issues ni
+cierre de historias. Metadatos descriptivos, identidad estructurada, dominio SEO
+configurable y WebP sin pérdida; conserva privacidad QR/cuenta y composición.
+[Activación, migración futura y límites](funcionalidades/landing-page.md).
+No incluye compra de dominio, publicación ni gestión de Search Console.
+
+Corrección visual20/10, ADR-119: usuario exige barra solo con iconos y trasladar
+efectos móviles a componentes reutilizables web. Se implementan indicador liquid
+persistente y expansión/retorno desde origen en los recorridos existentes;
+sin nuevas HU/RF/issues, backend, SQL, despliegue o cierre de historias.
+[Alcance y validación](funcionalidades/transiciones-web.md).
+
+## Navegación y recuperación web autorizadas —20/10/2026
+
+El usuario solicita la barra de móvil y confirma incorporar Explorar, Mis mascotas
+y Reportar. Incremento web de funciones existentes HU-03/04/05/06/07/10,
+RF-03/05/06/11/13;
+sin nuevas HU/issues ni cierre por arrastre. Entrega lista filtrada/paginada,
+mascotas propias alta/edición/fotos y cuatro tipos de reporte con mapa/borrador.
+Sustituye la pendiente histórica de estos recorridos en ADR-073; no implica
+paridad completa ni ampliar seguimiento/administración. [ADR-118](decisiones/118-navegacion-web-y-recorridos-de-recuperacion.md)
+y [ficha con límites y validación](funcionalidades/navegacion-web.md).
+Sin SQL nuevo, despliegue o acciones GitHub; integración remota pendiente.
+
+Incremento20/10 autorizado de HU-01 y HU-05/06/07, RF-01/05/06/13: celular privado opcional en perfil y sugerencia al autor al autorizar contacto por caso (ADR-116). Plan033 después de032/031, sin nueva historia/issue ni cierre adicional. No publicación automática ni contacto anónimo/QR/PDF; hosted y Android pendientes.
+
+## Tipografía compartida móvil/web —20/10/2026
+
+Por instrucción explícita, todos los títulos principales adoptan Poppins400/32/
+#454746 según [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+Incremento transversal de presentación de funcionalidades existentes; sin nueva
+HU/RF/issue ni cierre de historias o despliegue por arrastre.
+
 ## Registro y recuperación web autorizados —19/10/2026
 
 El usuario autoriza completar los recorridos de acceso ya existentes en móvil:
@@ -227,6 +313,8 @@ Prompt:
 Implementa S1 de Entre Huellas según docs/GUIA_MVP.md: HU-01, RF-01 y RF-34. Lee AGENTS.md y docs/ESTADO.md. Usa Supabase Auth y repositorios; versiona esquema y políticas. Implementa cuenta y sesión con criterios verificables. Si faltan URL/configuración del proyecto, solicita solo lo necesario y avanza con código, migraciones y pruebas independientes. Actualiza el estado con la demo y la validación real.
 ```
 
+Refinamiento20/10 de HU-01/05/06/07, RF-01/05/06/13: selector de país con bandera/prefijo en perfil y contacto por caso, ADR-117. Número nacional separado y búsqueda local; mismo contrato internacional y consentimiento, sin SQL adicional ni nueva HU/issue.
+
 ### S2 - Mascotas, fotos y zonas
 
 - **HU-02 / RF-02,16:** guardar zonas, radio y preferencias; admitir selección manual con GPS denegado y conservarlas tras reiniciar.
@@ -242,6 +330,11 @@ Implementa S2 de Entre Huellas: HU-02 a HU-04 y sus criterios en docs/GUIA_MVP.m
 ```
 
 ### S3 - Casos perdidos y encontrados
+
+Incremento autorizado20/10 de HU-05/06/07, RF-05/06/13: nueva ficha pública móvil por tarjetas glass (ADR-113) y ampliación explícita de contacto por caso (ADR-114). Registro/edición/retiro del contacto desde la ficha publicada, con consentimiento separado para foto y sin repetir publicación. Plan031 requiere030, activación hosted pendiente. Vistas previas conservan ImmersivePhotoSheet. Sin issue nuevo ni cierre de historias; sin contacto en QR/web anónima/cartel.
+
+
+Conservación20/10 de fichas/vistas previas HU-05/06/07: diseño renombrado a ImmersivePhotoSheet (Ficha fotográfica inmersiva), ADR-112. Sin nueva HU/issue, ampliación de alcance o cierre de historias. Uso futuro documentado; nuevo diseño glass por tarjetas aún sin implementar.
 
 Refinamiento20/10 de HU-07.2 / RF-13 / issue #33: panel de mapa minimizable
 hasta Ver ficha, apertura50% y límite adaptable por contenido/texto; créditos
@@ -308,6 +401,9 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 ```
 
 ### S4 - Cartel, QR y avistamientos
+
+Ampliación explícita20/10 de HU-07/HU-08, RF-08/13/37: Compartir ficha abre panel blanco sin X; copiar enlace, WhatsApp, Facebook y PDF público por lectores autorizados de búsquedas activas. Denunciar reutiliza el formulario existente. RPC prepare_case_share/plan032, sin otorgar permisos de autor o modificar el contrato QR. Activación remota y prueba de aplicaciones Android pendientes; ADR-115. Sin issue nuevo ni cierre de historias.
+
 
 18/10/2026, HU-10.2 / RF-11 / issue #37: envío Android desde ficha abierta,
 fecha/hora real, comentario/foto opcionales, GPS con alternativa manual y galería
@@ -711,3 +807,10 @@ y se regenera el emblema blanco dentro de las ilustraciones, sin overlays.
 Logo actualizado en web/QR/favicon y recursos Flutter/nativos, sin nuevos casos
 de uso, permisos, HU/issue o ampliación funcional de plataformas futuras.
 Validación y límites registrados en ESTADO y ficha identidad-visual.
+
+Refinamiento20/10/2026 de S3 (HU-05/RF-05/issue #5, HU-06/RF-06/issue #6):
+buscador opcional antes del mapa para reportar pérdida/hallazgo, reutilizando
+places. Sugerencias de Perú también en Explorar (HU-07/RF-13) y Ciudad del perfil
+(HU-01.7/RF-01); mapa manual libre. Sin nuevas historias/SQL ni cierre adicional.
+[ADR-107](decisiones/107-busqueda-reportes-y-sugerencias-peru.md),
+[ficha](funcionalidades/ubicaciones-buscador.md).

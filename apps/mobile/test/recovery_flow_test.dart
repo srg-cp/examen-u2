@@ -209,10 +209,10 @@ void main() {
         await tester.pump(const Duration(seconds: 8));
         await tester.pumpAndSettle();
         await tester.ensureVisible(
-          find.text('Ver historial', skipOffstage: false),
+          find.text('Ver seguimiento', skipOffstage: false),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Ver historial', skipOffstage: false));
+        await tester.tap(find.text('Ver seguimiento', skipOffstage: false));
         await tester.pumpAndSettle();
         expect(find.byType(CaseTimelineScreen), findsOneWidget);
         final timeline = tester.widget<CaseTimelineScreen>(
@@ -222,11 +222,11 @@ void main() {
         expect(timeline.target.community, true);
         router.pop();
         await tester.pumpAndSettle();
-        await tester.ensureVisible(
-          find.text('Denunciar contenido', skipOffstage: false),
-        );
+        await tester.tap(find.byTooltip('Compartir ficha'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Denunciar contenido', skipOffstage: false));
+        await tester.ensureVisible(find.byTooltip('Denunciar contenido'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Denunciar contenido'));
         await tester.pumpAndSettle();
         expect(find.byType(ContentReportScreen), findsOneWidget);
         final reportScreen = tester.widget<ContentReportScreen>(

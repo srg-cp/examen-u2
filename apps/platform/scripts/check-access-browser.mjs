@@ -51,26 +51,26 @@ try {
  await page.getByRole('button', { name: 'Comenzar', exact: true }).click(); await page.getByRole('alert').filter({ hasText: 'No pudimos completar' }).waitFor();
  assert.equal(new URL(page.url()).pathname, '/bienvenida'); await page.getByRole('heading', { name: 'Una nueva historia' }).waitFor();
  await page.unroute('**/api/access/onboarding'); await page.getByRole('button', { name: 'Comenzar', exact: true }).click(); await page.waitForURL('**/inicio');
- await page.getByRole('heading', { name: 'Hola, Usuario de prueba', exact: true }).waitFor(); assert.equal(server.completions(), 1);
+ await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor(); assert.equal(server.completions(), 1);
  assert.equal(await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).count(), 0);
  await captures('ordinary-home');
  await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/inicio'); await page.getByRole('alert').filter({ hasText: 'no tiene permiso' }).waitFor();
  await page.goto(server.origin + '/login?next=https://untrusted.example'); await page.waitForURL('**/inicio'); // Fixed destination, not an open redirect.
- const other = await context.newPage(); observe(other); await other.goto(server.origin + '/inicio'); await other.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+ const other = await context.newPage(); observe(other); await other.goto(server.origin + '/inicio'); await other.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
  await signout(); await other.waitForURL('**/iniciar-sesion'); assert.equal(await other.getByText('ordinario@example.test', { exact: true }).count(), 0);
  await page.goto(server.origin + '/moderacion'); await page.waitForURL('**/iniciar-sesion');
  await login('moderador@example.test'); await page.waitForURL('**/inicio'); await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).waitFor();
  await captures('reviewer-home');
  await page.route('**/api/access/management', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' }));
  await page.reload(); await page.getByRole('button', { name: 'Reintentar acceso a gestión', exact: true }).waitFor();
- await page.getByRole('heading', { name: 'Hola, Revisor de prueba', exact: true }).waitFor();
+ await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
  await page.unroute('**/api/access/management'); await page.getByRole('button', { name: 'Reintentar acceso a gestión', exact: true }).click();
  await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).click(); await page.waitForURL('**/moderacion'); await page.getByRole('button', { name: 'Revisar denuncia', exact: true }).waitFor();
- server.revoke(true); await page.reload(); await page.waitForURL('**/inicio'); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+ server.revoke(true); await page.reload(); await page.waitForURL('**/inicio'); await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
  assert.equal(await page.getByRole('link', { name: 'Revisar denuncias', exact: true }).count(), 0); server.revoke(false);
  await page.route('**/api/access/session', r => r.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' }));
  await page.reload(); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).waitFor(); assert.equal(await page.getByText('moderador@example.test', { exact: true }).count(), 0);
- await page.unroute('**/api/access/session'); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click(); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+ await page.unroute('**/api/access/session'); await page.getByRole('button', { name: 'Reintentar conexión', exact: true }).click(); await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
  let expiresAt;
  await page.route('**/api/access/session', async route => {
   expiresAt ??= Date.now() + 1000;
@@ -82,7 +82,7 @@ try {
  for (const provider of ['Google', 'Facebook']) {
   server.oauthDenied(provider === 'Facebook');
   await page.goto(server.origin + '/iniciar-sesion'); await page.getByRole('button', { name: 'Continúa con ' + provider, exact: true }).click(); await page.waitForURL('**/inicio');
-  await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor(); await signout();
+  await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor(); await signout();
  }
  assert.deepEqual(errors, []); await context.close();
  console.log('General access Chrome QA passed: landing/login/legal routes, validation/password visibility, ordinary/reviewer accounts, three-step persistent onboarding/retry, role revocation, cross-tab logout, expiry, connection/permission retry, fixed redirects, Google/Facebook PKCE fixtures, 1920/1440/731/390/320/text200%, no overflow/CSP/hydration errors. Fixture backend only.');

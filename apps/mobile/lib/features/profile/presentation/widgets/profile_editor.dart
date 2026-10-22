@@ -2,6 +2,7 @@ import '../../../../core/presentation/widgets/failure_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/international_phone_field.dart';
 import '../../../../core/presentation/widgets/app_field_surface.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/primary_action_button_style.dart';
@@ -32,7 +33,7 @@ class ProfileEditor extends ConsumerWidget {
         isLoading: true,
         loadingLabel: 'Cargando tu perfil',
         radius: 22,
-        child: SkeletonFormFields(fieldCount: 3),
+        child: SkeletonFormFields(fieldCount: 4),
       );
     }
     if (profile.hasError) {
@@ -74,7 +75,8 @@ class _ProfileFields extends StatefulWidget {
     this.cityFieldBuilder,
   });
   final ProfileEditState value;
-  final void Function({String? displayName, String? city}) onEdit;
+  final void Function({String? displayName, String? city, String? contactPhone})
+  onEdit;
   final VoidCallback onSave;
   final VoidCallback onDiscard;
   final ValueChanged<String> onSelectCity;
@@ -85,6 +87,7 @@ class _ProfileFields extends StatefulWidget {
 
 class _ProfileFieldsState extends State<_ProfileFields> {
   late final _name = TextEditingController(text: widget.value.displayName);
+  late final _phone = TextEditingController(text: widget.value.contactPhone);
   late final _city = TextEditingController(text: widget.value.city);
   @override
   void didUpdateWidget(_ProfileFields oldWidget) {
@@ -92,6 +95,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
     for (final pair in [
       (_name, widget.value.displayName),
       (_city, widget.value.city),
+      (_phone, widget.value.contactPhone),
     ]) {
       if (pair.$1.text != pair.$2) {
         pair.$1.value = TextEditingValue(
@@ -106,6 +110,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
   void dispose() {
     _name.dispose();
     _city.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
@@ -113,6 +118,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
   Widget build(BuildContext context) {
     final state = widget.value;
     final nameError = state.issue == ProfileFailureKind.invalidName;
+    final phoneError = state.issue == ProfileFailureKind.invalidPhone;
     final cityError = state.issue == ProfileFailureKind.invalidCity;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,6 +183,26 @@ class _ProfileFieldsState extends State<_ProfileFields> {
                 },
               ),
         ),
+        const SizedBox(height: 20),
+        ShakeField(
+          errorId: state.errorId,
+          hasError: phoneError,
+          child: InternationalPhoneField(
+            label: 'Celular de contacto (opcional)',
+            controller: _phone,
+            enabled: !state.isBusy,
+            invalid: phoneError,
+            onChanged: (value) => widget.onEdit(contactPhone: value),
+            onSubmitted: (_) {
+              if (state.isDirty && !state.isBusy) widget.onSave();
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Elige el país y escribe tu número. Se guarda en privado; tú eliges en qué fichas compartirlo. Cambiarlo aquí no modifica contactos ya publicados.',
+          style: TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF626975)),
+        ),
         const SizedBox(height: 24),
         LoadingShimmer(
           isLoading: state.isBusy,
@@ -199,6 +225,8 @@ class _ProfileFieldsState extends State<_ProfileFields> {
 }
 
 String profileFailureLabel(ProfileFailureKind kind) => switch (kind) {
+  ProfileFailureKind.invalidPhone =>
+    'Celular: incluye + y entre 8 y 15 dígitos con código de país.',
   ProfileFailureKind.invalidName => 'Nombre: usa hasta 120 caracteres.',
   ProfileFailureKind.invalidCity =>
     'Selecciona una ciudad de las sugerencias (hasta 120 caracteres).',

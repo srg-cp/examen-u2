@@ -1,8 +1,24 @@
 # ADR-006: transiciones de etapa y carga con shimmer
 
+Refinamiento20/10/2026, confirmación de salida: por petición del usuario,
+confirmActionDialog sin origen usa PopupDialogTransition (fundido y escala
+uniforme .96→1,160ms al abrir/cerrar). Superficie y contenido aparecen juntos,
+sin cuadro vacío, medición post-frame ni aparición tardía del texto. Conserva
+SafeArea/insets, ancho máximo420, radio28, scroll, semántica y acciones.
+Movimiento reducido inmediato. Solo las confirmaciones con origen explícito
+conservan OriginDialogTransition/320ms; la navegación de páginas no cambia.
+
+
 Fecha: 8 de octubre de 2026. Estado: aceptada por instrucción del usuario.
 
 ## Contexto
+
+Refinamiento20/10/2026, corrección solicitada del reveal duplicado en selectores:
+AppSelectField usa la apertura nativa del panel seguida del stagger compartido
+cuando finaliza la animación de ruta. No añade AuthStageTransition/CoverReveal
+interior, que reproducía otra apertura y pintaba el fondo de página en el panel.
+Cabecera fuera del efecto; movimiento reducido inmediato. Alcance compartido a
+sus consumidores, sin cambios de selección, dominio o persistencia.
 
 El usuario solicita una UX consistente con cover reveal seguido de stagger reveal en los lugares apropiados, incluido el resultado Contraseña actualizada. Rechaza etiquetas de carga con puntos suspensivos, como Enviando…, y pide shimmer como indicador de trabajo en curso. La marca debe permanecer estable durante las etapas de acceso.
 

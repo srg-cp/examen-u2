@@ -1,5 +1,102 @@
 # Arquitectura de Entre Huellas
 
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+Origen web21/10, ADR-125: OriginPageSurface conserva el cuerpo vivo oculto durante
+apertura y OriginTransitionHost ejecuta GSAP Flip/CustomEase de PrettyModal de
+Sader. Eliminados snapshots/hold/previous/WAAPI de navegación. El controlador
+retiene únicamente rect/control y coordina Flip.to antes de desmontar mediante
+hook visual compartido (sin política/guard de acceso nuevo). Solo presentación;
+estado/casos de uso/permisos intactos. [Decisión y excepción a ADR-124](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+Movimiento21/10, ADR-124: origin_motion_contract centraliza320/260ms y fases
+móviles; origin_dialog_motion reproduce las curvas/progresión de Flutter para
+GlassDialog. AccountProfile/NotificationBell entregan el control real sin
+infraestructura; el diálogo mantiene contenido hasta finalizar retorno y
+cancela WAAPI/estilos/nodos en resize/preferencia/desmontaje. Host de navegación
+consume las mismas constantes. Prueba de paridad contra Dart y QA de fotogramas.
+[Decisión global](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Cabecera/alertas web21/10: páginas de cuenta componen NotificationBell por slot
+de AccountScreen, sin imports de presentación entre funcionalidades. Notifications
+separa ReadInbox/MarkNotificationRead/contrato, DTO/repositorios HTTP y servidor,
+InboxSource y ViewModel. Plugin inyecta por actor; Nitro revalida cuenta/onboarding
+y actor antes de RPC existentes con JWT privado. AccountProfile usa proyección
+de sesión existente; ReadAccountAvatar/ServerAccountRepository/AccountSource
+protegen proxy privado de foto con ruta del actor y tamaño acotado. Sin foto,
+iniciales. GlassSurface/GlassDialog son presentación compartida sin negocio.
+Sin rutas nuevas ni cambios de SQL; [ficha](funcionalidades/notificaciones-web.md).
+
+Reportar web21/10, ADR-123: RecoveryViewModel entrega mascotas/búsquedas por
+fuente, con readiness/fallo/carga independientes, casos de uso existentes y
+descarte de respuestas tardías. RecoveryScreen inicia estas lecturas junto al
+borrador y monta el mapa sin esperar; FieldSkeleton limita el placeholder al
+selector pendiente. Metadatos de borrador conservados hasta lectura confirmada;
+sin caché/SQL/guard adicional. [Decisión](decisiones/123-carga-progresiva-reportar-web.md).
+
+Tema de controles21/10, refinamiento ADR-122: roles CSS locales --sf-* en
+fields.css comparten paleta celeste entre campos, selectores, panel y loader.
+Sin estado/persistencia de tema, lógica nueva ni dependencias entre features.
+
+Controles web21/10: FieldSelect/TextField/DateField/TimeField/DateTimeField en
+app/components y fields.css, adaptados de Sader por petición explícita.
+MorphPanel comparte top layer/FLIP y lifecycle con WAAPI, sin infraestructura
+ni negocio. TopLoadingBar observa navegación real; excepción local a ADR-027.
+[ADR-122](decisiones/122-controles-web-reutilizables-desde-sader.md).
+
+Navegación web20/10, ADR-121: AccountSessionTransport expone su proyección vigente
+solo a composición; bootstrap inicializa ViewModel/repositorio ligados al actor
+después de hidratar. Sin nueva caché, perfil en SSR ni cambios de política global.
+Montajes no emiten avisos de identidad. Preload de código/intención en componentes
+compartidos; lecturas independientes en paralelo. [Decisión](decisiones/121-navegacion-web-sin-esperas-repetidas.md).
+
+Hero landing20/10, ADR-120: typography.css excluye #hero-title de Poppins global;
+landing.css recupera sus valores y mascotas previos a1fc1bd1. Solo presentación,
+sin cambios SEO/dominio/data/permisos. Excepción explícita pedida por el usuario.
+
+Movimiento web20/10, ADR-119: plugin navigation_motion compone estado visual por
+aplicación, sin payload SSR. UserNavigation persiste fuera de NuxtPage; AccountScreen
+la habilita tras sesión/bienvenida, sin alterar política de acceso. Controlador
+origin_transition + OriginTransitionHost/OriginActionButton colaboran mediante
+callbacks de presentación y NavigationLink origin; sin negocio, repositorios o
+imports entre features. DOM decorativo temporal sin campos/formularios, liberado
+al terminar o cambiar identidad. [Ficha](funcionalidades/transiciones-web.md).
+
+Web20/10, ADR-118: páginas componen AccountScreen por slot y RecoveryScreen,
+sin imports de presentación entre funcionalidades. UserNavigation compartido
+contiene cuatro rutas account de la política global. RecoveryViewModel consume
+casos de uso concretos; HTTP/IndexedDB y fuentes RPC/Edge/Storage quedan en data,
+compuestas por plugin/utilidades Nitro. Revalidación por operación con JWT privado,
+proyecciones explícitas y fotografías en proxy de mismo origen. Sin SQL nuevo.
+[Alcance y validación](funcionalidades/navegacion-web.md).
+
+Selector telefónico20/10, ADR-117: InternationalPhoneField en core/presentation se reutiliza en profile y case_contacts. Catálogo country_picker y banderas circle_flags encapsulados en presentación; controller externo conserva número completo, sin cambios de dominio/data/SQL ni imports entre funcionalidades.
+
+Celular20/10, ADR-116: profile transporta contactPhone mediante entidad/DTO, contratos, UpdateProfile y ViewModel. read_case_contact sugiere el valor privado solo al autor mediante su propia proyección; sin imports de otra presentación/data ni publicación automática. Plan033/fuentes112–114 después de032.
+
+Compartir ficha20/10, ADR-115: case_posters añade SharePublicCase/CaseShareRepository/ViewModel y fuentes RPC/plataforma. Reutiliza DTO y generador PDF público; Clipboard se inyecta desde bootstrap como callback, sin Flutter en data. Router compone CaseShareButton por builder y callback de denuncia, sin imports entre presentaciones. RPC prepare_case_share/plan032 autoriza lectores de búsquedas activas, con dueño real, enlace estable y sin reactivar revocaciones.
+
+Refinamiento de presentación20/10, ADR-113: GlassSurface incorpora GlassSurfaceFinish.frosted, reutilizado por CasePublicGlassCard y controles de contacto. El valor polished por defecto mantiene los consumidores anteriores. CasePublicCards separa caption adaptable (nombre/estado en fila y paginación centrada) sin cambiar dominio, datos, mapas o acciones.
+
+Ficha pública20/10, ADR-113/114: CasePublicCards y CasePublicScreenShell componen tarjetas glass y navegación compartida; ImmersivePhotoSheet se conserva en vistas previas. case_contacts separa dominio/casos de uso/repositorio/DTO/fuente/ViewModel; router inyecta su panel por slot y bootstrap/main sus dependencias. Plan031 protege consentimiento y foto por caso; no amplía QR ni perfiles privados.
+
+Diseño conservado20/10, ADR-112: `ImmersivePhotoSheet` sustituye el nombre `CasePublicationPreview`; geometría `ImmersivePhotoSheetGeometry`. Sigue activo sin cambios visuales en perdidos/encontrados. Contrato en [Ficha fotográfica inmersiva](funcionalidades/ficha-fotografica-inmersiva.md). Las referencias anteriores al nombre antiguo son históricas.
+
+Tipografía20/10, ADR-111: AppTypography.primaryTitle en core/theme es el contrato
+de títulos principales móvil (Poppins400/32/#454746/1.25/tracking0), consumido por
+tema, shells y cabeceras específicas. Nuxt registra typography.css global con
+tokens equivalentes y Poppins Regular local idéntico; h1 hereda sin overrides por
+recorrido. Marca/cuerpo y fronteras de dominio/data conservados. Prueba de paridad
+de tokens/fuente, revisión de layouts normales/ampliados y normas UI compartidas.
+
 Explorar20/10, ADR-106: preview reporta altura real del resumen tras layout;
 ExploreCaseMap calcula mínimo adaptable y compone atribución junto al borde
 del panel mediante sus controladores. ZoneMapPicker.showAttribution permite
@@ -739,3 +836,29 @@ Core contiene FilterPopover<T>, FilterChoiceGroup<T> y SelectionPillSurface. El 
 ## Búsqueda de lugares y filtros integrados
 
 ADR-042 sustituye la ruta modal de ADR-041 por FilterExpansion<T>, manteniendo SelectionPillSurface/FilterChoiceGroup compartidos y sin dependencias core→features. ExploreFilters conserva borrador local y confirmación hacia ExploreViewModel. SearchPlaces→PlaceSearchRepository→PlaceSearchRepositoryImpl→PhotonPlaceDataSource incorpora búsqueda de ciudades/direcciones; DTO GeoJSON y errores/caché permanecen en data. PlaceSearchViewModel autoDispose gobierna consulta y descarte por cuenta/disposición. Bootstrap/main inyectan cliente/endpoint/repositorio; providers declaran contratos. ZoneMapPicker añade fitRadius opt-in sin reglas de negocio. Sin cambios de permisos o contrato SQL019. [ADR-042](decisiones/042-filtros-integrados-y-busqueda-zonas.md).
+
+Reportar20/10, ADR-107: CaseLocationFields/CaseReportFields reciben slot
+ReportLocationSearchBuilder sin imports core→features. App compone places para
+pérdida propia/comunitaria y router inyecta el builder en hallazgo. ProviderScope
+local aísla ViewModel autoDispose de Explorar; casos de uso/fuente/caché existentes.
+Photon solicita countrycode=PE y filtra respuestas por código, sin límites de
+mapa ni SQL nuevos. Selección pasa por el ViewModel del reporte; referencia
+privada independiente. [ADR-107](decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
+
+Places20/10, ADR-108: OverlayPortal/CompositedTransformTarget/Follower resuelve
+sugerencias sin afectar layout de formularios. Presentación conserva resultados
+en ViewModel existente; foco/portal/geometría pertenecen al widget. AppTextField
+acepta FocusNode externo sin disponerlo, mantiene nodo propio por defecto.
+Sin cambios de dominio/data/servidor; restricciones de Perú de ADR-107 intactas.
+
+Places20/10, ADR-109: cancelación de dominio por operación atraviesa SearchPlaces,
+contratos y repositorio; data traduce a AbortableRequest del cliente inyectado.
+ViewModel cancela al editar/limpiar/cambiar cuenta/desmontar y lanza a300ms sin
+cola detrás de consultas antiguas. Generación descarta resultados/errores tardíos;
+repositorio impide cachear respuestas canceladas. Sin SDK en presentación/dominio.
+
+Corrección places20/10, ADR-110: debounce600ms por instrucción explícita, sin
+cola para peticiones recientes y con cancelación por operación conservada.
+Timeout de transporte20s tras reproducir respuestas válidas a13–16s; mantiene
+aborto al vencer. Búsqueda parcial delegada a fuente sin comparar nombres por
+igualdad ni introducir comodines. Filtro Perú y contratos de ADR-109 conservados.

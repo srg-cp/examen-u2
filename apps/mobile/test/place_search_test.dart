@@ -14,6 +14,54 @@ import 'package:flutter_application_entrehuellas/features/places/providers/place
 import 'support/fake_place_search.dart';
 
 void main() {
+  for (final citiesOnly in [false, true]) {
+    test(
+      'Peru filter rejects foreign and unverified countries: cities=$citiesOnly',
+      () async {
+        var foreignOnly = false;
+        Map<String, Object> feature(String? code) => {
+          'geometry': {
+            'coordinates': [-70.25, -18.01],
+          },
+          'properties': {
+            'name': 'Tacna',
+            'country': 'Perú',
+            'type': 'city',
+            if (code != null) 'countrycode': code,
+          },
+        };
+        final client = MockClient((request) async {
+          expect(request.url.queryParameters['countrycode'], 'PE');
+          expect(
+            request.url.queryParameters['layer'],
+            citiesOnly ? 'city' : isNull,
+          );
+          return http.Response(
+            jsonEncode({
+              'features': [
+                feature('CL'),
+                feature(null),
+                feature(''),
+                if (!foreignOnly) feature('pe'),
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        });
+        addTearDown(client.close);
+        final source = PhotonPlaceDataSource(client);
+        final places = await source.search('Tacna', citiesOnly: citiesOnly);
+        expect(places, hasLength(1));
+        expect(places.single.latitude, -18.01);
+        foreignOnly = true;
+        expect(
+          await source.search('Santiago', citiesOnly: citiesOnly),
+          isEmpty,
+        );
+      },
+    );
+  }
   test(
     'Place lookup validates, normalizes, decodes longitude/latitude and caches requests',
     () async {
@@ -23,6 +71,7 @@ void main() {
         expect(request.url.queryParameters, {
           'q': 'Miraflores Lima',
           'limit': '5',
+          'countrycode': 'PE',
         });
         expect(request.headers.containsKey('Authorization'), false);
         expect(request.headers['User-Agent'], startsWith('EntreHuellas/'));
@@ -37,6 +86,7 @@ void main() {
                   'name': 'Miraflores',
                   'city': 'Miraflores',
                   'country': 'Perú',
+                  'countrycode': 'PE',
                 },
               },
             ],
@@ -131,7 +181,7 @@ void main() {
           .search('Lima');
       await container
           .read(placeSearchViewModelProvider.notifier)
-          .search('Cusco');
+          .search('Lima');
       expect(repo.queries, hasLength(1));
       sessions.add(const AuthSession(userId: 'b'));
       await Future<void>.delayed(Duration.zero);

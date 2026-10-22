@@ -385,6 +385,34 @@ void main() {
           expect(sheet.controller!.size, lessThan(released));
           await settleMap(tester);
           expect(sheet.controller!.size, closeTo(.5, .001));
+
+          // A quick release keeps travelling, and touching it again holds the
+          // current position before a new drag wins the gesture arena.
+          final handle = find.bySemanticsLabel(
+            'Desliza para ampliar o reducir el resumen',
+          );
+          await tester.timedDrag(
+            handle,
+            const Offset(0, -90),
+            const Duration(milliseconds: 100),
+          );
+          await tester.pump();
+          await tester.pump();
+          final flung = sheet.controller!.size;
+          await tester.pump(const Duration(milliseconds: 32));
+          expect(sheet.controller!.size, greaterThan(flung));
+          expect(sheet.controller!.size, lessThan(.9));
+          final interrupt = await tester.startGesture(tester.getCenter(handle));
+          final held = sheet.controller!.size;
+          await tester.pump(const Duration(milliseconds: 120));
+          expect(sheet.controller!.size, closeTo(held, .0001));
+          await interrupt.moveBy(const Offset(0, 60));
+          await tester.pump();
+          expect(sheet.controller!.size, lessThan(held));
+          await interrupt.up();
+          await settleMap(tester);
+          sheet.controller!.jumpTo(.5);
+          await tester.pump();
         }
         expect(sheet.minChildSize, .22);
         expect(find.text('Filtros de búsqueda'), findsNothing);

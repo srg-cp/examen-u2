@@ -100,7 +100,7 @@ final class SupabaseProfileDataSource implements ProfileDataSource {
         userId,
         () => _client
             .from('profiles')
-            .select('id,display_name,city')
+            .select('id,display_name,city,contact_phone')
             .eq('id', userId)
             .single(),
         requireStoredPhoto: requireStoredPhoto,
@@ -110,13 +110,18 @@ final class SupabaseProfileDataSource implements ProfileDataSource {
     String userId, {
     required String? displayName,
     required String? city,
+    required String? contactPhone,
   }) => _run(
     userId,
     () => _client
         .from('profiles')
-        .update({'display_name': displayName, 'city': city})
+        .update({
+          'display_name': displayName,
+          'city': city,
+          'contact_phone': contactPhone,
+        })
         .eq('id', userId)
-        .select('id,display_name,city')
+        .select('id,display_name,city,contact_phone')
         .single(),
   );
 }

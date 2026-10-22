@@ -1,3 +1,4 @@
+import 'app_typography.dart';
 import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
@@ -57,20 +58,8 @@ abstract final class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.background,
       textTheme: const TextTheme(
-        displaySmall: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -1.4,
-          height: 1.12,
-          color: AppColors.ink,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 27,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.8,
-          height: 1.18,
-          color: AppColors.ink,
-        ),
+        displaySmall: AppTypography.primaryTitle,
+        headlineMedium: AppTypography.primaryTitle,
         titleLarge: TextStyle(
           fontSize: 21,
           fontWeight: FontWeight.w600,

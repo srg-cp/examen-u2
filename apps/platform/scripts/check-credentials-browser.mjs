@@ -55,7 +55,7 @@ try {
   assert.equal((await context.cookies()).some(c => c.name === 'eh_credentials'), false);
   await page.getByRole('link', { name: 'Iniciar sesión', exact: true }).click(); await page.waitForURL('**/iniciar-sesion');
   await page.getByLabel('Correo', { exact: true }).fill('existente@example.test'); await page.getByLabel('Contraseña', { exact: true }).fill('updated-password');
-  await page.getByLabel('Contraseña', { exact: true }).press('Enter'); await page.waitForURL('**/inicio'); await page.getByRole('heading', { name: 'Tu cuenta', exact: true }).waitFor();
+  await page.getByLabel('Contraseña', { exact: true }).press('Enter'); await page.waitForURL('**/inicio'); await page.getByRole('heading', { name: 'Su regreso empieza contigo', exact: true }).waitFor();
   await context.clearCookies(); await page.goto(server.origin + '/restablecer-contrasena'); await page.waitForURL(/\/recuperar-contrasena/); assert.equal(await page.getByLabel('Nueva contraseña', { exact: true }).count(), 0);
   await page.waitForFunction(() => !!document.querySelector('#__nuxt')?.__vue_app__);
   await page.evaluate(() => {

@@ -1,3 +1,4 @@
+import { chooseDate, chooseTime } from './field-browser-helpers.mjs';
 // Local fixtures only; no service credentials or production writes.
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
@@ -19,9 +20,9 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(message.text())) errors.push(message.text()); });
   await context.route('https://basemaps.cartocdn.com/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: tile }));
-  const open = async () => { await page.goto(`${server.origin}/c/${slug}`); await page.getByRole('button', { name: 'La vi · Reportar avistamiento' }).click(); await page.getByRole('heading', { name: '¿Dónde le viste?' }).waitFor(); await page.getByRole('button', { name: 'Usar centro del mapa' }).waitFor(); };
+  const open = async () => { await page.goto(`${server.origin}/c/${slug}`); await page.getByRole('button', { name: 'La vi · Reportar avistamiento' }).click(); await page.getByRole('heading', { name: '¿Dónde le viste?' }).waitFor(); await page.locator('.location-map').waitFor(); };
   const send = () => page.getByRole('button', { name: 'Enviar avistamiento', exact: true });
-  const fill = async () => { await page.getByLabel('Fecha', { exact: true }).fill('2026-01-01'); await page.getByLabel('Hora', { exact: true }).fill('10:30'); await page.getByRole('button', { name: 'Usar centro del mapa' }).click(); await page.getByLabel('Comentario (opcional)').fill('Caminaba por el parque'); };
+  const fill = async () => { await chooseDate(page, 'Fecha', '2026-01-01'); await chooseTime(page, 'Hora', '10:30'); await page.locator('.location-map.leaflet-container').click(); await page.getByLabel('Comentario (opcional)').fill('Caminaba por el parque'); };
   const noOverflow = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
   console.log('Opening sighting form'); await open();
   await page.locator('.location-map .leaflet-tile-loaded').first().waitFor();
@@ -33,10 +34,26 @@ try {
   const mapPixel = [...mapRaster.data.subarray(pixelOffset, pixelOffset + 3)];
   for (const [index, expected] of [241, 245, 245].entries()) assert.ok(Math.abs(mapPixel[index] - expected) <= 2, 'Global map filter is painted, not just declared: ' + mapPixel);
   await page.getByRole('link', { name: '© CARTO', exact: true }).waitFor();
+  assert.equal(await page.locator('.leaflet-control-zoom').count(), 0);
+  assert.equal(await page.locator('.location-map').evaluate(el => el.clientHeight), 280);
+  assert.equal(await page.locator('.location-map-wrap').evaluate(el => getComputedStyle(el).borderRadius), '22px');
    await send().click(); await page.getByRole('alert').getByText(/Revisa la fecha/).waitFor();
   assert.equal(await page.getByLabel('Fecha', { exact: true }).getAttribute('aria-invalid'), 'true');
   console.log('Validation and denied GPS'); await page.getByRole('button', { name: 'Usar mi ubicación actual' }).click(); await page.getByRole('alert').getByText(/No pudimos obtener tu ubicación/).waitFor();
   console.log('Manual point and photo'); await fill();
+  const pin = page.locator('.location-map-pin');
+  await pin.waitFor();
+  assert.match(await pin.getAttribute('src'), /\/map-location-pin\.svg$/);
+  assert.deepEqual(await pin.evaluate(el => [el.clientWidth, el.clientHeight]), [36, 36]);
+  const area = page.locator('.leaflet-overlay-pane path');
+  assert.equal(await area.getAttribute('stroke'), '#111111');
+  assert.equal(await area.getAttribute('stroke-width'), '2');
+  assert.ok(Math.abs(Number(await area.getAttribute('fill-opacity')) - 34 / 255) < .001);
+  await page.locator('.location-map').focus();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Enter');
+  await page.getByRole('alert').waitFor({ state: 'hidden' });
+  await page.locator('.location-map-wrap').screenshot({ path: fileURLToPath(new URL('map-mobile-parity.png', output)) });
   await page.locator('input[type=file]').first().setInputFiles({ name: 'bad.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('not an image') });
   console.log('Submitting invalid photo'); await send().click(); await page.getByRole('alert').getByText(/No pudimos preparar la foto/).waitFor();
   assert.equal(server.sightings(), 0); await page.getByRole('button', { name: 'Quitar foto' }).click();

@@ -1,5 +1,91 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## Paridad de animaciones Perfil/Alertas —21/10/2026
+
+`node scripts/check-dialog-motion-browser.mjs` requiere build vigente y las
+mismas PLAYWRIGHT_MODULE/CHROME_PATH. Ejecuta con movimiento normal y controla
+la línea temporal WAAPI para medir origen,320/260ms y fases, guardar fotogramas
+de entrada/contenido/salida y verificar retorno/foco/marca. Cubre1440/390/320
+con texto200%, resize, preferencia reducida en vivo, cierre rápido, recarga y
+reproducción real. Capturas de viewport en `apps/mobile/build/ui-preview/web-dialog-motion`;
+fullPage puede redimensionar temporalmente el navegador e interrumpir el efecto.
+`npm test` contrasta el contrato web con rutas e intervalos Flutter. ADR-124
+exige esta paridad; probar solo movimiento reducido no acredita una animación.
+
+## Cabecera, perfil de consulta y alertas —21/10/2026
+
+`node scripts/check-inbox-browser.mjs` usa PLAYWRIGHT_MODULE/CHROME_PATH y el
+build vigente como los demás QA. Comprueba avatar/fallback, glass, cabecera y
+paneles1440/390/320/texto200%, teclado/Escape/scroll, skeleton frente a vacío,
+errores/reintentos/paginación, lectura persistida y cambio de cuenta. Capturas
+en `apps/mobile/build/ui-preview/web-inbox`. Backend fixture, sin push real.
+
+`npm test` incorpora dominio/DTO/repositorios/ViewModel de notificaciones y
+avatar; `npm run test:server` incorpora el aislamiento de las APIs nuevas,
+Origin/onboarding, confirmación de leído, avatar privado y errores seguros.
+Se usan las RPC existentes de plan027 y el bucket opcional profile-avatars;
+no hay SQL nuevo ni configuración de push. Ver `docs/funcionalidades/notificaciones-web.md`.
+
+## Inicio con diseño móvil —21/10/2026
+
+Con build vigente y PLAYWRIGHT_MODULE/CHROME_PATH configurados como en los
+demás scripts, ejecutar `node scripts/check-home-browser.mjs`. Levanta backend
+fixture y valida escritorio/móvil/320/texto200%, imagen/fuente, cuenta con
+teclado, accesos/retorno y permisos. Capturas en
+`apps/mobile/build/ui-preview/web-home`. Si el dev server ocupa `.nuxt`, usar
+`$env:NUXT_BUILD_DIR='.nuxt-home-review'; npm run build` para construir aparte.
+
+## Carga progresiva de Reportar —21/10/2026
+
+`node scripts/check-report-loading-browser.mjs`, con las mismas variables
+PLAYWRIGHT_MODULE/CHROME_PATH y build actual, retiene peticiones de mascotas,
+búsquedas y el módulo Leaflet. Verifica campos utilizables antes de completarlas,
+selectores independientes, retry solo del recurso fallido y borrador restaurado
+con IDs/version/fotos conservados antes de recibir las listas. Backend fixture,
+sin cuentas ni datos remotos. Capturas en apps/mobile/build/ui-preview/web-report-loading.
+
+## Controles compartidos de Sader —21/10/2026
+
+`node scripts/check-text-field-browser.mjs` valida la etiqueta transparente y la
+muesca real de input/textarea (vacío, hover, foco, texto conservado tras blur,
+error y320px/texto200%). Usa las mismas variables/fixture; evidencia revisable
+en apps/mobile/build/ui-preview/web-text-field. Comprueba también que una etiqueta
+larga con texto ampliado no se superponga al valor del input.
+
+`node scripts/check-top-loading-browser.mjs` reproduce el ciclo de navegación
+del loader con fixture: login, recarga autenticada, cambios de sección, consulta
+retenida, query/hash, duplicado, guard abortado y redirección. Requiere las mismas
+variables de Playwright/Chrome y build actual; no usa cuentas ni backend remoto.
+
+Con build actual, `node scripts/check-fields-browser.mjs` usa PLAYWRIGHT_MODULE
+y CHROME_PATH como los otros scripts. Levanta un backend fixture local; revisa
+fotogramas del morph, búsqueda sin tildes, teclado/retorno de foco, línea superior
+durante consulta de sesión, calendario/hora24h y responsive/texto200%/movimiento
+reducido. Evidencia en apps/mobile/build/ui-preview/web-fields.
+Los scripts de recovery y sightings usan field-browser-helpers.mjs para operar
+los controles visibles. No ejecutar un build mientras los fixtures están
+abiertos: Windows mantiene cargada la DLL de sharp. Un dev server existente
+se conserva; usar NUXT_BUILD_DIR=.nuxt-fields-validation para compilar aparte.
+
+## SEO de landing —20/10/2026
+
+El mismo script de optimización genera hero-*-320/640.webp para srcset/sizes y
+social-reunion.jpg1200×630 para Open Graph/JSON-LD. Versionar estos derivados
+al sustituir originales. Hero completo/PNG siguen disponibles; CSS y título
+original conservados. El JPEG social no sustituye ilustraciones visibles.
+
+NUXT_PUBLIC_SITE_URL define el origen HTTPS público para canonical, tarjetas
+sociales, JSON-LD, robots y sitemap; predeterminado https://entrehuellas.kormind.com.
+Se puede sustituir al arrancar producción sin recompilar. PUBLIC_WEB_ORIGIN
+conserva su responsabilidad independiente de origen permitido para operaciones.
+No usar Host para deducir la identidad SEO ni apuntar al dominio futuro antes
+de activarlo. [Migración y validación](../../docs/funcionalidades/landing-page.md).
+
+Tras sustituir PNG de landing, ejecutar `node scripts/optimize-landing-images.mjs`
+y versionar sus WebP; el script verifica píxeles visibles y alfa sin pérdida.
+Picture conserva los PNG originales como respaldo. Docker no necesita regenerar
+imágenes ni incorporar scripts adicionales en runtime.
+
 ## Registro y recuperación por código —19/10/2026
 
 El login incorpora /crear-cuenta y /recuperar-contrasena; el código verificado
@@ -193,3 +279,36 @@ Misma configuración de moderación, más allowlist web en Supabase según
 docs/CONFIGURACION. check-login-browser.mjs recorre ambos proveedores mediante
 fixture, sin contactar Google/Facebook reales. Formulario estable, sin skeleton
 inicial ni texto de cuentas autorizadas.
+
+## Navegación y recuperación web —20/10/2026
+
+`node scripts/check-origin-continuity-browser.mjs` usa PLAYWRIGHT_MODULE y
+CHROME_PATH con build vigente y backend fixture. BROWSER_ORIGIN permite probar
+el dev existente (por ejemplo http://127.0.0.1:5173); todas sus APIs se interceptan
+hacia el fixture para no usar sesiones/datos ni backend reales. Cubre nueve puntos
+y acceso negro Reportar de Inicio. Usa la timeline real de GSAP Flip de Sader
+para comprobar rect inicial,0.7s, cuerpo oculto incluso99% y visible al100%.
+Verifica que no se clona Inicio ni se crean capas paralelas, y que el cierre
+anima el componente antes de desmontar. Dos reaperturas a tiempo real y modo
+reducido por caso,1852/1255/390/320. ORIGIN_WIDTHS=320 y ORIGIN_TEXT_SCALE=200%
+permiten comprobar texto ampliado. Reinicia fixture entre disparadores para
+respetar el límite de login. Capturas0/45/99/100% y cierre en
+apps/mobile/build/ui-preview/web-origin-sader. Sin operaciones remotas.
+
+Animaciones: `node scripts/check-navigation-motion-browser.mjs` usa las mismas
+variables PLAYWRIGHT_MODULE/CHROME_PATH y backend fixture. Comprueba fotogramas
+del indicador, expansión/retorno, continuidad de cabecera, editor compartido,
+descarte cancelado, resize, movimiento reducido y cierre de sesión durante el
+efecto. Capturas en apps/mobile/build/ui-preview/web-navigation-motion.
+Si hay un dev server activo, verificar con NUXT_BUILD_DIR separado (por ejemplo
+../mobile/build/platform-motion-nuxt) y NUXT_IGNORE_LOCK=1; no limpiar su .nuxt ni
+detener el proceso. Los enlaces con origin y OriginActionButton reutilizan el
+controlador del plugin navigation_motion, sin cambiar lógica de las features.
+
+`node scripts/check-recovery-browser.mjs` requiere build vigente,
+PLAYWRIGHT_MODULE y CHROME_PATH como las demás comprobaciones. Levanta backend
+fixture local: barra, filtros, alta/edición/foto de mascotas, cuatro reportes,
+borrador/reintento y renders 1440/390/320/texto200%. No modifica Supabase real.
+`npm test` incluye dominio/ViewModel de recovery y `npm run test:server` sus
+contratos de sesión/onboarding, origen, actor, proyección y deduplicación.
+Ver docs/funcionalidades/navegacion-web.md para alcance e integración pendiente.

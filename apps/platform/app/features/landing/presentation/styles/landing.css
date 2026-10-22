@@ -53,12 +53,10 @@ html:has(.landing-page) {
 .landing-page p {
   margin: 0;
 }
-.landing-page h1,
 .landing-page h2,
 .landing-page h3 {
   font-weight: 500;
 }
-.landing-page h1,
 .landing-page h2 {
   letter-spacing: -0.055em;
   line-height: 1.02;
@@ -426,8 +424,12 @@ html:has(.landing-page) {
   margin: 12px auto 10px;
 }
 .landing-page .hero h1 {
+  font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(42px, 7vw, 108px);
   font-weight: 500;
+  color: var(--ink);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
 }
 .landing-page .hero-dog {
   position: absolute !important;
@@ -479,6 +481,9 @@ html:has(.landing-page) {
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+}
+.landing-page .art picture {
+  display: contents;
 }
 .landing-page .character-strip {
   isolation: isolate;
@@ -1119,11 +1124,11 @@ html:has(.landing-page) {
   .landing-page .eyebrow {
     font-size: 8px;
   }
-  .landing-page .hero h1 {
-    font-size: clamp(32px, 8.5vw, 48px);
-  }
   .landing-page .hero-heading {
     margin: 20px auto 18px;
+  }
+  .landing-page .hero h1 {
+    font-size: clamp(32px, 8.5vw, 48px);
   }
   .landing-page .hero-dog {
     width: 36px;

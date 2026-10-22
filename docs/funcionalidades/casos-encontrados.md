@@ -1,5 +1,22 @@
 # Casos encontrados — HU-06 / RF-06 / issue #6
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Corrección20/10/2026: nombre principal de Ver ficha directamente sobre la
+fotografía, sin cápsula blanca ni padding añadido. CasePublicationPreview
+conserva Poppins400/32/gris, texto completo y scroll. Ajuste solicitado por el
+usuario; sin cambios de datos, permisos o acciones.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión física Android pendiente.
+
 **Auditoría de seguimiento18/10:** HU-06/#6 en Done conforme al alcance aprobado ADR-034 de búsqueda comunitaria/avisos vinculados, implementado e integrado.014 reportado y flujos posteriores consumen el contrato. La auditoría no crea casos ni atribuye propietario/cierre a un aviso.
 
 Ampliación del16 de octubre: marcador glass superior derecho para Guardar caso/Quitar de guardados, compuesto por router con [saved_cases](casos-guardados.md). Origen found incluye comunitarios/avisos/anteriores sin ampliar permisos. Requiere020; formato/análisis sin incidencias, sin pruebas ejecutadas ni activación remota. [ADR-050](../decisiones/050-casos-guardados-por-cuenta.md).
@@ -142,3 +159,11 @@ Cambio de alcance autorizado: HU-05/RF-05 y HU-06/RF-06; se adelantan partes app
 
 
 La vi/La encontré se reporta desde ficha de búsqueda abierta, con vínculo fijo. Retirado el acceso genérico de Reportar y dropdown de casos; ReadRecoverySearch solo lee el destino concreto. El listado histórico conserva consulta/descarte y + abre Mascota perdida. [ADR-037](../decisiones/037-avisos-desde-ficha.md). Sin SQL nuevo; Explorar/HU-07 y Android real pendientes.
+
+## Búsqueda del lugar —20/10/2026
+
+Avisos de hallazgo reutilizan el [buscador compartido](ubicaciones-buscador.md)
+antes del mapa. Sugerencias de Perú; elegir centra/marca el punto privado, con
+ajuste manual posterior. No rellena la referencia ni exige buscar; mapa libre,
+sin SQL/permisos nuevos.24 pruebas places/arquitectura/creación aprobadas;
+Android pendiente. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).

@@ -1,5 +1,48 @@
 # Acceso web
 
+21/10, cabecera completada: avatar con foto privada/iniciales abre Tu cuenta
+en panel glass. Campana compuesta desde las páginas permite consultar la
+[bandeja real](notificaciones-web.md). El cierre usa un icono circular glass
+con nombre accesible y tooltip; conserva la operación original. Se retira el
+desplegable inferior; política global, onboarding y permisos intactos.
+
+21/10: [Inicio web](inicio.md) adopta la composición de Inicio móvil, con
+accesos reales, ilustración y Cerca de ti. Tu cuenta se despliega por teclado
+o toque, conserva datos reales y no añade persistencia. Gestión/reintento
+continúan según permisos; sesión, onboarding y política global intactos.
+
+21/10: Inicio y tarjeta de gestión sin frases decorativas sobre los títulos.
+Se retira el pie legal del shell de cuenta compartido con las demás secciones;
+login/registro y documentos públicos conservan sus enlaces legales.
+Cambio de presentación, sin modificar sesión, onboarding ni permisos.
+
+Navegación20/10, ADR-121: bootstrap puede iniciar el ViewModel con la proyección
+vigente del transporte solo después de hidratar, vinculando actor en HTTP.
+No aumenta el plazo15s ni serializa estado privado en SSR. La política global
+sigue comprobando cada destino, los permisos no se cachean y los avisos de
+sesión/foco/visibilidad conservan invalidación. Montar una sección no representa
+un cambio de identidad. El vencimiento se programa también con estado inicial.
+Identidad y perfil se leen en paralelo sin devolver datos antes de validar ambos.
+
+Diagnóstico20/10: producción rechazaba el Origin HTTPS antes de Auth y aceptaba
+http://127.0.0.1:5173 (POST vacío403 frente a422, sin credenciales). Configurar
+PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com en runtime de producción y
+reiniciar/recrear contenedor; desarrollo conserva su origen local. Corrección
+remota pendiente, sin cambiar CSRF/roles/SQL. Evidencia en ESTADO.
+
+20/10, ADR-118: Inicio comparte la barra de cuenta con /explorar, /mis-mascotas
+y /reportar, protegidas por la política global. AccountScreen ofrece un slot
+compuesto por páginas para conservar cabecera, sesión, logout y onboarding sin
+importar otra presentación. Gestión continúa en Inicio por permiso.
+[Recorridos implementados y límites](navegacion-web.md); las pendientes históricas
+de estas tres secciones quedan sustituidas dentro del alcance de esa ficha.
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión en dispositivos reales pendiente.
+
 ## Hover glass compartido en campos —19/10/2026
 
 LoginInput hereda reflejo glass interior visible (ribete2px/borde#8FA9C4) al pasar el ratón por campos

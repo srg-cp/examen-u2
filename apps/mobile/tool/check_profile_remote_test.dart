@@ -47,12 +47,14 @@ void main() {
           aId,
           displayName: 'Profile integration check',
           city: 'Lima',
+          contactPhone: original.contactPhone,
         );
         expect(saved.displayName, 'Profile integration check');
         await repo.update(
           aId,
           displayName: saved.displayName,
           city: saved.city,
+          contactPhone: saved.contactPhone,
         );
         await restored.auth.signInWithPassword(
           email: emailA,
@@ -101,6 +103,7 @@ void main() {
           aId,
           displayName: original.displayName,
           city: original.city,
+          contactPhone: original.contactPhone,
         );
       }
     },

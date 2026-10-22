@@ -37,7 +37,7 @@ class ExploreCaseMap extends StatefulWidget {
 }
 
 class _ExploreCaseMapState extends State<ExploreCaseMap>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double _minimumExtent = .22;
   double _summaryHeight = 172;
 
@@ -47,6 +47,14 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
   }
 
   late final _pullOffset = AnimationController.unbounded(vsync: this);
+  late final _sheetMotion = AnimationController.unbounded(vsync: this)
+    ..addListener(_applySheetMotion);
+
+  void _applySheetMotion() {
+    if (_sheet.isAttached) {
+      _sheet.jumpTo(_sheetMotion.value.clamp(_minimumExtent, .9));
+    }
+  }
 
   int? _sheetPointer;
   VelocityTracker? _dragVelocity;
@@ -58,6 +66,8 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
   void _beginSheetDrag(PointerDownEvent event) {
     if (_sheetPointer != null) return;
     _settleRequest++;
+    // Hold the exact position on contact, even before the drag recognizer wins.
+    _sheetMotion.stop();
     _sheetPointer = event.pointer;
     _dragStartExtent = _sheet.isAttached ? _sheet.size : null;
     _dragOrigin = event.position;
@@ -119,7 +129,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
           (a, b) => (a - current).abs() <= (b - current).abs() ? a : b,
         );
       }
-      _moveSheet(target);
+      _moveSheet(target, velocity: -velocity / _sheet.sizeToPixels(1));
     });
   }
 
@@ -166,19 +176,28 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
     if (scroll != null && scroll.hasClients) scroll.jumpTo(0);
   }
 
-  void _moveSheet(double size) {
+  void _moveSheet(double size, {double velocity = 0}) {
     if (!_sheet.isAttached) return;
     _settleRequest++;
+    _sheetMotion.stop();
     size = size.clamp(_minimumExtent, .9);
     if (MediaQuery.disableAnimationsOf(context)) {
       _sheet.jumpTo(size);
     } else {
-      _sheet.animateTo(
-        size,
-        duration: Duration(
-          milliseconds: (320 + (size - _sheet.size).abs() * 320).round(),
+      final current = _sheet.size;
+      // Stop native ballistic motion once, then keep the release velocity.
+      // A damped spring avoids restarting slowly after a moving finger.
+      _sheet.jumpTo(current);
+      _sheetMotion.value = current;
+      _sheetMotion.animateWith(
+        SpringSimulation(
+          const SpringDescription(mass: 1, stiffness: 260, damping: 34),
+          current,
+          size,
+          velocity.clamp(-3.0, 3.0),
+          tolerance: const Tolerance(distance: .0001, velocity: .0001),
+          snapToEnd: true,
         ),
-        curve: Curves.easeInOutCubic,
       );
     }
   }
@@ -198,6 +217,7 @@ class _ExploreCaseMapState extends State<ExploreCaseMap>
   @override
   void dispose() {
     _settleRequest++;
+    _sheetMotion.dispose();
     _pullOffset.dispose();
     _sheet.dispose();
     _map.dispose();

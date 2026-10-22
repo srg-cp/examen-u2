@@ -13,6 +13,39 @@ const actor = '11111111-1111-4111-8111-111111111145', other = '22222222-2222-422
 const session = () => ({ actor, expiresAt: Date.now() + 60000, email: 'user@example.test', profile: { displayName: 'Luna', city: 'Lima', onboardingCompleted: false } });
 const vm = repo => new AccountViewModel(new AccessAccount(repo), new StartAccountSocialSignIn(repo), new CompleteAccountOnboarding(repo), new ReadManagementAccess(repo));
 
+test('Prepared account mounts without a loading reset, binds writes and disappears on invalidation or TTL', async () => {
+ let now = Date.now(), calls = [];
+ const transport = new AccountSessionTransport(async (path, init) => {
+  calls.push({ path, init });
+  return Response.json(path.endsWith('management') ? { canReviewReports: false } : session());
+ }, () => now);
+ assert.equal(transport.preparedSession(), null);
+ await transport.fetch('/api/access/session');
+ const prepared = transport.preparedSession();
+ const repository = new HttpAccountRepository(transport.fetch, prepared.actor);
+ const model = new AccountViewModel(new AccessAccount(repository), new StartAccountSocialSignIn(repository), new CompleteAccountOnboarding(repository), new ReadManagementAccess(repository), prepared);
+ assert.equal(model.state.checking, false); assert.equal(model.state.session.actor, actor);
+ await model.loadManagementAccess();
+ assert.equal(calls.length, 2); assert.equal(calls[1].init.headers['X-Account-Actor'], actor);
+ now += 15001; assert.equal(transport.preparedSession(), null);
+ await transport.fetch('/api/access/session'); assert.ok(transport.preparedSession());
+ transport.invalidate(); assert.equal(transport.preparedSession(), null);
+ model.invalidate(); assert.equal(model.state.session, null); model.dispose();
+});
+
+test('Parallel profile reads cannot expose a result before remote identity validation', async () => {
+ let finishIdentity, profileReads = 0;
+ const source = { user: () => new Promise(resolve => { finishIdentity = resolve; }), profile: async () => {
+  profileReads++; return [{ id: actor, display_name: null, city: null, onboarding_completed_at: null }];
+ } };
+ const repository = new ServerAccountRepository(source, { actor, token: 'private-test-token', expiresAt: Date.now() + 60000 });
+ let returned = false;
+ const pending = repository.session().then(value => { returned = true; return value; });
+ await Promise.resolve(); assert.equal(profileReads, 1); assert.equal(returned, false);
+ finishIdentity({ id: other }); await assert.rejects(pending, /unauthenticated/);
+ assert.equal(returned, false);
+});
+
 test('Prepared session transport deduplicates reads, bounds reuse by TTL/token expiry and never caches permissions or failures', async () => {
  let now = Date.now(), calls = 0, status = 200;
  const transport = new AccountSessionTransport(async () => { calls++; return new Response(JSON.stringify({ ...session(), expiresAt: now + 60000 }), { status }); }, () => now);

@@ -1,5 +1,90 @@
 # Entre Huellas: regla de oro de UI y UX
 
+**Patrón aprobado y reutilizable21/10:** [Expansión desde origen con identidad
+del control](patrones-ui-ux/expansion-desde-origen.md). Referencia visual aprobada
+por el usuario en Reportar web; reutilizar el motor compartido, sus fases y
+retorno, con validación por recorrido. No sustituir por fade/panel instantáneo
+ni extender automáticamente a Perfil/Alertas o Flutter. La guía incluye
+integración, accesibilidad, limpieza y criterios de revisión.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+**Instrucción posterior21/10, ADR-125:** la navegación web desde origen reemplaza
+su motor por el código GSAP Flip de Sader, sin clonar páginas, con contenido
+oculto hasta completar apertura0.7s. Divergencia explícitamente solicitada respecto
+a ADR-124 solo en este motor; Perfil/Alertas y Flutter conservados.
+[Alcance](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+**Paridad obligatoria21/10, ADR-124:** por instrucción explícita, las animaciones
+equivalentes de móvil y web deben coincidir: efecto, origen/destino, sentido,
+duración, curvas, fases de contenido y retorno. No cambiar parámetros por
+plataforma ni sustituir una expansión por aparición instantánea/fade. Solo la
+geometría final se adapta al viewport. Comprobar apertura y cierre con fotogramas
+y movimiento normal, además de movimiento reducido, foco y limpieza. Divergencias
+solo por instrucción expresa y documentada del usuario. [Contrato y corrección
+de Perfil/Alertas](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Controles web21/10, ADR-122: petición explícita autoriza adaptar FieldSelect,
+inputs/calendario/hora y animaciones de Sader en Nuxt, incluidos radios/Inter
+locales. La línea superior durante navegación web es excepción a ADR-027;
+Flutter conserva sus reglas vigentes. [Ficha](funcionalidades/controles-web.md).
+
+Hero landing20/10, ADR-120: el usuario restaura su título original grande,
+Arial500/#171918/1.02/tracking−0.055em, adaptable hasta108px y móvil32–48px,
+con mascotas laterales originales. Excepción local a ADR-111; resto sin cambios.
+
+Panel Compartir ficha20/10, ADR-115: blanco opaco sin glass ni X, según corrección explícita. Las tres opciones superiores conservan etiquetas; Descargar/Denunciar solo iconos en dos círculos grises. Mantener tooltip/semántica, cierre por gesto/toque fuera/Atrás y movimiento reducido; controles de cabecera glass existentes.
+
+Fidelidad de la ficha20/10, refinamiento ADR-113: Perdido acompaña al nombre en la misma fila, a su derecha; paginación centrada debajo. Material frosted compartido para tarjetas/contacto, ribete blanco único y sombras suaves. No aplicar el contorno doble metálico a estas tarjetas; volver/guardar conservan su glass anterior. Etiquetas largas y texto ampliado se apilan sin recortar el estado.
+
+Ficha pública móvil20/10, ADR-113: CasePublicCards sustituye el layout inmersivo solo al consultar casos. GlassSurface gris perla, navegación compartida52, nombre blanco48/800 y título de navegación Poppins400/20/gris según mockup aprobado (con texto ampliado título32 en fila propia); excepción local a ADR-111. ImmersivePhotoSheet sigue conservado en vistas previas. Contacto real por consentimiento y permisos, ADR-114; sin datos simulados en producción.
+
+Renombrado20/10, ADR-112: `CasePublicationPreview` pasa a llamarse `ImmersivePhotoSheet` (**Ficha fotográfica inmersiva**). Sus reglas visuales, incluida la excepción del nombre blanco48/800, se conservan. [Guía del patrón](funcionalidades/ficha-fotografica-inmersiva.md).
+
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Ver ficha móvil20/10: nombre de mascota directamente sobre la fotografía,
+sin cápsula blanca añadida al aplicar la tipografía principal (ADR-111).
+
+Alineación móvil20/10, ajuste ADR-111: títulos de CollectionHeader alineados al
+borde superior de su fila, sin centrado vertical según la altura de la acción.
+Explorar y Mis mascotas comparten el origen superior/lateral de «Su regreso».
+Conservar altura mínima56, reserva de botones y adaptación con texto ampliado.
+
+**Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
+gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
+AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.
+Permitir ajuste de líneas y ampliación accesible, sin overrides de tamaño/peso/color
+por pantalla. Aplica también a Guardados, acceso, onboarding, landing y legales.
+Marca oficial y remate azul600 de «empieza contigo» conservados; subtítulos,
+diálogos, tarjetas, controles y PDF conservan su jerarquía. Sustituye reglas
+anteriores de tipografía de títulos. Véase [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+
+Títulos móviles20/10, corrección del usuario: «Explorar» y «Mis mascotas» usan
+peso400 y gris #454746, como «Su regreso». Conservan fuente sans-serif del
+sistema, tamaño32 y ampliación accesible. CollectionHeader comparte este estilo
+solo para estas secciones; los demás listados conservan su estilo anterior.
+Sustituye para ambas secciones la indicación de peso500 del19/10.
+
+Confirmaciones móviles20/10: sin origen explícito (incluido «¿Salir del reporte?»),
+popup rápido160ms con fundido y escala uniforme .96→1; superficie/texto juntos,
+sin expansión desde cuadro central ni contenido tardío. Movimiento reducido
+inmediato. Confirmaciones con tarjeta de origen explícita conservan morph320ms.
+Refinamiento de ADR-006; composición/acciones compartidas conservadas.
+
+
 Corrección posterior20/10 del usuario para Inicio: título sin GlassSurface,
 tamaño32 tras nueva referencia (antes26/23); Poppins/pesos de ADR-105 conservados.
 «Su regreso» gris #454746; «empieza contigo» degradado horizontal #459FF6→#75C9EF.
@@ -13,7 +98,8 @@ puede requerir apertura mayor; conservar scroll. Créditos OSM/CARTO compactos
 Reservar retorno; retirar título central si falta espacio. Sustituye mínimo50%
 y crédito superior de ADR-103/084 solo aquí, sin cambiar paleta global ADR-104.
 Movimiento refinado: acompañar al dedo directamente y acomodar al soltar con
-easeInOutCubic320–540ms, según distancia; retorno amortiguado en el mínimo.
+resorte1/260/34 que conserva velocidad del gesto y se detiene al tocar de nuevo;
+sustituye easeInOutCubic320–540ms. Retorno amortiguado en el mínimo.
 Sin tween durante arrastre ni acomodo autónomo con movimiento reducido.
 
 **Título de Inicio móvil20/10, ADR-105:** por referencia explícita del usuario,
@@ -675,3 +761,9 @@ los PNG mediante imagegen como estampado sobre la tela. Prohibido sustituirlo
 por un logo superpuesto a las mascotas desde Vue/CSS/SVG. Variar mascotas, razas,
 pelajes y colores de pañuelo, manteniendo estilo y animación hero aprobados.
 La marca de navegación/favicon usa las fuentes oficiales actualizadas de logo/.
+
+**Buscador20/10, ADR-108:** sugerencias de places en un panel flotante del ancho
+del campo, lista continua sin cápsulas por fila. No desplazar contenido con
+resultados ni skeleton. Respetar teclado/área segura, scroll/texto ampliado,
+cierre al elegir/tocar fuera/retorno y limpieza al desmontar. Aplicación compartida
+en Reportar, Explorar y Ciudad del perfil; filtro Perú de ADR-107 conservado.

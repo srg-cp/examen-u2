@@ -1,5 +1,148 @@
 # Entre Huellas: reglas de UI y UX web
 
+Mapas21/10, [ADR-129](decisiones/129-paridad-visual-de-mapas-mobile-web.md):
+por instrucción explícita, reproducir mapa, pines y detalles móviles en cada
+recorrido equivalente mediante LocationMap compartido. Referencia ZoneMapPicker:
+pin location_on36 centrado, viewport280/radio22/zoom12 y créditos superiores;
+radio0 en pérdidas y200m en avistamientos. Sin controles Leaflet ajenos al móvil.
+Pines de resultados con marca son distintos del selector; no afirmar mapa de
+Explorar web existente. Conservar teclado, texto ampliado, errores y privacidad.
+
+**Patrón aprobado21/10:** [Expansión desde origen con identidad del
+control](patrones-ui-ux/expansion-desde-origen.md). Reutilizar NavigationLink
+con origin / OriginActionButton, OriginPageSurface y el host/coordinador global;
+conservar fases, fullscreen y retorno. La guía fija cuándo usarlo y cómo validar
+otra integración. Aprobación visual del usuario para Reportar; no implica
+migración o auditoría global.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+**Origen web21/10, instrucción posterior ADR-125:** sustituir el motor de
+navegación por PrettyModal de Sader/GSAP Flip real; sin copias de Inicio ni
+superficies paralelas. El contenido aparece solo al terminar la apertura0.7s;
+contracción del componente vivo antes de desmontar. Excepción explícita a
+tiempos/fases de ADR-124 para este motor; Perfil/Alertas, campos y Flutter
+conservados. [Decisión](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+**Paridad de animaciones21/10, ADR-124:** cada recorrido equivalente conserva
+la animación móvil: efecto, origen/destino, duración, curvas, fases y retorno;
+no omitirla ni elegir otra por tratarse de web. Se adapta la geometría final,
+sin cambiar el movimiento. Perfil/Alertas expanden desde avatar/campana reales
+320ms y vuelven260ms, easeInOutCubic; contenido desde65%, fuente hasta45%.
+GlassDialog mantiene contenido hasta terminar salida. Verificar fotogramas con
+movimiento normal y reducido, foco/cancelación/scroll. [Regla global y alcance
+verificado](decisiones/124-paridad-animaciones-mobile-web.md).
+
+**Cabecera y glass de cuenta21/10:** completar la referencia Home móvil con
+campana Alertas y avatar circular (foto privada o iniciales), acceso real al
+perfil y cierre de sesión compacto. GlassSurface comparte acabado polished
+de móvil: blur22, degradado neutro, ribete y sombra; se reutiliza en controles,
+tarjetas de Inicio y bandeja. GlassDialog concentra panel, backdrop, teclado,
+foco y limpieza del scroll. Marca estable y fuera del stagger; sin pie legal.
+Las alertas muestran datos reales, skeleton/fallo/vacío distintos y lectura
+confirmada por servidor; sin contadores ni alertas inventadas.
+
+**Inicio web21/10:** por petición explícita, adaptar HomeContent móvil:
+«Su regreso / empieza contigo» con título global Poppins400/32 y énfasis600
+azul→celeste, accesos negros, ilustración original3:2 y tarjetas glass/radio26
+de comunidad y Cerca de ti. Escritorio en dos columnas; móvil en el orden
+título/accesos/ilustración/cercanía. Solo destinos web implementados:
+Reportar, Explorar y Mis mascotas. Cuenta desplegable y gestión por permiso;
+marca, navegación, stagger, texto ampliado y ausencia de pie legal conservados.
+
+**Cabeceras de cuenta21/10:** por petición explícita, retirar las frases
+decorativas sobre títulos en Inicio, Explorar, Mis mascotas, Reportar y
+Moderación, incluida la tarjeta de gestión. Sin pie de Términos/Privacidad
+en el shell autenticado; conservar espacio de scroll para la barra flotante.
+Los enlaces legales públicos y las etiquetas informativas de casos se mantienen.
+
+**Reportar progresivo21/10, ADR-123:** tras verificar acceso, el formulario
+aparece sin esperar las listas remotas; cada selector pendiente usa FieldSkeleton
+y el mapa su placeholder compartido. Conservar contenido confirmado durante
+refresh con shimmer, error por toast y reintento de la fuente concreta. No
+mostrar vacío hasta confirmarlo ni volver a animar el formulario al llegar datos.
+
+**Etiqueta de campos21/10, corrección ADR-122:** TextField mantiene label/for
+transparente y una muesca real en el contorno, sin parche sólido sobre el fondo
+degradado. Un solo trazo de foco/error; hover sin el ribete antiguo. Las etiquetas
+largas deben ajustar líneas y reservar espacio con texto ampliado sin tapar el valor.
+
+**Tema celeste de controles21/10, refinamiento ADR-122:** por petición expresa,
+fields.css centraliza roles --sf-* según la paleta de Entre Huellas: selección
+celeste/texto azul oscuro, hover/superficies celestes suaves, foco azul y línea
+superior azul. Sin colores neutros fijos por componente ni variantes por feature;
+mantener geometría/animaciones de Sader y rojo de error. Alcance de los controles
+adaptados, sin selector de tema ni cambio de títulos/landing/acceso/Flutter.
+
+**Controles Sader21/10, ADR-122:** por instrucción explícita, los formularios
+intervenidos usan la piel y animaciones de Sader mediante componentes compartidos,
+Inter local, controles48px/radio8px y panel morph32px. Línea superior4px durante
+navegación web: excepción local a la prohibición de barras. Toast/shimmer/skeleton,
+marca, títulos y acceso conservan sus contratos. Sin helpers de error bajo campos.
+[Contrato y alcance](funcionalidades/controles-web.md).
+
+**Respuesta de navegación20/10, ADR-121:** entrada general StaggerReveal240ms,
+separación35ms y retraso máximo140ms, sin blur ni doble entrada durante expansión
+desde origen. Onboarding/login conservan parámetros propios. Reutilizar sesión
+vigente solo después de hidratar; conservar política global, marca/barra estables,
+movimiento reducido y QR legible sin JavaScript. No emitir cambios de cuenta por
+montar una sección. [Decisión](decisiones/121-navegacion-web-sin-esperas-repetidas.md).
+
+**Corrección posterior20/10:** el acento seleccionado de la barra web tampoco
+se eleva al hover/foco/presión: retirar translateY(-2px). Conserva brillo,
+deslizamiento de selección y retorno horizontal al arrastrar. Sustituye la
+elevación de ADR-119 solo en UserNavigation; no cambia botones de otros flujos.
+
+**Barra compacta20/10, refinamiento explícito de ADR-119:** ancho conjunto máximo
+304px; las tres opciones mantienen altura52px y ancho aproximado71px. Por
+corrección posterior, sin impulso horizontal al hover. Arrastre horizontal
+hasta8px con retorno480ms al soltar, sin cambiar selección ni activar enlaces.
+Movimiento reducido sin impulso; conservar limpieza, foco y semántica existentes.
+
+**Barra web20/10, corrección explícita:** Inicio/Explorar/Mis mascotas/Reportar
+conservan iconos y nombres accesibles mediante aria-label, sin atributo title ni
+tooltip al mantener el puntero. Sustituye solo el requisito de tooltip de la
+barra en ADR-118/119; los demás controles conservan sus reglas.
+
+**Hero landing20/10, ADR-120:** excepción explícita posterior a ADR-111 solo para
+#hero-title: Arial500/#171918/1.02/tracking−0.055em, clamp42px/7vw/108px;
+móvil clamp32px/8.5vw/48px. Mascotas laterales y composición originales recuperadas.
+Los demás títulos conservan Poppins. No cambiar el hero al optimizar SEO.
+
+**Animaciones y barra20/10, ADR-119:** solo iconos en todos los anchos, con
+tooltip/semántica. Barra persistente e indicador único deslizante320ms con
+interpolación de iconos; elevación2px/200ms según móvil. OriginTransitionHost y
+OriginActionButton/NavigationLink origin reutilizan expansión real320ms y
+retorno260ms, origen hasta45% y contenido desde65%. Marca fuera del efecto.
+Sin origen ficticio en recarga/directa, sin cobertura global ni cambios en acceso.
+Cancelar/resize/identidad/movimiento reducido limpian máscara/inert/frames.
+[Ficha](funcionalidades/transiciones-web.md). Sustituye las etiquetas y selección
+estática iniciales de ADR-118; stagger general conserva ADR-075.
+
+**Navegación de cuenta20/10, ADR-118:** Inicio/Explorar/Mis mascotas/Reportar
+comparten cápsula glass flotante, selección azul y círculo Reportar de nueve puntos
+basados en móvil. Marca en SiteHeader; nombres accesibles/tooltip/foco, área segura,
+espacio final de scroll y movimiento reducido. Solo recorridos implementados;
+gestión sigue en Inicio con permiso. Acceso/onboarding/públicas/QR no incorporan
+la barra de cuenta. [Ficha](funcionalidades/navegacion-web.md).
+
+**Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
+gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
+AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.
+Permitir ajuste de líneas y ampliación accesible, sin overrides de tamaño/peso/color
+por pantalla. Aplica también a Guardados, acceso, onboarding, landing y legales.
+Marca oficial y remate azul600 de «empieza contigo» conservados; subtítulos,
+diálogos, tarjetas, controles y PDF conservan su jerarquía. Sustituye reglas
+anteriores de tipografía de títulos. Véase [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+
 **Cartografía global20/10, ADR-104:** todos los mapas usan LocationMap compartido,
 Positron configurado y matriz sRGB equivalente a MapStyle móvil. Acabado50/50
 entre Reportar original y Explorar anterior; sin estilos por funcionalidad.

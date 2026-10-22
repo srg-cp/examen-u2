@@ -18,8 +18,8 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   ssr: true,
-  css: ['~/assets/main.css', '~/assets/maps.css'],
-  runtimeConfig: { public: { mapTileUrl: '' } },
+  css: ['~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css', '~/assets/fields.css'],
+  runtimeConfig: { public: { mapTileUrl: '', siteUrl: 'https://entrehuellas.kormind.com' } },
   typescript: { strict: true },
   sourcemap: { server: false, client: false },
   nitro: { preset: 'node-server', compressPublicAssets: true },
@@ -28,7 +28,10 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'es' },
       title: 'Entre Huellas',
       meta: [{ name: 'referrer', content: 'no-referrer' }],
-      link: [{ rel: 'icon', href: '/brand-icon.png', type: 'image/png' }],
+      link: [
+        { rel: 'icon', href: '/brand-icon.png', type: 'image/png' },
+        { rel: 'preload', as: 'font', type: 'font/ttf', href: '/fonts/poppins/Poppins-Regular.ttf', crossorigin: 'anonymous' },
+      ],
     },
   },
 });

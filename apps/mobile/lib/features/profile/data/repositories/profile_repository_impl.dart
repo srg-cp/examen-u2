@@ -30,6 +30,13 @@ final class ProfileRepositoryImpl implements ProfileRepository {
     String userId, {
     required String? displayName,
     required String? city,
-  }) =>
-      _run(() => _source.update(userId, displayName: displayName, city: city));
+    required String? contactPhone,
+  }) => _run(
+    () => _source.update(
+      userId,
+      displayName: displayName,
+      city: city,
+      contactPhone: contactPhone,
+    ),
+  );
 }

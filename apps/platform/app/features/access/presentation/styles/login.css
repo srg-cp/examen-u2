@@ -1,7 +1,7 @@
 .reader-shell .login-layout{width:100%;min-height:100svh;display:flex;flex-direction:column}
 .reader-shell .login-screen{width:100%;max-width:488px;margin:auto;padding:56px 24px;position:relative}
 .reader-shell .login-heading{margin-bottom:32px}
-.reader-shell .login-heading h1{font-size:clamp(2rem,5vw,2.5rem);margin:0 0 12px;font-weight:500}
+.reader-shell .login-heading h1{margin:0 0 12px;}
 .reader-shell .login-heading p{color:#656861;font-size:1rem;line-height:1.5;margin:0}
 .reader-shell .login-form{display:grid;gap:14px;min-width:0}
 .reader-shell .login-field{display:block;position:relative;min-width:0;color:#6e6e73}

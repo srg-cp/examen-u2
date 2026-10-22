@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import 'email_code_input.dart';
@@ -51,11 +52,7 @@ class EmailCodeConfirmation extends StatelessWidget {
         child: Text(
           'Revisa tu correo',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF111111),
-          ),
+          style: AppTypography.primaryTitle,
         ),
       ),
       const SizedBox(height: 16),

@@ -1,5 +1,79 @@
 # Diseño de la interfaz: implementación y revisión
 
+## Patrón reutilizable aprobado: expansión desde origen
+
+[Guía de uso y revisión](patrones-ui-ux/expansion-desde-origen.md), aprobada
+visualmente por el usuario el21/10/2026 en Reportar web. Define superficie
+que se estira desde el control, identidad sin estiramiento, fullscreen,
+transformación del contenido y retorno; incluye parámetros, componentes,
+ejemplos de integración, accesibilidad y comprobaciones. Es la referencia
+para reutilizar esta animación sin recrearla por funcionalidad.
+
+Los apuntes cronológicos siguientes conservan el historial; el contrato actual
+es ADR-128 y la guía enlazada, sin ocultar el cuerpo hasta100% ni aplicar blur
+a la superficie/icono.
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+Origen de navegación web21/10, instrucción posterior ADR-125: reemplazo por
+GSAP Flip/PrettyModal de Sader (0.7s), sin clonar páginas; cuerpo oculto hasta
+terminar apertura y componente cerrado oculto hasta commit de ruta. Excepción
+explícita a ADR-124 solo en ese motor; Perfil/Alertas y Flutter conservados.
+[Contrato vigente](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md).
+
+Paridad obligatoria21/10, ADR-124: animaciones equivalentes móvil/web comparten
+efecto, origen, sentido, duración, curvas, fases y retorno; solo geometría
+responsive adaptable. Perfil/Alertas web:320/260ms desde avatar/campana reales,
+easeInOutCubic, fuente hasta45%, contenido desde65% con easeOutCubic y escala
+según ancho. Revisar fotogramas de entrada/salida con movimiento normal,
+además de reducido, foco y limpieza; capturas finales no prueban paridad.
+[Contrato](decisiones/124-paridad-animaciones-mobile-web.md).
+
+Hero landing20/10, ADR-120: recuperar primera captura del usuario, con Arial500,
+oscuro #171918, tamaño42–108px (móvil32–48px), line-height1.02 y tracking−0.055em.
+Mascotas laterales originales; #hero-title queda fuera de Poppins global.
+
+Animaciones web20/10, ADR-119: iconos sin texto visible, cápsula azul deslizante
+320ms con iconos gris/blanco y elevación del acento2px. Barra fuera de NuxtPage
+para conservar continuidad; origen compartido320/260ms en Reportar y editor de
+mascota, con retorno y cabecera estable. Movimiento reducido/cancelación/resize
+liberan interacción; [ficha](funcionalidades/transiciones-web.md).
+
+Navegación web20/10, ADR-118: cápsula glass flotante de Inicio/Explorar/Mis mascotas
+y círculo Reportar de nueve puntos, selección degradada azul basada en móvil.
+Semántica/foco/tooltip, área segura, espacio de scroll y texto ampliado; marca
+superior conservada. Formularios reutilizan mapa/toast/skeleton/shimmer; acciones
+apiladas en móvil. [Ficha](funcionalidades/navegacion-web.md).
+
+Teléfono20/10, ADR-117: bandera vectorial y prefijo seleccionables junto al número nacional, con AppFieldSurface compartido; apilado en ancho/texto ampliado. Panel blanco con búsqueda española y scroll integral ante teclado, sin X. Vacíos con Perú inicial; número existente conserva prefijo, compartidos ambiguos muestran globo. Semántica país/prefijo y controles48.
+
+Perfil20/10, ADR-116: Celular de contacto opcional reutiliza AppTextField/ShakeField/espaciado20 existente, teclado telefónico y privacidad visible. Sugerencia por caso sin activar consentimiento ni foto; toast superior y guardado conjunto con shimmer real.
+
+Compartir ficha20/10, ADR-115: panel inferior blanco opaco/radio28/tirador, sin glass ni X. Copiar enlace azul/icono blanco, WhatsApp verde y Facebook azul arriba; Descargar/Denunciar en círculos grises contiguos solo iconos, tooltip y semántica. Gesto/toque fuera/Atrás para cerrar; scroll con texto ampliado. Cabecera conserva glass y sitúa título en fila propia bajo380px o texto ampliado, evitando solapamiento con Compartir/Guardar. [Ficha](funcionalidades/compartir-ficha.md).
+
+Corrección de fidelidad20/10, ADR-113: etiqueta Perdido a la derecha del nombre en una fila centrada; paginación debajo y al centro. GlassSurfaceFinish.frosted para tarjetas de ficha y controles de contacto: un ribete blanco, sombra difusa y gradiente traslúcido perla/celeste; sin relleno gris adicional ni contorno oscuro doble. Polished sigue por defecto en navegación y consumidores anteriores. Adaptar etiquetas largas/texto ampliado con apilado y foto más alta.
+
+Ficha pública móvil20/10: [tarjetas glass aprobadas](funcionalidades/ficha-publica-mobile.md), ADR-113. Radio28, margen16, foto redondeada con nombre blanco48/800, navegación glass52 y mapa propio. Título de navegación Poppins400/20/gris por referencia explícita; texto ampliado usa título32 en fila propia. [Contacto autorizado por caso](funcionalidades/contacto-reportante.md), ADR-114. ImmersivePhotoSheet continúa en las vistas previas, conservado para reutilización.
+
+Diseño conservado20/10: **Ficha fotográfica inmersiva** (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), según [ADR-112](decisiones/112-conservar-ficha-fotografica-inmersiva.md). [Guía de reutilización](funcionalidades/ficha-fotografica-inmersiva.md). Se conservan foto completa, nombre blanco48/800 y panel deslizable; nuevo mockup por tarjetas aún sin implementar.
+
+**Títulos principales20/10/2026, ADR-111:** Poppins Regular400, tamaño base32,
+gris #454746, interlineado1.25 y tracking0 en móvil y web. Flutter usa
+AppTypography.primaryTitle; Nuxt typography.css/h1 y fuente local compartida.
+Permitir ajuste de líneas y ampliación accesible, sin overrides de tamaño/peso/color
+por pantalla. Aplica también a Guardados, acceso, onboarding, landing y legales.
+Marca oficial y remate azul600 de «empieza contigo» conservados; subtítulos,
+diálogos, tarjetas, controles y PDF conservan su jerarquía. Sustituye reglas
+anteriores de tipografía de títulos. Véase [ADR-111](decisiones/111-titulos-principales-poppins-mobile-web.md).
+
 Inicio, corrección posterior20/10: título Poppins32 sin contenedor glass,
 mismos pesos de ADR-105. Primera frase gris #454746; segunda con ShaderMask
 horizontal #459FF6→#75C9EF según nueva captura. Descripción16/1.4 debajo del perro/gato dentro
@@ -12,8 +86,8 @@ o mínimo si requiere más y máximo90%, scroll seguro. MapAttribution.compact:
 fuente8/escalable, ribete claro estrecho, objetivos48; derecha8/izquierda84,
 crédito visual aproximadamente8px sobre panel, sigue extensión/resistencia.
 Título central se retira en altura insuficiente; retorno conservado.
-Movimiento del panel: snap propio easeInOutCubic320–540ms según distancia,
-parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
+Movimiento del panel: resorte propio1/260/34 con impulso del gesto, cancelado
+al tocar de nuevo. Parada por dirección de pasada rápida o proximidad al soltar despacio. Resorte
 inferior1/190/28; dedo directo, contenido con su inercia, reduced sin acomodo.
 
 Título de Inicio móvil20/10: referencia tipográfica del usuario aplicada con
@@ -480,6 +554,12 @@ QA reproducible: flutter test --no-pub test/pets_navigation_test.dart --concurre
 
 ## AppSelectField: selección acorde a los inputs
 
+Corrección20/10/2026: la apertura de ruta del panel precede a una única línea
+StaggerReveal de opciones. Sin AuthStageTransition/CoverReveal interior: evitamos
+una segunda apertura y la cortina con el fondo de página dentro del panel blanco.
+El stagger espera AnimationStatus.completed, sin temporizadores; reconstrucciones
+y cierre conservan su estado. Movimiento reducido muestra opciones inmediatamente.
+
 Core/presentation/widgets/app_select_field.dart implementa campo controlado reutilizando decoración compartida y panel inferior de opciones propio. Especie y Sexo en PetEditorScreen consumen el mismo componente; callback solo llama al ViewModel. AppSelectOption envuelve incluso valores null para diferenciar desconocido de cancelación. Sin SDK ni reglas de dominio en el componente.
 
 Panel blanco sin elevación/tinte, radio superior 28; filas neutras de radio 18, estado activo carbón/check, iconos decorativos y etiquetas accesibles. Cabecera fuera de cover/stagger; cuerpo desplazable, texto ampliado y movimiento reducido conservados. Campo y flecha conservan dimensiones de input y foco/error. QA añade pets_options_normal/small; pruebas de selector comprueban cancelación, desconocido y bloqueo, junto al recorrido completo de mascotas.
@@ -787,3 +867,17 @@ presenta PNG y LandingCharacterCard conserva figura/caption/decoración nativas.
 Fuentes oficiales actualizadas en logo se conservan; copias oficiales PNG en landing/QR/favicon y /brand.svg disponible como vector y recursos
 Flutter/launchers/splash actualizados. Animación hero aprobada conservada.
 Prompts finales/procedencia: apps/platform/LANDING_ASSETS.md.
+
+Reportar20/10, ADR-107: buscador compartido de ciudad/dirección antes del mapa,
+con sugerencias de Perú y mismo campo/listado de Explorar. Título/privacidad,
+buscador, mapa y referencia participan en el stagger con cuenta actualizada;
+header persistente. Buscar es opcional, elegir centra/marca y tocar mapa ajusta;
+referencia privada independiente. Skeleton/shimmer y toast compartidos.
+Renders390×844/texto1 y320×350/texto2 revisados sin overflow; Android pendiente.
+
+Buscador20/10, ADR-108: OverlayPortal/LayerLink anclado al campo; panel único
+#F5F5F7/radio22/separación8, ancho del campo, altura máxima320 limitada por teclado
+y área segura. Preferir debajo; arriba si debajo hay menos120 y arriba hay más.
+Filas rectas mínimo48, texto13/fuente compartida, icono18; scroll sin expansión
+del formulario. Foco/selección/cierre fuera/Escape/retorno y desmontaje cuidados.
+Consulta muestra skeleton/shimmer en el panel, sin repetir stagger por edición.

@@ -52,7 +52,7 @@ const other=computed(()=>props.kind==='terms'?{to:'/privacidad',label:'Política
 .legal-switch span{min-width:0;overflow-wrap:anywhere}
 .legal-switch svg{width:16px;height:16px;flex-shrink:0}
 .legal-heading{margin-bottom:32px}
-.reader-shell .legal-heading h1{margin:0 0 24px;text-align:center;background:linear-gradient(to right,#171918,#656861);background-clip:text;-webkit-background-clip:text;color:transparent;font-size:2.8125rem;font-weight:500;line-height:1.16;letter-spacing:-.025em;overflow-wrap:anywhere}
+.reader-shell .legal-heading h1{margin:0 0 24px;text-align:center;overflow-wrap:anywhere}
 .legal-metadata{display:flex;align-items:center;flex-wrap:wrap;gap:12px 32px;padding-top:16px;color:#656861;font-size:.875rem;line-height:1.5}
 .reader-shell .legal-metadata p{display:flex;align-items:center;gap:8px;min-width:0;margin:0;font-size:inherit;line-height:inherit}
 .legal-metadata p:last-child{font-weight:600}

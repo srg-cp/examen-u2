@@ -5,6 +5,9 @@ import 'shake_field.dart';
 import 'validation_surface.dart';
 import 'zone_map_picker.dart';
 
+typedef ReportLocationSearchBuilder =
+    Widget Function(bool enabled, void Function(double, double) onSelect);
+
 /// Both report forms use the same private location interaction and guidance.
 class CaseLocationFields extends StatelessWidget {
   const CaseLocationFields({
@@ -18,6 +21,7 @@ class CaseLocationFields extends StatelessWidget {
     required this.errorId,
     this.pointInvalid = false,
     this.placeInvalid = false,
+    this.locationSearchBuilder,
     super.key,
   });
   final String title;
@@ -27,6 +31,7 @@ class CaseLocationFields extends StatelessWidget {
   final void Function(double, double)? onSelect;
   final ValueChanged<String>? onPlaceChanged;
   final bool pointInvalid, placeInvalid;
+  final ReportLocationSearchBuilder? locationSearchBuilder;
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +47,7 @@ class CaseLocationFields extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Toca el mapa para marcar el lugar. No necesitas dar permiso de ubicación. La referencia y el punto exacto son privados.',
+              'Busca una ciudad o dirección de Perú o toca el mapa para marcar el lugar. Puedes ajustar el punto en el mapa. No necesitas dar permiso de ubicación. La referencia y el punto exacto son privados.',
             ),
           ],
         ),
@@ -50,6 +55,15 @@ class CaseLocationFields extends StatelessWidget {
       const SizedBox(height: 20),
       StaggerRevealItem(
         order: order + 1,
+        child: locationSearchBuilder == null
+            ? const SizedBox.shrink()
+            : locationSearchBuilder!(onSelect != null, (lat, lon) {
+                onSelect?.call(lat, lon);
+              }),
+      ),
+      if (locationSearchBuilder != null) const SizedBox(height: 20),
+      StaggerRevealItem(
+        order: order + 2,
         child: ValidationSurface(
           invalid: pointInvalid,
           errorId: errorId,
@@ -63,7 +77,7 @@ class CaseLocationFields extends StatelessWidget {
       ),
       const SizedBox(height: 20),
       StaggerRevealItem(
-        order: order + 2,
+        order: order + 3,
         child: ShakeField(
           errorId: errorId,
           hasError: placeInvalid,

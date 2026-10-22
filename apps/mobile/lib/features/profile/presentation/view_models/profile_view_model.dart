@@ -34,11 +34,13 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
           userId: current.profile.userId,
           displayName: current.profile.displayName,
           city: current.profile.city,
+          contactPhone: current.profile.contactPhone,
           email: remote.email,
           avatarUri: remote.avatarUri,
         ),
         displayName: current.displayName,
         city: current.city,
+        contactPhone: current.contactPhone,
         saving: current.saving,
         citySelected: current.citySelected,
         issue: current.issue,
@@ -47,18 +49,21 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
     );
   }
 
-  void edit({String? displayName, String? city}) {
+  void edit({String? displayName, String? city, String? contactPhone}) {
     final current = state.asData?.value;
     if (current == null || current.isBusy) return;
     final keepIssue =
         (current.issue == ProfileFailureKind.invalidName &&
             displayName == null) ||
-        (current.issue == ProfileFailureKind.invalidCity && city == null);
+        (current.issue == ProfileFailureKind.invalidCity && city == null) ||
+        (current.issue == ProfileFailureKind.invalidPhone &&
+            contactPhone == null);
     state = AsyncData(
       ProfileEditState(
         profile: current.profile,
         displayName: displayName ?? current.displayName,
         city: city ?? current.city,
+        contactPhone: contactPhone ?? current.contactPhone,
         citySelected: city == null
             ? current.citySelected
             : city.trim().isEmpty || city == current.profile.city,
@@ -83,8 +88,11 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         profile: current.profile,
         displayName: current.displayName,
         city: city,
+        contactPhone: current.contactPhone,
         citySelected: true,
-        issue: current.issue == ProfileFailureKind.invalidName
+        issue:
+            current.issue == ProfileFailureKind.invalidName ||
+                current.issue == ProfileFailureKind.invalidPhone
             ? current.issue
             : null,
         errorId: current.errorId,
@@ -102,6 +110,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         profile: current.profile,
         displayName: current.displayName,
         city: current.city,
+        contactPhone: current.contactPhone,
         saving: const AsyncLoading(),
         citySelected: current.citySelected,
       ),
@@ -111,6 +120,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
         current.profile.userId,
         displayName: current.displayName,
         city: current.city,
+        contactPhone: current.contactPhone,
         citySelected: current.citySelected,
       );
       if (ref.mounted && generation == _generation) {
@@ -119,6 +129,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
             profile: saved,
             displayName: saved.displayName ?? '',
             city: saved.city ?? '',
+            contactPhone: saved.contactPhone ?? '',
             saved: true,
           ),
         );
@@ -133,6 +144,7 @@ class ProfileViewModel extends AsyncNotifier<ProfileEditState> {
             profile: current.profile,
             displayName: current.displayName,
             city: current.city,
+            contactPhone: current.contactPhone,
             saving: AsyncError(failure, stack),
             citySelected: current.citySelected,
             issue: failure.kind,

@@ -27,9 +27,17 @@ try {
       scrollTo(0, 0);
       await Promise.all([...document.images].map(img => img.decode()));
     });
-    const artwork = await page.locator('.art img').evaluateAll(images => images.map(img => ({ src: img.getAttribute('src'), width: img.naturalWidth, height: img.naturalHeight })));
+    const artwork = await page.locator('.art img').evaluateAll(images => images.map(img => ({ src: img.getAttribute('src'), currentSrc: img.currentSrc, width: img.naturalWidth, height: img.naturalHeight })));
     assert.ok(artwork.length >= 17);
-    assert.ok(artwork.every(img => img.src.startsWith('/images/landing/') && img.width >= 1024 && img.height >= 800), 'Independent high-resolution artwork required everywhere');
+    assert.ok(artwork.every(img => img.src.startsWith('/images/landing/') && img.width > 0 && img.height > 0), 'Independent artwork decodes everywhere');
+    const heroImages = artwork.filter(img => /hero-(dog|cat)\.png$/.test(img.src));
+    assert.ok(heroImages.every(img => /hero-(dog|cat)-(320|640)\.webp$/.test(img.currentSrc)), 'Hero selects a smaller responsive source at DPR 1');
+    assert.ok(artwork.every(img => img.currentSrc.endsWith('.webp')), 'Browsers with WebP support select the lossless optimized artwork');
+    assert.ok(await page.locator('.step-art, .art-home, .art-map').evaluateAll(nodes => nodes.every(node => {
+      const frame = node.getBoundingClientRect();
+      const image = node.querySelector('img').getBoundingClientRect();
+      return image.height > 0 && image.top < frame.bottom && image.bottom > frame.top;
+    })), 'Optimized illustrations remain inside their visible layout windows');
     assert.equal(new Set(artwork.map(img => img.src)).size, 12);
     assert.equal(await page.locator('.character-label').count(), 24);
     assert.equal(await page.locator('.character-group').first().locator('.character:not([aria-hidden="true"])').count(), 4, 'The four distinct messages remain exposed; visual repetitions are decorative');

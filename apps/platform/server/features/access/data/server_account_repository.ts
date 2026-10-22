@@ -13,8 +13,12 @@ export class ServerAccountRepository implements AccountRepository {
     return { session: s, email: typeof user.email === 'string' ? user.email : null };
   }
   async session(): Promise<AccountSession> {
-    const { session: s, email } = await this.identity();
-    const rows = await this.source.profile(s.token, s.actor) as { id?: unknown; display_name?: unknown; city?: unknown; onboarding_completed_at?: unknown }[];
+    const current = this.established;
+    if (!current || current.expiresAt <= Date.now()) throw new AccessFailure('unauthenticated');
+    // Both reads use the same private token. Never return the profile until
+    // identity validation has succeeded; RLS still applies to the profile read.
+    const [{ session: s, email }, raw] = await Promise.all([this.identity(), this.source.profile(current.token, current.actor)]);
+    const rows = raw as { id?: unknown; display_name?: unknown; city?: unknown; onboarding_completed_at?: unknown }[];
     const row = Array.isArray(rows) && rows.length === 1 ? rows[0] : undefined;
     if (!row || row.id !== s.actor || !(row.onboarding_completed_at === null || (typeof row.onboarding_completed_at === 'string' && Number.isFinite(Date.parse(row.onboarding_completed_at))))) throw new AccessFailure('unavailable');
     return accountSessionDto({ actor: s.actor, expiresAt: s.expiresAt, email, profile: {
@@ -36,6 +40,7 @@ export class ServerAccountRepository implements AccountRepository {
     return this.source.exchange(code, verifier).then(value => this.establish(value));
   }
   async logout() { const s = this.established; this.established = null; if (s) await this.source.logout(s.token); }
+  async avatar() { const {session}=await this.identity();return this.source.avatar(session.token,session.actor); }
   async completeOnboarding() {
     const { session } = await this.identity();
     await this.source.completeOnboarding(session.token);

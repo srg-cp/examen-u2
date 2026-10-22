@@ -54,9 +54,9 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); photo.value = null; });
     <StaggerReveal as="form" v-else class="sighting-form" novalidate @submit.prevent="send">
       <p class="muted">Ayuda a encontrar a {{ activeCase.name || 'esta mascota' }}. No necesitas crear una cuenta.</p>
       <fieldset :disabled="blocked"><legend>Cuándo le viste</legend>
-        <div class="sighting-date-row" :class="{ invalid: invalid('observedAt'), shake: invalid('observedAt') }" :key="invalid('observedAt') ? state.noticeId : 'date'">
-          <label>Fecha<input v-model="day" type="date" min="2000-01-01" required :aria-invalid="invalid('observedAt')" /></label>
-          <label>Hora<input v-model="time" type="time" required :aria-invalid="invalid('observedAt')" /></label>
+        <div class="sighting-date-row">
+          <DateField v-model="day" label="Fecha" min="2000-01-01" :disabled="blocked" :invalid="invalid('observedAt')" />
+          <TimeField v-model="time" label="Hora" :disabled="blocked" :invalid="invalid('observedAt')" />
         </div><p class="privacy">Usa la fecha y hora locales en que ocurrió, aunque haya sido otro día.</p>
       </fieldset>
       <fieldset :disabled="blocked"><legend>Dónde le viste</legend>
@@ -66,7 +66,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); photo.value = null; });
         <p class="privacy">{{ point ? (point.source === 'gps' ? `Ubicación actual seleccionada · precisión aproximada ${Math.round(point.accuracy || 0)} m.` : 'Punto manual seleccionado.') : 'Elige el punto donde viste la mascota.' }} El punto exacto se conserva protegido y no se muestra en la ficha pública.</p>
       </fieldset>
       <fieldset :disabled="blocked"><legend>Detalles que pueden ayudar</legend>
-        <label :class="{ invalid: invalid('comment'), shake: invalid('comment') }">Comentario (opcional)<textarea v-model="comment" maxlength="500" rows="4" :aria-invalid="invalid('comment')" placeholder="Cómo estaba, hacia dónde iba o alguna señal para reconocerle" /><span class="field-count">{{ [...comment].length }}/500</span></label>
+        <TextField v-model="comment" label="Comentario (opcional)" multiline :maxlength="500" :disabled="blocked" :invalid="invalid('comment')" />
         <p class="privacy">Evita incluir teléfonos, direcciones de viviendas o datos personales.</p>
         <label class="secondary photo-choice" :class="{ working: photoBusy }">{{ photoName || 'Añadir foto (opcional)' }}<input type="file" accept="image/jpeg,image/png,image/webp" :disabled="blocked" @change="selectPhoto" /></label>
         <label class="secondary photo-choice">Tomar foto (opcional)<input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" :disabled="blocked" @change="selectPhoto" /></label>

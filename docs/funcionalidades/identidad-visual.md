@@ -1,5 +1,32 @@
 # Identidad visual y recursos de marca
 
+Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
+caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
+blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con
+elipsis. Sin cápsula blanca. Solo CasePublicationPreview; los demás títulos
+conservan Poppins400/32/gris. Acciones, panel y datos intactos.
+
+Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
+la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
+comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
+por centrado vertical. Regresión de navegación con fuentes reales en390×844
+y320×350/texto2 aprobada. Sin cambio de tipografía, datos o permisos.
+
+Tipografía global20/10/2026, [ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md):
+títulos principales de pantalla/página/etapa en Poppins400, base32, gris #454746,
+altura1.25 y tracking0. Incluye Guardados, acceso, onboarding, fichas y h1 web,
+también landing/legales. AppTypography.primaryTitle en Flutter y typography.css
+en Nuxt; mismo archivo Regular local con OFL, sin descarga remota ni SDK nuevo.
+Fuente del cuerpo y marca oficial conservadas; remate azul de Inicio conserva600.
+Texto ampliado y scroll; por corrección posterior del usuario, preview fotográfico
+muestra el nombre directamente sobre la imagen, sin superficie blanca añadida.
+Sin persistencia/permisos nuevos ni configuración de activación. Comprobación
+local completada: formato/análisis Flutter correctos,70 pruebas móviles y56 web
+aprobadas, typecheck/build web correctos. Chrome validó30 layouts, texto200%, QR
+sin JS y onboarding existente; capturas normales/pequeñas revisadas. Regresión
+de paridad protege tokens y archivo local de fuente. Android físico pendiente;
+detalle y logs en [ESTADO](../ESTADO.md). Sin APK ni despliegue.
+
 Reutilización móvil19/10: reunion.png original de landing copiado byte a byte a
 assets/illustrations/reunion.png para HomeReunionCard, sin regeneración ni recorte.
 Tarjeta ilustrada sin acción ficticia, semántica de imagen; comparación SHA256

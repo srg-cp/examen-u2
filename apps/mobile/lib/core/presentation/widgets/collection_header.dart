@@ -1,3 +1,4 @@
+import '../../theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class CollectionHeader extends StatelessWidget {
@@ -14,14 +15,7 @@ class CollectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final heading = Text(
-        title,
-        style: const TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF111111),
-        ),
-      );
+      final heading = Text(title, style: AppTypography.primaryTitle);
       if (action == null) return heading;
       if (!keepActionInline &&
           (constraints.maxWidth < 300 ||
@@ -37,10 +31,11 @@ class CollectionHeader extends StatelessWidget {
           ],
         );
       }
-      // Keep titles aligned across collections with different action sizes.
+      // Anchor titles to the content origin, independent of action height.
       return ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 56),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: heading),
             const SizedBox(width: 12),

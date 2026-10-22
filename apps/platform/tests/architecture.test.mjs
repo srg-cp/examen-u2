@@ -5,6 +5,32 @@ import { posix } from 'node:path';
 import { RateLimit, clientAddress } from '../server/infrastructure/rate_limit.ts';
 import { configuration } from '../server/infrastructure/config.ts';
 import { routePolicies, routeAccess, sessionRedirect, accountDestination, assertRegisteredRoutes } from '../shared/routing/route_policy.ts';
+import { siteOrigin } from '../shared/seo/site_metadata.ts';
+import { ORIGIN_ENTER_MS,ORIGIN_EXIT_MS,ORIGIN_SOURCE_END,ORIGIN_CONTENT_START,originMotionFrame } from '../app/utils/origin_motion_contract.ts';
+
+test('Mobile and web profile/dialog origin transitions share timing, curves and source/content phases',async()=>{
+  const mobile=await readFile(new URL('../../mobile/lib/core/presentation/widgets/origin_page_transition.dart',import.meta.url),'utf8');
+  const router=await readFile(new URL('../../mobile/lib/app/router.dart',import.meta.url),'utf8');
+  const entity=await readFile(new URL('../../mobile/lib/app/navigation/entity_editor_page.dart',import.meta.url),'utf8');
+  for(const source of [router.slice(router.indexOf("path: 'profile'")),entity]){
+    assert.match(source,new RegExp(`transitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_ENTER_MS}`));
+    assert.match(source,new RegExp(`reverseTransitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_EXIT_MS}`));
+  }
+  assert.match(mobile,/Curves\.easeInOutCubic/);assert.match(mobile,/Interval\(\.65, 1, curve: Curves\.easeOutCubic\)/);
+  assert.match(mobile,/Interval\(\s*0,\s*\.45,/);
+  assert.equal(ORIGIN_SOURCE_END,.45);assert.equal(ORIGIN_CONTENT_START,.65);
+  assert.deepEqual(originMotionFrame(0),{shape:0,source:1,content:0});
+  assert.equal(originMotionFrame(.45).source,0);assert.equal(originMotionFrame(.65).content,0);
+  assert.ok(Math.abs(originMotionFrame(.5).shape-.516875)<.002);
+  assert.deepEqual(originMotionFrame(1),{shape:1,source:0,content:1});
+});
+
+test('SEO identity accepts only a configured HTTPS origin, never arbitrary URL content', () => {
+  assert.equal(siteOrigin('https://entrehuellas.app/'), 'https://entrehuellas.app');
+  for (const value of ['http://entrehuellas.app', 'https://user:password@entrehuellas.app', 'https://entrehuellas.app/path', 'https://entrehuellas.app/?redirect=evil', 'https://entrehuellas.app/#fragment', '//attacker.example', 'javascript:alert(1)']) {
+    assert.throws(() => siteOrigin(value));
+  }
+});
 async function sources(path) {
   const files = [];
   for (const item of await readdir(path, { withFileTypes: true })) {
@@ -14,6 +40,28 @@ async function sources(path) {
   }
   return files;
 }
+
+test('Primary titles share the mobile/web typography and local font', async () => {
+  const mobile = await readFile(new URL('../../mobile/lib/core/theme/app_typography.dart', import.meta.url), 'utf8');
+  const web = await readFile(new URL('../app/assets/typography.css', import.meta.url), 'utf8');
+  const size = Number(mobile.match(/fontSize: (\d+)/)[1]);
+  const weight = mobile.match(/fontWeight: FontWeight\.w(\d+)/)[1];
+  const color = mobile.match(/Color\(0xFF([\dA-Fa-f]{6})\)/)[1].toLowerCase();
+  assert.match(mobile, /fontFamily: 'Poppins'/);
+  assert.ok(web.includes(`--primary-title-size: ${size / 16}rem`));
+  assert.ok(web.includes(`--primary-title-weight: ${weight}`));
+  assert.ok(web.includes(`--primary-title-color: #${color}`));
+  assert.match(web, /:is\(\.reader-shell, \.landing-page\) h1/);
+  const mobileFont = await readFile(new URL('../../mobile/assets/fonts/Poppins-Regular.ttf', import.meta.url));
+  const webFont = await readFile(new URL('../public/fonts/poppins/Poppins-Regular.ttf', import.meta.url));
+  assert.ok(mobileFont.equals(webFont), 'Both platforms must ship the same font');
+  const config = await readFile(new URL('../nuxt.config.ts', import.meta.url), 'utf8');
+  assert.match(config, /~\/assets\/typography\.css/);
+  for (const file of ['collection_header', 'entity_screen_shell', 'app_page_layout']) {
+    const source = await readFile(new URL('../../mobile/lib/core/presentation/widgets/' + file + '.dart', import.meta.url), 'utf8');
+    assert.match(source, /AppTypography\.primaryTitle/, file);
+  }
+});
 
 test('All maps use shared adapters and the same mobile/web tile palette', async () => {
   for (const [path, source] of await sources(new URL('../app/', import.meta.url))) {

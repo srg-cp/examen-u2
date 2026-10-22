@@ -8,8 +8,75 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/confirm_action_dialog.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_dialog_transition.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/popup_dialog_transition.dart';
 
 void main() {
+  for (final reduced in [false, true]) {
+    testWidgets('Discard popup opens and closes together; reduced=$reduced', (
+      tester,
+    ) async {
+      bool? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(disableAnimations: reduced),
+            child: child!,
+          ),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  result = await confirmActionDialog(
+                    context,
+                    title: '¿Salir del reporte?',
+                    description: 'Se descartarán los datos y fotos.',
+                    action: 'Salir',
+                  );
+                },
+                child: const Text('Abrir'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Abrir'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 40));
+      expect(find.byType(OriginDialogTransition), findsNothing);
+      final popup = find.byType(PopupDialogTransition);
+      final fade = find.descendant(
+        of: popup,
+        matching: find.byType(FadeTransition),
+      );
+      final transform = find
+          .descendant(of: popup, matching: find.byType(Transform))
+          .first;
+      final earlyRect = tester.getRect(find.text('¿Salir del reporte?'));
+      expect(tester.widget<FadeTransition>(fade).opacity.value, greaterThan(0));
+      expect(
+        tester.widget<Transform>(transform).transform.entry(0, 0),
+        inInclusiveRange(.96, 1.0),
+      );
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(tester.widget<FadeTransition>(fade).opacity.value, 1);
+      final finalRect = tester.getRect(find.text('¿Salir del reporte?'));
+      expect(earlyRect.width / finalRect.width, inInclusiveRange(.96, 1.0));
+      await tester.tap(find.text('Cancelar'));
+      await tester.pump();
+      if (!reduced) {
+        await tester.pump(const Duration(milliseconds: 40));
+        expect(
+          tester.widget<FadeTransition>(fade).opacity.value,
+          inExclusiveRange(0, 1),
+        );
+        expect(find.text('¿Salir del reporte?'), findsOneWidget);
+      }
+      await tester.pumpAndSettle();
+      expect(result, false);
+      expect(popup, findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
   for (final small in [false, true]) {
     for (final action in [
       'Salir',

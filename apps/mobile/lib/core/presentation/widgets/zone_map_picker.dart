@@ -20,6 +20,7 @@ class ZoneMapPicker extends StatefulWidget {
     this.showCenterMarker = true,
     this.showRadius = true,
     this.showAttribution = true,
+    this.compactAttribution = false,
     this.attributionTopInset = 0,
     this.readOnlyNavigation = false,
     this.markers = const [],
@@ -37,6 +38,7 @@ class ZoneMapPicker extends StatefulWidget {
   final bool readOnly, showCenterMarker, fitRadius, showRadius;
   final double attributionTopInset;
   final bool showAttribution;
+  final bool compactAttribution;
 
   /// Result maps can be explored without changing the selected search center.
   final bool readOnlyNavigation;
@@ -225,18 +227,21 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
           ),
           if ((MapConfig.usesCarto && widget.showAttribution) || _failed)
             Positioned(
-              top: widget.borderRadius == 0
+              top: widget.compactAttribution
+                  ? null
+                  : widget.borderRadius == 0
                   ? MediaQuery.paddingOf(context).top +
                         8 +
                         widget.attributionTopInset
                   : 8,
-              left: MapConfig.usesCarto ? 76 : 8,
+              bottom: widget.compactAttribution ? 4 : null,
+              left: MapConfig.usesCarto && !widget.compactAttribution ? 76 : 8,
               right: 8,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (MapConfig.usesCarto && widget.showAttribution)
-                    const MapAttribution(),
+                    MapAttribution(compact: widget.compactAttribution),
                   if (_failed)
                     TextButton(
                       onPressed: () => setState(() {

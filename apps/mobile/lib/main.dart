@@ -1,3 +1,4 @@
+import 'features/case_contacts/providers/case_contact_providers.dart';
 import 'features/content_reports/providers/content_report_providers.dart';
 import 'features/case_closure/providers/case_closure_providers.dart';
 import 'features/notifications/providers/notification_providers.dart';
@@ -47,8 +48,14 @@ Future<void> main() async {
         sightingRepositoryProvider.overrideWithValue(
           bootstrap.sightingRepository,
         ),
+        caseShareRepositoryProvider.overrideWithValue(
+          bootstrap.caseShareRepository,
+        ),
         casePosterRepositoryProvider.overrideWithValue(
           bootstrap.casePosterRepository,
+        ),
+        caseContactRepositoryProvider.overrideWithValue(
+          bootstrap.caseContactRepository,
         ),
         savedCasesRepositoryProvider.overrideWithValue(
           bootstrap.savedCasesRepository,

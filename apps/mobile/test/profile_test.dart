@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +17,7 @@ import 'package:flutter_application_entrehuellas/features/profile/presentation/w
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'app_test.dart' show FakeAuthRepository;
 import 'support/fake_profile.dart';
+import 'alert_preferences_test.dart' show loadFonts;
 
 void main() {
   late FakeProfile repo;
@@ -76,6 +81,83 @@ void main() {
       );
       expect(clear.displayName, isNull);
       expect(clear.city, isNull);
+    },
+  );
+
+  test(
+    'Phone normalization, validation, removal and profile-only edits',
+    () async {
+      final update = UpdateProfile(repo);
+      final saved = await update(
+        'one',
+        displayName: 'Ana',
+        city: '',
+        citySelected: true,
+        contactPhone: ' +51 (900) 000-000 ',
+      );
+      expect(saved.contactPhone, '+51900000000');
+      for (final phone in [
+        '900000000',
+        '+012345678',
+        '+123',
+        '+1234567890123456',
+        '+51abc900000000',
+      ]) {
+        await expectLater(
+          update(
+            'one',
+            displayName: 'Ana',
+            city: '',
+            citySelected: true,
+            contactPhone: phone,
+          ),
+          throwsA(
+            isA<ProfileFailure>().having(
+              (e) => e.kind,
+              'kind',
+              ProfileFailureKind.invalidPhone,
+            ),
+          ),
+        );
+      }
+      expect(repo.updates, 1);
+      await container.read(profileViewModelProvider.future);
+      final model = container.read(profileViewModelProvider.notifier);
+      model.edit(contactPhone: '+51 911 111 111');
+      model.selectCity('Lima');
+      model.applyAvatar(const AccountProfile(userId: 'one'));
+      expect(
+        container.read(profileViewModelProvider).requireValue.contactPhone,
+        '+51 911 111 111',
+      );
+      repo.failUpdate = true;
+      await model.save();
+      expect(
+        container.read(profileViewModelProvider).requireValue.contactPhone,
+        '+51 911 111 111',
+      );
+      repo.failUpdate = false;
+      await model.save();
+      container.invalidate(profileViewModelProvider);
+      expect(
+        (await container.read(profileViewModelProvider.future)).contactPhone,
+        '+51911111111',
+      );
+      model.edit(contactPhone: 'invalid');
+      await model.save();
+      model.selectCity('Cusco');
+      expect(
+        container.read(profileViewModelProvider).requireValue.issue,
+        ProfileFailureKind.invalidPhone,
+      );
+      model.discard();
+      expect(
+        container.read(profileViewModelProvider).requireValue.contactPhone,
+        '+51911111111',
+      );
+      model.edit(contactPhone: '');
+      await model.save();
+      expect(repo.profiles['one']!.contactPhone, isNull);
     },
   );
 
@@ -223,6 +305,12 @@ void main() {
     testWidgets(
       'Profile fields persist through save error and remain reachable; small=$small',
       (tester) async {
+        await tester.runAsync(() async {
+          await loadFonts();
+          await const SvgAssetLoader(
+            'packages/circle_flags/assets/svg/pe.svg',
+          ).loadBytes(null);
+        });
         await tester.runAsync(
           () => container.read(profileViewModelProvider.future),
         );
@@ -232,19 +320,23 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
+        final capture = GlobalKey();
         await tester.pumpWidget(
-          UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              theme: AppTheme.light,
-              home: MediaQuery(
-                data: MediaQueryData(
-                  textScaler: TextScaler.linear(small ? 2 : 1),
-                ),
-                child: const Scaffold(
-                  body: SingleChildScrollView(
-                    padding: EdgeInsets.all(24),
-                    child: ProfileEditor(),
+          RepaintBoundary(
+            key: capture,
+            child: UncontrolledProviderScope(
+              container: container,
+              child: MaterialApp(
+                theme: AppTheme.light,
+                home: MediaQuery(
+                  data: MediaQueryData(
+                    textScaler: TextScaler.linear(small ? 2 : 1),
+                  ),
+                  child: const Scaffold(
+                    body: SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: ProfileEditor(),
+                    ),
                   ),
                 ),
               ),
@@ -252,12 +344,16 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        expect(find.byType(TextField), findsNWidgets(2));
+        expect(find.byType(TextField), findsNWidgets(3));
         expect(
           tester.widget<SelectableText>(find.byType(SelectableText)).data,
           'ana@example.invalid',
         );
         await tester.enterText(find.byType(TextField).first, 'María');
+        await tester.pump();
+        final phone = find.byType(TextField).at(2);
+        await tester.ensureVisible(phone);
+        await tester.enterText(phone, '900 000 000');
         await tester.pump();
         repo.failUpdate = true;
         await tester.ensureVisible(find.text('Guardar cambios'));
@@ -273,9 +369,30 @@ void main() {
         await tester.tap(find.text('Guardar cambios'));
         await tester.pumpAndSettle();
         expect(find.text('Cambios guardados'), findsOneWidget);
+        expect(repo.profiles['one']!.contactPhone, '+51900000000');
         await tester.pump(const Duration(seconds: 7));
         await tester.pumpAndSettle();
         expect(find.text('Cambios guardados'), findsNothing);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.ensureVisible(find.text('Celular de contacto (opcional)'));
+        await tester.pumpAndSettle();
+        if (Platform.environment['CAPTURE_PROFILE_CONTACT'] == '1') {
+          await tester.runAsync(() async {
+            final image =
+                await (capture.currentContext!.findRenderObject()
+                        as RenderRepaintBoundary)
+                    .toImage();
+            final bytes = await image.toByteData(
+              format: ui.ImageByteFormat.png,
+            );
+            final folder = Directory('build/ui-preview/profile-contact')
+              ..createSync(recursive: true);
+            await File(
+              '${folder.path}/${small ? 'small' : 'normal'}.png',
+            ).writeAsBytes(bytes!.buffer.asUint8List());
+            image.dispose();
+          });
+        }
         expect(tester.takeException(), isNull);
       },
     );

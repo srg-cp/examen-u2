@@ -1,9 +1,97 @@
 # Funcionalidades de Entre Huellas
 
+Patrón UI/UX aprobado21/10: [Expansión desde origen con identidad del
+control](../patrones-ui-ux/expansion-desde-origen.md), con contrato visual,
+componentes, ejemplos y revisión para reutilizarlo en otros recorridos.
+Implementación/evidencia: [transiciones web](transiciones-web.md).
+
+Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
+móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
+y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente
+hasta45% invertida al regresar. Fade/blur de Sader solo al cuerpo de destino.
+Control original oculto temporalmente para evitar duplicado y restaurado junto
+a la limpieza de identidad, estilos y referencias. Se mantienen0.7s/CustomEase,
+ruta anterior detrás, marca/barra, acceso/guards y reducido. Perfil/Alertas y
+Flutter intactos. [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Los apuntes anteriores que contradigan esa fase se conservan como historial.
+
+21/10, instrucción posterior: [origen de navegación sustituido por Sader/GSAP](transiciones-web.md),
+ADR-125; sin clonar pantallas y contenido solo al terminar apertura. Perfil/Alertas
+conservan ADR-124; excepción explícita y evidencia acotadas al motor intervenido.
+
+21/10: [paridad obligatoria de animaciones](transiciones-web.md), ADR-124;
+Perfil/Alertas web expanden y retornan desde avatar/campana con tiempos/curvas
+móviles. Verificación con fotogramas normales y movimiento reducido.
+
+21/10: [cabecera y bandeja de alertas web](notificaciones-web.md), con avatar,
+consulta de perfil y glass compartido con móvil. Lectura/paginación/marcar leída
+reales sobre plan027; sin push, edición de perfil o migraciones nuevas.
+
+21/10: [Inicio web](inicio.md) adopta el diseño de móvil con título azul,
+accesos negros, ilustración y Cerca de ti; cuenta desplegable y gestión por
+permiso. Build/typecheck/64 pruebas y QA Chrome responsive aprobados.
+
+21/10: [navegación de cuenta](navegacion-web.md) sin frases decorativas sobre
+títulos ni pie legal tras iniciar sesión; [legales](documentos-legales.md)
+conservan sus accesos públicos. Typecheck y64 pruebas aprobados; build/revisión
+visual pendientes según ESTADO.
+
+21/10: [Reportar web](navegacion-web.md) carga campos y dependencias por separado,
+con skeleton por selector y mapa, borrador íntegro y retry de cada fuente. ADR-123.
+
+21/10: [Controles web compartidos desde sader-panel](controles-web.md),
+FieldSelect/inputs/calendario/hora y línea de navegación superior. ADR-122.
+
+Respuesta web20/10: [navegación](navegacion-web.md), [acceso](acceso-web.md) y
+[transiciones](transiciones-web.md) eliminan esperas repetidas según ADR-121;
+medición local con backend fixture, sin confirmación remota ni despliegue.
+
+Hero20/10: [landing](landing-page.md) recupera título grande y mascotas de la
+referencia original, por petición explícita. Excepción ADR-120 a ADR-111.
+
+SEO20/10: [landing pública](landing-page.md), identidad SSR, dominio configurable
+y WebP sin pérdida. Incluye migración futura a entrehuellas.app;
+publicación e indexación real pendientes.
+
+Web20/10: [transiciones desde origen y navegación liquid](transiciones-web.md),
+barra solo con iconos, indicador deslizante y expansión/retorno compartidos con
+la referencia móvil. ADR-119; evidencia local y dispositivos físicos pendientes.
+
+Web20/10: [barra de navegación y recorridos de recuperación](navegacion-web.md),
+Inicio/Explorar/Mis mascotas/Reportar, datos compartidos y operaciones autorizadas.
+ADR-118; implementación/QA local, integración remota pendiente.
+
+Entrada telefónica20/10: Perfil y Contacto del reportante comparten selector de país con bandera y prefijo (ADR-117). Búsqueda local en español y número nacional; contrato internacional/privacidad intactos, sin SQL adicional.
+
+Celular20/10: [Perfil](perfil.md) incorpora número privado opcional y [Contacto del reportante](contacto-reportante.md) lo sugiere solo al autor, con consentimiento por ficha. ADR-116/plan033 después de032; activación remota pendiente.
+
+20/10: [Compartir ficha pública](compartir-ficha.md), panel blanco sin X con Copiar enlace/WhatsApp/Facebook y dos iconos grises Descargar/Denunciar. Difusión y PDF para lectores autorizados de búsquedas activas; plan032 requiere activación remota. ADR-115, sin cierre de historias.
+
+Ficha pública20/10: [corrección de posición de Perdido y acabado glass](ficha-publica-mobile.md), con frosted compartido y paginación centrada; refinamiento ADR-113. Validación visual normal/pequeña y preservación del glass anterior en ESTADO.
+
+Ficha pública móvil20/10: [nuevo diseño por tarjetas glass](ficha-publica-mobile.md) y [contacto del reportante con permiso por caso](contacto-reportante.md), ADR-113/114. Diseño implementado localmente; contacto requiere activación031. El [patrón inmersivo](ficha-fotografica-inmersiva.md) se conserva en vistas previas.
+
+Diseño conservado20/10: [Ficha fotográfica inmersiva](ficha-fotografica-inmersiva.md) (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), renombrada para reutilización futura. Continúa activa; ADR-112.
+
+Ficha del caso20/10: [nombre sobre fotografía con diseño original](identidad-visual.md),
+blanco48/800 con sombra, sin cápsula; excepción local a ADR-111.
+
+Móvil20/10: [títulos de las secciones alineados con Inicio](identidad-visual.md),
+sin centrado vertical según la altura del botón. Refinamiento de ADR-111.
+
+Títulos20/10: [regla Poppins400/32/gris para móvil y web](identidad-visual.md),
+incluido [Guardados](casos-guardados.md); ADR-111.
+
+Reportes20/10: [confirmación de salida rápida](busquedas-y-avisos.md), popup
+compartido160ms sin expansión desde origen; refinamiento de ADR-006.
+
+
 Explorar20/10: [panel minimizable hasta Ver ficha](explorar.md) y créditos
 compactos que acompañan su borde superior, según ADR-106. Paleta global intacta.
+Refinamiento de movimiento: impulso al soltar y detención al nuevo contacto;
+validación y revisión Android pendiente en la misma ficha.
 
-Cartografía20/10: [acabado compartido móvil/web](cartografia-compartida.md),
+Cartografía21/10: [acabado y detalles compartidos móvil/web](cartografia-compartida.md),
 intermedio entre Reportar y Explorar, obligatorio en adaptadores comunes.
 Sustituye filtro local de Explorar; base/activación web según ADR-104.
 
@@ -201,3 +289,18 @@ La corrección global del11 de octubre aplica ADR-027/028 a las fichas existente
 
 
 Mascota perdida adopta un único formulario con selección de ficha y datos del reporte conservados: [búsquedas y avisos](busquedas-y-avisos.md), [ADR-038](../decisiones/038-formulario-unico-mascota-perdida.md).
+
+Reportar20/10: [buscador compartido](ubicaciones-buscador.md) antes del mapa para
+pérdida/hallazgo. Sugerencias de Perú también en Explorar y Ciudad del perfil;
+mapa manual libre. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
+
+Ubicaciones20/10: [sugerencias flotantes](ubicaciones-buscador.md) en panel único
+continuo, sin empujar el contenido de Reportar, Explorar o Perfil. ADR-108.
+
+Ubicaciones20/10: [respuesta reciente](ubicaciones-buscador.md) con debounce300ms
+y cancelación HTTP por consulta para evitar esperas acumuladas. Filtro PE y
+panel flotante conservados; latencia del proveedor variable. ADR-109.
+
+Ubicaciones20/10: [corrección de espera y búsqueda parcial](ubicaciones-buscador.md).
+Pausa600ms restaurada; timeout20s para respuestas válidas tardías del proveedor.
+`tacn` devuelve Tacna en consulta real; cancelación/Perú/panel conservados. ADR-110.

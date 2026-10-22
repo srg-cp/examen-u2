@@ -1,5 +1,1295 @@
 # Estado del proyecto
 
+## Pines y detalles del selector web según móvil —21/10/2026
+
+Por instrucción explícita, comparados ZoneMapPicker/CaseLocationFields y
+SightingScreen con LocationMap. ADR-104 solo igualaba teselas/filtro: web aún
+mostraba círculo negro, zoom14, alto300/radio24, créditos inferiores y controles
+propios de Leaflet. [ADR-129](decisiones/129-paridad-visual-de-mapas-mobile-web.md)
+registra la referencia móvil para los recorridos equivalentes.
+
+LocationMap ahora usa location_on negro36 centrado, zoom12, alto280/radio22,
+créditos arriba8 con objetivos48 y fuente ampliable. Eliminados controles+/− y
+botón Usar centro del mapa; flechas y Enter/Espacio conservan selección por teclado.
+Reportar pérdidas conserva radio0; avisos sighting/with_reporter y SightingMap
+QR usan200m, relleno111111/34 de255 y borde2. Misma matriz de color solo sobre
+teselas, punto privado sin cambios y toast/reintento existentes. Bloqueo de
+interacción durante envío y ResizeObserver con limpieza al desmontar para
+expansión/resize. Sin SQL, nuevos paquetes, despliegue ni modificación Flutter.
+
+Validación:71 pruebas aprobadas, typecheck y build Nuxt correctos usando
+.nuxt-map-parity-qa. QA Chrome del build para avistamiento QR, Reportar y carga
+progresiva aprobada: pin36, altura/radio reales, círculo/color/borde, teclado,
+selección, crédito, filtro pintado, GPS denegado, reintento de envío ambiguo,
+cuatro tipos de reporte y recuperación de borrador. Responsive1440/731/390/320/1920
+y texto200%, sin overflow ni errores CSP/hidratación. El script de carga tenía
+un selector ambiguo por los dos accesos Reportar de Inicio; acotado a navegación
+y repetido correctamente. Capturas revisadas en apps/mobile/build/ui-preview/
+public-sightings/map-mobile-parity.png y evidencia responsive en web-recovery.
+
+Límite: backend y teselas fixture; no confirma red/proveedor reales ni aprobación
+visual del usuario. Próximo paso: contrastar Android/web con Positron real.
+Explorar web mantiene lista; el mapa de resultados con pines de marca de móvil
+todavía no existe en web. No afirmar paridad funcional global o historia cerrada.
+Ficha de cartografía/índice y regla UI web actualizados; trabajo local previo conservado.
+
+## Animación aprobada y documentada como patrón UI/UX —21/10/2026
+
+El usuario confirma aprobación visual de la animación de Reportar y pide
+documentarla para reutilización. Creada la [guía del patrón](patrones-ui-ux/expansion-desde-origen.md):
+experiencia, usos, parámetros/fases de apertura y retorno, componentes
+compartidos, ejemplos reales de ruta/editor local, accesibilidad, limpieza
+y criterios de revisión. Enlazada desde reglas UI/UX general/web, DISENO_UI,
+índice de funcionalidades, ficha de transiciones, ADR-128 y AGENTS.
+
+Solo documentación; no se alteran código ni parámetros de la animación.
+Verificados enlaces locales y coherencia con componentes/estilos existentes;
+no se repiten build o pruebas de navegador por este cambio documental.
+La validación técnica anterior conserva sus límites: Chrome con fixture;
+Safari/Firefox/físico y cada integración futura requieren su revisión.
+Sin nuevas HU/RF, cierre de historias, migración global ni despliegue.
+
+## Botón móvil que se transforma dentro del fullscreen de Sader —21/10/2026
+
+Por petición explícita, combinado el origen móvil con el motor web ya aprobado.
+Se revisó OriginPageTransition Flutter: color/radio fuente, identidad centrada
+con tamaño original y opacidad hasta45%, invertida al cerrar. [ADR-128](decisiones/128-identidad-mobile-en-origen-web-fullscreen.md)
+registra la combinación: GSAP/CustomEase0.7s y fullscreen de Sader conservados;
+superficie negra visible desde el comienzo, icono sin estiramiento y radio visual
+que vuelve al círculo. Fade/blur de Sader solo sobre el cuerpo de destino.
+
+Captura únicamente icono/etiqueta del control en memoria; sin clonar páginas ni
+formularios. Identidad aria-hidden, compensación por eje de escala y retirada
+al finalizar/cancelar; control original oculto temporalmente y restaurado.
+Se corrigió interpolación de radio con unidades mixtas que dejaba esquinas:
+radio calculado en coordenadas visuales como ClipRRect móvil. Marca, navegación,
+ruta anterior detrás, guards, reducido y limpieza de cuenta conservados.
+
+Validación:71 pruebas, typecheck y build correctos. QA Chrome del build aprobada
+por nueve puntos y acceso de Inicio en1852/1255/390/320: icono conserva tamaño
+en apertura/cierre (tolerancia0.6px), fuente termina45%, reaparece antes de
+llegar al botón y termina circular; identidad temporal retirada y control
+restaurado. Fullscreen, fade/blur del cuerpo, geometría, contenido sin salto,
+reaperturas, reducido y aviso de viewport aprobados. Regresión de navegación
+aprobada con editores locales, borrador cancelado, resize e identidad.
+Dev5173 aprobado1255 y320/texto200% por ambos accesos. Revisadas capturas de
+apertura5/15% y cierre95% en apps/mobile/build/ui-preview/web-origin-sader.
+Documentación y reglas actualizadas; sin despliegue, SQL, permisos o ampliación
+funcional. Pendientes confirmación visual del usuario y Safari/Firefox/físico.
+Sin modificar Flutter/Perfil/Alertas ni afirmar paridad global.
+
+## Expansión fullscreen y fases originales de PrettyModal —21/10/2026
+
+El usuario aprueba la sección anterior detrás pero pide cubrir toda la pantalla
+y copiar la transformación progresiva de Sader. Revisados pretty-modal.tsx,
+SectionModal y globals.css: SectionModal usa pretty-modal-fullscreen; la entrada
+combina Flip0.7s con opacity0/blur10px→1/0 en500ms y cubic-bezier(0.56,0.27,0,1).
+[ADR-127](decisiones/127-origen-fullscreen-y-fases-prettymodal-sader.md) sustituye
+el destino main y la entrada sin fade de ADR-126; no inventa una espera al50%.
+
+La superficie real ahora ocupa100dvw/100dvh durante morph, sin max-width de
+columna. Cuerpo situado en sus coordenadas finales, con espaciador vacío que
+conserva altura/scroll; se restauran sin salto al terminar/cancelar. Eliminados
+relleno negro y radio interpolados propios. Se copian apertura/cierre CSS de
+PrettyModal; Vue integra el efecto con rutas/guards y DOM saliente retenido.
+Marca/barra estables, colores propios, reducido, resize e identidad conservados.
+
+Validación local Chrome: typecheck,71 pruebas y build correctos. QA del build
+por ambos accesos en1852/1255/390/320: rect inicial, fade/blur original,
+destino completo a los cuatro bordes, contenido escalado, sección anterior
+detrás, ausencia de salto del título al restaurar, cierre, reaperturas y
+reducido; duración real687–705ms. Regresión de navegación aprobada con marca,
+editores locales, borrador cancelado, resize e identidad. Dev5173 aprobado
+1255/390 por ambos accesos;320/texto200% comprueba además duración500ms y curva
+CSS exacta. Capturas en apps/mobile/build/ui-preview/web-origin-sader revisadas.
+Documentación y reglas actualizadas; sin SQL, permisos, despliegue ni cambio
+de alcance funcional. Confirmación visual del usuario y Safari/Firefox/físico
+pendientes; sin auditoría global ni modificación de Perfil/Alertas o Flutter.
+
+## Contenido que crece dentro del origen y sección anterior detrás —21/10/2026
+
+El usuario precisa el contrato: no retirar la sección actual al abrir y no
+esperar a terminar para mostrar el formulario. [ADR-126](decisiones/126-contenido-dentro-de-expansion-y-ruta-anterior-visible.md)
+sustituye la fase de cuerpo oculto de ADR-125. NuxtPage conserva el DOM real
+saliente mediante leave de Vue, fijo en su posición, inert y aria-hidden;
+la nueva ruta tiene fondo exterior transparente durante apertura. Flip escala
+la superficie real con su título/campos/mapa visibles desde0%, recortados por
+su mismo contorno y fondo opaco, sin transparentar la vista anterior a través
+del formulario. Al terminar se retira la ruta anterior, sin otro reveal.
+Sin clones ni otra instancia del formulario; acceso/guards/datos conservados.
+
+Validación: typecheck,71 pruebas y build correctos. QA Chrome del build aprobada
+en1852/1255/390/320 por nueve puntos y acceso de Inicio: rect inicial del botón,
+contenido visible desde0%, título escalado, sección anterior retenida, fotogramas
+0/2/5/10/15/45/99/100%, duración real687–706ms, cierre, reaperturas, aviso de
+viewport y reducido. Regresión de navegación aprobada: marca, editor local,
+borrador cancelado, resize real, reducido e identidad. Capturas revisadas en
+apps/mobile/build/ui-preview/web-origin-sader; en45% se ve Reportar dentro de
+la expansión y la sección anterior fuera del contorno. Dev5173 aprobado1255
+por ambos accesos y320/texto200% también aprobado con fixture.
+Documentación, reglas e índice actualizados; sin cambios de alcance funcional,
+SQL, permisos ni despliegue. Confirmación visual del usuario y otros navegadores/
+dispositivo físico pendientes; sin afirmación de auditoría global.
+
+## Cancelación prematura al abrir una ruta desde origen —21/10/2026
+
+El usuario sigue observando entrada instantánea y cierre animado. Se amplía
+QA para medir duración y crecimiento sin pausar GSAP. Un aviso inducido de
+visualViewport.resize durante entrada reproduce el salto: el listener llamaba
+cancel/finish y mostraba el formulario a21ms, aunque no cambiase el tamaño.
+Esto demuestra una causa posible del síntoma; no hay trazas del navegador
+del usuario para atribuirle ese evento concreto.
+
+OriginTransitionHost compara ahora tamaño de ventana, altura visual y escala:
+avisos sin cambio real o de ancho visual por scrollbar no terminan Flip.
+Resize real, teclado/zoom, movimiento reducido e identidad conservan limpieza.
+La ruta mantiene su contrato de acceso y contenido oculto hasta finalizar;
+sin convertir Reportar en modal ni cambiar tiempos/curva. ADR-125 y ficha
+actualizados. Validación dev5173 en1255/390 con aviso inducido aprobada;
+typecheck,71 pruebas y build correctos. Regresión de navegación del build
+aprobada, incluido resize real, borrador cancelado y cambio de identidad.
+QA del build aprobada desde ambos accesos en1852/1255/390/320: duración real
+observada684–708ms, crecimiento, formulario oculto, aviso inducido, capturas
+iniciales, retorno y reducido. En320 el acceso rectangular crece principalmente
+en altura; se comprueba área, no duplicación del ancho. Confirmación visual del usuario y
+Safari/Firefox/dispositivo físico pendientes; sin despliegue ni auditoría global.
+
+## Forma del botón visible desde el primer fotograma —21/10/2026
+
+Nueva observación del usuario: seguía sin percibirse el nacimiento desde el
+botón. La validación anterior comprobaba geometría y contraste intermedio,
+pero no detectaba que el keyframe de apertura ocultaba la superficie con
+opacidad0 y blur10px. Se elimina ese fade/blur de entrada: opacidad1 y sin
+desenfoque, según la variante shell de Sader. Se mantienen Flip, curva0.7s,
+radio/color reales, disolución del relleno y cuerpo oculto hasta finalizar.
+ADR-125 y ficha de transiciones actualizadas; sin cambio de alcance funcional.
+
+Prueba ampliada con fotogramas0/2/5/10/15%, opacidad1, sin blur y relleno
+visible, además de contenido oculto hasta99%. Capturas revisadas del círculo
+de nueve puntos y del acceso rectangular. Dev5173 aprobado en1255/390;
+build aprobado por ambos disparadores en1852/1255/390/320 con retorno,
+reaperturas y movimiento reducido. Regresión de navegación aprobada, incluidos
+borrador cancelado, resize e identidad. Typecheck,71 pruebas y build correctos.
+Solo evidencia local en Chrome con fixture; pendiente confirmación visual del
+usuario y Safari/Firefox/dispositivo físico. Sin despliegue ni auditoría global.
+
+## Apertura de Reportar perceptible —21/10/2026
+
+El usuario precisa que se refiere a la apertura de Reportar. Causa confirmada:
+el cuerpo permanecía oculto y su superficie pintaba el mismo degradado del fondo,
+por lo que GSAP movía geometría que no contrastaba. Ahora se captura únicamente
+color/radio del control, junto a su rect, y el componente real nace con ese relleno.
+Flip conserva curva/duración; el relleno se disuelve linealmente en la misma
+timeline hasta transparencia para llegar al fondo real sin salto de color.
+El formulario sigue oculto hasta completar apertura y no se clonan pantallas.
+
+QA de origen añade contraste efectivo del relleno y opacidad durante apertura,
+sin limitarse a matrices/rects. Sincroniza también el keyframe CSS con GSAP para
+capturar el fotograma45%; revisado con superficie visible. Validación dev5173
+con fixture por ambos accesos a1255/390; QA del build aprobada en1852/1255/390/320,
+incluidos apertura/cierre, contraste, contenido oculto hasta100%, ausencia de
+copias, reducido y reaperturas. Regresión de navegación aprobada (borrador,
+resize, retorno e identidad).71 pruebas, typecheck y build correctos.
+Sin despliegue; Safari/Firefox/físico pendientes, sin auditoría global.
+
+## Motor de origen sustituido por código de Sader —21/10/2026
+
+Por instrucción explícita reiterada, reemplazado el motor de navegación desde
+origen: GSAP3.15.0 y código de PrettyModal (Flip.getState/from/to, scale:true,
+CustomEase original,0.7s y sus keyframes). OriginPageSurface es el componente
+vivo; su cuerpo permanece oculto hasta terminar. Eliminados clonado de Inicio,
+hold/previous, superficie paralela y WAAPI manual. El cierre anima antes de
+desmontar/cambiar ruta y permanece oculto hasta el commit, sin destello al
+restaurar estilos. [ADR-125](decisiones/125-origen-web-reemplazado-por-sader-gsap-flip.md)
+registra la excepción explícita a tiempos/fases de ADR-124 solo en este motor.
+Perfil/Alertas y Flutter conservados. Los apartados siguientes describen el
+historial de las aproximaciones retiradas, no el motor vigente.
+
+QA Chrome en dev5173 y build con APIs/backend fixture: nueve puntos y acceso
+negro de Inicio en1852/1255/390/320; rect inicial coincide con control real,
+duración0.7s, cuerpo oculto incluso99%, visible al100%,0 copias/capas antiguas,
+cierre con componente montado, reaperturas reales y reducido. Texto200% a320px
+comprobado por ambos accesos. Capturas de0/45/99/100% y cierre revisadas en
+apps/mobile/build/ui-preview/web-origin-sader. Typecheck,71/71 pruebas y build
+aislado correctos. Regresión check-navigation-motion-browser.mjs aprobada:
+barra/marca, retorno local/ruta, cancelación de borrador, resize, reducido e
+identidad. check-dialog-motion-browser.mjs confirma Perfil/Alertas conservados,
+incluidos foco, texto200%, resize/reducido/desmontaje y reproducción real.
+
+Sin datos/sesión/backend reales, despliegue, cambios de SQL, operaciones o cierre
+de historias. Siguiente paso: revisión del usuario en su pestaña y Safari/Firefox/
+dispositivo físico. No acredita auditoría global de animaciones.
+
+## Contenido crece desde el origen con FLIP real —21/10/2026
+
+Nueva corrección tras captura e instrucción reiterada del usuario. Los ajustes
+anteriores mantenían el cuerpo con escala .98→1 en su posición final: el recorte
+por sí solo no cumplía el movimiento solicitado. OriginTransitionHost ahora
+traslada y escala superficie y contenido vivo con la misma matriz, siguiendo
+PrettyModal/ExpandIntactModal de sader-panel. Layout final medido una vez e
+invertido al rect real; radios/icono compensados,320/260ms y fases conservados.
+La fuente no se limita a nueve puntos: también el acceso negro Reportar de Inicio.
+Al montar se eliminan capas huérfanas de versiones anteriores durante HMR.
+
+QA Chrome ejecutado contra el servidor existente127.0.0.1:5173, con APIs
+interceptadas hacia backend fixture (sin datos/cookies/operaciones de la cuenta
+real). Ambos disparadores en1852/1440/390/320: primer fotograma coincide con su
+rect, cuerpo y superficie tienen la misma escala en0/15/45/65/75/85%, no hay
+formulario visible antes del movimiento ni contenido antes65%. Escala inicial
+de nueve puntos a1852px:0.0345572 horizontal y0.0820513 vertical, en lugar de.98.
+Dos fotogramas de preparación por caso,0 vacíos; tres reaperturas por caso,
+retorno/reducido y limpieza correctos. Capturas first-frame/opening/content en
+apps/mobile/build/ui-preview/web-origin-continuity, con prefijos nine/shortcut.
+Typecheck y build aislados correctos,71/71 pruebas aprobadas. La misma QA de
+ocho combinaciones pasa también contra el build de producción; regresión
+check-navigation-motion-browser.mjs aprobada (retorno local/ruta, cancelación,
+resize, movimiento reducido, cambio de cuenta y estabilidad de marca/barra).
+Sin despliegue ni auditoría global; pendiente revisión del usuario en su pestaña
+y Safari/Firefox/dispositivo físico.
+
+## Expansión de Reportar sin accesos de Inicio superpuestos —21/10/2026
+
+Corrección tras captura del usuario: la validación anterior comprobaba cobertura,
+pero no descartaba mezcla de contenido anterior y destino. Se revisan PrettyModal
+y ExpandIntactModal de sader-panel y se adapta su principio de superficie y
+contenido recortados juntos, sin introducir React/GSAP ni cambiar320/260ms.
+El formulario se recorta al rect animado; el host se vincula al shell del destino
+real y sale de él al terminar. El controlador espera el montaje real hasta2s
+(salida limpia ante fallo/cambio de ruta/actor) y retira la copia anterior por
+referencia aunque su contenedor haya cambiado. Permisos y datos conservados.
+
+Validación local: typecheck,71/71 pruebas y build aislado correctos. Chrome
+check-origin-continuity-browser.mjs ampliado a1852/1440/390/320, apertura/fase
+de contenido/cierre, límites geométricos del recorte y ausencia de accesos
+clonados/hosts huérfanos; tres reaperturas por ancho y movimiento reducido.
+Cobertura previa:2 fotogramas por ancho,0 vacíos. Capturas desktop/móvil revisadas
+en apps/mobile/build/ui-preview/web-origin-continuity. Regresión
+check-navigation-motion-browser.mjs correcta: retorno local/ruta, cancelación,
+resize, cambio de cuenta, marca y fases. Backend fixture; sin despliegue ni
+verificación Safari/Firefox/dispositivo físico. Siguiente paso: revisión del
+usuario en su instancia; no constituye auditoría global de animaciones.
+
+## Expansión web sin fotogramas vacíos —21/10/2026
+
+Corregido el parpadeo del botón de nueve puntos al entrar en Reportar: la copia
+decorativa saneada de la pantalla anterior se monta antes de navegar, fuera de
+NuxtPage, y se transfiere al host cuando la expansión está lista. Cubre también
+los dos requestAnimationFrame de preparación; no modifica320/260ms, curvas,
+fases, origen/destino ni retorno. Limpieza al completar/cancelar, cambiar actor,
+resize, preferencia reducida o desmontaje; copia inerte, sin persistencia nueva.
+
+Validación local: typecheck,71/71 pruebas y build aislado .nuxt-origin-flicker
+correctos. Chrome check-origin-continuity-browser.mjs registra2 fotogramas de
+espera y0 descubiertos en cada ancho1440/390/320; capturas de apertura/cierre
+revisadas, retorno y modo reducido correctos. check-navigation-motion-browser.mjs
+pasa expansión/fases, retorno local/ruta, marca, navegación cancelada, resize,
+modo reducido y cambio de cuenta. Evidencia con backend fixture en
+apps/mobile/build/ui-preview/web-origin-continuity. Sin despliegue; siguiente
+paso: revisión del usuario y Safari/Firefox/dispositivos físicos. No acredita
+auditoría global de animaciones.
+
+## Barra web estable al cambiar el scroll —21/10/2026
+
+Corregido el salto horizontal de la navegación al aparecer/desaparecer el
+scroll vertical por carga de contenido o bloqueo del scroll en paneles.
+main.css reserva el canal mediante scrollbar-gutter:stable en html; conserva
+la barra persistente, selección animada, dimensiones y reglas de acceso.
+
+QA local reproducible: scripts/check-navigation-stability-browser.mjs, Chrome
+con scrollbar clásica visible (sin --hide-scrollbars). Antes: salto7,5px;
+después: variación0px en posición/tamaño a1440/390/320, con navegación,
+lecturas demoradas, contenido largo y apertura/cierre de Perfil.71/71 pruebas,
+typecheck y build aislado aprobados sin detener el dev server. Build conserva
+avisos preexistentes de BigInt/target y deprecación de exports de Vue.
+Sin despliegue. Siguiente paso: comprobar Safari/Firefox y dispositivos físicos.
+
+## Regla global de animaciones y corrección Perfil/Alertas —21/10/2026
+
+Por instrucción explícita del usuario, AGENTS y reglas UI/UX móvil/web exigen
+que las animaciones equivalentes coincidan en efecto, origen/destino, sentido,
+duración, curvas, fases y retorno. Solo se adapta geometría final al viewport;
+divergencias necesitan instrucción expresa y registro. ADR-124, arquitectura,
+guía, diseño y fichas actualizados. La regla es global; esta entrega verifica
+Perfil/Alertas y no acredita auditoría de todas las animaciones existentes.
+
+Se corrige la omisión previa de GlassDialog: apertura desde avatar/campana real
+320ms y contracción al mismo control260ms. origin_motion_contract centraliza
+duraciones/curvas/fases móviles; origin_dialog_motion aplica progresión Flutter
+easeInOutCubic, fuente hasta45%, contenido desde65%/easeOutCubic y escala según
+ancho. Perfil no fabrica icono de fuente; Alertas conserva solo SVG decorativo.
+Contenido y diálogo permanecen hasta finalizar salida. Se conserva el panel
+glass responsive; operaciones, sesión, permisos y backend sin cambios.
+
+Interacción inerte durante expansión, Escape disponible, foco al control
+después del cierre. Resize/preferencia/desmontaje cancelan animaciones y limpian
+estilos temporales/nodos/inert/scroll. Apertura/cierre rápidos y respuestas
+tardías no dejan overlays bloqueados ni contenido invisible.
+
+Validación: typecheck/build aislado correctos y71/71 pruebas aprobadas,
+incluida paridad automática contra las rutas/intervalos/curvas Dart. QA normal
+check-dialog-motion-browser.mjs pasa tiempos y fotogramas reales de apertura/
+contenido/cierre, origen exacto, foco/marca,1440/390/320/texto200%, resize,
+preferencia reducida en vivo, cierre durante apertura, recarga/desmontaje y
+reproducción a tiempo real. Capturas mobile de apertura/contenido/cierre
+revisadas en apps/mobile/build/ui-preview/web-dialog-motion. Las capturas se
+toman del viewport sin redimensionarlo para no interrumpir la animación.
+Regresiones check-inbox-browser.mjs, check-home-browser.mjs y
+check-navigation-motion-browser.mjs aprobadas con fixtures, sin errores CSP/
+hidratación ni overflow. Diff-check limpio.
+
+Sin cambios Flutter, datos, dependencias ni despliegue. Próximo paso: revisión
+del usuario en desarrollo y comprobación en Safari/Firefox/dispositivos físicos.
+
+## Cabecera Home completa: usuario, alertas y glass —21/10/2026
+
+Corrección posterior solicitada por el usuario: cabecera de cuenta con campana,
+avatar privado/iniciales y logout circular accesible. Avatar abre Tu cuenta con
+nombre/correo/ciudad reales; sustituye el desplegable inferior anterior. Las
+iniciales se conservan mientras llega la foto o si no existe. Proxy JPEG propio
+valida cuenta/onboarding/actor, ruta del dueño y tamaño2MiB; no expone Storage,
+URL firmada, teléfono o token. Edición/foto de perfil web no incluida.
+
+Campana compuesta por slots de las cuatro páginas; no importa presentación
+entre funcionalidades. NotificationBell/InboxViewModel/ReadInbox y
+MarkNotificationRead consumen repositorios/DTO HTTP y servidor con InboxSource.
+Lectura/páginas/mark usan RPC de plan027 y JWT de usuario, previa validación de
+sesión/onboarding/X-Account-Actor por operación. POST exige origen y mantiene
+protecciones globales. IDs bigint como cadenas; proyección sin owner/caso/contacto.
+Skeleton/fallo/vacío distintos, refresh con shimmer, lectura confirmada tras
+servidor, retry de lectura idempotente y página fallida. Cambio/expiración de
+identidad y desmontaje descartan datos/respuestas tardías. Sin push/seguimiento/
+preferencias web, enlaces ficticios a casos ni nuevas migraciones/Flutter.
+
+GlassSurface unifica degradado neutro, blur22, ribete y sombra polished móvil
+en tarjetas/controles; GlassDialog comparte panel, backdrop, cierre exterior/X/
+Escape, foco y limpieza de scroll. Marca y navegación persistentes conservadas.
+
+Validación final local: build aislado .nuxt-home-review, typecheck,70/70 pruebas
+unitarias/arquitectura y29/29 de servidor aprobados. Nueva integración prueba
+anónimo, otra cuenta/actor, Origin, onboarding, lectura idempotente, privacidad
+del DTO, error frente a vacío y avatar autorizado/faltante. QA Chrome de
+check-inbox-browser.mjs cubre1440/390/320/texto200%, cabecera, foto/iniciales,
+perfil/Escape/scroll, glass, bandeja lazy/skeleton/errores/reintentos/páginas,
+lectura persistida y aislamiento al cambiar cuenta. Capturas mobile/perfil/
+bandeja revisadas en apps/mobile/build/ui-preview/web-inbox. Regresiones
+check-home-browser.mjs, check-stagger-browser.mjs y check-access-browser.mjs
+aprobadas con fixtures, sin errores CSP/hidratación ni overflow. Diff-check limpio.
+
+Guía, arquitectura, reglas UI web e índice/fichas actualizados. Sin despliegue;
+próximo paso: revisión del usuario y comprobación con backend real, Safari/
+Firefox/dispositivos físicos. No se afirma recepción push ni integración remota.
+
+## Inicio de platform con diseño de móvil —21/10/2026
+
+Por petición del usuario, AccountScreen compone HomeContent de presentación
+con el diseño vigente de Home móvil: título Poppins32/gris y remate azul600,
+accesos negros, ilustración original3:2 y descripción en glass26, Cerca de ti
+con tarjeta glass y enlace a Explorar. Escritorio en dos columnas; responsive
+en secuencia móvil y apilado de accesos en ancho reducido. Poppins600 local
+copiado del mismo recurso móvil con su licencia existente.
+
+Cuenta real conservada en desplegable nativo accesible; gestión/retry dependen
+del permiso existente. Reportar conserva expansión/retorno desde origen.
+Explorar sustituye Mis reportes entre los accesos porque no hay listado propio
+web implementado; no se crean rutas vacías ni se promete geolocalización móvil.
+Sin cambios de dominio, datos, onboarding, política de acceso ni SQL/Flutter.
+
+Validación: typecheck y64/64 pruebas aprobados; build correcto con directorio
+aislado .nuxt-home-review, sin detener el dev server ni eludir su lock.
+Chrome check-home-browser.mjs pasa1440/390/320/texto200%, imagen/fuente, cuenta
+por teclado, tres destinos/retorno, ausencia del pie legal, redirect anónimo
+y gestión por rol. Capturas desktop/mobile/text200 revisadas en
+apps/mobile/build/ui-preview/web-home. Regresiones check-stagger-browser.mjs
+y check-access-browser.mjs aprobadas: entrada real, permisos pendientes,
+movimiento reducido, QR sin JS, acceso/onboarding, retry, roles y logout.
+Diff-check sin errores. Documentadas reglas web y fichas de Inicio/acceso/
+navegación. Sin despliegue; próximo paso: revisión del usuario y backend real,
+Safari/Firefox/dispositivos físicos. Sustituye el build pendiente del ajuste
+anterior de cabeceras/pie de cuenta; los cambios anteriores se mantienen.
+
+## Cabeceras y pie de cuenta simplificados —21/10/2026
+
+Por petición explícita, retiradas las frases decorativas sobre títulos en
+Inicio («Más caminos de vuelta a casa»), Explorar/Mis mascotas/Reportar
+(«Cada huella cuenta»), Moderación y tarjeta de gestión. Eliminado el pie de
+Términos/Privacidad de AccountScreen, compartido por las secciones autenticadas.
+El espacio inferior pasa al contenido para conservar acceso sobre la barra
+flotante. Enlaces legales públicos/login/registro y etiquetas de tipo/estado
+se conservan. Sin cambios de dominio, datos, sesión ni permisos.
+
+Validación local: typecheck y64/64 pruebas aprobados. Build intentado pero
+rechazado por el lock del servidor Nuxt de desarrollo activo en127.0.0.1:5173;
+se conserva ese proceso. Revisión visual responsive y build pendientes.
+Reglas web y fichas de navegación/acceso/moderación/legales actualizadas.
+Sin despliegue. Siguiente paso: revisión visual del usuario y build cuando
+el servidor de desarrollo no esté utilizando el directorio de Nuxt.
+
+## Reportar con carga por componente —21/10/2026
+
+Por autorización del usuario, Reportar ya no oculta el formulario completo hasta
+recibir mascotas/búsquedas. Tras la política de acceso, monta campos y mapa e
+inicia en paralelo lecturas remotas y borrador local. La restauración local
+deshabilita brevemente la edición para no sobrescribirla; las consultas remotas
+solo afectan sus selectores, con FieldSkeleton compartido. RecoveryViewModel
+entrega cada resultado al llegar y mantiene readiness/fallo/petición por fuente.
+Fallo no equivale a vacío; retry específico, deduplicado, conserva lo escrito.
+
+Publicar espera solo la lista pertinente al tipo de reporte, con validación y
+autorización existentes. Guardar borrador antes de recibir metadata conserva
+las referencias, versión y fotos restauradas. Respuestas tardías se descartan
+al desmontar o confirmar publicación; reintento ambiguo conserva su payload.
+Explorar/Mis mascotas, política global, sesión preparada y animación conservados.
+
+Validación: typecheck/build y64/64 pruebas correctos. QA Chrome con fixtures pasa
+check-report-loading-browser.mjs: mascotas/búsquedas/módulo Leaflet retenidos,
+inputs utilizables, selectores/mapa independientes, error/retry de una sola
+fuente, borrador editado/guardado antes de recibir listas con IDs/version/fotos
+íntegros y390/320 sin overflow/CSP/hidratación. Captura revisada en
+apps/mobile/build/ui-preview/web-report-loading/fields-before-data.png.
+Regresión check-recovery-browser.mjs confirma crear/editar/foto, filtros, cuatro
+tipos de reporte, borrador y retry ambiguo, incluido texto200%. Diff-check correcto.
+
+ADR-123, arquitectura, reglas, guía y ficha actualizadas. Sin caché, SQL,
+endpoints, permisos, Flutter ni despliegue nuevos. No se ha medido la latencia
+real del backend; la validación de acceso aún puede esperar su respuesta.
+Siguiente paso: revisión del usuario y validación remota/Safari/Firefox/físicos.
+
+## Etiqueta y borde de inputs/textarea —21/10/2026
+
+Corregido TextField compartido a partir de las capturas del usuario: la etiqueta
+ya no pinta un rectángulo opaco sobre el degradado. Un fieldset/legend decorativo
+con aria-hidden recorta la muesca real del borde; el label/for permanece visible
+y transparente. Campo vacío sin foco mantiene el contorno cerrado; al enfocar
+o conservar texto tras blur abre la muesca. Foco/error tienen un único trazo;
+retirado el ribete/fondo de hover heredado. Etiquetas largas reservan sus líneas
+adicionales y no se superponen al valor con texto200%; base48px conservada.
+
+Validación local: build, typecheck,62/62 pruebas y diff-check correctos.
+Chrome QA de TextField pasa input/textarea vacíos, hover, foco, texto/blur,
+invalid,390/320/texto200% y etiqueta larga sin superposición. Capturas revisadas
+en apps/mobile/build/ui-preview/web-text-field. También pasaron QA de controles,
+avistamientos QR y moderación; después del ajuste final de espacio/rem se
+repitieron TextField y QR. Sin errores de página/CSP/hidratación ni overflow
+horizontal en estos escenarios. ADR-122/ficha/desarrollo actualizados.
+
+Sin cambios de dominio, datos, permisos o Flutter ni despliegue. Siguiente paso:
+revisión del usuario; Safari/Firefox y dispositivos físicos siguen pendientes.
+
+## Tema celeste en los controles adaptados de Sader —21/10/2026
+
+Por petición del usuario, fields.css sustituye colores neutros fijos por roles
+CSS compartidos: superficies celestes suaves, selección #D6E8FF/texto #244C75,
+hover #E5F2FA, foco #2C87CE, loader #2887EF y error #B53F48. Aplica a inputs,
+selectores, paneles, calendario/hora y línea superior; conserva las dimensiones,
+animaciones y comportamiento anteriores. Sin selector de temas, cambios de
+dominio/datos, otras pieles ni Flutter. Refinamiento documentado en ADR-122.
+
+Validación: build correcto; check-fields-browser.mjs pasa con backend fixture,
+comprobando colores reales de selección/calendario/hora/foco/loader, morph,
+teclado, búsqueda, movimiento reducido,1920/1440/731/390/320 y texto200%, sin
+errores CSP/hidratación ni overflow horizontal. Capturas revisadas en web-fields.
+Contrastes calculados de pares locales: selección7.12:1, texto secundario5.44:1,
+hover4.81:1 y foco3.64:1; no equivalen a una auditoría global. Diff-check correcto.
+Pendiente: revisión del usuario y Safari/Firefox/dispositivos físicos; sin despliegue.
+
+## Línea superior que seguía cargando —21/10/2026
+
+Corregido el ciclo de vida del loader reportado por el usuario. NuxtPage recibía
+una función inline nueva en cada render de app.vue; Nuxt observa esa identidad
+y podía emitir page:loading:start al actualizar cabecera/navegación sin otra
+carga pendiente. pageKey ahora conserva una referencia estable. TopLoadingBar
+deja de iniciar una segunda vez desde beforeEach y termina también al confirmar
+la ruta y en page:finish, además del cierre normal/error. No modifica el diseño
+de la línea, política de acceso ni preparación de sesión.
+
+Validación local: build, typecheck y62/62 pruebas correctos. Nueva regresión
+check-top-loading-browser.mjs pasa Chrome con fixture: login/montaje de barra,
+recarga autenticada, cambios de sección, consulta de acceso retenida (loader
+visible durante trabajo real), query/hash/ruta duplicada, guard abortado,
+redirección por sesión y legales. Tras cada escenario la línea queda oculta,
+sin errores de página. Sin despliegue ni comprobación Safari/Firefox.
+
+Siguiente paso: comprobar el recorrido original del usuario en su navegador.
+
+## Controles web compartidos desde sader-panel —21/10/2026
+
+Por petición explícita, adaptados FieldSelect, inputs con etiqueta flotante/inset,
+calendario y selector horario como componentes reutilizables de apps/platform.
+MorphPanel comparte expansión centrada desde el control, radio32px,
+apertura420ms/cierre300ms, curva power3.out y blur12px. Piel local Inter y
+medidas/colores/iconos de la referencia; crecimiento natural con texto ampliado.
+Sustituidos controles en filtros, mascotas, reportes, avistamientos y motivo de
+moderación. Retirados estilos antiguos que contaminaban campos y buscador.
+TopLoadingBar reproduce el segmento40%/670ms en línea4px superior durante
+navegación real, incluida espera de política de acceso, con cierre por éxito,
+cancelación/error y pulso sin desplazamiento en movimiento reducido.
+Excepción explícita a ADR-027 solo para esta línea de navegación web.
+
+Validación final local: typecheck correcto;62/62 pruebas; build correcto con
+NUXT_BUILD_DIR=.nuxt-fields-validation, conservando el servidor dev existente;
+git diff --check sin errores. Chrome QA de fields/recovery/sightings/moderación
+correcto con fixtures: frames de morph/blur, búsqueda sin tildes, teclado/foco,
+loader durante consulta de sesión retenida, fecha/hora local hasta23:59,
+1920/1440/731/390/320 y texto200%/movimiento reducido. Formularios confirman
+persistencia/reintentos de los cuatro tipos de reporte, mascota/foto/borrador,
+avistamiento anónimo/EXIF y decisiones autorizadas. Sin fallos de hidratación,
+CSP ni overflow horizontal en los escenarios comprobados. Capturas revisadas en
+apps/mobile/build/ui-preview/web-fields, web-recovery, public-sightings y moderation-web.
+
+ADR-122, reglas de arquitectura/UI, guía y fichas actualizadas. Sin cambios
+de dominio/data/SQL, permisos, Flutter, backend remoto ni despliegue. No cierra
+historias ni acredita equivalencia píxel a píxel en todos los navegadores.
+Siguiente paso: revisión del usuario y validación Safari/Firefox/dispositivos
+físicos; integración remota de los recorridos sigue pendiente según sus fichas.
+
+## Navegación web sin esperas repetidas —20/10/2026
+
+Por petición del usuario, corregida la pausa al cambiar secciones. AccountScreen
+ya no emite un cambio de identidad en cada montaje, que invalidaba la caché de
+su propia pestaña. Bootstrap reutiliza la proyección vigente de15s para iniciar
+ViewModel/repositorio ligados al actor después de hidratar, sin skeleton ni
+segunda lectura de sesión tras la política global. La hidratación inicial
+conserva el estado SSR; vencimiento, foco, avisos y cambios de cuenta mantienen
+invalidación. Gestión se consulta solo en Inicio. No se cachean permisos ni se
+elimina autorización por operación.
+
+NavigationLink prepara código/sesión por intención; la barra prepara código de
+sus destinos. Ruta exacta activa no repite consultas. StaggerReveal general usa
+240ms/35ms, máximo140ms de retraso, sin blur ni entrada superpuesta a la expansión
+desde origen. Onboarding/login conservan parámetros propios. Identidad/perfil
+y requisitos de Reportar se leen en paralelo sin exponer resultados antes de
+validación. ADR-121, arquitectura, reglas, guía y tres fichas actualizadas.
+
+Comparación local de builds anterior/posterior en Chrome con backend fixture y
+250ms añadidos a cada lectura de sesión: seis cambios provocaban seis consultas
+extra; ahora cero dentro del plazo vigente. Mediana clic→encabezado visible de
+339,5ms a51ms (aproximadamente85% menos); primera navegación posterior156ms,
+restantes40–69ms. Estas cifras incluyen automatización y no acreditan producción
+ni latencia real de Supabase. Evidencia JSON/captura revisada en
+apps/mobile/build/ui-preview/web-navigation-performance; script reproducible
+apps/platform/scripts/check-navigation-performance-browser.mjs. La comparación
+usa encabezados, no los tiempos de contenido del registro anterior.
+
+Validación local: build Nuxt/typecheck,62/62 pruebas unitarias/arquitectura y
+28/28 de servidor aprobadas. QA Chrome de rendimiento comprueba TTL real15s,
+invalidación, recarga/hidratación y ausencia de errores; regresión de acceso,
+onboarding/reintento, roles, logout entre pestañas y recuperación completa con
+mascotas/fotos/cuatro reportes aprobada. Stagger comprueba fotogramas reales,
+retrasos35ms, texto200%, movimiento reducido y QR sin JS. Renders1440/390/320
+y otros anchos en scripts existentes, sin overflow/CSP/hidratación.
+
+Sin SQL, despliegue ni acciones GitHub. Siguiente paso: revisión del usuario en
+su navegador y medición en producción/dispositivos físicos cuando se autorice
+publicar. La latencia de las operaciones y la revalidación tras vencer15s siguen
+dependiendo de la red; no se promete navegación instantánea en toda condición.
+
+## Barra web sin elevación al hover —20/10/2026
+
+Por corrección explícita con captura, retirado translateY(-2px) del acento en
+UserNavigation, también en foco/presión. Conserva brillo, tamaño compacto,
+selección deslizante y arrastre con retorno. Reglas y fichas actualizadas.
+Validación: typecheck/build y QA Chrome con backend fixture correctos, incluida
+igualdad de posición vertical antes/durante hover de la opción seleccionada;
+regresión de navegación, arrastre y movimiento reducido aprobada. Sin despliegue.
+Siguiente paso: revisión del gesto en dispositivo físico.
+
+## Retirado el impulso al hover de la barra web —20/10/2026
+
+Por corrección del usuario, eliminado previewPush y su animación horizontal al
+pasar el puntero. Se conserva el ancho compacto304px, el arrastre con retorno y
+el deslizamiento al seleccionar sección. Reglas y fichas actualizadas.
+Validación: typecheck/build y QA Chrome con backend fixture correctos; hover sin
+impulso, arrastre con retorno, navegación y movimiento reducido comprobados.
+Sin despliegue. Siguiente paso: revisión táctil en dispositivo físico.
+
+## Barra web compacta y retorno elástico —20/10/2026
+
+Por petición explícita, UserNavigation limita el conjunto a304px (antes480px).
+Las tres opciones miden aproximadamente71×52px, más redondeadas; se conservan
+glass, iconos, selección azul y Reportar. Hover impulsa el acento hasta6px y
+vuelve en480ms. Arrastre horizontal lo desplaza hasta8px y al soltar retorna;
+un arrastre no activa enlaces. Movimiento reducido elimina el desplazamiento
+extra; cambio de ruta, cancelación y desmontaje limpian el gesto/animación.
+
+Validación: typecheck/build correctos,59/59 pruebas, git diff --check y QA Chrome
+con backend fixture aprobados. Renders1920/1440/731/390/320, áreas táctiles≥48px,
+impulso/retorno, arrastre sin navegar, movimiento reducido y regresión de
+transiciones, sin errores CSP/hidratación. Captura390 revisada visualmente;
+evidencia en apps/mobile/build/ui-preview/web-navigation-motion/compact-*.png.
+Sin despliegue. Siguiente paso: revisar sensación del gesto en dispositivo físico
+y publicar cuando se autorice; la evidencia local no confirma integración remota.
+
+## Cierre de Reportar web —20/10/2026
+
+El recorrido abierto desde los nueve puntos incorpora X circular glass sticky,
+mediante GlassNavigationButton compartido. Vuelve a la sección de cuenta de
+origen; sin origen de cuenta, a Inicio. Mantiene el guard de cambios sin guardar,
+el bloqueo durante operaciones y la transición de retorno existente.
+Validación: typecheck correcto,12/12 pruebas de recuperación/arquitectura y
+git diff --check correctos. Pendiente QA visual/interacción en navegador;
+sin publicación. Siguiente paso: revisar cierre limpio, cancelar/confirmar
+salida con cambios y entrada directa en navegador.
+
+## Barra web sin tooltip —20/10/2026
+
+Por petición explícita, retirado title de Inicio, Explorar, Mis mascotas y
+Reportar en UserNavigation. Se conservan aria-label, foco y efectos existentes.
+Regla web y fichas de navegación/transiciones actualizadas.
+Validación: npm run typecheck y git diff --check correctos. Sin despliegue;
+pendiente comprobación visual del hover en navegador y publicación autorizada.
+Siguiente paso: comprobar la barra en la web al actualizar la versión.
+
+## Segunda revisión SEO sin cambiar el hero aprobado —20/10/2026
+
+Comprobación HTTPS de producción:200 con título antiguo, sin JSON-LD ni tarjeta
+summary_large_image. Las mejoras locales previas aún no están publicadas.
+La extensión.app no garantiza mejor ranking; dominio propio recomendado por
+claridad de marca, con migración permanente documentada para cuando esté activo.
+
+Nuevo incremento: variantes WebP320/640 para hero por viewport/densidad, con fuente
+completa y PNG de respaldo conservados. No cambia texto, CSS o composición de
+ADR-120. Variante social JPEG1200×630 de la ilustración pública aprobada,89.933
+bytes frente a3.628.600 anteriores, con Open Graph/JSON-LD coherentes. Generación
+reproducible en el script existente; sin dependencias, SQL ni endpoints nuevos.
+
+Validación: build/typecheck correctos,59/59 pruebas unitarias/arquitectura y28/28
+de servidor aprobadas. QA Chrome1440/731/390/320, texto200 %, sin JS, animaciones,
+FAQ/teclado/anclas, CSP/hidratación y QR aprobado. A1440px DPR1/2/3 el navegador
+elige320/640/completo; fuente Arial, tamaño100.8px y color #171918 conservados.
+Peso conjunto de hero:186.122/702.904/2.604.418 bytes según densidad. DPR1 reduce
+92,9 % respecto a WebP completos; no implica igual reducción de toda la página.
+Capturas en ui-preview/landing-vue y logs platform-seo-next-* en apps/mobile/build.
+
+Pendiente: despliegue autorizado, propiedad/Search Console/sitemap, indexación y
+Core Web Vitals reales. No se afirman puntuaciones Lighthouse, posiciones o
+tráfico sin medir. Siguiente paso: publicar y comprobar la portada real antes
+de migrar dominio. Se mantiene el trabajo local anterior y no se realiza push.
+
+## Título original de landing restaurado —20/10/2026
+
+Por petición explícita con dos capturas, recuperados del padre de1fc1bd1 los
+valores originales del hero: Arial500/#171918, line-height1.02, tracking−0.055em,
+clamp42px/7vw/108px y móvil32–48px, junto con mascotas laterales62–148px y offsets
+previos. La reducción provenía de la unificación de títulos ADR-111; no de una
+necesidad de SEO. La afirmación anterior de conservación de tipografía en el
+relevo de SEO era incorrecta: las capturas de aquel QA ya mostraban el hero reducido.
+
+typography.css excluye solo #hero-title; los demás h1 conservan Poppins. ADR-120,
+AGENTS, normas, diseño, arquitectura, guía y ficha/índice registran la excepción
+explícita. Metadatos SEO, imágenes WebP y demás cambios locales conservados.
+
+Validación: build Nuxt correcto,59/59 pruebas unitarias/arquitectura aprobadas;
+QA Chrome de landing1440/731/390/320, texto200 %, animaciones/movimiento reducido,
+SSR/FAQ sin JS y navegación QR aprobado, sin overflow ni errores CSP/hidratación.
+Captura desktop-top revisada: vuelve el título grande oscuro de la referencia.
+Logs platform-hero-* en apps/mobile/build; capturas en ui-preview/landing-vue.
+Sin despliegue. Siguiente paso: revisión visual del usuario antes de publicar.
+
+## SEO de landing y futura migración de dominio —20/10/2026
+
+Revisión de producción por HTTPS: portada200, HTML SSR con título/description/
+canonical, robots200 y sitemap200 del dominio entrehuellas.kormind.com.
+Faltaban imagen social, og:url/identidad estructurada y configuración unificada
+del dominio; las doce ilustraciones PNG originales sumaban27.134.705 bytes.
+No se consultó Search Console ni se midieron rankings/Core Web Vitals reales.
+
+Implementación local: título/descripción orientados a mascotas perdidas/encontradas,
+apoyo del hero explícito, Open Graph/Twitter con ilustración pública existente y
+JSON-LD WebSite/Organization/WebPage bajo nonce CSP. NUXT_PUBLIC_SITE_URL centraliza
+canonical/social/JSON-LD/robots/sitemap y admite cambio en runtime; HTTPS validado
+sin depender de Host, cabeceras reenviadas o campañas. El dominio actual permanece
+predeterminado. Sitemap solo incluye portada; QR/cuenta/legales conservan noindex,
+autorización y proyecciones. Sin datos privados ni disponibilidad/valoraciones falsas.
+
+WebP sin pérdida y picture con respaldo PNG reducen las doce ilustraciones a
+15.165.652 bytes (−44,1 %). Script reproducible verifica alfa y todos los RGB
+visibles; conserva PNG, dimensiones y lazy loading. Picture usa display:contents
+para conservar las ventanas aprobadas; revisión de capturas confirma encuadre.
+
+Validación final local: build Nuxt, typecheck,59/59 pruebas unitarias/arquitectura
+y28/28 de servidor aprobadas. Pruebas comprueban JSON-LD/nonce/imagen, URL canonical
+sin campañas, cambio a entrehuellas.app en runtime sin residuos del dominio anterior,
+Host ajeno ignorado y noindex privado conservado. QA Chrome pasa1440/731/390/320,
+texto200 %, movimiento reducido/animaciones, FAQ/teclado/anclas, navegación QR y
+SSR sin JS; WebP realmente seleccionado, sin overflow ni errores CSP/hidratación.
+Capturas revisadas en apps/mobile/build/ui-preview/landing-vue; logs platform-seo-*
+en apps/mobile/build. No acredita rendimiento de usuarios reales ni indexación.
+
+Ficha landing/índice, guía, desarrollo y ejemplo de entorno actualizados con
+activación y pasos DNS/HTTPS, redirecciones permanentes, OAuth/orígenes/cookies
+y Search Console para la futura migración. Cambios previos de navegación conservados.
+Sin SQL, compras, push, despliegue ni acciones remotas de configuración.
+Siguiente paso: publicar este incremento autorizado en una tarea de despliegue,
+verificar HTML/robots/sitemap reales y registrar la propiedad en Search Console.
+
+## Barra solo con iconos y animaciones móviles reutilizadas en web —20/10/2026
+
+Corregida la adaptación por petición del usuario: desaparecen las etiquetas
+visibles también en escritorio, conservando aria-label/title/foco. La barra vive
+fuera de NuxtPage y conserva instancia/posición entre las cuatro rutas de cuenta;
+se habilita tras confirmar sesión/bienvenida. El indicador azul único se desliza
+320ms con la curva móvil; los iconos interpolan gris/blanco según su posición.
+Hover/foco/presión elevan el acento2px/200ms. Glass/ribete/sombra refinados según
+GlassSurface y NavigationAccentSurface; Reportar sigue negro con nueve puntos.
+
+Nuevo controlador origin_transition y OriginTransitionHost/OriginActionButton,
+compuestos por plugin navigation_motion. NavigationLink opta con origin. Se
+aplican a Reportar, Registrar/Editar mascota y revisión autorizada desde Inicio;
+retorno de ruta y cierre local invierten el efecto. Entrada320ms/retorno260ms,
+origen hasta45% y contenido desde65%, según OriginPageTransition móvil. Marca y
+barra permanecen fuera. Entrada directa/recarga no simulan un origen; los guards
+de autorización y cambios pendientes siguen siendo los existentes.
+
+La transición espera el montaje de Nuxt y opera dentro de su shell. Mantiene
+una copia visual anterior transitoria/inerta, sin campos de formulario, scripts,
+IDs, diálogos o avisos; se libera al completar/cancelar y no se guarda en el
+registro de retorno, SSR o almacenamiento. Cambio de identidad cancela y limpia;
+resize/orientación/movimiento reducido/desmontaje liberan máscara, inert,
+animaciones y frames. CSS/WAAPI/CSSOM conservan la CSP estricta, sin unsafe-inline.
+
+Validación local: build y typecheck correctos,58/58 pruebas unitarias/arquitectura
+y27/27 de servidor. QA Chrome nuevo comprueba fotogramas del indicador y expansión,
+contenido tardío, continuidad real del nodo de barra, retorno de ruta/local,
+cabecera estable, descarte cancelado, resize, movimiento reducido y cierre de
+sesión a mitad de efecto sin datos anteriores visibles. Capturas revisadas en
+apps/mobile/build/ui-preview/web-navigation-motion; sin errores CSP/hidratación.
+Regresión Chrome de recuperación y acceso, con backend fixture y renders
+1440/390/320/texto200%, documentada en sus scripts. No acredita pruebas remotas.
+
+ADR-119, ficha transiciones-web/índice, navegación web, reglas visuales, diseño,
+arquitectura, guía y desarrollo actualizados. Sin SQL/backend/Flutter ni nuevas
+dependencias. El dev server existente se conservó y producción se verificó con
+NUXT_BUILD_DIR aislado; logs web-motion-build/tests/server-tests en apps/mobile/build.
+Pendiente revisión del usuario y gestos/foco en navegadores físicos. No se ha
+desplegado ni realizado acciones GitHub. Siguiente paso: revisar estos efectos
+en el recorrido real antes de publicar.
+
+## Diagnóstico de acceso denegado en producción —20/10/2026
+
+Comprobado en https://entrehuellas.kormind.com: POST vacío a /api/access/login,
+sin credenciales/cookies, devuelve403 invalid_request con Origin del sitio HTTPS,
+pero422 invalid con Origin http://127.0.0.1:5173. Confirma que producción acepta
+el origen de desarrollo; el middleware rechaza antes de autenticar en Supabase.
+No es una denegación por rol ni evidencia de contraseña incorrecta. También se
+rechazan HTTPS con barra final y HTTP del dominio. Sin cuentas reales ni cambios
+remotos realizados.
+
+Corrección operativa pendiente: configurar PUBLIC_WEB_ORIGIN exactamente como
+https://entrehuellas.kormind.com en el entorno de ejecución de producción y
+reiniciar/recrear el contenedor para que el proceso reciba el nuevo valor.
+Desarrollo conserva http://127.0.0.1:5173. No se relaja CSRF, cookies o permisos.
+Tras aplicar, repetir petición vacía: origen HTTPS debe producir422 invalid y
+localhost403 invalid_request; después verificar acceso real. No requiere SQL
+ni cambio de código. No se ha confirmado aún la corrección remota.
+
+## Navegación de cuenta y recuperación web —20/10/2026
+
+Implementado el alcance confirmado por el usuario: barra estilo móvil con
+Inicio/Explorar/Mis mascotas y Reportar independiente. Cápsula glass flotante,
+selección azul, nueve puntos, etiquetas en escritorio/semántica móvil, foco,
+tooltip y área segura. La marca permanece en la cabecera. Se reserva scroll
+final para acceder a contenido/legales por encima de la barra.
+
+Nuevas rutas account de la política única SSR/cliente. Explorar consulta RPC
+existente con filtros tipo/especie/estado y cursor. Mis mascotas consulta registros
+propios, permite alta/edición con validación y añadir foto mediante Edge existente.
+Reportar publica pérdida propia, posible pérdida, avistamiento y custodia: selección
+de mascota o búsqueda real, fecha/hora, referencia privada, LocationMap y fotos
+verificadas. Los envíos ambiguos conservan UUID/datos y reintentan sin duplicar;
+foto de mascota pendiente también conserva ID/bytes para reintento.
+
+Guardar borrador es local/explícito en IndexedDB por cuenta, con fotos y UUID,
+restaurable hasta siete días y eliminación tras confirmación cuando el navegador
+lo permite. No publica ni sincroniza automáticamente. Toast superior, invalid/
+shake, skeleton inicial y shimmer conservando contenido durante refresh. Salida
+con cambios sin guardar se confirma. Botones apilados en móvil/texto ampliado.
+
+AccountScreen expone slot; las páginas componen recovery sin imports entre
+presentaciones. RecoveryViewModel consume casos de uso/contratos propios; HTTP,
+IndexedDB y fuentes RPC/Edge/Storage en data; composición plugin/Nitro. APIs
+revalidan cuenta/onboarding, actor esperado y origen; publicable/JWT de usuario
+solo en servidor. Fotos recodificadas sin EXIF y proxy con sesión/proyección
+permitida. No se envían rutas Storage, token, referencia exacta o teléfono en
+tarjetas públicas. Consultas Explorar limitadas como lecturas, sin consumir el
+cupo de publicaciones. SQL/RLS/Edge existentes conservados; sin migración nueva.
+
+Validación final local: typecheck y build Nuxt correctos;58/58 pruebas de
+dominio/arquitectura y27/27 de servidor aprobadas. Chrome sobre build de producción
+con backend fixture: cuatro entradas, filtros, mascota alta/edición/foto, cuatro
+tipos de reporte, restauración de borrador y reintento ambiguo sin duplicados.
+Regresión de acceso Chrome completa aprobada: onboarding, roles/revocación,
+reintentos, logout entre pestañas, expiración y OAuth simulado. Renders revisados
+1440/390/320 y texto200%, sin overflow ni errores CSP/hidratación. Logs
+web-recovery-build/tests/server-tests en apps/mobile/build y capturas en
+apps/mobile/build/ui-preview/web-recovery. No equivale a validar RLS remota.
+
+ADR-118, ficha navegacion-web/índice, acceso-web, arquitectura/diseño/regla web,
+guía y desarrollo actualizados. Límite actual: Explorar en lista, hasta100 mascotas
+activas propias, alta/edición/adición de fotos; sin mapa de resultados, ficha web
+autenticada completa, archivo/baja/gestión de galería ni paridad global móvil.
+Pendiente integración Supabase/Edge con dos cuentas reales y revisión en
+dispositivos físicos. No se publicó web/SQL ni se realizaron acciones GitHub;
+trabajo móvil concurrente del selector telefónico conservado. Siguiente paso:
+comprobar estos recorridos con la configuración y datos reales antes de publicar.
+
+## Selector de país con bandera para teléfonos —20/10/2026
+
+Implementado InternationalPhoneField compartido en Perfil y Contacto del
+reportante: bandera vectorial/prefijo seleccionable y entrada del número nacional.
+Panel blanco con tirador, sin X, búsqueda local en español por nombre sin tildes,
+ISO o prefijo; cierre por toque fuera/Atrás/arrastre. Perú/+51 inicialmente en
+campos vacíos; elegir país sin número no crea un valor. En ancho pequeño/texto2
+se apilan selector y número. Scroll integral del panel con teclado/área segura y
+movimiento reducido. Nombre y prefijo accesibles; objetivos del selector48px.
+
+country_picker2.0.28 aporta catálogo/localización y circle_flags5.0.1 los SVG
+locales, dibujados mediante flutter_svg existente. Se evita depender de emojis
+o del loader propio de banderas, que no completaba su precarga en pruebas.
+Versiones fijadas y lock actualizado; sin red, permisos de dispositivo o GPS/IP.
+No se guardan países ISO separados ni se deduce un país de un prefijo ambiguo:
+globo/prefijo hasta elegir; una elección explícita compatible se conserva en
+el formulario. Valores con prefijo desconocido se mantienen completos.
+
+Controller externo/VM/dominio/SQL conservan el contrato internacional. Pegado de
+número completo no duplica prefijo, cambio de país conserva parte nacional,
+ceros iniciales conservados y vacío sigue vacío. Campos existentes no se
+reescriben al montar/cancelar/recargar. Disabled/busy bloquean controles; listeners,
+controller interno y foco se liberan. Conserva validación + y8–15 dígitos, toast
+superior/ShakeField, privacidad y consentimiento independiente por caso/foto.
+No añade patch: siguen pendientes los anteriores031/032/033 y Android físico.
+
+ADR-117, fichas perfil/contacto e índice, arquitectura/diseño y guía actualizados.
+Refinamiento HU-01/05/06/07 RF-01/05/06/13 sin nueva HU/issue ni cierre de historia.
+Cambios ajenos en web conservados.
+
+Validación:31/31 pruebas Flutter aprobadas (selector, perfil/contacto, navegación
+y arquitectura); formato/diff correctos. Incluyen búsqueda por nombre/ISO/prefijo,
+país sin número, pegado completo, borrado, nacional sin prefijo, cambio de país,
+compartidos/desconocidos, ceros, control deshabilitado/cancelación, cambio de
+controller y liberación; panel390 y320/texto2 con teclado simulado sin overflow.
+Renders revisados en apps/mobile/build/ui-preview/country-phone y profile-contact,
+con SVG reales precargados para la captura y fuentes locales.
+flutter analyze sin incidencias (64.4s).
+
+Logs country-phone-final-tests y country-phone-final-analyze en apps/mobile/build.
+No se repite SQL por este cambio de presentación; no hay despliegue, APK o GitHub.
+Pendientes teclado/autofill/banderas/selector en Android físico y activación de
+los patches anteriores. Siguiente paso: prueba física del recorrido de contacto.
+
+## Celular privado de perfil y sugerencia del reportante —20/10/2026
+
+Completado el recorrido solicitado: Perfil permite guardar/eliminar celular de
+contacto opcional, con teclado telefónico, autofill y código de país. Reutiliza
+AppTextField/ShakeField/espaciado existentes y feedback en toast superior. Formato
++ y8–15 dígitos; normaliza espacios, guiones y paréntesis. Sin inferir números ni
+verificación de titularidad SMS. Guardado junto con nombre/ciudad; estado conserva
+borrador ante fallo, cambio de foto/ciudad y bloqueo durante envío; Descartar,
+relectura y cambio de identidad mantienen las garantías existentes.
+
+AccountProfile/DTO, contratos, fuente Supabase, UpdateProfile, ViewModel/estado y
+ProfileEditor ampliados. read_case_contact incorpora suggested_phone solo para
+el autor desde profiles.contact_phone privado. case_contacts consume su propia
+proyección y precarga la sugerencia sin activar contacto/foto. Editar/eliminar
+el número del perfil no altera contactos publicados; se gestionan en cada ficha.
+No amplía proyecciones QR anónimas/PDF/sociales ni acceso a perfiles ajenos.
+
+El contacto por caso ya está preparado en patch031, aún pendiente de activación.
+Nuevo plan033/fuentes112–114, migración20261020003300_profile_contact_phone.sql y
+patch033 generados mediante Build-ProfileContactPhonePatch/Build-Migration y
+Build-RunAll. Aplicar solo pendientes en orden030→031→032→033. Se añade columna
+nullable con restricción de formato, grants por columna/RLS propia y sugerencia
+autorizada. No se reescriben SQL031/032 ni se insertan datos en cuentas reales.
+El validador de run_all admite la nueva columna/estructura sin debilitar rechazo
+de tipo o nulabilidad incompatibles; se verifica repetición sin pérdida de datos.
+
+ADR-116, ficha perfil/contacto e índice, guía HU-01/05/06/07 RF-01/05/06/13,
+arquitectura/diseño, AGENTS y README SQL/patchs actualizados. Sin nueva HU/issue
+ni cierre adicional de historias. Trabajo previo de compartir conservado.
+
+Validación: formato/diff correctos, flutter analyze sin incidencias y39/39 pruebas
+Flutter aprobadas (perfil, SDK simulado, foto, contacto, arquitectura y navegación
+de perfil/casos). Normalización/rechazo/borrado/reintento/cambio de identidad,
+consentimiento desactivado, sugerencia restringida al autor y preservación al
+cambiar foto/ciudad. Renders revisados390px normal y320px/texto2, scroll y sin
+overflow; fixtures en apps/mobile/build/ui-preview/profile-contact.
+SQL/PostGIS local:45/45 pruebas aprobadas en la suite completa. Incluye formato
+autoritativo, aislamiento entre dos cuentas, rechazo anónimo, sugerencia solo al
+autor, consentimiento/retirada, número publicado independiente del perfil y
+repetición del patch033/bundle completo conservando datos y permisos.
+
+Logs profile-contact-verified-tests, profile-contact-final-analyze y
+profile-contact-final-sql en apps/mobile/build. Pendiente aplicar SQL remoto
+031/032/033 después de030 y verificar persistencia, consentimiento, foto y
+teclado/autofill en Android físico. No se ha desplegado SQL, web o APK ni
+realizado acciones GitHub. Siguiente paso: activación de los patches pendientes
+y prueba con dos cuentas en el entorno real.
+
+## Compartir ficha: panel blanco sin X —20/10/2026
+
+Implementado el diseño aprobado: botón glass junto a Guardar, panel inferior
+blanco opaco con tirador, sin glass ni X por corrección explícita. Copiar enlace
+en círculo azul/icono blanco, WhatsApp y Facebook con etiquetas; Descargar y
+Denunciar son dos círculos grises contiguos solo con iconos, tooltip y semántica.
+Cierra por arrastre, toque fuera o Atrás. Scroll/área segura/texto ampliado y
+movimiento reducido; cabecera bajo380px reserva título en otra fila para evitar
+solapamiento de los tres controles. Denunciar sale del panel al formulario real
+del mismo caso y sustituye el botón largo del cuerpo de estas fichas.
+
+case_posters incorpora entidad/contrato/SharePublicCase, ViewModel/estado propios,
+repositorio y fuentes RPC/plataforma; reutiliza DTO y PDF saneado existentes.
+Bootstrap/main inyectan implementaciones y Clipboard como callback para conservar
+la frontera sin Flutter en data. No se relajó la comprobación arquitectónica.
+WhatsApp/Facebook abren el destino externo con solo la URL pública; usuario elige
+si envía/publica. Descargar abre impresión/Guardar como PDF, con cancelación sin
+confirmación falsa de guardado. Toast superior/shimmer solo por operación real,
+bloqueo de doble acción y descarte de resultados de otra cuenta.
+
+Plan032/fuentes110–111, RPC prepare_case_share autenticada y patch/migración
+20261020003200_case_sharing.sql generados con Build-Migration,
+Build-CaseSharingPatch y Build-RunAll. Autor derivado del caso aun si comparte un
+lector ajeno; slug estable sin reactivar revocación. Exige búsqueda activa,
+visible y con foto comprobada por el lector QR. Avisos vinculados/custodia,
+cerradas/ocultas/eliminadas o sin foto no generan enlaces ficticios; Denunciar
+permanece disponible. prepare_case_poster sigue exclusivo del autor. Sin nuevos
+grants directos, contactos en QR/PDF, SDK social, dependencias o permisos de rol.
+La revisión/sesión/enlace se validan otra vez antes de entregar al dispositivo.
+
+ADR-115, ficha compartir-ficha, índice, ficha móvil/carteles, arquitectura,
+normas, diseño, AGENTS, guía y README de datos/patchs actualizados. Referencia
+visual en mockups/compartir-ficha-referencia.png; su X se elimina por la corrección
+posterior del usuario. Ampliación explícita HU-07/HU-08, RF-08/13/37, sin issue
+nuevo ni cierre de historias. ImmersivePhotoSheet conservado.
+
+Validación final: formato correcto, flutter analyze sin incidencias y63/63 pruebas
+Flutter aprobadas: repositorio/URL/configuración/revisión/PDF, doble acción/cambio
+de cuenta, panel normal/pequeño con texto2, movimiento normal/reducido, ausencia
+de X/etiquetas inferiores, cierre por los tres medios, denuncia real, reserva de
+cabecera360px, fichas, carga, carteles, recuperación y arquitectura.
+SQL/PostGIS local45/45: incluye compartir por lector ajeno, propiedad intacta,
+idempotencia, revocación/cierre/moderación y repetición de migración/bundle.
+
+Renders revisados en apps/mobile/build/ui-preview/case-sharing, con fuentes reales,
+fixtures y teselas simuladas; no acredita el proveedor cartográfico por red.
+Logs case-sharing-final-{analyze,tests}, case-sharing-layout-final y
+case-sharing-sql-suite en apps/mobile/build. Generación sin reescribir SQL previo.
+Pendiente activar032 después de031 y comprobar Clipboard, WhatsApp/Facebook,
+enlace QR y guardar/cancelar PDF en Android físico. Se reutiliza la configuración
+pública ya existente; no se afirma que la web QR previamente confirmada esté caída.
+Sin despliegue, APK o GitHub. Siguiente paso: activación remota autorizada y prueba
+física. Cambios existentes conservados.
+
+## Ficha pública: fidelidad de Perdido y glass —20/10/2026
+
+Por corrección explícita del usuario, la etiqueta del caso se coloca a la derecha
+del nombre en la misma fila, centrada verticalmente. Los puntos de galería van
+centrados debajo. Texto ampliado o etiqueta larga apilan sin recortar el estado;
+la foto ampliada usa proporción0.8 para reservar espacio.
+
+GlassSurface incorpora el acabado frosted compartido: ribete blanco único,
+sombra difusa suave y gradiente perla/celeste traslúcido. Tarjetas de la ficha y
+controles de contacto lo reutilizan, retirando el relleno gris adicional y el
+doble borde oscuro. SMS/teléfono conservan iconos azules, ahora22, y objetivo52.
+Volver/guardar mantienen el glass anterior; polished sigue siendo el valor por
+defecto para todos los consumidores previos. ImmersivePhotoSheet intacto.
+
+ADR-113, normas, diseño, arquitectura, índice y fichas actualizados. Sin cambios
+funcionales, datos, SQL, permisos o alcance HU; activación031 sigue pendiente.
+
+Validación: formato correcto y flutter analyze sin incidencias.28 pruebas de ficha,
+contacto, patrón inmersivo, carga y arquitectura aprobadas;26 de perdidos/encontrados
+y1 de estabilidad de glass en Inicio también aprobadas (55 en total). Regresión
+geométrica confirma misma línea nombre/estado, margen derecho16 y paginación
+centrada;390×844 y320×350/texto2, movimiento normal/reducido. La prueba de Inicio
+ya verificaba pintura estable y falló solo por una etiqueta retirada; se actualizó
+su toque a la acción real Mis mascotas, sin cambiar Inicio.
+
+Capturas normal/pequeña revisadas en apps/mobile/build/ui-preview/public-cards,
+comparadas con mockups/ficha-publica-glass-contacto.png. Fotos/datos de fixture y
+teselas simuladas; no prueba red real. Logs public-cards-fidelity-{tests,analyze,
+regressions,home-glass} en apps/mobile/build. Siguiente paso: revisión Android
+físico. Sin APK, despliegue ni operaciones remotas; cambios previos conservados.
+
+## Nueva ficha pública glass y contacto autorizado —20/10/2026
+
+Implementados CasePublicCards/CasePublicScreenShell en consultas de perdidos y
+encontrados, según el último mockup aprobado (conservado en
+mockups/ficha-publica-glass-contacto.png). Foto redondeada, nombre blanco48/800,
+metadatos/rasgos en tarjetas gris perla, mapa propio con punto/halo azul y créditos
+compactos, CTA azul y enlace Ver seguimiento. Volver/guardar mantienen glass
+compartido; SMS/teléfono también usan ese control con iconos azules. Título de
+navegación20 por composición aprobada,32 en fila propia con texto ampliado.
+Scroll normal; título se desplaza para evitar solapamientos. Se conservan
+operaciones reales y permisos de seguimiento, avisos/custodia, cartel, cierre y
+denuncia. ImmersivePhotoSheet conserva íntegro su diseño y uso en vistas previas.
+
+Por elección explícita del usuario se añade case_contacts, dominio/casos de uso,
+DTO/fuente/repositorio y ViewModel autoDispose por caso/cuenta. Router compone el
+panel por slot; bootstrap/main inyectan. El autor registra/edita/retira contacto
+DESDE SU FICHA PUBLICADA, con consentimiento desactivado inicialmente y elección
+separada para foto. Guardado independiente, sin volver a publicar el caso.
+Nombre público2–80, teléfono internacional y avatar de perfil almacenado opcional;
+inicial real si no hay foto. SMS/marcador son acciones externas, sin chat propio.
+
+Plan031/fuentes106–109, migración20261020003100_case_contacts.sql y patch031
+versionados/generados. Tabla privada/RLS/RPC, autor por auth.uid(), CAS/reintento
+exacto y autorización por caso activo/visible. Foto: SELECT acotado y URL60s;
+escrituras continúan privadas incluso ante políticas permisivas amplias.
+Retirada/cierre/ocultamiento bloquean nuevas lecturas/firmas, sin recuperar
+imágenes descargadas ni invalidar antes de tiempo una firma ya emitida.
+No se amplían QR/web anónima/carteles ni consultas de perfiles privados.
+
+Documentados ADR-113/114, fichas ficha-publica-mobile/contacto-reportante,
+índice, patrón conservado, guía, arquitectura, diseño, normas y AGENTS.
+Ampliación explícita de HU-05/06/07, RF-05/06/13; sin issue nuevo ni cierre de HU.
+
+Validación local final: flutter analyze sin incidencias, formato correcto y
+78/78 pruebas Flutter aprobadas: layouts390×844 y320×350/texto2, movimiento
+normal/reducido, galería/descripción, mapa público, acciones/retorno, contacto,
+reintento ambiguo/doble envío/cambio de cuenta, navegación, recuperación,
+cronología, mapas compartidos y arquitectura. Se corrigió un desbordamiento
+real del enlace de seguimiento con texto2 detectado al ampliar la suite.
+Pruebas con AMBIENT_BACKGROUND_MOTION=false y base Positron configurada.
+Renders revisados en apps/mobile/build/ui-preview/public-cards (fixtures de
+prueba y teselas simuladas, sin afirmar validación del proveedor por red).
+
+SQL:43/43 pruebas de la batería PostgreSQL/PostGIS local aprobadas, más repetición
+de las2 de contacto fortalecidas con ocultamiento por moderación y conflicto
+tras edición intermedia. Se verifican aislamiento, consentimiento, firma autorizada,
+revocación, restricciones, reintentos y repetición de migración/bundle.
+Build-Migration/Build-CaseContactsPatch/Build-RunAll correctos, sin reescribir
+migraciones anteriores. Logs public-cards-final-{analyze,tests},
+public-cards-sql-suite y sql-contact-tests en apps/mobile/build.
+
+Pendiente: aplicar031 después de030 en Supabase, verificar Storage/foto y
+SMS/marcador en Android físico. Sin activación hosted, APK, despliegue o GitHub.
+Siguiente paso: activación remota autorizada y revisión física con dos cuentas;
+el diseño queda implementado y el patrón anterior conservado. Cambios locales
+previos preservados, incluido mockups/detalles-ficha.png.
+
+## Diseño conservado: Ficha fotográfica inmersiva —20/10/2026
+
+Por petición explícita se conserva el diseño actual de Ver ficha para una futura
+funcionalidad. CasePublicationPreview se renombra a ImmersivePhotoSheet y su
+geometría a ImmersivePhotoSheetGeometry, con archivos, imports, consumidores y
+pruebas actualizados. Sin cambios visuales o de comportamiento: sigue activo
+en fichas/vistas previas de perdidos/encontrados. No se elimina ni duplica.
+
+ADR-112 y ficha funcionalidades/ficha-fotografica-inmersiva.md documentan
+composición, medidas, gestos, campos, privacidad, dependencias, errores y
+reutilización. Índice, arquitectura, diseño, normas UI, AGENTS, guía y ficha de
+reportes enlazan la conservación. Sin nueva HU/issue, cierre de historias,
+operaciones, SQL o permisos. Propuesta glass por tarjetas aprobada visualmente,
+aún sin aplicar; funcionalidad futura sin definir.
+
+Validación local: formato de8 archivos y40/40 pruebas existentes aprobadas
+(composición normal/compacta, texto2, movimiento normal/reducido, integraciones
+perdidos/encontrados y arquitectura), con AMBIENT_BACKGROUND_MOTION=false.
+Flutter analyze sin incidencias. Revisión física Android pendiente. Siguiente paso:
+aplicar el nuevo diseño a Ver ficha en otro incremento conservando este patrón.
+Sin APK, despliegue ni acciones GitHub. Cambios locales previos conservados.
+
+## Ficha del caso: nombre con diseño original —20/10/2026
+
+Por instrucción explícita se restaura únicamente el nombre sobre fotografía
+de CasePublicationPreview a su diseño anterior: fuente del sistema, blanco,
+tamaño48/peso800, altura1.05, sombra suave y dos líneas con elipsis; sin cápsula.
+Los demás títulos mantienen Poppins400/32/gris. Excepción registrada en AGENTS,
+ADR-111, norma UI y fichas. Sin cambios de datos/permisos/acciones o alcance.
+
+Validación: formato correcto y4/4 pruebas del preview aprobadas en390×844 y
+320×350/texto2 con movimiento normal/reducido; se verifican estilo original,
+scroll y acciones. Captura390 revisada con texto blanco directamente sobre foto;
+renders en apps/mobile/build/ui-preview/publication-preview. Flutter analyze sin incidencias.
+Logs case-title-original-* en apps/mobile/build. Siguiente paso: revisión Android
+físico; sin APK ni despliegue.
+
+## Ver ficha: nombre sin cápsula blanca —20/10/2026
+
+Por corrección explícita del usuario se retira GlassSurface/ColoredBox y padding
+añadidos bajo el nombre en CasePublicationPreview. Nombre directamente sobre la
+fotografía, conservando Poppins400/32/gris, ajuste de texto, panel y operaciones.
+ADR-111, norma UI y fichas actualizadas; sin cambios de datos/permisos o alcance.
+
+Validación: formato correcto, flutter analyze sin incidencias y4/4 pruebas del
+preview aprobadas en390×844 y320×350/texto2, con movimiento normal/reducido y
+acciones/scroll accesibles. Captura390 revisada sin fondo blanco; renders en
+apps/mobile/build/ui-preview/publication-preview y logs preview-no-title-background-*
+en apps/mobile/build. Siguiente paso: revisión Android físico; sin APK ni despliegue.
+
+## Títulos de las secciones alineados con Inicio —20/10/2026
+
+Corregido el centrado vertical de CollectionHeader: la fila ancla sus hijos
+arriba, conservando altura mínima56 y espacio de acciones. Explorar y Mis
+mascotas comparten origen superior/lateral con «Su regreso»; se elimina la
+bajada8 con texto normal. Se reutiliza la cabecera en los demás listados,
+sin offsets negativos ni ajustes por pantalla. Tipografía Poppins y datos/
+permisos intactos. Refinamiento de ADR-111 y regla UI; fichas actualizadas.
+
+Validación: regresión integrada en Home reproduce antes el desfase92→100 y
+pasa después, con fuentes reales y navegación entre secciones en390×844 y
+320×350/texto2. Suite de títulos, Inicio, listados, carga de mascotas y
+arquitectura37/37 aprobada; formato correcto y flutter analyze sin incidencias.
+Capturas en apps/mobile/build/ui-preview/primary-titles y logs title-alignment-*
+en apps/mobile/build. Siguiente paso: revisión Android físico; sin APK ni despliegue.
+
+## Títulos principales Poppins en móvil y web —20/10/2026
+
+Regla explícita del usuario, ADR-111: Poppins Regular400, base32, gris #454746,
+altura1.25 y tracking0 para títulos de pantalla/página/etapa. AppTypography y
+typography.css centralizan el contrato; mismo Regular local/OFL en ambas apps.
+Incluye Guardados, listados, acceso/onboarding, perfil/preferencias/ubicaciones,
+fichas, landing h1, cuenta/moderación, QR/avistamientos y legales. Retirados los
+overrides de títulos por recorrido; texto ampliado con ajuste y scroll. La marca
+oficial y el remate azul600 de Inicio conservan su estilo. El nombre sobre foto
+usa superficie clara para contraste; ilustraciones del hero ajustadas al título32
+para evitar solapar la descripción. No unifica márgenes/altura de cabeceras.
+
+Regla registrada en AGENTS, normas UI móvil/web, DISENO_UI, guía y fichas enlazadas.
+Sin nuevas HU/RF/issues ni cambio de dominio/data/SQL/permisos o cierre de historias.
+
+Validación final: formato correcto, flutter analyze sin incidencias y70/70 pruebas
+de layouts, preview, Inicio, acceso, listados, arquitectura, perfil, mascotas y
+entrada de preferencias aprobadas con AMBIENT_BACKGROUND_MOTION=false.
+Seis layouts nuevos usan fuentes reales en390×844 y320×350/texto2, con acciones
+alcanzables. Preview verifica también nombre largo completo y ambos modos de
+movimiento. Primera pasada detectó expectativas antiguas de truncado/sombra y
+un gesto de prueba con posición fija; adaptados al nuevo título y scroll real.
+La captura nueva se corrigió para ejecutar rasterización fuera del reloj de prueba.
+
+Web: typecheck/build correctos,56/56 pruebas aprobadas, incluida paridad de tokens
+y archivo de fuente móvil/web. Chrome verificó30 layouts de10 páginas, texto200%,
+QR sin JS, ausencia de overflow/CSP/hidratación y fuente local cargada; QA existente
+de onboarding también aprobada con su nueva tipografía y flujos intactos.
+Capturas revisadas en apps/mobile/build/ui-preview/primary-titles y
+publication-preview; logs primary-titles-{format,analyze,final-tests},
+primary-web-{build,tests} en apps/mobile/build. Siguiente paso: revisión física
+Android y dispositivos reales; sin APK, publicación ni despliegue.
+
+## Títulos de Explorar y Mis mascotas —20/10/2026
+
+Por petición del usuario, ambos títulos usan peso400 y gris #454746, como
+«Su regreso», conservando fuente del sistema, tamaño32 y adaptación accesible.
+CollectionHeader permite compartir el estilo entre ambas secciones sin cambiar
+los demás listados. El fallback de Home también conserva esta coherencia.
+Sin cambios de alcance, dominio, datos o permisos. Fichas: funcionalidades/explorar.md
+y funcionalidades/mascotas.md. Formato correcto y flutter analyze completo sin
+incidencias. Sin pruebas nuevas por tratarse de un ajuste tipográfico; siguiente
+paso: revisión visual en Android. Sin APK ni despliegue.
+
+## Navegación móvil: arrastre al pasar por Explorar —20/10/2026
+
+Corregida la pérdida de animación Inicio→Explorar→Mis mascotas y vuelta.
+Insertar/retirar el botón flotante Mapa desplazaba el Positioned sin clave de
+la barra y desmontaba LiquidNavigation. Clave estable en ese contenedor
+conserva estado y tween320ms; movimiento reducido inmediato. Solo presentación,
+sin cambios de alcance, dominio, datos o permisos. Ficha: funcionalidades/inicio.md.
+
+Validación: las dos nuevas regresiones integradas fallaron antes del ajuste
+por desmontaje y pasan después; comprueban ambos sentidos con Mapa, identidad
+y posiciones inicial/intermedia/final. Suite Home/refresh de Inicio y mascotas/
+arquitectura/consistencia27/27 aprobada con AMBIENT_BACKGROUND_MOTION=false;
+formato correcto y flutter analyze completo sin incidencias.
+Siguiente paso: revisar animación en Android físico; sin APK ni despliegue.
+
+## Confirmación de salida: popup rápido —20/10/2026
+
+Corregido «¿Salir del reporte?» y las confirmaciones compartidas sin origen:
+PopupDialogTransition funde superficie y contenido juntos con escala uniforme
+.96→1 en160ms al abrir/cerrar. Retira cuadro central expandido y texto tardío;
+sin desplazamiento desde retorno. Conserva layout/acciones, scroll, insets y
+movimiento reducido inmediato. Confirmaciones con origen explícito conservan
+OriginDialogTransition/320ms. Refinamiento de ADR-006, HU-05/RF-05 y HU-06/RF-06;
+sin cambios de dominio/data/SQL ni ampliación de alcance.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y34/34
+pruebas de confirmaciones, morph con origen, arquitectura, consistencia y entrada
+real de reportes aprobadas con AMBIENT_BACKGROUND_MOTION=false. Dos regresiones
+verifican entrada completa a160ms, escala mínima96%, cierre y movimiento reducido.
+Renders390×844 y320×350/texto2 revisados en build/ui-preview/confirmations;
+acciones alcanzables con scroll. Log: apps/mobile/build/popup-confirmation-tests.log.
+Primeros intentos detectaron un nombre de archivo de prueba inexistente y un
+finder demasiado amplio en la nueva prueba; corregidos antes de la suite final.
+Siguiente paso: revisar sensación de apertura/cierre en Android autenticado;
+sin APK ni despliegue ni cierre de historias.
+
+## Alertas: expansión desde campana y vacío compartido —20/10/2026
+
+La campana de Inicio entrega OriginPageSource con sus límites reales relativos
+al Navigator a la ruta existente de Alertas. Reutiliza entityEditorPage y
+OriginPageTransition (320ms/260ms, movimiento reducido inmediato), conservando
+la sección subyacente. Bandeja vacía confirmada reutiliza CollectionEmptyState
+de Mis mascotas/Explorar con campana neutra, título y descripción centrados.
+Skeleton/error no muestran vacío; preferencias, lectura, paginación y refresh
+conservan su comportamiento. Refinamiento de HU-12.2/#41, RF-17,18 según ADR-006;
+sin dominio/data/SQL nuevos ni cambios de alcance.
+
+Validación:40/40 pruebas de notificaciones, navegación, Inicio, arquitectura y
+consistencia aprobadas con AMBIENT_BACKGROUND_MOTION=false; análisis Flutter
+completo sin incidencias. Regresión de navegación verifica origen real,
+expansión intermedia y retorno; cuatro de bandeja verifican carga/vacío/error
+y recuperación en390×844 y320×350/texto2, este último con movimiento reducido.
+Capturas del vacío en apps/mobile/build/ui-preview/notifications.
+Siguiente paso: revisión visual Android autenticado y demo real de HU-12;
+sin APK, despliegue ni cierre de historia.
+
+## Selectores móviles: una sola entrada de opciones —20/10/2026
+
+Corregida la apertura duplicada de AppSelectField, visible en Especie y Sexo
+(opcional): el panel inferior ya animaba su entrada y su cuerpo añadía otra
+cortina de AppPageBackground antes del stagger. Retirada esa cortina interna;
+StaggerReveal empieza al completar la animación de ruta del panel, con cabecera
+estable y movimiento reducido inmediato. Corrección compartida para todos sus
+consumidores, sin cambiar opciones, selección, cancelación o contratos.
+Refinamiento de ADR-006, sin ampliar HU-03/RF-03 ni otros recorridos consumidores.
+
+Validación: formato correcto y análisis Flutter completo sin incidencias;
+20/20 pruebas de selector, arquitectura y consistencia aprobadas;
+cuatro regresiones nuevas comprueban Especie/Sexo, ausencia de cortina, espera
+hasta abrir el panel, progreso sin reinicio y selección, en390×844 y320×350
+con texto2/movimiento reducido. Las pruebas existentes mantienen cancelación,
+valor desconocido y bloqueo. Fondo ambiental desactivado mediante configuración
+de pruebas para permitir pumpAndSettle. Logs en apps/mobile/build/select-reveal-*.log.
+Siguiente paso: revisión visual Android de apertura/cierre; sin APK ni despliegue.
+
+## Preferencias y ubicaciones: entrada sin reveal duplicado —20/10/2026
+
+Corregido el reinicio de cover/stagger al resolver la consulta en Preferencias
+de alertas y Ubicaciones de interés (HU-02.2/#27 y HU-02.1/#26; RF-02,16).
+Las claves dependientes de datos reconstruían la transición al pasar de
+unavailable a la cuenta; en preferencias también reconstruían el scroll.
+Se conserva el subárbol de entrada y se deshabilita la cortina durante carga,
+siguiendo la regla existente: skeleton y resultado pertenecen a una sola entrada.
+Las etapas lista/editor mantienen su transición; datos de otra identidad siguen
+ocultos por el estado del ViewModel. Sin cambios de dominio, persistencia o alcance.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias;24 nuevas
+regresiones de ambas pantallas con consultas50/2000ms, datos/vacío/error y
+movimiento reducido. Suite focalizada38/38 con fondo animado; suite ampliada61/61
+con AMBIENT_BACKGROUND_MOTION=false, incluidos formularios normales/pequeños,
+descarte, reintentos, arquitectura y consistencia. Primer intento ampliado:55/61,
+con6 timeouts de pumpAndSettle por la animación continua del fondo; repetición
+con su configuración de movimiento desactivada aprobada. Logs en
+apps/mobile/build/preferences-reveal-{focused,static-background,analyze}.log.
+Siguiente paso: comprobar ambas entradas en Android autenticado; no se generó
+APK ni se desplegó.
+
+## Explorar: continuidad del gesto del panel —20/10/2026
+
+Nueva corrección solicitada por el usuario: el acomodo conserva velocidad al
+soltar mediante resorte amortiguado1/260/34; sustituye el reinicio desde reposo
+de easeInOutCubic. Tocar otra vez detiene el controlador antes de reconocer el
+nuevo arrastre. Controlador liberado al desmontar; límites, scroll de contenido,
+resistencia inferior, créditos y movimiento reducido conservados. Solo presentación,
+refinamiento de ADR-106 / HU-07.2 / RF-13 / issue #33, sin ampliar alcance.
+
+Validación inicial:16 pruebas de mapa/arquitectura aprobadas, incluida regresión
+de impulso tras pasada rápida, interrupción al contacto y arrastre en sentido
+contrario. Las6 pruebas de mapa repetidas con CARTO/capturas también aprobadas
+en apps/mobile/build/explore-panel-fluid-carto.log. Formato correcto y análisis
+completo sin incidencias (build/explore-panel-fluid-analyze.log).
+Siguiente paso: revisar sensación y rendimiento en Android físico;
+los frames de widget no certifican fluidez del dispositivo. Sin APK ni despliegue.
+
 ## Explorar: movimiento más suave del panel —20/10/2026
 
 Por petición del usuario, sustituir snap lineal por acomodo easeInOutCubic al
@@ -5216,3 +6506,92 @@ Validación: suite completa Flutter **336 pruebas aprobadas** en build/explore-i
 Después de la identificación HTTP, fuente/repositorio/caso de uso reales ejecutados con Dart devolvieron **5 resultados válidos** para Miraflores Lima Peru en build/explore-place-live.log. Las4 pruebas del buscador se repiten en build/explore-place-final-tests.log tras ese ajuste. Análisis sin incidencias en build/explore-inline-analyze-final.log; formato en build/explore-inline-format.log. Dependencias resueltas offline; sin actualización de versiones. ADR-042 sustituye la parte modal de041; norma UI, diseño/arquitectura, configuración, guía y ficha actualizados.
 
 Pendiente: Android autenticado con backend019, fotos y teselas reales, cobertura de direcciones del proveedor y rendimiento nativo. La prueba HTTP no acredita disponibilidad futura ni un servicio de producción. Sin APK, commit/push, modificación remota de Supabase o despliegue. Siguiente paso: verificar este recorrido en la app.
+
+## Reportar: buscador previo al mapa y sugerencias de Perú —20/10/2026
+
+Por instrucción del usuario, se reutiliza places antes del mapa en pérdida
+propia/comunitaria y avisos de hallazgo. Elegir sugerencia actualiza el punto
+privado mediante su ViewModel y centra ZoneMapPicker; después permite ajuste
+manual. Búsqueda opcional, referencia privada independiente, sin GPS ni cambios
+de precisión pública/permisos. App compone el slot compartido; ViewModel de
+búsqueda aislado de Explorar mediante ProviderScope local/autoDispose.
+
+Toda consulta textual compartida (Explorar, reportes y Ciudad del perfil) pide
+countrycode=PE y comprueba país PE de cada respuesta. País ausente/otro se
+descarta; respuestas válidas extranjeras dan vacío, malformadas conservan fallo.
+Mapa manual libre; no es restricción territorial de publicación. Sin SQL,
+configuración o despliegue nuevos. ADR-107 y fichas actualizadas; sin ampliar HU.
+
+Validación: formato correcto, análisis Flutter completo sin incidencias y72
+pruebas aprobadas:24 places/arquitectura/creación por rutas reales y48 de
+Explorar/perfil/perdidos/encontrados. Incluye sugerencias extranjeras o sin país,
+modo Ciudad, selección que centra mapa, ajuste posterior y referencia conservada.
+Renders390×844/texto1 y320×350/texto2 revisados sin overflow; las capturas no
+acreditan teselas reales (red bloqueada por harness). Consulta real Tacna/PE:
+cinco sugerencias PE. No se publicó ni desplegó. Siguiente paso: comprobar en
+Android sugerencias reales, teclado, mapa y reintento con conectividad variable.
+
+## Buscador: sugerencias superpuestas y lista continua —20/10/2026
+
+Por corrección del usuario con dos capturas, PlaceSearchFields muestra un panel
+único continuo sobre el contenido, sin cápsulas individuales ni desplazar
+mapa/radio/campos durante consulta o resultados. OverlayPortal anclado al campo,
+ancho compartido, filas mínimo48, máximo320 con scroll y límites de teclado/área
+segura; apertura arriba cuando falta espacio abajo. Común a Reportar, Explorar
+y Ciudad del perfil, con la política Perú/casos de uso/persistencia conservados.
+AppTextField admite FocusNode externo sin disponerlo. Seleccionar/tocar fuera,
+Escape/retorno y desmontar limpian el panel; tocar fuera invalida pendientes y
+no consume la acción exterior. Toast/skeleton/shimmer existentes conservados.
+ADR-108, ficha/índice y documentación de diseño/arquitectura actualizados.
+
+Validación:50 pruebas aprobadas en build/place-overlay-final-tests.log (4 nuevas
+para geometría de consulta/resultados, selección/scroll normal y pequeño,
+teclado300/apertura arriba, cierre exterior/respuesta tardía y desmontaje;
+regresiones de places/Explorar/Reportar/Perfil/arquitectura). Renders390×844/texto1
+y320×350/texto2 en build/ui-preview/place-overlay revisados sin overflow y con
+lista continua. Formato limpio; análisis completo sin incidencias. Sin despliegue.
+Siguiente paso: revisar en Android teclado real, scroll del formulario y panel.
+
+## Buscador: cancelar consultas antiguas y priorizar el último texto —20/10/2026
+
+Por petición del usuario ante demora6–9s, debounce de600 a300ms y retirada de la
+cola que esperaba la petición anterior. Editar cancela inmediatamente; última
+consulta empieza tras300ms sin esperar la anterior. Cancelación por operación
+independiente de Flutter/HTTP, transmitida por caso de uso/repositorio a fuente
+AbortableRequest. Selección/cierre/cambio de cuenta/disposición cancelan trabajo.
+Consultas activas idénticas se deduplican; generaciones protegen contra respuestas
+y errores tardíos. Caché30/5min no acepta respuestas canceladas. Cliente inyectado,
+PE/filtro recibido, Ciudad/dirección y overlay conservados; sin nueva dependencia,
+SQL, proveedor ni despliegue. ADR-109 y ficha compartida actualizados.
+
+Validación:54 pruebas aprobadas en build/place-speed-final-tests.log;4 nuevas
+comprueban300ms sin esperar respuesta antigua en ambos modos, cancelación HTTP,
+cacheo tras aborto y limpieza/desmontaje. Regresión de places/overlay/arquitectura,
+Explorar, Reportar y Perfil. Formato limpio y análisis Flutter completo sin
+incidencias en build/place-speed-analysis.log. Medición real adicional Chiclayo/PE:
+HTTP200, cero redirecciones, conexión0,25s y primer byte/total9,75s. Mediciones
+previas con/sin PE5,6–8s. El incremento elimina espera acumulada del cliente; no
+acredita latencia inferior3s del proveedor ni rendimiento en Android. Siguiente
+paso: medir en Android con la red del usuario; si persiste la lentitud, evaluar
+la latencia/disponibilidad del proveedor con evidencia de ese entorno.
+
+## Buscador: restaurar600ms y evitar errores por respuestas tardías —20/10/2026
+
+Por nueva instrucción del usuario, restaurado debounce600ms. Cancelación de
+consultas anteriores y descarte tardío se conservan. Diagnóstico con cliente Dart
+real: fuente Tacna/Lima vencía a12s; GET anterior y AbortableRequest devolvieron
+HTTP200/mismos1705 bytes a13,95/13,88s. `tacn` sí devuelve cinco sugerencias
+Tacna/PE a13,42s y `tacna` a14,37s: el corte12s impedía recibirlas. Fuente ahora
+permite20s con aborto al vencer; no exige nombre completo ni añade comodines.
+Consulta sin PE también tardó15,87s. Sin cambiar proveedor, mapa, overlay,
+permisos o alcance. ADR-110 sustituye300ms/timeout12s de ADR-109; ficha actualizada.
+
+Validación:57 pruebas aprobadas en build/place-timeout-prefix-tests.log. Tres
+nuevas verifican respuesta parcial válida después15s en modo dirección/Ciudad y
+aborto ante proveedor sin respuesta a20s; prueba de concurrencia adaptada a600ms.
+Regresiones de places/overlay/arquitectura/Explorar/Reportar/Perfil aprobadas.
+Análisis completo sin incidencias en build/place-timeout-prefix-analysis.log;
+formato correcto. Diagnóstico temporal retirado tras usar fuente/cliente reales.
+No se desplegó. La corrección recupera respuestas válidas, no acelera el servidor
+ni garantiza3s. Siguiente paso: revisión Android/red del usuario y, si persiste
+latencia, evaluar proveedor/cobertura/condiciones con evidencia de ese entorno.

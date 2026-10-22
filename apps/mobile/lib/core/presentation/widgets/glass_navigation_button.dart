@@ -7,24 +7,31 @@ class GlassNavigationButton extends StatelessWidget {
     required this.tooltip,
     required this.onPressed,
     this.icon = Icons.chevron_left_rounded,
+    this.foregroundColor = const Color(0xFF111111),
+    this.finish = GlassSurfaceFinish.polished,
+    this.iconSize = 28,
     super.key,
   });
   final String tooltip;
   final VoidCallback? onPressed;
   final IconData icon;
+  final Color foregroundColor;
+  final GlassSurfaceFinish finish;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) => GlassSurface(
     radius: 26,
+    finish: finish,
     child: IconButton(
       tooltip: tooltip,
       onPressed: onPressed,
       style: IconButton.styleFrom(
         fixedSize: const Size(52, 52),
         shape: const CircleBorder(),
-        foregroundColor: const Color(0xFF111111),
+        foregroundColor: foregroundColor,
       ),
-      icon: Icon(icon, size: 28),
+      icon: Icon(icon, size: iconSize),
     ),
   );
 }

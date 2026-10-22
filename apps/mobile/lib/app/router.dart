@@ -1,3 +1,5 @@
+import '../features/case_posters/presentation/widgets/case_share_button.dart';
+import '../features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import '../features/content_reports/presentation/screens/content_report_screen.dart';
 import '../features/content_reports/presentation/widgets/report_content_button.dart';
 import '../features/case_closure/presentation/screens/case_closure_screen.dart';
@@ -14,6 +16,7 @@ import '../features/explore/presentation/screens/explore_map_screen.dart';
 import '../features/case_posters/presentation/screens/case_poster_screen.dart';
 import '../features/case_posters/domain/entities/case_poster.dart';
 import '../features/places/presentation/widgets/place_search_fields.dart';
+import 'widgets/report_location_search.dart';
 import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
 import '../features/saved_cases/presentation/widgets/save_case_button.dart';
@@ -222,7 +225,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             ref.read(profileViewModelProvider.notifier).retry();
             await ref.read(profileViewModelProvider.future);
           },
-          onAlerts: () => context.push('/home/notifications'),
+          onAlerts: (source) =>
+              context.push('/home/notifications', extra: source),
           profileAvatar: const ProfileAvatarButton(),
           petsContent: const PetsSection(),
           exploreFloatingAction: const ExploreMapButton(),
@@ -286,7 +290,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ),
                   ),
                 ],
-                child: const FoundEditorScreen(),
+                child: const FoundEditorScreen(
+                  locationSearchBuilder: buildReportLocationSearch,
+                ),
               ),
             ),
           ),
@@ -330,8 +336,19 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
-                reportAction: ReportContentButton(
-                  target: (kind: 'found', id: state.pathParameters['id']!),
+                contact: CaseContactPanel(
+                  target: (source: 'found', id: state.pathParameters['id']!),
+                ),
+                shareActionBuilder: (name, event) => CaseShareButton(
+                  target: PosterCase(
+                    PosterSource.found,
+                    state.pathParameters['id']!,
+                  ),
+                  title: name,
+                  eventLabel: event,
+                  onReport: () => context.push(
+                    '/home/denounce/found/${state.pathParameters['id']}',
+                  ),
                 ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(
@@ -402,8 +419,19 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
-                reportAction: ReportContentButton(
-                  target: (kind: 'lost', id: state.pathParameters['id']!),
+                contact: CaseContactPanel(
+                  target: (source: 'lost', id: state.pathParameters['id']!),
+                ),
+                shareActionBuilder: (name, event) => CaseShareButton(
+                  target: PosterCase(
+                    PosterSource.lost,
+                    state.pathParameters['id']!,
+                  ),
+                  title: name,
+                  eventLabel: event,
+                  onReport: () => context.push(
+                    '/home/denounce/lost/${state.pathParameters['id']}',
+                  ),
                 ),
                 id: state.pathParameters['id']!,
                 followAction: FollowTargetButton(
@@ -426,6 +454,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
+                  showSightingAction: false,
                   id: value.id,
                   community: false,
                   canResolve: value.canResolve,

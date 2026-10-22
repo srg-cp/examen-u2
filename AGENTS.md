@@ -1,5 +1,55 @@
 # Entre Huellas: instrucciones del proyecto
 
+Patrón UI/UX aprobado21/10: antes de reutilizar la expansión desde origen,
+consultar docs/patrones-ui-ux/expansion-desde-origen.md. Conservar el contrato
+ADR-128 y usar componentes/coordinador existentes; validar cada integración.
+Aprobación visual del usuario en Reportar web, sin migración global implícita.
+
+Origen web21/10, combinación explícita ADR-128: conservar fullscreen/GSAP Sader
+pero sumar identidad móvil al abrir/cerrar: superficie negra/radio del control
+se transforman, nueve puntos mantienen tamaño y se centran dentro, fase fuente
+hasta45% invertida al volver. Fade/blur de Sader solo al cuerpo, no a superficie
+ni icono; restaurar control y limpiar identidad en cancelación/fin/cambio de
+cuenta. Véase docs/decisiones/128-identidad-mobile-en-origen-web-fullscreen.md.
+
+Origen web21/10, precisión ADR-127: expansión al viewport completo, con fases
+originales de PrettyModal/Sader (Flip0.7s más entrada opacity0/blur10→1/0 en500ms,
+cubic-bezier(0.56,0.27,0,1)). Sustituye apertura sin fade y destino limitado al
+main de ADR-126; conservar sección anterior detrás, contenido dentro del morph,
+marca/barra estables, reducido y limpieza. Véase docs/decisiones/127-origen-fullscreen-y-fases-prettymodal-sader.md.
+
+Origen web21/10, precisión posterior ADR-126: conservar la sección anterior
+visible detrás durante apertura; el contenido nuevo se ve desde el inicio
+dentro de la superficie y escala con ella desde el botón. Sin reveal al final.
+Sustituye la fase de cuerpo oculto de ADR-125; mantener0.7s/CustomEase de Sader,
+sin clones de páginas, con acceso global, reducido y limpieza de identidad.
+Perfil/Alertas y Flutter conservados. Véase docs/decisiones/126-contenido-dentro-de-expansion-y-ruta-anterior-visible.md.
+
+Animaciones21/10, ADR-124, por instrucción explícita: las animaciones de un mismo
+recorrido en móvil y web deben coincidir en efecto, origen/destino, sentido,
+duración, curva, fases de contenido y retorno. No sustituir expansión por panel
+instantáneo/fade ni cambiar tiempos por plataforma. La geometría final puede
+adaptarse al viewport sin cambiar el contrato de movimiento. Respetar movimiento
+reducido en ambos, conservar foco/limpieza y comprobar fotogramas de apertura y
+cierre con movimiento normal. Cualquier divergencia requiere instrucción explícita
+del usuario y decisión documentada. Perfil/Alertas usan origen real320/260ms,
+easeInOutCubic, fuente hasta45% y contenido desde65%. Véase
+docs/decisiones/124-paridad-animaciones-mobile-web.md. No afirmar auditoría global
+de animaciones por validar solo estos recorridos.
+
+Hero landing20/10, ADR-120: por instrucción explícita, #hero-title recupera Arial,
+peso500, #171918, line-height1.02, tracking−0.055em, tamaño adaptable42–108px
+(móvil32–48px) y mascotas laterales originales. Excepción local a ADR-111;
+los demás títulos conservan Poppins400/32/gris. No reducirlo por cambios de SEO.
+
+Celular20/10, ADR-116: profiles.contact_phone es privado/opcional; solo se sugiere al autor por read_case_contact. Guardar perfil no publica contacto ni modifica los ya compartidos. Mantener consentimiento por caso/foto y plan033 después de032.
+
+Compartir ficha20/10, ADR-115: botón junto a Guardar; panel blanco opaco, sin glass ni X por instrucción explícita. Copiar enlace azul/icono blanco, WhatsApp y Facebook con etiquetas; Descargar/Denunciar son dos círculos grises contiguos sin texto visible, con tooltip/semántica. Compartir/descargar usa solo el enlace QR público activo y autorizado (plan032), sin dar permisos de autor a otros lectores.
+
+Ficha pública móvil20/10, ADR-113/114: consultas usan CasePublicCards con tarjetas glass según mockup aprobado; conservar ImmersivePhotoSheet en vistas previas y para reutilización futura. Título compacto de navegación Poppins400/20/gris por aprobación explícita; con texto ampliado título32 en fila propia. Nombre sobre foto blanco48/800. Contacto del autor por caso con consentimiento y RPC protegidas (plan031), sin ampliar perfiles privados/QR.
+
+Conservación20/10, ADR-112: el componente `CasePublicationPreview` se renombra a `ImmersivePhotoSheet` (Ficha fotográfica inmersiva). Conservarlo para reutilización futura, también cuando se sustituya el diseño de Ver ficha. Las reglas anteriores de su nombre blanco48/800 siguen vigentes. Véase docs/funcionalidades/ficha-fotografica-inmersiva.md.
+
 ## Contexto
 
 Construimos el MVP de recuperación colaborativa. Android primero. La arquitectura acordada es Clean Architecture por funcionalidad con Flutter, MVVM, Riverpod, casos de uso, repositorios y Supabase como backend. La web QR forma parte del MVP. Los motivos y las consecuencias se registran en [ADR-001](docs/decisiones/001-arquitectura-aplicacion.md).
@@ -18,6 +68,18 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
   No recrear los proyectos ni cambiar identificadores de paquete por moverlos.
 
 ## Implementación
+
+- Excepción local a ADR-111,20/10/2026: el nombre sobre fotografía de la ficha
+  del caso (CasePublicationPreview) conserva fuente del sistema, blanco48/800,
+  sombra suave y dos líneas con elipsis; sin cápsula blanca. Los demás títulos
+  conservan Poppins400/32/gris.
+
+- Títulos principales de móvil/web: Poppins Regular400, tamaño base32, gris
+  #454746, interlineado1.25 y tracking0. Reutilizar AppTypography.primaryTitle
+  y typography.css; fuente local, texto ampliado y ajuste de líneas. Incluye
+  Guardados/acceso/onboarding/landing/legales; marca oficial y énfasis azul600
+  de Inicio conservados. Sin overrides por funcionalidad. Seguir
+  [ADR-111](docs/decisiones/111-titulos-principales-poppins-mobile-web.md).
 
 - Cartografía global20/10/2026: todos los mapas móviles/web usan el acabado
   intermedio entre Reportar original y Explorar, según

@@ -33,8 +33,8 @@ try {
  await page.evaluate(() => document.fonts.ready);
  assert.equal(await page.locator('.onboarding-flow').evaluate(el => getComputedStyle(el).fontFamily.includes('Inter')), true);
  assert.equal(await page.evaluate(() => document.fonts.check('16px "Inter"')), true);
- assert.equal(await heading.evaluate(el => getComputedStyle(el).fontSize), '48px');
- assert.equal(await heading.evaluate(el => getComputedStyle(el).fontWeight), '600');
+ assert.equal(await heading.evaluate(el => getComputedStyle(el).fontSize), '32px');
+ assert.equal(await heading.evaluate(el => getComputedStyle(el).fontWeight), '400');
  assert.equal(await page.locator('.onboarding-step-description').evaluate(el => getComputedStyle(el).fontSize), '18px');
  assert.equal(await page.locator('.onboarding-next').evaluate(el => getComputedStyle(el).borderRadius), '18px');
  assert.equal(await page.locator('.onboarding-next').evaluate(el => getComputedStyle(el).height), '48px');
@@ -114,6 +114,6 @@ try {
  await page.goto(server.origin + '/'); await page.waitForTimeout(1300);
  assert.equal(new URL(page.url()).pathname, '/'); assert.deepEqual(errors, []);
  await context.close();
- console.log('Onboarding Chrome QA passed: Sader layout/Inter/type/buttons, identical mobile PNGs, real 550ms/90ms stagger and reversed exit, no cream cover, forward-only steps, persistent official brand, no dots/back button, double-click lock, step3 visible save/error/retry, reduced motion (including mid-exit), teardown timers, desktop/mobile/320x350/text200%, no overflow/CSP/hydration errors. Fixture backend only.');
+ console.log('Onboarding Chrome QA passed: Sader layout/Inter body/Poppins primary title/buttons, identical mobile PNGs, real 550ms/90ms stagger and reversed exit, no cream cover, forward-only steps, persistent official brand, no dots/back button, double-click lock, step3 visible save/error/retry, reduced motion (including mid-exit), teardown timers, desktop/mobile/320x350/text200%, no overflow/CSP/hydration errors. Fixture backend only.');
 } finally { await browser.close(); await server.close(); }
 

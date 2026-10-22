@@ -1,7 +1,8 @@
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_publication_preview.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/immersive_photo_sheet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -793,14 +794,14 @@ void main() {
         final previewMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );
-        final composition = tester.widget<CasePublicationPreview>(
-          find.byType(CasePublicationPreview),
+        final composition = tester.widget<ImmersivePhotoSheet>(
+          find.byType(ImmersivePhotoSheet),
         );
         expect(previewMap.latitude, composition.latitude);
         expect(previewMap.longitude, composition.longitude);
         expect(previewMap.readOnly, isTrue);
         expect(previewMap.showCenterMarker, isFalse);
-        expect(find.byType(CasePublicationPreview), findsOneWidget);
+        expect(find.byType(ImmersivePhotoSheet), findsOneWidget);
         await shot('preview');
         cases.loseResponse = true;
         await tester.runAsync(m.publish);
@@ -843,18 +844,9 @@ void main() {
         await tester.pumpWidget(host(const FoundDetailScreen(id: 'case')));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        expect(find.byType(CasePublicationPreview), findsOneWidget);
-        expect(find.byType(PageView), findsOneWidget);
-        expect(find.byType(ZoneMapPicker), findsNothing);
-        final sheetForpublicMap = tester.widget<DraggableScrollableSheet>(
-          find.byType(DraggableScrollableSheet),
-        );
-        sheetForpublicMap.controller!.animateTo(
-          sheetForpublicMap.maxChildSize,
-          duration: const Duration(milliseconds: 1),
-          curve: Curves.linear,
-        );
-        await tester.pumpAndSettle();
+        expect(find.byType(CasePublicCards), findsOneWidget);
+        expect(find.byType(PageView), findsNothing);
+        expect(find.byType(ZoneMapPicker), findsOneWidget);
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
         );
@@ -868,7 +860,7 @@ void main() {
         expect(publicMap.showCenterMarker, isFalse);
         expect(publicMap.onSelect, isNull);
         expect(publicMap.radiusMeters, 1000);
-        expect(find.text('Ficha pública'), findsNothing);
+        expect(find.text('Ficha pública'), findsOneWidget);
         expect(find.text('Vista previa pública'), findsNothing);
         expect(find.text('Publicar caso'), findsNothing);
         expect(find.text('Editar reporte'), findsNothing);

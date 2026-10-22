@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_photo.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_skeleton.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards_skeleton.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/glass_navigation_button.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/skeleton_form_fields.dart';
@@ -87,9 +87,9 @@ void main() {
             ),
           );
           await tester.pump(const Duration(milliseconds: 200));
-          expect(find.byType(CasePublicSkeleton), findsOneWidget);
+          expect(find.byType(CasePublicCardsSkeleton), findsOneWidget);
           expect(find.byType(SkeletonFormFields), findsNothing);
-          expect(find.text('Ficha pública'), findsNothing);
+          expect(find.text('Ficha pública'), findsOneWidget);
           expect(find.byType(LoadingShimmer), findsOneWidget);
           final semantics = tester.ensureSemantics();
           expect(
@@ -128,7 +128,7 @@ void main() {
           expect(tester.takeException(), isNull);
           pending.complete();
           await tester.pumpAndSettle();
-          expect(find.byType(CasePublicSkeleton), findsNothing);
+          expect(find.byType(CasePublicCardsSkeleton), findsNothing);
           expect(find.byType(LoadingShimmer), findsNothing);
           expect(find.text('Ficha pública'), findsOneWidget);
           expect(tester.takeException(), isNull);

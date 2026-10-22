@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'case_preview_geometry.dart';
+import 'immersive_photo_sheet_geometry.dart';
 import 'loading_shimmer.dart';
 import 'zone_map_picker.dart';
 import 'glass_surface.dart';
@@ -27,9 +27,11 @@ class CasePublicSkeleton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SizedBox(height: CasePreviewGeometry.photoSpace(context)),
+                  SizedBox(
+                    height: ImmersivePhotoSheetGeometry.photoSpace(context),
+                  ),
                   Padding(
-                    padding: CasePreviewGeometry.titlePadding,
+                    padding: ImmersivePhotoSheetGeometry.titlePadding,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: FractionallySizedBox(
@@ -42,9 +44,9 @@ class CasePublicSkeleton extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: CasePreviewGeometry.cardPadding(context),
+                    padding: ImmersivePhotoSheetGeometry.cardPadding(context),
                     child: GlassSurface(
-                      radius: CasePreviewGeometry.cardRadius,
+                      radius: ImmersivePhotoSheetGeometry.cardRadius,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(

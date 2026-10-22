@@ -1,5 +1,107 @@
 # Landing pública en la plataforma
 
+## Segunda mejora de SEO: recursos adaptables —20/10/2026
+
+Sin cambios de CSS, texto o composición aprobados en ADR-120. El hero ofrece
+WebP320/640 además de1254 mediante srcset/sizes, manteniendo PNG de respaldo y
+dimensiones de layout. El navegador decide según viewport/densidad. Las variantes
+pequeñas se remuestrean desde PNG y se codifican WebP sin pérdida; no equivalen a
+los píxeles originales a resolución completa, que continúan disponibles.
+
+QA local1440px: DPR1 descarga186.122 bytes entre ambos hero frente a2.604.418
+de los WebP completos (−92,9 %); DPR2 elige640 y descarga702.904; DPR3 conserva
+los completos. Son tamaños de archivos seleccionados, no reducción porcentual
+de toda la página ni medición de Core Web Vitals. Tamaño, color y fuente del
+título confirmados en los tres casos; QA responsive/sin JS/texto200 % conservado.
+
+La vista previa social usa derivado JPEG público1200×630 sobre blanco de la
+ilustración aprobada (sin recortar),89.933 bytes frente a3.628.600 del PNG anterior.
+Open Graph y JSON-LD actualizan URL/tipo/dimensiones; el origen sigue configurable.
+El script optimize-landing-images.mjs regenera variantes y vista previa.
+
+Producción revisada de nuevo: entrega el título SEO antiguo, sin JSON-LD ni
+summary_large_image; el código preparado localmente aún requiere publicación.
+El dominio propio entrehuellas.app mejora claridad/recordación de marca, pero
+.app no da ventaja automática de ranking. Puede posicionarse el subdominio actual.
+Tras publicar, verificar propiedad en Search Console, enviar sitemap e inspeccionar
+portada/indexación; medir rendimiento real antes de afirmar mejoras de posición.
+La compra/migración y acciones de Search Console siguen pendientes del propietario.
+
+Referencia: [guía SEO de Google, dominios y extensiones](https://developers.google.com/search/docs/fundamentals/seo-starter-guide),
+[experiencia de página](https://developers.google.com/search/docs/appearance/page-experience)
+y [recursos adaptables](https://web.dev/learn/design/responsive-images).
+
+## Restauración del hero original —20/10/2026
+
+Por petición explícita y primera captura del usuario, #hero-title recupera Arial500,
+#171918, interlineado1.02, tracking−0.055em y tamaño42–108px (móvil32–48px).
+Se recuperan también escala/offsets originales de las mascotas laterales. Valores
+anteriores a1fc1bd1, cuyo cambio global a Poppins32 redujo este hero. ADR-120
+sustituye solo aquí la regla ADR-111 descrita más abajo. Texto del título, SEO,
+WebP, acceso, controles y persistencia/permisos permanecen. Sin nueva activación
+de backend; revisión responsive/texto ampliado y resultados en ESTADO.
+
+## SEO y dominio público —20/10/2026
+
+La portada conserva SSR, un único h1, preguntas nativas y navegación sin JS.
+El título pasa a «Entre Huellas | Mascotas perdidas y encontradas» y la descripción
+explica búsqueda, avisos y colaboración. El apoyo del hero menciona mascotas
+perdidas sin sustituir el lema ni la composición. Open Graph y Twitter incluyen
+nombre, URL e ilustración pública existente con tamaño/alt. No se inventan
+perfiles sociales, valoraciones, descargas ni disponibilidad.
+
+JSON-LD WebSite/Organization/WebPage identifica el proyecto y su portada con nonce
+de la CSP existente. No promete resultado enriquecido ni publica datos de cuentas
+o casos. `shared/seo/site_metadata.ts` centraliza textos y valida el origen HTTPS.
+`NUXT_PUBLIC_SITE_URL` es configuración pública Nuxt actualizable al arrancar:
+canonical, og:url, imágenes, JSON-LD, robots y sitemap usan la misma identidad.
+No depende de Host, parámetros de campaña ni cabeceras reenviadas. Un origen
+inválido falla explícitamente; corregir configuración y reiniciar el proceso.
+
+Solo `/` aparece en sitemap y es indexable. Acceso, legales, cuenta y QR conservan
+su X-Robots-Tag noindex; robots no bloquea JS/CSS/fuentes/ilustraciones. Se mantienen
+las restricciones QR/API; robots no concede permisos ni garantiza que desaparezca
+una URL enlazada desde terceros. Sin persistencia, SQL ni endpoints de producto.
+
+Las doce ilustraciones ofrecen WebP sin pérdida mediante picture y PNG original
+de respaldo, conservando dimensiones y lazy loading. Regenerar desde apps/platform
+con `node scripts/optimize-landing-images.mjs` tras cambiar PNG. El script verifica
+alfa y RGB visibles: 27.134.705 →15.165.652 bytes (−44,1 %), sin contar repeticiones
+ni caché. No equivale a medir Core Web Vitals reales.
+
+Activación actual: `NUXT_PUBLIC_SITE_URL=https://entrehuellas.kormind.com`.
+No apuntar todavía a entrehuellas.app, que el usuario planea adquirir. Al migrar:
+
+1. Adquirir/configurar DNS y HTTPS del dominio nuevo y comprobar la aplicación.
+2. Cambiar NUXT_PUBLIC_SITE_URL y PUBLIC_WEB_ORIGIN a https://entrehuellas.app
+   en el entorno del proceso y reiniciar. Son contratos distintos: identidad SEO
+   y origen permitido de operaciones. Actualizar callbacks OAuth, allowlists y
+   consumidores del dominio según su configuración existente.
+3. Configurar redirecciones permanentes301/308 de navegación desde el dominio
+   anterior a la misma ruta del nuevo, preservando parámetros necesarios y evitando
+   cadenas. Mantener el dominio anterior al menos un año. Verificar QR existentes,
+   acceso y recuperación; las cookies anteriores no se transfieren al dominio
+   nuevo. No reproducir escrituras automáticamente.
+4. Verificar ambas propiedades en Google Search Console, enviar el sitemap nuevo,
+   solicitar indexación/usar Cambio de dirección si está disponible y vigilar
+   indexación, errores y tráfico. Requiere acceso del propietario; no se inventa
+   etiqueta de verificación ni se promete una posición.
+
+Validación: SSR/metadatos/JSON-LD/CSP/imagen, cambio de dominio en runtime y
+cabeceras ajenas; QR/privadas siguen noindex. Resultados finales en ESTADO.
+Publicación, Search Console, migración y métricas reales pendientes.
+
+Referencias: [nombres de sitio](https://developers.google.com/search/docs/appearance/site-names),
+[títulos](https://developers.google.com/search/docs/appearance/title-link),
+[robots](https://developers.google.com/search/docs/crawling-indexing/robots/intro) y
+[migración de dominio](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes).
+
+Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
+el estilo global; sustituye tipografía anterior de cabeceras principales.
+Reglas y validación en [identidad visual](identidad-visual.md) y
+[ADR-111](../decisiones/111-titulos-principales-poppins-mobile-web.md). Sin cambios
+de recorrido, datos, permisos o activación; revisión en dispositivos reales pendiente.
+
 ## Acceso preparado antes de pulsar —19/10/2026
 
 AccountViewModel consulta sesión en segundo plano al montar (SSR sigue público)

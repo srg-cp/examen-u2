@@ -24,12 +24,14 @@ class CaseEditorScreen extends ConsumerStatefulWidget {
   const CaseEditorScreen({
     this.embedded = false,
     this.petDetailsOnly = false,
+    this.locationSearchBuilder,
     super.key,
   });
   final bool embedded;
 
   /// App composes the common report fields for embedded creation.
   final bool petDetailsOnly;
+  final ReportLocationSearchBuilder? locationSearchBuilder;
   @override
   ConsumerState<CaseEditorScreen> createState() => _CaseEditorScreenState();
 }
@@ -101,7 +103,7 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
       },
       child: CaseScreenShell(
         title: 'Mascota perdida',
-        count: value?.stage == CaseEditorStage.form ? 7 : 2,
+        count: value?.stage == CaseEditorStage.form ? 8 : 2,
         loading: async.isLoading,
         immersive: value?.stage == CaseEditorStage.preview,
         notice: async.hasError
@@ -356,6 +358,7 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
           ),
         if (!widget.petDetailsOnly)
           CaseReportFields(
+            locationSearchBuilder: widget.locationSearchBuilder,
             dateTime: value.dateTimeDraft,
             latitude: value.latitude,
             longitude: value.longitude,

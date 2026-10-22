@@ -1,3 +1,4 @@
+import '../../../../core/theme/app_typography.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -61,11 +62,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   child: StaggerRevealText(
                     text: widget.title,
                     startOrder: 0,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 36,
-                      height: 1.08,
-                      color: Colors.black,
-                    ),
+                    style: AppTypography.primaryTitle,
                   ),
                 ),
                 const SizedBox(height: 18),
