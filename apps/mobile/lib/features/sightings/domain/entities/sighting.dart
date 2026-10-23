@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 enum SightingIssue {
+  localStorage,
   invalid,
   unavailable,
   forbidden,

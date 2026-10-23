@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Borradores locales](borradores-locales.md): HU-15.1/RF-32/#47; guardado y recuperación
+  por cuenta en Android, fotos y comando estable. Validación nativa pendiente.
+
 - [Bloquear y desbloquear cuentas](bloqueos-usuarios.md): HU-14.2/RF-23/#44;
   elecciones propias en móvil/web, rechazo SQL de nuevos avisos/avistamientos
   autenticados y ocultamiento de contacto/foto confirmado; activación034/036

@@ -12,6 +12,8 @@ String caseDateLabel(DateTime time) => caseDateTimeLabel(time);
 String caseFailureLabel(CaseFailureKind? kind) => switch (kind) {
   CaseFailureKind.busy =>
     'Otra operación está usando esta mascota. Reintenta en unos segundos.',
+  CaseFailureKind.localStorage =>
+    'No pudimos guardar el borrador en este dispositivo. Libera espacio y reintenta antes de salir.',
   CaseFailureKind.timedOut =>
     'La publicación no respondió. Reintenta o consulta Mis casos.',
   CaseFailureKind.invalid =>

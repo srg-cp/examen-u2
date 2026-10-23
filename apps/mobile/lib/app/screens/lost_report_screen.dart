@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/presentation/widgets/report_draft_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/report_location_search.dart';
@@ -136,7 +137,7 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
           '¿Salir del reporte?',
           ambiguous
               ? 'El envío pudo haber llegado al servidor. Consulta tus casos antes de publicarlo otra vez.'
-              : 'Se descartarán los datos y fotos sin publicar de este reporte.',
+              : 'Conservaremos los borradores en este dispositivo para que puedas retomarlos.',
           'Salir',
         );
     if (!mounted || !leave) {
@@ -144,9 +145,15 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
       return;
     }
     if (other?.dirty == true &&
-        !await ref.read(foundEditorViewModelProvider.notifier).discard()) {
+        !await ref.read(foundEditorViewModelProvider.notifier).saveForLater()) {
       // The failed draft may be in the inactive editor; make its feedback visible.
       if (mounted) setState(() => _community = true);
+      _leaving = false;
+      return;
+    }
+    if (own?.dirty == true &&
+        !await ref.read(caseEditorViewModelProvider.notifier).saveForLater()) {
+      if (mounted) setState(() => _community = false);
       _leaving = false;
       return;
     }
@@ -178,7 +185,7 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
         _place.clear();
       }
     });
-    // Watching both ViewModels keeps each draft alive only while this route lives.
+    // Both editors stay mounted for switching; checkpoints survive the route.
     // The community editor needs the session, but no catalogue request.
     final ownAsync = ref.watch(caseEditorViewModelProvider);
     final otherAsync = ref.watch(foundEditorViewModelProvider);
@@ -285,6 +292,42 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (!loading &&
+                      !error &&
+                      (_community ? other != null : own != null))
+                    ReportDraftStatus(
+                      onRetry:
+                          blocked ||
+                              (_community
+                                  ? other?.issue !=
+                                        FoundFailureKind.localStorage
+                                  : own?.issue != CaseFailureKind.localStorage)
+                          ? null
+                          : (_community
+                                ? ref
+                                      .read(
+                                        foundEditorViewModelProvider.notifier,
+                                      )
+                                      .saveForLater
+                                : ref
+                                      .read(
+                                        caseEditorViewModelProvider.notifier,
+                                      )
+                                      .saveForLater),
+                      onDiscard: blocked
+                          ? null
+                          : () => _community
+                                ? ref
+                                      .read(
+                                        foundEditorViewModelProvider.notifier,
+                                      )
+                                      .discardLocalDraft(other!.draftId)
+                                : ref
+                                      .read(
+                                        caseEditorViewModelProvider.notifier,
+                                      )
+                                      .discardLocalDraft(own!.draftId),
+                    ),
                   if (_community)
                     const FoundEditorScreen(
                       embedded: true,

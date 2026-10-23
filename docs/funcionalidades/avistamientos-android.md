@@ -73,3 +73,10 @@ Validación local, capturas y logs en [ESTADO](../ESTADO.md).
 Pendiente activar025/servidor y demo Android autenticada con GPS/cámara/galería,
 fotos/teselas reales, reintento tras pérdida de respuesta y permisos hosted.
 Sin APK nuevo, despliegue, escritura remota ni cierre de issue desde este incremento.
+
+
+23/10, HU-15.1: el editor conserva un borrador local por cuenta/contexto, con
+UUID y evidencia, recuperación sin red y conservación al salir. Comandos ambiguos
+se retoman sin editar su contenido. [Recorrido, persistencia, reglas y validación
+pendiente](borradores-locales.md), ADR-131. No activa cola automática ni caché
+de fichas. La demo Android de reinicio sin red sigue pendiente.

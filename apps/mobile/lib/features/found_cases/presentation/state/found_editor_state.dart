@@ -151,6 +151,8 @@ String foundFailureLabel(FoundFailureKind? kind) => switch (kind) {
     'Un bloqueo entre estas cuentas impide enviar nuevos avisos. Puedes revisar tus cuentas bloqueadas desde Perfil.',
   FoundFailureKind.targetClosed =>
     'Esta búsqueda ya no admite avisos. Puedes volver a su ficha; conservamos lo escrito hasta que salgas.',
+  FoundFailureKind.localStorage =>
+    'No pudimos guardar el borrador en este dispositivo. Libera espacio y reintenta antes de salir.',
   FoundFailureKind.timedOut =>
     'La operación no respondió. Reintenta el mismo envío o consulta Mis búsquedas y avisos.',
   FoundFailureKind.invalid => 'Revisa los campos marcados antes de continuar.',

@@ -1,3 +1,5 @@
+import '../features/onboarding/data/data_sources/offline_onboarding_data_source.dart';
+import '../features/onboarding/data/data_sources/onboarding_completion_cache.dart';
 import '../features/case_posters/domain/repositories/case_share_repository.dart';
 import '../features/case_posters/data/repositories/case_share_repository_impl.dart';
 import '../features/case_posters/data/data_sources/supabase_case_share_source.dart';
@@ -327,7 +329,11 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
             ),
           ),
           onboardingRepository: OnboardingRepositoryImpl(
-            SupabaseOnboardingDataSource(supabase.client),
+            OfflineOnboardingDataSource(
+              SupabaseOnboardingDataSource(supabase.client),
+              PreferencesOnboardingCompletionCache(),
+              currentOwner: () => supabase.client.auth.currentUser?.id,
+            ),
           ),
         );
       } catch (_) {

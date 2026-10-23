@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/report_draft_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' show TileProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,11 +49,15 @@ class _SightingScreenState extends ConsumerState<SightingScreen> {
           '¿Salir del avistamiento?',
           v?.frozen != null
               ? 'El envío pudo haberse guardado. Reintenta antes de salir para confirmar el resultado y evitar otro reporte.'
-              : 'Se descartarán los datos que todavía no enviaste.',
+              : 'Conservaremos el borrador en este dispositivo para que puedas retomarlo.',
           'Salir',
         );
     _leaving = false;
     if (!mounted || !leave) return;
+    if (!await ref.read(sightingViewModelProvider.notifier).saveForLater()) {
+      return;
+    }
+    if (!mounted) return;
     setState(() => _canPop = true);
     await WidgetsBinding.instance.endOfFrame;
     if (mounted) {
@@ -132,7 +137,20 @@ class _SightingScreenState extends ConsumerState<SightingScreen> {
                   ),
                 ],
               )
-            : _form(v, m),
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ReportDraftStatus(
+                    onRetry: v.issue == SightingIssue.localStorage && !v.busy
+                        ? m.saveForLater
+                        : null,
+                    onDiscard: v.busy || v.frozen != null
+                        ? null
+                        : () => m.discardLocalDraft(v.id),
+                  ),
+                  _form(v, m),
+                ],
+              ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
 import 'dart:io';
@@ -105,6 +107,7 @@ void main() {
         final pets = FakePets();
         final scope = ProviderContainer(
           overrides: [
+            localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             contentReportRepositoryProvider.overrideWithValue(FakeReports()),
             caseClosureRepositoryProvider.overrideWithValue(closures),
             sightingRepositoryProvider.overrideWithValue(FakeSightings()),

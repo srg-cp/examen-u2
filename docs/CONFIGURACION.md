@@ -683,6 +683,24 @@ En Auth URL Configuration autorizar únicamente los callback de los entornos
 usados: <PUBLIC_WEB_ORIGIN>/api/moderation/oauth/callback?flow=* (la parte flow
 es aleatoria por intento; usar el patrón acotado de redirect URLs de Supabase).
 Validar que el patrón admita la query flow sin permitir hosts externos.
+
+En Supabase autohospedado, la lista efectiva pertenece al contenedor Auth:
+`GOTRUE_URI_ALLOW_LIST`. La plantilla estándar la recibe de
+`ADDITIONAL_REDIRECT_URLS`; comprobar el mapeo del Compose antes de editar.
+Añadir a la lista existente, separada por comas, esta entrada de producción:
+
+```text
+https://entrehuellas.kormind.com/api/moderation/oauth/callback?flow=*
+```
+
+Conservar las entradas móvil y local existentes. Recrear Auth para aplicar
+el entorno y probar con un flujo nuevo. El23/10 se comprobó que el retorno
+local se conservaba, mientras producción caía en `entrehuellas://login-callback/`:
+el enlace inicial hacia Google puede incluir redirect_to aunque Auth finalmente
+lo rechace. Comprobar el retorno real, no solo el302 inicial hacia Google.
+No sustituir Site URL móvil ni modificar Google→Supabase para resolver esta
+allowlist. Aplicación remota y login real pendientes; evidencia en acceso-web.
+
 Google/Facebook se configuran en el Dashboard del proveedor/Supabase con sus
 credenciales existentes; no copiar client secrets a esta app. El callback del
 proveedor hacia Supabase sigue siendo el de ese backend, no el callback Nuxt.

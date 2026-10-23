@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -57,6 +59,7 @@ ProviderContainer containerFor(
   Stream<AuthSession?>? sessions,
 }) => ProviderContainer(
   overrides: [
+    localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
     sightingRepositoryProvider.overrideWithValue(repository),
     sightingTargetProvider.overrideWithValue(target),
     sightingSessionProvider.overrideWith(

@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -91,6 +93,7 @@ void main() {
         final boundary = GlobalKey();
         final scope = ProviderContainer(
           overrides: [
+            localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),

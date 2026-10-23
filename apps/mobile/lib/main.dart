@@ -1,3 +1,7 @@
+import 'features/offline_drafts/data/repositories/local_draft_repository_impl.dart';
+import 'features/offline_drafts/data/data_sources/open_local_draft_database_stub.dart'
+    if (dart.library.io) 'features/offline_drafts/data/data_sources/open_local_draft_database.dart';
+import 'features/offline_drafts/providers/local_draft_providers.dart';
 import 'features/user_blocks/providers/user_block_providers.dart';
 import 'features/case_contacts/providers/case_contact_providers.dart';
 import 'features/content_reports/providers/content_report_providers.dart';
@@ -34,6 +38,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        localDraftRepositoryProvider.overrideWithValue(
+          LocalDraftRepositoryImpl(openLocalDraftDatabase()),
+        ),
         userBlockRepositoryProvider.overrideWithValue(
           bootstrap.userBlockRepository,
         ),

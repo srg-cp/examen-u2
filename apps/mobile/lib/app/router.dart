@@ -1,3 +1,4 @@
+import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
 import '../features/user_blocks/presentation/screens/user_blocks_screen.dart';
 import '../features/user_blocks/presentation/widgets/user_block_controls.dart';
 import '../features/case_contacts/presentation/view_models/case_contact_view_model.dart';
@@ -138,6 +139,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/notifications' ||
+              state.uri.path == '/home/drafts' ||
               state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
               state.uri.path == '/home/explore-map' ||
@@ -344,6 +346,33 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
               child: const MyFoundCasesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'drafts',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: LocalDraftsScreen(
+                onOpen: (draft) async {
+                  final parts = draft.slot.split(':');
+                  final path = draft.slot == 'lost'
+                      ? '/home/lost-cases/new'
+                      : draft.slot == 'community-search'
+                      ? '/home/lost-cases/community/new'
+                      : parts.first == 'sighting' && parts.length == 3
+                      ? '/home/sightings/${parts[1] == 'true' ? 'found' : 'lost'}/${Uri.encodeComponent(parts[2])}'
+                      : parts.first == 'found' && parts.length == 3
+                      ? Uri(
+                          path: '/home/found-cases/new',
+                          queryParameters: {
+                            'case': parts[2],
+                            'community': parts[1],
+                          },
+                        ).toString()
+                      : null;
+                  if (path != null) await context.push<void>(path);
+                },
+              ),
             ),
           ),
           GoRoute(

@@ -1,6 +1,7 @@
 import '../../../pets/domain/entities/pet.dart';
 
 enum CaseFailureKind {
+  localStorage,
   unavailable,
   timedOut,
   busy,

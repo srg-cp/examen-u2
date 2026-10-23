@@ -195,3 +195,10 @@ también para pérdida comunitaria. Elegir sugerencia de Perú marca/centra el p
 privado, ajustable después en mapa. Búsqueda opcional, referencia independiente
 y mapa libre. Sin SQL/permisos nuevos;24 pruebas places/arquitectura/creación
 aprobadas. Android pendiente. [ADR-107](../decisiones/107-busqueda-reportes-y-sugerencias-peru.md).
+
+
+23/10, HU-15.1: el editor conserva un borrador local por cuenta/contexto, con
+UUID y evidencia, recuperación sin red y conservación al salir. Comandos ambiguos
+se retoman sin editar su contenido. [Recorrido, persistencia, reglas y validación
+pendiente](borradores-locales.md), ADR-131. No activa cola automática ni caché
+de fichas. La demo Android de reinicio sin red sigue pendiente.

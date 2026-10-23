@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/report_draft_status.dart';
 import '../../../../core/presentation/widgets/case_report_fields.dart';
 import '../../../../core/presentation/widgets/collection_add_button.dart';
 import '../../../../core/presentation/widgets/validation_surface.dart';
@@ -56,11 +57,15 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
           '¿Salir del reporte?',
           value?.lockedDraft != null
               ? 'El envío pudo haber llegado al servidor. Consulta Mis casos antes de publicar otra vez.'
-              : 'Se descartarán los datos que todavía no publicaste.',
+              : 'Conservaremos el borrador en este dispositivo para que puedas retomarlo.',
           'Salir',
         );
     _leaving = false;
     if (!mounted || !leave) return;
+    if (!await ref.read(caseEditorViewModelProvider.notifier).saveForLater()) {
+      return;
+    }
+    if (!mounted) return;
     setState(() => _canPop = true);
     await WidgetsBinding.instance.endOfFrame;
     if (mounted) {
@@ -141,7 +146,27 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
         hasError: value.invalidFields.contains(field),
         child: child,
       );
-  Widget _content(CaseEditorState value, CaseEditorViewModel model) {
+  Widget _content(CaseEditorState value, CaseEditorViewModel model) =>
+      value.stage != CaseEditorStage.form
+      ? _editorContent(value, model)
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!(value.stage == CaseEditorStage.confirmed) &&
+                !widget.petDetailsOnly)
+              ReportDraftStatus(
+                onRetry:
+                    value.issue == CaseFailureKind.localStorage && !value.busy
+                    ? model.saveForLater
+                    : null,
+                onDiscard: value.busy || value.lockedDraft != null
+                    ? null
+                    : () => model.discardLocalDraft(value.draftId),
+              ),
+            _editorContent(value, model),
+          ],
+        );
+  Widget _editorContent(CaseEditorState value, CaseEditorViewModel model) {
     if (value.stage == CaseEditorStage.confirmed) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

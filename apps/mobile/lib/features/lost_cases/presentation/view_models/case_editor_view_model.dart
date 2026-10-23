@@ -1,3 +1,6 @@
+import 'dart:async';
+import '../../../offline_drafts/providers/local_draft_providers.dart';
+import '../state/case_local_draft.dart';
 import '../../../../core/presentation/state/event_date_time_draft.dart';
 import '../../../../core/domain/utils/new_entity_id.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,11 +24,114 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
   Duration get publicationTimeout =>
       _publicationTimeout ?? const Duration(seconds: 35);
   int _generation = 0;
+  Object? _checkpointKey;
+  void Function()? _stopObserving;
+
+  Future<bool> discardLocalDraft(String expectedId) async {
+    final value = state.asData?.value;
+    if (value == null ||
+        value.draftId != expectedId ||
+        value.busy ||
+        value.lockedDraft != null) {
+      return false;
+    }
+    final generation = _generation;
+    final remove = ref.read(removeLocalDraftProvider);
+    final slot = 'lost';
+    final keep = ref.keepAlive();
+    state = AsyncData(value.copyWith(busy: true));
+    try {
+      await remove(value.ownerId, slot, value.draftId);
+      if (!_current(generation, value.ownerId)) return false;
+      ref.invalidateSelf();
+      return true;
+    } catch (_) {
+      if (_current(generation, value.ownerId)) {
+        state = AsyncData(
+          state.requireValue.copyWith(
+            busy: false,
+            issue: CaseFailureKind.localStorage,
+          ),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  Future<bool> saveForLater() async {
+    final value = state.asData?.value;
+    if (value == null || state.isLoading) return false;
+    final generation = _generation;
+    final saved = await _saveLocal(value);
+    if (saved &&
+        _current(generation, value.ownerId) &&
+        state.requireValue.issue == CaseFailureKind.localStorage) {
+      state = AsyncData(state.requireValue.copyWith(clearIssue: true));
+    }
+    return saved;
+  }
+
+  Future<bool> _saveLocal(CaseEditorState value) async {
+    if (!value.dirty && value.lockedDraft == null) return true;
+    final generation = _generation;
+    final save = ref.read(saveLocalDraftProvider);
+    final keep = ref.keepAlive();
+    try {
+      await save(caseLocalDraft(value));
+      return true;
+    } catch (_) {
+      if (_current(generation, value.ownerId) &&
+          caseCheckpointKey(state.requireValue) == caseCheckpointKey(value)) {
+        state = AsyncData(
+          state.requireValue.copyWith(issue: CaseFailureKind.localStorage),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  void _observeDraft() {
+    _checkpointKey = null;
+    _stopObserving?.call();
+    final generation = _generation;
+    _stopObserving = listenSelf((previous, next) {
+      if (generation != _generation) return;
+      final value = next.asData?.value;
+      if (next.isLoading || value == null) return;
+      final key = caseCheckpointKey(value);
+      if (_checkpointKey == key) return;
+      _checkpointKey = key;
+      if (value.stage == CaseEditorStage.confirmed) {
+        final remove = ref.read(removeLocalDraftProvider);
+        unawaited(
+          remove(value.ownerId, 'lost', value.draftId).catchError((Object _) {
+            // The receipt remains confirmed. An undeleted exact command is safe to replay.
+          }),
+        );
+      } else {
+        unawaited(_saveLocal(value));
+      }
+    });
+  }
+
   @override
   Future<CaseEditorState> build() async {
-    _generation++;
+    final generation = ++_generation;
     final session = await ref.watch(caseSessionProvider.future);
+    if (!ref.mounted || generation != _generation) {
+      throw const CaseFailure(CaseFailureKind.forbidden);
+    }
     if (session == null) throw const CaseFailure(CaseFailureKind.forbidden);
+    _observeDraft();
+    final local = await ref.read(readLocalDraftProvider)(
+      session.userId,
+      'lost',
+    );
+    if (local != null) return restoreCaseLocalDraft(local);
     final pets = await ref.read(listMyPetsProvider)(session.userId);
     return CaseEditorState(
       ownerId: session.userId,
@@ -227,6 +333,13 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
       state = AsyncData(
         current.copyWith(busy: true, lockedDraft: draft, clearIssue: true),
       );
+      if (!await _saveLocal(state.requireValue)) {
+        if (_current(generation, current.ownerId)) {
+          state = AsyncData(state.requireValue.copyWith(busy: false));
+        }
+        return;
+      }
+      if (!_current(generation, current.ownerId)) return;
       final published = await ref
           .read(publishLostCaseProvider)(current.ownerId, draft)
           .timeout(

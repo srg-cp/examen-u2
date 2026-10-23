@@ -1,3 +1,6 @@
+import 'dart:async';
+import '../../../offline_drafts/providers/local_draft_providers.dart';
+import '../state/found_local_draft.dart';
 import '../../../../core/presentation/state/event_date_time_draft.dart';
 import 'recovery_case_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,12 +24,113 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
   bool get communitySearch =>
       ref.read(foundEditorContextProvider).communitySearch;
   int _generation = 0;
+  Object? _checkpointKey;
+  void Function()? _stopObserving;
+  String _slot = "";
+  Future<bool> discardLocalDraft(String expectedId) async {
+    final value = state.asData?.value;
+    if (value == null || value.draftId != expectedId || value.busy) {
+      return false;
+    }
+    final generation = _generation;
+    final remove = ref.read(removeLocalDraftProvider);
+    final slot = _slot;
+    final keep = ref.keepAlive();
+    try {
+      if (value.attempted && !await discard()) return false;
+      if (!_current(generation, value.ownerId)) return false;
+      state = AsyncData(state.requireValue.copyWith(busy: true));
+      await remove(value.ownerId, slot, value.draftId);
+      if (!_current(generation, value.ownerId)) return false;
+      ref.invalidateSelf();
+      return true;
+    } catch (_) {
+      if (_current(generation, value.ownerId)) {
+        state = AsyncData(
+          state.requireValue.copyWith(
+            busy: false,
+            issue: FoundFailureKind.localStorage,
+          ),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  Future<bool> saveForLater() async {
+    final value = state.asData?.value;
+    if (value == null || state.isLoading) return false;
+    final generation = _generation;
+    final saved = await _saveLocal(value);
+    if (saved &&
+        _current(generation, value.ownerId) &&
+        state.requireValue.issue == FoundFailureKind.localStorage) {
+      state = AsyncData(state.requireValue.copyWith(clearIssue: true));
+    }
+    return saved;
+  }
+
+  Future<bool> _saveLocal(FoundEditorState value) async {
+    if (!value.dirty && value.lockedDraft == null) return true;
+    final generation = _generation;
+    final slot = _slot;
+    final save = ref.read(saveLocalDraftProvider);
+    final keep = ref.keepAlive();
+    try {
+      await save(foundLocalDraft(value, slot));
+      return true;
+    } catch (_) {
+      if (_current(generation, value.ownerId) &&
+          foundCheckpointKey(state.requireValue) == foundCheckpointKey(value)) {
+        state = AsyncData(
+          state.requireValue.copyWith(issue: FoundFailureKind.localStorage),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  void _observeDraft() {
+    _checkpointKey = null;
+    _stopObserving?.call();
+    final generation = _generation;
+    _stopObserving = listenSelf((previous, next) {
+      if (generation != _generation) return;
+      final value = next.asData?.value;
+      if (next.isLoading || value == null) return;
+      final key = foundCheckpointKey(value);
+      if (_checkpointKey == key) return;
+      _checkpointKey = key;
+      if (value.stage == FoundStage.confirmed) {
+        final remove = ref.read(removeLocalDraftProvider);
+        unawaited(
+          remove(value.ownerId, _slot, value.draftId).catchError((Object _) {
+            // The receipt remains confirmed. An undeleted exact command is safe to replay.
+          }),
+        );
+      } else {
+        unawaited(_saveLocal(value));
+      }
+    });
+  }
+
   @override
   Future<FoundEditorState> build() async {
-    _generation++;
+    final generation = ++_generation;
     final session = await ref.watch(foundSessionProvider.future);
+    if (!ref.mounted || generation != _generation) {
+      throw const FoundFailure(FoundFailureKind.forbidden);
+    }
     if (session == null) throw const FoundFailure(FoundFailureKind.forbidden);
     final context = ref.watch(foundEditorContextProvider);
+    _slot = foundDraftSlot(context);
+    _observeDraft();
+    final local = await ref.read(readLocalDraftProvider)(session.userId, _slot);
+    if (local != null) return restoreFoundLocalDraft(local, context);
     final target = context.communitySearch
         ? null
         : await ref.watch(readRecoverySearchProvider)(
@@ -269,6 +373,13 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
       v.copyWith(busy: true, lockedDraft: d, attempted: true, clearIssue: true),
     );
     try {
+      if (!await _saveLocal(state.requireValue)) {
+        if (_current(g, v.ownerId)) {
+          state = AsyncData(state.requireValue.copyWith(busy: false));
+        }
+        return;
+      }
+      if (!_current(g, v.ownerId)) return;
       final published = await ref
           .read(publishFoundCaseProvider)(v.ownerId, d)
           .timeout(

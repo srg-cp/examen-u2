@@ -1,5 +1,12 @@
 # Arquitectura de Entre Huellas
 
+23/10, ADR-131: `offline_drafts` conserva formularios Android mediante dominio/casos de uso,
+repositorio y Drift/SQLite privado. Los editores convierten su estado dentro de su
+presentación y colaboran mediante dominio/providers; bootstrap/main inyectan fuentes.
+Comando exacto antes de enviar, contexto/cuenta, lista desde Perfil y exclusión de
+backup. El adaptador de onboarding recuerda solo bienvenida confirmada por cuenta
+para transporte caído; sesión/autorización remotas conservadas. [Ficha](funcionalidades/borradores-locales.md).
+
 23/10, HU-14.2/RF-23/#44: `user_blocks` concentra elecciones privadas por cuenta,
 con dominio/repositorios/casos de uso, ViewModels y fuentes Supabase/HTTP en
 móvil/web. Bootstrap/router/páginas componen integraciones mediante slots.

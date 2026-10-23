@@ -78,3 +78,10 @@ Sustituye el acceso genérico anterior: Reportar abre directamente Mascota perdi
 ## Formulario único de pérdida — 12 de octubre de 2026
 
 Sustituye las pestañas de ADR-035: Mascota a reportar permite elegir una ficha o No está en mis mascotas. Ficha muestra resumen/fotos públicas; sin ficha pide descripción/fotos sin registrarla como propia. Fecha/hora/mapa/referencia y revisión forman un solo bloque conservado al seleccionar. Cada origen mantiene descripción y fotos, UUID y permisos existentes; no se mezclan datos de mascotas ni identidades. Bloqueos, descarte, toast y vista previa conservados. [ADR-038](../decisiones/038-formulario-unico-mascota-perdida.md). Sin SQL nuevo; evidencia local y Android pendiente en ESTADO.
+
+
+23/10, HU-15.1: el editor conserva un borrador local por cuenta/contexto, con
+UUID y evidencia, recuperación sin red y conservación al salir. Comandos ambiguos
+se retoman sin editar su contenido. [Recorrido, persistencia, reglas y validación
+pendiente](borradores-locales.md), ADR-131. No activa cola automática ni caché
+de fichas. La demo Android de reinicio sin red sigue pendiente.

@@ -525,6 +525,12 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 
 ### S6 - Moderación, offline y validación
 
+23/10: autorizado HU-15.1/#47/RF-32. Borradores locales por cuenta en Android,
+fotos, fecha parcial y comando estable; Perfil → Borradores. ADR-131 documenta
+la recuperación de bienvenida confirmada ante fallo de transporte como dependencia
+de entrada offline. Cola automática HU-15.2 y caché de fichas HU-15.3 conservan su
+alcance separado. [Validación y límites](funcionalidades/borradores-locales.md).
+
 23/10/2026: HU-14.2/RF-23/issue #44 implementada localmente en móvil/web:
 bloquear/desbloquear cuentas desde contenido autorizado y lista propia en Perfil.
 Alcance confirmado por el usuario: impedir nuevos avisos y avistamientos

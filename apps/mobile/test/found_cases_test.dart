@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
@@ -185,6 +187,7 @@ void main() {
     cases = FakeFoundCases();
     container = ProviderContainer(
       overrides: [
+        localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
         authRepositoryProvider.overrideWithValue(auth),
         foundCaseRepositoryProvider.overrideWithValue(cases),
         lostCaseRepositoryProvider.overrideWithValue(FakeCases()),
