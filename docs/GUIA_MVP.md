@@ -1,5 +1,11 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+22/10: preparación de distribución Android solicitada por el usuario: firma
+propia y prerelease con APK por push a main, condicionada a validaciones.
+[Configuración y límites](funcionalidades/distribucion-android.md). Infraestructura
+de entrega de las HU existentes, sin nuevas historias, alcance de producto,
+cierre del MVP, publicación en Play ni activación remota por arrastre.
+
 Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
 móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
 y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente

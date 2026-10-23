@@ -1,5 +1,63 @@
 # Estado del proyecto
 
+## Guía operativa Android en la raíz —22/10/2026
+
+Creada [INSTALACION_ANDROID.md](../INSTALACION_ANDROID.md) por petición del usuario:
+preparación de herramientas, firma/respaldo, JSON y procedencia de valores,
+cinco secrets paso a paso, integración a main, ejecución manual/reintentos,
+descarga/instalación/actualización, compilación local y resolución de fallos.
+README raíz incorpora acceso superior, apartado propio y enlace documental;
+ficha de distribución enlaza la guía. Conservados cambios locales anteriores.
+Sin código, workflows, credenciales ni publicación remota modificados en este
+incremento. Validación documental de enlaces y correspondencia con scripts/YAML;
+no se repiten builds/pruebas de aplicación por cambios exclusivamente documentales.
+Pendientes reales conservados: firma definitiva, valores/secrets del usuario,
+integración a main, Actions real e instalación con backend/dispositivo reales.
+
+## Preparación de distribución Android —22/10/2026
+
+Configurado `.github/workflows/flutter.yml` para validar cada push a main y,
+si pasa, compilar APK universal con firma propia, comprobarlo con apksigner y
+publicar prerelease `android-build-N` con APK/checksum. Número Android10000+N,
+reintento idempotente y artifact14 días ante fallo de publicación. PR sin firma
+ni publicación; ejecución manual solo publica desde main. Identificador Android
+existente conservado; no cambia SQL, acceso, Firebase ni funcionalidades.
+
+Gradle consume firma desde entorno o key.properties ignorado y rechaza release
+sin configuración, sin fallback debug. Script PowerShell genera/exporta JKS
+sin sobrescribir; validador Python reconstruye archivos ignorados y rechaza
+secrets ausentes, configuración ajena, claves privilegiadas y placeholders.
+[Ficha con los cinco secrets y pasos del usuario](funcionalidades/distribucion-android.md),
+ejemplos e índice/README/guía actualizados. Sin subir credenciales ni ejecutar
+acciones remotas, commits, push o merge.
+
+Validación local: formato620 archivos, análisis sin incidencias,518 pruebas
+Flutter y5 Python aprobadas. Actionlint1.7.12 aprobado (binario contrastado con
+digest SHA-256 publicado). Sintaxis PowerShell y exportación Base64 comprobadas
+con certificado desechable; exportación de prueba retirada para no confundirla
+con la firma definitiva. Gradle compila la configuración Kotlin y rechaza la
+release sin firma como se esperaba. Error inicial de loopback Java resuelto
+para estas comprobaciones con WindowsSelectorProvider, sin cambiar el entorno
+global ni las opciones versionadas del proyecto.
+
+La primera suite reveló7 expectativas antiguas de3 archivos: shell anterior
+en retorno de ficha, color/selector Opacity de transición y dos campos frente
+a tres tras el celular privado. Corregidas solo las pruebas a la implementación
+vigente; sin cambiar apariencia, movimiento ni omitir pruebas para publicar.
+
+APK release universal compilado con JDK17 en2m28s (402 tareas) y firma v2
+verificada por apksigner; certificado CN=Local Build Validation y configuración
+ficticia. Artefacto renombrado a build/android-signing-validation/
+app-validation-only.apk: no es una entrega conectada al backend ni firma final.
+Primer intento con JBR21 y heap8 GB terminó por memoria nativa insuficiente;
+el reintento con heap3 GB/2 workers pasó y esos límites quedan en CI mediante
+GRADLE_OPTS. Generación de archivos temporales Kotlin excluida de Git.
+
+El usuario debe generar/respaldar firma definitiva, completar JSON y colocar cinco secrets,
+integrar cambios a main y ejecutar Actions real. Instalación y recorridos con
+backend real/dispositivo pendientes; no se acredita MVP listo ni release remota.
+Siguiente paso: activar los secrets siguiendo la ficha y verificar primer APK.
+
 ## Pines y detalles del selector web según móvil —21/10/2026
 
 Por instrucción explícita, comparados ZoneMapPicker/CaseLocationFields y

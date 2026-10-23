@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Distribución Android por GitHub Releases](distribucion-android.md): firma,
+  secrets, APK por push a main, instalación, reintentos y validación pendiente.
+
 Patrón UI/UX aprobado21/10: [Expansión desde origen con identidad del
 control](../patrones-ui-ux/expansion-desde-origen.md), con contrato visual,
 componentes, ejemplos y revisión para reutilizarlo en otros recorridos.

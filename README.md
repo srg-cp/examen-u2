@@ -13,6 +13,7 @@
   <p>
     <a href="#primeros-pasos">Primeros pasos</a> ·
     <a href="#configuracion-local">Configuración</a> ·
+    <a href="INSTALACION_ANDROID.md">Instalar/publicar APK</a> ·
     <a href="#trabajo-en-equipo">Colaborar</a> ·
     <a href="#documentacion">Documentación</a>
   </p>
@@ -119,6 +120,20 @@ El recorrido comienza en acceso; una cuenta que no completó el onboarding debe 
 
 Si falla el acceso o falta una función remota, confirma el entorno y la activación del incremento con el responsable. No ejecutes todo el SQL sobre el servidor compartido para intentar resolverlo.
 
+## 📦 Instalar y publicar Android
+
+La [guía paso a paso de instalación y distribución](INSTALACION_ANDROID.md)
+explica cómo generar y respaldar la firma, completar el JSON local, guardar los
+cinco secrets en GitHub, activar la compilación desde `main`, descargar el APK
+e instalarlo o actualizarlo en un teléfono. Incluye compilación local y solución
+de errores, con comandos e indicaciones de dónde ejecutar cada paso.
+
+El workflow está preparado para publicar una **prerelease con APK firmado** por
+cada push a `main` que supere las validaciones. Su activación real requiere
+configurar los secrets e integrar los cambios; no implica despliegue de Supabase
+ni publicación en Google Play. Quien solo instala el APK no necesita Flutter,
+el JSON ni las credenciales de firma.
+
 <a id="trabajo-en-equipo"></a>
 
 ## 🤝 Trabajo en equipo
@@ -201,6 +216,7 @@ entrehuellas/
 | Necesitas… | Consulta |
 | --- | --- |
 | Preparar el entorno y diagnosticar acceso | [Configuración y validación](docs/CONFIGURACION.md) |
+| Configurar firma/secrets, publicar, instalar o actualizar el APK | [Instalación y distribución Android](INSTALACION_ANDROID.md) |
 | Conocer lo implementado y sus pendientes | [Estado](docs/ESTADO.md) · [Funcionalidades](docs/funcionalidades/README.md) |
 | Elegir y delimitar una entrega | [Guía MVP](docs/GUIA_MVP.md) · [Backlog](docs/BACKLOG_MVP.md) |
 | Respetar las fronteras de código | [Reglas](docs/REGLAS_ARQUITECTURA.md) · [Arquitectura](docs/ARQUITECTURA.md) |

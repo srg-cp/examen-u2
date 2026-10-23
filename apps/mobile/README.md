@@ -34,7 +34,14 @@ La app muestra los créditos enlazados del proveedor y conserva los pines de mar
 Detener e iniciar la ejecución tras cambiar la URL; hot reload no actualiza
 dart-defines. Sin este valor se conserva el mapa OSM estándar de desarrollo.
 
-## Comprobaciones
+## APK y distribución
+
+La [guía de distribución Android](../../docs/funcionalidades/distribucion-android.md)
+explica la preparación de firma y los cinco secrets. `.github/workflows/flutter.yml`
+valida y publica una prerelease con APK firmado por cada push a `main`.
+Las releases sin firma propia fallan; debug conserva su configuración habitual.
+
+## Comprobaciones locales
 
 El icono del launcher Android utiliza los originales de `logo`. Regeneración e instrucciones de instalación en [logo/README.md](../logo/README.md).
 
