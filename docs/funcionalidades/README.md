@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Apelaciones de moderación](apelaciones-moderacion.md): decisiones propias,
+  motivo, estado y respuesta auditada; usuario móvil/web, revisión solo web.
+
 - [Distribución Android por GitHub Releases](distribucion-android.md): firma,
   secrets, APK por push a main, instalación, reintentos y validación pendiente.
 

@@ -1,5 +1,10 @@
 # Patches manuales de Supabase
 
+Apelaciones23/10:035_patch_moderation_appeals.sql generado mediante
+Build-AppealsPatch.ps1; requiere030, no034. Aplicar el contenido completo solo
+si está pendiente. Conserva decisiones originales y visibilidad; no requiere
+reaplicar030. Desarrollo remoto aún pendiente; ver CONFIGURACION y la ficha.
+
 Celular privado20/10: 033_patch_profile_contact_phone.sql después de032, añade profiles.contact_phone y sugerencia al autor. Contacto por caso está en031 y compartir en032; aplicar solo pendientes en orden. Generado con Build-ProfileContactPhonePatch, no editar independientemente.
 
 Difusión20/10: [032_patch_case_sharing.sql](032_patch_case_sharing.sql), generado mediante Build-CaseSharingPatch.ps1. Ejecutar íntegro después de031 cuando se autorice activar la nueva RPC; no reaplicar patches anteriores. Validación local en ESTADO, sin despliegue remoto.

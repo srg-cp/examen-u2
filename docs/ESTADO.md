@@ -1,5 +1,58 @@
 # Estado del proyecto
 
+## HU-14.4: apelaciones de moderación —23/10/2026
+
+Implementada la apelación de decisiones sobre contenido propio con motivo,
+estado y respuesta en Flutter/Nuxt. Perfil móvil e Inicio web enlazan a Mis
+apelaciones; Denuncias web enlaza a Revisar apelaciones, con política global
+reviewer y autorización SQL en cada operación. Se distingue propietario del
+contenido, denunciante y autor autenticado del avistamiento. Evidencia anónima
+no se atribuye a una cuenta. [Ficha](funcionalidades/apelaciones-moderacion.md).
+
+Plan035/fuentes119–121 genera migración y patch035. Tablas privadas con RLS,
+RPC de autoría/rol, accesos de revisión auditados y bloqueos/idempotencia por
+comando/decisión. Una apelación y respuesta definitiva por decisión. Se conserva
+la decisión original; responder no cambia visibilidad, que sigue en la operación
+auditada existente. Sin ampliación de permisos públicos ni exposición de denuncia,
+evidencia, coordenadas o paths. No depende de034/HU-14.2, que se trabaja aparte.
+
+Recorridos reutilizan campos, toast, skeleton/shimmer y confirmación de salida
+con borrador, incluido cerrar sesión en web. Conflicto mantiene el motivo y
+permite repetir una consulta fallida; reintento ambiguo conserva UUID/contenido.
+Cambio de cuenta, expiración, revocación y disposición ocultan datos y descartan
+respuestas tardías. /moderacion pasa a pages/moderacion/index.vue para montar
+su nueva ruta hermana correctamente. El router móvil permite /home/appeals
+solo tras cuenta/onboarding; dos pruebas de integración verifican el acceso real.
+
+TextField admite límite Unicode opcional, usado en apelaciones, y su contador
+compartido queda en flujo dentro del contorno para no tapar texto ampliado.
+Regresión de controles Chrome aprobada. Ajustado el selector antiguo de ese
+harness a la navegación Reportar y añadidas llaves a una expectativa Flutter
+existente que impedía análisis limpio; sin cambiar su comprobación.
+
+Validación local:
+
+- SQL PGlite/PostGIS:48/48, incluidos3 escenarios nuevos y repetición del bundle.
+- Web:77/77 pruebas,30/30 de servidor de producción, typecheck y build aprobados.
+- Flutter:formato/análisis sin incidencias, regresión524/524 con
+  AMBIENT_BACKGROUND_MOTION=false; después18/18 focalizadas, incluidos8 escenarios
+  de apelaciones (dos nuevos de router) y10 de arquitectura. El primer intento
+  global se interrumpió por timeouts del fondo continuo, ya documentados en
+  este proyecto; no se ocultaron fallos mediante omisión de pruebas.
+- Chrome fixture:envío/validación/descarte y logout cancelados/reintento único,
+  respuesta/consulta del autor/revocación, límite1000 Unicode, teclado,
+  movimiento normal/reducido, CSP/hidratación,1920/1440/731/390/320/texto200%.
+  Renders revisados en apps/mobile/build/ui-preview/appeals-web y appeals-mobile;
+  también aprobado check-fields-browser sobre el campo compartido.
+
+Trabajo aislado en feature/moderation-appeals, carpeta entreHuellas-appeals,
+para conservar los cambios simultáneos de HU-14.2 en la carpeta original.
+Commit/push autorizados por el usuario para esta entrega; sin merge ni despliegue.
+Pendientes:aplicar035 en desarrollo remoto, demo con autores/revisor reales,
+contención multiconexión hosted, Android instalado y otros navegadores.
+El siguiente paso es activar035 siguiendo CONFIGURACION. No se cierra el issue
+remoto#46 ni HU-14 por la implementación local.
+
 ## Guía operativa Android en la raíz —22/10/2026
 
 Creada [INSTALACION_ANDROID.md](../INSTALACION_ANDROID.md) por petición del usuario:

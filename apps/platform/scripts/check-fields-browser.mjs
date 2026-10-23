@@ -32,7 +32,7 @@ try {
     window.fieldFrames=[];
     const tick=()=>{const el=document.querySelector('.sader-morph-panel');if(el)window.fieldFrames.push({width:el.getBoundingClientRect().width,transform:getComputedStyle(el).transform,blur:getComputedStyle(el.firstElementChild).filter});requestAnimationFrame(tick);};tick();
   });
-  await page.getByRole('link',{name:'Reportar',exact:true}).click();
+  await page.locator('.user-navigation-report').click();
   try {
     await page.getByRole('progressbar',{name:'Cargando página'}).waitFor();
     assert.equal(await page.locator('.sader-top-loader').evaluate(el=>getComputedStyle(el,'::after').backgroundColor),'rgb(40, 135, 239)','Loading segment follows the sky-blue theme');

@@ -1,5 +1,12 @@
 # Base de datos de Entre Huellas
 
+HU-14.4/#46,23/10: plan035/fuentes119–121 añade apelaciones propias,
+respuestas y lecturas auditadas privadas. Build-AppealsPatch genera patch035 y
+migración20261023003500_moderation_appeals.sql; requiere030, sin dependencia de
+034/HU-14.2. Build-RunAll incorpora035 tras033. No ejecutar el acumulativo para
+actualizar producción; aplicar solamente el incremento pendiente. Validación
+local48/48, sin aplicación remota. [Ficha](../docs/funcionalidades/apelaciones-moderacion.md).
+
 Celular privado20/10: plan033/fuentes112–114, patch033/migración20261020003300_profile_contact_phone.sql. Nullable text con formato internacional y grants por columna/RLS propia; read_case_contact sugiere solo al autor. Build-ProfileContactPhonePatch/Build-RunAll; después de032, sin reescribir031. Hosted pendiente.
 
 Compartir ficha20/10: plan032/fuentes110–111, migración20261020003200_case_sharing.sql y patch032 generados con Build-CaseSharingPatch/Build-RunAll. RPC autenticada prepara solo búsquedas activas/visibles con foto validada por el lector QR; dueño real y slug estable, sin reactivar enlaces revocados ni permisos de autor. [Ficha](../docs/funcionalidades/compartir-ficha.md). Activación remota pendiente.

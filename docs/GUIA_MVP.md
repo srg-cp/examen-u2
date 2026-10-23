@@ -525,6 +525,13 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 
 ### S6 - Moderación, offline y validación
 
+Avance23/10, HU-14.4/#46/RF-33: implementada la vía mínima de apelación propia
+con motivo/estado/respuesta en móvil/web, revisión autorizada solo en web,
+historial e idempotencia privados en plan035. No cambia visibilidad al responder:
+se conserva la operación auditada de moderación. Validación local y activación
+pendiente en [la ficha](funcionalidades/apelaciones-moderacion.md); no cierra
+HU-14, HU-14.2 ni la validación remota de esta derivada.
+
 - **HU-14 / RF-22,23,33:** denuncia, bloqueo, ocultamiento por moderador con motivo y auditoría; vía de apelación mínima.
 - **HU-15 / RF-32:** borrador y caché local con Drift/SQLite, cola de envíos y estados visibles. Cortar conexión y reiniciar no pierde el borrador; reenvío no duplica ni confirma publicación antes de respuesta del servidor.
 - **HU-16 / RF-35,40:** métricas agregadas y controles administrativos mínimos, accesibles solo por roles autorizados. Definir con el usuario una interfaz mínima para esta operación.

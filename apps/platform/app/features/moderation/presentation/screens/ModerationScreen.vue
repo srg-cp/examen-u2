@@ -48,6 +48,7 @@ onBeforeUnmount(()=>{++accessCheck;unsubscribe();model.dispose();channel?.close(
 </script>
 <template>
   <OriginPageSurface id="view" class="moderation-screen">
+    <NavigationLink to="/moderacion/apelaciones" class="text-button">Revisar apelaciones</NavigationLink>
     <header class="moderation-header"><div><h1 ref="heading" tabindex="-1">{{state.stage==='detail'?'Revisar denuncia':'Denuncias'}}</h1></div><NavigationLink class="text-button" to="/inicio">Volver a Entre Huellas</NavigationLink><ActionButton v-if="state.session" :disabled="state.busy" @click="logout">Cerrar sesión</ActionButton></header>
     <TopToast ref="toast" />
     <section v-if="accessProblem"><ActionButton @click="checkAccess()">Reintentar conexión</ActionButton></section>

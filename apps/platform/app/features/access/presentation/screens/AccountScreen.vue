@@ -3,7 +3,7 @@ import '../styles/account.css';
 import OnboardingFlow from '../widgets/OnboardingFlow.vue';
 import HomeContent from '../widgets/HomeContent.vue';
 import AccountProfile from '../widgets/AccountProfile.vue';
-const props = withDefaults(defineProps<{ onboarding?: boolean }>(), { onboarding: false });
+const props = withDefaults(defineProps<{ onboarding?: boolean; beforeLogout?: () => Promise<boolean> }>(), { onboarding: false });
 const model = useNuxtApp().$accessModel();
 const state = shallowRef(model.state);
 const unsubscribe = model.subscribe(value => { state.value = value; });
@@ -34,6 +34,7 @@ let leaving = false;
 let signingOut = false;
 let noticesReady = false;
 async function logout() {
+  if (props.beforeLogout && !await props.beforeLogout()) return;
   signingOut = true;
   const done = await model.logout();
   channel?.postMessage('changed');
@@ -104,6 +105,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
           <slot :session="state.session">
           <StaggerReveal as="div" class="account-grid" :aria-busy="state.checkingManagement">
             <HomeContent />
+            <NavigationLink to="/apelaciones" class="secondary">Mis apelaciones</NavigationLink>
             <section v-if="state.canReview" class="account-management account-panel" aria-labelledby="management-title">
               <div><h2 id="management-title">Cuidamos la comunidad</h2><p>Revisa las denuncias y ayuda a mantener un espacio seguro.</p></div>
               <NavigationLink to="/moderacion" origin class="secondary">Revisar denuncias</NavigationLink>

@@ -1,5 +1,23 @@
 # Configuración y validación de la app
 
+## Apelaciones de moderación —23/10/2026
+
+HU-14.4 requiere030 y plan035. Generar mediante
+`database/scripts/Build-AppealsPatch.ps1` y aplicar completo
+`database/patchs/035_patch_moderation_appeals.sql` en desarrollo antes de desplegar
+los clientes. Si se usan migraciones, aplicar su equivalente035 una sola vez;
+no aplicar ambas copias como migraciones independientes. No reaplicar030.
+035 no depende de034 (bloqueos), que puede integrarse por separado sin renumerar.
+No requiere nuevas variables ni grants directos a tablas. El revisor existente
+debe estar asignado por servidor; una cuenta normal no recibe ese permiso.
+
+Verificar con dos autores y una cuenta revisora: decisión propia/ajena,
+apelación/reenvío, respuesta/reenvío, consulta del autor, revocación del revisor
+y decisión original conservada. Web usa Inicio → Mis apelaciones y
+Denuncias → Revisar apelaciones; Android usa Perfil → Mis apelaciones.
+El incremento dejó SQL/remoto/Android instalado pendientes; commit/push no
+equivalen a despliegue ni a migración aplicada. [Ficha](funcionalidades/apelaciones-moderacion.md).
+
 ## Acceso general web —19/10/2026
 
 El acceso canónico /iniciar-sesion ya no exige permiso de revisión. Reutiliza

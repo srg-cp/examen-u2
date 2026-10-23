@@ -140,7 +140,7 @@ test('Server-only configuration accepts existing Dokploy names and rejects brows
 test('Administrative UI remains exclusive to platform, with no Flutter administrative route', async () => {
   const mobileRouter = await readFile(new URL('../../mobile/lib/app/router.dart', import.meta.url), 'utf8');
   assert.doesNotMatch(mobileRouter, /path:\s*['"](?:admin|moderacion|moderation)(?:\/|['"])/);
-  const page = await readFile(new URL('../app/pages/moderacion.vue', import.meta.url), 'utf8');
+  const page = await readFile(new URL('../app/pages/moderacion/index.vue', import.meta.url), 'utf8');
   assert.match(page, /ModerationScreen/);
   for (const [path, source] of await sources(new URL('../server/features/moderation/', import.meta.url))) {
     assert.doesNotMatch(source, /\/presentation\/|from ['"].*(?:vue|nuxt)/, path);

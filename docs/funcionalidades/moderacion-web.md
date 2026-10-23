@@ -1,5 +1,10 @@
 # Revisión y moderación de denuncias en la web
 
+23/10, HU-14.4: Denuncias incorpora Revisar apelaciones. El revisor registra
+respuesta privada con motivo/cuenta/fecha; el autor consulta su estado desde
+móvil/web. No cambia visibilidad automáticamente ni reemplaza decisiones.
+[Recorrido, persistencia, activación035 y evidencia](apelaciones-moderacion.md).
+
 21/10: cabecera de Denuncias/Revisar denuncia sin frase decorativa superior,
 por petición del usuario. Motivo, tipo/fecha, avisos de privacidad, operaciones
 y autorización permanecen; solo cambia la presentación de la cabecera.
