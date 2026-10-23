@@ -13,6 +13,7 @@ const id = ref(''); const blocked = computed(() => state.value.working || state.
 const invalid = (name: string) => state.value.failure?.fields.includes(name) ?? false;
 const messages = { invalid: 'Revisa la fecha y hora, el punto elegido y el comentario. La fecha no puede estar en el futuro.',
   location: 'No pudimos obtener tu ubicación. Marca el punto en el mapa.',
+  blocked:'Un bloqueo entre estas cuentas impide enviar nuevos avistamientos.',
   photo: 'No pudimos preparar la foto. Elige una imagen JPEG, PNG o WebP de hasta 8 MB, o envía sin foto.',
   closed: 'Este caso ya no admite avistamientos. Vuelve a la ficha para actualizar su estado.',
   conflict: 'Este envío ya fue registrado con otros datos. Vuelve a la ficha.',

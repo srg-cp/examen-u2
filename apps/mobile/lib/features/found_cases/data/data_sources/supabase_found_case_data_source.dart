@@ -19,6 +19,7 @@ class SupabaseFoundCaseDataSource implements FoundCaseDataSource {
 
   FoundSourceFailure _failure(String? code, String? message) =>
       FoundSourceFailure(switch (message) {
+        'interaction_blocked' => FoundFailureKind.blocked,
         'found_photos_unverified' => FoundFailureKind.photos,
         'found_draft_limit' => FoundFailureKind.draftLimit,
         'found_target_closed' => FoundFailureKind.targetClosed,

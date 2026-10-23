@@ -21,7 +21,7 @@ export default defineEventHandler(async event => {
   } catch (error) {
     if (error instanceof SightingAuthenticationFailure) { setResponseStatus(event, 401); return {error: 'forbidden'}; }
     const failure = error instanceof SightingFailure ? error : new SightingFailure('unavailable');
-    setResponseStatus(event, failure.kind === 'invalid' ? 400 : failure.kind === 'photo' ? 422 : failure.kind === 'rate_limited' ? 429 : ['closed', 'conflict'].includes(failure.kind) ? 409 : 503);
+    setResponseStatus(event, failure.kind === 'blocked' ? 423 : failure.kind === 'invalid' ? 400 : failure.kind === 'photo' ? 422 : failure.kind === 'rate_limited' ? 429 : ['closed', 'conflict'].includes(failure.kind) ? 409 : 503);
     setHeader(event, 'Connection', 'close');
     if (failure.kind === 'rate_limited') setHeader(event, 'Retry-After', 600);
     return {error: failure.kind, fields: failure.fields};

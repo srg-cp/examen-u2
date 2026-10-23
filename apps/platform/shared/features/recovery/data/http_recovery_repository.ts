@@ -5,7 +5,7 @@ export class HttpRecoveryRepository implements RecoveryRepository {
   private async call(path: string, body?: unknown, multipart = false): Promise<unknown> {
     try {
       const response = await this.fetcher('/api/recovery/' + path, { method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'X-Account-Actor': this.actor, ...(!multipart && body !== undefined ? { 'Content-Type': 'application/json' } : {}) }, ...(body === undefined ? {} : { body: multipart ? body as FormData : JSON.stringify(body) }), signal: AbortSignal.timeout(multipart ? 120000 : 30000) });
-      if (!response.ok) { await response.body?.cancel(); throw new RecoveryFailure(response.status === 401 ? 'unauthenticated' : response.status === 403 ? 'forbidden' : response.status === 409 ? 'conflict' : response.status === 422 ? 'invalid' : 'unavailable'); }
+      if (!response.ok) { await response.body?.cancel(); throw new RecoveryFailure(response.status === 423 ? 'blocked' : response.status === 401 ? 'unauthenticated' : response.status === 403 ? 'forbidden' : response.status === 409 ? 'conflict' : response.status === 422 ? 'invalid' : 'unavailable'); }
       return await response.json();
     } catch (e) { throw e instanceof RecoveryFailure ? e : new RecoveryFailure('unavailable'); }
   }

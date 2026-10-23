@@ -1,4 +1,4 @@
-export type RecoveryIssue = 'invalid' | 'unauthenticated' | 'forbidden' | 'conflict' | 'unavailable' | 'photo';
+export type RecoveryIssue = 'invalid' | 'unauthenticated' | 'forbidden' | 'conflict' | 'unavailable' | 'photo' | 'blocked';
 export class RecoveryFailure extends Error {
   constructor(readonly kind: RecoveryIssue, readonly fields: readonly string[] = []) { super(kind); }
 }

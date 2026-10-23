@@ -1,5 +1,12 @@
 # Backlog de Entre Huellas
 
+**Avance23/10:** [HU-14.2/#44](044-HU-14.2.md) implementada localmente en
+`feature/user-blocking`, con alcance de nuevas contribuciones autenticadas y
+SQL034–035 y contacto/foto ocultos según confirmación del usuario.
+[Ficha](../funcionalidades/bloqueos-usuarios.md). Activación/demo remotas
+pendientes; tablas y etiquetas `needs:refinement` inferiores son la instantánea
+previa de GitHub, sin sincronización de issues/Projects en esta tarea.
+
 **Avance posterior18/10:** HU-14.3/#45 implementada localmente en platform,
 con030/configuración/demo/integración pendientes. Administración exclusivamente
 web; Flutter conserva denuncia del usuario. Estados remotos/tablas inferiores

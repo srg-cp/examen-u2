@@ -173,6 +173,7 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
               SightingIssue.invalid,
               SightingIssue.photo,
               SightingIssue.rateLimited,
+              SightingIssue.blocked,
             }.contains(failure.issue),
           ),
         );

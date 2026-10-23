@@ -525,6 +525,14 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 
 ### S6 - Moderación, offline y validación
 
+23/10/2026: HU-14.2/RF-23/issue #44 implementada localmente en móvil/web:
+bloquear/desbloquear cuentas desde contenido autorizado y lista propia en Perfil.
+Alcance confirmado por el usuario: impedir nuevos avisos y avistamientos
+autenticados y ocultar contacto/foto entre ambas cuentas; fichas/historial/denuncias
+y QR anónimo conservan permisos. Sin chat ni suspensión. Plan034 después de033 y035 después de034;
+activación/demo reales pendientes, sin cerrar historia ni épica.
+[Ficha](funcionalidades/bloqueos-usuarios.md), [ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md).
+
 - **HU-14 / RF-22,23,33:** denuncia, bloqueo, ocultamiento por moderador con motivo y auditoría; vía de apelación mínima.
 - **HU-15 / RF-32:** borrador y caché local con Drift/SQLite, cola de envíos y estados visibles. Cortar conexión y reiniciar no pierde el borrador; reenvío no duplica ni confirma publicación antes de respuesta del servidor.
 - **HU-16 / RF-35,40:** métricas agregadas y controles administrativos mínimos, accesibles solo por roles autorizados. Definir con el usuario una interfaz mínima para esta operación.

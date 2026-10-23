@@ -71,6 +71,13 @@ class ProfileScreen extends ConsumerWidget {
                         TextButton.icon(
                           onPressed: exit.isLoading
                               ? null
+                              : () => context.push('/home/blocked-users'),
+                          icon: const Icon(Icons.block_rounded),
+                          label: const Text('Cuentas bloqueadas'),
+                        ),
+                        TextButton.icon(
+                          onPressed: exit.isLoading
+                              ? null
                               : () => context.push('/home/alert-preferences'),
                           icon: const Icon(Icons.notifications_outlined),
                           label: const Text('Preferencias de alertas'),

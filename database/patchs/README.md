@@ -79,3 +79,15 @@ Generar mediante `database/scripts/Build-PetPhotoProcessingPatch.ps1`. Aplicar t
 # Límite de bloqueos al publicar perdido — patch015
 
 Ejecutar completo [015_patch_lost_case_lock_timeout.sql](015_patch_lost_case_lock_timeout.sql), una vez aplicados los comandos de patch013. Regenerar con `./database/scripts/Build-LostCaseLockTimeoutPatch.ps1`. Plan015/fuente056 conserva historial previo y limita a5s cada espera de bloqueo dentro de la RPC; no cambia autorizaciones ni deduplicación. Su repetición y la de run_all están validadas localmente. No libera solicitudes antiguas ni acredita recuperación remota. La recuperación de la cola observada es un procedimiento operacional separado; no ejecutar scripts de cancelación como migraciones.
+
+## Bloqueos de cuentas —034,23/10/2026
+
+Generado [034_patch_user_blocks.sql](034_patch_user_blocks.sql) mediante
+`database/scripts/Build-UserBlocksPatch.ps1`. Ejecutar todo el contenido después
+de033 en desarrollo; después actualizar clientes. No reaplicar030 confirmado.
+Gestiona elecciones propias y rechaza nuevas contribuciones autenticadas entre
+cuentas; conserva historial, denuncias y QR anónimo. Después, aplicar
+[035_patch_block_case_contacts.sql](035_patch_block_case_contacts.sql), generado
+con `Build-BlockCaseContactsPatch.ps1`, para el ocultamiento de contacto/foto
+confirmado por usuario, con consentimiento intacto. Activación remota
+pendiente; [alcance y validación](../../docs/funcionalidades/bloqueos-usuarios.md).

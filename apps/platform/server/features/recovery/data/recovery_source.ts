@@ -6,8 +6,8 @@ export class RecoverySource {
     try {
       const response = await this.fetcher(this.config.url + path, { method: body === undefined ? 'GET' : 'POST', headers: { apikey: this.config.key, Authorization: 'Bearer ' + this.token, ...(body !== undefined ? { 'Content-Type': binary ? 'image/jpeg' : 'application/json' } : {}), ...headers }, ...(body === undefined ? {} : { body: binary ? new Uint8Array(body as Uint8Array) : JSON.stringify(body) }), cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(binary ? 60000 : 15000) });
       if (!response.ok) {
-        let code = ''; try { code = (await response.json())?.code || ''; } catch { /* No upstream messages cross the boundary. */ }
-        throw new RecoveryFailure(response.status === 401 ? 'unauthenticated' : response.status === 403 || code === '42501' ? 'forbidden' : response.status === 409 || ['40001','23505'].includes(code) ? 'conflict' : ['23514','22023'].includes(code) || response.status === 422 ? 'invalid' : 'unavailable');
+        let code = '',blocked=false; try { const value=await response.json();code=value?.code || '';blocked=value?.message==='interaction_blocked'; } catch { /* No upstream messages cross the boundary. */ }
+        throw new RecoveryFailure(blocked?'blocked':response.status === 401 ? 'unauthenticated' : response.status === 403 || code === '42501' ? 'forbidden' : response.status === 409 || ['40001','23505'].includes(code) ? 'conflict' : ['23514','22023'].includes(code) || response.status === 422 ? 'invalid' : 'unavailable');
       }
       const reader = response.body?.getReader(); if (!reader) return null;
       const chunks = []; let size = 0;

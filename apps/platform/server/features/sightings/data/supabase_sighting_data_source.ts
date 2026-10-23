@@ -17,7 +17,7 @@ export class SupabaseSightingDataSource implements SightingSource {
       finally { await reader.cancel().catch(() => {}); }
       const value = JSON.parse(text + decoder.decode());
       if (!response.ok) {
-        const kinds = { sighting_invalid: 'invalid', sighting_closed: 'closed', sighting_conflict: 'conflict', sighting_rate_limited: 'rate_limited' } as const;
+        const kinds = { interaction_blocked:'blocked',sighting_invalid: 'invalid', sighting_closed: 'closed', sighting_conflict: 'conflict', sighting_rate_limited: 'rate_limited' } as const;
         throw new SightingFailure(kinds[value.message as keyof typeof kinds] || 'unavailable');
       }
       return value;

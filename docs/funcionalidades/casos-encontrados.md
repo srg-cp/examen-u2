@@ -1,5 +1,10 @@
 # Casos encontrados — HU-06 / RF-06 / issue #6
 
+23/10, HU-14.2: con034 activo, publicar un nuevo aviso vinculado respeta los
+[bloqueos entre cuentas](bloqueos-usuarios.md). Un bloqueo en cualquier dirección
+rechaza el envío en SQL con toast específico y borrador conservado. Recibos de
+envíos anteriores e historial mantienen sus permisos. Activación034/demo pendientes.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

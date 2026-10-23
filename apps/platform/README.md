@@ -169,3 +169,16 @@ ignorado; para producción añadir la variable del entorno y desplegar/reiniciar
 Todos los mapas web reutilizan `LocationMap` y el acabado intermedio común a
 móvil. Sin variable válida se conserva el fallo/reintento, no un mapa simulado.
 [Ficha compartida](../../docs/funcionalidades/cartografia-compartida.md).
+
+## Bloqueos de cuentas —23/10/2026
+
+`/cuentas-bloqueadas` usa la política global `account`; acceso desde Perfil y
+contexto de Explorar. APIs `/api/user-blocks/*` enlazan sesión/actor, exigen origen
+exacto en POST, cuerpo JSON acotado y RPC propias con credencial de usuario.
+Requiere patch034 después de033,035 después de034 y Nuxt actualizado;
+035 oculta contacto/foto entre cuentas bloqueadas, según confirmación del usuario,
+conservando consentimiento y QR anónimo. Sin variables nuevas.
+El adaptador de avistamientos y reportes traduce `interaction_blocked` a un
+fallo específico, sin revelar quién mantiene la elección. [Ficha](../../docs/funcionalidades/bloqueos-usuarios.md).
+`npm test`, `npm run test:server` y `scripts/check-user-blocks-browser.mjs`
+incluyen la nueva funcionalidad. Activación/demo hosted pendientes.

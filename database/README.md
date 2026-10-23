@@ -1,5 +1,13 @@
 # Base de datos de Entre Huellas
 
+Bloqueos23/10: HU-14.2/RF-23/#44, plan034/fuentes115–118. Tabla privada/RPC propias
+y triggers de contribuciones nuevas; lock por pareja, CAS y replay. Generar
+Build-UserBlocksPatch/Build-RunAll; patch034 después de033 y035 después de034
+(fuente119/Build-BlockCaseContactsPatch), con clientes actualizados.
+035 oculta contacto/foto entre cuentas bloqueadas, sin cambiar consentimiento.
+QR anónimo conserva permisos. Validación SQL local en ESTADO; activación
+hosted pendiente. [Ficha](../docs/funcionalidades/bloqueos-usuarios.md).
+
 Celular privado20/10: plan033/fuentes112–114, patch033/migración20261020003300_profile_contact_phone.sql. Nullable text con formato internacional y grants por columna/RLS propia; read_case_contact sugiere solo al autor. Build-ProfileContactPhonePatch/Build-RunAll; después de032, sin reescribir031. Hosted pendiente.
 
 Compartir ficha20/10: plan032/fuentes110–111, migración20261020003200_case_sharing.sql y patch032 generados con Build-CaseSharingPatch/Build-RunAll. RPC autenticada prepara solo búsquedas activas/visibles con foto validada por el lector QR; dueño real y slug estable, sin reactivar enlaces revocados ni permisos de autor. [Ficha](../docs/funcionalidades/compartir-ficha.md). Activación remota pendiente.

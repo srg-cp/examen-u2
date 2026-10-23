@@ -147,6 +147,8 @@ class FoundEditorState {
 }
 
 String foundFailureLabel(FoundFailureKind? kind) => switch (kind) {
+  FoundFailureKind.blocked =>
+    'Un bloqueo entre estas cuentas impide enviar nuevos avisos. Puedes revisar tus cuentas bloqueadas desde Perfil.',
   FoundFailureKind.targetClosed =>
     'Esta búsqueda ya no admite avisos. Puedes volver a su ficha; conservamos lo escrito hasta que salgas.',
   FoundFailureKind.timedOut =>

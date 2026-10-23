@@ -345,8 +345,9 @@ void main() {
               find.byType(EntityScreenShell),
               !found && fromList ? findsOneWidget : findsNothing,
             );
-            if (found)
+            if (found) {
               expect(find.byType(CasePublicScreenShell), findsOneWidget);
+            }
             expect(tester.takeException(), isNull);
             await tester.pumpWidget(const SizedBox.shrink());
           },

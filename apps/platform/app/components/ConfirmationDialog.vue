@@ -12,7 +12,7 @@ onBeforeUnmount(()=>dialog.value?.close());
   </dialog>
 </template>
 <style>
-.reader-shell .confirmation-dialog{border:0;border-radius:28px;padding:28px;max-width:min(520px,calc(100% - 32px));max-height:calc(100svh - 32px);overflow:auto;color:#171918;background:#fff;box-shadow:0 20px 80px #17191830}
+.reader-shell .confirmation-dialog{border:0;border-radius:28px;padding:28px;max-width:min(520px,calc(100% - 32px));max-height:calc(100svh - 32px);overflow:auto;overflow-wrap:anywhere;color:#171918;background:#fff;box-shadow:0 20px 80px #17191830}
 .reader-shell .confirmation-dialog::backdrop{background:#17191855;backdrop-filter:blur(8px)}
-.reader-shell .confirmation-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.reader-shell .confirmation-actions>*{flex:1}
+.reader-shell .confirmation-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.reader-shell .confirmation-actions>*{flex:1 1 10rem;min-width:0;max-width:100%;white-space:normal}
 </style>

@@ -1,5 +1,11 @@
 # Avistamientos desde Android
 
+23/10, HU-14.2: con034 activo, los nuevos envíos autenticados respetan
+[bloqueos entre cuentas](bloqueos-usuarios.md) en ambos sentidos mediante el
+trigger SQL, también tras pasar por Nuxt. Rechazo específico y datos conservados;
+reintentar un envío ya guardado devuelve su recibo. QR sin cuenta conserva acceso.
+Actualizar servidor/Flutter junto con034; activación/demo reales pendientes.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

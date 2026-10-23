@@ -24,5 +24,6 @@ watch(() => props.session.actor,() => {open.value=false;photoFailed.value=false;
       <div><dt>Ciudad</dt><dd>{{ session.profile.city || 'Sin registrar' }}</dd></div>
     </dl>
     <p class="privacy">Tu cuenta y la bienvenida completada se comparten con la aplicación móvil.</p>
+    <NavigationLink to="/cuentas-bloqueadas" class="secondary" @click="open=false">Cuentas bloqueadas</NavigationLink>
   </GlassDialog>
 </template>

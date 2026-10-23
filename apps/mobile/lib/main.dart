@@ -1,3 +1,4 @@
+import 'features/user_blocks/providers/user_block_providers.dart';
 import 'features/case_contacts/providers/case_contact_providers.dart';
 import 'features/content_reports/providers/content_report_providers.dart';
 import 'features/case_closure/providers/case_closure_providers.dart';
@@ -32,6 +33,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        userBlockRepositoryProvider.overrideWithValue(
+          bootstrap.userBlockRepository,
+        ),
         contentReportRepositoryProvider.overrideWithValue(
           bootstrap.contentReportRepository,
         ),

@@ -28,13 +28,15 @@ export default defineEventHandler(event => {
     getHeader(event, 'sec-fetch-mode') === 'navigate' && getHeader(event, 'sec-fetch-dest') === 'document';
   const recoveryPath = path.startsWith('/api/recovery/');
   const recoveryWrite = event.method === 'POST' && ['/api/recovery/explore','/api/recovery/pets','/api/recovery/reports','/api/recovery/pet-photo'].includes(path);
-  const notificationPath = path.startsWith('/api/notifications/');
+  const blockPath = path.startsWith('/api/user-blocks/');
+  const blockWrite = event.method === 'POST' && ['/api/user-blocks/prepare','/api/user-blocks/set'].includes(path);
+  const notificationPath = blockPath || path.startsWith('/api/notifications/');
   const notificationWrite = event.method === 'POST' && path === '/api/notifications/read';
   const moderationPath = notificationPath || recoveryPath || path.startsWith('/api/moderation/') || path.startsWith('/api/access/');
   const credentialWrite = event.method === 'POST' && /^\/api\/access\/credentials\/(register|recover|verify|resend|reset|cancel)$/.test(path);
   const moderationWrite = credentialWrite || (event.method === 'POST' && ['/api/access/login','/api/access/logout','/api/access/onboarding','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path));
   if (moderationPath && !oauthCallback && !accountEntryNavigation && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
-  const submission = notificationWrite || recoveryWrite || moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
+  const submission = blockWrite || notificationWrite || recoveryWrite || moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
   if (event.method !== 'GET' && event.method !== 'HEAD' && !submission) {
     setHeader(event, 'Allow', 'GET, HEAD'); setResponseStatus(event, 405); return { error: 'method_not_allowed' };
   }

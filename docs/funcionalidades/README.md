@@ -1,5 +1,10 @@
 # Funcionalidades de Entre Huellas
 
+- [Bloquear y desbloquear cuentas](bloqueos-usuarios.md): HU-14.2/RF-23/#44;
+  elecciones propias en móvil/web, rechazo SQL de nuevos avisos/avistamientos
+  autenticados y ocultamiento de contacto/foto confirmado; activación034/035
+  pendiente. QR anónimo conserva permisos; implementación local no equivale a historia cerrada.
+
 - [Distribución Android por GitHub Releases](distribucion-android.md): firma,
   secrets, APK por push a main, instalación, reintentos y validación pendiente.
 

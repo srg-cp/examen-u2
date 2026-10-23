@@ -1,5 +1,16 @@
 # Configuración y validación de la app
 
+## Bloqueos de cuentas —23/10/2026
+
+HU-14.2 requiere plan034 después de033 y035 después de034. Generar con
+`database/scripts/Build-UserBlocksPatch.ps1` y `Build-BlockCaseContactsPatch.ps1`;
+aplicar ambos patches completos en
+desarrollo y actualizar Nuxt/Flutter. Sin nuevas variables, roles o Firebase;
+reutiliza Auth y el servidor de avistamientos configurado. No reaplicar030
+confirmado por el usuario. Validar A/B/C, ambas direcciones, respuesta perdida,
+cambio/reinicio de cuenta y QR anónimo. [Ficha y pasos](funcionalidades/bloqueos-usuarios.md).
+No se ejecutó SQL ni despliegue remoto en este incremento.
+
 ## Acceso general web —19/10/2026
 
 El acceso canónico /iniciar-sesion ya no exige permiso de revisión. Reutiliza

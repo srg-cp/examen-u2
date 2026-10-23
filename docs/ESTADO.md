@@ -1,5 +1,84 @@
 # Estado del proyecto
 
+## Bloqueos propios en móvil y web —HU-14.2/RF-23/#44,23/10/2026
+
+Por petición del usuario se implementa HU-14.2 con commit/push autorizados al
+terminar. Rama `feature/user-blocking` creada desde `feature/platform-moderation`,
+base7fd9adf y árbol inicialmente limpio. El usuario confirma el alcance de
+impedir nuevos avisos y avistamientos autenticados y ocultar contacto/foto entre
+las cuentas bloqueadas, conservando el consentimiento almacenado por caso.
+[ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md)
+y [ficha](funcionalidades/bloqueos-usuarios.md) concretan reglas y límites.
+
+El primer intento de commit terminó con `gpg: signing failed: Timeout`.
+El usuario indica que completó Pinentry; se reanuda el commit/push con firma,
+conservando `commit.gpgsign=true` en su configuración local. No se desactiva GPG.
+
+Flutter ofrece bloqueo desde fichas/revisión privada autenticada y gestión desde
+Perfil. Web incorpora `/cuentas-bloqueadas`, acceso desde Perfil y contexto de
+Explorar; política global `account`, APIs con identidad/origen/cuerpo acotado.
+Ambas implementan dominio/casos de uso, repositorios/fuentes y ViewModels por
+funcionalidad, con composición en bootstrap/router/páginas. No hay directorio
+de perfiles, chat ni acciones administrativas móviles. Un recurso propio o
+reportero QR anónimo no ofrece autobloqueo/identidad inventada.
+
+Plan034/fuentes115–118, migración y patch generados por los scripts versionados,
+sin alterar SQL anterior. Relación privada con UUID propio, elección y versión;
+sin grants directos y lista propia de20. Autor derivado del contenido autorizado,
+sin IDs de cuenta ni perfiles privados en DTO. Desbloqueo posible tras retirar
+el contenido. CAS/replay evita duplicados y órdenes antiguas; la elección inversa
+no se revela ni se retira. Lock por pareja serializa elección y contribución.
+Triggers en escrituras rechazan nuevos avisos/avistamientos afectados incluso
+desde adaptadores servidor; errores distinguen bloqueo de sesión/respuesta incierta.
+Plan035/fuente119 añade el contacto confirmado sin reescribir034:
+`case_contact_visible` devuelve falso para lectores bloqueados en cualquiera
+de los sentidos; RPC y guard restrictivo de avatar comparten esa comprobación.
+El autor y terceros autorizados conservan sus permisos. Consentimiento/teléfono/
+versión almacenados intactos. Desbloquear restaura solo el contacto aún consentido.
+Una URL de foto ya firmada puede durar60s; no se recuperan datos ya descargados.
+Móvil invalida la familia de consultas de contacto tras mutaciones, también ante
+respuesta ambigua, para retirar nombres/teléfonos/fotos consultados previamente.
+
+Recibos previos, historial, denuncias, cierre, fichas/lista/mapa/Guardados
+y QR sin cuenta conservan permisos. La UI comunica el alcance
+antes de confirmar. Skeleton/shimmer/toast, refresh conservado, reintento exacto
+tras respuesta perdida y descarte de datos/respuestas al cambiar cuenta.
+En móvil una confirmación antigua no se aplica a otro estado. En web un conflicto
+también limpia datos privados por posible cambio de identidad.
+
+Validación local:526 pruebas Flutter aprobadas; análisis sin incidencias y
+formato correcto.28 regresiones móviles tras ajustar rechazo conocido y18 de
+bloqueos/arquitectura tras revisar DTO/composición.77 pruebas web, typecheck,
+build Nuxt y30 pruebas de servidor aprobados. Tras confirmar contacto/foto,
+se repiten las526 pruebas Flutter completas y50 SQL completas, todas aprobadas.
+23 pruebas de bloqueos/contactos/arquitectura verifican también la retirada del
+teléfono ya consultado y su recuperación solo tras desbloquear. Cinco escenarios
+SQL de bloqueos incluyen contacto/foto en ambos orígenes, permiso restrictivo de
+Storage incluso ante política amplia, consentimiento intacto y terceros.
+La suite incluye publicación RPC auténtica,
+retención del borrador y contribuciones en ambas direcciones. Incluyen permisos,
+replay/conflicto, paginación, recurso retirado, repetición de run_all/035 y QR anónimo.
+
+QA Chrome del build: acceso global, entrada por Perfil, cancelación, resultado
+ambiguo/replay con una sola escritura, recarga, refresh fallido conservado,
+desbloqueo, normal/reducido y1440/390/320 con texto200%; sin overflow ni errores
+CSP/hidratación. Se corrigió overflow de título/acciones de ConfirmationDialog
+compartido con texto200%; acción final comprobada mediante scroll. Renders
+móviles390×844 y320×350/texto2 revisados, confirmación y acciones alcanzables.
+Capturas en apps/mobile/build/ui-preview/{user-blocks,web-user-blocks}; logs
+hu142-* en build ignorado. Una expectativa inicial de QA confundía el puente
+global de acceso con login directo y otra comprobaba el envío antes de su
+respuesta; ajustadas al contrato y repetidas. Añadidas llaves a un `if` existente
+en case_creation_effects_test para dejar análisis limpio, sin alterar su lógica.
+
+Pendientes: aplicar034 después de033 y035 después de034, actualizar clientes/Nuxt y probar A/B/C
+en Android/Supabase reales, incluida contención multiconexión y reinicio físico.
+PGlite de una conexión y fixtures no certifican esos escenarios. Safari/Firefox
+y aprobación visual del usuario pendientes. Sin despliegue, SQL remoto, roles,
+nuevos secrets ni cierre de issue/épica. Documentación/backlog conservan la
+instantánea remota y distinguen implementación local. Siguiente paso: activar
+y validar034/035; después continuar HU-14.4 (apelaciones) según sus criterios.
+
 ## Guía operativa Android en la raíz —22/10/2026
 
 Creada [INSTALACION_ANDROID.md](../INSTALACION_ANDROID.md) por petición del usuario:

@@ -2,7 +2,7 @@ export type SightingPoint = Readonly<{ latitude: number; longitude: number; sour
 export type SightingDraft = Readonly<{ id: string; observedAt: string; point: SightingPoint | null; comment: string; photo: Uint8Array | null }>;
 export type SightingReceipt = Readonly<{ id: string; receivedAt: string; late: boolean }>;
 export class SightingFailure extends Error {
-  constructor(readonly kind: 'invalid' | 'unavailable' | 'closed' | 'rate_limited' | 'photo' | 'conflict' | 'location', readonly fields: readonly string[] = []) {
+  constructor(readonly kind: 'invalid' | 'unavailable' | 'closed' | 'rate_limited' | 'photo' | 'conflict' | 'location' | 'blocked', readonly fields: readonly string[] = []) {
     super(kind); this.name = 'SightingFailure';
   }
 }

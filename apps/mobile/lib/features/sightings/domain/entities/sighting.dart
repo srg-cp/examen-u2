@@ -4,6 +4,7 @@ enum SightingIssue {
   invalid,
   unavailable,
   forbidden,
+  blocked,
   closed,
   conflict,
   rateLimited,

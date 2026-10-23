@@ -16,7 +16,7 @@ export async function recovery(event: H3Event, photo = false) {
 }
 export function recoveryError(event: H3Event, e: unknown) {
   if (!(e instanceof RecoveryFailure)) return accountError(event,e);
-  setResponseStatus(event,e.kind === 'unauthenticated' ? 401 : e.kind === 'forbidden' ? 403 : e.kind === 'conflict' ? 409 : e.kind === 'invalid' || e.kind === 'photo' ? 422 : 503);
+  setResponseStatus(event,e.kind === 'blocked' ? 423 : e.kind === 'unauthenticated' ? 401 : e.kind === 'forbidden' ? 403 : e.kind === 'conflict' ? 409 : e.kind === 'invalid' || e.kind === 'photo' ? 422 : 503);
   return { error:e.kind };
 }
 export async function recoveryForm(event: H3Event) {
