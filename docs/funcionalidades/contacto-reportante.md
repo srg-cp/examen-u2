@@ -1,5 +1,13 @@
 # Contacto del reportante por caso
 
+23/10, alcance HU-14.2 confirmado por usuario: patch035 después de034 oculta
+nombre/teléfono/foto entre cuentas bloqueadas, en cualquiera de los sentidos.
+RPC y Storage reutilizan `case_contact_visible`; autor y terceros autorizados
+conservan permisos. No modifica el consentimiento ni publica contacto nuevo al
+desbloquear. Flutter revalida consultas después de una mutación de bloqueo,
+incluida respuesta ambigua. URLs firmadas previas pueden durar60s; no se recuperan
+datos/fotos ya obtenidos. [Bloqueos](bloqueos-usuarios.md), activación remota pendiente.
+
 Selector20/10, ADR-117: teléfono de contacto usa InternationalPhoneField compartido con Perfil, bandera/prefijo y número nacional, búsqueda local en español. Conserva sugerencia completa, consentimiento por caso/foto, reintentos y formato SQL; no requiere otro patch.
 
 Actualización20/10, ADR-116: sugerencia del celular privado del perfil únicamente

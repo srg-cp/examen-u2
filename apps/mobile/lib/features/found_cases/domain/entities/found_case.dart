@@ -4,6 +4,7 @@ enum FoundFailureKind {
   unavailable,
   timedOut,
   forbidden,
+  blocked,
   invalid,
   conflict,
   photos,

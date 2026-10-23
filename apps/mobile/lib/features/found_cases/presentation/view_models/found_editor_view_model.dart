@@ -306,6 +306,7 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
                   FoundFailureKind.photos,
                   FoundFailureKind.draftLimit,
                   FoundFailureKind.targetClosed,
+                  FoundFailureKind.blocked,
                 }.contains(e.kind),
           ),
         );

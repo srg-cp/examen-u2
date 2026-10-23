@@ -38,8 +38,9 @@ la decisión apelada, incluso tras decisiones posteriores, junto al envío y res
 
 Plan035/fuentes119–121, migración `20261023003500_moderation_appeals.sql`
 y patch035 generado. Requiere las tablas/RPC de030; no depende de HU-14.2/034.
-El bundle acumulativo de esta rama llega a033 más035; al integrar034 se deben
-conservar ambos planes y fuentes, sin renumerar migraciones ya aplicadas.
+La integración con bloqueos incorpora034 y036 al bundle y conserva035 y sus
+fuentes119–121 intactos. El complemento de contacto de bloqueos usa036/fuente122
+para evitar duplicar la versión035. No se renumeran migraciones ya aplicadas.
 
 moderation_appeals, moderation_appeal_answers y moderation_appeal_access son
 tablas privadas con RLS y sin grants directos. RPC security definer con
@@ -96,3 +97,10 @@ anidada y el contador del TextField compartido para que no tape texto ampliado.
 Pendientes: aplicar035 en desarrollo remoto, probar dos cuentas y revisor reales,
 contención multiconexión hosted, Android instalado y otros navegadores. No se
 marca la historia como cerrada hasta completar la evidencia remota requerida.
+
+Integración23/10 de ambas funcionalidades:537 pruebas Flutter,83 web,31 de
+servidor y55 SQL aprobadas; formato/análisis/typecheck/build correctos. Chrome
+sobre el build integrado vuelve a validar ambos recorridos con fixtures. El
+router real móvil prueba acceso a bloqueos en sus tres etapas de cuenta y
+conserva las regresiones de apelaciones. Evidencia local; activación y demo
+remotas pendientes, como se detalla en ESTADO.

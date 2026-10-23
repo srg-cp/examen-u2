@@ -91,6 +91,7 @@ class NativeSightingSource implements SightingSource {
       final issue = switch (value['error']) {
         'invalid' => SightingIssue.invalid,
         'closed' => SightingIssue.closed,
+        'blocked' => SightingIssue.blocked,
         'conflict' => SightingIssue.conflict,
         'rate_limited' => SightingIssue.rateLimited,
         'photo' => SightingIssue.photo,

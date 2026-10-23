@@ -1,5 +1,23 @@
 # Configuración y validación de la app
 
+## Bloqueos de cuentas —23/10/2026
+
+HU-14.2 requiere plan034 después de033 y036 después de034. Generar con
+`database/scripts/Build-UserBlocksPatch.ps1` y `Build-BlockCaseContactsPatch.ps1`;
+aplicar ambos patches completos en
+desarrollo y actualizar Nuxt/Flutter. Sin nuevas variables, roles o Firebase;
+reutiliza Auth y el servidor de avistamientos configurado. No reaplicar030
+confirmado por el usuario. Validar A/B/C, ambas direcciones, respuesta perdida,
+cambio/reinicio de cuenta y QR anónimo. [Ficha y pasos](funcionalidades/bloqueos-usuarios.md).
+No se ejecutó SQL ni despliegue remoto en este incremento.
+
+Al integrar apelaciones,035 queda reservado a esa funcionalidad y el complemento
+de contacto de bloqueos pasa a036/fuente122 con el mismo SQL. El anterior
+035_patch_block_case_contacts.sql queda sustituido por036_patch_block_case_contacts.sql;
+no ejecutar ambos como incrementos distintos. El orden del repositorio es
+034 (bloqueos),035 (apelaciones),036 (contacto). Aplicar solamente lo pendiente;
+si se registraron versiones mediante la CLI, comprobar primero su historial.
+
 ## Apelaciones de moderación —23/10/2026
 
 HU-14.4 requiere030 y plan035. Generar mediante

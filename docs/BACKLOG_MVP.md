@@ -22,7 +22,11 @@ Las dependencias son resultados concretos. No completar baja/exportación para e
 
 ## Refinamiento y alcance
 
-- #44: concretar qué interacciones existentes afecta bloquear/desbloquear. No crear chat ni bloquear funciones críticas implícitamente.
+- #44: alcance concretado e implementado localmente23/10 en
+  [ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md): nuevas
+  contribuciones autenticadas, sin chat ni bloqueo implícito de funciones críticas.
+  Contacto/foto ocultos según confirmación del usuario, con consentimiento intacto.
+  Activación034/036/demo remotas pendientes; estado GitHub sin sincronización nueva.
 - #51: acordar la interfaz administrativa mínima y las funciones controlables.
 - #25: exportación básica a JSON UTF-8 con perfil propio y solicitudes/estados de baja, descargable o compartible; no depende de futuros casos/mascotas.
 
@@ -1056,6 +1060,11 @@ Registrar el escenario, resultado y evidencia en este issue y en docs/ESTADO.md.
 Pendiente de implementación. Las casillas permanecen pendientes hasta verificar los criterios completos.
 
 ### HU-14.2 — Bloquear y desbloquear usuarios — [#44](https://github.com/srg-cp/entrehuellas/issues/44)
+
+Implementación local23/10: [bloqueos móvil/web](funcionalidades/bloqueos-usuarios.md),
+SQL034/036 y pruebas. Contacto/foto ocultos entre bloqueados por confirmación
+del usuario; QR anónimo conserva acceso. Casillas inferiores
+pendientes de aceptación completa; no cerrar por evidencia local.
 
 Como usuario, quiero controlar las interacciones permitidas con otra cuenta para limitar contactos problemáticos.
 

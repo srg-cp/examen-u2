@@ -1,3 +1,6 @@
+import '../features/user_blocks/presentation/screens/user_blocks_screen.dart';
+import '../features/user_blocks/presentation/widgets/user_block_controls.dart';
+import '../features/case_contacts/presentation/view_models/case_contact_view_model.dart';
 import '../features/case_posters/presentation/widgets/case_share_button.dart';
 import '../features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import '../features/content_reports/presentation/screens/content_report_screen.dart';
@@ -66,6 +69,10 @@ import '../features/onboarding/presentation/view_models/entry_view_model.dart';
 import '../features/onboarding/presentation/state/entry_destination.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  void refreshCaseContacts() {
+    if (ref.mounted) ref.invalidate(caseContactViewModelProvider);
+  }
+
   final refresh = ValueNotifier(0);
   ref.listen(entryViewModelProvider, (_, _) => refresh.value++);
   ref.listen(recoveryAccessViewModelProvider, (_, _) => refresh.value++);
@@ -131,6 +138,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/notifications' ||
+              state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
@@ -339,14 +347,35 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'blocked-users',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: UserBlocksScreen(onSettled: refreshCaseContacts),
+            ),
+          ),
+          GoRoute(
             path: 'found-cases/:id',
             pageBuilder: (context, state) => entityDetailPage(
               context: context,
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
-                contact: CaseContactPanel(
-                  target: (source: 'found', id: state.pathParameters['id']!),
+                contact: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CaseContactPanel(
+                      target: (
+                        source: 'found',
+                        id: state.pathParameters['id']!,
+                      ),
+                    ),
+                    UserBlockPanel(
+                      target: (kind: 'found', id: state.pathParameters['id']!),
+                      onSettled: refreshCaseContacts,
+                    ),
+                  ],
                 ),
                 shareActionBuilder: (name, event) => CaseShareButton(
                   target: PosterCase(
@@ -428,8 +457,17 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
-                contact: CaseContactPanel(
-                  target: (source: 'lost', id: state.pathParameters['id']!),
+                contact: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CaseContactPanel(
+                      target: (source: 'lost', id: state.pathParameters['id']!),
+                    ),
+                    UserBlockPanel(
+                      target: (kind: 'lost', id: state.pathParameters['id']!),
+                      onSettled: refreshCaseContacts,
+                    ),
+                  ],
                 ),
                 shareActionBuilder: (name, event) => CaseShareButton(
                   target: PosterCase(
@@ -568,11 +606,23 @@ final routerProvider = Provider<GoRouter>((ref) {
                   key: state.pageKey,
                   source: state.extra,
                   child: SightingReviewScreen(
-                    reportAction: ReportContentButton(
-                      target: (
-                        kind: 'sighting',
-                        id: state.pathParameters['sighting']!,
-                      ),
+                    reportAction: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ReportContentButton(
+                          target: (
+                            kind: 'sighting',
+                            id: state.pathParameters['sighting']!,
+                          ),
+                        ),
+                        UserBlockPanel(
+                          onSettled: refreshCaseContacts,
+                          target: (
+                            kind: 'sighting',
+                            id: state.pathParameters['sighting']!,
+                          ),
+                        ),
+                      ],
                     ),
                     reviewKey: (
                       target: (

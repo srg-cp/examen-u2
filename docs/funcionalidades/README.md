@@ -1,5 +1,10 @@
 # Funcionalidades de Entre Huellas
 
+- [Bloquear y desbloquear cuentas](bloqueos-usuarios.md): HU-14.2/RF-23/#44;
+  elecciones propias en móvil/web, rechazo SQL de nuevos avisos/avistamientos
+  autenticados y ocultamiento de contacto/foto confirmado; activación034/036
+  pendiente. QR anónimo conserva permisos; implementación local no equivale a historia cerrada.
+
 - [Apelaciones de moderación](apelaciones-moderacion.md): decisiones propias,
   motivo, estado y respuesta auditada; usuario móvil/web, revisión solo web.
 

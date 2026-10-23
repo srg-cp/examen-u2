@@ -1,5 +1,123 @@
 # Estado del proyecto
 
+## Integración de bloqueos y apelaciones —23/10/2026
+
+Se incorpora origin/main (c03fa84, merge de apelaciones fdcf1e3/PR#64) en
+feature/user-blocking (dc0195b/PR#65). Se resuelven los11 conflictos conservando
+ambas funcionalidades, APIs, inyección, rutas y suites de pruebas. La integración
+se prepara en la rama de bloqueos, sin reescribir los commits originales.
+
+El plan035 de apelaciones y fuentes119–121 se conservan intactos. El complemento
+de contacto de bloqueos pasa de035/fuente119 a036/fuente122; cuerpo SQL idéntico,
+con migración/patch regenerados desde el plan.034 permanece intacto. El bundle
+incluye034,035 y036. Nuevas comprobaciones del catálogo rechazan versiones de
+migración y números globales de fuentes duplicados en la suite SQL.
+
+Se corrige primary_titles_test: MaterialIcons se carga desde el asset empaquetado
+por Flutter, sin acceder a la ruta interna del caché SDK que faltaba en CI Linux.
+No se cambia la UI ni se omite la prueba.
+
+La revisión del router detecta además que /home/blocked-users estaba declarada
+pero faltaba en la política global de cuenta móvil: redirigía al Inicio incluso
+con onboarding completado. Se reproduce el fallo con el router real y se añade
+la ruta al mismo control global. Tres regresiones cubren visitante, cuenta sin
+onboarding y cuenta preparada; se conservan las pruebas reales de apelaciones.
+
+Validación final local:537/537 Flutter (AMBIENT_BACKGROUND_MOTION=false), formato
+643 archivos sin cambios y análisis sin incidencias;5/5 pruebas Python de
+preparación de distribución.83/83 pruebas web,31/31 de servidor, typecheck y
+build Nuxt correctos.55/55 SQL PGlite/PostGIS, incluida repetición del bundle,
+ambas funcionalidades y catálogo sin colisiones. Chrome sobre build integrado:
+apelaciones y bloqueos aprobados con fixtures, reintentos, permisos, navegación,
+movimiento normal/reducido, pantallas pequeñas/texto200% y sin fallos CSP/hidratación.
+El primer pase móvil reprodujo el fallo del router; tras corregirlo, la regresión
+completa537/537 queda en build/integration-tests-final.log. No se omiten pruebas.
+
+Siguiente paso: commit firmado/push en PR#65, verificar CI y fusionar con merge
+para conservar fdcf1e3 y dc0195b en main. Confirmación remota pendiente al
+registrar esta evidencia local; no equivale a despliegue ni cierre de historia.
+Activación Supabase, despliegue Nuxt y demo física siguen siendo tareas separadas.
+No se ejecuta SQL remoto ni se dan por cerradas las historias con esta integración.
+
+## Bloqueos propios en móvil y web —HU-14.2/RF-23/#44,23/10/2026
+
+Por petición del usuario se implementa HU-14.2 con commit/push autorizados al
+terminar. Rama `feature/user-blocking` creada desde `feature/platform-moderation`,
+base7fd9adf y árbol inicialmente limpio. El usuario confirma el alcance de
+impedir nuevos avisos y avistamientos autenticados y ocultar contacto/foto entre
+las cuentas bloqueadas, conservando el consentimiento almacenado por caso.
+[ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md)
+y [ficha](funcionalidades/bloqueos-usuarios.md) concretan reglas y límites.
+
+El primer intento de commit terminó con `gpg: signing failed: Timeout`.
+El usuario indica que completó Pinentry; se reanuda el commit/push con firma,
+conservando `commit.gpgsign=true` en su configuración local. No se desactiva GPG.
+
+Flutter ofrece bloqueo desde fichas/revisión privada autenticada y gestión desde
+Perfil. Web incorpora `/cuentas-bloqueadas`, acceso desde Perfil y contexto de
+Explorar; política global `account`, APIs con identidad/origen/cuerpo acotado.
+Ambas implementan dominio/casos de uso, repositorios/fuentes y ViewModels por
+funcionalidad, con composición en bootstrap/router/páginas. No hay directorio
+de perfiles, chat ni acciones administrativas móviles. Un recurso propio o
+reportero QR anónimo no ofrece autobloqueo/identidad inventada.
+
+Plan034/fuentes115–118, migración y patch generados por los scripts versionados,
+sin alterar SQL anterior. Relación privada con UUID propio, elección y versión;
+sin grants directos y lista propia de20. Autor derivado del contenido autorizado,
+sin IDs de cuenta ni perfiles privados en DTO. Desbloqueo posible tras retirar
+el contenido. CAS/replay evita duplicados y órdenes antiguas; la elección inversa
+no se revela ni se retira. Lock por pareja serializa elección y contribución.
+Triggers en escrituras rechazan nuevos avisos/avistamientos afectados incluso
+desde adaptadores servidor; errores distinguen bloqueo de sesión/respuesta incierta.
+Plan036/fuente122 añade el contacto confirmado sin reescribir034:
+`case_contact_visible` devuelve falso para lectores bloqueados en cualquiera
+de los sentidos; RPC y guard restrictivo de avatar comparten esa comprobación.
+El autor y terceros autorizados conservan sus permisos. Consentimiento/teléfono/
+versión almacenados intactos. Desbloquear restaura solo el contacto aún consentido.
+Una URL de foto ya firmada puede durar60s; no se recuperan datos ya descargados.
+Móvil invalida la familia de consultas de contacto tras mutaciones, también ante
+respuesta ambigua, para retirar nombres/teléfonos/fotos consultados previamente.
+
+Recibos previos, historial, denuncias, cierre, fichas/lista/mapa/Guardados
+y QR sin cuenta conservan permisos. La UI comunica el alcance
+antes de confirmar. Skeleton/shimmer/toast, refresh conservado, reintento exacto
+tras respuesta perdida y descarte de datos/respuestas al cambiar cuenta.
+En móvil una confirmación antigua no se aplica a otro estado. En web un conflicto
+también limpia datos privados por posible cambio de identidad.
+
+Validación local:526 pruebas Flutter aprobadas; análisis sin incidencias y
+formato correcto.28 regresiones móviles tras ajustar rechazo conocido y18 de
+bloqueos/arquitectura tras revisar DTO/composición.77 pruebas web, typecheck,
+build Nuxt y30 pruebas de servidor aprobados. Tras confirmar contacto/foto,
+se repiten las526 pruebas Flutter completas y50 SQL completas, todas aprobadas.
+23 pruebas de bloqueos/contactos/arquitectura verifican también la retirada del
+teléfono ya consultado y su recuperación solo tras desbloquear. Cinco escenarios
+SQL de bloqueos incluyen contacto/foto en ambos orígenes, permiso restrictivo de
+Storage incluso ante política amplia, consentimiento intacto y terceros.
+La suite incluye publicación RPC auténtica,
+retención del borrador y contribuciones en ambas direcciones. Incluyen permisos,
+replay/conflicto, paginación, recurso retirado, repetición de run_all/035 y QR anónimo.
+
+QA Chrome del build: acceso global, entrada por Perfil, cancelación, resultado
+ambiguo/replay con una sola escritura, recarga, refresh fallido conservado,
+desbloqueo, normal/reducido y1440/390/320 con texto200%; sin overflow ni errores
+CSP/hidratación. Se corrigió overflow de título/acciones de ConfirmationDialog
+compartido con texto200%; acción final comprobada mediante scroll. Renders
+móviles390×844 y320×350/texto2 revisados, confirmación y acciones alcanzables.
+Capturas en apps/mobile/build/ui-preview/{user-blocks,web-user-blocks}; logs
+hu142-* en build ignorado. Una expectativa inicial de QA confundía el puente
+global de acceso con login directo y otra comprobaba el envío antes de su
+respuesta; ajustadas al contrato y repetidas. Añadidas llaves a un `if` existente
+en case_creation_effects_test para dejar análisis limpio, sin alterar su lógica.
+
+Pendientes: aplicar034 después de033 y036 después de034, actualizar clientes/Nuxt y probar A/B/C
+en Android/Supabase reales, incluida contención multiconexión y reinicio físico.
+PGlite de una conexión y fixtures no certifican esos escenarios. Safari/Firefox
+y aprobación visual del usuario pendientes. Sin despliegue, SQL remoto, roles,
+nuevos secrets ni cierre de issue/épica. Documentación/backlog conservan la
+instantánea remota y distinguen implementación local. Siguiente paso: activar
+y validar034/036; después continuar HU-14.4 (apelaciones) según sus criterios.
+
 ## HU-14.4: apelaciones de moderación —23/10/2026
 
 Implementada la apelación de decisiones sobre contenido propio con motivo,

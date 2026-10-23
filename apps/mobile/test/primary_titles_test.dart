@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -22,21 +21,9 @@ void main() {
     final body = FontLoader('sans-serif')
       ..addFont(rootBundle.load('assets/fonts/Roboto-Regular.ttf'));
     await body.load();
-    final configFile = File('.dart_tool/package_config.json').absolute;
-    final config =
-        jsonDecode(await configFile.readAsString()) as Map<String, dynamic>;
-    final flutter = (config['packages'] as List)
-        .cast<Map<String, dynamic>>()
-        .firstWhere((package) => package['name'] == 'flutter');
-    final icon = configFile.uri
-        .resolve('${flutter['rootUri']}/')
-        .resolve(
-          '../../bin/cache/artifacts/material_fonts/materialicons-regular.otf',
-        );
-    await (FontLoader(
-          'MaterialIcons',
-        )..addFont(File.fromUri(icon).readAsBytes().then(ByteData.sublistView)))
-        .load();
+    final icons = FontLoader('MaterialIcons')
+      ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+    await icons.load();
   });
 
   for (final small in [false, true]) {

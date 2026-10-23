@@ -1,9 +1,17 @@
 # Base de datos de Entre Huellas
 
+Bloqueos23/10: HU-14.2/RF-23/#44, plan034/fuentes115–118. Tabla privada/RPC propias
+y triggers de contribuciones nuevas; lock por pareja, CAS y replay. Generar
+Build-UserBlocksPatch/Build-RunAll; patch034 después de033 y036 después de034
+(fuente122/Build-BlockCaseContactsPatch), con clientes actualizados.
+036 oculta contacto/foto entre cuentas bloqueadas, sin cambiar consentimiento.
+QR anónimo conserva permisos. Validación SQL local en ESTADO; activación
+hosted pendiente. [Ficha](../docs/funcionalidades/bloqueos-usuarios.md).
+
 HU-14.4/#46,23/10: plan035/fuentes119–121 añade apelaciones propias,
 respuestas y lecturas auditadas privadas. Build-AppealsPatch genera patch035 y
 migración20261023003500_moderation_appeals.sql; requiere030, sin dependencia de
-034/HU-14.2. Build-RunAll incorpora035 tras033. No ejecutar el acumulativo para
+034/HU-14.2. Build-RunAll incorpora034,035 y036 tras033. No ejecutar el acumulativo para
 actualizar producción; aplicar solamente el incremento pendiente. Validación
 local48/48, sin aplicación remota. [Ficha](../docs/funcionalidades/apelaciones-moderacion.md).
 

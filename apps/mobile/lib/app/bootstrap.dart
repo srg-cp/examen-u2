@@ -97,6 +97,9 @@ import '../core/config/startup_state.dart';
 import '../features/auth/data/data_sources/supabase_auth_data_source.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/data/repositories/unavailable_auth_repository.dart';
+import '../features/user_blocks/domain/repositories/user_block_repository.dart';
+import '../features/user_blocks/data/repositories/user_block_repository_impl.dart';
+import '../features/user_blocks/data/data_sources/user_block_source.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/repositories/access_repository.dart';
 import '../features/auth/data/repositories/access_repository_impl.dart';
@@ -112,6 +115,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.userBlockRepository = const UnavailableUserBlockRepository(),
     this.caseShareRepository = const UnavailableCaseShareRepository(),
     this.caseContactRepository = const UnavailableCaseContactRepository(),
     this.contentReportRepository = const UnavailableContentReportRepository(),
@@ -144,6 +148,7 @@ class AppBootstrap {
   });
 
   final CaseClosureRepository caseClosureRepository;
+  final UserBlockRepository userBlockRepository;
   final CaseContactRepository caseContactRepository;
   final ContentReportRepository contentReportRepository;
   final AppealsRepository appealsRepository;
@@ -195,6 +200,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          userBlockRepository: UserBlockRepositoryImpl(
+            SupabaseUserBlockSource(supabase.client),
+          ),
           contentReportRepository: ContentReportRepositoryImpl(
             SupabaseContentReportSource(supabase.client),
           ),
