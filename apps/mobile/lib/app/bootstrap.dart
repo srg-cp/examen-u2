@@ -6,6 +6,9 @@ import '../features/case_contacts/domain/repositories/case_contact_repository.da
 import '../features/case_contacts/data/repositories/case_contact_repository_impl.dart';
 import '../features/case_contacts/data/data_sources/case_contact_source.dart';
 import '../features/content_reports/domain/repositories/content_report_repository.dart';
+import '../features/moderation_appeals/domain/repositories/appeals_repository.dart';
+import '../features/moderation_appeals/data/repositories/appeals_repository_impl.dart';
+import '../features/moderation_appeals/data/data_sources/appeals_source.dart';
 import '../features/content_reports/data/repositories/content_report_repository_impl.dart';
 import '../features/content_reports/data/data_sources/content_report_source.dart';
 import '../features/case_closure/domain/repositories/case_closure_repository.dart';
@@ -112,6 +115,7 @@ class AppBootstrap {
     this.caseShareRepository = const UnavailableCaseShareRepository(),
     this.caseContactRepository = const UnavailableCaseContactRepository(),
     this.contentReportRepository = const UnavailableContentReportRepository(),
+    this.appealsRepository = const UnavailableAppealsRepository(),
     this.caseClosureRepository = const UnavailableCaseClosureRepository(),
     this.notificationRepository = const UnavailableNotificationRepository(),
     this.pushRepository = const UnavailablePushRepository(),
@@ -142,6 +146,7 @@ class AppBootstrap {
   final CaseClosureRepository caseClosureRepository;
   final CaseContactRepository caseContactRepository;
   final ContentReportRepository contentReportRepository;
+  final AppealsRepository appealsRepository;
   final StartupState state;
   final NotificationRepository notificationRepository;
   final PushRepository pushRepository;
@@ -192,6 +197,9 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
         return AppBootstrap(
           contentReportRepository: ContentReportRepositoryImpl(
             SupabaseContentReportSource(supabase.client),
+          ),
+          appealsRepository: AppealsRepositoryImpl(
+            SupabaseAppealsSource(supabase.client),
           ),
           caseClosureRepository: CaseClosureRepositoryImpl(
             SupabaseCaseClosureSource(supabase.client),

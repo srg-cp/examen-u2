@@ -53,6 +53,7 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/widgets/profile_avatar.dart';
 import '../features/profile/presentation/view_models/profile_view_model.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/moderation_appeals/presentation/screens/appeals_screen.dart';
 import '../features/interest_zones/presentation/screens/interest_zones_screen.dart';
 import '../features/alert_preferences/presentation/screens/alert_preferences_screen.dart';
 import '../features/pets/presentation/widgets/pets_section.dart';
@@ -130,6 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/my-reports' ||
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/notifications' ||
+              state.uri.path == '/home/appeals' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
@@ -236,6 +238,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ),
         routes: [
+          GoRoute(
+            path: 'appeals',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const AppealsScreen(),
+            ),
+          ),
           GoRoute(
             path: 'notifications',
             pageBuilder: (context, state) => entityEditorPage(

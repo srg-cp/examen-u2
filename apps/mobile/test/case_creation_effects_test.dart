@@ -1,4 +1,5 @@
 import 'package:flutter_application_entrehuellas/features/found_cases/presentation/screens/found_editor_screen.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_location_fields.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/zone_map_picker.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/view_models/case_editor_view_model.dart';
@@ -342,8 +343,11 @@ void main() {
             expect(find.text('¿Salir del reporte?'), findsNothing);
             expect(
               find.byType(EntityScreenShell),
-              found || fromList ? findsOneWidget : findsNothing,
+              !found && fromList ? findsOneWidget : findsNothing,
             );
+            if (found) {
+              expect(find.byType(CasePublicScreenShell), findsOneWidget);
+            }
             expect(tester.takeException(), isNull);
             await tester.pumpWidget(const SizedBox.shrink());
           },

@@ -37,6 +37,12 @@ void main() {
       );
       final surface = find.byKey(const ValueKey('origin-surface'));
       final source = find.byKey(const ValueKey('origin-page-source'));
+      final content = find
+          .ancestor(
+            of: find.text('Destination'),
+            matching: find.byType(Opacity),
+          )
+          .first;
       BoxDecoration decoration() =>
           tester
                   .widget<DecoratedBox>(
@@ -59,15 +65,17 @@ void main() {
       final earlyColor = decoration().color;
       final earlyOpacity = tester.widget<Opacity>(source).opacity;
       expect(earlyRect.width, greaterThan(56));
-      expect(earlyColor, isNot(const Color(0xFF111111)));
+      // The source color remains underneath the fading page background.
+      expect(earlyColor, const Color(0xFF111111));
       expect(earlyOpacity, inExclusiveRange(0, 1));
-      expect(tester.widget<Opacity>(find.byType(Opacity).first).opacity, 0);
+      expect(tester.widget<Opacity>(content).opacity, 0);
       await tester.tapAt(const Offset(200, 400));
       expect(taps, 0);
       controller.value = 1;
       await tester.pump();
       expect(source, findsNothing);
-      expect(decoration().color, Colors.white);
+      expect(decoration().color, const Color(0xFF111111));
+      expect(tester.widget<Opacity>(content).opacity, 1);
       await tester.tap(find.text('Destination'));
       expect(taps, 1);
       controller.reverse();
@@ -106,6 +114,12 @@ void main() {
         ),
       );
       final surface = find.byKey(const ValueKey('origin-surface'));
+      final content = find
+          .ancestor(
+            of: find.byKey(const ValueKey('page-layout')),
+            matching: find.byType(Opacity),
+          )
+          .first;
       expect(tester.getRect(surface), origin);
       expect(
         tester.getSize(find.byKey(const ValueKey('page-layout'))),
@@ -114,13 +128,13 @@ void main() {
       controller.value = .5;
       await tester.pump();
       final middle = tester.getRect(surface);
-      expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 0);
+      expect(tester.widget<Opacity>(content).opacity, 0);
       expect(middle.width, greaterThan(origin.width));
       expect(middle.width, lessThan(400));
       controller.value = 1;
       await tester.pump();
       expect(tester.getRect(surface), const Rect.fromLTWH(0, 0, 400, 800));
-      expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 1);
+      expect(tester.widget<Opacity>(content).opacity, 1);
       controller.reverse();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 240));

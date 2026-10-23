@@ -57,7 +57,8 @@ void main() {
       repo.pendingRead!.complete();
       await tester.pumpAndSettle();
       expect(find.byType(SkeletonFormFields), findsNothing);
-      expect(find.byType(TextField), findsNWidgets(2));
+      // Name, email and the optional private phone added in ADR-116.
+      expect(find.byType(TextField), findsNWidgets(3));
       expect(find.text('Correo electrónico'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },

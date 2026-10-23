@@ -1,5 +1,13 @@
 # Arquitectura de Entre Huellas
 
+23/10, HU-14.4: moderation_appeals en Flutter y appeals en Nuxt mantienen
+dominio/casos de uso, repositorios, fuentes/DTO y ViewModels por funcionalidad.
+Bootstrap/plugins/Nitro componen la inyección. Perfil/Inicio enlazan al usuario;
+revisión solo web mediante la política global reviewer. Plan035/fuentes119–121
+separa envíos/respuestas append-only y auditoría de lectura; valida autoría o
+rol por operación y deduplica comandos sin alterar decisiones ni visibilidad.
+[Ficha y límites de validación](funcionalidades/apelaciones-moderacion.md).
+
 Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
 móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
 y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente

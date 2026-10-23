@@ -74,8 +74,8 @@
 .reader-shell .sader-invalid .sader-text-input:not(:focus)+.sader-floating-label{color:var(--sf-danger)}
 .reader-shell .sader-inset .sader-text-input{min-height:3.5rem;border-radius:calc(.625rem + 4px);padding:1.5rem .75rem .5rem;transition-duration:.3s}
 .reader-shell .sader-inset .sader-floating-label,.reader-shell .sader-inset .sader-text-input:is(:focus,:not(:placeholder-shown))+.sader-floating-label{left:.75rem;top:.5rem;transform:none;padding:0;background:transparent;font-size:.75rem;font-weight:400;line-height:1rem}
-.reader-shell .sader-multiline .sader-text-input{resize:vertical;min-height:120px;padding-bottom:32px}
-.sader-counter{position:absolute;bottom:8px;right:12px;font-size:.75rem;color:var(--sf-muted);pointer-events:none}
+.reader-shell .sader-multiline .sader-text-input{resize:vertical;min-height:120px;padding-bottom:.75rem}
+.sader-counter{display:block;padding:0 .75rem .5rem;text-align:right;font-size:.75rem;line-height:1.5;color:var(--sf-muted);pointer-events:none}
 .sader-calendar{display:flex;flex-direction:column;gap:8px;padding:4px 8px}
 .sader-calendar-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0 0 8px;font-weight:600}
 .sader-calendar-header>div{display:flex;gap:4px}
