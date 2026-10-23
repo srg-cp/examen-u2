@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ModerationScreen from '../features/moderation/presentation/screens/ModerationScreen.vue';
+import ModerationScreen from '../../features/moderation/presentation/screens/ModerationScreen.vue';
 const withBack=ref(false);
 useHead({title:'Moderación · Entre Huellas',meta:[{name:'robots',content:'noindex, nofollow, noarchive'}]});
 </script>

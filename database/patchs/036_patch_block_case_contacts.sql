@@ -3,7 +3,7 @@
 -- HU-14.2 / RF-23 / issue #44: alcance confirmado por usuario, ocultar contacto/foto entre cuentas bloqueadas. Requiere034; consentimiento conservado.. Apply this entire migration once.
 begin;
 
--- Source: database/functions/119_block_case_contacts.sql | normalized SHA256: 8238909cc7f2a5b52215b1edd36cd88cb84a73909e692c4d52829d0248b51f9c
+-- Source: database/functions/122_block_case_contacts.sql | normalized SHA256: 8238909cc7f2a5b52215b1edd36cd88cb84a73909e692c4d52829d0248b51f9c
 -- HU-14.2: a block in either direction suppresses the per-case contact,
 -- including the shared avatar, through the existing read/Storage adapter.
 -- Preserve consent and owner editing; unblocking never publishes a new contact.

@@ -1,5 +1,9 @@
 # ADR-130: bloqueos de interacciones entre cuentas
 
+Integración23/10: apelaciones ya integrada en main conserva035/fuentes119–121.
+El complemento de contacto de esta decisión usa036/fuente122, con SQL idéntico;
+se regeneran migración y patch y se conserva034 sin modificaciones.
+
 Fecha: 23/10/2026, America/Lima. HU-14.2 / RF-23 / issue #44.
 
 ## Contexto
@@ -65,7 +69,7 @@ Cambios de cuenta y disposición descartan respuestas tardías. Se reutilizan
 shells, botones glass, stagger y confirmación existentes, sin nuevo contrato de
 animación. La confirmación web compartida ajusta texto/acciones para 320px/200%.
 
-Plan034/fuentes115–118 se activa después de033; plan035/fuente119 añade el contacto
+Plan034/fuentes115–118 se activa después de033; plan036/fuente122 añade el contacto
 confirmado por el usuario sin reescribir034. Después se actualizan los clientes.
 No se reescriben migraciones anteriores. No requiere Firebase ni secretos nuevos.
 La activación remota, prueba Android físico, navegadores adicionales y contención

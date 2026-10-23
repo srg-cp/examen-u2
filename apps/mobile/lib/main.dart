@@ -1,6 +1,7 @@
 import 'features/user_blocks/providers/user_block_providers.dart';
 import 'features/case_contacts/providers/case_contact_providers.dart';
 import 'features/content_reports/providers/content_report_providers.dart';
+import 'features/moderation_appeals/providers/appeals_providers.dart';
 import 'features/case_closure/providers/case_closure_providers.dart';
 import 'features/notifications/providers/notification_providers.dart';
 import 'features/explore/providers/explore_providers.dart';
@@ -38,6 +39,9 @@ Future<void> main() async {
         ),
         contentReportRepositoryProvider.overrideWithValue(
           bootstrap.contentReportRepository,
+        ),
+        appealsRepositoryProvider.overrideWithValue(
+          bootstrap.appealsRepository,
         ),
         caseClosureRepositoryProvider.overrideWithValue(
           bootstrap.caseClosureRepository,

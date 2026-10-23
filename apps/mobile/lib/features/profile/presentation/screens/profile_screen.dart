@@ -90,6 +90,13 @@ class ProfileScreen extends ConsumerWidget {
                           label: const Text('Ubicaciones de interés'),
                         ),
                         const SizedBox(height: 16),
+                        TextButton.icon(
+                          onPressed: exit.isLoading
+                              ? null
+                              : () => context.push('/home/appeals'),
+                          icon: const Icon(Icons.fact_check_outlined),
+                          label: const Text('Mis apelaciones'),
+                        ),
                         LoadingShimmer(
                           isLoading: exit.isLoading,
                           loadingLabel: 'Cerrando sesión',

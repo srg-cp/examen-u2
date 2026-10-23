@@ -23,6 +23,17 @@ import 'package:flutter_application_entrehuellas/features/case_contacts/domain/e
 import 'package:flutter_application_entrehuellas/features/case_contacts/providers/case_contact_providers.dart';
 import 'package:flutter_application_entrehuellas/features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import 'package:flutter_application_entrehuellas/features/case_contacts/presentation/view_models/case_contact_view_model.dart';
+import 'package:flutter_application_entrehuellas/app/entre_huellas_app.dart';
+import 'package:flutter_application_entrehuellas/app/router.dart';
+import 'package:flutter_application_entrehuellas/core/config/startup_state.dart';
+import 'package:flutter_application_entrehuellas/core/config/startup_state_provider.dart';
+import 'package:flutter_application_entrehuellas/features/auth/providers/auth_providers.dart';
+import 'package:flutter_application_entrehuellas/features/auth/providers/password_recovery_providers.dart';
+import 'package:flutter_application_entrehuellas/features/onboarding/providers/onboarding_providers.dart';
+import 'package:flutter_application_entrehuellas/features/profile/providers/profile_providers.dart';
+import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
+import 'support/fake_password_recovery.dart';
+import 'support/fake_profile.dart';
 
 const actor = '11111111-1111-4111-8111-111111111142',
     other = '22222222-2222-4222-8222-222222222242';
@@ -127,6 +138,58 @@ class BlockAwareContactRepository extends FakeContactRepository {
 }
 
 void main() {
+  for (final stage in ['guest', 'onboarding', 'ready']) {
+    testWidgets(
+      'HU14.2 real router gates blocked accounts by account stage: $stage',
+      (tester) async {
+        final auth = FakeAuthRepository();
+        if (stage != 'guest') auth.current = const AuthSession(userId: actor);
+        final onboarding = FakeOnboarding(auth);
+        if (stage == 'ready') onboarding.completed.add(actor);
+        final c = ProviderContainer(
+          overrides: [
+            startupStateProvider.overrideWithValue(
+              const StartupState(StartupStatus.ready),
+            ),
+            authRepositoryProvider.overrideWithValue(auth),
+            onboardingRepositoryProvider.overrideWithValue(onboarding),
+            passwordRecoveryRepositoryProvider.overrideWithValue(
+              FakePasswordRecovery(),
+            ),
+            profileRepositoryProvider.overrideWithValue(FakeProfile()),
+            userBlockRepositoryProvider.overrideWithValue(FakeBlocks()),
+          ],
+        );
+        addTearDown(() async {
+          c.dispose();
+          await auth.controller.close();
+        });
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: c,
+            child: const EntreHuellasApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        c.read(routerProvider).go('/home/blocked-users');
+        await tester.pumpAndSettle();
+        expect(
+          c.read(routerProvider).routeInformationProvider.value.uri.path,
+          switch (stage) {
+            'guest' => '/access',
+            'onboarding' => '/onboarding',
+            _ => '/home/blocked-users',
+          },
+        );
+        expect(
+          find.byType(UserBlocksScreen),
+          stage == 'ready' ? findsOneWidget : findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
   test(
     'Domain rejects invalid references/cursors/versions before repository access',
     () async {

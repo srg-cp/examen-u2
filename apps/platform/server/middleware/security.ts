@@ -32,11 +32,13 @@ export default defineEventHandler(event => {
   const blockWrite = event.method === 'POST' && ['/api/user-blocks/prepare','/api/user-blocks/set'].includes(path);
   const notificationPath = blockPath || path.startsWith('/api/notifications/');
   const notificationWrite = event.method === 'POST' && path === '/api/notifications/read';
-  const moderationPath = notificationPath || recoveryPath || path.startsWith('/api/moderation/') || path.startsWith('/api/access/');
+  const appealPath = path.startsWith('/api/appeals/');
+  const appealWrite = event.method === 'POST' && ['/api/appeals/list','/api/appeals/submit','/api/appeals/answer'].includes(path);
+  const moderationPath = appealPath || notificationPath || recoveryPath || path.startsWith('/api/moderation/') || path.startsWith('/api/access/');
   const credentialWrite = event.method === 'POST' && /^\/api\/access\/credentials\/(register|recover|verify|resend|reset|cancel)$/.test(path);
   const moderationWrite = credentialWrite || (event.method === 'POST' && ['/api/access/login','/api/access/logout','/api/access/onboarding','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path));
   if (moderationPath && !oauthCallback && !accountEntryNavigation && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
-  const submission = blockWrite || notificationWrite || recoveryWrite || moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
+  const submission = blockWrite || appealWrite || notificationWrite || recoveryWrite || moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
   if (event.method !== 'GET' && event.method !== 'HEAD' && !submission) {
     setHeader(event, 'Allow', 'GET, HEAD'); setResponseStatus(event, 405); return { error: 'method_not_allowed' };
   }
@@ -47,7 +49,7 @@ export default defineEventHandler(event => {
       (nativeSubmission && (!/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(getHeader(event, 'authorization') || '') || getHeader(event, 'origin')))) {
       setResponseStatus(event, 403); return { error: 'invalid_request' };
     }
-    if (!(moderationWrite || path === '/api/recovery/explore' ? moderationLimiter : writeLimiter).allow(peer) || (credentialWrite && !path.endsWith('/cancel') && !credentialLimiter.allow(peer)) || (['/api/access/login','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start'].includes(path) && !loginLimiter.allow(peer))) { setHeader(event, 'Retry-After', 60); setResponseStatus(event, 429); return { error: 'rate_limited' }; }
+    if (!(moderationWrite || appealWrite || path === '/api/recovery/explore' ? moderationLimiter : writeLimiter).allow(peer) || (credentialWrite && !path.endsWith('/cancel') && !credentialLimiter.allow(peer)) || (['/api/access/login','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start'].includes(path) && !loginLimiter.allow(peer))) { setHeader(event, 'Retry-After', 60); setResponseStatus(event, 429); return { error: 'rate_limited' }; }
     if (writes >= 4) { setResponseStatus(event, 503); return { error: 'unavailable' }; }
     writes++; let released = false;
     const releaseWrite = () => { if (!released) { released = true; writes--; } };

@@ -312,3 +312,14 @@ borrador/reintento y renders 1440/390/320/texto200%. No modifica Supabase real.
 `npm test` incluye dominio/ViewModel de recovery y `npm run test:server` sus
 contratos de sesión/onboarding, origen, actor, proyección y deduplicación.
 Ver docs/funcionalidades/navegacion-web.md para alcance e integración pendiente.
+
+## Apelaciones HU-14.4 —23/10/2026
+
+`npm test` incluye dominio/DTO/transporte/ViewModel y `npm run test:server`
+incluye apelaciones con cookie, Origin, actor, permisos, respuesta y reintentos.
+Con build vigente, `scripts/check-appeals-browser.mjs` usa PLAYWRIGHT_MODULE
+y CHROME_PATH como los demás scripts y genera capturas locales en
+apps/mobile/build/ui-preview/appeals-web. Solo backend fixture, sin escrituras
+remotas. Políticas globales: /apelaciones account y /moderacion/apelaciones
+reviewer. /moderacion vive en pages/moderacion/index.vue para que la ruta
+de apelaciones se monte como página independiente. Activación SQL035 pendiente.

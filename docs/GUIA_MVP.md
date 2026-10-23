@@ -529,9 +529,16 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 bloquear/desbloquear cuentas desde contenido autorizado y lista propia en Perfil.
 Alcance confirmado por el usuario: impedir nuevos avisos y avistamientos
 autenticados y ocultar contacto/foto entre ambas cuentas; fichas/historial/denuncias
-y QR anónimo conservan permisos. Sin chat ni suspensión. Plan034 después de033 y035 después de034;
+y QR anónimo conservan permisos. Sin chat ni suspensión. Plan034 después de033 y036 después de034;
 activación/demo reales pendientes, sin cerrar historia ni épica.
 [Ficha](funcionalidades/bloqueos-usuarios.md), [ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md).
+
+Avance23/10, HU-14.4/#46/RF-33: implementada la vía mínima de apelación propia
+con motivo/estado/respuesta en móvil/web, revisión autorizada solo en web,
+historial e idempotencia privados en plan035. No cambia visibilidad al responder:
+se conserva la operación auditada de moderación. Validación local y activación
+pendiente en [la ficha](funcionalidades/apelaciones-moderacion.md); no cierra
+HU-14, HU-14.2 ni la validación remota de esta derivada.
 
 - **HU-14 / RF-22,23,33:** denuncia, bloqueo, ocultamiento por moderador con motivo y auditoría; vía de apelación mínima.
 - **HU-15 / RF-32:** borrador y caché local con Drift/SQLite, cola de envíos y estados visibles. Cortar conexión y reiniciar no pierde el borrador; reenvío no duplica ni confirma publicación antes de respuesta del servidor.

@@ -1,5 +1,10 @@
 # Bloquear y desbloquear cuentas
 
+Integración23/10 con HU-14.4: se conserva035 de apelaciones y el complemento
+local de contacto cambia a036/fuente122 con el mismo cuerpo SQL. Los nombres035
+anteriores de contacto quedan sustituidos en el repositorio; no ejecutar ambos
+como incrementos distintos. La integración y su validación se registran en ESTADO.
+
 HU-14.2 / RF-23 / issue #44. Implementación móvil/web/SQL en
 `feature/user-blocking`, 23/10/2026. [ADR-130](../decisiones/130-bloqueos-de-interacciones-entre-cuentas.md).
 
@@ -43,8 +48,8 @@ onboarding. El SQL valida la propiedad de la relación.
 Plan034 después de033; fuentes115–118, migración
 `20261023003400_user_blocks.sql` y patch034 generados mediante
 `Build-UserBlocksPatch.ps1` / `Build-RunAll.ps1`.
-Después, plan035/fuente119 y migración/patch035
-`20261023003500_block_case_contacts.sql`, mediante `Build-BlockCaseContactsPatch.ps1`,
+Después, plan036/fuente122 y migración/patch036
+`20261023003600_block_case_contacts.sql`, mediante `Build-BlockCaseContactsPatch.ps1`,
 añaden el ocultamiento confirmado sin reescribir034. Las lecturas RPC y las
 políticas restrictivas existentes de avatar usan `case_contact_visible`.
 No se borran ni alteran consentimiento, número o versión del contacto.
@@ -81,7 +86,7 @@ inválida y respuesta incierta; conserva lo escrito para salir o reintentar.
 
 ## Activación y validación
 
-1. Verificar prerrequisitos hasta033. Aplicar los patches034 y035 completos en desarrollo,
+1. Verificar prerrequisitos hasta033. Aplicar los patches034 y036 completos en desarrollo,
    con el procedimiento versionado; no reaplicar030 ya confirmado por el usuario.
 2. Actualizar/reiniciar Nuxt y Flutter conjuntamente con el nuevo contrato.
    Reutiliza Auth, variables privadas de cuenta web y URL del servidor de
@@ -110,6 +115,13 @@ ambiguo sin doble escritura, recarga, refresh fallido, desbloqueo, normal/reduci
 y1440/390/320 con texto200%, sin overflow/CSP/hidratación. Capturas revisadas en
 `apps/mobile/build/ui-preview/user-blocks` y `web-user-blocks`.
 
-Faltan patches034/035 remotos, demo Android/Supabase real, Safari/Firefox y concurrencia
+Faltan patches034/036 remotos, demo Android/Supabase real, Safari/Firefox y concurrencia
 hosted multiconexión. PGlite y fixtures no certifican esos escenarios. Sin
 despliegue, asignación de roles ni cierre de la historia/épica por esta entrega.
+
+Integración23/10 de ambas funcionalidades:537 pruebas Flutter,83 web,31 de
+servidor y55 SQL aprobadas; formato/análisis/typecheck/build correctos. Chrome
+sobre el build integrado vuelve a validar ambos recorridos con fixtures. El
+router real móvil prueba acceso a bloqueos en sus tres etapas de cuenta y
+conserva las regresiones de apelaciones. Evidencia local; activación y demo
+remotas pendientes, como se detalla en ESTADO.

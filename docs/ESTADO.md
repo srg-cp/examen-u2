@@ -1,5 +1,44 @@
 # Estado del proyecto
 
+## Integración de bloqueos y apelaciones —23/10/2026
+
+Se incorpora origin/main (c03fa84, merge de apelaciones fdcf1e3/PR#64) en
+feature/user-blocking (dc0195b/PR#65). Se resuelven los11 conflictos conservando
+ambas funcionalidades, APIs, inyección, rutas y suites de pruebas. La integración
+se prepara en la rama de bloqueos, sin reescribir los commits originales.
+
+El plan035 de apelaciones y fuentes119–121 se conservan intactos. El complemento
+de contacto de bloqueos pasa de035/fuente119 a036/fuente122; cuerpo SQL idéntico,
+con migración/patch regenerados desde el plan.034 permanece intacto. El bundle
+incluye034,035 y036. Nuevas comprobaciones del catálogo rechazan versiones de
+migración y números globales de fuentes duplicados en la suite SQL.
+
+Se corrige primary_titles_test: MaterialIcons se carga desde el asset empaquetado
+por Flutter, sin acceder a la ruta interna del caché SDK que faltaba en CI Linux.
+No se cambia la UI ni se omite la prueba.
+
+La revisión del router detecta además que /home/blocked-users estaba declarada
+pero faltaba en la política global de cuenta móvil: redirigía al Inicio incluso
+con onboarding completado. Se reproduce el fallo con el router real y se añade
+la ruta al mismo control global. Tres regresiones cubren visitante, cuenta sin
+onboarding y cuenta preparada; se conservan las pruebas reales de apelaciones.
+
+Validación final local:537/537 Flutter (AMBIENT_BACKGROUND_MOTION=false), formato
+643 archivos sin cambios y análisis sin incidencias;5/5 pruebas Python de
+preparación de distribución.83/83 pruebas web,31/31 de servidor, typecheck y
+build Nuxt correctos.55/55 SQL PGlite/PostGIS, incluida repetición del bundle,
+ambas funcionalidades y catálogo sin colisiones. Chrome sobre build integrado:
+apelaciones y bloqueos aprobados con fixtures, reintentos, permisos, navegación,
+movimiento normal/reducido, pantallas pequeñas/texto200% y sin fallos CSP/hidratación.
+El primer pase móvil reprodujo el fallo del router; tras corregirlo, la regresión
+completa537/537 queda en build/integration-tests-final.log. No se omiten pruebas.
+
+Siguiente paso: commit firmado/push en PR#65, verificar CI y fusionar con merge
+para conservar fdcf1e3 y dc0195b en main. Confirmación remota pendiente al
+registrar esta evidencia local; no equivale a despliegue ni cierre de historia.
+Activación Supabase, despliegue Nuxt y demo física siguen siendo tareas separadas.
+No se ejecuta SQL remoto ni se dan por cerradas las historias con esta integración.
+
 ## Bloqueos propios en móvil y web —HU-14.2/RF-23/#44,23/10/2026
 
 Por petición del usuario se implementa HU-14.2 con commit/push autorizados al
@@ -30,7 +69,7 @@ el contenido. CAS/replay evita duplicados y órdenes antiguas; la elección inve
 no se revela ni se retira. Lock por pareja serializa elección y contribución.
 Triggers en escrituras rechazan nuevos avisos/avistamientos afectados incluso
 desde adaptadores servidor; errores distinguen bloqueo de sesión/respuesta incierta.
-Plan035/fuente119 añade el contacto confirmado sin reescribir034:
+Plan036/fuente122 añade el contacto confirmado sin reescribir034:
 `case_contact_visible` devuelve falso para lectores bloqueados en cualquiera
 de los sentidos; RPC y guard restrictivo de avatar comparten esa comprobación.
 El autor y terceros autorizados conservan sus permisos. Consentimiento/teléfono/
@@ -71,13 +110,66 @@ global de acceso con login directo y otra comprobaba el envío antes de su
 respuesta; ajustadas al contrato y repetidas. Añadidas llaves a un `if` existente
 en case_creation_effects_test para dejar análisis limpio, sin alterar su lógica.
 
-Pendientes: aplicar034 después de033 y035 después de034, actualizar clientes/Nuxt y probar A/B/C
+Pendientes: aplicar034 después de033 y036 después de034, actualizar clientes/Nuxt y probar A/B/C
 en Android/Supabase reales, incluida contención multiconexión y reinicio físico.
 PGlite de una conexión y fixtures no certifican esos escenarios. Safari/Firefox
 y aprobación visual del usuario pendientes. Sin despliegue, SQL remoto, roles,
 nuevos secrets ni cierre de issue/épica. Documentación/backlog conservan la
 instantánea remota y distinguen implementación local. Siguiente paso: activar
-y validar034/035; después continuar HU-14.4 (apelaciones) según sus criterios.
+y validar034/036; después continuar HU-14.4 (apelaciones) según sus criterios.
+
+## HU-14.4: apelaciones de moderación —23/10/2026
+
+Implementada la apelación de decisiones sobre contenido propio con motivo,
+estado y respuesta en Flutter/Nuxt. Perfil móvil e Inicio web enlazan a Mis
+apelaciones; Denuncias web enlaza a Revisar apelaciones, con política global
+reviewer y autorización SQL en cada operación. Se distingue propietario del
+contenido, denunciante y autor autenticado del avistamiento. Evidencia anónima
+no se atribuye a una cuenta. [Ficha](funcionalidades/apelaciones-moderacion.md).
+
+Plan035/fuentes119–121 genera migración y patch035. Tablas privadas con RLS,
+RPC de autoría/rol, accesos de revisión auditados y bloqueos/idempotencia por
+comando/decisión. Una apelación y respuesta definitiva por decisión. Se conserva
+la decisión original; responder no cambia visibilidad, que sigue en la operación
+auditada existente. Sin ampliación de permisos públicos ni exposición de denuncia,
+evidencia, coordenadas o paths. No depende de034/HU-14.2, que se trabaja aparte.
+
+Recorridos reutilizan campos, toast, skeleton/shimmer y confirmación de salida
+con borrador, incluido cerrar sesión en web. Conflicto mantiene el motivo y
+permite repetir una consulta fallida; reintento ambiguo conserva UUID/contenido.
+Cambio de cuenta, expiración, revocación y disposición ocultan datos y descartan
+respuestas tardías. /moderacion pasa a pages/moderacion/index.vue para montar
+su nueva ruta hermana correctamente. El router móvil permite /home/appeals
+solo tras cuenta/onboarding; dos pruebas de integración verifican el acceso real.
+
+TextField admite límite Unicode opcional, usado en apelaciones, y su contador
+compartido queda en flujo dentro del contorno para no tapar texto ampliado.
+Regresión de controles Chrome aprobada. Ajustado el selector antiguo de ese
+harness a la navegación Reportar y añadidas llaves a una expectativa Flutter
+existente que impedía análisis limpio; sin cambiar su comprobación.
+
+Validación local:
+
+- SQL PGlite/PostGIS:48/48, incluidos3 escenarios nuevos y repetición del bundle.
+- Web:77/77 pruebas,30/30 de servidor de producción, typecheck y build aprobados.
+- Flutter:formato/análisis sin incidencias, regresión524/524 con
+  AMBIENT_BACKGROUND_MOTION=false; después18/18 focalizadas, incluidos8 escenarios
+  de apelaciones (dos nuevos de router) y10 de arquitectura. El primer intento
+  global se interrumpió por timeouts del fondo continuo, ya documentados en
+  este proyecto; no se ocultaron fallos mediante omisión de pruebas.
+- Chrome fixture:envío/validación/descarte y logout cancelados/reintento único,
+  respuesta/consulta del autor/revocación, límite1000 Unicode, teclado,
+  movimiento normal/reducido, CSP/hidratación,1920/1440/731/390/320/texto200%.
+  Renders revisados en apps/mobile/build/ui-preview/appeals-web y appeals-mobile;
+  también aprobado check-fields-browser sobre el campo compartido.
+
+Trabajo aislado en feature/moderation-appeals, carpeta entreHuellas-appeals,
+para conservar los cambios simultáneos de HU-14.2 en la carpeta original.
+Commit/push autorizados por el usuario para esta entrega; sin merge ni despliegue.
+Pendientes:aplicar035 en desarrollo remoto, demo con autores/revisor reales,
+contención multiconexión hosted, Android instalado y otros navegadores.
+El siguiente paso es activar035 siguiendo CONFIGURACION. No se cierra el issue
+remoto#46 ni HU-14 por la implementación local.
 
 ## Guía operativa Android en la raíz —22/10/2026
 

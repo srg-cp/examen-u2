@@ -5,11 +5,19 @@ con dominio/repositorios/casos de uso, ViewModels y fuentes Supabase/HTTP en
 móvil/web. Bootstrap/router/páginas componen integraciones mediante slots.
 RPC propias y triggers SQL rechazan nuevas contribuciones autenticadas en ambos
 sentidos, con lock por pareja y versión esperada; no amplían perfiles públicos.
-035 añade ocultamiento de contacto/foto por `case_contact_visible`, compartido
+036 añade ocultamiento de contacto/foto por `case_contact_visible`, compartido
 por RPC/Storage, sin cambiar el consentimiento. App compone la invalidación de
 contactos tras mutaciones sin imports de presentación entre funcionalidades.
-Ruta web registrada globalmente como `account`. Planes034/035 y límites de QR:
+Ruta web registrada globalmente como `account`. Planes034/036 y límites de QR:
 [ADR-130](decisiones/130-bloqueos-de-interacciones-entre-cuentas.md).
+
+23/10, HU-14.4: moderation_appeals en Flutter y appeals en Nuxt mantienen
+dominio/casos de uso, repositorios, fuentes/DTO y ViewModels por funcionalidad.
+Bootstrap/plugins/Nitro componen la inyección. Perfil/Inicio enlazan al usuario;
+revisión solo web mediante la política global reviewer. Plan035/fuentes119–121
+separa envíos/respuestas append-only y auditoría de lectura; valida autoría o
+rol por operación y deduplica comandos sin alterar decisiones ni visibilidad.
+[Ficha y límites de validación](funcionalidades/apelaciones-moderacion.md).
 
 Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
 móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
