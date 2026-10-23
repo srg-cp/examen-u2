@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/presentation/screens/found_editor_screen.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_location_fields.dart';
@@ -114,6 +116,9 @@ void main() {
               );
             final scope = ProviderContainer(
               overrides: [
+                localDraftRepositoryProvider.overrideWithValue(
+                  FakeLocalDrafts(),
+                ),
                 startupStateProvider.overrideWithValue(
                   const StartupState(StartupStatus.ready),
                 ),

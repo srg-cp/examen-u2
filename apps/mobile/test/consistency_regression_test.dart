@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:async';
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/entities/found_case.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/providers/found_case_providers.dart';
@@ -38,6 +40,7 @@ void main() {
     final cases = FakeCases()..mine.add(item);
     final scope = ProviderContainer(
       overrides: [
+        localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
         petSessionProvider.overrideWith(
           (ref) => Stream.value(const AuthSession(userId: 'one')),
         ),
@@ -98,6 +101,7 @@ void main() {
         final cases = FakeFoundCases()..pending = Completer<void>();
         final scope = ProviderContainer(
           overrides: [
+            localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             foundCaseRepositoryProvider.overrideWithValue(cases),
             foundSessionProvider.overrideWith(
               (ref) => Stream.value(const AuthSession(userId: 'one')),

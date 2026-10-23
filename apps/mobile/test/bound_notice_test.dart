@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
@@ -85,6 +87,7 @@ void main() {
           );
         final scope = ProviderContainer(
           overrides: [
+            localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             authRepositoryProvider.overrideWithValue(auth),
             foundCaseRepositoryProvider.overrideWithValue(found),
             lostCaseRepositoryProvider.overrideWithValue(lost),

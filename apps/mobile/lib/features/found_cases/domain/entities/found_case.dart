@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 enum FoundFailureKind {
+  localStorage,
   unavailable,
   timedOut,
   forbidden,

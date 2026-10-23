@@ -1,3 +1,6 @@
+import 'dart:async';
+import '../../../offline_drafts/providers/local_draft_providers.dart';
+import '../state/sighting_local_draft.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/domain/utils/new_entity_id.dart';
 import '../../domain/entities/sighting.dart';
@@ -13,13 +16,119 @@ final sightingViewModelProvider =
 
 class SightingViewModel extends AsyncNotifier<SightingState> {
   int _generation = 0;
+  Object? _checkpointKey;
+  void Function()? _stopObserving;
+  String _slot = "";
+  Future<bool> discardLocalDraft(String expectedId) async {
+    final value = state.asData?.value;
+    if (value == null ||
+        value.id != expectedId ||
+        value.busy ||
+        value.frozen != null) {
+      return false;
+    }
+    final generation = _generation;
+    final remove = ref.read(removeLocalDraftProvider);
+    final slot = _slot;
+    final keep = ref.keepAlive();
+    state = AsyncData(value.copy(busy: true));
+    try {
+      await remove(value.owner, slot, value.id);
+      if (!_current(generation, value.owner)) return false;
+      ref.invalidateSelf();
+      return true;
+    } catch (_) {
+      if (_current(generation, value.owner)) {
+        state = AsyncData(
+          state.requireValue.copy(
+            busy: false,
+            failure: const SightingFailure(SightingIssue.localStorage),
+          ),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  Future<bool> saveForLater() async {
+    final value = state.asData?.value;
+    if (value == null || state.isLoading) return false;
+    final generation = _generation;
+    final saved = await _saveLocal(value);
+    if (saved &&
+        _current(generation, value.owner) &&
+        state.requireValue.issue == SightingIssue.localStorage) {
+      state = AsyncData(state.requireValue.copy());
+    }
+    return saved;
+  }
+
+  Future<bool> _saveLocal(SightingState value) async {
+    if (!value.dirty && value.frozen == null) return true;
+    final generation = _generation;
+    final slot = _slot;
+    final save = ref.read(saveLocalDraftProvider);
+    final keep = ref.keepAlive();
+    try {
+      await save(sightingLocalDraft(value, slot));
+      return true;
+    } catch (_) {
+      if (_current(generation, value.owner) &&
+          sightingCheckpointKey(state.requireValue) ==
+              sightingCheckpointKey(value)) {
+        state = AsyncData(
+          state.requireValue.copy(
+            failure: const SightingFailure(SightingIssue.localStorage),
+          ),
+        );
+      }
+      return false;
+    } finally {
+      keep.close();
+    }
+  }
+
+  void _observeDraft() {
+    _checkpointKey = null;
+    _stopObserving?.call();
+    final generation = _generation;
+    _stopObserving = listenSelf((previous, next) {
+      if (generation != _generation) return;
+      final value = next.asData?.value;
+      if (next.isLoading || value == null) return;
+      final key = sightingCheckpointKey(value);
+      if (_checkpointKey == key) return;
+      _checkpointKey = key;
+      if (value.receipt != null) {
+        final remove = ref.read(removeLocalDraftProvider);
+        unawaited(
+          remove(value.owner, _slot, value.id).catchError((Object _) {
+            // The receipt remains confirmed. An undeleted exact command is safe to replay.
+          }),
+        );
+      } else {
+        unawaited(_saveLocal(value));
+      }
+    });
+  }
+
   @override
   Future<SightingState> build() async {
-    _generation++;
-    ref.watch(sightingTargetProvider);
+    final generation = ++_generation;
+    final target = ref.watch(sightingTargetProvider);
+    _slot = sightingDraftSlot(target);
     final session = await ref.watch(sightingSessionProvider.future);
+    if (!ref.mounted || generation != _generation) {
+      throw const SightingFailure(SightingIssue.forbidden);
+    }
     if (session == null) throw const SightingFailure(SightingIssue.forbidden);
-    return SightingState(owner: session.userId, id: newEntityId());
+    _observeDraft();
+    final local = await ref.read(readLocalDraftProvider)(session.userId, _slot);
+    return local == null
+        ? SightingState(owner: session.userId, id: newEntityId())
+        : restoreSightingLocalDraft(local, target);
   }
 
   bool _current(int generation, String owner) =>
@@ -149,6 +258,18 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
     final generation = _generation, keep = ref.keepAlive();
     state = AsyncData(v.copy(busy: true, frozen: draft));
     try {
+      if (!await _saveLocal(state.requireValue)) {
+        if (_current(generation, v.owner)) {
+          state = AsyncData(
+            state.requireValue.copy(
+              busy: false,
+              failure: const SightingFailure(SightingIssue.localStorage),
+            ),
+          );
+        }
+        return;
+      }
+      if (!_current(generation, v.owner)) return;
       final receipt = await ref
           .read(submitSightingProvider)(v.owner, draft)
           .timeout(const Duration(seconds: 60));

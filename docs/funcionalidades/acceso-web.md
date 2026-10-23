@@ -1,5 +1,34 @@
 # Acceso web
 
+## Retorno Google de producción —23/10/2026
+
+Diagnóstico remoto sin sesión: inicio OAuth web200 y redirección de Auth302 a
+Google con PKCE. Localhost y producción usan el mismo Supabase/cliente Google.
+Una cancelación simulada con state nuevo conserva el callback local y flow;
+para producción Auth devuelve entrehuellas://login-callback/, perdiendo el
+callback web. Confirma rechazo del retorno de producción por la allowlist
+efectiva; no demuestra por sí solo la causa de la espera en accounts.google.com.
+
+Corrección operativa pendiente: añadir
+https://entrehuellas.kormind.com/api/moderation/oauth/callback?flow=*
+a GOTRUE_URI_ALLOW_LIST del contenedor Auth, o a ADDITIONAL_REDIRECT_URLS si
+Compose la inyecta allí; conservar entradas móvil/local y recrear Auth.
+No cambiar el callback Google→Supabase ni sustituir Site URL móvil como atajo.
+Repetir cancelación y verificar que vuelve al callback web con flow; después
+probar login real y onboarding. Sin acceso al despliegue ni cambios remotos.
+La comparación con Sader no acredita esta configuración: usa otro Supabase.
+
+El usuario confirma que Compose inyecta GOTRUE_URI_ALLOW_LIST desde
+ADDITIONAL_REDIRECT_URLS; su valor declarado solo contiene el host Supabase,
+http://localhost:3000/* y entrehuellas://login-callback/. Falta producción.
+El historial b51aa4b→b364688 conserva callback/flow/PKCE desde19/10; no se
+identifica una regresión reciente de esa URL. La aceptación remota de127.0.0.1
+requiere contrastar también el entorno efectivo de Auth con el declarado.
+
+No se autentican cuentas, intercambian códigos ni registran estados/verifiers/
+tokens. Si Google sigue esperando tras corregir el retorno, obtener URL/estado
+de la petición pendiente y logs Auth para diagnosticar ese tramo por separado.
+
 21/10, cabecera completada: avatar con foto privada/iniciales abre Tu cuenta
 en panel glass. Campana compuesta desde las páginas permite consultar la
 [bandeja real](notificaciones-web.md). El cierre usa un icono circular glass

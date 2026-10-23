@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/report_draft_status.dart';
 import '../../../../core/presentation/widgets/case_report_fields.dart';
 import '../../../../core/presentation/widgets/size_choice_selector.dart';
 import '../../../../core/presentation/widgets/photo_add_tile.dart';
@@ -62,7 +63,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
           '¿Salir del reporte?',
           v?.lockedDraft != null
               ? 'El envío pudo haberse publicado. Revisa Mis búsquedas y avisos antes de reportarlo otra vez.'
-              : 'Se descartarán los datos que todavía no publicaste.',
+              : 'Conservaremos el borrador en este dispositivo para que puedas retomarlo.',
           'Salir',
         );
     if (!mounted) {
@@ -74,7 +75,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
       return;
     }
     if (v?.dirty == true &&
-        !await ref.read(foundEditorViewModelProvider.notifier).discard()) {
+        !await ref.read(foundEditorViewModelProvider.notifier).saveForLater()) {
       _leaving = false;
       return;
     }
@@ -198,7 +199,23 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
     hasError: v.invalidFields.contains(f),
     child: child,
   );
-  Widget _content(FoundEditorState v, FoundEditorViewModel m) {
+  Widget _content(FoundEditorState v, FoundEditorViewModel m) =>
+      v.stage != FoundStage.form
+      ? _editorContent(v, m)
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!(v.stage == FoundStage.confirmed) && !widget.petDetailsOnly)
+              ReportDraftStatus(
+                onRetry: v.issue == FoundFailureKind.localStorage && !v.busy
+                    ? m.saveForLater
+                    : null,
+                onDiscard: v.busy ? null : () => m.discardLocalDraft(v.draftId),
+              ),
+            _editorContent(v, m),
+          ],
+        );
+  Widget _editorContent(FoundEditorState v, FoundEditorViewModel m) {
     if (v.stage == FoundStage.confirmed) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -225,6 +242,11 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
         actions: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (v.attempted)
+              ReportDraftStatus(
+                onRetry: null,
+                onDiscard: v.busy ? null : () => m.discardLocalDraft(v.draftId),
+              ),
             if (v.lockedDraft != null) ...[
               const SizedBox(height: 12),
               TextButton(

@@ -65,6 +65,8 @@ class SightingState {
 String sightingIssueLabel(SightingIssue issue) => switch (issue) {
   SightingIssue.blocked =>
     'Un bloqueo entre estas cuentas impide enviar nuevos avistamientos. Puedes revisar tus cuentas bloqueadas desde Perfil.',
+  SightingIssue.localStorage =>
+    'No pudimos guardar el borrador en este dispositivo. Libera espacio y reintenta antes de salir.',
   SightingIssue.invalid => 'Revisa la fecha, ubicación y los campos marcados.',
   SightingIssue.location =>
     'No pudimos obtener tu ubicación. Puedes marcar el punto en el mapa.',

@@ -1,3 +1,5 @@
+import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
@@ -88,6 +90,7 @@ void main() {
       final reports = ActivityFound()..mine.addAll([community, notice]);
       final scope = ProviderContainer(
         overrides: [
+          localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
           authRepositoryProvider.overrideWithValue(auth),
           lostCaseRepositoryProvider.overrideWithValue(cases),
           foundCaseRepositoryProvider.overrideWithValue(reports),
@@ -168,6 +171,7 @@ void main() {
         final cases = FakeCases()..mine.add(own);
         final scope = ProviderContainer(
           overrides: [
+            localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),

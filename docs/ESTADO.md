@@ -1,5 +1,109 @@
 # Estado del proyecto
 
+## HU-15.1: borradores locales por cuenta —23/10/2026
+
+El usuario da por resuelto el login OAuth de Supabase y autoriza continuar con
+HU-15.1/RF-32/#47. Esta confirmación sustituye el pendiente operativo de OAuth
+como siguiente paso; no se atribuye a esta sesión una prueba remota del login.
+Rama local `feature/offline-drafts`, desde `04ed9f7`; árbol inicial con tres documentos locales modificados.
+
+Implementado guardado/recuperación en Android de perdido propio, búsqueda
+comunitaria, aviso de encontrado y avistamiento. Drift/SQLite local esquema1,
+clave cuenta/contexto y UUID estable, campos parciales de fecha/hora, coordenada,
+selección/versión de mascota, referencias de fotos propias y bytes de evidencia
+nueva. Se excluyen URLs firmadas y backup/transferencia Android. `offline_drafts`
+separa dominio/casos de uso, repositorio, fuente/DTO y ViewModel; los editores
+convierten su propio estado y colaboran mediante dominio/providers. Composición
+en main/bootstrap; sin imports cruzados de presentation/data.
+
+Los editores leen el borrador antes de consultar mascotas/búsquedas remotas.
+Salir conserva y espera la escritura; Perfil → Borradores reúne los de la cuenta
+actual y abre el contexto original. Confirmación para descarte, fallos mediante
+toast superior, skeleton/shimmer compartidos y bloqueo de dobles acciones. La
+vista previa inmersiva mantiene sus restricciones de tamaño originales. Una
+lectura corrupta/fallida no se convierte en vacío ni sobrescribe el borrador.
+
+Antes de enviar se confirma en disco el comando exacto. Una respuesta incierta
+se recupera congelada y reintenta UUID/contenido originales, incluidos instante,
+versión y fotos. La confirmación elimina solo ese UUID. Encontrado conserva la
+RPC de descarte que comprueba que no hay publicación activa antes del borrado
+local; el rechazo conserva ambos estados. La limpieza local fallida tras una
+publicación puede dejar el mismo comando reintentable, sin confirmar duplicados.
+
+Para entrar al reiniciar sin red, el adaptador de bienvenida recuerda únicamente
+un resultado remoto confirmado por cuenta en SharedPreferences. Solo usa `true`
+para la misma identidad ante timeout/ClientException; responde a negativos y
+rechazos remotos sin fallback. La sesión sigue siendo la ya guardada por Auth y
+las operaciones conservan autorización remota. No es sesión nueva, rol/permiso
+cacheado ni omisión de bienvenida. [ADR-131](decisiones/131-borradores-locales-por-cuenta.md)
+y [ficha](funcionalidades/borradores-locales.md).
+
+Validación final local:555/555 pruebas Flutter con
+`--dart-define=AMBIENT_BACKGROUND_MOTION=false`;18 nuevas cubren persistencia y
+UI/acceso, junto a las537 existentes.63/63 focalizadas tras revisar descarte y
+comandos congelados. Archivo SQLite real cerrado/reabierto, aislamiento A/B y
+logout, fecha parcial/evidencia binaria, UUID/versiones/instantes intactos,
+escrituras ordenadas y recibos antiguos, corrupción sin reemplazo, fallo de disco
+sin petición remota, reintento y bienvenida por cuenta. Tres pruebas de router
+verifican visitante/bienvenida/cuenta preparada. Formato664 archivos sin cambios
+y análisis final sin incidencias; `git diff --check` correcto. Capturas con fuentes
+reales revisadas en build/ui-preview/offline-drafts (390×844 y320×350/texto200%);
+acciones alcanzables por scroll, reintento/descarte y apertura única comprobados.
+Logs en apps/mobile/build/offline-{full-tests-final,regression-final,analyze-final,ui}.log.
+
+Durante el trabajo se corrigieron errores de integración/API y las restricciones
+de la previa inmersiva detectados por las pruebas. Un primer pase de regresión
+omitió el dart-define y encontró timeouts del fondo continuo; se repitió con el
+parámetro ya usado por este proyecto. El primer render de QA no cargaba Poppins;
+se corrigió el harness y se revisaron las capturas con fuentes reales. No se
+omiten pruebas ni se presentan esos intentos como validación final.
+
+Android intentado con `tool/offline_drafts_smoke.dart` y base separada, sin
+cuenta/backend. Gradle falla antes de compilar con
+`java.io.IOException: Unable to establish loopback connection`; reproducido
+con JVM IPv4. No se obtuvo APK nuevo, no se instaló ni se reinició la app.
+Pendiente resolver ese entorno y comprobar cierre/reinicio Android sin red,
+fotos reales, entrada global/Perfil/Borradores, cambio de cuenta y publicación
+con Supabase, además del rendimiento con fotos máximas. Fixtures y SQLite local
+no sustituyen esas condiciones ni la aprobación visual del usuario.
+
+No se cambió SQL/backend/Nuxt ni se activó cola automática HU-15.2 o caché de
+fichas HU-15.3. Sin commit/push/PR, publicación o cierre de historia; cambios
+previos de CONFIGURACION/ESTADO/acceso-web conservados. Siguiente paso: validación
+Android pendiente; después HU-15.2 según sus propios criterios.
+
+## Diagnóstico OAuth Google en producción —23/10/2026
+
+Se reproduce una diferencia de allowlist en Supabase Auth: con PKCE y un flujo
+nuevo por entorno, la cancelación simulada del proveedor conserva el callback
+de http://127.0.0.1:5173 y su query flow, pero sustituye el callback de
+https://entrehuellas.kormind.com por entrehuellas://login-callback/.
+Ambos usan el mismo cliente Google y callback HTTPS de Supabase. Producción
+responde200 al inicio OAuth, emite cookie HttpOnly/Secure/Lax y Auth responde302
+hacia Google. El callback Nuxt sin flujo responde303 al login con fallo seguro.
+
+Hallazgo confirmado: el retorno web de producción no está autorizado por la
+configuración efectiva de Auth. Añadir el patrón acotado del callback con flow
+a GOTRUE_URI_ALLOW_LIST (ADDITIONAL_REDIRECT_URLS en la plantilla estándar),
+conservando móvil/local y recreando Auth. No se accede al panel/servidor ni se
+modifican variables remotas. Sader usa otro backend Supabase.
+
+Validación: solicitudes HTTP reales sin autenticar cuentas; no se intercambian
+códigos ni se crean sesiones. Esta prueba demuestra el retorno incorrecto,
+pero no acredita que explique por sí solo la espera dentro de Google de la
+captura. Pendiente aplicar configuración y probar consentimiento/cancelación
+con cuenta real; si persiste la espera, revisar la petición pendiente del
+navegador y logs Auth. Sin cambios de código/SQL, build ni despliegue.
+Detalles en [acceso web](funcionalidades/acceso-web.md) y CONFIGURACION.
+
+El usuario confirma Compose GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+y Environment con host Supabase, http://localhost:3000/* y callback móvil,
+sin callback web de producción. Historial: b51aa4b (19/10) ya generaba el mismo
+callback web con flow y PKCE; b364688 conserva esa construcción. No se atribuye
+el fallo a un cambio reciente del callback sin evidencia. El éxito observado
+con127.0.0.1 no se explica solo con la lista declarada: comprobar el entorno
+efectivo del contenedor Auth si difiere del Environment mostrado en Dokploy.
+
 ## Integración de bloqueos y apelaciones —23/10/2026
 
 Se incorpora origin/main (c03fa84, merge de apelaciones fdcf1e3/PR#64) en
