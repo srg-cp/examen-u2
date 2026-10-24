@@ -141,6 +141,7 @@ class _SightingScreenState extends ConsumerState<SightingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ReportDraftStatus(
+                    submissionState: v.submissionStatus?.name,
                     onRetry: v.issue == SightingIssue.localStorage && !v.busy
                         ? m.saveForLater
                         : null,

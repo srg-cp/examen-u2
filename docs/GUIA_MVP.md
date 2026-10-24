@@ -525,6 +525,12 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 
 ### S6 - Moderación, offline y validación
 
+23/10: autorizado HU-15.2/#48/RF-32 sobre HU-15.1, que conserva su validación
+Android pendiente. Cola SQLite por cuenta, reclamación y recibo durable, reintento
+activo con backoff, rechazo manual y Perfil → Envíos; ADR-132. Sin SQL remoto,
+servicio de segundo plano, cierre de historias ni caché de fichas HU-15.3.
+[Evidencia y límites](funcionalidades/envios-pendientes.md).
+
 23/10: autorizado HU-15.1/#47/RF-32. Borradores locales por cuenta en Android,
 fotos, fecha parcial y comando estable; Perfil → Borradores. ADR-131 documenta
 la recuperación de bienvenida confirmada ante fallo de transporte como dependencia

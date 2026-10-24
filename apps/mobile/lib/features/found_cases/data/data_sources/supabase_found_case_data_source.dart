@@ -65,6 +65,7 @@ class SupabaseFoundCaseDataSource implements FoundCaseDataSource {
               },
             )
             .timeout(_requestTimeout);
+        _identity(owner);
         final retired =
             await _client
                     .rpc('list_found_photo_cleanup', params: {'p_id': d.id})

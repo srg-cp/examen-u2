@@ -5,7 +5,7 @@ import '../repositories/sighting_repository.dart';
 class SubmitSighting {
   const SubmitSighting(this.repository);
   final SightingRepository repository;
-  Future<SightingReceipt> call(String owner, SightingDraft draft) async {
+  void validate(String owner, SightingDraft draft) {
     if (owner.isEmpty) throw const SightingFailure(SightingIssue.forbidden);
     final fields = <String>{};
     if (draft.observedAt.isAfter(DateTime.now()) ||
@@ -30,6 +30,10 @@ class SubmitSighting {
     }
     if (draft.target.id.isEmpty || draft.id.isEmpty) fields.add('id');
     if (fields.isNotEmpty) throw SightingFailure(SightingIssue.invalid, fields);
+  }
+
+  Future<SightingReceipt> call(String owner, SightingDraft draft) async {
+    validate(owner, draft);
     final receipt = await repository.submit(owner, draft);
     if (receipt.id != draft.id) {
       throw const SightingFailure(SightingIssue.unavailable);

@@ -207,6 +207,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
           children: [
             if (!(v.stage == FoundStage.confirmed) && !widget.petDetailsOnly)
               ReportDraftStatus(
+                submissionState: v.submissionStatus?.name,
                 onRetry: v.issue == FoundFailureKind.localStorage && !v.busy
                     ? m.saveForLater
                     : null,
@@ -242,6 +243,14 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
         actions: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (v.submissionStatus != null)
+              Text(reportSubmissionStatusLabel(v.submissionStatus?.name)),
+            TextButton(
+              onPressed: v.busy
+                  ? null
+                  : () => context.push('/home/submissions'),
+              child: const Text('Ver envíos'),
+            ),
             if (v.attempted)
               ReportDraftStatus(
                 onRetry: null,

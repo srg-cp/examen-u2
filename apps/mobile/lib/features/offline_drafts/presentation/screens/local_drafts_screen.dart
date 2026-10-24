@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/entity_screen_shell.dart';
@@ -40,6 +41,10 @@ class _LocalDraftsScreenState extends ConsumerState<LocalDraftsScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text('Sin publicar · Solo en este dispositivo'),
+              TextButton(
+                onPressed: () => context.push('/home/submissions'),
+                child: const Text('Ver envíos'),
+              ),
               const SizedBox(height: 16),
               if (async.isLoading)
                 const SkeletonFormFields(fieldCount: 3)

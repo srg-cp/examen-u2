@@ -1,3 +1,4 @@
+import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
 import '../features/user_blocks/presentation/screens/user_blocks_screen.dart';
 import '../features/user_blocks/presentation/widgets/user_block_controls.dart';
@@ -140,6 +141,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/notifications' ||
               state.uri.path == '/home/drafts' ||
+              state.uri.path == '/home/submissions' ||
               state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
               state.uri.path == '/home/explore-map' ||
@@ -346,6 +348,41 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
               child: const MyFoundCasesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'submissions',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: SubmissionQueueScreen(
+                onOpen: (entry) {
+                  final d = entry.command, receipt = entry.receipt;
+                  if (receipt?.lost != null) {
+                    context.push('/home/cases/${receipt!.id}');
+                    return;
+                  }
+                  if (receipt?.found != null) {
+                    context.push('/home/found-cases/${receipt!.id}');
+                    return;
+                  }
+                  final p = d.slot.split(':');
+                  final route = d.slot == 'lost'
+                      ? '/home/lost-cases/new'
+                      : d.slot == 'community-search'
+                      ? '/home/lost-cases/community/new'
+                      : p.length == 3 && p[0] == 'sighting'
+                      ? (receipt != null
+                            ? '/home/${p[1] == 'true' ? 'found-cases' : 'cases'}/${Uri.encodeComponent(p[2])}'
+                            : '/home/sightings/${p[1] == 'true' ? 'found' : 'lost'}/${Uri.encodeComponent(p[2])}')
+                      : p.length == 3 && p[0] == 'found'
+                      ? Uri(
+                          path: '/home/found-cases/new',
+                          queryParameters: {'case': p[2], 'community': p[1]},
+                        ).toString()
+                      : null;
+                  if (route != null) context.push(route);
+                },
+              ),
             ),
           ),
           GoRoute(

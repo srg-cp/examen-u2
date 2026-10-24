@@ -1,3 +1,4 @@
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import '../../../../core/presentation/state/event_date_time_draft.dart';
 import '../../../../core/domain/use_cases/approximate_case_location.dart';
 import '../../../pets/domain/entities/pet.dart';
@@ -19,6 +20,7 @@ class CaseEditorState {
     this.latitude,
     this.longitude,
     this.placeReference = '',
+    this.submissionStatus,
     this.issue,
     this.errorId = 0,
     Set<CaseField> invalidFields = const {},
@@ -33,6 +35,7 @@ class CaseEditorState {
        photos = List.unmodifiable(photos),
        selectedPhotos = Set.unmodifiable(selectedPhotos),
        invalidFields = Set.unmodifiable(invalidFields);
+  final SubmissionStatus? submissionStatus;
   final String ownerId, draftId, placeReference;
   final List<Pet> pets;
   final Pet? pet;
@@ -66,6 +69,8 @@ class CaseEditorState {
   }
 
   CaseEditorState copyWith({
+    bool clearSubmissionStatus = false,
+    SubmissionStatus? submissionStatus,
     bool clearPoint = false,
     Pet? pet,
     List<PetPhoto>? photos,
@@ -86,6 +91,9 @@ class CaseEditorState {
     LostCaseDraft? lockedDraft,
     bool clearLockedDraft = false,
   }) => CaseEditorState(
+    submissionStatus: clearSubmissionStatus
+        ? null
+        : submissionStatus ?? this.submissionStatus,
     ownerId: ownerId,
     draftId: draftId,
     pets: pets,

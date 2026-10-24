@@ -1,3 +1,4 @@
+import 'package:flutter_application_entrehuellas/features/offline_drafts/domain/entities/queued_report.dart';
 // Native Android persistence smoke. Run twice across force-stop; no account or backend.
 // Uses its own database, never report_drafts.sqlite or the stored Supabase session.
 import 'dart:io';
@@ -51,6 +52,35 @@ Future<void> main() async {
         );
       }
     }
+    if (phase == 'WRITE') {
+      await repository.enqueue(
+        LocalReportDraft(
+          owner: 'smoke-A',
+          slot: 'sighting:false:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa25',
+          id: 'stable-queued-command',
+          frozen: true,
+          instant: DateTime.utc(2026, 1, 1),
+          latitude: -12,
+          longitude: -77,
+          comment: 'Original retained',
+          photo: Uint8List.fromList([255, 216, 255, 1, 2]),
+        ),
+      );
+      await repository.claimSubmission(
+        'smoke-A',
+        'stable-queued-command',
+        DateTime.now(),
+        manual: true,
+      );
+    }
+    final queue = await repository.listQueue('smoke-A');
+    if (queue.length != 1 ||
+        queue.single.command.id != 'stable-queued-command' ||
+        queue.single.command.photo![1] != 216 ||
+        (phase == 'READ' && queue.single.status != SubmissionStatus.pending) ||
+        (await repository.listQueue('smoke-B')).isNotEmpty) {
+      throw StateError('Native queue recovery mismatch');
+    }
     final drafts = await repository.list('smoke-A');
     if (drafts.length != 3 ||
         drafts.any(
@@ -65,7 +95,7 @@ Future<void> main() async {
       throw StateError('Native draft persistence mismatch');
     }
     debugPrint(
-      'OFFLINE_DRAFTS_SMOKE_PASS phase=$phase count=${drafts.length} accountIsolation=true evidence=true partialDate=true',
+      'OFFLINE_DRAFTS_SMOKE_PASS phase=$phase count=${drafts.length} accountIsolation=true evidence=true partialDate=true queueProcessRecovery=true',
     );
     await database.close();
     runApp(

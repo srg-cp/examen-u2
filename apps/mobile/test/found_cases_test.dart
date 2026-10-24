@@ -460,7 +460,17 @@ void main() {
         'Blanca con manchas negras',
       );
       await m.publish();
-      expect(identical(cases.attempts[0], cases.attempts[1]), true);
+      expect(cases.attempts[1].id, cases.attempts[0].id);
+      expect(cases.attempts[1].occurredAt, cases.attempts[0].occurredAt);
+      expect(cases.attempts[1].traits, cases.attempts[0].traits);
+      expect(
+        cases.attempts[1].photos.map((p) => p.id),
+        cases.attempts[0].photos.map((p) => p.id),
+      );
+      expect(
+        cases.attempts[1].photos.first.bytes,
+        cases.attempts[0].photos.first.bytes,
+      );
       expect(
         container.read(foundEditorViewModelProvider).requireValue.stage,
         FoundStage.confirmed,

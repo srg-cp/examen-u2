@@ -1,3 +1,9 @@
+import '../features/auth/providers/auth_providers.dart';
+import '../features/offline_drafts/presentation/view_models/submission_sync_view_model.dart';
+import '../features/onboarding/presentation/view_models/entry_view_model.dart';
+import '../features/onboarding/presentation/state/entry_destination.dart';
+import '../features/auth/presentation/view_models/recovery_access_view_model.dart';
+import '../features/auth/domain/entities/recovery_access.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,13 +14,38 @@ import 'package:go_router/go_router.dart';
 import '../features/notifications/presentation/view_models/push_view_model.dart';
 
 class EntreHuellasApp extends ConsumerStatefulWidget {
-  const EntreHuellasApp({this.observeNotifications = false, super.key});
+  const EntreHuellasApp({
+    this.observeNotifications = false,
+    this.observeQueue = false,
+    super.key,
+  });
   final bool observeNotifications;
+  final bool observeQueue;
   @override
   ConsumerState<EntreHuellasApp> createState() => _EntreHuellasAppState();
 }
 
-class _EntreHuellasAppState extends ConsumerState<EntreHuellasApp> {
+class _EntreHuellasAppState extends ConsumerState<EntreHuellasApp>
+    with WidgetsBindingObserver {
+  bool _foreground = true, _queueReady = false;
+  String? _queueOwner;
+  SubmissionSyncViewModel? _queueSync;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState phase) {
+    _foreground = phase == AppLifecycleState.resumed;
+    if (widget.observeQueue) {
+      ref
+          .read(submissionSyncViewModelProvider.notifier)
+          .setEnabled(_foreground && _queueReady, owner: _queueOwner);
+    }
+  }
+
   GoRouter? _router;
   bool _pendingOpen = false;
   void _openInbox() {
@@ -33,12 +64,38 @@ class _EntreHuellasAppState extends ConsumerState<EntreHuellasApp> {
 
   @override
   void dispose() {
+    _queueSync?.stop();
+    WidgetsBinding.instance.removeObserver(this);
     _router?.routerDelegate.removeListener(_openInbox);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.observeQueue) {
+      ref.watch(submissionSyncViewModelProvider);
+      _queueSync = ref.read(submissionSyncViewModelProvider.notifier);
+      final entry = ref.watch(entryViewModelProvider),
+          recovery = ref.watch(recoveryAccessViewModelProvider),
+          session = ref.watch(authSessionProvider);
+      _queueReady =
+          !entry.isLoading &&
+          !entry.hasError &&
+          entry.asData?.value == EntryDestination.home &&
+          !recovery.isLoading &&
+          !recovery.hasError &&
+          recovery.asData?.value == RecoveryAccess.idle &&
+          !session.isLoading &&
+          !session.hasError;
+      _queueOwner = _queueReady ? session.asData?.value?.userId : null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref
+              .read(submissionSyncViewModelProvider.notifier)
+              .setEnabled(_foreground && _queueReady, owner: _queueOwner);
+        }
+      });
+    }
     final router = ref.watch(routerProvider);
     if (_router != router) {
       _router?.routerDelegate.removeListener(_openInbox);

@@ -155,6 +155,7 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
             if (!(value.stage == CaseEditorStage.confirmed) &&
                 !widget.petDetailsOnly)
               ReportDraftStatus(
+                submissionState: value.submissionStatus?.name,
                 onRetry:
                     value.issue == CaseFailureKind.localStorage && !value.busy
                     ? model.saveForLater
@@ -191,6 +192,14 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
         actions: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (value.submissionStatus != null)
+              Text(reportSubmissionStatusLabel(value.submissionStatus?.name)),
+            TextButton(
+              onPressed: value.busy
+                  ? null
+                  : () => context.push('/home/submissions'),
+              child: const Text('Ver envíos'),
+            ),
             if (value.lockedDraft != null) ...[
               const SizedBox(height: 12),
               TextButton(

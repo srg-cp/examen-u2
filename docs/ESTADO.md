@@ -1,5 +1,59 @@
 # Estado del proyecto
 
+## HU-15.2: cola persistente y reintentos —23/10/2026
+
+Por autorización «ok siguiente», implementado el incremento local de
+HU-15.2/RF-32/issue #48 en `feature/offline-submission-queue`. HU-15.1 se conserva;
+durante el trabajo apareció como HEAD `1b9b05f`. Esta sesión no hizo commit,
+push, acciones en GitHub ni despliegue.
+
+La confirmación de perdido propio, búsqueda, encontrado o avistamiento guarda
+primero el comando exacto en SQLite esquema2. Migración1→2 conserva borradores.
+La cola separa cuenta/UUID, fija huella de campos y fotos y reclama cada intento
+atómicamente. Pérdida de respuesta/reinicio conserva UUID, instante, versión,
+destino y evidencia; nunca crea una publicación alternativa para resolver un
+conflicto. Recibo validado duradero antes de limpiar bytes/borrador; un envío ya
+confirmado no vuelve a realizar HTTP. La lista de borradores excluye recibos
+publicados incluso si falló su limpieza local.
+
+Perfil → Envíos muestra pendientes/en curso, fallidos y publicados; permite
+consultar motivo por toast, reintentar el comando original, revisar formulario
+y abrir resultado. Los editores bloquean cambios durante intención pendiente/en
+curso y aceptan el recibo tardío del mismo envío. Descarte cancela solo intención
+pendiente/fallida; no revierte publicaciones. Encontrado conserva su RPC protegida.
+
+Sincronización solo con app activa y cuenta autorizada por la política global:
+entrada/resume y sondeo15s, backoff5/15/30/60/120s. Los rechazos definitivos detienen
+el automático; corregir invalid/photo exige publicación explícita. Logout/cambio
+de cuenta/pausa impiden el siguiente envío. El cierre de la app libera el timer.
+No se promete trabajo en segundo plano ni se introduce SQL remoto, permisos,
+workers o paridad offline Nuxt. Véanse [ADR-132](decisiones/132-cola-persistente-de-envios-android.md)
+y [ficha](funcionalidades/envios-pendientes.md).
+
+Validación final: **573/573 pruebas Flutter**, incluidas18 nuevas de cola/UI,
+con `--dart-define=AMBIENT_BACKGROUND_MOTION=false`; análisis sin incidencias.
+SQLite real: migración, reinicio/proceso, bytes, reclamaciones concurrentes,
+respuesta perdida antes/después de persistencia simulada, recibo/identidad,
+conflictos, disco fallido, revisión y cancelación. Router real con sincronización
+activa comprueba visitante/bienvenida/cuenta preparada; se corrigió la liberación
+del timer detectada al desmontar la app. Renders390×844 y320×350/texto200% con
+fuentes reales revisados, acciones alcanzables por scroll. Formato676 archivos
+sin cambios y `git diff --check` correcto. Logs locales en
+`apps/mobile/build/queue-{full-tests-final,analyze-final,sql-regression}.log`.
+
+**3/3 pruebas SQL focalizadas** sobre PGlite/PostGIS: perdido, encontrado y búsqueda;
+verifican autorización/deduplicación de los comandos existentes. No equivalen a
+suite SQL completa ni prueba de Supabase alojado. Sin migraciones remotas nuevas.
+
+Smoke Android ampliado para recuperar borrador y reclamación entre procesos,
+con base separada sin backend. Intentado en emulador; Gradle falla antes de compilar
+con `java.io.IOException: Unable to establish loopback connection`
+(`apps/mobile/build/queue-android-smoke.log`). **No hay APK nuevo ni instalación**.
+Pendiente resolver Java/Gradle y comprobar Android/Supabase reales: cierre sin red,
+reinicio, pérdida de respuesta alrededor del commit, cuenta/fotos, concurrencia,
+revocación de sesión y rendimiento máximo. Implementación local, historia #48 y
+épica sin cerrar. Siguiente paso: esa validación; HU-15.3 requiere continuar el plan.
+
 ## HU-15.1: borradores locales por cuenta —23/10/2026
 
 El usuario da por resuelto el login OAuth de Supabase y autoriza continuar con

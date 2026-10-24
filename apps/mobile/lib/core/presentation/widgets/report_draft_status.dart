@@ -4,7 +4,13 @@ import 'loading_shimmer.dart';
 
 /// State and actions are provided by each editor's ViewModel.
 class ReportDraftStatus extends StatefulWidget {
-  const ReportDraftStatus({required this.onRetry, this.onDiscard, super.key});
+  const ReportDraftStatus({
+    required this.onRetry,
+    this.onDiscard,
+    this.submissionState,
+    super.key,
+  });
+  final String? submissionState;
   final Future<bool> Function()? onRetry, onDiscard;
   @override
   State<ReportDraftStatus> createState() => _ReportDraftStatusState();
@@ -54,7 +60,7 @@ class _ReportDraftStatusState extends State<ReportDraftStatus> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Borrador · Sin publicar'),
+        Text(reportSubmissionStatusLabel(widget.submissionState)),
         const Text(
           'Puedes retomarlo desde este formulario en este dispositivo.',
         ),
@@ -80,3 +86,11 @@ class _ReportDraftStatusState extends State<ReportDraftStatus> {
     ),
   );
 }
+
+String reportSubmissionStatusLabel(String? state) => switch (state) {
+  'pending' => 'Pendiente de envío',
+  'sending' => 'Pendiente · Envío en curso',
+  'failed' => 'Fallido · Requiere revisión',
+  'published' => 'Publicado',
+  _ => 'Borrador · Sin publicar',
+};

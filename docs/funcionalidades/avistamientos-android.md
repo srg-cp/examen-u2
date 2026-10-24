@@ -80,3 +80,12 @@ UUID y evidencia, recuperación sin red y conservación al salir. Comandos ambig
 se retoman sin editar su contenido. [Recorrido, persistencia, reglas y validación
 pendiente](borradores-locales.md), ADR-131. No activa cola automática ni caché
 de fichas. La demo Android de reinicio sin red sigue pendiente.
+
+
+23/10, HU-15.2/ADR-132: las confirmaciones de Publicar/Enviar pasan por la
+[cola persistente de envíos](envios-pendientes.md), con estados veraces, UUID/payload
+originales y recibo durable. App activa reintenta transitorios; rechazo/conflicto
+requiere acción explícita. Un recibo validado tardío actualiza el editor; un
+timeout no inicia otra petición mientras el intento original sigue activo.
+Descarte respeta reclamación y autorización remota de encontrado. Validación
+Android/Supabase real pendiente; no certifica cierre de esta historia.

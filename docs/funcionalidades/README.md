@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Envíos pendientes y reintentos](envios-pendientes.md): HU-15.2/RF-32/#48; cola SQLite
+  por cuenta, estados persistentes y recibos verificados. Android real pendiente.
+
 - [Borradores locales](borradores-locales.md): HU-15.1/RF-32/#47; guardado y recuperación
   por cuenta en Android, fotos y comando estable. Validación nativa pendiente.
 

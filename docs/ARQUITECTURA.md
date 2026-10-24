@@ -1,5 +1,10 @@
 # Arquitectura de Entre Huellas
 
+23/10, ADR-132: `offline_drafts` incorpora cola local esquema2 con dominio/casos
+de uso, transporte por las operaciones existentes, CAS y recibos persistentes.
+App compone lifecycle y cuenta autorizada para sincronización activa; sin imports
+cruzados de data/presentation. [Ficha](funcionalidades/envios-pendientes.md).
+
 23/10, ADR-131: `offline_drafts` conserva formularios Android mediante dominio/casos de uso,
 repositorio y Drift/SQLite privado. Los editores convierten su estado dentro de su
 presentación y colaboran mediante dominio/providers; bootstrap/main inyectan fuentes.

@@ -1,3 +1,6 @@
+import '../../../offline_drafts/domain/entities/local_report_draft.dart';
+import '../../../offline_drafts/providers/submission_queue_providers.dart';
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import 'dart:async';
 import '../../../offline_drafts/providers/local_draft_providers.dart';
 import '../state/case_local_draft.dart';
@@ -24,6 +27,47 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
   Duration get publicationTimeout =>
       _publicationTimeout ?? const Duration(seconds: 35);
   int _generation = 0;
+  List<QueuedReport> _queueSnapshot = const [];
+  void _observeQueue(String owner) {
+    _queueSnapshot = const [];
+    final generation = _generation;
+    ref.listen(queuedReportsProvider(owner), (previous, next) {
+      if (generation != _generation || next.isLoading || next.hasError) return;
+      _queueSnapshot = next.asData?.value ?? const [];
+      _applyQueue(generation, owner);
+    });
+  }
+
+  void _applyQueue(int generation, String owner) {
+    if (!_current(generation, owner)) return;
+    final v = state.requireValue;
+    if (v.busy || v.published != null) return;
+    final entry = _queueSnapshot
+        .where((e) => e.command.id == v.draftId)
+        .firstOrNull;
+    if (entry == null) {
+      if (v.submissionStatus != null) {
+        state = AsyncData(v.copyWith(clearSubmissionStatus: true));
+      }
+      return;
+    }
+    final receipt = entry.receipt;
+    if (receipt != null) {
+      state = AsyncData(
+        v.copyWith(
+          stage: CaseEditorStage.confirmed,
+          published: receipt.lost,
+          dirty: false,
+          busy: false,
+          submissionStatus: entry.status,
+          clearIssue: true,
+        ),
+      );
+    } else if (v.submissionStatus != entry.status) {
+      state = AsyncData(v.copyWith(submissionStatus: entry.status));
+    }
+  }
+
   Object? _checkpointKey;
   void Function()? _stopObserving;
 
@@ -37,20 +81,25 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     }
     final generation = _generation;
     final remove = ref.read(removeLocalDraftProvider);
+    final cancel = ref.read(cancelLocalSubmissionProvider);
     final slot = 'lost';
     final keep = ref.keepAlive();
     state = AsyncData(value.copyWith(busy: true));
     try {
+      await cancel(value.ownerId, value.draftId);
+      if (!_current(generation, value.ownerId)) return false;
       await remove(value.ownerId, slot, value.draftId);
       if (!_current(generation, value.ownerId)) return false;
       ref.invalidateSelf();
       return true;
-    } catch (_) {
+    } catch (error) {
       if (_current(generation, value.ownerId)) {
         state = AsyncData(
           state.requireValue.copyWith(
             busy: false,
-            issue: CaseFailureKind.localStorage,
+            issue: error is SubmissionFailure
+                ? CaseFailureKind.conflict
+                : CaseFailureKind.localStorage,
           ),
         );
       }
@@ -100,6 +149,11 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     final generation = _generation;
     _stopObserving = listenSelf((previous, next) {
       if (generation != _generation) return;
+      scheduleMicrotask(() {
+        if (ref.mounted) {
+          _applyQueue(generation, next.asData?.value.ownerId ?? '');
+        }
+      });
       final value = next.asData?.value;
       if (next.isLoading || value == null) return;
       final key = caseCheckpointKey(value);
@@ -127,6 +181,7 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
     }
     if (session == null) throw const CaseFailure(CaseFailureKind.forbidden);
     _observeDraft();
+    _observeQueue(session.userId);
     final local = await ref.read(readLocalDraftProvider)(
       session.userId,
       'lost',
@@ -150,6 +205,10 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
       value != null &&
       !state.isLoading &&
       !value.busy &&
+      !{
+        SubmissionStatus.pending,
+        SubmissionStatus.sending,
+      }.contains(value.submissionStatus) &&
       !value.loadingPhotos &&
       value.lockedDraft == null &&
       value.stage != CaseEditorStage.confirmed;
@@ -340,13 +399,19 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
         return;
       }
       if (!_current(generation, current.ownerId)) return;
-      final published = await ref
-          .read(publishLostCaseProvider)(current.ownerId, draft)
+      final result = await ref
+          .read(dispatchQueuedReportsProvider)
+          .send(
+            caseLocalDraft(state.requireValue),
+            isCurrent: () => _current(generation, current.ownerId),
+            resolveRejected: current.lockedDraft == null,
+          )
           .timeout(
             publicationTimeout,
             onTimeout: () => throw const CaseFailure(CaseFailureKind.timedOut),
           );
       if (!_current(generation, current.ownerId)) return;
+      final published = result.lost!;
       state = AsyncData(
         state.requireValue.copyWith(
           busy: false,
@@ -358,7 +423,16 @@ class CaseEditorViewModel extends AsyncNotifier<CaseEditorState> {
       );
       ref.read(notifyPetChangedProvider)(current.ownerId, draft.petId);
       ref.invalidate(myCasesViewModelProvider);
-    } catch (e) {
+    } catch (error) {
+      final e = error is LocalDraftFailure
+          ? const CaseFailure(CaseFailureKind.localStorage)
+          : error is SubmissionFailure
+          ? CaseFailure(
+              error.issue == SubmissionIssue.conflict
+                  ? CaseFailureKind.conflict
+                  : CaseFailureKind.unavailable,
+            )
+          : error;
       if (_current(generation, current.ownerId)) {
         state = AsyncData(
           state.requireValue.copyWith(
