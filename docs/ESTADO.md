@@ -1,5 +1,25 @@
 # Estado del proyecto
 
+## GitHub reconciliado: PR67 fusionado y #47/#48 cerrados —24/10/2026
+
+PR [#67](https://github.com/srg-cp/entrehuellas/pull/67) fusionado en main,
+commit12dac7b. CI del HEAD4968a34 aprobado: Flutter validate6m40s (cinco pruebas
+Python, formato, análisis y suite Flutter), SQL56/56 y procesamiento de fotos.
+#47/HU-15.1 y #48/HU-15.2 cerrados con criterios/evidencia, etiqueta Done y Status
+nativo concordantes. Verificación final API de los51 issues:29 cerrados/Done,
+15 abiertos/In progress y7 abiertos/Backlog; ninguna discrepancia ni etiqueta
+status duplicada. #5/#6/#9 conservan cierres previos con casillas técnicas
+corregidas. #43–#46 y épicas #14/#15 ya reflejan implementación iniciada;
+needs:refinement retirado de #44 porque su alcance ya estaba acordado.
+
+No hay otro cierre adicional justificado: los22 abiertos conservan los criterios
+de la [auditoría](backlog/auditoria-github-2026-10-24.md). #15 sigue abierta por
+#49/HU-15.3, siguiente incremento sin iniciar. No se reaplica SQL ni se despliega
+backend por esta reconciliación. La distribución automática de APK tiene un
+pendiente independiente y previo: faltan los cinco secrets de configuración/firma
+en GitHub; run40040206814 validó Flutter y falló en Prepare private build files.
+No se afirma publicación de APK ni se crean credenciales de firma por esta tarea.
+
 ## Integración y auditoría de GitHub autorizadas —24/10/2026
 
 El usuario autoriza integrar HU-15.2 y revisar/cerrar también las demás entregas

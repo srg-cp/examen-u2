@@ -1,5 +1,9 @@
 # Borradores locales de reportes
 
+Estado24/10: **Done**, [#47 cerrado](https://github.com/srg-cp/entrehuellas/issues/47).
+Integración original PR66 y aceptación final con PR67/CI aprobado. La evidencia
+Android siguiente corresponde a emulador y reinicio de proceso.
+
 HU-15.1 / RF-32 / issue #47 · S6 · Android primero.
 [ADR-131](../decisiones/131-borradores-locales-por-cuenta.md).
 

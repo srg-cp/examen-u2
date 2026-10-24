@@ -1,7 +1,7 @@
 # Funcionalidades de Entre Huellas
 
 24/10: [auditoría de los 51 issues de GitHub](../backlog/auditoria-github-2026-10-24.md).
-Borradores #47 y cola #48 cumplen el cierre técnico; integración y CI por PR.
+Borradores #47 y cola #48 cerrados e integrados por PR67 con CI aprobado.
 Las demás historias abiertas conservan los criterios pendientes allí detallados.
 
 - [Envíos pendientes y reintentos](envios-pendientes.md): HU-15.2/RF-32/#48; cola SQLite

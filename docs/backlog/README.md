@@ -3,12 +3,19 @@
 ## Seguimiento del24/10/2026
 
 [Auditoría actual de los 51 issues](auditoria-github-2026-10-24.md), autorizada por
-el usuario. PR [#67](https://github.com/srg-cp/entrehuellas/pull/67) integra la cola
-validada y cierra #47/#48 tras CI. Al integrar:29 issues cerrados y22 abiertos;
+el usuario. PR [#67](https://github.com/srg-cp/entrehuellas/pull/67) fusionado con CI
+aprobado; cola integrada y #47/#48 cerrados. Verificado:29 cerrados y22 abiertos;
 #15 queda abierta por #49. #43–#46 y épicas #14/#15 pasan a In progress;
 #44 ya tiene alcance acordado. Los criterios remotos/nativos pendientes de las
 otras historias se mantienen explícitos. Las tablas y fichas de instantánea
 inferiores corresponden al18/10, no al resultado actual de GitHub/Projects.
+
+| Estado actual24/10 | Total | Historias | Épicas |
+| --- | ---: | ---: | ---: |
+| Done | 29 | 23 | 6 |
+| In progress | 15 | 10 | 5 |
+| Backlog | 7 | 6 | 1 |
+| Ready / In review | 0 | 0 | 0 |
 
 **Avance23/10:** [HU-14.2/#44](044-HU-14.2.md) implementada localmente en
 `feature/user-blocking`, con alcance de nuevas contribuciones autenticadas y

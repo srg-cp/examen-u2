@@ -1,8 +1,9 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
 24/10: usuario autoriza integrar y cerrar historias terminadas. PR
-[#67](https://github.com/srg-cp/entrehuellas/pull/67) integra HU-15.2 y acredita
-cierre de #47/#48 con CI y evidencia final. [Auditoría de los51 issues](backlog/auditoria-github-2026-10-24.md)
+[#67](https://github.com/srg-cp/entrehuellas/pull/67) ya fusionado integra HU-15.2;
+#47/#48 cerrados con CI y evidencia final. Resultado verificado:29 cerrados y22
+abiertos, etiqueta/Projects concordantes. [Auditoría de los51 issues](backlog/auditoria-github-2026-10-24.md)
 conserva abiertos los criterios pendientes de otras entregas. HU-15/#15 sigue
 abierta por HU-15.3/#49, siguiente incremento sin implementar.
 

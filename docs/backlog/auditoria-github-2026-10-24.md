@@ -20,7 +20,9 @@ de todas las funcionalidades. Las notas históricas no sustituyen el estado actu
   Parches 037/038 aplicados por el usuario y comprobados remotamente.
   [Ficha y reproducción](../funcionalidades/envios-pendientes.md).
 
-La integración en main se tramita por PR con cierre de #47/#48. No se acredita
+Integrado en main por [PR #67](https://github.com/srg-cp/entrehuellas/pull/67),
+commit12dac7b; #47/#48 cerrados. Flutter validate, SQL56/56 y fotos aprobados en CI.
+No se acredita
 teléfono físico ni reinicio completo de Android: se probó reinicio del proceso
 en emulador Pixel_9a/API36/x86_64. No se vuelve a aplicar SQL ni se despliega
 backend por esta auditoría. Los logs privados y la configuración de cuentas
@@ -44,9 +46,10 @@ permanecen fuera de Git; las herramientas reproducibles se incluyen en el PR.
 | #50, #51 | Estadísticas y controles administrativos sin implementar; #51 requiere acordar funciones controlables. |
 | #1, #8, #12, #14, #15, #16 | Épicas abiertas: tienen derivadas pendientes. #15 conserva #49 aunque cierren #47/#48. |
 
-Las historias #43–#46 y las épicas #14/#15 pasan a In progress, conservando
-pendientes concretos. #47/#48 pasan a Done tras integrar y verificar CI. Se
-sincronizan etiqueta status y campo Status nativo del tablero para los 51 issues.
+Las historias #43–#46 y las épicas #14/#15 están In progress, conservando
+pendientes concretos. #47/#48 están Done después de integrar y verificar CI.
+Verificados por API los51 issues: una etiqueta status por issue, concordancia
+con Status nativo y con abierto/cerrado. Totales:29 Done,15 In progress,7 Backlog.
 
 ## Cierres previos contrastados
 
@@ -58,7 +61,13 @@ otra entrega completa abierta además de #47/#48. #5/#6/#9 tienen criterios
 aceptados y cerrados, pero cuatro casillas técnicas antiguas cada uno siguen
 vacías: se sincronizan sin atribuirles una demo nueva.
 
-Resultado previsto tras integrar: **29 cerrados y 22 abiertos**, contando épicas
+Resultado verificado tras integrar: **29 cerrados y 22 abiertos**, contando épicas
 y derivadas por separado. No son 29 funcionalidades independientes ni un
 porcentaje de avance del MVP. Los cierres anteriores conservan sus límites de
 validación documentados; esta revisión no certifica todas las funciones en remoto.
+
+La publicación automática de APK conserva un bloqueo previo independiente:
+faltan MOBILE_CONFIG_JSON, ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+ANDROID_KEY_ALIAS y ANDROID_KEY_PASSWORD en GitHub. Run40040206814 tiene validate
+aprobado y release fallido en preparación. No se afirma APK publicado ni se
+proporcionan nuevos secretos de firma por actualizar issues.
