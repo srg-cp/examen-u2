@@ -1,5 +1,9 @@
 # Envíos pendientes y reintentos
 
+Estado24/10: **Done**, [#48 cerrado](https://github.com/srg-cp/entrehuellas/issues/48)
+y [PR67 fusionado](https://github.com/srg-cp/entrehuellas/pull/67) con CI aprobado.
+Conserva los límites de emulador/desarrollo remoto detallados debajo; #49 sigue pendiente.
+
 HU-15.2 / RF-32 / issue #48 · S6 · Android primero.
 [ADR-132](../decisiones/132-cola-persistente-de-envios-android.md).
 
