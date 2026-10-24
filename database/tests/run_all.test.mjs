@@ -6,6 +6,20 @@ import { postgis } from '@electric-sql/pglite-postgis';
 
 const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
 
+test('Recovery business conflicts upgrade to PT409 without changing bodies, settings or privileges and repeat safely', async t => {
+ const db=await database(t); await db.exec(bundle);
+ const names=['publish_lost_case','prepare_recovery_report','publish_recovery_report','publish_found_case'];
+ const rows=(await db.query(`select p.oid,p.proname,p.proowner,p.prosecdef,p.proconfig,p.proacl,pg_get_functiondef(p.oid) definition
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname=any($1::text[]) order by p.proname`,[names])).rows;
+ assert.equal(rows.length,4);
+ for(const row of rows){assert.match(row.definition,/PT409/);assert.doesNotMatch(row.definition,/errcode\s*=\s*'40001'/i);await db.exec(row.definition.replaceAll('PT409','40001'));}
+ const patch=(await readFile(new URL('../functions/123_recovery_business_conflicts.sql',import.meta.url),'utf8'))+'\n'+(await readFile(new URL('../functions/124_recovery_nested_business_conflicts.sql',import.meta.url),'utf8'));
+ await db.exec(patch);await db.exec(patch);
+ const after=(await db.query(`select p.oid,p.proname,p.proowner,p.prosecdef,p.proconfig,p.proacl,pg_get_functiondef(p.oid) definition
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname=any($1::text[]) order by p.proname`,[names])).rows;
+ assert.deepEqual(after,rows);
+});
+
 test('Case timeline isolates private evidence, orders observed time, paginates and audits versioned reviews',async t=>{
  const db=await database(t);await db.exec(bundle);
  const owner='11111111-1111-4111-8111-111111111126',other='22222222-2222-4222-8222-222222222226';
@@ -705,7 +719,7 @@ test('Lost publication authorizes, deduplicates, protects history and exposes on
   const first=(await publish()).rows[0];
   const repeat=(await publish()).rows[0];
   assert.deepEqual(repeat,first);
-  await assert.rejects(publish([id,pet,1,params[3],-12,-77,params[6],[photo]]),/case_conflict/);
+  await assert.rejects(publish([id,pet,1,params[3],-12,-77,params[6],[photo]]),error=>error.code==='PT409'&&/case_conflict/.test(error.message));
   await assert.rejects(publish(['dddddddd-dddd-4ddd-8ddd-dddddddddd06',...params.slice(1)]),/case_already_active/);
   await assert.rejects(db.query('select public.archive_pet($1,2)',[pet]),/pet_active_case/);
   await assert.rejects(db.query('select public.begin_pet_deletion($1,2)',[pet]),/pet_has_case_history/);

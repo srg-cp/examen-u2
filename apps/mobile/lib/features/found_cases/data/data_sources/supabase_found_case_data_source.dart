@@ -25,7 +25,7 @@ class SupabaseFoundCaseDataSource implements FoundCaseDataSource {
         'found_target_closed' => FoundFailureKind.targetClosed,
         _ => switch (code) {
           '42501' || '401' || '403' => FoundFailureKind.forbidden,
-          '40001' || '23505' || '409' => FoundFailureKind.conflict,
+          '40001' || 'PT409' || '23505' || '409' => FoundFailureKind.conflict,
           '23514' => FoundFailureKind.invalid,
           '55P03' || '57014' => FoundFailureKind.timedOut,
           '422' || '413' => FoundFailureKind.photoInvalid,

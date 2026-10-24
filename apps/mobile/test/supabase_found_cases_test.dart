@@ -242,6 +242,17 @@ void main() {
           ),
         ),
       );
+      publishFailureCode = 'PT409';
+      await expectLater(
+        PublishFoundCase(repo)('owner', draft),
+        throwsA(
+          isA<FoundFailure>().having(
+            (error) => error.kind,
+            'kind',
+            FoundFailureKind.conflict,
+          ),
+        ),
+      );
       publishFailureCode = '55P03';
       await expectLater(
         PublishFoundCase(repo)('owner', draft),

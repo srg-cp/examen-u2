@@ -530,6 +530,37 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 
 ### S6 - Moderación, offline y validación
 
+23/10, resolución final remota HU-15.2: usuario aplica037/038;6/6 pruebas estrictas
+en desarrollo aprobadas, incluidos campos/fotos distintos del mismo UUID,
+deduplicación, permisos y revocación. La delegación interna omitida en037 queda
+corregida por038 sin reescribir historia. Regresión final575/575 Flutter,
+56/56 SQL después de038, análisis limpio,10 checks SQLite Android y recorrido
+normal sin red→reinicio→reintento automático aprobados. Validación técnica de
+HU-15.2 completada en emulador y desarrollo remoto; siguiente incremento HU-15.3.
+Evidencia en ESTADO; las notas de activación pendiente siguientes son historial anterior.
+Sin cierre de issue/épica ni inicio implícito de HU-15.3.
+
+23/10, comprobación posterior: usuario aplica037; perdido devuelvePT409, pero
+la búsqueda delegaba en un helper fuera del parche. Plan038/fuente124 completa
+publish_found_case sin cambiar037 ni permisos. Cuatro SQL focalizadas pasan;
+aplicación remota038 y nueva suite estricta pendientes. Sin nuevas HU/alcance.
+
+23/10, hallazgo posterior al ciclo Android: repetir el mismo UUID con contenido
+distinto agota timeout remoto por uso de40001 como conflicto de negocio. Plan037
+y ADR-134 preparan PT409 para tres RPC de cola y compatibilidad Flutter; cuatro
+SQL/20 Flutter focalizadas y575 Flutter/56 SQL completos posteriores pasan;
+análisis limpio y APK actualizado instalado. Aplicación remota037 y suite estricta pendientes;
+la evidencia previa siguiente no cierra esa validación ni autoriza omitirla.
+
+23/10, validación posterior de HU-15.1/15.2:575 pruebas Flutter y55 SQL locales,
+6 remotas con cuentas distintas y servidor real de desarrollo,10 comprobaciones
+SQLite nativas y ciclo completo en app normal Android emulada (guardar/reiniciar
+sin red, cola pendiente y publicación automática al recuperar red, mismo UUID y
+sin duplicados). Sin migraciones/despliegue nuevo, teléfono físico o cierre en
+GitHub. Sustituye los bloqueos anteriores para esos escenarios; límites y logs
+en [ESTADO](ESTADO.md) y [envíos](funcionalidades/envios-pendientes.md).
+Siguiente incremento funcional: HU-15.3; no iniciado por esta validación.
+
 23/10: autorizado HU-15.2/#48/RF-32 sobre HU-15.1, que conserva su validación
 Android pendiente. Cola SQLite por cuenta, reclamación y recibo durable, reintento
 activo con backoff, rechazo manual y Perfil → Envíos; ADR-132. Sin SQL remoto,

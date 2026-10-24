@@ -1,5 +1,69 @@
 # Configuración y validación de la app
 
+## Validación offline Android y Supabase de desarrollo —23/10/2026
+
+Corrección final aplicada por el usuario:037 y038, [ADR-134](decisiones/134-conflictos-de-publicacion-sin-reintento-postgrest.md).
+La suite remota estricta aprueba6/6, incluyendo UUID/payload distinto en perdido
+y selección de fotos/campos incompatible en búsqueda. Los conflictos ya devuelven
+rechazo de dominio sin timeout. Logs: build/queue-hosted-validation-after-038.log.
+Regresión completa posterior:56/56 SQL locales;575/575 Flutter y análisis limpio.
+El recorrido Android normal y10 checks SQLite nativos también están aprobados;
+validación técnica del alcance completada, con límites de emulador en ESTADO.
+
+Para activar en otro entorno: aplicar TODO patch037 y después038, desde
+`database/patchs`, con rol administrativo y cliente Flutter actualizado.038
+completa el helper publish_found_case que usa la RPC pública. No modificar037
+aplicado ni usar run_all para actualizar el servidor. Los patches conservan
+ajustes, propietario, ACL, seguridad y datos. Las cuentas autenticadas no pueden
+aplicar DDL. La web ya interpreta HTTP409. No es migración global de40001.
+
+No se inspeccionaron procesos privados de PostgREST ni se ejecutó cancelación/
+restart remoto. Procesos antiguos en bucle, si existen, requieren diagnóstico
+acotado del administrador; no ejecutar scripts con PID históricos ni afirmar
+que cambiar funciones acredita su terminación.
+
+HU-15.1/15.2 validadas en Pixel_9a/API36 y backend real confirmado como desarrollo
+por el usuario. Detalles/evidencia en [envíos pendientes](funcionalidades/envios-pendientes.md)
+y ESTADO. La prueba remota usa dos cuentas distintas y **crea publicaciones QA**;
+no ejecutarla contra producción. Lee `apps/mobile/config/profile_test.local.json`,
+ignorado por Git, con URL/clave publicable y credenciales A/B. También admite
+PROFILE_TEST_REFRESH_TOKEN_B obtenido por verificación OTP autorizada, sin cambiar
+la contraseña de B; actualiza ese token localmente cuando rota. No pasar secretos
+por argumentos públicos ni guardarlos en logs. Cuenta A/B idéntica hace fallar
+la comprobación. Se borran casos QA por las operaciones existentes y mascotas con
+historia quedan archivadas; recibos/auditoría se conservan según contrato.
+
+Desde apps/mobile:
+
+```powershell
+flutter test --no-pub tool/check_submission_queue_remote_test.dart --reporter expanded
+flutter build apk --profile --target tool/offline_queue_native_validation.dart --target-platform android-x64
+flutter build apk --profile --target-platform android-x64 --dart-define-from-file=config/supabase.local.json
+```
+
+El primer comando valida pérdida de respuesta tras commit y replay de perdido,
+búsqueda, encontrado y avistamiento con servidor real, permisos A/B y revocación
+de la sesión de prueba. El segundo genera checks de SQLite nativo con base temporal
+separada, migración, reclamaciones y bytes máximos; requiere instalar/abrir su APK
+y comprobar QUEUE_NATIVE_VALIDATION_PASS. El tercero restaura la entrada normal;
+una compilación por sí sola no acredita ejecutar las pruebas.
+
+Workaround de Java observado en este equipo: antes de invocar Flutter/Gradle,
+crear un directorio temporal bajo apps/mobile/android/build y definir solo para
+el proceso JAVA_TOOL_OPTIONS con `-Djdk.net.unixdomain.tmpdir=` y la ruta absoluta
+`C:\Users\Administrator\Documents\projects\entreHuellas\apps\mobile\android\build\java-local-transport-temporary-directory`.
+Se verificó gradlew help y ambos builds; no se modifica gradle.properties global.
+JDK usado: Android Studio jbr21.0.7. Command-line Tools23 ya no emite el mensaje
+que Flutter3.35.3 busca al comprobar licencias; Platform35 se instala/acepta durante
+el build. No hace falta repetir --android-licenses por ese aviso de formato.
+
+El AVD con6GB rechaza el APK debug normal de158MB; profile x64 de53.6MB y la
+actualización PT409 de69.3MB se instalan sin borrar datos. El emulador headless inicial cae con0xc0000005 en Windows;
+para completar la UI se usa `-gpu angle_indirect -feature -Vulkan -no-snapshot`
+y extras temporales de Activity `--ez enable-impeller false --ez enable-software-rendering true`.
+Son condiciones del harness, sin cambios de Manifest ni garantías sobre todos los
+drivers. Queda comprobado reinicio del proceso sin red; no se probó teléfono físico.
+
 ## Bloqueos de cuentas —23/10/2026
 
 HU-14.2 requiere plan034 después de033 y036 después de034. Generar con
