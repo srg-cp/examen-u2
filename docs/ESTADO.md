@@ -4,7 +4,8 @@
 
 El usuario autoriza integrar HU-15.2 y revisar/cerrar también las demás entregas
 terminadas. Auditoría de los 51 issues: 27 ya cerrados; #47/HU-15.1 y #48/HU-15.2
-cumplen el cierre con la evidencia final inferior. Se tramita PR a main y CI,
+cumplen el cierre con la evidencia final inferior. Se tramita
+[#67](https://github.com/srg-cp/entrehuellas/pull/67) a main y CI,
 con herramientas de validación y patches037/038 ya comprobados en desarrollo.
 Las otras historias abiertas conservan criterios pendientes concretos; no se
 cierran por existir pantallas o por aplicación de un patch. Se sincronizan
