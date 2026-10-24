@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../theme/app_typography.dart';
 import 'app_scaffold.dart';
 import 'confirmation_toast.dart';
 import 'cover_reveal.dart';
-import 'glass_navigation_button.dart';
+import 'glass_navigation_bar.dart';
 import 'scroll_safe_area.dart';
 import 'stagger_reveal.dart';
 
@@ -13,7 +12,6 @@ class CasePublicScreenShell extends StatelessWidget {
   const CasePublicScreenShell({
     required this.child,
     required this.loading,
-    this.trailingAction,
     this.shareAction,
     this.notice,
     this.noticeId,
@@ -22,7 +20,6 @@ class CasePublicScreenShell extends StatelessWidget {
   });
 
   final Widget child;
-  final Widget? trailingAction;
   final Widget? shareAction;
   final bool loading;
   final String? notice;
@@ -42,7 +39,7 @@ class CasePublicScreenShell extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 440),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final top = MediaQuery.paddingOf(context).top + 4;
+                final top = GlassNavigationBar.topOf(context);
                 final largeText =
                     constraints.maxWidth < 380 ||
                     MediaQuery.textScalerOf(context).scale(20) > 26;
@@ -66,7 +63,7 @@ class CasePublicScreenShell extends StatelessWidget {
                               child: Center(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 56,
+                                    horizontal: 64,
                                   ),
                                   child: Text(
                                     'Ficha pública',
@@ -109,33 +106,7 @@ class CasePublicScreenShell extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Positioned(
-                      top: top,
-                      left: 8,
-                      right: 8,
-                      child: Row(
-                        children: [
-                          GlassNavigationButton(
-                            tooltip: 'Volver',
-                            onPressed:
-                                onBack ??
-                                () => context.canPop()
-                                    ? context.pop()
-                                    : context.go('/home'),
-                          ),
-                          const Spacer(),
-                          if (shareAction != null) ...[
-                            shareAction!,
-                            const SizedBox(width: 8),
-                          ],
-                          SizedBox(
-                            width: 52,
-                            height: 52,
-                            child: trailingAction,
-                          ),
-                        ],
-                      ),
-                    ),
+                    GlassNavigationBar(onBack: onBack, trailing: shareAction),
                   ],
                 );
               },

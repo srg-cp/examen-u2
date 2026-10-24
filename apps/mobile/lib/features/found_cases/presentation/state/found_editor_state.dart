@@ -1,3 +1,4 @@
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import '../../../../core/presentation/state/event_date_time_draft.dart';
 import '../../../../core/domain/use_cases/approximate_case_location.dart';
 import '../../domain/entities/found_case.dart';
@@ -27,6 +28,7 @@ class FoundEditorState {
     List<FoundPhotoDraft> photos = const [],
     this.busy = false,
     this.dirty = false,
+    this.submissionStatus,
     this.issue,
     this.errorId = 0,
     Set<FoundField> invalidFields = const {},
@@ -37,6 +39,7 @@ class FoundEditorState {
   }) : dateTimeDraft = dateTimeDraft ?? EventDateTimeDraft.from(occurredAt),
        photos = List.unmodifiable(photos),
        invalidFields = Set.unmodifiable(invalidFields);
+  final SubmissionStatus? submissionStatus;
   final bool communitySearch, communityTarget;
   final String reportKind;
   final String? targetId;
@@ -83,6 +86,8 @@ class FoundEditorState {
   }
 
   FoundEditorState copyWith({
+    bool clearSubmissionStatus = false,
+    SubmissionStatus? submissionStatus,
     bool clearPoint = false,
     bool clearTarget = false,
     String? reportKind,
@@ -112,6 +117,9 @@ class FoundEditorState {
     bool clearLock = false,
     bool? attempted,
   }) => FoundEditorState(
+    submissionStatus: clearSubmissionStatus
+        ? null
+        : submissionStatus ?? this.submissionStatus,
     ownerId: ownerId,
     communitySearch: communitySearch,
     target: target,

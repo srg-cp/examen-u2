@@ -1,3 +1,4 @@
+import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
 import '../features/user_blocks/presentation/screens/user_blocks_screen.dart';
 import '../features/user_blocks/presentation/widgets/user_block_controls.dart';
@@ -140,6 +141,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/saved-cases' ||
               state.uri.path == '/home/notifications' ||
               state.uri.path == '/home/drafts' ||
+              state.uri.path == '/home/submissions' ||
               state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
               state.uri.path == '/home/explore-map' ||
@@ -349,6 +351,41 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'submissions',
+            pageBuilder: (context, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: SubmissionQueueScreen(
+                onOpen: (entry) {
+                  final d = entry.command, receipt = entry.receipt;
+                  if (receipt?.lost != null) {
+                    context.push('/home/cases/${receipt!.id}');
+                    return;
+                  }
+                  if (receipt?.found != null) {
+                    context.push('/home/found-cases/${receipt!.id}');
+                    return;
+                  }
+                  final p = d.slot.split(':');
+                  final route = d.slot == 'lost'
+                      ? '/home/lost-cases/new'
+                      : d.slot == 'community-search'
+                      ? '/home/lost-cases/community/new'
+                      : p.length == 3 && p[0] == 'sighting'
+                      ? (receipt != null
+                            ? '/home/${p[1] == 'true' ? 'found-cases' : 'cases'}/${Uri.encodeComponent(p[2])}'
+                            : '/home/sightings/${p[1] == 'true' ? 'found' : 'lost'}/${Uri.encodeComponent(p[2])}')
+                      : p.length == 3 && p[0] == 'found'
+                      ? Uri(
+                          path: '/home/found-cases/new',
+                          queryParameters: {'case': p[2], 'community': p[1]},
+                        ).toString()
+                      : null;
+                  if (route != null) context.push(route);
+                },
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'drafts',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -391,26 +428,36 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: FoundDetailScreen(
-                contact: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CaseContactPanel(
-                      target: (
-                        source: 'found',
-                        id: state.pathParameters['id']!,
-                      ),
-                    ),
-                    UserBlockPanel(
-                      target: (kind: 'found', id: state.pathParameters['id']!),
-                      onSettled: refreshCaseContacts,
-                    ),
-                  ],
+                contact: CaseContactPanel(
+                  target: (source: 'found', id: state.pathParameters['id']!),
                 ),
-                shareActionBuilder: (name, event) => CaseShareButton(
+                shareActionBuilder: (name, event, canFollow) => CaseShareButton(
                   target: PosterCase(
                     PosterSource.found,
                     state.pathParameters['id']!,
                   ),
+                  caseActions: [
+                    SaveCaseButton(
+                      target: SavedCaseRef(
+                        source: SavedCaseSource.found,
+                        id: state.pathParameters['id']!,
+                      ),
+                      inPanel: true,
+                    ),
+                    if (canFollow)
+                      FollowTargetButton(
+                        inPanel: true,
+                        target: (
+                          kind: 'found',
+                          id: state.pathParameters['id']!,
+                        ),
+                      ),
+                    UserBlockPanel(
+                      inPanel: true,
+                      target: (kind: 'found', id: state.pathParameters['id']!),
+                      onSettled: refreshCaseContacts,
+                    ),
+                  ],
                   title: name,
                   eventLabel: event,
                   onReport: () => context.push(
@@ -418,9 +465,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                followAction: FollowTargetButton(
-                  target: (kind: 'found', id: state.pathParameters['id']!),
-                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
@@ -430,12 +474,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   icon: const Icon(Icons.picture_as_pdf_outlined),
                   label: const Text('Crear cartel con QR'),
-                ),
-                savedAction: SaveCaseButton(
-                  target: SavedCaseRef(
-                    source: SavedCaseSource.found,
-                    id: state.pathParameters['id']!,
-                  ),
                 ),
               ),
             ),
@@ -486,23 +524,33 @@ final routerProvider = Provider<GoRouter>((ref) {
               origin: state.extra is Rect ? state.extra as Rect : null,
               key: state.pageKey,
               child: CaseDetailScreen(
-                contact: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CaseContactPanel(
-                      target: (source: 'lost', id: state.pathParameters['id']!),
-                    ),
-                    UserBlockPanel(
-                      target: (kind: 'lost', id: state.pathParameters['id']!),
-                      onSettled: refreshCaseContacts,
-                    ),
-                  ],
+                contact: CaseContactPanel(
+                  target: (source: 'lost', id: state.pathParameters['id']!),
                 ),
-                shareActionBuilder: (name, event) => CaseShareButton(
+                shareActionBuilder: (name, event, canFollow) => CaseShareButton(
                   target: PosterCase(
                     PosterSource.lost,
                     state.pathParameters['id']!,
                   ),
+                  caseActions: [
+                    SaveCaseButton(
+                      target: SavedCaseRef(
+                        source: SavedCaseSource.lost,
+                        id: state.pathParameters['id']!,
+                      ),
+                      inPanel: true,
+                    ),
+                    if (canFollow)
+                      FollowTargetButton(
+                        inPanel: true,
+                        target: (kind: 'lost', id: state.pathParameters['id']!),
+                      ),
+                    UserBlockPanel(
+                      inPanel: true,
+                      target: (kind: 'lost', id: state.pathParameters['id']!),
+                      onSettled: refreshCaseContacts,
+                    ),
+                  ],
                   title: name,
                   eventLabel: event,
                   onReport: () => context.push(
@@ -510,9 +558,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                followAction: FollowTargetButton(
-                  target: (kind: 'lost', id: state.pathParameters['id']!),
-                ),
                 timelineAction: TimelineAccessButton(
                   target: (id: state.pathParameters['id']!, community: false),
                 ),
@@ -522,12 +567,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   icon: const Icon(Icons.picture_as_pdf_outlined),
                   label: const Text('Crear cartel con QR'),
-                ),
-                savedAction: SaveCaseButton(
-                  target: SavedCaseRef(
-                    source: SavedCaseSource.lost,
-                    id: state.pathParameters['id']!,
-                  ),
                 ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
                   showSightingAction: false,

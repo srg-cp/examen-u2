@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/panel_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
@@ -6,8 +7,13 @@ import '../../domain/entities/notification.dart';
 import '../view_models/following_view_model.dart';
 
 class FollowTargetButton extends ConsumerWidget {
-  const FollowTargetButton({required this.target, super.key});
+  const FollowTargetButton({
+    required this.target,
+    this.inPanel = false,
+    super.key,
+  });
   final AlertTarget target;
+  final bool inPanel;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(followingViewModelProvider(target));
@@ -25,26 +31,23 @@ class FollowTargetButton extends ConsumerWidget {
       child: LoadingShimmer(
         isLoading: busy,
         loadingLabel: 'Actualizando seguimiento',
-        child: TextButton.icon(
+        child: PanelActionButton(
+          iconOnly: inPanel,
           onPressed: busy
               ? null
               : reload
               ? model.retry
               : model.toggle,
-          icon: Icon(
-            data?.subscription.following == true
-                ? Icons.notifications_active_outlined
-                : Icons.notifications_none_rounded,
-          ),
-          label: Text(
-            reload
-                ? 'Reintentar seguimiento'
-                : data?.failed == true
-                ? 'Reintentar cambio'
-                : data?.subscription.following == true
-                ? 'Dejar de seguir'
-                : 'Seguir ${target.kind == 'zone' ? 'zona' : 'caso'}',
-          ),
+          icon: data?.subscription.following == true
+              ? Icons.notifications_active_outlined
+              : Icons.notifications_none_rounded,
+          label: reload
+              ? 'Reintentar seguimiento'
+              : data?.failed == true
+              ? 'Reintentar cambio'
+              : data?.subscription.following == true
+              ? 'Dejar de seguir'
+              : 'Seguir ${target.kind == 'zone' ? 'zona' : 'caso'}',
         ),
       ),
     );

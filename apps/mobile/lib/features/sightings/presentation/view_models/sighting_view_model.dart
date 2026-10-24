@@ -1,3 +1,6 @@
+import '../../../offline_drafts/domain/entities/local_report_draft.dart';
+import '../../../offline_drafts/providers/submission_queue_providers.dart';
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import 'dart:async';
 import '../../../offline_drafts/providers/local_draft_providers.dart';
 import '../state/sighting_local_draft.dart';
@@ -16,6 +19,55 @@ final sightingViewModelProvider =
 
 class SightingViewModel extends AsyncNotifier<SightingState> {
   int _generation = 0;
+  List<QueuedReport> _queueSnapshot = const [];
+  void _observeQueue(String owner) {
+    _queueSnapshot = const [];
+    final generation = _generation;
+    ref.listen(queuedReportsProvider(owner), (previous, next) {
+      if (generation != _generation || next.isLoading || next.hasError) return;
+      _queueSnapshot = next.asData?.value ?? const [];
+      _applyQueue(generation, owner);
+    });
+  }
+
+  void _applyQueue(int generation, String owner) {
+    if (!_current(generation, owner)) return;
+    final v = state.requireValue;
+    if (v.busy || v.receipt != null) return;
+    final entry = _queueSnapshot.where((e) => e.command.id == v.id).firstOrNull;
+    if (entry == null) {
+      if (v.submissionStatus != null) {
+        state = AsyncData(
+          v.copy(
+            clearSubmissionStatus: true,
+            failure: v.issue == null
+                ? null
+                : SightingFailure(v.issue!, v.fields),
+          ),
+        );
+      }
+      return;
+    }
+    final receipt = entry.receipt;
+    if (receipt != null) {
+      state = AsyncData(
+        v.copy(
+          receipt: receipt.sighting,
+          dirty: false,
+          busy: false,
+          submissionStatus: entry.status,
+        ),
+      );
+    } else if (v.submissionStatus != entry.status) {
+      state = AsyncData(
+        v.copy(
+          submissionStatus: entry.status,
+          failure: v.issue == null ? null : SightingFailure(v.issue!, v.fields),
+        ),
+      );
+    }
+  }
+
   Object? _checkpointKey;
   void Function()? _stopObserving;
   String _slot = "";
@@ -29,20 +81,27 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
     }
     final generation = _generation;
     final remove = ref.read(removeLocalDraftProvider);
+    final cancel = ref.read(cancelLocalSubmissionProvider);
     final slot = _slot;
     final keep = ref.keepAlive();
     state = AsyncData(value.copy(busy: true));
     try {
+      await cancel(value.owner, value.id);
+      if (!_current(generation, value.owner)) return false;
       await remove(value.owner, slot, value.id);
       if (!_current(generation, value.owner)) return false;
       ref.invalidateSelf();
       return true;
-    } catch (_) {
+    } catch (error) {
       if (_current(generation, value.owner)) {
         state = AsyncData(
           state.requireValue.copy(
             busy: false,
-            failure: const SightingFailure(SightingIssue.localStorage),
+            failure: SightingFailure(
+              error is SubmissionFailure
+                  ? SightingIssue.conflict
+                  : SightingIssue.localStorage,
+            ),
           ),
         );
       }
@@ -96,6 +155,11 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
     final generation = _generation;
     _stopObserving = listenSelf((previous, next) {
       if (generation != _generation) return;
+      scheduleMicrotask(() {
+        if (ref.mounted) {
+          _applyQueue(generation, next.asData?.value.owner ?? '');
+        }
+      });
       final value = next.asData?.value;
       if (next.isLoading || value == null) return;
       final key = sightingCheckpointKey(value);
@@ -125,6 +189,7 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
     }
     if (session == null) throw const SightingFailure(SightingIssue.forbidden);
     _observeDraft();
+    _observeQueue(session.userId);
     final local = await ref.read(readLocalDraftProvider)(session.userId, _slot);
     return local == null
         ? SightingState(owner: session.userId, id: newEntityId())
@@ -270,15 +335,30 @@ class SightingViewModel extends AsyncNotifier<SightingState> {
         return;
       }
       if (!_current(generation, v.owner)) return;
-      final receipt = await ref
-          .read(submitSightingProvider)(v.owner, draft)
+      final result = await ref
+          .read(dispatchQueuedReportsProvider)
+          .send(
+            sightingLocalDraft(state.requireValue, _slot),
+            isCurrent: () => _current(generation, v.owner),
+            resolveRejected: v.frozen == null,
+          )
           .timeout(const Duration(seconds: 60));
       if (_current(generation, v.owner)) {
+        final receipt = result.sighting!;
         state = AsyncData(
           state.requireValue.copy(busy: false, receipt: receipt, dirty: false),
         );
       }
-    } catch (error) {
+    } catch (caught) {
+      final error = caught is LocalDraftFailure
+          ? const SightingFailure(SightingIssue.localStorage)
+          : caught is SubmissionFailure
+          ? SightingFailure(
+              caught.issue == SubmissionIssue.conflict
+                  ? SightingIssue.conflict
+                  : SightingIssue.unavailable,
+            )
+          : caught;
       var failure = error is SightingFailure
           ? error
           : const SightingFailure(SightingIssue.unavailable);

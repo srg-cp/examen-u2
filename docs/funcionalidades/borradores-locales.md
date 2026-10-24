@@ -56,23 +56,57 @@ Skeleton en lectura inicial, shimmer en acciones locales y sin dobles acciones.
 Sin variables ni servicios nuevos. Dependencias nativas Drift, path/path_provider
 y sqlite3_flutter_libs incluidas en pubspec/lock y registros de plugins. Requiere
 actualizar el cliente Android; la web Nuxt conserva sus recorridos actuales.
-No entrega HU-15.2 (cola automática) ni HU-15.3 (fichas/mapas en caché).
+La cola automática HU-15.2 se documenta en [envíos pendientes](envios-pendientes.md).
+No entrega HU-15.3 (fichas/mapas en caché).
 
-## Validación y pendientes
+## Validación acreditada —23/10/2026
 
-555/555 pruebas Flutter completas,63/63 focalizadas y18 regresiones nuevas de
-persistencia/UI/acceso; formato664 archivos y análisis limpios. Capturas390×844
-y320×350/texto200% revisadas con fuentes reales, sin overflow y con acciones
-alcanzables por scroll. No equivale a aprobación visual del usuario.
+La ampliación final detectó timeouts de conflicto remoto.037/038 fueron aplicados
+por el usuario y la suite estricta pasa6/6: perdido y preparación/publicación de
+búsqueda rechazan contenido incompatible, sin timeout. Cuatro SQL focalizadas
+verifican repetición y conservación de ajustes/ACL; regresión completa en ESTADO.
+La cola local sigue rechazando la mutación por huella antes de enviar.
 
-Pruebas de archivo SQLite y ViewModels verifican cierre/reapertura, UUID, evidencia,
-fecha parcial, aislamiento, fallos y reintento exacto. Renders de lista normales y
-pequeños/texto ampliado y regresión de formularios; resultados finales en ESTADO.
+La regresión final compartida con HU-15.2 pasa575/575 pruebas Flutter,56/56 SQL
+locales después de038 y análisis sin incidencias. Se conservan los renders previos390×844 y
+320×350/texto200%, sin atribuirles aprobación visual del usuario. Resultados de
+la integración de cola en [envíos pendientes](envios-pendientes.md) y ESTADO.
 
-El smoke nativo `apps/mobile/tool/offline_drafts_smoke.dart` usa una base separada
-para ejecutarlo dos veces con force-stop entre ellas; no accede a cuenta/backend.
-El intento de Android queda bloqueado por Gradle/Java: Unable to establish loopback
-connection, reproducido también forzando IPv4. No se instaló ni reinició la app.
-Pendiente reinicio Android real sin red con fotos, recorrido por Perfil/Borradores,
-A→B/logout, publicación/reintento con Supabase y rendimiento con fotos máximas.
-La evidencia local y fixtures no cierran la historia ni sustituyen esa demo.
+En la app normal instalada en Pixel_9a/Android16/API36, Perfil→Borradores/Envíos
+sigue accesible sin red incluso si falla la consulta remota de perfil. Se crea un
+borrador QA desde el formulario, se confirma Salir y se recupera tras force-stop
+con modo avión y Wi-Fi apagado: Retomar conserva exactamente la referencia
+QA_native_offline_20261023. Se descarta por la confirmación del producto; no había
+borradores anteriores y no se modifica el caso activo de la mascota existente.
+
+Después, búsqueda comunitaria QA con foto elegida por el picker Android y
+normalizada por el código real: Publicar sin red conserva comando y bytes en la
+cola, que sobrevive a force-stop/reapertura. Al recuperar red, sincronización
+automática publica el mismo UUID/huella y limpia el borrador. Servidor real de
+desarrollo confirma un resultado con una foto; el caso QA se retira desde Mis
+reportes y deja de ser público. Sin cambios de datos originales ni logout de la
+sesión que ya tenía el emulador.
+
+El smoke previo con base separada aprueba WRITE→force-stop→READ sin red. Nuevo
+tool/offline_queue_native_validation.dart aprueba10 checks nativos: migración1→2
+preserva fecha parcial y3×2MiB de evidencia con hash completo, aislamiento A/B,
+conflicto del mismo UUID, dos conexiones/una reclamación, nonce anterior, backoff,
+cancelación protegida y8MiB de evidencia de avistamiento. Sus datos son sintéticos
+y se eliminan al terminar; no prueba cámara física. Mediciones observadas en
+emulador:682ms migración/lectura6MiB,709ms enqueue6MiB y1296ms guardar/leer8MiB.
+
+Seis pruebas remotas usan dos identidades confirmadas, JPEG procesado por el
+servidor, respuesta perdida tras commit, reintento idempotente, aislamiento,
+rechazo de autoría y revocación de la sesión de prueba. No se cambia la contraseña
+de B ni se cierran otras sesiones. Configuración de prueba solo en archivo local
+ignorado por Git. Fixtures QA retirados/archivados con las APIs del producto;
+auditoría/recibos permanecen según contrato.
+
+Logs y herramientas reproducibles en la ficha de envíos y CONFIGURACION. La app
+normal profile x64 queda instalada al terminar; Wi-Fi y modo avión restaurados.
+La UI se verifica con workaround gráfico del emulador (ANGLE, sin Vulkan/Impeller,
+render software por extras) sin cambiar Manifest ni el producto. No se acredita
+teléfono físico, todos los drivers, reinicio completo del dispositivo ni fallos
+físicos de almacenamiento. Los bloqueos anteriores de APK/demo quedan sustituidos
+para lo aquí comprobado. El24/10 el usuario autoriza integración/cierre de #47;
+se tramita con CI y auditoría GitHub, sin nueva afirmación de teléfono físico.

@@ -46,7 +46,7 @@ class SupabaseLostCaseDataSource implements LostCaseDataSource {
         'case_pet_incomplete' => CaseFailureKind.incompletePet,
         _ => switch (e.code) {
           '42501' => CaseFailureKind.forbidden,
-          '40001' => CaseFailureKind.conflict,
+          '40001' || 'PT409' => CaseFailureKind.conflict,
           '55P03' => CaseFailureKind.busy,
           '23514' => CaseFailureKind.invalid,
           '23505' => CaseFailureKind.conflict,

@@ -1,5 +1,17 @@
 # Entre Huellas: regla de oro de UI y UX
 
+Corrección23/10, ADR-133: Favoritos/Seguir/Bloquear usan el mismo
+PanelActionButton que Descargar/Denunciar: círculos grises56 con iconos26, sin
+etiqueta visible, tooltip/semántica. Todos bajo el separador; Wrap centra y
+ajusta filas en pantallas pequeñas. Sin glass dentro del panel blanco.
+
+23/10, [ADR-133](decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
+en ficha pública, solo Volver/Compartir arriba; Favoritos/Seguir/Bloquear dentro
+del panel Compartir ficha. Reutilizar GlassNavigationBar para geometría en los
+shells de ficha/entidades: inset seguro superior+4 y laterales24. El botón glass
+resuelve apariencia; la barra resuelve colocación, fuera de scroll/entrada.
+No duplicar offsets por ficha ni reservar el antiguo espacio de Guardar.
+
 **Patrón aprobado y reutilizable21/10:** [Expansión desde origen con identidad
 del control](patrones-ui-ux/expansion-desde-origen.md). Referencia visual aprobada
 por el usuario en Reportar web; reutilizar el motor compartido, sus fases y

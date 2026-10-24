@@ -140,41 +140,44 @@ void main() {
         );
         final late = cases.pending!;
         if (discarding) {
-          cases.pendingDiscard = Completer<void>();
-          expect(await model.discard(), isFalse);
-          expect(
-            scope.read(foundEditorViewModelProvider).requireValue.busy,
-            isFalse,
-          );
-          expect(
-            scope.read(foundEditorViewModelProvider).requireValue.issue,
-            FoundFailureKind.timedOut,
-          );
-          cases.pendingDiscard!.complete();
-          late.complete();
-          await Future<void>.delayed(Duration.zero);
+          expect(await model.discardLocalDraft(timedOut.draftId), isFalse);
+          expect(cases.discards, isEmpty);
           expect(
             scope.read(foundEditorViewModelProvider).requireValue.stage,
             FoundStage.preview,
           );
-          expect(
-            scope.read(foundEditorViewModelProvider).requireValue.issue,
-            FoundFailureKind.timedOut,
-          );
-          cases.pendingDiscard = null;
-          expect(await model.discard(), isTrue);
-          expect(cases.discards.toSet(), {timedOut.draftId});
-        } else {
-          cases.pending = null;
-          await model.publish();
-          expect(cases.attempts, hasLength(2));
-          expect(identical(cases.attempts.first, cases.attempts.last), isTrue);
+          late.complete();
+          await Future<void>.delayed(Duration.zero);
           expect(
             scope.read(foundEditorViewModelProvider).requireValue.stage,
             FoundStage.confirmed,
           );
-          late.complete();
+          expect(
+            scope.read(foundEditorViewModelProvider).requireValue.published!.id,
+            timedOut.draftId,
+          );
+          expect(await model.discardLocalDraft(timedOut.draftId), isFalse);
+          expect(cases.discards, isEmpty);
+        } else {
+          final retry = model.publish();
           await Future<void>.delayed(Duration.zero);
+          expect(cases.attempts, hasLength(1));
+          expect(
+            scope.read(foundEditorViewModelProvider).requireValue.published,
+            isNull,
+          );
+          late.complete();
+          await retry;
+          expect(cases.attempts, hasLength(1));
+          expect(cases.attempts.single.id, timedOut.draftId);
+          expect(
+            cases.attempts.single.photos.first.bytes,
+            timedOut.lockedDraft!.photos.first.bytes,
+          );
+          expect(
+            scope.read(foundEditorViewModelProvider).requireValue.stage,
+            FoundStage.confirmed,
+          );
           expect(
             scope.read(foundEditorViewModelProvider).requireValue.issue,
             isNull,

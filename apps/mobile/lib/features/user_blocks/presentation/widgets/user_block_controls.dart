@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/panel_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
@@ -23,8 +24,14 @@ String blockFailureLabel(Object? error) => switch (error is BlockFailure
 };
 
 class UserBlockPanel extends ConsumerWidget {
-  const UserBlockPanel({required this.target, this.onSettled, super.key});
+  const UserBlockPanel({
+    required this.target,
+    this.onSettled,
+    this.inPanel = false,
+    super.key,
+  });
   final BlockTarget target;
+  final bool inPanel;
   final VoidCallback? onSettled;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +40,21 @@ class UserBlockPanel extends ConsumerWidget {
     final value = async.isLoading || async.hasError
         ? null
         : async.asData?.value;
-    if (async.isLoading) return const SkeletonFormFields(fieldCount: 1);
+    if (async.isLoading) {
+      if (inPanel) {
+        return const LoadingShimmer(
+          isLoading: true,
+          loadingLabel: 'Consultando bloqueo',
+          radius: 28,
+          child: PanelActionButton(
+            label: 'Bloquear cuenta del reportante',
+            icon: Icons.block_rounded,
+            onPressed: null,
+          ),
+        );
+      }
+      return const SkeletonFormFields(fieldCount: 1);
+    }
     if (!async.hasError && value?.target == null) {
       return const SizedBox.shrink();
     }
@@ -48,14 +69,18 @@ class UserBlockPanel extends ConsumerWidget {
                 : 'Cuenta desbloqueada')
           : blockFailureLabel(async.error ?? value?.issue),
       child: value == null
-          ? TextButton(
+          ? PanelActionButton(
+              iconOnly: inPanel,
+              icon: Icons.refresh_rounded,
               onPressed: model.retry,
-              child: const Text('Reintentar bloqueo'),
+              label: 'Reintentar bloqueo',
             )
           : Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 UserBlockAction(
+                  inPanel: inPanel,
                   entry: value.target!,
                   busy: value.busy,
                   locked:
@@ -67,7 +92,9 @@ class UserBlockPanel extends ConsumerWidget {
                   },
                 ),
                 if (value.pending != null)
-                  TextButton(
+                  PanelActionButton(
+                    iconOnly: inPanel,
+                    icon: Icons.refresh_rounded,
                     onPressed: value.busy
                         ? null
                         : () async {
@@ -77,12 +104,14 @@ class UserBlockPanel extends ConsumerWidget {
                             );
                             onSettled?.call();
                           },
-                    child: const Text('Reintentar cambio'),
+                    label: 'Reintentar cambio',
                   ),
                 if (value.issue == BlockIssue.conflict)
-                  TextButton(
+                  PanelActionButton(
+                    iconOnly: inPanel,
+                    icon: Icons.refresh_rounded,
                     onPressed: model.retry,
-                    child: const Text('Consultar bloqueo'),
+                    label: 'Consultar bloqueo',
                   ),
               ],
             ),
@@ -96,10 +125,12 @@ class UserBlockAction extends StatefulWidget {
     required this.busy,
     required this.locked,
     required this.onChange,
+    this.inPanel = false,
     super.key,
   });
   final UserBlock entry;
   final bool busy, locked;
+  final bool inPanel;
   final Future<void> Function() onChange;
   @override
   State<UserBlockAction> createState() => _UserBlockActionState();
@@ -111,7 +142,8 @@ class _UserBlockActionState extends State<UserBlockAction> {
   Widget build(BuildContext context) => LoadingShimmer(
     isLoading: widget.busy,
     loadingLabel: 'Guardando bloqueo',
-    child: TextButton.icon(
+    child: PanelActionButton(
+      iconOnly: widget.inPanel,
       onPressed: widget.busy || widget.locked || _confirming
           ? null
           : () async {
@@ -138,14 +170,12 @@ class _UserBlockActionState extends State<UserBlockAction> {
                 await widget.onChange();
               }
             },
-      icon: Icon(
-        widget.entry.enabled ? Icons.lock_open_rounded : Icons.block_rounded,
-      ),
-      label: Text(
-        widget.entry.enabled
-            ? 'Desbloquear cuenta'
-            : 'Bloquear cuenta del reportante',
-      ),
+      icon: widget.entry.enabled
+          ? Icons.lock_open_rounded
+          : Icons.block_rounded,
+      label: widget.entry.enabled
+          ? 'Desbloquear cuenta'
+          : 'Bloquear cuenta del reportante',
     ),
   );
 }

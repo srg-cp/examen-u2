@@ -1,5 +1,11 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+24/10: usuario autoriza integrar y cerrar historias terminadas. PR
+[#67](https://github.com/srg-cp/entrehuellas/pull/67) integra HU-15.2 y acredita
+cierre de #47/#48 con CI y evidencia final. [Auditoría de los51 issues](backlog/auditoria-github-2026-10-24.md)
+conserva abiertos los criterios pendientes de otras entregas. HU-15/#15 sigue
+abierta por HU-15.3/#49, siguiente incremento sin implementar.
+
 22/10: preparación de distribución Android solicitada por el usuario: firma
 propia y prerelease con APK por push a main, condicionada a validaciones.
 [Configuración y límites](funcionalidades/distribucion-android.md). Infraestructura
@@ -408,6 +414,11 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+23/10, refinamiento explícito de ficha pública, ADR-133: Favoritos, Seguir caso y
+Bloquear pasan al panel Compartir ficha. Cabecera Volver/Compartir con geometría
+compartida con entidades. Sin cambios de permisos/datos ni cierre de historias;
+no se retiran los recorridos de avistamiento discutidos sin instrucción de cambio.
+
 Ampliación explícita20/10 de HU-07/HU-08, RF-08/13/37: Compartir ficha abre panel blanco sin X; copiar enlace, WhatsApp, Facebook y PDF público por lectores autorizados de búsquedas activas. Denunciar reutiliza el formulario existente. RPC prepare_case_share/plan032, sin otorgar permisos de autor o modificar el contrato QR. Activación remota y prueba de aplicaciones Android pendientes; ADR-115. Sin issue nuevo ni cierre de historias.
 
 
@@ -524,6 +535,43 @@ Implementa el alcance activo S5: HU-11, HU-12.1/12.2 y HU-13 de docs/GUIA_MVP.md
 ```
 
 ### S6 - Moderación, offline y validación
+
+23/10, resolución final remota HU-15.2: usuario aplica037/038;6/6 pruebas estrictas
+en desarrollo aprobadas, incluidos campos/fotos distintos del mismo UUID,
+deduplicación, permisos y revocación. La delegación interna omitida en037 queda
+corregida por038 sin reescribir historia. Regresión final575/575 Flutter,
+56/56 SQL después de038, análisis limpio,10 checks SQLite Android y recorrido
+normal sin red→reinicio→reintento automático aprobados. Validación técnica de
+HU-15.2 completada en emulador y desarrollo remoto; siguiente incremento HU-15.3.
+Evidencia en ESTADO; las notas de activación pendiente siguientes son historial anterior.
+Sin cierre de issue/épica ni inicio implícito de HU-15.3.
+
+23/10, comprobación posterior: usuario aplica037; perdido devuelvePT409, pero
+la búsqueda delegaba en un helper fuera del parche. Plan038/fuente124 completa
+publish_found_case sin cambiar037 ni permisos. Cuatro SQL focalizadas pasan;
+aplicación remota038 y nueva suite estricta pendientes. Sin nuevas HU/alcance.
+
+23/10, hallazgo posterior al ciclo Android: repetir el mismo UUID con contenido
+distinto agota timeout remoto por uso de40001 como conflicto de negocio. Plan037
+y ADR-134 preparan PT409 para tres RPC de cola y compatibilidad Flutter; cuatro
+SQL/20 Flutter focalizadas y575 Flutter/56 SQL completos posteriores pasan;
+análisis limpio y APK actualizado instalado. Aplicación remota037 y suite estricta pendientes;
+la evidencia previa siguiente no cierra esa validación ni autoriza omitirla.
+
+23/10, validación posterior de HU-15.1/15.2:575 pruebas Flutter y55 SQL locales,
+6 remotas con cuentas distintas y servidor real de desarrollo,10 comprobaciones
+SQLite nativas y ciclo completo en app normal Android emulada (guardar/reiniciar
+sin red, cola pendiente y publicación automática al recuperar red, mismo UUID y
+sin duplicados). Sin migraciones/despliegue nuevo, teléfono físico o cierre en
+GitHub. Sustituye los bloqueos anteriores para esos escenarios; límites y logs
+en [ESTADO](ESTADO.md) y [envíos](funcionalidades/envios-pendientes.md).
+Siguiente incremento funcional: HU-15.3; no iniciado por esta validación.
+
+23/10: autorizado HU-15.2/#48/RF-32 sobre HU-15.1, que conserva su validación
+Android pendiente. Cola SQLite por cuenta, reclamación y recibo durable, reintento
+activo con backoff, rechazo manual y Perfil → Envíos; ADR-132. Sin SQL remoto,
+servicio de segundo plano, cierre de historias ni caché de fichas HU-15.3.
+[Evidencia y límites](funcionalidades/envios-pendientes.md).
 
 23/10: autorizado HU-15.1/#47/RF-32. Borradores locales por cuenta en Android,
 fotos, fecha parcial y comando estable; Perfil → Borradores. ADR-131 documenta

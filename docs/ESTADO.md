@@ -1,5 +1,332 @@
 # Estado del proyecto
 
+## Integración y auditoría de GitHub autorizadas —24/10/2026
+
+El usuario autoriza integrar HU-15.2 y revisar/cerrar también las demás entregas
+terminadas. Auditoría de los 51 issues: 27 ya cerrados; #47/HU-15.1 y #48/HU-15.2
+cumplen el cierre con la evidencia final inferior. Se tramita
+[#67](https://github.com/srg-cp/entrehuellas/pull/67) a main y CI,
+con herramientas de validación y patches037/038 ya comprobados en desarrollo.
+Las otras historias abiertas conservan criterios pendientes concretos; no se
+cierran por existir pantallas o por aplicación de un patch. Se sincronizan
+etiquetas/Projects, casillas antiguas de #5/#6/#9 y la épica #15, que queda
+abierta por #49. [Revisión de todos los issues](backlog/auditoria-github-2026-10-24.md).
+Siguiente incremento funcional: HU-15.3; no iniciado. La evidencia Android es
+de emulador y reinicio de proceso, sin afirmar teléfono físico o reboot del SO.
+
+## HU-15.2: validación técnica completada con037/038 —23/10/2026
+
+El usuario confirma aplicación del038 después del037. Nueva ejecución completa
+contra Supabase de desarrollo: **6/6 aprobadas**, sin omisiones, en15s
+(`apps/mobile/build/queue-hosted-validation-after-038.log`, exit0).
+Ahora se comprueban expresamente los tres puntos de rechazo: payload distinto
+de perdido, campos distintos de búsqueda y selección de fotos distinta en su
+preparación. Devuelven conflicto de dominio, sin los timeouts anteriores.
+
+Pasaron de nuevo fotos reales (tres en búsqueda), publicación perdida con
+replay concurrente, respuesta descartada tras commit, reapertura de cola y recibo
+sin HTTP; encontrado vinculado de B, avistamiento por Nuxt con evidencia,
+aislamiento/autorización A/B y revocación de la sesión de prueba entre commit y
+respuesta. Fixtures retirados/mascotas QA archivadas conforme al contrato.
+No se modifican otras sesiones ni se ejecuta cancelación/restart remoto.
+
+Validaciones previas vigentes:575/575 Flutter, análisis limpio,10 checks SQLite
+nativos y ciclo real en app normal Android emulada sin red→force-stop→reabrir→
+publicación automática con UUID/huella intactos, recibo y un solo resultado.
+Cuatro SQL focalizadas con037+038 pasan y conservan metadatos/ACL de las cuatro
+funciones. **Regresión SQL completa posterior a038:56/56 aprobadas**, cero fallos,
+cero omitidas, exit0 (`database/tests/queue-full-sql-validation-after-038.log`).
+La validación técnica solicitada queda completada para Android emulado y backend
+de desarrollo:575 Flutter,56 SQL locales,6 remotas estrictas y10 checks SQLite
+nativos, además del recorrido visible normal documentado. Análisis sin incidencias
+y diff sin errores de espacio; no quedan checks ejecutándose ni bloqueos técnicos
+del alcance comprobado. App normal actualizada instalada, sesión conservada,
+Wi-Fi habilitado y modo avión desactivado. Siguiente incremento funcional:HU-15.3,
+sin iniciarlo por arrastre. No se hizo commit/push ni cierre de issue/épica.
+Esta entrada sustituye los pendientes de activación/suite remota de las notas
+anteriores. No implica cierre en GitHub ni prueba de teléfono físico.
+
+## Patch037 aplicado; complemento038 para helper interno —23/10/2026
+
+El usuario confirma ejecución del037. Nueva suite contra desarrollo verifica
+perdido con PT409 (sin el timeout anterior), replay concurrente y recibo local.
+La prueba estricta de búsqueda con rasgos modificados sigue en timeout: la RPC
+publish_recovery_report delega esa comparación a publish_found_case, cuyo cuerpo
+no estaba en el alcance del037. Suite5/6; los otros escenarios, incluida revocación,
+pasan y los fixtures se retiran. Log: queue-hosted-validation-after-037.log.
+
+Se corrige la omisión con fuente124/plan038/patch038, sin reescribir037 aplicado.
+Solo reemplaza40001 por PT409 en ese helper, conservando cuerpo restante,
+OID/propietario/security definer/proconfig/ACL. La prueba de conversión ahora
+cubre las cuatro funciones y repetición de ambos patches. Cuatro SQL focalizadas
+aprobadas (queue-nested-conflict-sql-targeted.log); suite SQL completa posterior
+en curso. Flutter no cambia:575 pruebas/análisis y APK actualizado previos vigentes.
+Se solicita al usuario ejecutar TODO database/patchs/038_patch_recovery_nested_business_conflicts.sql
+con rol administrativo; sin acceso DDL por las cuentas A/B. Siguiente paso:
+confirmar038 y repetir las6 pruebas remotas estrictas. No se cierra la validación
+por el éxito parcial del037 ni se ejecutan restart/cancelaciones remotas.
+
+## Hallazgo final HU-15.2: conflicto remoto requiere patch037 —23/10/2026
+
+La ampliación de la última prueba remota con mismo UUID y payload cambiado falla:
+se esperaba CaseFailure.conflict, pero el servidor no responde y se alcanza el
+timeout30s. Reproducción HTTP directa agota10s, independiente de Flutter. La suite
+ampliada termina5/6; los seis escenarios base previos y el ciclo Android completo
+sí pasaron como se detalla debajo. **La validación final aún no está cerrada.**
+
+Preparada corrección [ADR-134](decisiones/134-conflictos-de-publicacion-sin-reintento-postgrest.md):
+plan037/fuente123 y patch037 generados, sin alterar migraciones previas. Cambia
+solo los40001 explícitos de tres RPC de cola a PT409, conservando cuerpos restantes,
+settings y permisos; adaptadores Flutter compatibles con ambos. Cuatro pruebas
+SQL y20 Flutter focalizadas pasan. Regresión completa posterior: **575/575 Flutter,
+56/56 SQL locales**, análisis sin incidencias y diff sin errores de espacio.
+Build profile normal actualizado69.3MB compilado e instalado con éxito; conserva
+sesión/datos y compatibilidad con40001/PT409. Logs finales:
+`apps/mobile/build/queue-full-validation-tests-after-conflict.log`,
+`queue-final-validation-analyze-after-conflict.log`,
+`queue-normal-android-profile-build-final.log` y
+`database/tests/queue-full-sql-validation-after-conflict.log`.
+Se solicita al usuario aplicar TODO database/patchs/037_patch_recovery_business_conflicts.sql
+en SQL Editor de desarrollo, pues las cuentas A/B no autorizan DDL. Sin ejecución
+remota, restart ni cancelación de sesiones por el agente. Siguiente paso: aplicar
+037 y repetir la suite remota con conflicto estricto de perdido y de preparación/
+publicación de búsqueda; no ocultar esas comprobaciones. No queda ningún check
+local ejecutándose; pendiente exclusivamente la activación/verificación remota037.
+
+## HU-15.1/15.2: evidencia previa al hallazgo final en Android y desarrollo remoto —23/10/2026
+
+Por petición explícita de terminar la validación, se comprueba el backend real
+de desarrollo confirmado por el usuario. La segunda cuenta ya existía; acceso
+por código enviado/confirmado por el usuario, sin cambiar su contraseña.
+Configuración privada/sesión solo en `apps/mobile/config/profile_test.local.json`,
+ignorado por Git. No se registran credenciales ni tokens en estos documentos.
+
+Resultados finales:
+
+- **575/575 pruebas Flutter**, sin omisiones, con movimiento ambiental desactivado;
+  análisis final sin incidencias y diff sin errores de espacio.
+- **55/55 pruebas SQL de la suite completa** en PGlite/PostGIS; no son55 pruebas
+  alojadas. La autorización remota se comprueba adicionalmente con A/B reales.
+- **6/6 pruebas remotas nuevas**: perdido, búsqueda comunitaria con tres fotos,
+  encontrado vinculado con autor B, avistamiento por endpoint Nuxt, aislamiento/
+  permisos/logout y revocación de la sesión de prueba entre commit y respuesta.
+  Usan repositorios/casos de uso reales y JPEG decodificable procesado por el
+  servidor. La inyección descarta una respuesta HTTP2xx ya recibida del servidor;
+  el replay del mismo UUID confirma una publicación y el recibo local evita HTTP.
+  Dos publicaciones concurrentes idénticas de perdido devuelven el mismo caso.
+  Logout local revoca realmente el refresh token, detiene el siguiente elemento
+  y permite recuperar ambos UUID al reingresar. No se revocan otras sesiones.
+- **10 comprobaciones nativas SQLite** en Pixel_9a/Android16/API36: migración1→2,
+  tres evidencias de2MiB, aislamiento, conflicto de payload, dos conexiones con
+  una sola reclamación, descarte protegido, reapertura, nonce antiguo, backoff
+  y evidencia de avistamiento de8MiB. Hash completo de los bytes conservado.
+  Tiempos observados: lectura/migración6MiB682ms, enqueue6MiB709ms,
+  escritura/lectura8MiB1296ms; no son SLA ni medición en teléfono físico.
+- **App normal instalada y recorrida** con la sesión que ya tenía el emulador:
+  Perfil→Borradores/Envíos accesibles sin red incluso ante fallo de perfil;
+  formulario→guardar/salir→force-stop→reabrir sin red→Retomar conserva el texto
+  exacto. El intento de reportar una mascota con caso activo es rechazado sin
+  cambiar ese caso; se descarta solo el borrador QA creado para la prueba.
+  Búsqueda comunitaria nueva con foto normalizada desde galería: publicar sin red
+  queda pendiente; cierre/reapertura conserva UUID/huella; al restaurar red,
+  **sin pulsar Reintentar**, el intento4 publica y Ver resultado abre su ficha.
+  SQLite antes/después confirma mismo UUID/huella, recibo durable, payload
+  reducido289260→564 caracteres y cero borradores restantes. Consulta remota
+  confirma un solo resultado activo con una foto. Se elimina exclusivamente
+  esa publicación QA desde Mis reportes y se verifica que deja de ser pública.
+
+Herramientas reproducibles nuevas en `apps/mobile/tool`:
+`check_submission_queue_remote_test.dart` y `offline_queue_native_validation.dart`.
+Logs en build: `queue-full-validation-tests.log`, `queue-final-validation-analyze.log`,
+`queue-hosted-validation-final.log`, `queue-native-validation-android.log`;
+SQL: `database/tests/queue-full-sql-validation.log`. Evidencia del ciclo real:
+`queue-android-cycle-evidence.json`, snapshots SQLite y XML de las pantallas.
+
+Gradle vuelve a funcionar dentro del agente usando solo para cada proceso
+JAVA_TOOL_OPTIONS con directorio temporal de sockets bajo android/build.
+Sin cambio persistente de Java/Gradle/proyecto. Build normal debug correcto;
+por espacio del AVD, se instala el build profile x64 de53.6MB. Windows registra
+caídas0xc0000005 del emulador headless con la configuración gráfica inicial;
+se completa la UI con ANGLE, Vulkan desactivado y arranque software/Impeller
+desactivado mediante extras de Activity, sin cambiar Manifest ni producción.
+Wi-Fi/modo avión restaurados; queda instalada la app normal, sin APK de smoke.
+
+Los fixtures remotos del harness se retiran mediante APIs de usuario; mascotas
+QA con historia quedan archivadas según contrato y se conserva auditoría/recibos.
+El recibo local de la publicación Android retirada permanece como comprobante.
+Sin cambios de producto/SQL, migraciones, despliegue, commit/push o cierre en GitHub.
+Los escenarios anteriores quedan acreditados para este entorno; la ampliación
+posterior detecta el conflicto descrito arriba, que requiere patch037 antes de
+completar la validación final. No se afirma teléfono físico, todos los fabricantes
+ni fallo físico de almacenamiento. Siguiente incremento tras ese cierre: **HU-15.3**;
+la comprobación complementaria en teléfono físico no se presenta como ejecutada.
+Esta sección sustituye los bloqueos/pendientes de APK y demo remota de las notas
+históricas inferiores para los escenarios concretos aquí comprobados.
+
+## Smoke Android offline aprobado en emulador —23/10/2026
+
+El usuario genera APK debug solo android-x64 del smoke existente:
+`flutter build apk --debug --target tool/offline_drafts_smoke.dart --target-platform android-x64`.
+Archivo126240513 bytes,23/10 a21:52; ADB instala con éxito en Pixel_9a,
+Android16/API36/x86_64. Sustituye los bloqueos de instalación descritos debajo;
+la compilación se realizó en PowerShell externo, no dentro del agente.
+
+Primera ejecución: `OFFLINE_DRAFTS_SMOKE_PASS phase=WRITE count=3`, PID4196.
+Se activa modo avión y se deshabilita Wi-Fi, se fuerza cierre con am force-stop
+y se comprueba ausencia de PID. Nueva apertura en frío, PID4386:
+`OFFLINE_DRAFTS_SMOKE_PASS phase=READ count=3 accountIsolation=true evidence=true partialDate=true queueProcessRecovery=true`.
+Verificados UUID/campos parciales, bytes de evidencia y separación smoke-A/smoke-B;
+la reclamación en curso vuelve a pendiente al abrir desde otro proceso.
+Wi-Fi y modo avión restaurados a sus valores iniciales al terminar.
+Logs locales: `apps/mobile/build/queue-android-write.log` y
+`apps/mobile/build/queue-android-read-offline.log`.
+
+Smoke usa SQLite separado y actores de prueba sin Auth/backend; no valida
+fotos reales, recorrido normal Perfil/Borradores/Envíos, sesión real, pérdida de
+respuesta del commit ni deduplicación en Supabase alojado. No equivale a reinicio
+completo del dispositivo ni Android físico. En el emulador queda instalado el
+APK de smoke, no la entrada normal main; datos existentes no borrados.
+Sin cambios de producto/SQL, commit, push o despliegue remoto. Siguiente paso:
+restaurar build normal para recorrido Android/Supabase real y validar reintento
+sin duplicados, cambio/revocación de sesión y fotos máximas. HU-15.1/15.2 no se
+cierran por este smoke. Diff documental sin errores de espacio.
+
+## Validación Android offline: APK compilado, instalación pendiente —23/10/2026
+
+El usuario compila correctamente desde PowerShell externo el smoke
+`flutter build apk --debug --target tool/offline_drafts_smoke.dart`.
+APK local verificado:193546225 bytes; Android SDK Platform35 instalado y licencia
+aceptada durante el build. Command-line Tools23 instalado; Flutter3.35.3 sigue
+informando licencias desconocidas al no reconocer la nueva salida de la CLI.
+Gradle help funciona fuera del agente; dentro continúa el fallo de conexión
+local de Java, también con JDK17 y selector alternativo. No se cambió la
+configuración del proyecto ni se afirma resuelto ese fallo.
+
+Emulador Android16/API36 conectado. Instalación ADB del APK intentada dos veces,
+incluida selección x86_64: Android rechaza por espacio insuficiente, con475MB
+libres de5.8GB. La reclamación de caché mediante `pm trim-caches 1G` no libera
+espacio. No se borran datos ni se desinstala la app existente. No se ha ejecutado
+el smoke ni validado reinicio nativo. Siguiente paso: compilar APK solo para
+android-x64 para reducir tamaño; si no basta, ampliar almacenamiento del emulador.
+Android/Supabase real, pérdida de respuesta y cierre de HU-15.1/15.2 pendientes.
+
+Nueva verificación solicitada por el usuario: ADB inicialmente sin dispositivos;
+se inicia Pixel_9a sin ventana y se espera arranque completo (API36). Sigue
+disponible el mismo APK debug de193546225 bytes del23/10 a21:37, sin un APK
+android-x64 nuevo en outputs. Con566MB libres tras arrancar, la instalación
+`adb install -r --abi x86_64` vuelve a fallar:
+`INSTALL_FAILED_INSUFFICIENT_STORAGE: Failed to override installation location`.
+No se ejecutó el smoke, no se borraron datos y no se cierra el feature.
+
+## Corrección visual del panel Compartir ficha —23/10/2026
+
+El usuario precisa que Favoritos, Seguir y Bloquear deben tener el mismo diseño
+que Descargar/Denunciar. Se sustituyen las filas de texto del incremento anterior
+por círculos grises56/iconos26, todos debajo del separador del panel. Un único
+PanelActionButton comparte diseño, tooltip/semántica y estado deshabilitado.
+Wrap centra las cinco acciones y adapta filas en pantallas estrechas. Los
+reintentos de bloqueo también mantienen formato circular; confirmación, guardado,
+seguimiento y lógica de permisos existentes conservados. El modo de icono se
+activa únicamente en el panel de ficha; otras entradas mantienen sus etiquetas.
+
+Validación:43/43 pruebas focalizadas de compartir, notificaciones, bloqueos y
+arquitectura, con movimiento ambiental desactivado; incluye guardado real con
+reapertura/doble envío, cuatro combinaciones de tamaño/movimiento y acciones por
+tooltip. Renders390×844 y320×350/texto200% revisados. Análisis Flutter sin incidencias y diff sin errores de espacio. Logs locales
+`apps/mobile/build/public-actions-icons-{tests,analyze}.log`.
+Pendiente revisión en Android real; sin APK, despliegue ni cambios SQL.
+
+
+## Ficha pública: acciones y navegación glass —23/10/2026
+
+Por instrucción del usuario, Favoritos, Seguir caso/Dejar de seguir y
+Bloquear/Desbloquear se trasladan al panel blanco «Compartir ficha».
+Cabecera con Volver/Compartir únicamente. El problema venía de offsets propios
+laterales8 de la ficha frente a24 del shell habitual, además del espacio reservado
+para Guardar. GlassNavigationBar concentra posición segura superior+4 y márgenes
+simétricos24; CasePublicScreenShell y EntityScreenShell la reutilizan.
+
+Router compone widgets existentes por slots del panel, sin imports cruzados de
+presentación. Favoritos ofrece texto y conserva ViewModel/semántica de selección,
+shimmer, reintento y bloqueo de doble envío. Seguimiento conserva su elegibilidad
+por tipo de caso; bloqueo mantiene confirmación y refresco de contactos. Contacto
+permanece en el cuerpo. Se conservan los dos recorridos de avistamiento: la tarea
+actual no pide modificarlos. Sin cambios de dominio, SQL, QR o web ni despliegue.
+Rama `feature/offline-submission-queue`, árbol inicialmente limpio.
+
+Validación: **65/65 pruebas focalizadas** (compartir, tarjetas públicas, cargas,
+contactos, transiciones de creación, notificaciones, bloqueos y arquitectura) con
+`--dart-define=AMBIENT_BACKGROUND_MOTION=false`. Añadida después una prueba real
+de Favoritos en el panel: guardar/quitar, doble envío y releer al reabrir; suite
+final de compartir **10/10**, total66 pruebas distintas verificadas. Análisis
+Flutter sin incidencias. Geometría comparada entre shells con inset24, estabilidad
+al scroll y panel normal/reducido; renders390×844 y320×350/texto200% revisados,
+acciones alcanzables por scroll. Formato aplicado y diff sin errores de espacio.
+Logs: `apps/mobile/build/public-actions-{tests,analyze,sharing-final}.log`;
+renders: `apps/mobile/build/ui-preview/{case-sharing,public-cards}`.
+
+Decisión [ADR-133](decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md),
+[ficha pública](funcionalidades/ficha-publica-mobile.md) y
+[panel](funcionalidades/compartir-ficha.md) actualizados. Pendiente revisión física
+Android y aprobación visual del usuario. No se generó/instaló APK ni se auditó la
+posición de todos los controles de la app. Siguiente paso: revisar esta ficha
+en dispositivo con datos reales y comprobar servicios/contacto tras bloqueo.
+
+
+## HU-15.2: cola persistente y reintentos —23/10/2026
+
+Por autorización «ok siguiente», implementado el incremento local de
+HU-15.2/RF-32/issue #48 en `feature/offline-submission-queue`. HU-15.1 se conserva;
+durante el trabajo apareció como HEAD `1b9b05f`. Esta sesión no hizo commit,
+push, acciones en GitHub ni despliegue.
+
+La confirmación de perdido propio, búsqueda, encontrado o avistamiento guarda
+primero el comando exacto en SQLite esquema2. Migración1→2 conserva borradores.
+La cola separa cuenta/UUID, fija huella de campos y fotos y reclama cada intento
+atómicamente. Pérdida de respuesta/reinicio conserva UUID, instante, versión,
+destino y evidencia; nunca crea una publicación alternativa para resolver un
+conflicto. Recibo validado duradero antes de limpiar bytes/borrador; un envío ya
+confirmado no vuelve a realizar HTTP. La lista de borradores excluye recibos
+publicados incluso si falló su limpieza local.
+
+Perfil → Envíos muestra pendientes/en curso, fallidos y publicados; permite
+consultar motivo por toast, reintentar el comando original, revisar formulario
+y abrir resultado. Los editores bloquean cambios durante intención pendiente/en
+curso y aceptan el recibo tardío del mismo envío. Descarte cancela solo intención
+pendiente/fallida; no revierte publicaciones. Encontrado conserva su RPC protegida.
+
+Sincronización solo con app activa y cuenta autorizada por la política global:
+entrada/resume y sondeo15s, backoff5/15/30/60/120s. Los rechazos definitivos detienen
+el automático; corregir invalid/photo exige publicación explícita. Logout/cambio
+de cuenta/pausa impiden el siguiente envío. El cierre de la app libera el timer.
+No se promete trabajo en segundo plano ni se introduce SQL remoto, permisos,
+workers o paridad offline Nuxt. Véanse [ADR-132](decisiones/132-cola-persistente-de-envios-android.md)
+y [ficha](funcionalidades/envios-pendientes.md).
+
+Validación final: **573/573 pruebas Flutter**, incluidas18 nuevas de cola/UI,
+con `--dart-define=AMBIENT_BACKGROUND_MOTION=false`; análisis sin incidencias.
+SQLite real: migración, reinicio/proceso, bytes, reclamaciones concurrentes,
+respuesta perdida antes/después de persistencia simulada, recibo/identidad,
+conflictos, disco fallido, revisión y cancelación. Router real con sincronización
+activa comprueba visitante/bienvenida/cuenta preparada; se corrigió la liberación
+del timer detectada al desmontar la app. Renders390×844 y320×350/texto200% con
+fuentes reales revisados, acciones alcanzables por scroll. Formato676 archivos
+sin cambios y `git diff --check` correcto. Logs locales en
+`apps/mobile/build/queue-{full-tests-final,analyze-final,sql-regression}.log`.
+
+**3/3 pruebas SQL focalizadas** sobre PGlite/PostGIS: perdido, encontrado y búsqueda;
+verifican autorización/deduplicación de los comandos existentes. No equivalen a
+suite SQL completa ni prueba de Supabase alojado. Sin migraciones remotas nuevas.
+
+Smoke Android ampliado para recuperar borrador y reclamación entre procesos,
+con base separada sin backend. Intentado en emulador; Gradle falla antes de compilar
+con `java.io.IOException: Unable to establish loopback connection`
+(`apps/mobile/build/queue-android-smoke.log`). **No hay APK nuevo ni instalación**.
+Pendiente resolver Java/Gradle y comprobar Android/Supabase reales: cierre sin red,
+reinicio, pérdida de respuesta alrededor del commit, cuenta/fotos, concurrencia,
+revocación de sesión y rendimiento máximo. Implementación local, historia #48 y
+épica sin cerrar. Siguiente paso: esa validación; HU-15.3 requiere continuar el plan.
+
 ## HU-15.1: borradores locales por cuenta —23/10/2026
 
 El usuario da por resuelto el login OAuth de Supabase y autoriza continuar con

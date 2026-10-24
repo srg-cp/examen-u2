@@ -296,6 +296,11 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
                       !error &&
                       (_community ? other != null : own != null))
                     ReportDraftStatus(
+                      submissionState:
+                          (_community
+                                  ? other?.submissionStatus
+                                  : own?.submissionStatus)
+                              ?.name,
                       onRetry:
                           blocked ||
                               (_community

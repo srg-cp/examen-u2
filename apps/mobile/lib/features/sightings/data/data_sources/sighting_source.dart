@@ -30,10 +30,17 @@ class NativeSightingSource implements SightingSource {
     }
     // Refresh through the SDK; tokens never enter domain or presentation.
     var session = supabase.auth.currentSession;
-    if (session?.isExpired == true) {
+    if (session == null ||
+        session.user.id != owner ||
+        supabase.auth.currentUser?.id != owner) {
+      throw const SightingFailure(SightingIssue.forbidden);
+    }
+    if (session.isExpired) {
       session = (await supabase.auth.refreshSession()).session;
     }
-    if (session == null || session.user.id != owner) {
+    if (session == null ||
+        session.user.id != owner ||
+        supabase.auth.currentUser?.id != owner) {
       throw const SightingFailure(SightingIssue.forbidden);
     }
     final request =

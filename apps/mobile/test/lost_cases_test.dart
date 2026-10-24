@@ -461,10 +461,18 @@ void main() {
       cases.pending = Completer<void>();
       final writing = model.publish();
       await model.publish();
+      await tick();
       expect(cases.attempts.length, 2);
       cases.pending!.complete();
       await writing;
-      expect(identical(cases.attempts[0], cases.attempts[1]), true);
+      expect(cases.attempts[1].id, cases.attempts[0].id);
+      expect(cases.attempts[1].petVersion, cases.attempts[0].petVersion);
+      expect(cases.attempts[1].occurredAt, cases.attempts[0].occurredAt);
+      expect(cases.attempts[1].photoIds, cases.attempts[0].photoIds);
+      expect(
+        cases.attempts[1].placeReference,
+        cases.attempts[0].placeReference,
+      );
       expect(
         container.read(caseEditorViewModelProvider).requireValue.stage,
         CaseEditorStage.confirmed,
@@ -484,7 +492,7 @@ void main() {
     },
   );
   test(
-    'A stalled publication ends, keeps its command and ignores late success',
+    'A stalled publication stays pending; retry joins its original flight until a validated receipt',
     () async {
       final scope = ProviderContainer(
         parent: container,
@@ -514,29 +522,36 @@ void main() {
       cases.pending = delayed;
       final first = model.publish();
       await model.publish();
+      await tick();
       expect(cases.attempts, hasLength(1));
       await first;
       final timedOut = scope.read(caseEditorViewModelProvider).requireValue;
       expect(timedOut.busy, false);
       expect(timedOut.issue, CaseFailureKind.timedOut);
-      expect(timedOut.lockedDraft, same(cases.attempts.single));
+      expect(timedOut.lockedDraft!.id, cases.attempts.single.id);
+      expect(
+        timedOut.lockedDraft!.occurredAt,
+        cases.attempts.single.occurredAt,
+      );
       model.backToForm();
       model.edit(placeReference: 'Changed');
       expect(
         scope.read(caseEditorViewModelProvider).requireValue.stage,
         CaseEditorStage.preview,
       );
-      cases.pending = null;
-      await model.publish();
+      final retry = model.publish();
+      await tick();
+      expect(cases.attempts, hasLength(1));
+      expect(
+        scope.read(caseEditorViewModelProvider).requireValue.published,
+        isNull,
+      );
+      delayed.complete();
+      await retry;
       final confirmed = scope.read(caseEditorViewModelProvider).requireValue;
       expect(confirmed.stage, CaseEditorStage.confirmed);
-      expect(cases.attempts[1], same(cases.attempts[0]));
-      delayed.complete();
-      await tick();
-      expect(
-        scope.read(caseEditorViewModelProvider).requireValue,
-        same(confirmed),
-      );
+      expect(confirmed.published!.id, cases.attempts.single.id);
+      expect(cases.attempts, hasLength(1));
     },
   );
   test(

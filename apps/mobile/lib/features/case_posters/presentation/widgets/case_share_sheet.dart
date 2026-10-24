@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/panel_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -13,11 +14,13 @@ class CaseShareSheet extends ConsumerWidget {
     required this.title,
     required this.eventLabel,
     required this.onReport,
+    this.caseActions = const [],
     super.key,
   });
   final PosterCase target;
   final String title, eventLabel;
   final VoidCallback onReport;
+  final List<Widget> caseActions;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(caseShareViewModelProvider(target));
@@ -146,31 +149,30 @@ class CaseShareSheet extends ConsumerWidget {
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Divider(height: 1, color: Color(0xFFE2E3E6)),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
                     LoadingShimmer(
                       isLoading: v?.action == CaseShareChannel.download,
                       loadingLabel: 'Preparando PDF',
                       radius: 28,
-                      child: IconButton(
-                        tooltip: 'Descargar ficha en PDF',
-                        style: _secondaryStyle,
+                      child: PanelActionButton(
+                        label: 'Descargar ficha en PDF',
                         onPressed: v == null || busy
                             ? null
                             : () => model.execute(CaseShareChannel.download),
-                        icon: const Icon(
-                          Icons.file_download_outlined,
-                          size: 26,
-                        ),
+                        icon: Icons.file_download_outlined,
                       ),
                     ),
-                    const SizedBox(width: 20),
-                    IconButton(
-                      tooltip: 'Denunciar contenido',
-                      style: _secondaryStyle,
+                    PanelActionButton(
+                      label: 'Denunciar contenido',
                       onPressed: busy ? null : onReport,
-                      icon: const Icon(Icons.flag_outlined, size: 26),
+                      icon: Icons.flag_outlined,
+                    ),
+                    ...caseActions.map(
+                      (action) => SizedBox(width: 56, child: action),
                     ),
                   ],
                 ),
@@ -181,14 +183,6 @@ class CaseShareSheet extends ConsumerWidget {
       ),
     );
   }
-
-  ButtonStyle get _secondaryStyle => IconButton.styleFrom(
-    backgroundColor: const Color(0xFFEEEEF0),
-    disabledBackgroundColor: const Color(0xFFEEEEF0),
-    foregroundColor: const Color(0xFF111111),
-    fixedSize: const Size.square(56),
-    shape: const CircleBorder(),
-  );
 }
 
 class _WhatsAppIcon extends StatelessWidget {

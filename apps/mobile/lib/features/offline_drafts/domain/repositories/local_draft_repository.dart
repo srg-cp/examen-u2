@@ -1,6 +1,8 @@
 import '../entities/local_report_draft.dart';
+import 'submission_queue_repository.dart';
 
-abstract interface class LocalDraftRepository {
+abstract interface class LocalDraftRepository
+    implements SubmissionQueueRepository {
   Future<List<LocalReportDraft>> list(String owner);
   Future<LocalReportDraft?> read(String owner, String slot);
   Future<void> save(LocalReportDraft draft);

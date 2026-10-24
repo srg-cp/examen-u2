@@ -44,6 +44,7 @@ void main() {
                 'code': switch (failure) {
                   'case_already_active' => '23505',
                   'PRIVATE LOCK DETAILS' => '55P03',
+                  'NEW CONFLICT PRIVATE DETAILS' => 'PT409',
                   _ => '40001',
                 },
                 'message': failure,
@@ -201,6 +202,17 @@ void main() {
         throwsA(
           isA<CaseFailure>().having(
             (e) => e.kind,
+            'kind',
+            CaseFailureKind.conflict,
+          ),
+        ),
+      );
+      failure = 'NEW CONFLICT PRIVATE DETAILS';
+      await expectLater(
+        PublishLostCase(repo)('owner', draft),
+        throwsA(
+          isA<CaseFailure>().having(
+            (error) => error.kind,
             'kind',
             CaseFailureKind.conflict,
           ),

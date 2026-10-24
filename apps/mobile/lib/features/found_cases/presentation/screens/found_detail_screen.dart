@@ -12,20 +12,16 @@ import '../widgets/found_public_content.dart';
 class FoundDetailScreen extends ConsumerWidget {
   const FoundDetailScreen({
     required this.id,
-    this.savedAction,
     this.contact,
     this.posterAction,
     this.timelineAction,
-    this.followAction,
     this.shareActionBuilder,
     super.key,
   });
-  final Widget? savedAction;
   final Widget? contact;
   final Widget? posterAction;
   final Widget? timelineAction;
-  final Widget? followAction;
-  final Widget Function(String, String)? shareActionBuilder;
+  final Widget Function(String, String, bool)? shareActionBuilder;
   final String id;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,13 +41,11 @@ class FoundDetailScreen extends ConsumerWidget {
                 'with_reporter' => 'Encontrada',
                 _ => 'Reporte',
               },
+              [
+                'possible_loss',
+                'legacy_found',
+              ].contains(state.requireValue.value!.reportKind),
             )
-          : null,
-      trailingAction:
-          !state.isLoading &&
-              !state.hasError &&
-              state.asData?.value.value != null
-          ? savedAction
           : null,
       loading: state.isLoading,
       notice: state.hasError
@@ -95,12 +89,6 @@ class FoundDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                     ],
-                    if (followAction != null &&
-                        [
-                          'possible_loss',
-                          'legacy_found',
-                        ].contains(state.requireValue.value!.reportKind))
-                      followAction!,
                     if ((state.requireValue.value!.canGeneratePoster ||
                             state.requireValue.value!.canResolve) &&
                         posterAction != null)

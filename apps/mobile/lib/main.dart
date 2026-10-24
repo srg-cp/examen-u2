@@ -119,7 +119,7 @@ Future<void> main() async {
           bootstrap.onboardingRepository,
         ),
       ],
-      child: const EntreHuellasApp(),
+      child: const EntreHuellasApp(observeQueue: true),
     ),
   );
 }

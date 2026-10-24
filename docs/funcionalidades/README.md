@@ -1,7 +1,16 @@
 # Funcionalidades de Entre Huellas
 
+24/10: [auditoría de los 51 issues de GitHub](../backlog/auditoria-github-2026-10-24.md).
+Borradores #47 y cola #48 cumplen el cierre técnico; integración y CI por PR.
+Las demás historias abiertas conservan los criterios pendientes allí detallados.
+
+- [Envíos pendientes y reintentos](envios-pendientes.md): HU-15.2/RF-32/#48; cola SQLite
+  por cuenta, estados persistentes y recibos verificados. Ciclo completo en app
+  Android emulada y6/6 remotas estrictas con037/038 aplicados; evidencia en la ficha.
+
 - [Borradores locales](borradores-locales.md): HU-15.1/RF-32/#47; guardado y recuperación
-  por cuenta en Android, fotos y comando estable. Validación nativa pendiente.
+  por cuenta en Android, fotos y comando estable. SQLite nativo y reapertura sin
+  red en app normal comprobados en emulador; teléfono físico no probado.
 
 - [Bloquear y desbloquear cuentas](bloqueos-usuarios.md): HU-14.2/RF-23/#44;
   elecciones propias en móvil/web, rechazo SQL de nuevos avisos/avistamientos

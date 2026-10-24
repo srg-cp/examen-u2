@@ -1,3 +1,4 @@
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import 'dart:typed_data';
 import '../../../../core/presentation/state/event_date_time_draft.dart';
 import '../../domain/entities/sighting.dart';
@@ -14,10 +15,12 @@ class SightingState {
     this.dirty = false,
     this.frozen,
     this.receipt,
+    this.submissionStatus,
     this.issue,
     this.fields = const {},
     this.notice = 0,
   });
+  final SubmissionStatus? submissionStatus;
   final String owner, id, comment;
   final EventDateTimeDraft dateTime;
   final SightingPoint? point;
@@ -30,6 +33,10 @@ class SightingState {
   final int notice;
   bool get editable =>
       !busy &&
+      !{
+        SubmissionStatus.pending,
+        SubmissionStatus.sending,
+      }.contains(submissionStatus) &&
       frozen == null &&
       receipt == null &&
       issue != SightingIssue.closed;
@@ -44,8 +51,13 @@ class SightingState {
     SightingDraft? frozen,
     bool unfreeze = false,
     SightingReceipt? receipt,
+    bool clearSubmissionStatus = false,
+    SubmissionStatus? submissionStatus,
     SightingFailure? failure,
   }) => SightingState(
+    submissionStatus: clearSubmissionStatus
+        ? null
+        : submissionStatus ?? this.submissionStatus,
     owner: owner,
     id: id,
     dateTime: dateTime ?? this.dateTime,

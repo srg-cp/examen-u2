@@ -1,3 +1,6 @@
+import '../../../offline_drafts/domain/entities/local_report_draft.dart';
+import '../../../offline_drafts/providers/submission_queue_providers.dart';
+import '../../../offline_drafts/domain/entities/queued_report.dart';
 import 'dart:async';
 import '../../../offline_drafts/providers/local_draft_providers.dart';
 import '../state/found_local_draft.dart';
@@ -24,6 +27,47 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
   bool get communitySearch =>
       ref.read(foundEditorContextProvider).communitySearch;
   int _generation = 0;
+  List<QueuedReport> _queueSnapshot = const [];
+  void _observeQueue(String owner) {
+    _queueSnapshot = const [];
+    final generation = _generation;
+    ref.listen(queuedReportsProvider(owner), (previous, next) {
+      if (generation != _generation || next.isLoading || next.hasError) return;
+      _queueSnapshot = next.asData?.value ?? const [];
+      _applyQueue(generation, owner);
+    });
+  }
+
+  void _applyQueue(int generation, String owner) {
+    if (!_current(generation, owner)) return;
+    final v = state.requireValue;
+    if (v.busy || v.published != null) return;
+    final entry = _queueSnapshot
+        .where((e) => e.command.id == v.draftId)
+        .firstOrNull;
+    if (entry == null) {
+      if (v.submissionStatus != null) {
+        state = AsyncData(v.copyWith(clearSubmissionStatus: true));
+      }
+      return;
+    }
+    final receipt = entry.receipt;
+    if (receipt != null) {
+      state = AsyncData(
+        v.copyWith(
+          stage: FoundStage.confirmed,
+          published: receipt.found,
+          dirty: false,
+          busy: false,
+          submissionStatus: entry.status,
+          clearIssue: true,
+        ),
+      );
+    } else if (v.submissionStatus != entry.status) {
+      state = AsyncData(v.copyWith(submissionStatus: entry.status));
+    }
+  }
+
   Object? _checkpointKey;
   void Function()? _stopObserving;
   String _slot = "";
@@ -34,22 +78,30 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
     }
     final generation = _generation;
     final remove = ref.read(removeLocalDraftProvider);
+    final cancel = ref.read(cancelLocalSubmissionProvider);
     final slot = _slot;
     final keep = ref.keepAlive();
+    state = AsyncData(value.copyWith(busy: true));
     try {
-      if (value.attempted && !await discard()) return false;
+      await cancel(value.ownerId, value.draftId);
+      if (!_current(generation, value.ownerId)) return false;
+      if (value.attempted && !await _performDiscard(alreadyBusy: true)) {
+        return false;
+      }
       if (!_current(generation, value.ownerId)) return false;
       state = AsyncData(state.requireValue.copyWith(busy: true));
       await remove(value.ownerId, slot, value.draftId);
       if (!_current(generation, value.ownerId)) return false;
       ref.invalidateSelf();
       return true;
-    } catch (_) {
+    } catch (error) {
       if (_current(generation, value.ownerId)) {
         state = AsyncData(
           state.requireValue.copyWith(
             busy: false,
-            issue: FoundFailureKind.localStorage,
+            issue: error is SubmissionFailure
+                ? FoundFailureKind.conflict
+                : FoundFailureKind.localStorage,
           ),
         );
       }
@@ -100,6 +152,11 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
     final generation = _generation;
     _stopObserving = listenSelf((previous, next) {
       if (generation != _generation) return;
+      scheduleMicrotask(() {
+        if (ref.mounted) {
+          _applyQueue(generation, next.asData?.value.ownerId ?? '');
+        }
+      });
       final value = next.asData?.value;
       if (next.isLoading || value == null) return;
       final key = foundCheckpointKey(value);
@@ -129,6 +186,7 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
     final context = ref.watch(foundEditorContextProvider);
     _slot = foundDraftSlot(context);
     _observeDraft();
+    _observeQueue(session.userId);
     final local = await ref.read(readLocalDraftProvider)(session.userId, _slot);
     if (local != null) return restoreFoundLocalDraft(local, context);
     final target = context.communitySearch
@@ -166,6 +224,10 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
       v != null &&
       !state.isLoading &&
       !v.busy &&
+      !{
+        SubmissionStatus.pending,
+        SubmissionStatus.sending,
+      }.contains(v.submissionStatus) &&
       v.lockedDraft == null &&
       v.issue != FoundFailureKind.targetClosed &&
       v.stage != FoundStage.confirmed;
@@ -380,14 +442,20 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
         return;
       }
       if (!_current(g, v.ownerId)) return;
-      final published = await ref
-          .read(publishFoundCaseProvider)(v.ownerId, d)
+      final result = await ref
+          .read(dispatchQueuedReportsProvider)
+          .send(
+            foundLocalDraft(state.requireValue, _slot),
+            isCurrent: () => _current(g, v.ownerId),
+            resolveRejected: v.lockedDraft == null,
+          )
           .timeout(
             _operationTimeout,
             onTimeout: () =>
                 throw const FoundFailure(FoundFailureKind.timedOut),
           );
       if (!_current(g, v.ownerId)) return;
+      final published = result.found!;
       state = AsyncData(
         state.requireValue.copyWith(
           busy: false,
@@ -403,7 +471,16 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
           recoveryCaseViewModelProvider((d.targetId!, d.communityTarget)),
         );
       }
-    } catch (e) {
+    } catch (error) {
+      final e = error is LocalDraftFailure
+          ? const FoundFailure(FoundFailureKind.localStorage)
+          : error is SubmissionFailure
+          ? FoundFailure(
+              error.issue == SubmissionIssue.conflict
+                  ? FoundFailureKind.conflict
+                  : FoundFailureKind.unavailable,
+            )
+          : error;
       if (_current(g, v.ownerId)) {
         state = AsyncData(
           state.requireValue.copyWith(
@@ -428,13 +505,22 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
   }
 
   // The frozen request can only be released after the server confirms no active case exists.
-  Future<bool> discard() async {
+  Future<bool> discard() => _performDiscard();
+
+  Future<bool> _performDiscard({bool alreadyBusy = false}) async {
     final v = state.asData?.value;
-    if (v == null || v.busy) return false;
+    if (v == null ||
+        (v.busy && !alreadyBusy) ||
+        v.stage == FoundStage.confirmed) {
+      return false;
+    }
     if (!v.attempted) return true;
+    final cancel = ref.read(cancelLocalSubmissionProvider);
     final g = _generation, keep = ref.keepAlive();
     state = AsyncData(v.copyWith(busy: true, clearIssue: true));
     try {
+      await cancel(v.ownerId, v.draftId);
+      if (!_current(g, v.ownerId)) return false;
       await ref
           .read(discardFoundDraftProvider)(v.ownerId, v.draftId)
           .timeout(
@@ -451,7 +537,11 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
         state = AsyncData(
           state.requireValue.copyWith(
             busy: false,
-            issue: e is FoundFailure ? e.kind : FoundFailureKind.unavailable,
+            issue: e is SubmissionFailure
+                ? FoundFailureKind.conflict
+                : e is FoundFailure
+                ? e.kind
+                : FoundFailureKind.unavailable,
           ),
         );
       }

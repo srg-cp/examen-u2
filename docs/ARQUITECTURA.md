@@ -1,5 +1,22 @@
 # Arquitectura de Entre Huellas
 
+23/10, ADR-134: conflictos deterministas de las tres RPC de cola usan PT409
+en lugar de40001 para evitar reintentos de serialización de PostgREST. Plan037
+actualiza por firma sin alterar ajustes/permisos; adaptadores de perdido y
+encontrado aceptan ambos códigos. Sin migración global de SQLSTATE ni nuevas
+fronteras.038 completa el helper publish_found_case sin ampliar permisos.
+037/038 aplicados por el usuario y6/6 remotas estrictas aprobadas en desarrollo.
+
+23/10, ADR-133: GlassNavigationBar comparte geometría entre los shells de
+entidades y ficha pública. Router compone acciones de guardado, seguimiento y
+bloqueo por slots del panel Compartir ficha, sin imports de UI/data entre features.
+Cada acción conserva su ViewModel y autorización existente; no cambia dominio/SQL.
+
+23/10, ADR-132: `offline_drafts` incorpora cola local esquema2 con dominio/casos
+de uso, transporte por las operaciones existentes, CAS y recibos persistentes.
+App compone lifecycle y cuenta autorizada para sincronización activa; sin imports
+cruzados de data/presentation. [Ficha](funcionalidades/envios-pendientes.md).
+
 23/10, ADR-131: `offline_drafts` conserva formularios Android mediante dominio/casos de uso,
 repositorio y Drift/SQLite privado. Los editores convierten su estado dentro de su
 presentación y colaboran mediante dominio/providers; bootstrap/main inyectan fuentes.

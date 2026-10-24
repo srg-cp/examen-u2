@@ -3,6 +3,10 @@ import '../domain/repositories/local_draft_repository.dart';
 import '../domain/use_cases/local_draft_actions.dart';
 import '../../auth/providers/auth_providers.dart';
 
+final cancelLocalSubmissionProvider = Provider(
+  (ref) => CancelLocalSubmission(ref.watch(localDraftRepositoryProvider)),
+);
+
 final localDraftSessionProvider = StreamProvider.autoDispose(
   (ref) => ref.watch(watchAuthSessionProvider)(),
 );

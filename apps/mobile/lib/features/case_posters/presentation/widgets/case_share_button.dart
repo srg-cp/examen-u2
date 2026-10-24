@@ -9,11 +9,13 @@ class CaseShareButton extends StatefulWidget {
     required this.title,
     required this.eventLabel,
     required this.onReport,
+    this.caseActions = const [],
     super.key,
   });
   final PosterCase target;
   final String title, eventLabel;
   final VoidCallback onReport;
+  final List<Widget> caseActions;
   @override
   State<CaseShareButton> createState() => _CaseShareButtonState();
 }
@@ -42,6 +44,7 @@ class _CaseShareButtonState extends State<CaseShareButton> {
         title: widget.title,
         eventLabel: widget.eventLabel,
         onReport: () => Navigator.of(sheetContext).pop(true),
+        caseActions: widget.caseActions,
       ),
     );
     if (!mounted) return;

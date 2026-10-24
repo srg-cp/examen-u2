@@ -130,8 +130,13 @@ void main() {
       repo.pending = Completer<void>();
       final retry = m.submit();
       await m.submit();
+      await Future<void>.delayed(Duration.zero);
       expect(repo.attempts.length, 2);
-      expect(identical(repo.attempts.last, first), true);
+      expect(repo.attempts.last.id, first.id);
+      expect(repo.attempts.last.observedAt, first.observedAt);
+      expect(repo.attempts.last.comment, first.comment);
+      expect(repo.attempts.last.point.latitude, first.point.latitude);
+      expect(repo.attempts.last.photo, first.photo);
       repo.pending!.complete();
       await retry;
       expect(

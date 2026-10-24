@@ -1,5 +1,23 @@
 # Base de datos de Entre Huellas
 
+Complemento23/10: usuario aplica037 y la prueba real de perdido ya devuelvePT409.
+La comparación interna de búsqueda permanecía en publish_found_case; fuente124/
+plan038 la corrige sin reescribir037. Build-RecoveryNestedBusinessConflictsPatch
+genera patch038/migración20261023003800 y run_all la aplica al final de037.
+Conserva cuerpo restante/settings/grants. Cuatro SQL focalizadas pasan para las
+cuatro funciones. Usuario aplica037/038 y suite remota estricta6/6 aprobada;
+regresión completa posterior a038 aprobada56/56, sin omisiones. Evidencia en ESTADO.
+
+23/10, validación HU-15.2: plan037/fuente123 corrige conflictos deterministas en
+publish_lost_case, prepare_recovery_report y publish_recovery_report:40001→PT409
+para evitar reintentos internos de PostgREST. Requiere018 y cliente Flutter que
+reconozca ambos códigos; web ya reconoce HTTP409. Build-RecoveryBusinessConflictsPatch
+genera patch037/migración20261023003700; Build-RunAll la incorpora al final.
+Sustitución acotada de definiciones por firma, conserva ajustes/ACL/propietario y
+no cambia datos/RLS. Cuatro SQL focalizadas y56/56 de la suite completa pasan;
+aplicación037 confirmada por el usuario y verificada remotamente junto con038.
+No aplicar run_all para actualizar un servidor existente. [ADR-134](../docs/decisiones/134-conflictos-de-publicacion-sin-reintento-postgrest.md).
+
 Bloqueos23/10: HU-14.2/RF-23/#44, plan034/fuentes115–118. Tabla privada/RPC propias
 y triggers de contribuciones nuevas; lock por pareja, CAS y replay. Generar
 Build-UserBlocksPatch/Build-RunAll; patch034 después de033 y036 después de034
