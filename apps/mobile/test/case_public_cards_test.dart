@@ -42,7 +42,7 @@ void main() {
           addTearDown(tester.view.resetDevicePixelRatio);
           addTearDown(tester.view.resetPadding);
           final boundary = GlobalKey();
-          var saved = 0, sightings = 0, backs = 0;
+          var shares = 0, sightings = 0, backs = 0;
           final contacts = FakeContactRepository()
             ..contact = const CaseContact(
               name: 'Lucía Torres',
@@ -72,10 +72,10 @@ void main() {
                 child: CasePublicScreenShell(
                   loading: false,
                   onBack: () => backs++,
-                  trailingAction: GlassNavigationButton(
-                    tooltip: 'Guardar caso',
-                    icon: Icons.bookmark_border_rounded,
-                    onPressed: () => saved++,
+                  shareAction: GlassNavigationButton(
+                    tooltip: 'Compartir ficha',
+                    icon: Icons.ios_share_rounded,
+                    onPressed: () => shares++,
                   ),
                   child: CasePublicCards(
                     contact: const CaseContactPanel(
@@ -139,7 +139,7 @@ void main() {
           expect(find.text('Lucía Torres'), findsOneWidget);
           expect(find.byType(DraggableScrollableSheet), findsNothing);
           expect(find.byType(GlassNavigationButton), findsNWidgets(4));
-          final header = tester.getRect(find.byTooltip('Guardar caso'));
+          final header = tester.getRect(find.byTooltip('Compartir ficha'));
           if (!small) {
             final name = tester.getRect(
               find.byKey(const ValueKey('public-case-photo-name')),
@@ -203,10 +203,10 @@ void main() {
             lessThanOrEqualTo(tester.view.physicalSize.height - 34),
           );
           await tester.tap(action);
-          await tester.tap(find.byTooltip('Guardar caso'));
-          expect(tester.getRect(find.byTooltip('Guardar caso')), header);
+          await tester.tap(find.byTooltip('Compartir ficha'));
+          expect(tester.getRect(find.byTooltip('Compartir ficha')), header);
           await tester.tap(find.byTooltip('Volver'));
-          expect((sightings, saved, backs), (1, 1, 1));
+          expect((sightings, shares, backs), (1, 1, 1));
           expect(tester.takeException(), isNull);
           await _capture(tester, boundary, small, reduced, 'actions');
           semantics.dispose();

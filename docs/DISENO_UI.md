@@ -1,5 +1,17 @@
 # Diseño de la interfaz: implementación y revisión
 
+Corrección23/10, ADR-133: Favoritos/Seguir/Bloquear usan el mismo
+PanelActionButton que Descargar/Denunciar: círculos grises56 con iconos26, sin
+etiqueta visible, tooltip/semántica. Todos bajo el separador; Wrap centra y
+ajusta filas en pantallas pequeñas. Sin glass dentro del panel blanco.
+
+23/10, [ADR-133](decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
+Ficha pública conserva Volver/Compartir; Favoritos/Seguir/Bloquear viven en el
+panel blanco. GlassNavigationBar es responsable de posición segura superior+4,
+márgenes24 y acciones alineadas; compartido por los shells de ficha y entidades.
+Las pantallas consumidoras entregan acciones, sin recolocar botones. No se afirma
+migración global de otros controles glass.
+
 ## Patrón reutilizable aprobado: expansión desde origen
 
 [Guía de uso y revisión](patrones-ui-ux/expansion-desde-origen.md), aprobada

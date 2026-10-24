@@ -12,20 +12,16 @@ class CaseDetailScreen extends ConsumerWidget {
   const CaseDetailScreen({
     required this.id,
     this.recoveryActions,
-    this.savedAction,
     this.contact,
     this.posterAction,
     this.timelineAction,
-    this.followAction,
     this.shareActionBuilder,
     super.key,
   });
-  final Widget? savedAction;
   final Widget? contact;
   final Widget? posterAction;
   final Widget? timelineAction;
-  final Widget? followAction;
-  final Widget Function(String, String)? shareActionBuilder;
+  final Widget Function(String, String, bool)? shareActionBuilder;
   final String id;
   final Widget Function(PublicLostCase, VoidCallback)? recoveryActions;
   @override
@@ -40,13 +36,8 @@ class CaseDetailScreen extends ConsumerWidget {
           ? shareActionBuilder?.call(
               state.requireValue.value!.fields.name,
               'Mascota perdida',
+              true,
             )
-          : null,
-      trailingAction:
-          !state.isLoading &&
-              !state.hasError &&
-              state.asData?.value.value != null
-          ? savedAction
           : null,
       loading: state.isLoading,
       notice: state.hasError
@@ -88,7 +79,6 @@ class CaseDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                     ],
-                    if (followAction != null) followAction!,
                     if (state.requireValue.value!.canResolve &&
                         posterAction != null)
                       posterAction!,

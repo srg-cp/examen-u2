@@ -1,4 +1,12 @@
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/panel_action_button.dart';
 import 'dart:async';
+import 'package:flutter_application_entrehuellas/features/saved_cases/domain/entities/saved_case_ref.dart';
+import 'package:flutter_application_entrehuellas/features/saved_cases/domain/entities/saved_case_mark.dart';
+import 'package:flutter_application_entrehuellas/features/saved_cases/domain/entities/saved_case_page.dart';
+import 'package:flutter_application_entrehuellas/features/saved_cases/domain/repositories/saved_cases_repository.dart';
+import 'package:flutter_application_entrehuellas/features/saved_cases/providers/saved_cases_providers.dart';
+import 'package:flutter_application_entrehuellas/features/saved_cases/presentation/widgets/save_case_button.dart';
+
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -12,7 +20,7 @@ import 'package:http/testing.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/glass_navigation_button.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/entity_screen_shell.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter_application_entrehuellas/features/case_posters/domain/entities/case_poster.dart';
 import 'package:flutter_application_entrehuellas/features/case_posters/domain/entities/case_share.dart';
@@ -77,8 +85,102 @@ class ShareRepositoryFake implements CaseShareRepository {
   }
 }
 
+class SavedRepositoryFake implements SavedCasesRepository {
+  SavedCaseMark mark = const SavedCaseMark(saved: false, version: 0);
+  Completer<void>? pending;
+  int calls = 0;
+  @override
+  Future<SavedCaseMark> read(String owner, SavedCaseRef target) async => mark;
+  @override
+  Future<SavedCasePage> list(String owner, {String? cursor}) async =>
+      SavedCasePage(items: []);
+  @override
+  Future<SavedCaseMark> setSaved(
+    String owner,
+    SavedCaseRef target, {
+    required bool saved,
+    required int expectedVersion,
+  }) async {
+    calls++;
+    expect(expectedVersion, mark.version);
+    await pending?.future;
+    return mark = SavedCaseMark(saved: saved, version: mark.version + 1);
+  }
+}
+
 void main() {
-  testWidgets('Narrow header keeps title below the three glass controls', (
+  testWidgets(
+    'Favorites in sharing panel persist across reopening and prevent double submit',
+    (tester) async {
+      final saved = SavedRepositoryFake();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            savedCasesRepositoryProvider.overrideWithValue(saved),
+            savedCasesSessionProvider.overrideWith(
+              (ref) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+            caseShareRepositoryProvider.overrideWithValue(
+              ShareRepositoryFake(),
+            ),
+            posterSessionProvider.overrideWith(
+              (ref) => Stream.value(const AuthSession(userId: 'a')),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: CasePublicScreenShell(
+              loading: false,
+              onBack: () {},
+              shareAction: CaseShareButton(
+                target: target,
+                title: 'Bruno',
+                eventLabel: 'Mascota perdida',
+                onReport: () {},
+                caseActions: [
+                  SaveCaseButton(
+                    target: SavedCaseRef(
+                      source: SavedCaseSource.lost,
+                      id: target.id,
+                    ),
+                    inPanel: true,
+                  ),
+                ],
+              ),
+              child: const SizedBox(),
+            ),
+          ),
+        ),
+      );
+      expect(find.byTooltip('Añadir a favoritos'), findsNothing);
+      await tester.tap(find.byTooltip('Compartir ficha'));
+      await tester.pumpAndSettle();
+      saved.pending = Completer<void>();
+      await tester.tap(find.byTooltip('Añadir a favoritos'));
+      await tester.pump();
+      await tester.tap(find.byTooltip('Añadir a favoritos'));
+      expect(saved.calls, 1);
+      saved.pending!.complete();
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Quitar de favoritos'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Compartir ficha'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Quitar de favoritos'), findsOneWidget);
+      saved.pending = null;
+      await tester.tap(find.byTooltip('Quitar de favoritos'));
+      await tester.pumpAndSettle();
+      expect(saved.mark.saved, false);
+      expect(saved.calls, 2);
+      expect(find.byTooltip('Añadir a favoritos'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Narrow header keeps title below the two glass controls', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(360, 740);
@@ -91,10 +193,6 @@ void main() {
         home: CasePublicScreenShell(
           loading: false,
           onBack: () {},
-          trailingAction: GlassNavigationButton(
-            tooltip: 'Guardar caso',
-            onPressed: () {},
-          ),
           shareAction: CaseShareButton(
             target: target,
             title: 'Bruno',
@@ -111,6 +209,41 @@ void main() {
     expect(titleRect.top, greaterThan(shareRect.bottom));
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'Public and entity headers share geometry including safe insets',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = const FakeViewPadding(top: 24);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPadding);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: EntityScreenShell(
+            loading: false,
+            onBack: () {},
+            child: const SizedBox(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final expected = tester.getRect(find.byTooltip('Volver'));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CasePublicScreenShell(
+            loading: false,
+            onBack: () {},
+            child: const SizedBox(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.getRect(find.byTooltip('Volver')), expected);
+      expect(expected.top, 28);
+      expect(expected.left, 24);
+    },
+  );
   test(
     'Sharing uses only the opaque public URL; PDF and handoff revalidate current revision',
     () async {
@@ -250,7 +383,7 @@ void main() {
           addTearDown(tester.view.resetDevicePixelRatio);
           final repo = ShareRepositoryFake();
           var reports = 0;
-          var saves = 0;
+          var saves = 0, follows = 0, blocks = 0;
           final boundary = GlobalKey();
           await tester.pumpWidget(
             ProviderScope(
@@ -273,16 +406,28 @@ void main() {
                 home: CasePublicScreenShell(
                   loading: false,
                   onBack: () {},
-                  trailingAction: GlassNavigationButton(
-                    tooltip: 'Guardar caso',
-                    icon: Icons.bookmark_border_rounded,
-                    onPressed: () => saves++,
-                  ),
                   shareAction: CaseShareButton(
                     target: target,
                     title: 'Bruno',
                     eventLabel: 'Mascota perdida',
                     onReport: () => reports++,
+                    caseActions: [
+                      PanelActionButton(
+                        onPressed: () => saves++,
+                        icon: Icons.bookmark_border_rounded,
+                        label: 'Añadir a favoritos',
+                      ),
+                      PanelActionButton(
+                        onPressed: () => follows++,
+                        icon: Icons.notifications_none_rounded,
+                        label: 'Seguir caso',
+                      ),
+                      PanelActionButton(
+                        onPressed: () => blocks++,
+                        icon: Icons.block_rounded,
+                        label: 'Bloquear cuenta del reportante',
+                      ),
+                    ],
                   ),
                   child: CasePublicCards(
                     name: 'Bruno',
@@ -324,9 +469,17 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          final saveRect = tester.getRect(find.byTooltip('Guardar caso'));
+          expect(find.byTooltip('Añadir a favoritos'), findsNothing);
+          expect(find.byTooltip('Seguir caso'), findsNothing);
+          expect(
+            find.byTooltip('Bloquear cuenta del reportante'),
+            findsNothing,
+          );
           final shareRect = tester.getRect(find.byTooltip('Compartir ficha'));
-          expect(shareRect.right, lessThan(saveRect.left));
+          final backRect = tester.getRect(find.byTooltip('Volver'));
+          expect(backRect.left, 24);
+          expect(shareRect.right, tester.view.physicalSize.width - 24);
+          expect(backRect.top, shareRect.top);
           await tester.tap(find.byTooltip('Compartir ficha'));
           await tester.pumpAndSettle();
           expect(find.byType(CaseShareSheet), findsOneWidget);
@@ -400,9 +553,21 @@ void main() {
           );
           await tester.pumpAndSettle();
           expect(find.byType(CaseShareSheet), findsNothing);
-          await tester.tap(find.byTooltip('Guardar caso'));
-          expect(saves, 1);
-          expect(tester.getRect(find.byTooltip('Guardar caso')), saveRect);
+          expect(tester.getRect(find.byTooltip('Compartir ficha')), shareRect);
+          await tester.tap(find.byTooltip('Compartir ficha'));
+          await tester.pumpAndSettle();
+          for (final label in [
+            'Añadir a favoritos',
+            'Seguir caso',
+            'Bloquear cuenta del reportante',
+          ]) {
+            await tester.ensureVisible(find.byTooltip(label));
+            await tester.pumpAndSettle();
+            await tester.tap(find.byTooltip(label));
+          }
+          expect((saves, follows, blocks), (1, 1, 1));
+          await tester.binding.handlePopRoute();
+          await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
         },
       );

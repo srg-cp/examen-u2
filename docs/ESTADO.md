@@ -1,5 +1,60 @@
 # Estado del proyecto
 
+## Corrección visual del panel Compartir ficha —23/10/2026
+
+El usuario precisa que Favoritos, Seguir y Bloquear deben tener el mismo diseño
+que Descargar/Denunciar. Se sustituyen las filas de texto del incremento anterior
+por círculos grises56/iconos26, todos debajo del separador del panel. Un único
+PanelActionButton comparte diseño, tooltip/semántica y estado deshabilitado.
+Wrap centra las cinco acciones y adapta filas en pantallas estrechas. Los
+reintentos de bloqueo también mantienen formato circular; confirmación, guardado,
+seguimiento y lógica de permisos existentes conservados. El modo de icono se
+activa únicamente en el panel de ficha; otras entradas mantienen sus etiquetas.
+
+Validación:43/43 pruebas focalizadas de compartir, notificaciones, bloqueos y
+arquitectura, con movimiento ambiental desactivado; incluye guardado real con
+reapertura/doble envío, cuatro combinaciones de tamaño/movimiento y acciones por
+tooltip. Renders390×844 y320×350/texto200% revisados. Análisis Flutter sin incidencias y diff sin errores de espacio. Logs locales
+`apps/mobile/build/public-actions-icons-{tests,analyze}.log`.
+Pendiente revisión en Android real; sin APK, despliegue ni cambios SQL.
+
+
+## Ficha pública: acciones y navegación glass —23/10/2026
+
+Por instrucción del usuario, Favoritos, Seguir caso/Dejar de seguir y
+Bloquear/Desbloquear se trasladan al panel blanco «Compartir ficha».
+Cabecera con Volver/Compartir únicamente. El problema venía de offsets propios
+laterales8 de la ficha frente a24 del shell habitual, además del espacio reservado
+para Guardar. GlassNavigationBar concentra posición segura superior+4 y márgenes
+simétricos24; CasePublicScreenShell y EntityScreenShell la reutilizan.
+
+Router compone widgets existentes por slots del panel, sin imports cruzados de
+presentación. Favoritos ofrece texto y conserva ViewModel/semántica de selección,
+shimmer, reintento y bloqueo de doble envío. Seguimiento conserva su elegibilidad
+por tipo de caso; bloqueo mantiene confirmación y refresco de contactos. Contacto
+permanece en el cuerpo. Se conservan los dos recorridos de avistamiento: la tarea
+actual no pide modificarlos. Sin cambios de dominio, SQL, QR o web ni despliegue.
+Rama `feature/offline-submission-queue`, árbol inicialmente limpio.
+
+Validación: **65/65 pruebas focalizadas** (compartir, tarjetas públicas, cargas,
+contactos, transiciones de creación, notificaciones, bloqueos y arquitectura) con
+`--dart-define=AMBIENT_BACKGROUND_MOTION=false`. Añadida después una prueba real
+de Favoritos en el panel: guardar/quitar, doble envío y releer al reabrir; suite
+final de compartir **10/10**, total66 pruebas distintas verificadas. Análisis
+Flutter sin incidencias. Geometría comparada entre shells con inset24, estabilidad
+al scroll y panel normal/reducido; renders390×844 y320×350/texto200% revisados,
+acciones alcanzables por scroll. Formato aplicado y diff sin errores de espacio.
+Logs: `apps/mobile/build/public-actions-{tests,analyze,sharing-final}.log`;
+renders: `apps/mobile/build/ui-preview/{case-sharing,public-cards}`.
+
+Decisión [ADR-133](decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md),
+[ficha pública](funcionalidades/ficha-publica-mobile.md) y
+[panel](funcionalidades/compartir-ficha.md) actualizados. Pendiente revisión física
+Android y aprobación visual del usuario. No se generó/instaló APK ni se auditó la
+posición de todos los controles de la app. Siguiente paso: revisar esta ficha
+en dispositivo con datos reales y comprobar servicios/contacto tras bloqueo.
+
+
 ## HU-15.2: cola persistente y reintentos —23/10/2026
 
 Por autorización «ok siguiente», implementado el incremento local de

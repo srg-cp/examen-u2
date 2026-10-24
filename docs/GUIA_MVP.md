@@ -408,6 +408,11 @@ Implementa S3: HU-05 a HU-07 de docs/GUIA_MVP.md. Usa repositorios, Supabase y P
 
 ### S4 - Cartel, QR y avistamientos
 
+23/10, refinamiento explícito de ficha pública, ADR-133: Favoritos, Seguir caso y
+Bloquear pasan al panel Compartir ficha. Cabecera Volver/Compartir con geometría
+compartida con entidades. Sin cambios de permisos/datos ni cierre de historias;
+no se retiran los recorridos de avistamiento discutidos sin instrucción de cambio.
+
 Ampliación explícita20/10 de HU-07/HU-08, RF-08/13/37: Compartir ficha abre panel blanco sin X; copiar enlace, WhatsApp, Facebook y PDF público por lectores autorizados de búsquedas activas. Denunciar reutiliza el formulario existente. RPC prepare_case_share/plan032, sin otorgar permisos de autor o modificar el contrato QR. Activación remota y prueba de aplicaciones Android pendientes; ADR-115. Sin issue nuevo ni cierre de historias.
 
 

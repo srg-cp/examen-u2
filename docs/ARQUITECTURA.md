@@ -1,5 +1,10 @@
 # Arquitectura de Entre Huellas
 
+23/10, ADR-133: GlassNavigationBar comparte geometría entre los shells de
+entidades y ficha pública. Router compone acciones de guardado, seguimiento y
+bloqueo por slots del panel Compartir ficha, sin imports de UI/data entre features.
+Cada acción conserva su ViewModel y autorización existente; no cambia dominio/SQL.
+
 23/10, ADR-132: `offline_drafts` incorpora cola local esquema2 con dominio/casos
 de uso, transporte por las operaciones existentes, CAS y recibos persistentes.
 App compone lifecycle y cuenta autorizada para sincronización activa; sin imports

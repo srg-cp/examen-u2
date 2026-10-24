@@ -1,5 +1,23 @@
 # Ficha pública móvil por tarjetas glass
 
+23/10, por instrucción del usuario, [ADR-133](../decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
+la cabecera conserva únicamente Volver y Compartir. Favoritos, Seguir/Dejar de
+seguir y Bloquear/Desbloquear pasan al panel «Compartir ficha», junto a Descargar/Denunciar: círculos grises56, iconos26, sin texto visible,
+con tooltip y semántica. Wrap centra los controles y permite varias filas. Las opciones mantienen
+sus ViewModels, permisos, confirmaciones, shimmer, toast y reintentos. Seguir
+conserva su disponibilidad anterior por tipo de caso y bloqueo no se ofrece
+contra la propia cuenta. El contacto permanece en el cuerpo de la ficha.
+
+GlassNavigationBar concentra el inset superior seguro +4 y márgenes simétricos24,
+fuera del scroll; lo consumen CasePublicScreenShell y EntityScreenShell. Se retira
+el hueco de Guardar en cabecera. Esto sustituye las notas anteriores de tres
+controles; no implica migración de todas las pantallas ni cambios en QR/web.
+Composición por slots desde router, sin imports de presentación entre features.
+No cambia SQL, persistencia, privacidad ni los dos recorridos de avistamiento.
+
+Validación de este incremento y límites en [ESTADO](../ESTADO.md). Pendiente
+revisión en dispositivo Android y aprobación visual del usuario.
+
 Compartir20/10, ADR-115: acceso junto a Guardar, con [panel blanco sin X](compartir-ficha.md). Denunciar se traslada al icono del panel; las demás operaciones del cuerpo permanecen. Descargar usa el PDF público existente; enlaces públicos de búsquedas activas por RPC nueva032. Título en fila propia bajo380px o con texto ampliado para reservar los tres controles.
 
 Refinamiento20/10 por corrección visual del usuario: etiqueta del caso a la derecha del nombre y centrada verticalmente en la misma fila; puntos de galería centrados debajo. Con texto ampliado o etiqueta larga se apilan y la foto crece. Tarjetas y controles de contacto usan GlassSurfaceFinish.frosted (ribete blanco único, sombra suave y tono perla/celeste traslúcido), sin doble borde oscuro ni relleno gris adicional. Volver/guardar e ImmersivePhotoSheet conservan su acabado. Renders comparados con el mockup; ver validación en ESTADO.

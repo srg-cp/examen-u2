@@ -2,9 +2,8 @@ import '../../theme/app_typography.dart';
 import 'app_scaffold.dart';
 import 'scroll_safe_area.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'cover_reveal.dart';
-import 'glass_navigation_button.dart';
+import 'glass_navigation_bar.dart';
 import 'stagger_reveal.dart';
 
 class EntityScreenShell extends StatefulWidget {
@@ -72,25 +71,12 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
             fit: StackFit.expand,
             children: [
               _content(context),
-              Positioned(
-                top: MediaQuery.paddingOf(context).top + 4,
-                left: 24,
-                child: GlassNavigationButton(
-                  tooltip: widget.navigationTooltip,
-                  onPressed: !widget.navigationEnabled
-                      ? null
-                      : widget.onBack ??
-                            () => context.canPop()
-                                ? context.pop()
-                                : context.go('/home'),
-                ),
+              GlassNavigationBar(
+                tooltip: widget.navigationTooltip,
+                enabled: widget.navigationEnabled,
+                onBack: widget.onBack,
+                trailing: widget.trailingAction,
               ),
-              if (widget.trailingAction != null)
-                Positioned(
-                  top: MediaQuery.paddingOf(context).top + 4,
-                  right: 24,
-                  child: widget.trailingAction!,
-                ),
             ],
           ),
         ),

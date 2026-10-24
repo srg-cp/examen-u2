@@ -1,5 +1,23 @@
 # Compartir ficha pública
 
+23/10, por instrucción del usuario, [ADR-133](../decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
+la cabecera conserva únicamente Volver y Compartir. Favoritos, Seguir/Dejar de
+seguir y Bloquear/Desbloquear pasan al panel «Compartir ficha», junto a Descargar/Denunciar: círculos grises56, iconos26, sin texto visible,
+con tooltip y semántica. Wrap centra los controles y permite varias filas. Las opciones mantienen
+sus ViewModels, permisos, confirmaciones, shimmer, toast y reintentos. Seguir
+conserva su disponibilidad anterior por tipo de caso y bloqueo no se ofrece
+contra la propia cuenta. El contacto permanece en el cuerpo de la ficha.
+
+GlassNavigationBar concentra el inset superior seguro +4 y márgenes simétricos24,
+fuera del scroll; lo consumen CasePublicScreenShell y EntityScreenShell. Se retira
+el hueco de Guardar en cabecera. Esto sustituye las notas anteriores de tres
+controles; no implica migración de todas las pantallas ni cambios en QR/web.
+Composición por slots desde router, sin imports de presentación entre features.
+No cambia SQL, persistencia, privacidad ni los dos recorridos de avistamiento.
+
+Validación de este incremento y límites en [ESTADO](../ESTADO.md). Pendiente
+revisión en dispositivo Android y aprobación visual del usuario.
+
 Implementado localmente20/10 según [ADR-115](../decisiones/115-panel-compartir-ficha-publica.md).
 Ampliación explícita de HU-07/HU-08 y RF-08/13/37; sin issue nuevo ni cierre de historia.
 
