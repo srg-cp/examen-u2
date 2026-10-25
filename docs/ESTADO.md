@@ -1,5 +1,23 @@
 # Estado del proyecto
 
+## Aplicación de039 confirmada por el usuario —24/10/2026
+
+El usuario confirma ejecución completa del patch039 en Supabase de desarrollo.
+Se registra como confirmación, sin afirmar comprobación remota por el agente.
+El patch no asigna administradores. Pendientes: identificar/asignar una cuenta
+autorizada, comprobar roles y conteos alojados, publicar rama y revisar/integrar
+con CI. #50/#16 siguen abiertas; no se repite039 por esta confirmación.
+
+## Commit local de HU-16.1 observado al terminar —24/10/2026
+
+El workspace ya contiene commit local6d43a21, con estadísticas y documentación;
+árbol limpio al comprobarlo, sin rama remota ni PR de pilot-statistics. Esta
+observación sustituye «sin commit» de las notas del incremento. La regresión SQL
+final pasó58/58; permanecen89/89 web,33/33 servidor, typecheck/build y Chrome
+aprobados. El agente no ejecutó ese commit ni publica otro por este seguimiento.
+Activación039, cuenta administradora explícita, demo alojada e integración
+siguen pendientes. #50/#16 permanecen abiertas; no se inicia #51.
+
 ## HU-15 cerrada; HU-16.1 implementada localmente —24/10/2026
 
 Por autorización del usuario se continúa desde la rama offline. PR

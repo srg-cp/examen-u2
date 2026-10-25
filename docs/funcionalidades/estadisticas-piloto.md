@@ -2,6 +2,8 @@
 
 HU-16.1 / RF-35 / [#50](https://github.com/srg-cp/entrehuellas/issues/50).
 Implementación local en `feature/pilot-statistics`; historia abierta.
+24/10: el usuario confirma ejecución completa de039 en desarrollo; asignación
+administrador y validación alojada siguen pendientes. No se reaplica el patch.
 [ADR-136](../decisiones/136-estadisticas-agregadas-y-permiso-administrador.md).
 
 ## Qué hace y recorrido
