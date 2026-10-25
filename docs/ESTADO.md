@@ -1,5 +1,12 @@
 # Estado del proyecto
 
+## Cabecera del README corregida —25/10/2026
+
+El aviso de coincidencias había quedado dentro del bloque HTML centrado, antes
+del icono, mezclando texto e imagen en GitHub. Se traslada a Sobre el proyecto
+para conservar la cabecera y se precisa la confirmación del patch040 y los
+pendientes reales. Cambio documental; revisión de estructura y diff sin errores.
+
 ## Publicación de rama autorizada —25/10/2026
 
 El usuario solicita commit y push de `feature/case-matching`. Se prepara el
