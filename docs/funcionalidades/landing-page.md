@@ -69,8 +69,13 @@ con `node scripts/optimize-landing-images.mjs` tras cambiar PNG. El script verif
 alfa y RGB visibles: 27.134.705 →15.165.652 bytes (−44,1 %), sin contar repeticiones
 ni caché. No equivale a medir Core Web Vitals reales.
 
-Activación actual: `NUXT_PUBLIC_SITE_URL=https://entrehuellas.kormind.com`.
-No apuntar todavía a entrehuellas.app, que el usuario planea adquirir. Al migrar:
+Dominio público vigente (24/10/2026): `https://entrehuellas.app`.
+El código y los ejemplos usan esta base; en Dokploy configurar también
+`NUXT_PUBLIC_SITE_URL=https://entrehuellas.app` y
+`PUBLIC_WEB_ORIGIN=https://entrehuellas.app`. El usuario confirma compra,
+Cloudflare activo y Resend verificado; no equivale a validar el despliegue desde
+este checkout. Supabase e infraestructura conservan sus dominios en kormind.com.
+Para completar la migración:
 
 1. Adquirir/configurar DNS y HTTPS del dominio nuevo y comprobar la aplicación.
 2. Cambiar NUXT_PUBLIC_SITE_URL y PUBLIC_WEB_ORIGIN a https://entrehuellas.app
@@ -89,7 +94,10 @@ No apuntar todavía a entrehuellas.app, que el usuario planea adquirir. Al migra
 
 Validación: SSR/metadatos/JSON-LD/CSP/imagen, cambio de dominio en runtime y
 cabeceras ajenas; QR/privadas siguen noindex. Resultados finales en ESTADO.
-Publicación, Search Console, migración y métricas reales pendientes.
+24/10: el usuario confirma propiedad verificada en Search Console. Código local
+migrado:83/83 pruebas web, typecheck/build,31/31 pruebas de servidor y7/7 de
+producción tras añadir la regresión del origen nuevo/anterior. Despliegue de
+esta revisión, redirecciones, revisión de marca OAuth y métricas reales pendientes.
 
 Referencias: [nombres de sitio](https://developers.google.com/search/docs/appearance/site-names),
 [títulos](https://developers.google.com/search/docs/appearance/title-link),

@@ -10,8 +10,10 @@ class SavedCaseListState {
     this.failed = false,
     this.notice,
     this.noticeId = 0,
+    this.offline = false,
   }) : items = List.unmodifiable(items);
   final String owner;
+  final bool offline;
   final List<PublicCaseCard> items;
   final String? cursor, notice;
   final bool refreshing, appending, failed;

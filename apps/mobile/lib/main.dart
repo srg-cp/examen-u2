@@ -1,3 +1,7 @@
+import 'features/offline_cases/data/data_sources/open_case_cache_database_stub.dart'
+    if (dart.library.io) 'features/offline_cases/data/data_sources/open_case_cache_database.dart';
+import 'features/offline_cases/data/repositories/case_cache_repository_impl.dart';
+import 'features/offline_cases/providers/case_cache_providers.dart';
 import 'features/offline_drafts/data/repositories/local_draft_repository_impl.dart';
 import 'features/offline_drafts/data/data_sources/open_local_draft_database_stub.dart'
     if (dart.library.io) 'features/offline_drafts/data/data_sources/open_local_draft_database.dart';
@@ -38,6 +42,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        caseCacheRepositoryProvider.overrideWithValue(
+          CaseCacheRepositoryImpl(openCaseCacheDatabase()),
+        ),
         localDraftRepositoryProvider.overrideWithValue(
           LocalDraftRepositoryImpl(openLocalDraftDatabase()),
         ),

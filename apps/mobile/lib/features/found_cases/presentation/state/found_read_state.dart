@@ -23,9 +23,13 @@ class PublicFoundState {
   const PublicFoundState({
     required this.ownerId,
     required this.value,
+    this.cachedAt,
+    this.storageFailed = false,
     this.refreshing = false,
     this.refreshFailed = false,
   });
+  final DateTime? cachedAt;
+  final bool storageFailed;
   final String? ownerId;
   final PublicFoundCase? value;
   final bool refreshing, refreshFailed;

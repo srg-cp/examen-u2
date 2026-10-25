@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
+    <exclude domain="file" path="case_cache.sqlite" />
+    <exclude domain="file" path="case_cache.sqlite-journal" />
+    <exclude domain="file" path="case_cache.sqlite-wal" />
+    <exclude domain="file" path="case_cache.sqlite-shm" />
     <exclude domain="file" path="report_drafts.sqlite" />
     <exclude domain="file" path="report_drafts.sqlite-journal" />
     <exclude domain="file" path="report_drafts.sqlite-wal" />

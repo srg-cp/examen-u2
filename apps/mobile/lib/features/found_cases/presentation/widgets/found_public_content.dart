@@ -20,16 +20,19 @@ class FoundPublicContent extends StatelessWidget {
     required this.value,
     this.actions,
     this.contact,
+    this.offline = false,
     this.localPhotos = const {},
     super.key,
   });
   final PublicFoundCase value;
   final Widget? actions;
   final Widget? contact;
+  final bool offline;
   final Map<String, Uint8List> localPhotos;
   @override
   Widget build(BuildContext context) => CasePublicCards(
     key: ValueKey(value.id),
+    offline: offline,
     name: value.speciesDetail ?? foundSpeciesLabel(value.species),
     eventLabel: value.status != 'active'
         ? 'Reporte cerrado'

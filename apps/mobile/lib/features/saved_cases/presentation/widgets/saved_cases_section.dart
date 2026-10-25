@@ -44,7 +44,19 @@ class SavedCasesSection extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (data.items.isEmpty && !data.failed)
+                    const SizedBox(height: 24),
+                    Text(
+                      'Favoritos de tu cuenta',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (data.offline)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          'Conéctate para consultar tus favoritos actuales. Las copias de este dispositivo están disponibles arriba.',
+                        ),
+                      ),
+                    if (data.items.isEmpty && !data.failed && !data.offline)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Text(
@@ -74,7 +86,7 @@ class SavedCasesSection extends ConsumerWidget {
                               }
                             },
                     ),
-                    if (data.failed)
+                    if (data.failed || data.offline)
                       TextButton(
                         onPressed: data.busy ? null : model.retry,
                         child: const Text('Reintentar'),

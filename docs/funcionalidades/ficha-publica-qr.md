@@ -1,5 +1,13 @@
 # Ficha pública QR
 
+24/10/2026: dominio público actualizado a `https://entrehuellas.app`. Los
+endpoints de Supabase y la infraestructura se conservan. Código/configuración
+local actualizados; despliegue, retorno OAuth, envío de correo y escaneo de QR
+en producción pendientes de comprobación. Los QR/PDF ya distribuidos con el
+subdominio anterior necesitan mantener ese host o una redirección de navegación
+a la misma ruta y parámetros; el código no regenera documentos existentes.
+
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y
@@ -47,7 +55,7 @@ integración HU-10.1 y validación/activación remota pendientes.
 
 ## Recorrido y campos
 
-El QR de HU-08 abre `https://entrehuellas.kormind.com/c/<token>` sin instalar
+El QR de HU-08 abre `https://entrehuellas.app/c/<token>` sin instalar
 la app ni iniciar sesión. Activo:1–3 fotos procesadas seleccionadas, nombre
 cuando existe, especie/detalle/tamaño/sexo disponibles, rasgos, fecha,
 zona pública aproximada y estado. Galería glass, compartir/copia real y

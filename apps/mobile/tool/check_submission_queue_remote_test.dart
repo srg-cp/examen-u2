@@ -166,8 +166,7 @@ void main() {
         b,
         webFault,
         ImagePicker(),
-        config['PUBLIC_CASE_WEB_URL'] as String? ??
-            'https://entrehuellas.kormind.com',
+        config['PUBLIC_CASE_WEB_URL'] as String? ?? 'https://entrehuellas.app',
       ),
     );
     transportB = SubmissionTransport(
@@ -183,8 +182,7 @@ void main() {
         a,
         webFault,
         ImagePicker(),
-        config['PUBLIC_CASE_WEB_URL'] as String? ??
-            'https://entrehuellas.kormind.com',
+        config['PUBLIC_CASE_WEB_URL'] as String? ?? 'https://entrehuellas.app',
       ),
     );
     transport = SubmissionTransport(

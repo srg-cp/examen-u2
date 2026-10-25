@@ -1,5 +1,12 @@
 # Arquitectura de Entre Huellas
 
+24/10, ADR-135: `offline_cases` aporta contrato/casos de uso de consulta y caché,
+SQLite privado separado y DTO con lista de campos públicos. ViewModels existentes
+consumen el caso de uso; main inyecta y router compone Consultados mediante slot
+de Guardados. Fallback solo por indisponibilidad, invalidación por respuesta del
+servidor y separación por cuenta; fotos locales sin URLs/permisos/contactos.
+[Ficha y validación](funcionalidades/fichas-sin-conexion.md).
+
 23/10, ADR-134: conflictos deterministas de las tres RPC de cola usan PT409
 en lugar de40001 para evitar reintentos de serialización de PostgREST. Plan037
 actualiza por firma sin alterar ajustes/permisos; adaptadores de perdido y

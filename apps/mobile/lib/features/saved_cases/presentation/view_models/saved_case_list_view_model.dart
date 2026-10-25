@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/failures/saved_case_failure.dart';
 import '../../providers/saved_cases_providers.dart';
 import '../state/saved_case_list_state.dart';
+import '../../../offline_cases/providers/case_cache_providers.dart';
 
 final savedCaseListViewModelProvider =
     AsyncNotifierProvider.autoDispose<
@@ -20,12 +21,25 @@ class SavedCaseListViewModel extends AsyncNotifier<SavedCaseListState> {
     if (session == null) {
       throw const SavedCaseFailure(SavedCaseFailureKind.forbidden);
     }
-    final page = await ref.read(listSavedCasesProvider)(session.userId);
-    return SavedCaseListState(
-      owner: session.userId,
-      items: page.items,
-      cursor: page.cursor,
-    );
+    try {
+      final page = await ref.read(listSavedCasesProvider)(session.userId);
+      return SavedCaseListState(
+        owner: session.userId,
+        items: page.items,
+        cursor: page.cursor,
+      );
+    } on SavedCaseFailure catch (error) {
+      if (error.kind != SavedCaseFailureKind.unavailable) rethrow;
+      final local = await ref
+          .read(listCachedCasesProvider)
+          ?.call(session.userId);
+      if (local == null || local.isEmpty) rethrow;
+      return SavedCaseListState(
+        owner: session.userId,
+        items: const [],
+        offline: true,
+      );
+    }
   }
 
   Future<void> refresh() async {
@@ -55,6 +69,7 @@ class SavedCaseListViewModel extends AsyncNotifier<SavedCaseListState> {
         refreshing: !append,
         appending: append,
         noticeId: old.noticeId,
+        offline: old.offline,
       ),
     );
     try {
@@ -89,6 +104,7 @@ class SavedCaseListViewModel extends AsyncNotifier<SavedCaseListState> {
           items: old.items,
           cursor: old.cursor,
           failed: true,
+          offline: old.offline,
           notice:
               'No pudimos consultar tus casos guardados. Puedes reintentar.',
           noticeId: old.noticeId + 1,

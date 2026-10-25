@@ -1,3 +1,4 @@
+import '../features/offline_cases/presentation/widgets/cached_cases_section.dart';
 import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
 import '../features/user_blocks/presentation/screens/user_blocks_screen.dart';
@@ -272,7 +273,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               context: context,
               key: state.pageKey,
               source: state.extra,
-              child: const SavedCasesScreen(),
+              child: const SavedCasesScreen(offlineCases: CachedCasesSection()),
             ),
           ),
           GoRoute(

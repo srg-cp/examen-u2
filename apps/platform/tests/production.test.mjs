@@ -45,16 +45,28 @@ test('Public submission accepts no session, enforces origin/validation, cleans e
   assert.equal((await send({ ...draft, id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' })).status, 409);
   assert.equal(server.sightings(), 1);
 });
+test('Production default origin accepts the new public domain and rejects the previous one', async t => {
+  const server = await productionFixture(undefined, { env: { PUBLIC_WEB_ORIGIN: '' } }); t.after(server.close);
+  const send = origin => {
+    const body = new FormData();
+    body.set('report', JSON.stringify({ id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', observedAt: '2100-01-01T00:00:00.000Z', point: null, comment: '' }));
+    return fetch(`${server.origin}/api/c/${slug}/sightings`, { method: 'POST', headers: { Origin: origin }, body });
+  };
+  assert.equal((await send('https://entrehuellas.kormind.com')).status, 403);
+  assert.equal((await send('https://entrehuellas.app')).status, 400, 'New origin reaches report validation');
+  assert.equal(server.sightings(), 0);
+});
+
 test('Landing SSR is public, works without product requests and keeps crawler policy separate from QR', async t => {
   const server = await productionFixture(); t.after(server.close);
   const response = await fetch(server.origin + '/'); const html = await response.text();
   assert.equal(response.status, 200); assert.equal(response.headers.get('x-robots-tag'), 'index, follow');
   assert.match(html, /Más huellas juntas/); assert.match(html, /<title>Entre Huellas/); assert.match(html, /name="description"/);
   assert.equal((html.match(/<details[\s>]/g) || []).length, 4);
-  assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.kormind.com\/"/);
+  assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.app\/"/);
   assert.match(html, /<title>Entre Huellas \| Mascotas perdidas y encontradas<\/title>/);
   assert.match(html, /property="og:site_name" content="Entre Huellas"/);
-  assert.match(html, /property="og:url" content="https:\/\/entrehuellas.kormind.com\/"/);
+  assert.match(html, /property="og:url" content="https:\/\/entrehuellas.app\/"/);
   assert.match(html, /name="twitter:card" content="summary_large_image"/);
   assert.equal((html.match(/<h1[\s>]/g) || []).length, 1);
   const schemaTag = html.match(/<script\b([^>]*type="application\/ld\+json"[^>]*)>([\s\S]*?)<\/script>/);
@@ -75,19 +87,19 @@ test('Landing SSR is public, works without product requests and keeps crawler po
 });
 
 test('SEO domain changes at runtime consistently and ignores request Host overrides', async t => {
-  const origin = 'https://entrehuellas.app';
+  const origin = 'https://public.example.org';
   const server = await productionFixture(undefined, { env: { NUXT_PUBLIC_SITE_URL: origin } }); t.after(server.close);
   const html = await (await fetch(server.origin + '/?utm_source=community', { headers: { 'X-Forwarded-Host': 'attacker.example' } })).text();
-  assert.match(html, /rel="canonical" href="https:\/\/entrehuellas.app\/"/);
-  assert.match(html, /property="og:url" content="https:\/\/entrehuellas.app\/"/);
-  assert.match(html, /property="og:image" content="https:\/\/entrehuellas.app\/images\/landing\/social-reunion.jpg"/);
+  assert.match(html, /rel="canonical" href="https:\/\/public.example.org\/"/);
+  assert.match(html, /property="og:url" content="https:\/\/public.example.org\/"/);
+  assert.match(html, /property="og:image" content="https:\/\/public.example.org\/images\/landing\/social-reunion.jpg"/);
   const schema = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1]);
   for (const item of schema['@graph']) assert.equal(item.url, origin + '/');
   const robots = await (await fetch(server.origin + '/robots.txt')).text();
   const sitemap = await (await fetch(server.origin + '/sitemap.xml')).text();
   assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
   assert.ok(sitemap.includes(`<loc>${origin}/</loc>`));
-  assert.doesNotMatch(html + robots + sitemap, /entrehuellas\.kormind\.com|attacker\.example/);
+  assert.doesNotMatch(html + robots + sitemap, /entrehuellas\.app|entrehuellas\.kormind\.com|attacker\.example/);
   for (const path of ['/iniciar-sesion', '/privacidad', '/terminos', '/c/unknown']) {
     assert.match((await fetch(server.origin + path)).headers.get('x-robots-tag'), /noindex/);
   }

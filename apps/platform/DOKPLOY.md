@@ -1,4 +1,16 @@
-# Despliegue GitHub → Dokploy → entrehuellas.kormind.com
+# Despliegue GitHub → Dokploy → entrehuellas.app
+
+## Dominio público vigente —24/10/2026
+
+Configurar en Environment `PUBLIC_WEB_ORIGIN=https://entrehuellas.app` y
+`NUXT_PUBLIC_SITE_URL=https://entrehuellas.app`, guardar y redesplegar esta
+revisión. Conservar SUPABASE_URL y los hosts de infraestructura existentes.
+En Android, usar `PUBLIC_CASE_WEB_URL=https://entrehuellas.app` en la
+configuración de compilación; las APK anteriores conservan sus valores.
+Mantener operativo el host público anterior para QR distribuidos; preparar en
+el proxy una redirección permanente de navegación que preserve ruta/parámetros,
+sin reproducir POST. Comprobar login, recuperación, OAuth, /health, sitemap y QR.
+No se han modificado remotamente Dokploy, Supabase ni redirecciones.
 
 ## Activación de moderación HU-14.3
 
@@ -16,7 +28,7 @@ despliega administración móvil ni se activa Firebase/FCM.
 HU-10.1,18/10: la rama local `feature/public-web-sighting` incorpora POST de
 avistamientos, sharp/Leaflet y migración024. No se ha publicado/desplegado.
 Antes de activarlo: aplicar024 después de023 y añadir
-`PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com` sin slash final; mantener
+`PUBLIC_WEB_ORIGIN=https://entrehuellas.app` sin slash final; mantener
 SUPABASE_SERVER_KEY únicamente en Environment de servidor. Usar la rama/revisión
 que se publique tras autorización, sin cambiar automáticamente el despliegue
 operativo indicado en las instrucciones históricas siguientes.
@@ -111,12 +123,12 @@ Antes de probar casos reales, aplicar022 si falta y después
 migraciones Supabase, aplicar la equivalente20261016002300 una sola vez; no ambos
 mecanismos y no todo run_all sobre producción. El contenedor no aplica SQL.
 
-DNS: registro A del host `entrehuellas` apuntando a la IPv4 pública del VDS.
+DNS: registro A del host `@` en la zona `entrehuellas.app`, apuntando a la IPv4 pública del VDS.
 No dejar un AAAA apuntando a otro servidor. Luego, en Domains de la Application:
 
 | Campo | Valor |
 | --- | --- |
-| Host | entrehuellas.kormind.com |
+| Host | entrehuellas.app |
 | Path | / |
 | Internal Path | / (o vacío si la versión no lo requiere) |
 | Strip Path | desactivado |
@@ -138,8 +150,8 @@ usar `node scripts/healthcheck.mjs`, timeout5s, retries3, intervalo30s.
 No instalar curl ni cambiar el comando de arranque.
 
 ```powershell
-curl.exe --fail --silent --show-error https://entrehuellas.kormind.com/health
-curl.exe --head https://entrehuellas.kormind.com/c/no-existe
+curl.exe --fail --silent --show-error https://entrehuellas.app/health
+curl.exe --head https://entrehuellas.app/c/no-existe
 ```
 
 Esperado: health devuelve `{"status":"ok"}`; página /c/no-existe devuelve HTML200

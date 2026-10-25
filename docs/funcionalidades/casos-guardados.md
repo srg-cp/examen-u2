@@ -1,5 +1,11 @@
 # Casos guardados
 
+24/10, HU-15.3: Guardados incorpora por composición Consultados en este dispositivo,
+independiente de favoritos remotos. Las fichas abiertas se conservan con datos/fotos
+públicos por cuenta para consulta sin red; marcar favorito por sí solo no descarga
+una ficha no consultada. Las notas anteriores sin descarga offline son historia
+previa a este incremento. [Contrato/evidencia](fichas-sin-conexion.md).
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

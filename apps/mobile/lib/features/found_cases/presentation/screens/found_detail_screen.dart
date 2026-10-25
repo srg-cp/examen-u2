@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/cached_case_notice.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/recovery_case_actions.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
@@ -31,7 +32,8 @@ class FoundDetailScreen extends ConsumerWidget {
       shareAction:
           !state.isLoading &&
               !state.hasError &&
-              state.asData?.value.value != null
+              state.asData?.value.value != null &&
+              state.asData?.value.cachedAt == null
           ? shareActionBuilder?.call(
               state.requireValue.value!.speciesDetail ??
                   foundSpeciesLabel(state.requireValue.value!.species),
@@ -48,7 +50,9 @@ class FoundDetailScreen extends ConsumerWidget {
             )
           : null,
       loading: state.isLoading,
-      notice: state.hasError
+      notice: state.asData?.value.storageFailed == true
+          ? 'No pudimos actualizar la copia de este dispositivo. Reintenta actualizar.'
+          : state.hasError
           ? 'No pudimos consultar el caso.'
           : state.asData?.value.refreshFailed == true
           ? 'No pudimos actualizar. Se conserva la última consulta.'
@@ -72,56 +76,86 @@ class FoundDetailScreen extends ConsumerWidget {
           : ContentRefresh(
               refreshing: state.requireValue.refreshing,
               label: 'Actualizando caso',
-              child: FoundPublicContent(
-                value: state.requireValue.value!,
-                contact: contact,
-                actions: Column(
-                  children: [
-                    if (timelineAction != null) timelineAction!,
-                    if (state.requireValue.value!.reportKind ==
-                            'possible_loss' &&
-                        state.requireValue.value!.status == 'active') ...[
-                      CollectionAddButton(
-                        label: 'Reportar avistamiento',
-                        icon: Icons.visibility_outlined,
-                        accented: true,
-                        route: '/home/sightings/found/$id',
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                    if ((state.requireValue.value!.canGeneratePoster ||
-                            state.requireValue.value!.canResolve) &&
-                        posterAction != null)
-                      posterAction!,
-                    state.requireValue.value!.reportKind == 'possible_loss'
-                        ? RecoveryCaseActions(
-                            showSightingAction: false,
-                            id: id,
-                            community: true,
-                            canResolve: state.requireValue.value!.canResolve,
-                            open: state.requireValue.value!.status == 'active',
-                            onChanged: model.retry,
-                          )
-                        : state.requireValue.value!.targetId != null &&
-                              state.requireValue.value!.status == 'active'
-                        ? TextButton(
-                            onPressed: () => context.push(
-                              state.requireValue.value!.communityTarget
-                                  ? '/home/found-cases/${state.requireValue.value!.targetId}'
-                                  : '/home/cases/${state.requireValue.value!.targetId}',
-                            ),
-                            child: const Text('Ver búsqueda'),
-                          )
-                        : state.requireValue.refreshFailed
-                        ? TextButton(
-                            onPressed: state.requireValue.refreshing
-                                ? null
-                                : model.retry,
-                            child: const Text('Reintentar'),
-                          )
-                        : const SizedBox.shrink(),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (state.requireValue.cachedAt != null)
+                    CachedCaseNotice(
+                      storedAt: state.requireValue.cachedAt!,
+                      onRefresh: state.requireValue.refreshing
+                          ? null
+                          : model.retry,
+                    ),
+                  FoundPublicContent(
+                    offline: state.requireValue.cachedAt != null,
+                    value: state.requireValue.value!,
+                    contact: state.requireValue.cachedAt == null
+                        ? contact
+                        : null,
+                    actions: Column(
+                      children: state.requireValue.cachedAt != null
+                          ? const []
+                          : [
+                              if (timelineAction != null) timelineAction!,
+                              if (state.requireValue.value!.reportKind ==
+                                      'possible_loss' &&
+                                  state.requireValue.value!.status ==
+                                      'active') ...[
+                                CollectionAddButton(
+                                  label: 'Reportar avistamiento',
+                                  icon: Icons.visibility_outlined,
+                                  accented: true,
+                                  route: '/home/sightings/found/$id',
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                              if ((state
+                                          .requireValue
+                                          .value!
+                                          .canGeneratePoster ||
+                                      state.requireValue.value!.canResolve) &&
+                                  posterAction != null)
+                                posterAction!,
+                              state.requireValue.value!.reportKind ==
+                                      'possible_loss'
+                                  ? RecoveryCaseActions(
+                                      showSightingAction: false,
+                                      id: id,
+                                      community: true,
+                                      canResolve:
+                                          state.requireValue.value!.canResolve,
+                                      open:
+                                          state.requireValue.value!.status ==
+                                          'active',
+                                      onChanged: model.retry,
+                                    )
+                                  : state.requireValue.value!.targetId !=
+                                            null &&
+                                        state.requireValue.value!.status ==
+                                            'active'
+                                  ? TextButton(
+                                      onPressed: () => context.push(
+                                        state
+                                                .requireValue
+                                                .value!
+                                                .communityTarget
+                                            ? '/home/found-cases/${state.requireValue.value!.targetId}'
+                                            : '/home/cases/${state.requireValue.value!.targetId}',
+                                      ),
+                                      child: const Text('Ver búsqueda'),
+                                    )
+                                  : state.requireValue.refreshFailed
+                                  ? TextButton(
+                                      onPressed: state.requireValue.refreshing
+                                          ? null
+                                          : model.retry,
+                                      child: const Text('Reintentar'),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ],
+                    ),
+                  ),
+                ],
               ),
             ),
     );

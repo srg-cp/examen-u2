@@ -1,5 +1,28 @@
 # Configuración y validación de la app
 
+## Caché de fichas consultadas —24/10/2026
+
+HU-15.3 no requiere configuración remota ni migración. Actualizar cliente Android;
+SQLite privado case_cache.sqlite se crea al primer uso y queda fuera de backup/
+transferencia. [Recorrido, reglas y evidencia](funcionalidades/fichas-sin-conexion.md).
+
+Desde apps/mobile, validación reproducible:
+
+```powershell
+flutter test --no-pub --dart-define=AMBIENT_BACKGROUND_MOTION=false test/offline_cases_test.dart
+flutter test --no-pub tool/check_case_cache_remote_test.dart --reporter expanded
+```
+
+La primera usa SQLite real local y adaptadores sustitutos para probar errores/
+sesiones/widgets. La segunda requiere el archivo privado ignorado
+config/profile_test.local.json con las cuentas A/B de desarrollo ya descritas;
+publica una búsqueda QA con foto real, prueba reapertura/offline/invalidation
+contra servidor y retira únicamente ese fixture. Puede rotar el refresh token B
+en ese mismo archivo privado; no lo imprime ni cierra otras sesiones. No usar
+datos de producción. Resultado final:16 focalizadas y591 de suite completa,
+análisis limpio y remota aprobada. Recorrido Android normal con red realmente
+desactivada/reinicio de proceso documentado en ESTADO, sin teléfono físico.
+
 ## Validación offline Android y Supabase de desarrollo —23/10/2026
 
 Corrección final aplicada por el usuario:037 y038, [ADR-134](decisiones/134-conflictos-de-publicacion-sin-reintento-postgrest.md).
@@ -309,7 +332,7 @@ incremento. Generar artefactos desde raíz con
 No editar los SQL generados ni ejecutar automáticamente escrituras remotas.
 
 Flutter conserva URL/clave publicable y sesión. `PUBLIC_CASE_WEB_URL` debe ser
-el origen HTTPS del servidor (predeterminado https://entrehuellas.kormind.com).
+el origen HTTPS del servidor (predeterminado https://entrehuellas.app).
 La ruta `/api/app/cases/{lost|found}/{id}/sightings` recibe bearer de usuario;
 el adaptador servidor verifica con Supabase Auth y usa su configuración privada
 existente. El móvil no envía Origin de navegador. No añadir CORS permisivo,
@@ -355,7 +378,7 @@ hosting Node22 con secreto servidor/TLS, sin caché/logs de tokens. Pasos en
 sigue false y formulario HU-10.1 pendiente. Actualiza el pendiente de implementación
 de la nota histórica de carteles siguiente.
 
-Carteles/QR (16 octubre): aplicar [patch022](../database/patchs/022_patch_case_posters.sql) después de001–021, con fotos operativas. Configurar PUBLIC_CASE_WEB_URL (base acordada: https://entrehuellas.kormind.com) y mantener PUBLIC_CASE_WEB_READY=false hasta implementar/verificar la ficha pública de HU-09 en `/c/<slug>`. El ejemplo versionado ya contiene estos valores públicos. No habilitar con una página provisional: al revisar, GET/ devuelve404. Con ready=false o URL no HTTPS no se crean enlaces ni PDFs; la UI informa mediante toast. No hay claves nuevas de servidor ni cambio de Auth. Los plugins printing/share_plus se prueban tras la próxima recompilación nativa; no se genera APK por instrucción del usuario. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md).
+Carteles/QR (16 octubre): aplicar [patch022](../database/patchs/022_patch_case_posters.sql) después de001–021, con fotos operativas. Configurar PUBLIC_CASE_WEB_URL (base acordada: https://entrehuellas.app) y mantener PUBLIC_CASE_WEB_READY=false hasta implementar/verificar la ficha pública de HU-09 en `/c/<slug>`. El ejemplo versionado ya contiene estos valores públicos. No habilitar con una página provisional: al revisar, GET/ devuelve404. Con ready=false o URL no HTTPS no se crean enlaces ni PDFs; la UI informa mediante toast. No hay claves nuevas de servidor ni cambio de Auth. Los plugins printing/share_plus se prueban tras la próxima recompilación nativa; no se genera APK por instrucción del usuario. [Ficha](funcionalidades/carteles-qr.md), [ADR-053](decisiones/053-carteles-pdf-y-enlaces-qr.md).
 
 Guardados/Ciudad (16 octubre): para Explorar → Guardados, aplicar [patch021](../database/patchs/021_patch_saved_case_list.sql) o migración20261016002100_saved_case_list.sql después de020 (aplicado según usuario). Build-SavedCaseListPatch/Build-RunAll generan fuentes074–076; no reescribir020. **021 pendiente**, sin SQL remoto ejecutado ni pruebas por instrucción vigente. Ciudad no necesita migración: buscador ahora en places, mismo PLACE_SEARCH_URL, modo layer=city/caché separada y selección explícita; guardar etiqueta mantiene límites/RLS del perfil. Endpoint sustituido debe admitir filtro de ciudades y GeoJSON reconocido. Análisis limpio; cobertura/recorridos Android por verificar. [ADR-051](decisiones/051-guardados-en-explorar-y-ciudad-con-sugerencias.md).
 
@@ -740,7 +763,7 @@ La web usa los proveedores habilitados en el mismo Supabase que móvil; registra
 la redirección web adicional. Completar SUPABASE_PUBLISHABLE_KEY,
 MODERATION_SESSION_SECRET (mínimo32 caracteres aleatorios privados) y
 PUBLIC_WEB_ORIGIN con el origen exacto, por ejemplo http://127.0.0.1:5173 para
-desarrollo o https://entrehuellas.kormind.com para producción. Guardar localmente
+desarrollo o https://entrehuellas.app para producción. Guardar localmente
 en .env.local y configurar servidor/Dokploy, nunca cliente/NUXT_PUBLIC.
 
 En Auth URL Configuration autorizar únicamente los callback de los entornos
@@ -754,7 +777,7 @@ En Supabase autohospedado, la lista efectiva pertenece al contenedor Auth:
 Añadir a la lista existente, separada por comas, esta entrada de producción:
 
 ```text
-https://entrehuellas.kormind.com/api/moderation/oauth/callback?flow=*
+https://entrehuellas.app/api/moderation/oauth/callback?flow=*
 ```
 
 Conservar las entradas móvil y local existentes. Recrear Auth para aplicar

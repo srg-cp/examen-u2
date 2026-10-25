@@ -6,10 +6,10 @@ class ReadPublicLostCase {
   final LostCaseRepository _repository;
   Future<PublicLostCase?> call(String id) async {
     final result = await _repository.readPublic(id);
-    if (result != null && (result.id != id || result.status != 'active')) {
-      throw const CaseFailure(CaseFailureKind.unavailable);
+    if (result != null && result.id != id) {
+      throw const CaseFailure(CaseFailureKind.forbidden);
     }
-    return result;
+    return result?.status == 'active' ? result : null;
   }
 }
 

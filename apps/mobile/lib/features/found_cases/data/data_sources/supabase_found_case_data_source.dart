@@ -24,7 +24,12 @@ class SupabaseFoundCaseDataSource implements FoundCaseDataSource {
         'found_draft_limit' => FoundFailureKind.draftLimit,
         'found_target_closed' => FoundFailureKind.targetClosed,
         _ => switch (code) {
-          '42501' || '401' || '403' => FoundFailureKind.forbidden,
+          '42501' ||
+          '401' ||
+          '403' ||
+          'PGRST301' ||
+          'PGRST302' ||
+          'PGRST303' => FoundFailureKind.forbidden,
           '40001' || 'PT409' || '23505' || '409' => FoundFailureKind.conflict,
           '23514' => FoundFailureKind.invalid,
           '55P03' || '57014' => FoundFailureKind.timedOut,

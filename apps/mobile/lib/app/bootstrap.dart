@@ -224,7 +224,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
               ImagePicker(),
               const String.fromEnvironment(
                 'PUBLIC_CASE_WEB_URL',
-                defaultValue: 'https://entrehuellas.kormind.com',
+                defaultValue: 'https://entrehuellas.app',
               ),
             ),
           ),
@@ -238,7 +238,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
             const NativePosterExportSource(),
             webBaseUrl: const String.fromEnvironment(
               'PUBLIC_CASE_WEB_URL',
-              defaultValue: 'https://entrehuellas.kormind.com',
+              defaultValue: 'https://entrehuellas.app',
             ),
             publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
           ),
@@ -258,7 +258,7 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
             ),
             webBaseUrl: const String.fromEnvironment(
               'PUBLIC_CASE_WEB_URL',
-              defaultValue: 'https://entrehuellas.kormind.com',
+              defaultValue: 'https://entrehuellas.app',
             ),
             publicWebReady: const bool.fromEnvironment('PUBLIC_CASE_WEB_READY'),
           ),
