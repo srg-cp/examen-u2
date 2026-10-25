@@ -1,9 +1,8 @@
-import sharp from 'sharp';
 import { createReadStream } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
-import { env, AutoProcessor, CLIPVisionModelWithProjection, RawImage } from '@huggingface/transformers';
+import type { AutoProcessor, CLIPVisionModelWithProjection } from '@huggingface/transformers';
 import { matchModel, MatchFailure, unitEmbedding } from '../../../../shared/features/matching/domain/matching.ts';
 import type { ImageEncoder } from '../../../../shared/features/matching/domain/matching.ts';
 
@@ -27,13 +26,16 @@ async function verify(directory:string) {
 }
 async function load(): Promise<Resources> {
   if (!process.env.MATCH_MODEL_DIRECTORY) throw new MatchFailure('unavailable');
-  env.allowRemoteModels = false;
-  env.allowLocalModels = true;
   const directory = process.env.MATCH_MODEL_DIRECTORY;
-  resources ??= verify(directory).then(()=>Promise.all([
-    AutoProcessor.from_pretrained(directory, { local_files_only: true }),
-    CLIPVisionModelWithProjection.from_pretrained(directory, { local_files_only: true, dtype: 'q8', device: 'cpu' }),
-  ])).then(([processor, model]) => ({ processor, model })).catch(() => { resources = null; throw new MatchFailure('unavailable'); });
+  resources ??= verify(directory).then(async()=>{
+    const { env, AutoProcessor, CLIPVisionModelWithProjection } = await import('@huggingface/transformers');
+    env.allowRemoteModels = false;
+    env.allowLocalModels = true;
+    return Promise.all([
+      AutoProcessor.from_pretrained(directory, { local_files_only: true }),
+      CLIPVisionModelWithProjection.from_pretrained(directory, { local_files_only: true, dtype: 'q8', device: 'cpu' }),
+    ]);
+  }).then(([processor, model]) => ({ processor, model })).catch(() => { resources = null; throw new MatchFailure('unavailable'); });
   return resources;
 }
 export class ClipImageEncoder implements ImageEncoder {
@@ -42,11 +44,14 @@ export class ClipImageEncoder implements ImageEncoder {
     if (!bytes.length || bytes.length > 2097152) throw new MatchFailure('unavailable');
     occupied = true;
     try {
+      // Listing searches/reviewing cached results must not load native image code.
+      const { default: sharp } = await import('sharp');
       const input = sharp(bytes, { limitInputPixels: 4000000, failOn: 'warning', animated: false });
       const metadata = await input.metadata();
       if (metadata.format !== 'jpeg' || (metadata.pages || 1) !== 1) throw new MatchFailure('unavailable');
       const { data, info } = await input.rotate().resize(224,224,{fit:'cover'}).removeAlpha().toColourspace('srgb').raw().toBuffer({resolveWithObject:true});
       const { processor, model } = await load();
+      const { RawImage } = await import('@huggingface/transformers');
       const image = new RawImage(new Uint8ClampedArray(data), info.width, info.height, info.channels);
       const output = await model(await processor(image));
       const vector = Array.from(output.image_embeds.data, x => Number(x));

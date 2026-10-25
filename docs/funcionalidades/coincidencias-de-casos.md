@@ -1,5 +1,26 @@
 # Coincidencias entre casos de mascotas
 
+## Corrección del runtime de imágenes Linux —25/10/2026
+
+El log alojado aportado por el usuario acredita500 en
+`/api/app/matching/searches`: `sharp` no encuentra `libvips-cpp.so.8.18.7`.
+Reproducido en Ubuntu x64: la disposición versionada de Nitro altera las rutas
+relativas ELF de las dependencias nativas. El hook de compilación conserva los
+paquetes nativos completos como hermanos dentro de cada versión de `sharp`,
+incluida la versión transitiva de Transformers, sin cambiar versiones/modelo.
+Las dependencias opcionales se incluyen explícitamente en Docker; una prueba
+de decodificación JPEG/redimensionado de ambas versiones bloquea la construcción
+si falla el runtime final. CI también comprueba el paquete generado.
+
+`sharp` y Transformers se importan al procesar fotos, dentro del manejo de
+errores del encoder. Listar búsquedas, autenticar y revisar resultados ya
+indexados no requieren cargar el motor. Una dependencia nativa indisponible al
+comparar devuelve503 seguro/reintentable, en lugar de500 durante la apertura.
+Regresión con carga nativa bloqueada y prueba del modelo real en Linux aprobadas;
+validaciones completas en [ESTADO](../ESTADO.md). Reconstrucción/despliegue y
+confirmación en el servidor alojado pendientes; no requiere reaplicar040 ni
+acredita precisión de identificación.
+
 25/10: usuario confirma patch040 ejecutado en Supabase. Sin reaplicación ni
 verificación remota independiente por esta confirmación. Modelo configurado
 para desarrollo local; demo con dos cuentas/evaluación/integración pendientes.

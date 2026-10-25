@@ -1,4 +1,5 @@
 import '../../../../core/presentation/widgets/panel_action_button.dart';
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -8,7 +9,7 @@ import '../../domain/entities/case_poster.dart';
 import '../../domain/entities/case_share.dart';
 import '../view_models/case_share_view_model.dart';
 
-class CaseShareSheet extends ConsumerWidget {
+class CaseShareSheet extends ConsumerStatefulWidget {
   const CaseShareSheet({
     required this.target,
     required this.title,
@@ -19,10 +20,40 @@ class CaseShareSheet extends ConsumerWidget {
   });
   final PosterCase target;
   final String title, eventLabel;
-  final VoidCallback onReport;
+  final Future<void> Function(OriginPageSource source) onReport;
   final List<Widget> caseActions;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CaseShareSheet> createState() => _CaseShareSheetState();
+}
+
+class _CaseShareSheetState extends ConsumerState<CaseShareSheet> {
+  bool _reporting = false;
+
+  Future<void> _report(BuildContext sourceContext) async {
+    if (_reporting) return;
+    final box = sourceContext.findRenderObject() as RenderBox;
+    final navigator = Navigator.of(context).context.findRenderObject();
+    final source = OriginPageSource(
+      bounds: box.localToGlobal(Offset.zero, ancestor: navigator) & box.size,
+      color: const Color(0xFFEEEEF0),
+      radius: box.size.shortestSide / 2,
+      child: const Icon(
+        Icons.flag_outlined,
+        size: 26,
+        color: Color(0xFF111111),
+      ),
+    );
+    setState(() => _reporting = true);
+    try {
+      await widget.onReport(source);
+    } finally {
+      if (mounted) setState(() => _reporting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final target = widget.target;
     final state = ref.watch(caseShareViewModelProvider(target));
     final model = ref.read(caseShareViewModelProvider(target).notifier);
     final v = state.isLoading ? null : state.asData?.value;
@@ -90,7 +121,7 @@ class CaseShareSheet extends ConsumerWidget {
                 Text('Compartir ficha', style: AppTypography.primaryTitle),
                 const SizedBox(height: 6),
                 Text(
-                  '$title · $eventLabel',
+                  '${widget.title} · ${widget.eventLabel}',
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.4,
@@ -166,12 +197,22 @@ class CaseShareSheet extends ConsumerWidget {
                         icon: Icons.file_download_outlined,
                       ),
                     ),
-                    PanelActionButton(
-                      label: 'Denunciar contenido',
-                      onPressed: busy ? null : onReport,
-                      icon: Icons.flag_outlined,
+                    Builder(
+                      builder: (sourceContext) => IgnorePointer(
+                        ignoring: _reporting,
+                        child: Opacity(
+                          opacity: _reporting ? 0 : 1,
+                          child: PanelActionButton(
+                            label: 'Denunciar contenido',
+                            onPressed: busy
+                                ? null
+                                : () => _report(sourceContext),
+                            icon: Icons.flag_outlined,
+                          ),
+                        ),
+                      ),
                     ),
-                    ...caseActions.map(
+                    ...widget.caseActions.map(
                       (action) => SizedBox(width: 56, child: action),
                     ),
                   ],

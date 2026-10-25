@@ -9,7 +9,7 @@ export async function matchingFixture(options={}){
  const indexed=new Map();
  const snapshot=(id,source)=>({id,source,owner:ordinary,kind:source==='lost'?'own_loss':'independent_found',revision:(source==='lost'?'a':'b').repeat(32),name:source==='lost'?'Luna':'Mascota encontrada',species:'dog',occurred_at:'2026-10-24T12:00:00Z',latitude:-18.005,longitude:-70.005,photos:[{id:photo,path:`${ordinary}/${id}/${photo}.jpg`,hash:'c'.repeat(64),embedding:options.uncached?(indexed.get(id)||null):vector}]});
  const send=(res,v,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(v));};
- const server=await moderationFixture(jpeg,{env:options.modelDirectory?{MATCH_MODEL_DIRECTORY:options.modelDirectory}:{},handle:async(req,res)=>{
+ const server=await moderationFixture(jpeg,{env:{...(options.modelDirectory?{MATCH_MODEL_DIRECTORY:options.modelDirectory}:{}),...(options.env||{})},handle:async(req,res)=>{
   if(req.url==='/auth/v1/user'&&authFailed){send(res,{},503);return true;}
   if(req.url==='/auth/v1/user'&&!['Bearer '+'o'.repeat(30),'Bearer '+'m'.repeat(30)].includes(req.headers.authorization)){send(res,{},401);return true;}
   const rpc=req.url?.split('/rest/v1/rpc/')[1];

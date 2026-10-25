@@ -1,5 +1,12 @@
 # Denunciar contenido
 
+25/10: desde Compartir ficha móvil, el formulario recibe la identidad del botón
+Denunciar y reutiliza la expansión/retorno compartidos. El panel permanece
+montado detrás y conserva su scroll al volver, tanto en perdidos como en
+encontrados; movimiento reducido inmediato. La confirmación de descarte,
+autorización, envío estable y recibo conservan su implementación. Evidencia y
+límites de esta integración en [Compartir ficha](compartir-ficha.md) y ESTADO.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

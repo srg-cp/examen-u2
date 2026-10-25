@@ -1,5 +1,15 @@
 # Compartir ficha pública
 
+25/10, corrección solicitada: Denunciar conserva el panel montado detrás y abre
+el formulario del mismo caso desde el círculo gris real (posición, radio28 e
+icono26). Reutiliza `OriginPageSource`, `entityEditorPage` y
+`OriginPageTransition`: apertura320ms/retorno260ms, easeInOutCubic, identidad
+hasta45% y contenido desde65%; movimiento reducido inmediato. Al volver se
+recupera el mismo panel y su scroll, sin volver a pulsar Compartir. El origen
+se captura antes de navegar y se bloquea la apertura duplicada. La composición
+sigue en router; no cambian autorización, envío, borrador ni recibo de denuncia.
+Sustituye la descripción anterior que cerraba el panel al denunciar.
+
 23/10, por instrucción del usuario, [ADR-133](../decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
 la cabecera conserva únicamente Volver y Compartir. Favoritos, Seguir/Dejar de
 seguir y Bloquear/Desbloquear pasan al panel «Compartir ficha», junto a Descargar/Denunciar: círculos grises56, iconos26, sin texto visible,
@@ -34,7 +44,8 @@ Copiar confirma solo tras escribir en Clipboard. WhatsApp/Facebook abren el
 destino externo con la URL precompuesta; el usuario elige si envía/publica y
 a quién. No se confirma entrega. Descargar genera el PDF público con QR y abre
 la impresión/Guardar como PDF del sistema; cancelar conserva la posibilidad de
-reintento. Denunciar cierra el panel y abre el formulario real del mismo caso.
+reintento. Denunciar abre desde su botón el formulario real del mismo caso,
+conservando el panel detrás durante apertura, edición y retorno.
 En fichas públicas, esta entrada sustituye el botón largo de denuncia del cuerpo;
 otras entradas existentes de denuncia permanecen.
 
@@ -79,6 +90,13 @@ database/patchs/032_patch_case_sharing.sql generados con Build-Migration,
 Build-CaseSharingPatch y Build-RunAll. Aplicar después de031 cuando se autorice.
 
 ## Validación
+
+Corrección25/10:8 regresiones con GoRouter y formulario real verifican origen
+gris56/radio28, crecimiento/retorno, misma instancia/scroll del panel, reapertura
+y Atrás posterior. Perdidos/encontrados,390×844 y320×600 con texto200%, normal
+y reducido. Suite pertinente38 aprobadas, análisis lib/test sin incidencias;
+capturas de fases en `apps/mobile/build/ui-preview/share-report-origin` con
+repositorios de prueba. Detalles y límites en ESTADO; Android físico pendiente.
 
 Pruebas de repositorio comprueban URL opaca/configuración, PDF solo público y
 revalidación; ViewModel verifica doble envío y cambio de cuenta. Layouts390×844
