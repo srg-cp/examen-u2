@@ -3,6 +3,7 @@ import { AccessFailure } from '../../shared/features/access/domain/access';
 import { routeAccess, sessionRedirect } from '../../shared/routing/route_policy';
 import { credentials, clearCredentialCookie } from '../utils/credentials';
 import { CredentialFailure } from '../../shared/features/access/domain/credentials';
+import { statistics } from '../utils/statistics';
 
 export default defineEventHandler(async event => {
   const url = getRequestURL(event);
@@ -33,6 +34,7 @@ export default defineEventHandler(async event => {
     const destination = sessionRedirect(access, session.profile.onboardingCompleted);
     if (destination) return sendRedirect(event, destination, 302);
     if (access === 'reviewer' && !await services.management.execute()) return sendRedirect(event, '/inicio?reason=forbidden', 302);
+    if (access === 'administrator' && !await (await statistics(event, false)).access.execute()) return sendRedirect(event, '/inicio?reason=forbidden', 302);
   } catch (error) {
     if (error instanceof AccessFailure && error.kind === 'unauthenticated') {
       clearAccountCookie(event);

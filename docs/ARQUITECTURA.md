@@ -1,5 +1,13 @@
 # Arquitectura de Entre Huellas
 
+24/10, ADR-136: `statistics` en Nuxt separa dominio/casos de uso, DTO/repositorios,
+fuentes HTTP/RPC y ViewModel. Inicio compone el acceso por slot; política global
+SSR/cliente `administrator` y RPC con permiso `platform_administrators` independiente
+de moderación. Plan039 devuelve únicamente conteos por período inclusivo en Lima,
+con clasificación cancelado/archivado confirmada por el usuario. Sin lectura
+privada adicional de casos, autoasignación ni controles de HU-16.2.
+[Contrato, activación y validación](funcionalidades/estadisticas-piloto.md).
+
 24/10, ADR-135: `offline_cases` aporta contrato/casos de uso de consulta y caché,
 SQLite privado separado y DTO con lista de campos públicos. ViewModels existentes
 consumen el caso de uso; main inyecta y router compone Consultados mediante slot

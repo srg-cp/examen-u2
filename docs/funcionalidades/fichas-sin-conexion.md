@@ -113,5 +113,8 @@ escritura, no puede persistirse esa eliminación hasta recuperar almacenamiento.
 La copia histórica nunca certifica vigencia remota mientras no hay conexión.
 
 Implementación y validación local/remota completadas en el alcance descrito.
-Pendiente integrar los cambios y tramitar #49/HU-15 cuando se autorice; no se hace
-commit/push/PR ni cierre de issues por esta implementación.
+24/10: PR #69 fusionado a main, commit1424b72; Flutter/web del HEAD y validate
+de main aprobados. #49 y épica #15 cerrados con evidencia y Projects en Done.
+El run40159160220 de publicación APK no recibió los cinco secrets; después el
+usuario informa su configuración definitiva. Falta verificar una nueva ejecución;
+pendiente de distribución independiente, sin afirmar APK publicado ni cierre del MVP.

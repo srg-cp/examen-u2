@@ -1,5 +1,89 @@
 # Estado del proyecto
 
+## HU-15 cerrada; HU-16.1 implementada localmente —24/10/2026
+
+Por autorización del usuario se continúa desde la rama offline. PR
+[#69](https://github.com/srg-cp/entrehuellas/pull/69) ya fusionado en main,
+commit1424b72; checks del HEAD477d33e Flutter validate y web aprobados.
+En main también pasan validate y web. #49/HU-15.3 y épica #15/HU-15 cerradas,
+etiqueta/Projects Done, con criterios y evidencia de las tres derivadas.
+El job release de run40159160220 falló al no recibir los cinco secrets de
+configuración/firma. La nota paralela inferior registra su configuración
+confirmada posteriormente por el usuario; falta comprobar una nueva ejecución
+con firma definitiva. No se afirma APK publicado.
+
+Main local actualizado y nueva `feature/pilot-statistics`; se preserva la nota
+local de seguimiento anterior en este documento. Implementación HU-16.1/RF-35/#50:
+`/administracion/estadisticas`, siete agregados por fechas inclusivas de Lima,
+máximo366 días, acceso desde Inicio y retorno por motor compartido. Dominio,
+casos de uso, repositorios/DTO/fuentes y ViewModel; política global SSR/cliente
+administrator y autorización de cada RPC con permiso independiente de moderación.
+Usuario confirma cancelado=retirado sin recuperación registrada y archivado=
+retirado después de recuperación registrada. No se infieren recuperaciones
+antiguas de resolved ni se atribuyen a la app; sin datos personales/coordenadas.
+Plan039/fuentes125–127, migración/patch039 generados y run_all actualizado mediante
+generadores. No se cambian Flutter, estados de casos, roles existentes ni HU-16.2.
+[Contrato, activación y límites](funcionalidades/estadisticas-piloto.md), ADR-136.
+
+Validación final: **89/89 web**, **33/33 servidor Nuxt construido**, typecheck y
+build correctos; **58/58 SQL/PostGIS locales**, incluidas dos nuevas con datos
+reproducibles, permisos, revocación, repetición y límites05:00UTC de Lima. Chrome
+con fixture: apertura0/5/15/45/99/100 y cierre50/75/95% en1440/390/320, fullscreen,
+reducido, teclado/foco en fechas, refresh/fallo conservando consulta confirmada,
+vacío y revocación sin datos residuales. Renders1920/1440/731/390/320 y320/texto200%
+revisados, sin overflow, errores JS/CSP/hidratación detectados. Build conserva
+avisos de rendimiento de plugins y exports obsoletos de Vue; sin cambiar dependencias.
+Logs/capturas locales ignorados descritos en la ficha; no son artefactos publicados.
+
+#50 y épica #16 pasan a In progress, sin cerrar criterios alojados ni #51.
+Auditoría API final de los51 issues:31 cerrados/Done,16 abiertos/In progress y4
+abiertos/Backlog; etiquetas y Projects concordantes. No equivale a porcentaje del
+MVP ni a nueva demo de todas las historias. Los pendientes anteriores se conservan.
+
+Siguiente paso: aplicar todo039 en Supabase de desarrollo, asignar explícitamente
+una cuenta administradora autorizada y demostrar roles/conteos reales; después
+publicar/revisar/integrar HU-16.1 y verificar CI. No se aplica SQL remoto, asignan
+roles, despliega web ni hace commit/push/PR del incremento nuevo por esta tarea.
+Se conservan los cambios paralelos en la guía raíz/README/ficha de distribución
+y su nota de firma/secrets. Sin confirmación alojada no se cierra #50/#16.
+Safari/Firefox y aprobación visual
+del usuario pendientes; no se inicia HU-16.2 ni se declara auditoría global.
+
+## Firma y secrets Android configurados; inventario documentado —24/10/2026
+
+El usuario confirma generación de firma definitiva, carga de los cinco secrets
+de repositorio (MOBILE_CONFIG_JSON, ANDROID_KEYSTORE_BASE64,
+ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS y ANDROID_KEY_PASSWORD) y
+key.properties local completado con sus datos. Comprobada existencia local de
+JKS, exportación Base64, JSON y properties; properties ignorado/no versionado.
+No se leen ni documentan contraseñas, JSON real o Base64. La carga en GitHub
+se registra como confirmación del usuario, sin auditoría remota de correspondencia.
+
+[Guía raíz: estado e inventario](../INSTALACION_ANDROID.md#estado-de-la-preparacion)
+relaciona cada secret con su archivo/propiedad local, origen y regeneración;
+distingue copia operativa de respaldo privado, sin duplicar valores en .env.local.
+README y ficha de distribución actualizados; evidencia histórica de build con
+firma desechable separada de esta configuración definitiva. No se modifica código,
+workflow, credenciales ni los cambios paralelos de estadísticas/offline.
+
+Validación documental: enlaces, cinco nombres de secrets y correspondencia de
+propiedades con scripts/workflow; diff de estos documentos sin errores de espacio.
+Sin repetir suites/build por cambios solo documentales ni ejecutar publicación.
+Pendientes: confirmar respaldo privado, integración a main, Actions con firma real
+y prueba de instalación/recorridos con backend real. Siguiente paso: primera
+ejecución de Flutter desde main y revisión de validate/release.
+
+## Seguimiento de HU-15.3 en GitHub actualizado —24/10/2026
+
+El usuario confirma el commit; se verifica477d33e publicado en
+feature/offline-case-cache. [#49](https://github.com/srg-cp/entrehuellas/issues/49)
+actualizado con cuatro criterios técnicos verificados, evidencia local/remota,
+enlaces al commit/documentación y límites. Etiqueta y Projects pasan de Backlog a
+In progress. Permanece abierto: no existe PR de la rama ni fusión a main; CI web
+run40158700222 estaba en curso al consultar, sin afirmar aprobación final.
+No se crea PR, fusiona código, cierra #49/#15 ni publica otro commit por esta tarea.
+Siguiente paso: PR, checks aplicables e integración antes del cierre.
+
 ## HU-15.3: fichas consultadas sin conexión implementadas y validadas —24/10/2026
 
 Por autorización del usuario se implementa HU-15.3/RF-32/#49 en

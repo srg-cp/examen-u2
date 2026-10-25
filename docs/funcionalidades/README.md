@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+- [Estadísticas del piloto](estadisticas-piloto.md): HU-16.1/RF-35/#50; consulta
+  web de agregados con permiso administrador independiente. Implementación local;
+  activación039, asignación explícita, demo alojada e integración pendientes.
+
 - [Fichas sin conexión](fichas-sin-conexion.md): HU-15.3/RF-32/#49; caché privada
   por cuenta de fichas consultadas y fotos, aviso de antigüedad e invalidación
   por respuesta del servidor. Evidencia y límites en su ficha.

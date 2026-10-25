@@ -1,5 +1,11 @@
 # Base de datos de Entre Huellas
 
+HU-16.1,24/10: fuentes125–127/plan039 generan migración y patch039 con
+Build-PilotStatisticsPatch/Build-RunAll. Permiso administrador independiente
+de revisores y RPC autenticadas de agregados por período de Lima. No asigna
+roles, cambia casos ni amplía lectura privada; activación remota pendiente.
+[Contrato y evidencia](../docs/funcionalidades/estadisticas-piloto.md).
+
 Complemento23/10: usuario aplica037 y la prueba real de perdido ya devuelvePT409.
 La comparación interna de búsqueda permanecía en publish_found_case; fuente124/
 plan038 la corrige sin reescribir037. Build-RecoveryNestedBusinessConflictsPatch

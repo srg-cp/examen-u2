@@ -1,5 +1,16 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+24/10: autorizado continuar tras HU-15.3. PR69 ya fusionado; checks de Flutter/web
+del HEAD y validación de main aprobados, #49 y épica #15 cerrados con evidencia.
+Publicación APK pendiente de nueva ejecución tras la configuración definitiva
+de firma/secrets confirmada por el usuario; el run anterior no los recibió.
+Se implementa HU-16.1/RF-35/#50 en `feature/pilot-statistics`: siete agregados
+por período de Lima, permiso administrador independiente y política global.
+Usuario confirma cancelado=retirado sin recuperación registrada y archivado=
+retirado después de recuperación registrada. Sin nuevas HU/RF/issues, controles
+de HU-16.2/#51 ni cambios de Flutter. Activación039/demo alojada/integración
+pendientes; [ficha](funcionalidades/estadisticas-piloto.md).
+
 24/10: cambio autorizado del dominio público a `https://entrehuellas.app` en
 servidor web, SEO y consumidores Android de QR/compartir/avistamientos.
 Supabase e infraestructura conservan sus endpoints en kormind.com. Sin nueva

@@ -1,5 +1,13 @@
 # Tu primera ejecución en Vue/Nuxt
 
+HU-16.1: `/administracion/estadisticas` usa permiso administrador independiente
+de moderación y RPC de plan039. Aplicar039 y asignar una cuenta explícita en
+desarrollo antes de comprobar permisos reales; no se autoasigna desde web.
+`node scripts/check-statistics-browser.mjs` con PLAYWRIGHT_MODULE/CHROME_PATH
+y build vigente verifica origen/retorno, fechas por teclado, responsive/texto200%,
+refresh/fallo, vacío y revocación con backend fixture. No certifica Supabase alojado.
+Ver [ficha de activación](../../docs/funcionalidades/estadisticas-piloto.md).
+
 ## Paridad de animaciones Perfil/Alertas —21/10/2026
 
 `node scripts/check-dialog-motion-browser.mjs` requiere build vigente y las
