@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/glass_navigation_button.dart';
+import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../../domain/entities/case_poster.dart';
 import 'case_share_sheet.dart';
 
@@ -14,7 +15,7 @@ class CaseShareButton extends StatefulWidget {
   });
   final PosterCase target;
   final String title, eventLabel;
-  final VoidCallback onReport;
+  final Future<void> Function(OriginPageSource source) onReport;
   final List<Widget> caseActions;
   @override
   State<CaseShareButton> createState() => _CaseShareButtonState();
@@ -25,7 +26,7 @@ class _CaseShareButtonState extends State<CaseShareButton> {
   Future<void> _show() async {
     if (_open) return;
     setState(() => _open = true);
-    final report = await showModalBottomSheet<bool>(
+    await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -43,13 +44,12 @@ class _CaseShareButtonState extends State<CaseShareButton> {
         target: widget.target,
         title: widget.title,
         eventLabel: widget.eventLabel,
-        onReport: () => Navigator.of(sheetContext).pop(true),
+        onReport: widget.onReport,
         caseActions: widget.caseActions,
       ),
     );
     if (!mounted) return;
     setState(() => _open = false);
-    if (report == true) widget.onReport();
   }
 
   @override

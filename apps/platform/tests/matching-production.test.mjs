@@ -2,6 +2,15 @@ import assert from'node:assert/strict';
 import{test}from'node:test';
 import{matchingFixture,lost,found}from'./matching_fixture.mjs';
 import{ordinary}from'./moderation_fixture.mjs';
+test('missing native image runtime preserves search listing and authentication, with a retryable comparison failure',async t=>{
+ const server=await matchingFixture({uncached:true,env:{NODE_OPTIONS:'--import='+new URL('./unavailable_native_images.mjs',import.meta.url).href}});t.after(server.close);
+ const call=(operation,token='o',body={})=>fetch(server.origin+'/api/app/matching/'+operation,{method:'POST',headers:{Authorization:'Bearer '+token.repeat(30),'Content-Type':'application/json'},body:JSON.stringify(body)});
+ assert.equal((await call('searches','x')).status,401);
+ const listed=await call('searches');assert.equal(listed.status,200);assert.equal((await listed.json())[0].ref.id,lost);
+ const comparison=await call('search','o',{source:'lost',id:lost});assert.equal(comparison.status,503);assert.deepEqual(await comparison.json(),{error:'unavailable'});
+ assert.equal(server.indexed.size,0);
+ assert.equal((await call('searches')).status,200);
+});
 test('matching built server enforces global SSR access, cookie actor binding, CSRF and strips server-only representations',async t=>{
  const server=await matchingFixture();t.after(server.close);
  const page=await fetch(server.origin+'/coincidencias',{redirect:'manual'});assert.equal(page.status,302);assert.match(page.headers.get('location'),/access\/entry/);

@@ -487,8 +487,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ],
                   title: name,
                   eventLabel: event,
-                  onReport: () => context.push(
+                  onReport: (source) => context.push<void>(
                     '/home/denounce/found/${state.pathParameters['id']}',
+                    extra: source,
                   ),
                 ),
                 id: state.pathParameters['id']!,
@@ -580,8 +581,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ],
                   title: name,
                   eventLabel: event,
-                  onReport: () => context.push(
+                  onReport: (source) => context.push<void>(
                     '/home/denounce/lost/${state.pathParameters['id']}',
+                    extra: source,
                   ),
                 ),
                 id: state.pathParameters['id']!,

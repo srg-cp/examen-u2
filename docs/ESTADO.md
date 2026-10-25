@@ -1,5 +1,60 @@
 # Estado del proyecto
 
+## Coincidencias: corrección de sharp/libvips en producción —25/10/2026
+
+El usuario aporta logs500 de `/api/app/matching/searches` con
+`libvips-cpp.so.8.18.7` ausente para el cargador Linux. Error reproducido en
+Ubuntu x64/Node24.18: Nitro separa versiones de paquetes nativos y rompe su
+resolución ELF relativa. Se conservan versiones fijadas de sharp0.35.5 y
+sharp0.34.5 transitivo, y se empaquetan sus dependencias nativas completas como
+hermanas en cada versión. Hook de compilación y prueba de JPEG/redimensionado
+del paquete generado, incluida en CI y en la etapa final Docker. Instalación
+Docker incluye opcionales y omite CUDA; no se instala libvips del sistema.
+
+Encoder importa sharp/Transformers únicamente al procesar fotos, dentro del
+manejo de fallos. Regresión con runtime nativo bloqueado: autenticación401,
+listado200, comparación503 segura/reintentable y listado posterior200. No
+cambia permisos, ranking, modelo ni SQL. Ficha funcional actualizada.
+
+Validación: build/typecheck en Linux y Windows aprobados;94/94 pruebas web en
+ambos y36/36 de servidor construido en Linux. Ambas versiones nativas procesan
+JPEG en Linux, también desde una copia aislada de `.output/server` sin acceso
+a dependencias de desarrollo, y en Windows. Servidor Linux con CLIP real y
+backend fixture indexa dos imágenes, produce512 componentes normalizados y
+reutiliza índices al reintentar. Las3 pruebas de servidor de matching y el
+mismo smoke de CLIP real también pasan en Windows. Esto no evalúa identidad
+de mascotas. El chequeo nativo ejecuta cada versión en un proceso separado
+para evitar colisiones de nombres DLL al probarlas en Windows.
+Los primeros intentos de la suite Linux aislada omitieron referencias móviles;
+se copiaron fuentes/fuentes tipográficas necesarias y la suite completa pasó.
+
+Pendiente construir el contenedor exacto (Docker Engine no disponible), publicar
+los cambios, reconstruir/desplegar y repetir el recorrido alojado. No se ejecutó
+SQL remoto ni se hizo commit/push/despliegue. Conservar cambios móviles previos.
+
+## Denunciar desde Compartir conserva panel y origen —25/10/2026
+
+Corrección solicitada en ficha pública móvil de perdido/encontrado: se elimina
+el cierre previo del panel Compartir. Se captura posición/radio/color/icono del
+botón Denunciar y se entrega a la transición de editor compartida, manteniendo
+el panel montado detrás. Al volver conserva su instancia y scroll; bloquea
+aperturas repetidas y respeta movimiento reducido. Sin cambios de dominio,
+SQL, permisos, envío/recibo ni alcance web. Fichas Compartir/Denunciar actualizadas.
+
+Validación:38 pruebas pertinentes aprobadas (compartir, denuncia, transición,
+arquitectura y8 regresiones nuevas con GoRouter/formulario reales y repositorios
+de prueba). Las8 regresiones se repiten tras cargar fuentes para renders:
+perdidos/encontrados,390×844 y320×600/texto200%, movimiento normal/reducido,
+dos aperturas/retornos y cierre posterior del panel con Atrás. Análisis lib/test
+sin incidencias y diff sin errores. Se desactiva solo el fondo ambiental continuo
+mediante `--dart-define=AMBIENT_BACKGROUND_MOTION=false`; la primera ejecución
+sin ese parámetro produjo timeouts de pumpAndSettle, no evidencia válida.
+Fotogramas de apertura0/5/15/45/99/100% y cierre50/75/95% generados en
+`apps/mobile/build/ui-preview/share-report-origin`; revisión local de origen,
+superficie creciente, panel detrás y retorno. Sin sesión/backend reales, APK,
+despliegue ni cierre de historias. Siguiente paso: prueba física Android y
+aceptación visual del usuario de este recorrido.
+
 ## Cabecera del README corregida —25/10/2026
 
 El aviso de coincidencias había quedado dentro del bloque HTML centrado, antes
