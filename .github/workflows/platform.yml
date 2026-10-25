@@ -9,6 +9,8 @@ permissions:
 jobs:
   reader:
     runs-on: ubuntu-latest
+    env:
+      ONNXRUNTIME_NODE_INSTALL_CUDA: skip
     defaults:
       run:
         working-directory: apps/platform

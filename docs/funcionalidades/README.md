@@ -1,5 +1,19 @@
 # Funcionalidades de Entre Huellas
 
+25/10: [Coincidencias entre casos](coincidencias-de-casos.md), HU-25/#71 y
+HU-26/#72, implementación local Android/web en `feature/case-matching`.
+Hallazgos independientes aprobados, motor CLIP CPU local, plan040 y revisión
+humana. Activación/evaluación/aceptación pendientes; no implica historias cerradas.
+Las notas inferiores de «sin implementar» son el plan inicial anterior.
+
+25/10: cuenta/acceso, difusión, seguimiento y recuperación aceptados por el usuario;
+#19/#34/#35/#40/#41/#13 y épica #8 cerrados. Estadísticas #50 ya aceptadas.
+Las activaciones/demos históricas inferiores no sustituyen estas aceptaciones.
+
+- [Coincidencias entre casos](coincidencias-de-casos.md): **incluido en MVP**,
+  HU-25/#71 y HU-26/#72; RF-19/RF-20. Backlog/P1, sin implementar; modelo,
+  contratos de candidatos y evaluación por refinar. ADR-137.
+
 - [Estadísticas del piloto](estadisticas-piloto.md): HU-16.1/RF-35/#50; consulta
   web de agregados con permiso administrador independiente. Implementación local;
   activación039, asignación explícita, demo alojada e integración pendientes.

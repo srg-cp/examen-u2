@@ -1,5 +1,27 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
+Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
+ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,
+índices/revisiones privadas (plan040), ranking exploratorio de hasta cinco casos,
+revisión humana y recorridos Android/web. Sin worker, inferencia externa ni FCM.
+[ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md). Activación040/demo alojada,
+dataset/evaluación, aceptación e integración pendientes; no se cierra el MVP.
+
+25/10: el usuario acepta cuenta/acceso, difusión, seguimiento y recuperación.
+Se cierran #19/#34/#35/#40/#41/#13 y épica #8 en GitHub/Projects. Cuenta HU-01
+conserva baja #24/exportación #25 sin implementar; HU-12 conserva push #42
+pospuesto. Sin nueva prueba independiente del agente.
+
+Cambio explícito de alcance: **coincidencias visuales incluido en MVP**,
+HU-25/#71 (indexación) y HU-26/#72 (sugerencia/revisión), RF-19/RF-20 originales.
+Sustituye V1/S10 del PDF solo para estas capacidades, sin renumerar HU ni
+confundirlas con #25/#26. Backlog/P1, refinamiento/modelo/evaluación pendientes;
+sin implementación, plazo ni servicios nuevos activados.
+[ADR-137](decisiones/137-coincidencias-visuales-en-el-mvp.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md).
+
 24/10: autorizado continuar tras HU-15.3. PR69 ya fusionado; checks de Flutter/web
 del HEAD y validación de main aprobados, #49 y épica #15 cerrados con evidencia.
 Publicación APK pendiente de nueva ejecución tras la configuración definitiva
@@ -249,7 +271,7 @@ El recorrido del MVP es:
 5. El responsable recibe ayuda en su bandeja, revisa evidencia y cierra el caso.
 6. El QR muestra el estado actualizado, con moderación y manejo de conectividad.
 
-Además: preferencias de zonas, datos públicos separados de privados, gestión de cuenta, auditoría y métricas mínimas. Chat completo, salud, cuidadores compartidos, refugios, adopciones, reservas e IA se planifican después del MVP.
+Además: preferencias de zonas, datos públicos separados de privados, gestión de cuenta, auditoría y métricas mínimas. Chat completo, salud, cuidadores compartidos, refugios, adopciones y reservas se planifican después del MVP. Por decisión del25/10, la similitud visual y revisión de coincidencias (HU-25/HU-26; RF-19/RF-20) se adelantan al MVP; otras ampliaciones de IA no quedan incluidas implícitamente.
 
 Los seis sprints son una secuencia de entregas. Si se conserva la duración de dos semanas del plan, representan doce semanas referenciales. La fecha de entrega y la capacidad semanal todavía deben confirmarse; el chat 00 es preparación, no una promesa de plazo adicional fijo.
 

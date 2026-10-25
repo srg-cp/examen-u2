@@ -1,5 +1,25 @@
 # Configuración y validación de la app
 
+## Matching visual —25/10/2026
+
+Implementación local HU-25/#71 y HU-26/#72; no activada en desarrollo alojado.
+Aplicar completo [patch040](../database/patchs/040_patch_case_matching.sql) después
+de039, nunca el acumulativo para actualizar un servidor. Publicar clientes y
+servidor coordinadamente; no se han desplegado desde este chat.
+
+En `apps/platform`, `npm run model:prepare` prepara pesos fijados y muestra
+`MATCH_MODEL_DIRECTORY`; configurarlo solo en servidor y ejecutar
+`npm run model:smoke`. Después del build,
+`node scripts/check-matching-model-server.mjs` verifica modelo real con backend
+de prueba. Docker empaqueta pesos y usa Node24/bookworm-slim CPU; no CUDA,
+worker ni cron. Docker Engine local no está disponible para verificar ese contenedor.
+Android usa `PUBLIC_CASE_WEB_URL` existente; fotos no salen a un proveedor IA.
+
+La evaluación requiere fotos autorizadas e identidades separadas, con manifiesto
+descrito en la [ficha](funcionalidades/coincidencias-de-casos.md) y
+`npm run model:evaluate -- ruta/manifiesto.json`. No hay precisión acreditada
+todavía. Demo de dos cuentas, evaluación y aceptación pendientes.
+
 ## Caché de fichas consultadas —24/10/2026
 
 HU-15.3 no requiere configuración remota ni migración. Actualizar cliente Android;

@@ -2,6 +2,7 @@ import { RecoveryFailure } from '../domain/recovery.ts';
 import type { RecoveryRepository, ExploreQuery, CasePage, Pet, PetDraft, ReportPhoto, ReportDraft, ReportReceipt, CaseCard } from '../domain/recovery.ts';
 export class HttpRecoveryRepository implements RecoveryRepository {
   constructor(private readonly actor: string, private readonly fetcher: typeof fetch = (input, init) => globalThis.fetch(input, init)) {}
+  async publication(source:'lost'|'found',id:string){return await this.call('case',{source,id}) as import('../domain/recovery.ts').CasePublication;}
   private async call(path: string, body?: unknown, multipart = false): Promise<unknown> {
     try {
       const response = await this.fetcher('/api/recovery/' + path, { method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store', headers: { 'X-Account-Actor': this.actor, ...(!multipart && body !== undefined ? { 'Content-Type': 'application/json' } : {}) }, ...(body === undefined ? {} : { body: multipart ? body as FormData : JSON.stringify(body) }), signal: AbortSignal.timeout(multipart ? 120000 : 30000) });

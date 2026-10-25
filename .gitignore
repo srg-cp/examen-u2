@@ -25,6 +25,7 @@ dist/
 .nuxt/
 .nuxt-*/
 .output/
+.cache/
 
 # Estado local de Supabase
 supabase/.temp/

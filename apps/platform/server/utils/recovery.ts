@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3';
 import { account, accountCookie, accountError } from './account';
 import { AccessFailure } from '../../shared/features/access/domain/access';
-import { ExploreCases, ReadMyPets, SaveMyPet, AddPetPhoto, ReadOpenSearches, PublishRecoveryReport, RecoveryFailure } from '../../shared/features/recovery/domain/recovery';
+import { ExploreCases, ReadMyPets, SaveMyPet, AddPetPhoto, ReadOpenSearches, PublishRecoveryReport, ReadCasePublication, RecoveryFailure } from '../../shared/features/recovery/domain/recovery';
 import { moderationConfiguration } from '../infrastructure/moderation_session';
 import { openAccountSession } from '../infrastructure/account_session';
 import { RecoverySource } from '../features/recovery/data/recovery_source';
@@ -12,7 +12,7 @@ export async function recovery(event: H3Event, photo = false) {
   const config = moderationConfiguration(process.env), privateSession = openAccountSession(getCookie(event,accountCookie),config.sessionSecret);
   if (!privateSession || privateSession.actor !== session.actor) throw new AccessFailure('unauthenticated');
   const repository = new ServerRecoveryRepository(new RecoverySource(config,privateSession.token),session.actor);
-  return { repository,explore:new ExploreCases(repository),pets:new ReadMyPets(repository),save:new SaveMyPet(repository),photo:new AddPetPhoto(repository),targets:new ReadOpenSearches(repository),publish:new PublishRecoveryReport(repository) };
+  return { repository,publication:new ReadCasePublication(repository),explore:new ExploreCases(repository),pets:new ReadMyPets(repository),save:new SaveMyPet(repository),photo:new AddPetPhoto(repository),targets:new ReadOpenSearches(repository),publish:new PublishRecoveryReport(repository) };
 }
 export function recoveryError(event: H3Event, e: unknown) {
   if (!(e instanceof RecoveryFailure)) return accountError(event,e);

@@ -1,5 +1,11 @@
 # Patches manuales de Supabase
 
+25/10: [040_patch_case_matching.sql](040_patch_case_matching.sql), generado
+por Build-CaseMatchingPatch.ps1 desde plan040/fuentes128–134. Aplicar completo
+después de039, con clientes/servidor coordinados. No aplicar run_all a un servidor
+existente. Índices/revisiones privados y hallazgos independientes aprobados; sin
+aplicación remota desde este chat. Modelo/evaluación en la ficha de matching.
+
 Estadísticas24/10: [039_patch_pilot_statistics.sql](039_patch_pilot_statistics.sql)
 generado mediante Build-PilotStatisticsPatch.ps1, con fuentes125–127. Aplicar todo
 en desarrollo sobre el esquema previo cuando se active el incremento; no reaplicar

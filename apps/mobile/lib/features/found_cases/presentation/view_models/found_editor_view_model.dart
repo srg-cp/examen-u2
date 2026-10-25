@@ -199,7 +199,11 @@ class FoundEditorViewModel extends AsyncNotifier<FoundEditorState> {
       ownerId: session.userId,
       draftId: newEntityId(),
       communitySearch: context.communitySearch,
-      reportKind: context.communitySearch ? 'possible_loss' : 'sighting',
+      reportKind: context.independentFound
+          ? 'independent_found'
+          : context.communitySearch
+          ? 'possible_loss'
+          : 'sighting',
       target: target,
     );
     return target == null

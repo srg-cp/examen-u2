@@ -1,19 +1,41 @@
 # Backlog de Entre Huellas
 
+- [#71 — HU-25: Indexar fotos visuales](071-HU-25.md) — MVP, Backlog/P1.
+- [#72 — HU-26: Sugerir y revisar coincidencias](072-HU-26.md) — MVP, Backlog/P1.
+
+## Seguimiento actualizado — 25/10/2026
+
+Aceptación expresa del usuario: #19, #34, #35, #40, #41, #13 y épica #8
+cerrados/Done en GitHub y Projects. La aceptación procede del usuario; no se
+ejecutó una nueva demo del agente ni se fabrican logs de escenarios particulares.
+HU-01 sigue abierta por #24/#25 sin implementar; HU-12 por #42/FCM pospuesto.
+Moderación/denuncias/bloqueos/apelaciones conservan sus pendientes #43–#46.
+Estadísticas #50 ya cerradas por la aceptación del24/10.
+
+Match incluido expresamente en MVP: **HU-25 / #71** y **HU-26 / #72**,
+RF-19/RF-20, Backlog/P1 y needs:refinement. No existían issues de estas
+historias al revisar los51 issues abiertos/cerrados. Ahora hay53 issues:
+**39 Done (31 historias y8 épicas),8 In progress (4 historias y4 épicas),
+6 Backlog (6 historias)**. No es porcentaje de avance ni53 entregas distintas.
+
+Pendientes de implementación: baja #24, exportación #25, controles #51 y
+coincidencias #71/#72. Push #42 sigue diferido. Las tablas/notas inferiores
+son instantáneas históricas, sustituidas por esta actualización.
+
 ## Seguimiento final del24/10/2026
 
 PR [#69](https://github.com/srg-cp/entrehuellas/pull/69) fusionado; Flutter/web del
 HEAD y validate de main aprobados. #49 y épica #15 cerradas/Done. HU-16.1/#50
-implementada localmente y épica #16 en In progress; activación039, asignación
-administrador, demo alojada e integración pendientes. #51 sin iniciar.
-API de los51 issues y Projects comprobados:31 Done,16 In progress,4 Backlog;
+cerrada/Done tras aceptación del usuario,039/asignación confirmadas y PR70
+integrado con CI de main aprobada. Épica #16 In progress por #51 sin iniciar.
+API de los51 issues y Projects comprobados:32 Done,15 In progress,4 Backlog;
 sin discrepancias. La publicación APK requiere verificar una nueva ejecución
 con la configuración definitiva de firma/secrets informada por el usuario.
 
 | Estado actual24/10 | Total | Historias | Épicas |
 | --- | ---: | ---: | ---: |
-| Done | 31 | 24 | 7 |
-| In progress | 16 | 11 | 5 |
+| Done | 32 | 25 | 7 |
+| In progress | 15 | 10 | 5 |
 | Backlog | 4 | 4 | 0 |
 | Ready / In review | 0 | 0 | 0 |
 

@@ -1,3 +1,7 @@
+import '../features/case_matching/domain/repositories/case_matching_repository.dart';
+import '../features/case_matching/data/repositories/case_matching_repository_impl.dart';
+import '../features/case_matching/data/repositories/unavailable_case_matching_repository.dart';
+import '../features/case_matching/data/data_sources/matching_source.dart';
 import '../features/onboarding/data/data_sources/offline_onboarding_data_source.dart';
 import '../features/onboarding/data/data_sources/onboarding_completion_cache.dart';
 import '../features/case_posters/domain/repositories/case_share_repository.dart';
@@ -117,6 +121,7 @@ import '../features/auth/data/repositories/unavailable_password_recovery_reposit
 
 class AppBootstrap {
   const AppBootstrap({
+    this.caseMatchingRepository = const UnavailableCaseMatchingRepository(),
     this.userBlockRepository = const UnavailableUserBlockRepository(),
     this.caseShareRepository = const UnavailableCaseShareRepository(),
     this.caseContactRepository = const UnavailableCaseContactRepository(),
@@ -149,6 +154,7 @@ class AppBootstrap {
     this.foundCaseRepository = const UnavailableFoundCaseRepository(),
   });
 
+  final CaseMatchingRepository caseMatchingRepository;
   final CaseClosureRepository caseClosureRepository;
   final UserBlockRepository userBlockRepository;
   final CaseContactRepository caseContactRepository;
@@ -202,6 +208,16 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           redirectUri: kIsWeb ? null : AppConfig.authRedirectUri,
         );
         return AppBootstrap(
+          caseMatchingRepository: CaseMatchingRepositoryImpl(
+            MatchingSource(
+              supabase.client,
+              http.Client(),
+              const String.fromEnvironment(
+                'PUBLIC_CASE_WEB_URL',
+                defaultValue: 'https://entrehuellas.app',
+              ),
+            ),
+          ),
           userBlockRepository: UserBlockRepositoryImpl(
             SupabaseUserBlockSource(supabase.client),
           ),

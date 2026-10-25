@@ -105,6 +105,8 @@ $nestedBusinessConflictsPlan=Get-Content -LiteralPath (Join-Path $databaseRoot '
 & (Join-Path $PSScriptRoot 'Build-RecoveryNestedBusinessConflictsPatch.ps1')
 $pilotStatisticsPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/039_pilot_statistics.json') -Raw | ConvertFrom-Json
 & (Join-Path $PSScriptRoot 'Build-PilotStatisticsPatch.ps1')
+$caseMatchingPlan=Get-Content -LiteralPath (Join-Path $databaseRoot 'migration_plans/040_case_matching.json') -Raw | ConvertFrom-Json
+& (Join-Path $PSScriptRoot 'Build-CaseMatchingPatch.ps1')
 function Protect-Creation([string]$Condition, [string]$Sql) {
     return 'do $run_all_object$' + "`n" + 'begin' + "`n" +
         "    if $Condition then`n$Sql`n    end if;`n" +
@@ -238,7 +240,7 @@ foreach ($relativePath in $expectedSources) {
         default { $lines.Add($sql) } # Reviewed repeatable grants and ON CONFLICT DO NOTHING backfill.
     }
 }
-foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources) + @($lostCasesPlan.sources) + @($foundCasesPlan.sources) + @($lostCaseLockTimeoutPlan.sources) + @($caseCollectionsPlan.sources) + @($foundCaseLockTimeoutPlan.sources) + @($recoveryPlan.sources) + @($explorePlan.sources) + @($savedCasesPlan.sources) + @($savedCasesListPlan.sources) + @($postersPlan.sources) + @($publicQrPlan.sources) + @($publicSightingsPlan.sources) + @($appSightingsPlan.sources) + @($timelinePlan.sources) + @($notificationsPlan.sources) + @($closurePlan.sources) + @($reportsPlan.sources) + @($moderationPlan.sources) + @($contactPlan.sources) + @($sharingPlan.sources) + @($profilePhonePlan.sources) + @($userBlocksPlan.sources) + @($appealsPlan.sources) + @($blockedContactsPlan.sources) + @($businessConflictsPlan.sources) + @($nestedBusinessConflictsPlan.sources) + @($pilotStatisticsPlan.sources))) {
+foreach ($relativePath in (@($onboardingPlan.sources) + @($avatarPlan.sources) + @($petsPlan.sources) + @($galleryPlan.sources) + @($deletionPlan.sources) + @($archivingPlan.sources) + @($requiredFieldsPlan.sources) + @($zonesPlan.sources) + @($preferencesPlan.sources) + @($photoProcessingPlan.sources) + @($lostCasesPlan.sources) + @($foundCasesPlan.sources) + @($lostCaseLockTimeoutPlan.sources) + @($caseCollectionsPlan.sources) + @($foundCaseLockTimeoutPlan.sources) + @($recoveryPlan.sources) + @($explorePlan.sources) + @($savedCasesPlan.sources) + @($savedCasesListPlan.sources) + @($postersPlan.sources) + @($publicQrPlan.sources) + @($publicSightingsPlan.sources) + @($appSightingsPlan.sources) + @($timelinePlan.sources) + @($notificationsPlan.sources) + @($closurePlan.sources) + @($reportsPlan.sources) + @($moderationPlan.sources) + @($contactPlan.sources) + @($sharingPlan.sources) + @($profilePhonePlan.sources) + @($userBlocksPlan.sources) + @($appealsPlan.sources) + @($blockedContactsPlan.sources) + @($businessConflictsPlan.sources) + @($nestedBusinessConflictsPlan.sources) + @($pilotStatisticsPlan.sources) + @($caseMatchingPlan.sources))) {
     $sql = [IO.File]::ReadAllText((Join-Path $databaseRoot $relativePath)).Replace("`r`n", "`n").TrimEnd()
     $hashAlgorithm = [Security.Cryptography.SHA256]::Create()
     try { $hash = [BitConverter]::ToString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($sql + "`n"))).Replace('-', '').ToLowerInvariant() }
@@ -250,4 +252,4 @@ $lines.Add("`ncommit;")
 $outputPath = Join-Path $databaseRoot 'run_all.sql'
 $content = ($lines -join "`n") + "`n"
 [IO.File]::WriteAllText($outputPath, $content, (New-Object Text.UTF8Encoding($false)))
-Write-Output 'Generado database/run_all.sql con perfiles, mascotas, casos, QR, avistamientos, cronología, alertas, contactos, bloqueos, apelaciones y estadísticas (001-010,012-127; fuente011 sustituida).'
+Write-Output 'Generado database/run_all.sql con perfiles, mascotas, casos, QR, avistamientos, cronología, alertas, contactos, bloqueos, apelaciones, estadísticas y coincidencias (001-010,012-134; fuente011 sustituida).'

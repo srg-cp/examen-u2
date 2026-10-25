@@ -9,18 +9,19 @@ class PublishFoundCase {
     final fields = <FoundField>{};
     if (!{
           'possible_loss',
+          'independent_found',
           'sighting',
           'with_reporter',
         }.contains(d.reportKind) ||
-        (d.reportKind == 'possible_loss' &&
+        ({'possible_loss', 'independent_found'}.contains(d.reportKind) &&
             (d.targetId != null || d.communityTarget)) ||
-        (d.reportKind != 'possible_loss' &&
+        (!{'possible_loss', 'independent_found'}.contains(d.reportKind) &&
             (d.targetId == null ||
                 d.targetId!.isEmpty ||
                 d.targetId == d.id))) {
       fields.add(FoundField.target);
     }
-    if (d.reportKind == 'possible_loss' &&
+    if ({'possible_loss', 'independent_found'}.contains(d.reportKind) &&
         (!{'dog', 'cat', 'other'}.contains(d.species) ||
             (d.species == 'other' &&
                 (d.speciesDetail == null ||
@@ -46,7 +47,8 @@ class PublishFoundCase {
         d.placeReference.trim().runes.length > 120) {
       fields.add(FoundField.place);
     }
-    if ((d.reportKind == 'possible_loss' && d.photos.isEmpty) ||
+    if (({'possible_loss', 'independent_found'}.contains(d.reportKind) &&
+            d.photos.isEmpty) ||
         d.photos.length > 3 ||
         d.photos.map((p) => p.id).toSet().length != d.photos.length ||
         d.photos.any(
