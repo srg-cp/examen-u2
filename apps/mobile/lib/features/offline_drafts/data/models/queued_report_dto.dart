@@ -28,7 +28,7 @@ class QueuedReportDto {
         f.reportKind != d.reportKind) {
       return false;
     }
-    if (d.slot == 'community-search') {
+    if ({'community-search', 'independent-found'}.contains(d.slot)) {
       return f.targetId == null && !f.communityTarget;
     }
     return p.length == 3 &&

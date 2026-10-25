@@ -1,5 +1,24 @@
 # Auditoría de GitHub — 24 de octubre de 2026
 
+## Seguimiento actualizado — 25/10/2026
+
+Aceptación expresa del usuario: #19, #34, #35, #40, #41, #13 y épica #8
+cerrados/Done en GitHub y Projects. La aceptación procede del usuario; no se
+ejecutó una nueva demo del agente ni se fabrican logs de escenarios particulares.
+HU-01 sigue abierta por #24/#25 sin implementar; HU-12 por #42/FCM pospuesto.
+Moderación/denuncias/bloqueos/apelaciones conservan sus pendientes #43–#46.
+Estadísticas #50 ya cerradas por la aceptación del24/10.
+
+Match incluido expresamente en MVP: **HU-25 / #71** y **HU-26 / #72**,
+RF-19/RF-20, Backlog/P1 y needs:refinement. No existían issues de estas
+historias al revisar los51 issues abiertos/cerrados. Ahora hay53 issues:
+**39 Done (31 historias y8 épicas),8 In progress (4 historias y4 épicas),
+6 Backlog (6 historias)**. No es porcentaje de avance ni53 entregas distintas.
+
+Pendientes de implementación: baja #24, exportación #25, controles #51 y
+coincidencias #71/#72. Push #42 sigue diferido. Las tablas/notas inferiores
+son instantáneas históricas, sustituidas por esta actualización.
+
 Actualización posterior autorizada: PR69 fusionado y checks Flutter/web aprobados;
 #49/HU-15.3 y épica #15 cerradas/Done con evidencia integrada. HU-16.1/#50
 implementada localmente y épica #16 In progress; activación039, asignación

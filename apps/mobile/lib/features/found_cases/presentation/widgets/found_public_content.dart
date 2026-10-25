@@ -39,7 +39,7 @@ class FoundPublicContent extends StatelessWidget {
         : switch (value.reportKind) {
             'possible_loss' => 'Posiblemente perdida',
             'sighting' => 'Avistamiento',
-            'with_reporter' => 'Encontrada',
+            'independent_found' || 'with_reporter' => 'Encontrada',
             _ => 'Reporte anterior',
           },
     photos: [
@@ -137,7 +137,7 @@ class FoundPreviewContent extends StatelessWidget {
     eventLabel: switch (value.reportKind) {
       'possible_loss' => 'Posiblemente perdida',
       'sighting' => 'Avistamiento',
-      'with_reporter' => 'Encontrada',
+      'independent_found' || 'with_reporter' => 'Encontrada',
       _ => 'Reporte anterior',
     },
     occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',

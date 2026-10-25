@@ -40,12 +40,13 @@ class FoundDetailScreen extends ConsumerWidget {
               switch (state.requireValue.value!.reportKind) {
                 'possible_loss' => 'Posiblemente perdida',
                 'sighting' => 'Avistamiento',
-                'with_reporter' => 'Encontrada',
+                'independent_found' || 'with_reporter' => 'Encontrada',
                 _ => 'Reporte',
               },
               [
                 'possible_loss',
                 'legacy_found',
+                'independent_found',
               ].contains(state.requireValue.value!.reportKind),
             )
           : null,

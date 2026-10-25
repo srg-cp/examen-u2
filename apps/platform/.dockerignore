@@ -8,6 +8,7 @@
 !tsconfig.json
 !scripts/
 !scripts/healthcheck.mjs
+!scripts/prepare-match-model.mjs
 !app/
 !app/**
 !shared/

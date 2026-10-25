@@ -1,5 +1,15 @@
 # Acceso y recuperación de contraseña
 
+## Aceptación del usuario — 25/10/2026
+
+El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya
+fueron validados y solicita actualizar el seguimiento. Se registra su aceptación,
+sin atribuir al agente una nueva demo ni un log individual de cada escenario.
+Esta nota sustituye los pendientes de validación correspondientes de las notas
+históricas; no activa FCM ni acredita baja/exportación sin implementar.
+
+Cuenta/acceso existente aceptados, incluido Google #19. Baja #24 y exportación #25 permanecen sin implementar; HU-01 sigue abierta por esas entregas.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

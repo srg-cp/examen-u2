@@ -47,6 +47,6 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),o
   if(ambiguous){ambiguous=false;send(res,{message:'PRIVATE_FAILURE_AFTER_COMMIT'},503);}else send(res,saved);
   return true;
  }
- const server=await productionFixture(jpeg,{handle,env:{SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture_123456',MODERATION_SESSION_SECRET:'fixture-session-secret-only-not-a-production-key'}});
+ const server=await productionFixture(jpeg,{handle,env:{SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture_123456',MODERATION_SESSION_SECRET:'fixture-session-secret-only-not-a-production-key',...(options.env||{})}});
  return {...server,close:async()=>{logoutBarrier?.release();await server.close();},pauseLogout(){let started,release;const wait=new Promise(resolve=>{release=resolve;}),begun=new Promise(resolve=>{started=resolve;});logoutBarrier={wait,started,release};return {started:begun,release(){logoutBarrier=null;release();}};},setOnboarding:(actor,value)=>onboarded.set(actor,value),completions:()=>completions,profileFailure:value=>{profileFailure=value;},oauthDenied:value=>{socialDenied=value;},oauthCancelled:value=>{socialCancelled=value;},revoke:value=>{revoked=value;},ambiguousDecision:()=>{ambiguous=true;},decisions:()=>decisions.size,accesses:()=>accesses,hidden:()=>hidden};
 }

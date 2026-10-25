@@ -1,5 +1,12 @@
 # Entre Huellas: instrucciones del proyecto
 
+Coincidencias25/10, ADR-137/138: HU-25/#71 y HU-26/#72 pertenecen al MVP.
+Hallazgos independientes aprobados expresamente; conservar avisos vinculados
+y clasificación histórica. Modelo CPU local en Nuxt existente, sin nuevos
+workers/servicios ni inferencia externa; pesos/versiones fijados y revisión
+humana. No afirmar precisión por un smoke ni cerrar historias sin activación,
+evaluación y aceptación. Véase docs/funcionalidades/coincidencias-de-casos.md.
+
 Patrón UI/UX aprobado21/10: antes de reutilizar la expansión desde origen,
 consultar docs/patrones-ui-ux/expansion-desde-origen.md. Conservar el contrato
 ADR-128 y usar componentes/coordinador existentes; validar cada integración.

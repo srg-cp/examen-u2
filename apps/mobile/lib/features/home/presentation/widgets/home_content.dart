@@ -92,6 +92,26 @@ class HomeContent extends StatelessWidget {
           },
         ),
       ),
+      const SizedBox(height: 16),
+      HomeQuickAction(
+        icon: Icons.manage_search_rounded,
+        label: 'Buscar coincidencias',
+        onTap: (source) => openHomeAction(
+          source,
+          '/home/coincidencias',
+          Icons.manage_search_rounded,
+        ),
+      ),
+      const SizedBox(height: 12),
+      HomeQuickAction(
+        icon: Icons.pets_outlined,
+        label: 'Encontré una mascota y no sé de quién es',
+        onTap: (source) => openHomeAction(
+          source,
+          '/home/found-cases/new?independent=true',
+          Icons.pets_outlined,
+        ),
+      ),
       const SizedBox(height: 28),
       const HomeReunionCard(),
       const SizedBox(height: 28),
@@ -285,4 +305,23 @@ void openLostReport(
               ),
       )
       .then((_) => onReturn?.call());
+}
+
+void openHomeAction(BuildContext context, String path, IconData icon) {
+  final box = context.findRenderObject(),
+      navigator = Navigator.of(context).context.findRenderObject();
+  final bounds = box is RenderBox && box.hasSize
+      ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
+      : null;
+  context.push(
+    path,
+    extra: bounds == null
+        ? null
+        : OriginPageSource(
+            bounds: bounds,
+            color: const Color(0xFF111111),
+            radius: 22,
+            child: Icon(icon, color: Colors.white),
+          ),
+  );
 }

@@ -134,9 +134,10 @@ class RecoverySearch {
 class FoundEditorContext {
   const FoundEditorContext({
     this.communitySearch = true,
+    this.independentFound = false,
     this.targetId,
     this.communityTarget = false,
   });
-  final bool communitySearch, communityTarget;
+  final bool communitySearch, communityTarget, independentFound;
   final String? targetId;
 }

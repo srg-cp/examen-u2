@@ -1,3 +1,4 @@
+import '../features/case_matching/presentation/screens/matching_screen.dart';
 import '../features/offline_cases/presentation/widgets/cached_cases_section.dart';
 import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
@@ -124,6 +125,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
       if (path == '/home' &&
           state.uri.path == '/home/found-cases/new' &&
+          state.uri.queryParameters['independent'] != 'true' &&
           ((state.uri.queryParameters['case'] ?? '').trim().isEmpty ||
               !{
                 'true',
@@ -145,6 +147,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/submissions' ||
               state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
+              state.uri.path == '/home/coincidencias' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
@@ -252,6 +255,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
         routes: [
           GoRoute(
+            path: 'coincidencias',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: MatchingScreen(
+                onOpen: (reference, origin) async {
+                  await context.push(
+                    '/home/${reference.source == 'lost' ? 'cases' : 'found-cases'}/${reference.id}',
+                    extra: origin,
+                  );
+                },
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'appeals',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -305,7 +324,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 overrides: [
                   foundEditorContextProvider.overrideWithValue(
                     FoundEditorContext(
-                      communitySearch: false,
+                      communitySearch:
+                          state.uri.queryParameters['independent'] == 'true',
+                      independentFound:
+                          state.uri.queryParameters['independent'] == 'true',
                       targetId: state.uri.queryParameters['case'],
                       communityTarget:
                           state.uri.queryParameters['community'] == 'true',
@@ -367,7 +389,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     return;
                   }
                   final p = d.slot.split(':');
-                  final route = d.slot == 'lost'
+                  final route = d.slot == 'independent-found'
+                      ? '/home/found-cases/new?independent=true'
+                      : d.slot == 'lost'
                       ? '/home/lost-cases/new'
                       : d.slot == 'community-search'
                       ? '/home/lost-cases/community/new'
@@ -393,7 +417,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               child: LocalDraftsScreen(
                 onOpen: (draft) async {
                   final parts = draft.slot.split(':');
-                  final path = draft.slot == 'lost'
+                  final path = draft.slot == 'independent-found'
+                      ? '/home/found-cases/new?independent=true'
+                      : draft.slot == 'lost'
                       ? '/home/lost-cases/new'
                       : draft.slot == 'community-search'
                       ? '/home/lost-cases/community/new'

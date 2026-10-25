@@ -1,5 +1,19 @@
 # Arquitectura de Entre Huellas
 
+25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
+Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
+ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,
+índices/revisiones privadas (plan040), ranking exploratorio de hasta cinco casos,
+revisión humana y recorridos Android/web. Sin worker, inferencia externa ni FCM.
+[ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md). Activación040/demo alojada,
+dataset/evaluación, aceptación e integración pendientes; no se cierra el MVP.
+
+25/10, [ADR-137](decisiones/137-coincidencias-visuales-en-el-mvp.md): HU-25/HU-26,
+RF-19/RF-20 se incorporan al MVP por instrucción explícita. Alcance aprobado,
+sin motor implementado. Selección de modelo/ejecución y candidatos elegibles
+pendiente; no introduce workers de IA ni cambia las fronteras existentes.
+
 24/10, ADR-136: `statistics` en Nuxt separa dominio/casos de uso, DTO/repositorios,
 fuentes HTTP/RPC y ViewModel. Inicio compone el acceso por slot; política global
 SSR/cliente `administrator` y RPC con permiso `platform_administrators` independiente

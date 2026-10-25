@@ -1,5 +1,23 @@
 # Búsquedas y avisos vinculados
 
+25/10, [ADR-138](../decisiones/138-motor-visual-local-y-hallazgos-independientes.md):
+usuario aprueba «Encontré una mascota y no sé de quién es» sin destino, además
+de los avisos vinculados existentes. `independent_found`, fotos propias obligatorias,
+metadatos/ubicación privados-públicos y custodia opcional elegida; no se inventa
+propietario, custodia ni reclasificación de históricos. Borrador/cola por cuenta
+con slot propio en Android. Plan040 y clientes actualizados juntos;
+activación remota y demo pendientes. [Matching](coincidencias-de-casos.md).
+
+## Aceptación del usuario — 25/10/2026
+
+El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya
+fueron validados y solicita actualizar el seguimiento. Se registra su aceptación,
+sin atribuir al agente una nueva demo ni un log individual de cada escenario.
+Esta nota sustituye los pendientes de validación correspondientes de las notas
+históricas; no activa FCM ni acredita baja/exportación sin implementar.
+
+Cuenta, difusión, seguimiento y recuperación aceptados por el usuario. Se incluye el match en MVP como HU-25/#71 y HU-26/#72, todavía sin implementar; no se reclasifican avisos vinculados.
+
 Actualización20/10, ADR-113/114: Ver ficha usa [tarjetas glass](ficha-publica-mobile.md), con [contacto del autor autorizado por caso](contacto-reportante.md). La publicación conserva vista previa ImmersivePhotoSheet. Contacto se registra/edita desde la ficha publicada y no repite publicación. Plan031/activación remota pendientes; alcance ampliado explícitamente en este chat.
 
 Conservación20/10, ADR-112: el diseño actual se llama **Ficha fotográfica inmersiva** (`ImmersivePhotoSheet`, antes `CasePublicationPreview`), sin cambio visual ni funcional. [Contrato de reutilización](ficha-fotografica-inmersiva.md). Las referencias al nombre anterior designan el mismo componente. Nuevo diseño glass por tarjetas pendiente de otro incremento.

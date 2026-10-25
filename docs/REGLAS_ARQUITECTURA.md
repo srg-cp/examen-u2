@@ -1,5 +1,16 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+25/10, [ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md):
+matching conserva dominio/casos de uso, repositorios/fuentes y ViewModels por
+funcionalidad. CPU en Nuxt existente con pesos locales fijados; sin nuevo worker
+ni inferencia externa. Actor verificado en servidor, índices/RPC privados y
+revisión humana sin asignación de propietario ni recuperación automática.
+
+25/10, excepción explícita de alcance [ADR-137](decisiones/137-coincidencias-visuales-en-el-mvp.md):
+coincidencias visuales HU-25/HU-26 incluidas en MVP. Esto no autoriza introducir
+workers de IA ni servicios nuevos sin decisión técnica; conservar Clean Architecture,
+permisos en servidor y separación de originales/derivados privados y datos públicos.
+
 Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
 móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
 y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente

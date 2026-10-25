@@ -1,5 +1,155 @@
 # Estado del proyecto
 
+## Publicación de rama autorizada —25/10/2026
+
+El usuario solicita commit y push de `feature/case-matching`. Se prepara el
+incremento completo con documentación de alcance/aceptaciones previas conservada.
+Revisión de138 archivos: sin destinos locales ausentes ni credenciales detectadas;
+env local, pesos ONNX, logs y work permanecen ignorados. Diff sin errores de
+espacio. Evidencia disponible:597 Flutter,63 SQL,94 web y35 servidor aprobados;
+build/typecheck, Chrome y modelo local documentados anteriormente.
+040 aplicado según usuario y RPC remota presente con rechazo correcto de actor
+nulo. Siguen pendientes demo de dos cuentas, evaluación con fotos autorizadas,
+aceptación e integración/CI; commit/push no cierran #71/#72 ni despliegan.
+
+## Aplicación040 confirmada por el usuario —25/10/2026
+
+El usuario confirma ejecución del patch040 en Supabase. Se registra como
+confirmación del usuario; no se atribuye al agente inspección remota ni se
+reaplica SQL. Configurado MATCH_MODEL_DIRECTORY en .env.local sin exponer secretos.
+Comprobación remota de solo lectura: read_case_match_context existe y rechaza
+actor nulo con403/42501 matching_forbidden. No acredita todavía ranking ni
+permisos entre cuentas reales. Typecheck y94 pruebas web finales aprobados;
+build y smoke del servidor construido con modelo real/backend fixture aprobados.
+Se inicia desarrollo local en127.0.0.1:5173 para la prueba del usuario. Publicación/despliegue y precisión
+con mascotas reales todavía no acreditados. #71/#72 siguen abiertos.
+
+## Matching: implementación local y pendientes de cierre —25/10/2026
+
+Rama `feature/case-matching`. Usuario autoriza HU-25/#71 y HU-26/#72 e incluye
+expresamente hallazgos independientes sin elegir una búsqueda, conservando avisos
+vinculados y datos históricos. Motor CLIP visual CPU local en Nuxt existente,
+indexación privada/versionada, ranking de hasta cinco casos y revisión humana;
+recorridos Android/web, fotos obligatorias y custodia opcional elegida.
+Confirmar sugerencia no asigna propietario ni confirma recuperación.
+ADR-138, ficha, configuración y guía actualizados; plan040/fuentes128–134,
+migración/patch generados y run_all mediante generadores. Integraciones de
+cartel/QR/compartir/seguimiento/cronología conservan permisos y proyecciones.
+
+Evidencia ejecutada:597/597 Flutter, análisis lib/test limpio;63/63 SQL/PostGIS;
+94/94 web,35/35 servidor construido, typecheck/build aprobados. Modelo real
+local produce512 componentes normalizados; servidor construido indexa dos
+canarios con backend de prueba y reutiliza índices. Esto no evalúa identidad
+de animales. Chrome1440/390/320, fases de apertura/cierre desde origen,
+fullscreen, reducido, revisión/ficha, texto200% y retry aprobados con fixtures.
+Capturas móvil390/320-texto2 revisadas; nueva prueba de origen/retorno móvil
+aprobada. Logs ignorados: apps/mobile/build/matching-*.log,
+apps/platform/matching-*.log y database/tests/matching-*.log.
+
+Tras esos checks se ajustó el texto de presentación y la composición web del
+destino al alternar aviso vinculado/hallazgo independiente; verificar ese último
+ajuste antes de integrar. No se afirma que cada cambio posterior esté cubierto
+por los resultados anteriores. Dockerfile preparado para CPU/glibc y pesos
+fijados; Docker Engine Linux local no disponible, contenedor pendiente.
+
+GitHub/Projects #71/#72 In progress/P1, abiertos; se retira needs:refinement
+porque contrato/modelo/recorrido están concretados, sin marcar aceptación.
+No se aplicó040 ni se desplegó backend/web, ni se hizo commit/push/PR de esta
+feature. Trabajo documental previo del usuario conservado.
+
+**Falta para cerrar:** comprobar ajustes finales y diff/enlaces/formato; activar
+040 y servidor/clientes en desarrollo; demo con dos cuentas; dataset autorizado
+con identidades separadas y evaluación Recall@5/falsos positivos/latencia;
+aceptación del usuario e integración/CI. Android físico y contenedor Linux
+pendientes. No hay precisión acreditada ni avisos automáticos activos, y no
+se declara feature terminada ni cierre del MVP. Siguiente paso: completar esas
+comprobaciones locales y preparar activación revisable; no solicitar fotos
+privadas ni aplicar SQL remoto sin autorización.
+
+## Seguimiento actualizado — 25/10/2026
+
+Aceptación expresa del usuario: #19, #34, #35, #40, #41, #13 y épica #8
+cerrados/Done en GitHub y Projects. La aceptación procede del usuario; no se
+ejecutó una nueva demo del agente ni se fabrican logs de escenarios particulares.
+HU-01 sigue abierta por #24/#25 sin implementar; HU-12 por #42/FCM pospuesto.
+Moderación/denuncias/bloqueos/apelaciones conservan sus pendientes #43–#46.
+Estadísticas #50 ya cerradas por la aceptación del24/10.
+
+Match incluido expresamente en MVP: **HU-25 / #71** y **HU-26 / #72**,
+RF-19/RF-20, Backlog/P1 y needs:refinement. No existían issues de estas
+historias al revisar los51 issues abiertos/cerrados. Ahora hay53 issues:
+**39 Done (31 historias y8 épicas),8 In progress (4 historias y4 épicas),
+6 Backlog (6 historias)**. No es porcentaje de avance ni53 entregas distintas.
+
+Pendientes de implementación: baja #24, exportación #25, controles #51 y
+coincidencias #71/#72. Push #42 sigue diferido. Las tablas/notas inferiores
+son instantáneas históricas, sustituidas por esta actualización.
+
+## Alcance y evidencia de esta actualización
+
+Usuario autoriza incluir el match y actualizar los recorridos ya validados.
+Se conserva el trabajo local previo de estadísticas y sus documentos. ADR-137,
+guía, backlog y fichas actualizados; sin modificar código de producto, ejecutar
+SQL, desplegar, hacer commit/push o activar Firebase. La aprobación es de alcance,
+no entrega del motor. Indexación versionada, ranking de hasta cinco candidatos
+con señales visuales/geográficas/temporales y revisión humana; sin identidad
+garantizada, propietario automático ni cierre del caso por sugerencia.
+
+Validación final:53 issues y53 tarjetas consultados por API;39 Done,8 In progress
+y6 Backlog, sin discrepancias de estado abierto/cerrado, etiqueta o Status.
+#71/#72 con prioridad P1 verificada. Enlaces locales de documentos modificados
+sin destinos ausentes y git diff --check correcto. Sin repetir
+pruebas de producto por un cambio de planificación y aceptación. Siguiente paso:
+refinar modelo, ejecución, candidatos reales y recorrido de HU-25/HU-26 antes
+de implementar; no reclasificar los avisos ya vinculados como nuevos hallazgos.
+
+## HU-16.1 cerrada con aceptación del usuario —24/10/2026
+
+El usuario confirma haber probado el recorrido después de aplicar039 y asignar
+la cuenta autorizada; solicita actualizar GitHub/Projects y no repetir la prueba.
+Se registra como aceptación del usuario, sin atribuir al agente una comprobación
+de sesión administradora ni un contraste alojado de conteos que no realizó.
+Se cancela la autenticación adicional: no se envían códigos ni se cambian sesiones.
+Se conserva la evidencia independiente alojada: cuatro rechazos correctos de
+las RPC para cuenta ordinaria/visitante, además de89 web,33 servidor,58 SQL
+locales, typecheck/build y Chrome previos.
+
+PR70 fusionado en main, commitb8c12e4. CI del commit integrado aprobada: web
+run40160764194 y backend run40160764206 (SQL y fotos). Algunas ejecuciones
+duplicadas SQL de rama/PR seguían en curso al consultar; no se afirma su resultado.
+#50/HU-16.1 cerrada, cuatro criterios marcados y status:done/Projects Done.
+#16/HU-16 sigue abierta/In progress con #50 completada y #51 pendiente de acordar
+funciones controlables e implementar. No se inicia HU-16.2 ni se cierra el MVP.
+Documentación y ficha sincronizadas; sin nuevos cambios de producto, SQL remoto,
+commit/push o despliegue por este seguimiento. Siguiente paso funcional: refinar #51.
+
+## Asignación confirmada; primera comprobación alojada —24/10/2026
+
+El usuario confirma ejecución de la operación privada de asignación. Se registra
+como confirmación, pendiente de observar el acceso con sesión de esa cuenta.
+Comprobación real de desarrollo de solo lectura: las RPC require_platform_administrator
+y read_pilot_statistics rechazan a una cuenta ordinaria con403/42501 y a visitante
+sin sesión con401/42501; cuatro verificaciones aprobadas. Sesión QA creada para
+esta consulta cerrada con scope=local; otras sesiones conservadas. Evidencia local
+ignorada: apps/platform/statistics-negative-remote.log.
+
+PR70 ya fusionado, commitb8c12e4; comprobaciones web aprobadas, SQL todavía en curso
+al consultar. No se afirma CI final ni cierre de #50/#16. Las sesiones de prueba
+disponibles pertenecen a otras cuentas; se solicita al usuario elegir código de
+correo o inicio local para autenticar la cuenta administradora, sin pedir su
+contraseña ni cambiarla. Pendientes: acceso administrador/conteos alojados y CI SQL.
+
+## Cuenta administradora identificada —24/10/2026
+
+El usuario indica la cuenta concreta autorizada para estadísticas. Se prepara
+operación privada local en work/assign-pilot-administrator.sql, fuera de Git,
+que exige una coincidencia única en auth.users, asigna solo ese UUID de forma
+idempotente y devuelve administrator_assigned. No se versiona el correo personal.
+No hay conexión SQL administrativa disponible en esta sesión; la asignación
+remota sigue pendiente de ejecutar la operación en SQL Editor de desarrollo.
+No se reaplica039 ni se asigna permiso de moderador. Después se comprobarán
+acceso administrador, rechazo de otras cuentas y conteos alojados.
+
 ## Aplicación de039 confirmada por el usuario —24/10/2026
 
 El usuario confirma ejecución completa del patch039 en Supabase de desarrollo.

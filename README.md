@@ -1,4 +1,9 @@
 <div align="center">
+
+25/10: coincidencias visuales incluidas en MVP e implementadas localmente en
+`feature/case-matching` (HU-25/#71 y HU-26/#72). Modelo CPU en servidor existente,
+hallazgos independientes y revisión humana; activación/evaluación pendientes.
+[Recorrido y configuración](docs/funcionalidades/coincidencias-de-casos.md).
   <img src="apps/mobile/assets/branding/app_icon.png" alt="Icono de Entre Huellas" width="136" />
   <h1>Entre Huellas</h1>
   <p><strong>Cada huella puede ayudar a volver a casa.</strong></p>

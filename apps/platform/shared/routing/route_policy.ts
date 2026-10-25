@@ -12,6 +12,8 @@ export const routePolicies: Readonly<Record<string, RouteAccess>> = Object.freez
   '/explorar': 'account',
   '/mis-mascotas': 'account',
   '/reportar': 'account',
+  '/coincidencias': 'account',
+  '/casos/:source/:id': 'account',
   '/cuentas-bloqueadas': 'account',
   '/bienvenida': 'onboarding',
   '/moderacion': 'reviewer',
