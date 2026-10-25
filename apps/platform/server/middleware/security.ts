@@ -44,7 +44,7 @@ export default defineEventHandler(event => {
   }
   if ((event.node.req.url?.length || 0) > 2048) { setResponseStatus(event, 414); return { error: 'invalid_request' }; }
   if (submission) {
-    const origin = process.env.PUBLIC_WEB_ORIGIN || (import.meta.dev ? getRequestURL(event).origin : 'https://entrehuellas.kormind.com');
+    const origin = process.env.PUBLIC_WEB_ORIGIN || (import.meta.dev ? getRequestURL(event).origin : 'https://entrehuellas.app');
     if ((!nativeSubmission && getHeader(event, 'origin') !== origin) || getHeader(event, 'sec-fetch-site') === 'cross-site' ||
       (nativeSubmission && (!/^Bearer [A-Za-z0-9._-]{20,8192}$/.test(getHeader(event, 'authorization') || '') || getHeader(event, 'origin')))) {
       setResponseStatus(event, 403); return { error: 'invalid_request' };

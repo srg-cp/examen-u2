@@ -37,16 +37,19 @@ class CasePublicContent extends StatelessWidget {
     required this.value,
     this.actions,
     this.contact,
+    this.offline = false,
     super.key,
   });
   final PublicLostCase value;
   final Widget? actions;
   final Widget? contact;
+  final bool offline;
   @override
   Widget build(BuildContext context) {
     final f = value.fields;
     return CasePublicCards(
       key: ValueKey(value.id),
+      offline: offline,
       name: f.name,
       eventLabel: value.status == 'active' ? 'Perdido' : 'Búsqueda cerrada',
       photos: [

@@ -1,5 +1,13 @@
 # Carteles PDF y QR
 
+24/10/2026: dominio público actualizado a `https://entrehuellas.app`. Los
+endpoints de Supabase y la infraestructura se conservan. Código/configuración
+local actualizados; despliegue, retorno OAuth, envío de correo y escaneo de QR
+en producción pendientes de comprobación. Los QR/PDF ya distribuidos con el
+subdominio anterior necesitan mantener ese host o una redirección de navegación
+a la misma ruta y parámetros; el código no regenera documentos existentes.
+
+
 Ampliación20/10, ADR-115: [Compartir ficha](compartir-ficha.md) permite difusión/descarga de la proyección pública por otros lectores autorizados mediante prepare_case_share/plan032. No altera el permiso de autor de prepare_case_poster ni el generador PDF; reutiliza el mismo enlace QR y respeta revocación. Activación032/Android pendientes, sin cierre de HU.
 
 **Auditoría de seguimiento18/10:** HU-08/#8 y #34/#35 siguen In progress por criterios concretos: impresión/escaneo físico y guardar/compartir/cancelar mediante hojas nativas Android. Generación/lector022/023 ya están confirmados; no mantener la web no disponible como bloqueo genérico.
@@ -21,7 +29,7 @@ Imprimir o guardar PDF abre el diálogo nativo de impresión y su opción Guarda
 
 Solo el autor de un caso activo, visible y con foto procesada seleccionada. Incluye pérdida propia/comunitaria y encontrado independiente anterior; avisos vinculados conservan su búsqueda de destino. PDF con nombre o especie cuando falta nombre, especie/tamaño/sexo disponibles, fecha y rasgos; foto sin EXIF, QR con margen blanco y enlace legible. Nombre/rasgos extensos se ajustan sin truncar. Sin ubicación exacta, referencia privada, contacto, salud, documentos, URLs firmadas o tokens de sesión.
 
-URL acordada por el usuario: `https://entrehuellas.kormind.com/c/<slug opaco>`. El PDF es una instantánea y pide consultar la ficha para ver cambios. El mismo slug permanece entre generaciones y tras cierre; una revocación nunca se deshace generando de nuevo. Antes de exportar se verifica de nuevo el servidor; cambios en la ficha imprimible exigen regenerar.
+URL acordada por el usuario: `https://entrehuellas.app/c/<slug opaco>`. El PDF es una instantánea y pide consultar la ficha para ver cambios. El mismo slug permanece entre generaciones y tras cierre; una revocación nunca se deshace generando de nuevo. Antes de exportar se verifica de nuevo el servidor; cambios en la ficha imprimible exigen regenerar.
 
 ## Persistencia y permisos
 

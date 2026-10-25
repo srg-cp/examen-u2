@@ -1,5 +1,76 @@
 # Estado del proyecto
 
+## HU-15.3: fichas consultadas sin conexión implementadas y validadas —24/10/2026
+
+Por autorización del usuario se implementa HU-15.3/RF-32/#49 en
+`feature/offline-case-cache`, sin cerrar automáticamente #49 ni la épica #15.
+`offline_cases`/ADR-135 conserva fichas públicas de perdido/encontrado consultadas
+y fotos en SQLite privado por cuenta; Guardados incorpora Consultados en este
+dispositivo por composición. Aviso/fecha/Actualizar en copia offline, sin contactos,
+URLs firmadas ni permisos persistidos. Hasta30 fichas/32MiB y3 fotos de2MiB.
+Ausencia/cierre/rechazo remoto invalida la copia y las respuestas/descargas tardías
+no deben restaurarla. No hay SQL, Edge Function, mapas descargados o PWA nuevos.
+[Contrato, recorrido y límites](funcionalidades/fichas-sin-conexion.md).
+
+Validación final: **591/591 Flutter**, incluidos16 checks nuevos de caché y los
+de arquitectura, con `AMBIENT_BACKGROUND_MOTION=false`; formato y análisis sin
+incidencias, diff sin errores de espacio. Prueba real de desarrollo aprobada en6s:
+cuentas A/B distintas, JPEG procesado/foto Storage decodificable, reapertura SQLite
+sin red, aislamiento/logout, reconexión y cierre real del fixture seguido de
+invalidación sin resurrección. Fixture QA retirado mediante APIs; casos originales
+y otras sesiones conservados. No se reaplican patches ni se despliega backend.
+
+App normal Android emulada: ficha perdida existente consultada, Wi-Fi desactivado+
+modo avión, force-stop, reapertura → Explorar/Guardados → ficha con foto/datos/fecha
+offline y sin contactos/acciones remotas. Red restaurada y Actualizar retira el
+aviso y reconsulta operaciones autorizadas. Snapshot SQLite real confirma1 ficha/
+1 foto con hash, cero URLs firmadas/contactos/flags. Build profile x64 final69.4MB
+correcto e instalado conservando datos. Umbral temporal de almacenamiento del AVD
+restaurado tras instalar; Wi-Fi activo y modo avión desactivado. Renders normales
+y320×500/texto200% revisados, sin atribuir aprobación visual del usuario.
+
+Logs locales en apps/mobile/build:offline-cases-full-tests.log,
+offline-cases-analyze.log, offline-cases-remote-final.log,
+offline-cases-android-build-final.log; evidencia nativa offline-case-native-evidence.json
+y XML/capturas de reapertura/reconexión. No se acredita teléfono físico ni reboot
+del SO. Si el almacenamiento impide borrar una copia invalidada, se oculta en el
+proceso y se informa el fallo, sin afirmar persistencia hasta reintentar con éxito.
+
+Siguiente paso: revisar/integrar este incremento y tramitar #49/HU-15 con su
+evidencia cuando se autorice. No se hace commit/push/PR ni cierres en GitHub.
+Se conservan los cambios paralelos del dominio público en el workspace; el resultado
+de esta suite usa movimiento ambiental desactivado y no reescribe sus pendientes
+de validación/publicación. No se inicia otra funcionalidad por arrastre.
+
+## Dominio público entrehuellas.app —24/10/2026
+
+Por instrucción del usuario, se actualiza el dominio público anterior en los
+valores de respaldo del origen permitido, OAuth y cookies del servidor, SEO
+Nuxt y consumidores Android de avistamientos, carteles/QR y compartir. Ejemplos,
+configuraciones locales ignoradas de Android y guías actualizados; endpoints
+Supabase e infraestructura conservados. No se reescribe SQL ni decisiones y
+evidencias históricas. El usuario informa Cloudflare/Resend verificados y
+cambios remotos de Supabase; el agente no los certifica ni despliega.
+
+Validación local: npm test83/83; typecheck y build correctos; test:server31/31.
+Tras añadir regresión del origen por defecto, production.test.mjs7/7: origen
+nuevo llega a validación, anterior rechazado403, SEO predeterminado y sustitución
+en runtime verificados. Build muestra advertencias de BigInt/es2019 y exports
+de Vue; no se modifican dependencias por esta tarea. Flutter: formato correcto,
+analyze sin incidencias;25 pruebas aprobadas y2 fallidas por pumpAndSettle
+timeout en case_posters_test.dart (líneas155 y380), reproducidas en segunda
+ejecución. No se afirma suite móvil completamente aprobada ni causa del timeout.
+
+Siguiente paso: publicar esta revisión cuando se autorice y redesplegar web con
+PUBLIC_WEB_ORIGIN y NUXT_PUBLIC_SITE_URL=https://entrehuellas.app. Recompilar
+Android con PUBLIC_CASE_WEB_URL nuevo y actualizar la configuración privada de
+CI si aún contiene el anterior. Comprobar acceso/correo/OAuth, fichas, QR y
+avistamientos en producción. Mantener el host anterior o configurar redirección
+permanente de navegación con ruta/parámetros para QR/PDF ya distribuidos; cookies
+no se transfieren. Pendientes: redirección remota, revisión Google y2 timeouts
+Flutter. Sin commit/push, despliegue, APK ni nuevos cierres de HU/issues.
+[Ficha y activación](funcionalidades/landing-page.md).
+
 ## GitHub reconciliado: PR67 fusionado y #47/#48 cerrados —24/10/2026
 
 PR [#67](https://github.com/srg-cp/entrehuellas/pull/67) fusionado en main,

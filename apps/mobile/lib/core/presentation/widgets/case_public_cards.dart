@@ -28,6 +28,7 @@ class CasePublicCards extends StatelessWidget {
     this.actions,
     this.contact,
     this.createMapTileProvider,
+    this.offline = false,
     super.key,
   });
 
@@ -42,6 +43,7 @@ class CasePublicCards extends StatelessWidget {
   final double latitude, longitude;
   final Widget? actions;
   final Widget? contact;
+  final bool offline;
   final TileProvider Function()? createMapTileProvider;
 
   @override
@@ -117,44 +119,49 @@ class CasePublicCards extends StatelessWidget {
               const SizedBox(height: 6),
               Text(occurredAt, style: _labelStyle),
               const SizedBox(height: 12),
-              ZoneMapPicker(
-                latitude: latitude,
-                longitude: longitude,
-                radiusMeters: 1000,
-                onSelect: null,
-                readOnly: true,
-                compactAttribution: true,
-                fitRadius: true,
-                showRadius: false,
-                showCenterMarker: false,
-                markers: [
-                  Marker(
-                    point: LatLng(latitude, longitude),
-                    width: 72,
-                    height: 72,
-                    child: Semantics(
-                      label: 'Ubicación pública aproximada',
-                      child: Container(
-                        padding: const EdgeInsets.all(23),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0x30459FF6),
-                        ),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
+              if (offline)
+                Text(
+                  'Ubicación pública aproximada: ${latitude.toStringAsFixed(3)}, ${longitude.toStringAsFixed(3)}. Mapa disponible al conectar.',
+                )
+              else
+                ZoneMapPicker(
+                  latitude: latitude,
+                  longitude: longitude,
+                  radiusMeters: 1000,
+                  onSelect: null,
+                  readOnly: true,
+                  compactAttribution: true,
+                  fitRadius: true,
+                  showRadius: false,
+                  showCenterMarker: false,
+                  markers: [
+                    Marker(
+                      point: LatLng(latitude, longitude),
+                      width: 72,
+                      height: 72,
+                      child: Semantics(
+                        label: 'Ubicación pública aproximada',
+                        child: Container(
+                          padding: const EdgeInsets.all(23),
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFF2887EF),
-                            border: Border.all(color: Colors.white, width: 2),
+                            color: Color(0x30459FF6),
+                          ),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF2887EF),
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-                height: 180,
-                borderRadius: 22,
-                createTileProvider: createMapTileProvider,
-              ),
+                  ],
+                  height: 180,
+                  borderRadius: 22,
+                  createTileProvider: createMapTileProvider,
+                ),
               const SizedBox(height: 10),
               Text(privacy, style: _labelStyle.copyWith(fontSize: 13)),
             ],

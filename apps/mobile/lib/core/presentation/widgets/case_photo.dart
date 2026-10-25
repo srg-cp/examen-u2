@@ -5,7 +5,9 @@ import 'loading_shimmer.dart';
 
 class CasePhotoView extends StatelessWidget {
   CasePhotoView.network(Uri uri, {this.semanticLabel, super.key})
-    : image = NetworkImage(uri.toString());
+    : image = uri.scheme == 'data'
+          ? MemoryImage(uri.data!.contentAsBytes())
+          : NetworkImage(uri.toString());
   CasePhotoView.memory(Uint8List bytes, {this.semanticLabel, super.key})
     : image = MemoryImage(bytes);
   const CasePhotoView({required this.image, this.semanticLabel, super.key});

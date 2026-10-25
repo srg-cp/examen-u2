@@ -40,7 +40,7 @@ variables solo en ejecución, healthcheck incorporado y CI de contenedor prepara
 
 Vue3, Nuxt4, TypeScript estricto y servidor Nitro. Node24.15+ recomendado
 (local verificado24.18.0); Docker y CI usan Node24.
-Ruta acordada: `https://entrehuellas.kormind.com/c/<token opaco de 64 hex>`.
+Ruta acordada: `https://entrehuellas.app/c/<token opaco de 64 hex>`.
 Migración local: no acredita un nuevo despliegue ni cierra HU-09. El formulario y la
 recepción de avistamientos corresponden a HU-10.1/#36 y aún no existen aquí.
 

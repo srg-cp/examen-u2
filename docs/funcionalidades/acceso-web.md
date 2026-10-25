@@ -1,5 +1,13 @@
 # Acceso web
 
+24/10/2026: dominio público actualizado a `https://entrehuellas.app`. Los
+endpoints de Supabase y la infraestructura se conservan. Código/configuración
+local actualizados; despliegue, retorno OAuth, envío de correo y escaneo de QR
+en producción pendientes de comprobación. Los QR/PDF ya distribuidos con el
+subdominio anterior necesitan mantener ese host o una redirección de navegación
+a la misma ruta y parámetros; el código no regenera documentos existentes.
+
+
 ## Retorno Google de producción —23/10/2026
 
 Diagnóstico remoto sin sesión: inicio OAuth web200 y redirección de Auth302 a
@@ -10,7 +18,7 @@ callback web. Confirma rechazo del retorno de producción por la allowlist
 efectiva; no demuestra por sí solo la causa de la espera en accounts.google.com.
 
 Corrección operativa pendiente: añadir
-https://entrehuellas.kormind.com/api/moderation/oauth/callback?flow=*
+https://entrehuellas.app/api/moderation/oauth/callback?flow=*
 a GOTRUE_URI_ALLOW_LIST del contenedor Auth, o a ADDITIONAL_REDIRECT_URLS si
 Compose la inyecta allí; conservar entradas móvil/local y recrear Auth.
 No cambiar el callback Google→Supabase ni sustituir Site URL móvil como atajo.
@@ -55,7 +63,7 @@ Identidad y perfil se leen en paralelo sin devolver datos antes de validar ambos
 
 Diagnóstico20/10: producción rechazaba el Origin HTTPS antes de Auth y aceptaba
 http://127.0.0.1:5173 (POST vacío403 frente a422, sin credenciales). Configurar
-PUBLIC_WEB_ORIGIN=https://entrehuellas.kormind.com en runtime de producción y
+PUBLIC_WEB_ORIGIN=https://entrehuellas.app en runtime de producción y
 reiniciar/recrear contenedor; desarrollo conserva su origen local. Corrección
 remota pendiente, sin cambiar CSRF/roles/SQL. Evidencia en ESTADO.
 

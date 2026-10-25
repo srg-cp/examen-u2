@@ -1,3 +1,5 @@
+import '../../../offline_cases/providers/case_cache_providers.dart';
+import '../../../offline_cases/domain/entities/cached_case.dart';
 import '../../../../core/presentation/state/retained_read.dart';
 import '../../../pets/providers/pet_providers.dart'
     show notifyPetChangedProvider;
@@ -109,13 +111,29 @@ class PublicCaseViewModel extends AsyncNotifier<PublicCaseState> {
   PublicCaseViewModel(this.id);
   final String id;
   int _generation = 0;
+  Future<CaseConsultation<PublicLostCase>> _read(String? owner) async {
+    final load = ref.read(readPublicLostCaseProvider);
+    final cached = ref.read(consultCachedCaseProvider);
+    return cached == null
+        ? CaseConsultation(await load(id))
+        : await cached<PublicLostCase>(
+            owner: owner,
+            source: 'lost',
+            id: id,
+            load: () => load(id),
+          );
+  }
+
   @override
   Future<PublicCaseState> build() async {
     _generation++;
     final session = await ref.watch(caseSessionProvider.future);
+    final result = await _read(session?.userId);
     return PublicCaseState(
       ownerId: session?.userId,
-      value: await ref.watch(readPublicLostCaseProvider)(id),
+      value: result.value,
+      cachedAt: result.cachedAt,
+      storageFailed: result.storageFailed,
     );
   }
 
@@ -131,16 +149,23 @@ class PublicCaseViewModel extends AsyncNotifier<PublicCaseState> {
       PublicCaseState(
         ownerId: current.ownerId,
         value: current.value,
+        cachedAt: current.cachedAt,
+        storageFailed: current.storageFailed,
         refreshing: true,
       ),
     );
     await retainedRead(
-      request: () => ref.read(readPublicLostCaseProvider)(id),
+      request: () => _read(current.ownerId),
       isCurrent: () =>
           ref.mounted && generation == _generation && !state.isLoading,
       onSuccess: (value) {
         state = AsyncData(
-          PublicCaseState(ownerId: current.ownerId, value: value),
+          PublicCaseState(
+            ownerId: current.ownerId,
+            value: value.value,
+            cachedAt: value.cachedAt,
+            storageFailed: value.storageFailed,
+          ),
         );
       },
       onFailure: () {
@@ -148,6 +173,8 @@ class PublicCaseViewModel extends AsyncNotifier<PublicCaseState> {
           PublicCaseState(
             ownerId: current.ownerId,
             value: current.value,
+            cachedAt: current.cachedAt,
+            storageFailed: current.storageFailed,
             refreshFailed: true,
           ),
         );

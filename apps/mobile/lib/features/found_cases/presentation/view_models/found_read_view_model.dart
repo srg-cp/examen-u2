@@ -1,3 +1,5 @@
+import '../../../offline_cases/providers/case_cache_providers.dart';
+import '../../../offline_cases/domain/entities/cached_case.dart';
 import '../../../../core/presentation/state/retained_read.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/found_case.dart';
@@ -145,13 +147,29 @@ class PublicFoundViewModel extends AsyncNotifier<PublicFoundState> {
   PublicFoundViewModel(this.id);
   final String id;
   int _generation = 0;
+  Future<CaseConsultation<PublicFoundCase>> _read(String? owner) async {
+    final load = ref.read(readPublicFoundCaseProvider);
+    final cached = ref.read(consultCachedCaseProvider);
+    return cached == null
+        ? CaseConsultation(await load(id))
+        : await cached<PublicFoundCase>(
+            owner: owner,
+            source: 'found',
+            id: id,
+            load: () => load(id),
+          );
+  }
+
   @override
   Future<PublicFoundState> build() async {
     _generation++;
     final session = await ref.watch(foundSessionProvider.future);
+    final result = await _read(session?.userId);
     return PublicFoundState(
       ownerId: session?.userId,
-      value: await ref.watch(readPublicFoundCaseProvider)(id),
+      value: result.value,
+      cachedAt: result.cachedAt,
+      storageFailed: result.storageFailed,
     );
   }
 
@@ -167,16 +185,23 @@ class PublicFoundViewModel extends AsyncNotifier<PublicFoundState> {
       PublicFoundState(
         ownerId: current.ownerId,
         value: current.value,
+        cachedAt: current.cachedAt,
+        storageFailed: current.storageFailed,
         refreshing: true,
       ),
     );
     await retainedRead(
-      request: () => ref.read(readPublicFoundCaseProvider)(id),
+      request: () => _read(current.ownerId),
       isCurrent: () =>
           ref.mounted && generation == _generation && !state.isLoading,
       onSuccess: (value) {
         state = AsyncData(
-          PublicFoundState(ownerId: current.ownerId, value: value),
+          PublicFoundState(
+            ownerId: current.ownerId,
+            value: value.value,
+            cachedAt: value.cachedAt,
+            storageFailed: value.storageFailed,
+          ),
         );
       },
       onFailure: () {
@@ -184,6 +209,8 @@ class PublicFoundViewModel extends AsyncNotifier<PublicFoundState> {
           PublicFoundState(
             ownerId: current.ownerId,
             value: current.value,
+            cachedAt: current.cachedAt,
+            storageFailed: current.storageFailed,
             refreshFailed: true,
           ),
         );

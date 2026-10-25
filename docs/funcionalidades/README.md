@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+- [Fichas sin conexión](fichas-sin-conexion.md): HU-15.3/RF-32/#49; caché privada
+  por cuenta de fichas consultadas y fotos, aviso de antigüedad e invalidación
+  por respuesta del servidor. Evidencia y límites en su ficha.
+
 24/10: [auditoría de los 51 issues de GitHub](../backlog/auditoria-github-2026-10-24.md).
 Borradores #47 y cola #48 cerrados e integrados por PR67 con CI aprobado.
 Las demás historias abiertas conservan los criterios pendientes allí detallados.

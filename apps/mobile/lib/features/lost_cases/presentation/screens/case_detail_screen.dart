@@ -1,3 +1,4 @@
+import '../../../../core/presentation/widgets/cached_case_notice.dart';
 import '../../domain/entities/lost_case.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/collection_add_button.dart';
@@ -32,7 +33,8 @@ class CaseDetailScreen extends ConsumerWidget {
       shareAction:
           !state.isLoading &&
               !state.hasError &&
-              state.asData?.value.value != null
+              state.asData?.value.value != null &&
+              state.asData?.value.cachedAt == null
           ? shareActionBuilder?.call(
               state.requireValue.value!.fields.name,
               'Mascota perdida',
@@ -40,7 +42,9 @@ class CaseDetailScreen extends ConsumerWidget {
             )
           : null,
       loading: state.isLoading,
-      notice: state.hasError
+      notice: state.asData?.value.storageFailed == true
+          ? 'No pudimos actualizar la copia de este dispositivo. Reintenta actualizar.'
+          : state.hasError
           ? 'No pudimos consultar el caso.'
           : state.asData?.value.refreshFailed == true
           ? 'No pudimos actualizar. Se conserva la última consulta.'
@@ -64,35 +68,56 @@ class CaseDetailScreen extends ConsumerWidget {
           : ContentRefresh(
               refreshing: state.requireValue.refreshing,
               label: 'Actualizando caso',
-              child: CasePublicContent(
-                value: state.requireValue.value!,
-                contact: contact,
-                actions: Column(
-                  children: [
-                    if (timelineAction != null) timelineAction!,
-                    if (state.requireValue.value!.status == 'active') ...[
-                      CollectionAddButton(
-                        label: 'Reportar avistamiento',
-                        icon: Icons.visibility_outlined,
-                        accented: true,
-                        route: '/home/sightings/lost/$id',
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                    if (state.requireValue.value!.canResolve &&
-                        posterAction != null)
-                      posterAction!,
-                    if (recoveryActions != null)
-                      recoveryActions!(state.requireValue.value!, model.retry),
-                    if (state.requireValue.refreshFailed)
-                      TextButton(
-                        onPressed: state.requireValue.refreshing
-                            ? null
-                            : model.retry,
-                        child: const Text('Reintentar'),
-                      ),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (state.requireValue.cachedAt != null)
+                    CachedCaseNotice(
+                      storedAt: state.requireValue.cachedAt!,
+                      onRefresh: state.requireValue.refreshing
+                          ? null
+                          : model.retry,
+                    ),
+                  CasePublicContent(
+                    offline: state.requireValue.cachedAt != null,
+                    value: state.requireValue.value!,
+                    contact: state.requireValue.cachedAt == null
+                        ? contact
+                        : null,
+                    actions: Column(
+                      children: state.requireValue.cachedAt != null
+                          ? const []
+                          : [
+                              if (timelineAction != null) timelineAction!,
+                              if (state.requireValue.value!.status ==
+                                  'active') ...[
+                                CollectionAddButton(
+                                  label: 'Reportar avistamiento',
+                                  icon: Icons.visibility_outlined,
+                                  accented: true,
+                                  route: '/home/sightings/lost/$id',
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                              if (state.requireValue.value!.canResolve &&
+                                  posterAction != null)
+                                posterAction!,
+                              if (recoveryActions != null)
+                                recoveryActions!(
+                                  state.requireValue.value!,
+                                  model.retry,
+                                ),
+                              if (state.requireValue.refreshFailed)
+                                TextButton(
+                                  onPressed: state.requireValue.refreshing
+                                      ? null
+                                      : model.retry,
+                                  child: const Text('Reintentar'),
+                                ),
+                            ],
+                    ),
+                  ),
+                ],
               ),
             ),
     );

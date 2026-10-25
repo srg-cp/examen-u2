@@ -8,7 +8,7 @@ export function moderationConfiguration(env:NodeJS.ProcessEnv):ModerationConfig 
     const key=env.SUPABASE_PUBLISHABLE_KEY||'',sessionSecret=env.MODERATION_SESSION_SECRET||'';
     if((url.protocol!=='https:' && !(url.protocol==='http:'&&local)) || url.username || url.password || !['','/'].includes(url.pathname) || url.search || url.hash || sessionSecret.length<32 || key.length<20 ||
       !(key.startsWith('sb_publishable_') || (key.startsWith('eyJ') && JSON.parse(Buffer.from(key.split('.')[1]||'','base64url').toString()).role==='anon')))throw Error();
-    const origin=new URL(env.PUBLIC_WEB_ORIGIN||'https://entrehuellas.kormind.com');
+    const origin=new URL(env.PUBLIC_WEB_ORIGIN||'https://entrehuellas.app');
     if(origin.protocol!=='https:' && !(origin.protocol==='http:' && ['localhost','127.0.0.1','[::1]'].includes(origin.hostname)))throw Error();
     return {url:url.origin,key,sessionSecret,secure:origin.protocol==='https:'};
   }catch{throw new ModerationFailure('unavailable');}

@@ -75,7 +75,7 @@ al sustituir originales. Hero completo/PNG siguen disponibles; CSS y título
 original conservados. El JPEG social no sustituye ilustraciones visibles.
 
 NUXT_PUBLIC_SITE_URL define el origen HTTPS público para canonical, tarjetas
-sociales, JSON-LD, robots y sitemap; predeterminado https://entrehuellas.kormind.com.
+sociales, JSON-LD, robots y sitemap; predeterminado https://entrehuellas.app.
 Se puede sustituir al arrancar producción sin recompilar. PUBLIC_WEB_ORIGIN
 conserva su responsabilidad independiente de origen permitido para operaciones.
 No usar Host para deducir la identidad SEO ni apuntar al dominio futuro antes
@@ -236,7 +236,7 @@ login con sesión, redirección sin JavaScript y cierre/recarga. eh_access ahora
 usa path / para la validación SSR; el cierre limpia también el alcance anterior.
 
 HU-10.1: aplicar024 en desarrollo después de023 antes de probar envíos reales.
-PUBLIC_WEB_ORIGIN limita POST al origen exacto: `https://entrehuellas.kormind.com`
+PUBLIC_WEB_ORIGIN limita POST al origen exacto: `https://entrehuellas.app`
 en producción, o el origen local del dev server si no se configura. No terminar
 con slash. Navegador no recibe clave de servidor ni rutas/evidencia privada.
 Ver [avistamientos web](../../docs/funcionalidades/avistamientos-web.md).

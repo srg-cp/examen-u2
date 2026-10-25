@@ -1,5 +1,17 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+24/10: cambio autorizado del dominio público a `https://entrehuellas.app` en
+servidor web, SEO y consumidores Android de QR/compartir/avistamientos.
+Supabase e infraestructura conservan sus endpoints en kormind.com. Sin nueva
+HU/RF/issue, SQL, ampliación funcional ni despliegue automático. Activación y
+pendientes en [landing](funcionalidades/landing-page.md) y ESTADO.
+
+24/10: autorizado implementar HU-15.3/RF-32/#49 en Android después del cierre de
+#47/#48. Caché privada de fichas consultadas y fotos, accesible desde Guardados,
+fecha/aviso e invalidación por servidor; ADR-135. Sin ampliar a mapas descargados,
+PWA/web offline, SQL nuevo ni cierre de issues por arrastre.
+[Evidencia y pendientes](funcionalidades/fichas-sin-conexion.md).
+
 24/10: usuario autoriza integrar y cerrar historias terminadas. PR
 [#67](https://github.com/srg-cp/entrehuellas/pull/67) ya fusionado integra HU-15.2;
 #47/#48 cerrados con CI y evidencia final. Resultado verificado:29 cerrados y22

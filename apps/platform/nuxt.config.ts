@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   ssr: true,
   css: ['~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css', '~/assets/fields.css'],
-  runtimeConfig: { public: { mapTileUrl: '', siteUrl: 'https://entrehuellas.kormind.com' } },
+  runtimeConfig: { public: { mapTileUrl: '', siteUrl: 'https://entrehuellas.app' } },
   typescript: { strict: true },
   sourcemap: { server: false, client: false },
   nitro: { preset: 'node-server', compressPublicAssets: true },
