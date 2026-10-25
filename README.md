@@ -129,8 +129,11 @@ e instalarlo o actualizarlo en un teléfono. Incluye compilación local y soluci
 de errores, con comandos e indicaciones de dónde ejecutar cada paso.
 
 El workflow está preparado para publicar una **prerelease con APK firmado** por
-cada push a `main` que supere las validaciones. Su activación real requiere
-configurar los secrets e integrar los cambios; no implica despliegue de Supabase
+cada push a `main` que supere las validaciones. El usuario confirmó el24/10 la
+configuración de firma, los cinco secrets y `key.properties` local; el
+[inventario y estado de preparación](INSTALACION_ANDROID.md#estado-de-la-preparacion)
+indica de dónde sale cada dato y los pendientes de respaldo, integración y
+validación de Actions. No implica despliegue de Supabase
 ni publicación en Google Play. Quien solo instala el APK no necesita Flutter,
 el JSON ni las credenciales de firma.
 

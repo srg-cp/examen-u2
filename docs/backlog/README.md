@@ -1,6 +1,23 @@
 # Backlog de Entre Huellas
 
-## Seguimiento del24/10/2026
+## Seguimiento final del24/10/2026
+
+PR [#69](https://github.com/srg-cp/entrehuellas/pull/69) fusionado; Flutter/web del
+HEAD y validate de main aprobados. #49 y épica #15 cerradas/Done. HU-16.1/#50
+implementada localmente y épica #16 en In progress; activación039, asignación
+administrador, demo alojada e integración pendientes. #51 sin iniciar.
+API de los51 issues y Projects comprobados:31 Done,16 In progress,4 Backlog;
+sin discrepancias. La publicación APK requiere verificar una nueva ejecución
+con la configuración definitiva de firma/secrets informada por el usuario.
+
+| Estado actual24/10 | Total | Historias | Épicas |
+| --- | ---: | ---: | ---: |
+| Done | 31 | 24 | 7 |
+| In progress | 16 | 11 | 5 |
+| Backlog | 4 | 4 | 0 |
+| Ready / In review | 0 | 0 | 0 |
+
+## Instantánea anterior a HU-15.3 y HU-16.1 —24/10/2026
 
 [Auditoría actual de los 51 issues](auditoria-github-2026-10-24.md), autorizada por
 el usuario. PR [#67](https://github.com/srg-cp/entrehuellas/pull/67) fusionado con CI

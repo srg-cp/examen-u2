@@ -1,5 +1,13 @@
 # Auditoría de GitHub — 24 de octubre de 2026
 
+Actualización posterior autorizada: PR69 fusionado y checks Flutter/web aprobados;
+#49/HU-15.3 y épica #15 cerradas/Done con evidencia integrada. HU-16.1/#50
+implementada localmente y épica #16 In progress; activación039, asignación
+administrador, demo alojada e integración pendientes. #51 conserva su refinamiento.
+Auditoría API final de los51 issues:31 Done,16 In progress y4 Backlog; etiquetas,
+estado abierto/cerrado y Projects concordantes. Los totales inferiores son la
+instantánea anterior. No se repiten las demos de todas las historias.
+
 Revisión autorizada por el usuario de los 51 issues originales/derivados y del
 tablero EntreHuellas. Se contrastan criterios, estado remoto, fuentes integradas,
 PR y fichas funcionales. Esta auditoría no equivale a ejecutar de nuevo las demos
@@ -42,9 +50,9 @@ permanecen fuera de Git; las herramientas reproducibles se incluyen en el PR.
 | #44 | Bloqueos implementados e integrados. Pendientes activación/verificación 034/036 y demo remota A/B, contactos/fotos y concurrencia. Alcance ya acordado; retirar needs:refinement. |
 | #45 | Moderación web implementada y 030 confirmado. Falta verificar configuración/rol y demo con revisores reales, cuenta ordinaria y concurrencia. |
 | #46 | Apelaciones implementadas e integradas. Pendientes activación/verificación 035 y demo de autor/ajeno/revisor reales, historial y reintentos. |
-| #49 | Caché offline de fichas HU-15.3 sin implementar; siguiente incremento funcional. Guardar una ficha online no demuestra caché offline. |
-| #50, #51 | Estadísticas y controles administrativos sin implementar; #51 requiere acordar funciones controlables. |
-| #1, #8, #12, #14, #15, #16 | Épicas abiertas: tienen derivadas pendientes. #15 conserva #49 aunque cierren #47/#48. |
+| #50 | Estadísticas implementadas localmente, con89 pruebas web,33 de servidor,58 SQL completas y Chrome fixture. Faltan039, asignación administrador, demo alojada e integración. |
+| #51 | Controles administrativos sin implementar; requiere acordar funciones controlables. |
+| #1, #8, #12, #14, #16 | Épicas abiertas: tienen derivadas pendientes. #15 ya cerrada después de integrar #49 por PR69. |
 
 Las historias #43–#46 y las épicas #14/#15 están In progress, conservando
 pendientes concretos. #47/#48 están Done después de integrar y verificar CI.

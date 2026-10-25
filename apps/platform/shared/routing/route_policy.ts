@@ -1,4 +1,4 @@
-export type RouteAccess = 'public' | 'guest' | 'account' | 'onboarding' | 'reviewer' | 'recovery';
+export type RouteAccess = 'public' | 'guest' | 'account' | 'onboarding' | 'reviewer' | 'administrator' | 'recovery';
 
 // Every page must be registered here; the architecture check compares this
 // inventory with app/pages, including redirects and the public 404 fallback.
@@ -15,6 +15,7 @@ export const routePolicies: Readonly<Record<string, RouteAccess>> = Object.freez
   '/cuentas-bloqueadas': 'account',
   '/bienvenida': 'onboarding',
   '/moderacion': 'reviewer',
+  '/administracion/estadisticas': 'administrator',
   '/apelaciones': 'account',
   '/moderacion/apelaciones': 'reviewer',
   '/terminos': 'public',
@@ -47,7 +48,7 @@ export function sessionRedirect(access: RouteAccess, onboardingCompleted: boolea
 // Only registered account destinations may survive the legacy-cookie bridge.
 export function accountDestination(value: unknown): string | null {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || /[\s?#\\]/.test(value)) return null;
-  return ['account', 'onboarding', 'reviewer'].includes(routeAccess(value)) ? value : null;
+  return ['account', 'onboarding', 'reviewer', 'administrator'].includes(routeAccess(value)) ? value : null;
 }
 export function entryDestination(value: unknown): string | null {
   if (typeof value !== 'string') return null;

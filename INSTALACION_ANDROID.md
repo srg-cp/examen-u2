@@ -1,6 +1,6 @@
 # Entre Huellas: configurar, publicar e instalar el APK
 
-Guía operativa del equipo, actualizada el 22 de octubre de 2026.
+Guía operativa del equipo, actualizada el 24 de octubre de 2026.
 Todos los comandos PowerShell de esta guía parten de la **raíz del repositorio**,
 la carpeta donde están `README.md`, `apps` y este archivo, salvo indicación expresa.
 
@@ -355,13 +355,62 @@ de desarrollo. Referencia: [distribución Android con Flutter](https://docs.flut
 
 ## Estado de la preparación
 
-La infraestructura se comprobó localmente: 518 pruebas Flutter y 5 Python,
+### Configuración inicial completada —24/10/2026
+
+El usuario confirmó en este chat que generó su firma definitiva, guardó los
+**cinco secrets de repositorio en GitHub** y completó `key.properties` con sus
+datos reales para compilar localmente. Se comprobó la existencia local del JKS,
+Base64, JSON de release y `key.properties`; este último está ignorado y no
+versionado. No se leyeron ni se incluyen aquí contraseñas o valores de los secrets.
+La confirmación de carga en GitHub procede del usuario; no es una auditoría
+remota ni una comprobación de que las contraseñas coincidan.
+
+### Inventario: origen y ubicación de cada dato
+
+Las rutas siguientes son relativas a la raíz del repositorio. Los archivos
+privados están ignorados por Git. En GitHub, los cinco valores se mantienen en
+**repositorio → Settings → Secrets and variables → Actions → Secrets**.
+
+| Secret de GitHub | Origen / copia local para uso operativo | Cómo mantenerlo o recuperarlo |
+| --- | --- | --- |
+| `MOBILE_CONFIG_JSON` | Contenido completo de `apps/mobile/config/release.local.json`; para el mismo entorno se pueden reutilizar los valores cliente de `supabase.local.json` | Editar el JSON y actualizar el secret con todo su contenido. Generar otro APK para aplicar los cambios. |
+| `ANDROID_KEYSTORE_BASE64` | Contenido de `apps/mobile/build/android-signing/keystore-base64.txt`, obtenido del JKS definitivo en `apps/mobile/android/keystore/entrehuellas-release.jks` | Si se pierde el TXT o se limpia `build`, regenerarlo desde el mismo JKS con `Setup-AndroidSigning.ps1 -ExportOnly`. No generar otra firma. |
+| `ANDROID_KEYSTORE_PASSWORD` | Contraseña elegida al crear el JKS; copia operativa en la propiedad `storePassword` de `apps/mobile/android/key.properties` | Respaldar en un gestor de contraseñas. GitHub no permite leer de vuelta el secret; el JKS/Base64 no recupera una contraseña olvidada. |
+| `ANDROID_KEY_ALIAS` | Alias de la clave; valor usado en este recorrido: `entrehuellas`. Copia operativa en `keyAlias` del mismo `key.properties` | Mantenerlo junto al respaldo del JKS y usar el mismo alias en local y GitHub. |
+| `ANDROID_KEY_PASSWORD` | Contraseña de la clave; copia operativa en `keyPassword` de `key.properties` | Si se eligió Enter durante la creación, coincide con la del almacén. Guardarla igualmente en el gestor y en este secret separado. |
+
+`key.properties` también contiene `storeFile`, la ruta al JKS local; esa ruta
+no es un secret adicional de GitHub. El runner prepara su propia ruta temporal.
+GitHub compila con sus secrets y no descarga el `key.properties` de tu equipo.
+No se centralizan ni duplican estas contraseñas en `.env.local`.
+
+**Respaldo privado:** conservar JKS, alias y ambas contraseñas fuera del
+repositorio, con contraseña/nota en el gestor elegido por el responsable.
+La ubicación de ese respaldo no se registra en este documento público ni se ha
+confirmado en esta sesión. La carpeta `build` y el `key.properties` operativo no
+sustituyen ese respaldo. No pegar valores reales en Markdown, YAML, PR o chat.
+
+### Pendientes de activación y validación
+
+- Confirmar que el respaldo privado de firma y contraseñas esté realizado.
+- Confirmar que la configuración versionada del workflow esté integrada en `main`.
+- Ejecutar **Actions → Flutter → Run workflow → main** y verificar `validate`
+  y `release` en verde con la firma/secrets definitivos.
+- Descargar e instalar el APK resultante y comprobar recorridos con backend real.
+
+No hace falta repetir la generación de firma ni volver a crear los cinco secrets
+si ya están correctos. Las copias locales y GitHub no se sincronizan: cualquier
+cambio debe actualizarse en los lugares que lo consumen. Ninguna ejecución de
+Actions o release con la firma definitiva queda acreditada por este registro.
+
+### Evidencia histórica de infraestructura —22/10/2026
+
+La infraestructura se comprobó localmente entonces: 518 pruebas Flutter y 5 Python,
 formato/análisis, actionlint, exportación de firma y rechazo de release sin firma.
 Se compiló un APK universal con JDK 17 y firma desechable verificada con apksigner.
 Ese APK usó configuración ficticia y **no es el APK real para distribuir**.
 
-Falta completar los valores del entorno, generar/respaldar la firma definitiva,
-guardar los cinco secrets, integrar a `main`, comprobar Actions real e instalar
-el APK resultante en un dispositivo con backend real. La evidencia y los límites
-están en [ESTADO](docs/ESTADO.md) y en la
+Esa prueba histórica usó firma desechable; no comprueba los secrets definitivos
+cargados posteriormente. El estado actual y los pendientes están arriba.
+La evidencia y los límites están en [ESTADO](docs/ESTADO.md) y en la
 [ficha técnica de distribución](docs/funcionalidades/distribucion-android.md).

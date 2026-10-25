@@ -11,8 +11,8 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "start": "node --env-file-if-exists=.env .output/server/index.mjs",
-    "test": "node --experimental-transform-types --test tests/reader.test.mjs tests/architecture.test.mjs tests/sightings.test.mjs tests/app-sightings.test.mjs tests/moderation.test.mjs tests/access.test.mjs tests/credentials.test.mjs tests/recovery.test.mjs tests/notifications.test.mjs tests/user-blocks.test.mjs tests/appeals.test.mjs",
-    "test:server": "node --test tests/production.test.mjs tests/moderation-production.test.mjs tests/access-production.test.mjs tests/credentials-production.test.mjs tests/recovery-production.test.mjs tests/notifications-production.test.mjs tests/user-blocks-production.test.mjs tests/appeals-production.test.mjs"
+    "test": "node --experimental-transform-types --test tests/reader.test.mjs tests/architecture.test.mjs tests/sightings.test.mjs tests/app-sightings.test.mjs tests/moderation.test.mjs tests/access.test.mjs tests/credentials.test.mjs tests/recovery.test.mjs tests/notifications.test.mjs tests/user-blocks.test.mjs tests/appeals.test.mjs tests/statistics.test.mjs",
+    "test:server": "node --test tests/production.test.mjs tests/moderation-production.test.mjs tests/access-production.test.mjs tests/credentials-production.test.mjs tests/recovery-production.test.mjs tests/notifications-production.test.mjs tests/user-blocks-production.test.mjs tests/appeals-production.test.mjs tests/statistics-production.test.mjs"
   },
   "dependencies": {
     "gsap": "3.15.0",

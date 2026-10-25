@@ -34,6 +34,14 @@ export default defineNuxtRouteMiddleware(async to => {
     }
     const destination = sessionRedirect(access, session.profile.onboardingCompleted);
     if (destination) return navigateTo(destination, { replace: true });
+    if (access === 'administrator') {
+      const statistics = useNuxtApp().$statisticsModel(session.actor);
+      try {
+        await statistics.checkAccess();
+        if (statistics.state.failure === 'unauthenticated' || statistics.state.failure === 'conflict') return navigateTo('/iniciar-sesion?reason=expired', { replace: true });
+        if (statistics.state.allowed === false) return navigateTo('/inicio?reason=forbidden', { replace: true });
+      } finally { statistics.dispose(); }
+    }
     if (access === 'reviewer') {
       await model.loadManagementAccess();
       if (model.state.canReview === false) return navigateTo('/inicio?reason=forbidden', { replace: true });

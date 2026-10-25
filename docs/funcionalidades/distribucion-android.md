@@ -132,12 +132,21 @@ La firma de Android aquí no reemplaza configurar redirect OAuth en Supabase.
 
 ## Validación y pendientes
 
-Validación local:518 pruebas Flutter y5 Python, formato/análisis/actionlint,
+Actualización24/10: el usuario confirma firma definitiva generada, cinco secrets
+de repositorio guardados y `key.properties` local completado. Comprobada existencia
+local de JKS, Base64, JSON y properties; sin leer sus valores. `key.properties`
+ignorado y no versionado. El
+[inventario operativo](../../INSTALACION_ANDROID.md#estado-de-la-preparacion)
+relaciona cada secret con su origen/archivo/propiedad local, respaldo y mantenimiento,
+sin incluir credenciales. La carga en GitHub procede de confirmación del usuario;
+no se inspecciona ni se certifica su correspondencia remota.
+
+Evidencia histórica22/10:518 pruebas Flutter y5 Python, formato/análisis/actionlint,
 exportación Base64 y rechazo Gradle sin firma aprobados. APK universal release
 compilado con JDK17/heap3 GB/2 workers y firma v2 verificada con certificado
 desechable. Solo configuración ficticia; ese APK de validación no se distribuye.
 La evidencia local y sus límites se registran en `docs/ESTADO.md`. Pendientes
-externos: colocar los cinco secrets, integrar a main, ejecutar Actions real y
+externos: confirmar respaldo privado e integración a main, ejecutar Actions real y
 probar el APK firmado en dispositivo con backend real: login/códigos/recuperación,
 Google y retorno a la app, fotos/cámara, ubicación/mapa, reportes y QR autorizados.
 La distribución automática no implica que el MVP completo esté validado.

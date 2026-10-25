@@ -67,7 +67,7 @@ watch(() => [state.value.checking, state.value.session] as const, async ([checki
   }
 });
 async function showRouteNotice() {
-  if (!props.onboarding && state.value.session && await consumeNotice(['forbidden']) === 'forbidden') toast.value?.show('Tu cuenta puede usar Entre Huellas, pero no tiene permiso para revisar denuncias.');
+  if (!props.onboarding && state.value.session && await consumeNotice(['forbidden']) === 'forbidden') toast.value?.show('Tu cuenta no tiene permiso para acceder a esa sección de gestión.');
 }
 watch(() => route.query.reason, () => { if (noticesReady) void showRouteNotice(); });
 onMounted(async () => {
@@ -106,6 +106,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); channel?.close(); channe
           <StaggerReveal as="div" class="account-grid" :aria-busy="state.checkingManagement">
             <HomeContent />
             <NavigationLink to="/apelaciones" class="secondary">Mis apelaciones</NavigationLink>
+            <slot name="management" :session="state.session" />
             <section v-if="state.canReview" class="account-management account-panel" aria-labelledby="management-title">
               <div><h2 id="management-title">Cuidamos la comunidad</h2><p>Revisa las denuncias y ayuda a mantener un espacio seguro.</p></div>
               <NavigationLink to="/moderacion" origin class="secondary">Revisar denuncias</NavigationLink>

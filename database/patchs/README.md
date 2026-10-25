@@ -1,5 +1,12 @@
 # Patches manuales de Supabase
 
+Estadísticas24/10: [039_patch_pilot_statistics.sql](039_patch_pilot_statistics.sql)
+generado mediante Build-PilotStatisticsPatch.ps1, con fuentes125–127. Aplicar todo
+en desarrollo sobre el esquema previo cuando se active el incremento; no reaplicar
+patches anteriores. No asigna administradores. La cuenta autorizada se asigna
+explícitamente en servidor y conserva permiso independiente de moderación.
+Activación/demo remotas pendientes; [ficha](../../docs/funcionalidades/estadisticas-piloto.md).
+
 Apelaciones23/10:035_patch_moderation_appeals.sql generado mediante
 Build-AppealsPatch.ps1; requiere030, no034. Aplicar el contenido completo solo
 si está pendiente. Conserva decisiones originales y visibilidad; no requiere
