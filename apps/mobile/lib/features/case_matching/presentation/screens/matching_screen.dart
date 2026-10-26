@@ -82,12 +82,12 @@ class MatchingScreen extends ConsumerWidget {
                   onChanged: v.busy ? null : model.select,
                 ),
                 const SizedBox(height: 20),
-                FilledButton(
-                  style: primaryActionButtonStyle(context, isLoading: v.busy),
-                  onPressed: v.busy ? null : model.search,
-                  child: LoadingShimmer(
-                    isLoading: v.busy,
-                    loadingLabel: 'Comparando publicaciones',
+                LoadingShimmer(
+                  isLoading: v.busy,
+                  loadingLabel: 'Comparando publicaciones',
+                  child: FilledButton(
+                    style: primaryActionButtonStyle(context, isLoading: v.busy),
+                    onPressed: v.busy ? null : model.search,
                     child: Text(
                       v.result?.complete == false
                           ? 'Continuar comparación'

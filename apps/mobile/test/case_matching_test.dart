@@ -22,6 +22,7 @@ import 'package:flutter_application_entrehuellas/features/case_matching/presenta
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/entities/found_case.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/use_cases/found_case_actions.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
 import 'found_cases_test.dart' show FakeFoundCases;
 
 const owner = 'a0000000-0000-4000-8000-000000000001';
@@ -314,6 +315,105 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
+  for (final config in [(390.0, 844.0, 1.0), (320.0, 600.0, 2.0)]) {
+    for (final reduced in [false, true]) {
+      testWidgets(
+        'matching shimmer covers button surface ${config.$1}/${config.$3}, reduced=$reduced',
+        (tester) async {
+          tester.view.physicalSize = Size(config.$1, config.$2);
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          final fake = FakeMatching()..barrier = Completer<void>();
+          final boundaryKey = GlobalKey();
+          await tester.pumpWidget(
+            ProviderScope(
+              overrides: [
+                authSessionProvider.overrideWith(
+                  (ref) => Stream.value(const AuthSession(userId: owner)),
+                ),
+                caseMatchingRepositoryProvider.overrideWithValue(fake),
+              ],
+              child: MaterialApp(
+                theme: AppTheme.light,
+                builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    disableAnimations: reduced,
+                    textScaler: TextScaler.linear(config.$3),
+                  ),
+                  child: child!,
+                ),
+                home: RepaintBoundary(
+                  key: boundaryKey,
+                  child: MatchingScreen(onOpen: (_, _) async {}),
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          final button = find.widgetWithText(
+            FilledButton,
+            'Buscar coincidencias',
+          );
+          await tester.ensureVisible(button);
+          final idleRect = tester.getRect(button);
+          await tester.tap(button);
+          await tester.pump();
+          final shimmer = find
+              .ancestor(of: button, matching: find.byType(LoadingShimmer))
+              .first;
+          expect(tester.getRect(shimmer), tester.getRect(button));
+          expect(tester.getRect(button), idleRect);
+          expect(tester.widget<LoadingShimmer>(shimmer).isLoading, isTrue);
+          expect(tester.widget<FilledButton>(button).onPressed, isNull);
+
+          Future<int> capture(String phase) async {
+            final boundary =
+                boundaryKey.currentContext!.findRenderObject()
+                    as RenderRepaintBoundary;
+            final image = await boundary.toImage();
+            final bytes = (await image.toByteData(
+              format: ui.ImageByteFormat.rawRgba,
+            ))!;
+            final rect = tester.getRect(button);
+            final point = boundary.globalToLocal(
+              Offset(rect.left + rect.width * .12, rect.top + 8),
+            );
+            final red = bytes.getUint8(
+              (point.dy.floor() * image.width + point.dx.floor()) * 4,
+            );
+            final png = (await image.toByteData(
+              format: ui.ImageByteFormat.png,
+            ))!;
+            final file = File(
+              'build/ui-preview/button-shimmer/matching-${config.$1.toInt()}-${config.$3.toInt()}-${reduced ? 'reduced' : 'normal'}-$phase.png',
+            );
+            await file.parent.create(recursive: true);
+            await file.writeAsBytes(png.buffer.asUint8List());
+            image.dispose();
+            return red;
+          }
+
+          // Let Material's pressed/disabled-state transition finish before
+          // comparing the static reduced-motion shimmer.
+          if (reduced) await tester.pumpAndSettle();
+          final start = (await tester.runAsync(() => capture('start')))!;
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 350));
+          final sweep = (await tester.runAsync(() => capture('sweep')))!;
+          expect(sweep, reduced ? start : greaterThan(start));
+          await tester.tap(button, warnIfMissed: false);
+          expect(fake.searchesCount, 1);
+          fake.barrier!.complete();
+          await tester.pumpAndSettle();
+          expect(tester.widget<LoadingShimmer>(shimmer).isLoading, isFalse);
+          expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox.shrink());
+        },
+      );
+    }
+  }
   for (final config in [(390.0, 844.0, 1.0), (320.0, 500.0, 2.0)]) {
     testWidgets(
       'matching UI real actions and accessible layout ${config.$1}/${config.$3}',

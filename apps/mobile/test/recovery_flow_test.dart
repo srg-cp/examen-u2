@@ -7,6 +7,7 @@ import 'content_reports_test.dart' show FakeReports;
 import 'package:flutter_application_entrehuellas/features/content_reports/providers/content_report_providers.dart';
 import 'package:flutter_application_entrehuellas/features/content_reports/presentation/screens/content_report_screen.dart';
 import 'package:flutter_application_entrehuellas/features/content_reports/presentation/view_models/content_report_view_model.dart';
+import 'package:flutter_application_entrehuellas/features/case_posters/presentation/widgets/case_share_sheet.dart';
 import 'case_closure_test.dart' show FakeClosure;
 import 'package:flutter_application_entrehuellas/features/case_closure/domain/entities/case_closure.dart';
 import 'package:flutter_application_entrehuellas/features/case_closure/providers/case_closure_providers.dart';
@@ -245,6 +246,12 @@ void main() {
         expect(find.text('Denuncia registrada'), findsOneWidget);
         router.pop();
         await tester.pumpAndSettle();
+        // Sharing stays mounted after returning from the report. Close it
+        // before using actions on the underlying case card.
+        expect(find.byType(CaseShareSheet), findsOneWidget);
+        await tester.binding.handlePopRoute();
+        await tester.pumpAndSettle();
+        expect(find.byType(CaseShareSheet), findsNothing);
         await tester.ensureVisible(
           find.text('Reportar avistamiento', skipOffstage: false),
         );

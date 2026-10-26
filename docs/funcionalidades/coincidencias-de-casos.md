@@ -1,6 +1,16 @@
 # Coincidencias entre casos de mascotas
 
+25/10, [ADR-139](../decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+Buscar/Continuar comparación aplica LoadingShimmer al botón completo, incluyendo
+superficie y padding. Se corrige el brillo limitado al texto; operación, ranking,
+permisos y reintentos conservados. Validación visual/local en ESTADO.
+
 ## Corrección del runtime de imágenes Linux —25/10/2026
+
+El hook omite el empaquetado cuando `nitro.options.dev` está activo: desarrollo
+resuelve dependencias del proyecto y no genera el servidor autocontenido que
+requiere el empaquetador. Producción conserva el empaquetado y su comprobación
+de confinamiento; no se relaja la protección de rutas. Validación en ESTADO.
 
 El log alojado aportado por el usuario acredita500 en
 `/api/app/matching/searches`: `sharp` no encuentra `libvips-cpp.so.8.18.7`.

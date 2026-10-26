@@ -3,9 +3,9 @@ import { useStaggerReveal, vStaggerReveal } from '~/composables/useStaggerReveal
 import '../styles/onboarding.css';
 const props = defineProps<{ step: number; busy: boolean; onNext: () => Promise<void> }>();
 const steps = [
-  { title: 'Cada huella\nimporta', text: 'Encuentra, ayuda y cuida\na las mascotas cerca de ti.', image: 'dog_waving.png' },
-  { title: 'Volvamos\na casa', text: 'Con tu ayuda, más mascotas\npueden reencontrarse\ncon su familia.', image: 'dog_with_map.png' },
-  { title: 'Una nueva\nhistoria', text: 'Pequeñas acciones generan\ngrandes finales.', image: 'dog_and_cat.png' },
+  { title: 'Cada huella importa', text: 'Encuentra, ayuda y cuida a las mascotas cerca de ti.', image: 'dog_waving.png' },
+  { title: 'Volvamos a casa', text: 'Con tu ayuda, más mascotas pueden reencontrarse con su familia.', image: 'dog_with_map.png' },
+  { title: 'Una nueva historia', text: 'Pequeñas acciones generan grandes finales.', image: 'dog_and_cat.png' },
 ] as const;
 const current = computed(() => steps[props.step]!);
 const show = ref(true), transitioning = ref(false), pressed = ref(false);
@@ -75,8 +75,8 @@ defineExpose({ finish });
     <div class="onboarding-illustration stagger-reveal-item" v-stagger-reveal="revealStyle(0)">
       <img :src="'/images/onboarding/' + current.image" width="1254" height="1254" alt="" decoding="async" />
     </div>
-    <h1 ref="heading" tabindex="-1" class="onboarding-step-title stagger-reveal-item" v-stagger-reveal="revealStyle(1)">{{ current.title }}</h1>
-    <p class="onboarding-step-description stagger-reveal-item" v-stagger-reveal="revealStyle(2)">{{ current.text }}</p>
+    <h1 ref="heading" tabindex="-1" class="onboarding-step-title onboarding-copy-slot stagger-reveal-item" v-stagger-reveal="revealStyle(1)"><span>{{ current.title }}</span><span v-for="item in steps" :key="item.image" class="onboarding-copy-measure" aria-hidden="true">{{ item.title }}</span></h1>
+    <p class="onboarding-step-description onboarding-copy-slot stagger-reveal-item" v-stagger-reveal="revealStyle(2)"><span>{{ current.text }}</span><span v-for="item in steps" :key="item.image" class="onboarding-copy-measure" aria-hidden="true">{{ item.text }}</span></p>
     <div class="onboarding-step-actions stagger-reveal-item" v-stagger-reveal="revealStyle(3)">
         <ActionButton variant="primary" class="onboarding-button onboarding-next" :class="{ 'onboarding-pressed': pressed }" :working="busy" :disabled="transitioning" @click="advance()"><span>{{ step === 2 ? 'Comenzar' : 'Continuar' }}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></ActionButton>
     </div>

@@ -1,5 +1,11 @@
 # Entre Huellas: instrucciones del proyecto
 
+Shimmer25/10, ADR-139, instrucción explícita: en botones el shimmer siempre
+cubre el control completo, incluida superficie/padding/iconos, nunca solo el
+texto. Flutter: LoadingShimmer por fuera del botón; web: working en el control.
+Conservar radio, etiqueta, semántica, bloqueo de dobles envíos, trabajo real y
+movimiento reducido. Véase docs/decisiones/139-shimmer-en-superficie-completa-del-boton.md.
+
 Coincidencias25/10, ADR-137/138: HU-25/#71 y HU-26/#72 pertenecen al MVP.
 Hallazgos independientes aprobados expresamente; conservar avisos vinculados
 y clasificación histórica. Modelo CPU local en Nuxt existente, sin nuevos

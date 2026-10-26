@@ -1,5 +1,21 @@
 # Entre Huellas: reglas de UI y UX web
 
+25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
+onboarding sin saltos de línea forzados y con altura común por grupo textual
+entre las tres etapas, recalculada por CSS grid. Textos de medida invisibles y
+aria-hidden; solo la etapa activa es accesible. Conservar tipografía, stagger,
+marca y scroll; no resolver saltos reduciendo texto/fuente o cambiando PNG.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): bienvenida
+conserva composición/geometría Sader y comparte --brand-action-* con Iniciar
+sesión de landing: degradado celeste, luz superior y sombra azul. Botón48/radio18,
+texto16/500 y flecha centrados juntos. Marca, títulos, etapas y guardado conservados.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+el shimmer de botones cubre toda su superficie, nunca solo texto/icono. Usar
+ActionButton/working en el control completo y el pseudo-elemento compartido
+con inset:0. Mantener radio, etiqueta, trabajo real y movimiento reducido.
+
 Mapas21/10, [ADR-129](decisiones/129-paridad-visual-de-mapas-mobile-web.md):
 por instrucción explícita, reproducir mapa, pines y detalles móviles en cada
 recorrido equivalente mediante LocationMap compartido. Referencia ZoneMapPicker:

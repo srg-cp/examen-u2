@@ -1,5 +1,33 @@
 # Entre Huellas: regla de oro de UI y UX
 
+25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
+onboarding web/móvil ajusta títulos/descripciones al ancho sin saltos forzados;
+reserva la altura máxima entre las tres etapas para estabilizar texto y acción.
+Respetar tipografía, ampliado, semántica del texto activo y scroll sin recortes.
+
+25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): onboarding
+móvil elimina PageView y comparte el contrato de movimiento web/Sader: cuatro
+grupos550ms/90ms, entrada desde+56/blur18, salida inversa, presión400ms previa.
+Marca fija, reducido/cancelación, bloqueo y guardado real visibles conservados.
+Sustituye la transición lateral restante de ADR-140; botón móvil grande conservado.
+
+25/10, precisión posterior ADR-140: solo móvil recupera botón68/radio26,
+padding28 horizontal/18 vertical y texto22/600 con fuente del sistema; conserva
+celeste/luz. Onboarding móvil avanza exclusivamente por Continuar/Comenzar,
+sin gesto horizontal; scroll vertical accesible conservado. Sustituye las medidas
+Sader móviles siguientes. Web conserva48/radio18 y padding8/12.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): onboarding
+móvil/web toma composición inferior y botón Sader48/radio18/texto16/500, con
+degradado y luz celestes de la landing. Textos al inicio, sin puntos visibles;
+progreso accesible, scroll/texto ampliado, marca y tres etapas conservados.
+Flutter reutiliza BottomContentLayout/BrandActionButton; alcance solo onboarding.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+por instrucción explícita, el shimmer de botones cubre toda la superficie,
+padding e iconos, nunca solo el texto. LoadingShimmer envuelve el botón completo.
+Mantener radio/tamaño/etiqueta, semántica, trabajo real y movimiento reducido.
+
 Corrección23/10, ADR-133: Favoritos/Seguir/Bloquear usan el mismo
 PanelActionButton que Descargar/Denunciar: círculos grises56 con iconos26, sin
 etiqueta visible, tooltip/semántica. Todos bajo el separador; Wrap centra y

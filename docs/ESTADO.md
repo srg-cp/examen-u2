@@ -1,5 +1,198 @@
 # Estado del proyecto
 
+## Onboarding: texto natural y posiciones estables —25/10/2026
+
+El usuario detecta que la segunda etapa mueve texto/acción y que los saltos de
+línea ocurren antes que en Sader. Causa confirmada: saltos explícitos en las
+cadenas y altura variable del bloque textual; las imágenes tenían iguales cajas.
+Se retiran los saltos forzados en títulos/descripciones web/móvil conservando
+palabras, puntuación, tamaños y fuentes. El texto se ajusta al ancho disponible.
+
+Los grupos título/descripción reservan la mayor altura de las tres alternativas
+para el ancho y escala actuales: Flutter mide con TextPainter/TextScaler/locale
+y estilos heredados, y aplica minHeight; web usa CSS grid con muestras invisibles
+y aria-hidden en la misma celda. Solo el texto activo es accesible. No se fijan
+alturas que corten texto ni se modifican PNG, marca, botón, stagger o guardado.
+Scroll vertical conservado. ADR-142 y ficha/reglas/guía documentan el ajuste.
+
+Validación:29 pruebas Flutter de onboarding/arquitectura/shimmer/harness y19 de
+registro/códigos aprobadas (48 en total), con fondo ambiental detenido para
+pumpAndSettle. Harness compara coordenadas de título/descripción/botón entre
+las tres etapas390×844 y320×600/texto200%: idénticas dentro de0.01px. Capturas
+regeneradas con texto natural, normales y ampliadas; inspección de etapas1/2.
+Análisis lib/test/harness sin incidencias; formato y diff limpios.
+
+Web: build y typecheck aprobados con NUXT_BUILD_DIR=.nuxt-onboarding-qa,
+sin detener el servidor dev5173 existente (el primer build normal fue rechazado
+por su lock). QA Chrome con backend fixture aprobado: compara x/y/ancho/alto de
+título, descripción y botón entre las tres etapas en1440×1000,390×844,
+320×350 y320×700/texto200%, sin diferencias; conserva foco/progreso accesible,
+marca, geometría/estilo de botón, guardado/fallo/reintento, reducido incluso
+durante salida y limpieza, sin errores CSP/hidratación ni overflow. Capturas
+web-onboarding actualizadas e inspección móvil de etapas1/2.
+
+Siguiente paso: revisión visual del usuario y Android físico. Sin despliegue ni
+nueva finalización contra Supabase remoto; no se afirma auditoría global de UI.
+
+## Onboarding móvil con stagger de web/Sader —25/10/2026
+
+Por instrucción del usuario se retira también el movimiento lateral programático:
+OnboardingScreen ya no usa PageView/PageController/animateToPage ni animación
+por línea. StaggerStageTransition/Item compartidos coordinan cuatro grupos:
+ilustración, título, descripción y acción. Entrada de arriba hacia abajo, salida
+en orden inverso,550ms por grupo/90ms de separación (820ms por fase), desplazamiento
+local+56px, blur18 y curva(.22,1,.36,1), como OnboardingFlow web. Presión400ms
+previa (escala1→.93→1), marca fija y bloqueo durante presión/salida/entrada.
+No se monta la siguiente etapa antes de completar la salida. Botón móvil grande
+68/radio26/texto22/600/padding28/18, celeste/luz y scroll vertical conservados.
+
+El ViewModel conserva completed tras guardado confirmado y acknowledgeCompletion
+reevalúa entrada después de la salida final. Mientras guarda se conserva la etapa
+y el shimmer completo; error no dispara salida y permite reintentar. Reducido
+omite animación/esperas y cambiar preferencia durante salida la completa; dispose
+cancela los tickers sin acciones tardías. Sin cambios en dominio/data/RPC ni web.
+ADR-141, reglas, guía y ficha registran el contrato; sustituye la transición
+programática lateral conservada en los apuntes anteriores, sin migración global.
+
+Validación local:29 pruebas aprobadas (app_test, stagger_stage_transition_test,
+arquitectura, shimmer y harness visual) con AMBIENT_BACKGROUND_MOTION=false para
+detener solo el fondo infinito. Incluye orden/fases, coordenada x estable, marca,
+ausencia de PageView, toques repetidos bloqueados, guardado pendiente visible y
+único, salida antes de Inicio, error/reintento, cambio de cuenta, reducido en
+mitad de salida, cancelación por dispose y320×350/texto200%. Harness adicional
+aprobado tras forzar repintado del RepaintBoundary antes de cada captura para
+evitar capas de imagen retenidas en las exportaciones intermedias. Formato y
+diff limpios; análisis lib/test/harness sin incidencias.
+
+Capturas regeneradas en apps/mobile/build/ui-preview/onboarding-sader: tres
+etapas390×844 y320×600/texto200%/reducido, motion-press-200ms,
+motion-exit-150ms y motion-entry-180ms. Fotogramas de presión/salida/entrada
+inspeccionados; salida muestra grupos inferiores desapareciendo primero y marca
+estable, sin recorrido lateral. No se afirma auditoría global de animaciones.
+Pendiente revisión visual del usuario y prueba en Android físico; sin despliegue
+ni nueva finalización remota contra Supabase.
+
+## Corrección del empaquetado nativo durante desarrollo —25/10/2026
+
+El hook `nitro.compiled` intentaba empaquetar sharp también en `nuxt dev`.
+Las dependencias de desarrollo se resuelven fuera de la salida del servidor y
+activaban la aserción `Native dependencies must stay inside the server output`.
+El hook retorna cuando `nitro.options.dev` está activo; producción conserva
+el empaquetado y la protección de rutas sin cambios. Trabajo local previo conservado.
+
+Validación Windows: arranque dev en5174 con directorio separado de compilación,
+servidor listo y GET `/`200 sin la aserción; proceso de comprobación detenido.
+Typecheck aprobado. El primer build fue bloqueado por el servidor dev existente;
+build posterior aprobado con NUXT_BUILD_DIR separado y NUXT_IGNORE_LOCK=1,
+sin detener el servidor del usuario. `check-native-images.mjs` aprobado para
+sharp0.35.5/libvips8.18.7 y sharp0.34.5/libvips8.17.3 (JPEG y resize224×224).
+Persisten avisos previos de BigInt/ES2019, deprecación y tiempos de plugins.
+Ficha de coincidencias actualizada; sin cambios de alcance, SQL ni despliegue.
+Siguiente paso: confirmar en la sesión habitual del usuario tras reiniciar
+`npm run dev`; servidor alojado no comprobado aquí.
+
+## Ajuste final del onboarding móvil —25/10/2026
+
+Instrucción posterior del usuario: móvil conserva su fuente y recupera el botón
+original grande, con mínimo68px, radio26, padding28 horizontal/18 vertical,
+texto22/peso600/altura1.15 e icono26. Mantiene celeste/luz de landing y el grupo
+etiqueta/flecha centrado; con texto ampliado Wrap permite pasar la flecha a otra
+fila para conservar la palabra. La composición inferior y la ausencia de puntos
+se mantienen. Esta precisión sustituye para móvil las medidas Sader de los
+apuntes siguientes; no se modifican estilos ni código web en este ajuste.
+
+PageView usa NeverScrollableScrollPhysics permanentemente: los gestos laterales
+no avanzan ni retroceden. Continuar conserva el desplazamiento programático y
+Comenzar guarda en la tercera etapa, con bloqueo real/shimmer/toast/reintento.
+El scroll vertical accesible permanece activo.
+
+Validación: regresión de gestos en las tres etapas, avance por botón y pruebas
+de cuenta/guardado/fallo/reintento; harness de las tres etapas390×844 y
+320×600/texto200%/reducido. Capturas regeneradas en onboarding-sader.
+Resultado:27 pruebas aprobadas y análisis lib/test/harness sin incidencias.
+Siguiente paso: revisión visual del usuario y prueba física Android. Sin despliegue.
+
+## Onboarding Sader con acción celeste de la landing —25/10/2026
+
+Precisión posterior del usuario: padding del botón igual a Sader tanto en alto
+como ancho:8px vertical/12px horizontal, ancho completo y altura mínima48.
+Flutter corrige padding vertical12→8; web ya tenía8/12. Conserva24px de margen
+lateral exterior y crecimiento accesible al ampliar texto.
+Verificación posterior: harness visual aprobado con las tres etapas390×844 y
+320×600/texto200%/reducido, manteniendo48px de altura normal; formato/diff limpios.
+
+Por instrucción del usuario, web/móvil usan composición Sader y botón con el
+degradado/luz de Iniciar sesión de la landing. Web ya tenía geometría inferior
+y se sustituye el negro por tokens compartidos --brand-action-*; landing conserva
+su acabado. Móvil reúne ilustración/texto/acción en un bloque inferior con scroll,
+texto al inicio, márgenes24/60 y botón mínimo48/radio18/texto16/500, etiqueta y
+flecha centradas juntas. Sin puntos visibles, con progreso accesible.
+Tres etapas, PNG/textos originales, marca, títulos globales, persistencia,
+toast/reintento y shimmer del control completo durante guardado conservados.
+Componentes reutilizables Flutter: BottomContentLayout y BrandActionButton.
+ADR-140 y ficha onboarding documentan alcance; no se migra recuperación ni otras
+pantallas, ni se afirma paridad/auditoría global de animaciones.
+
+Validación local:
+
+- Flutter:27 pruebas aprobadas (app_test, arquitectura, shimmer y harness visual),
+  con AMBIENT_BACKGROUND_MOTION=false para detener solo el fondo ambiental
+  infinito en pumpAndSettle. Incluye recorrido, gesto, guardado/fallo/reintento,
+  cambio de cuenta y320×350/texto200%. El test adapta ensureVisible al scroll
+  conjunto por etapa. Análisis lib/test/harness sin incidencias; análisis desde
+  raíz también detectó un lint de print en build/inspect_case_cache.dart,
+  ajeno al incremento. El primer intento sin detener el fondo agotó pumpAndSettle.
+- Web: typecheck y build aprobados;28 pruebas de acceso/arquitectura aprobadas.
+  Build conserva avisos de target ES2019/BigInt y deprecación de dependencias.
+  QA Chrome con backend fixture aprobado: acabado idéntico al botón de landing,
+  botón móvil a60px del borde y texto a24px, tres etapas, bloqueo de envío,
+  shimmer/503/reintento, finalización única, marca estable, reducido incluso
+  durante salida, teardown, desktop/móvil320×350/texto200%, sin overflow ni
+  errores CSP/hidratación. No utiliza credenciales ni backend remoto real.
+- Capturas: apps/mobile/build/ui-preview/onboarding-sader (tres etapas390×844
+  normal y320×600/texto200%/reducido) y web-onboarding (escritorio, móvil,
+  pantalla corta, ampliado, salida y guardado). Inspección visual de etapas1/2
+  móviles, texto ampliado, web móvil/escritorio y pantalla corta.
+
+Siguiente paso: revisión visual del usuario y Android físico. No se ejecutó
+despliegue, publicación ni nueva finalización contra Supabase remoto.
+
+## Shimmer sobre el botón completo —25/10/2026
+
+El usuario exige shimmer de botón sobre toda su superficie, nunca solo texto.
+Se corrige Buscar/Continuar comparación envolviendo FilledButton completo con
+LoadingShimmer. Revisión estática de72 usos en52 archivos de apps/mobile/lib:
+único uso encontrado que envolvía solo la etiqueta. Los demás botones revisados
+ya envolvían el control; skeletons/ContentRefresh conservados. Web revisada:
+ActionButton/working y el pseudo-elemento compartido cubren la superficie del
+control, incluidos controles de archivo/enlaces; sin cambios web de producto.
+
+LoadingShimmer detecta en debug/test ancestros ButtonStyleButton/IconButton
+y rechaza colocación dentro de child/label/icon, aun con wrappers intermedios.
+ADR-139, instrucciones/reglas de diseño y ficha de indicadores compartidos
+registran el contrato. Sin cambios de dominio, ranking, permisos o peticiones.
+
+Validación:25 pruebas pertinentes aprobadas (shimmer, matching y arquitectura),
+incluidas6 regresiones nuevas. Geometría igual a todo el botón, píxeles fuera
+del texto, etiqueta/tamaño estables, doble toque bloqueado y vuelta a reposo.
+Renders390×844 y320×600/texto200%, normal/reducido, en
+apps/mobile/build/ui-preview/button-shimmer; inspección visual de ambos
+fotogramas de barrido normal y del estático reducido390. El primer contraste reducido capturó la
+transición de estado de Material; se espera su fin antes de comparar brillo
+estático y la prueba final pasa. Análisis lib/test sin incidencias.
+
+Suite Flutter completa:609 aprobadas y2 fallos en recovery_flow_test, que
+intentaba tocar acciones de ficha detrás del panel Compartir conservado al
+volver de Denunciar por el incremento anterior. Se actualizan ambas pruebas
+para comprobar la conservación, cerrar el panel con Atrás y continuar; la
+reejecución del archivo pasa2/2. No se modifica ese comportamiento de producto
+ni se afirma una segunda ejecución completa. Formato/diff y enlaces locales
+de los12 documentos modificados revisados sin errores.
+
+Sin prueba física/sesión alojada, commit/push ni despliegue. Siguiente
+paso de producto: comprobar el botón durante una comparación real y aceptación
+visual del usuario; los renders locales usan repositorio de prueba.
+
 ## Coincidencias: corrección de sharp/libvips en producción —25/10/2026
 
 El usuario aporta logs500 de `/api/app/matching/searches` con

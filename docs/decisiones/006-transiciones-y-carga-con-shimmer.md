@@ -1,5 +1,9 @@
 # ADR-006: transiciones de etapa y carga con shimmer
 
+Precisión25/10, [ADR-139](139-shimmer-en-superficie-completa-del-boton.md):
+por instrucción explícita, el shimmer de botones cubre toda su superficie,
+padding e iconos, nunca solo el texto. LoadingShimmer envuelve el botón completo.
+
 Refinamiento20/10/2026, confirmación de salida: por petición del usuario,
 confirmActionDialog sin origen usa PopupDialogTransition (fundido y escala
 uniforme .96→1,160ms al abrir/cerrar). Superficie y contenido aparecen juntos,

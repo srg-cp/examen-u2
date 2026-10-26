@@ -1,5 +1,20 @@
 # Arquitectura de Entre Huellas
 
+25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): presentación
+comparte StaggerStageTransition/Item bidireccionales. OnboardingScreen coordina
+presión/salida/entrada sin PageView; OnboardingViewState.completed registra
+guardado confirmado antes de acknowledgeCompletion, que reevalúa entrada tras
+la salida. No hay cambios de dominio/data/RPC; otros StaggerReveal se conservan.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): presentación
+compartida Flutter añade BottomContentLayout/BrandActionButton; onboarding compone
+sus propios textos/ilustraciones/acciones. Web comparte tokens --brand-action-*
+entre landing y bienvenida. Sin cambios en dominio, repositorios, datos ni permisos.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+LoadingShimmer compartido envuelve botones completos y valida su colocación en
+debug/test. Web conserva working en el control. Sin cambios de dominio/data.
+
 25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
 Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
 ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,

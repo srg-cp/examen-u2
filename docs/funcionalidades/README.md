@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Indicadores de carga compartidos](indicadores-de-carga.md): shimmer sobre la
+  superficie completa del botón en móvil/web, ADR-139; skeleton/refresh conservados.
+
 25/10: [Coincidencias entre casos](coincidencias-de-casos.md), HU-25/#71 y
 HU-26/#72, implementación local Android/web en `feature/case-matching`.
 Hallazgos independientes aprobados, motor CLIP CPU local, plan040 y revisión
@@ -279,7 +282,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación16/10 de HU-07/RF-13; online integrado; offline HU-15.3/#49 sin implementar |
 | [Acceso y recuperación](acceso.md) | auth | HU-01; RF-01,34; #17/#18/#20/#22 Done; #19 retorno Google pendiente; épica #1 abierta por Google/baja/exportación |
-| [Onboarding por cuenta](onboarding.md) | onboarding | HU-01.5; RF-01; issue #21; ADR-004; Done |
+| [Onboarding por cuenta](onboarding.md) | onboarding | HU-01.5; RF-01; issue #21; ADR-004/140/141/142; Done; stagger y texto natural con posiciones estables; botón móvil grande |
 | [Inicio y navegación](inicio.md) | home | Composición de recorridos, acceso a Reportar y módulos |
 | [Perfil y foto de cuenta](perfil.md) | profile | HU-01.7; RF-01; issue #23; entrega integrada; Done |
 | [Mascotas](mascotas.md) | pets | HU-03; RF-03; issues #3/#28/#29; Done |

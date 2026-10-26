@@ -15,6 +15,13 @@ try {
  server.setOnboarding(ordinary, false);
  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'no-preference' });
  const page = await context.newPage(), errors = [];
+ const landing = await context.newPage();
+ await landing.goto(server.origin + '/');
+ const landingButton = await landing.locator('.header-cta').evaluate(el => {
+  const style = getComputedStyle(el);
+  return { background: style.backgroundImage, shadow: style.boxShadow, textShadow: style.textShadow, color: style.color };
+ });
+ await landing.close();
  page.on('pageerror', e => errors.push(e.message));
  page.on('console', m => { if (/Content Security Policy|Refused to|[Hh]ydration.*mismatch/.test(m.text())) errors.push(m.text()); });
  await page.goto(server.origin + '/iniciar-sesion');
@@ -23,6 +30,21 @@ try {
  await page.locator('.login-form button[type=submit]').click();
  await page.waitForURL('**/bienvenida');
  const heading = page.locator('.onboarding-step-title'), image = page.locator('.onboarding-illustration img');
+ const stableSlots = new Map();
+ const layouts = [
+  ['desktop', 1440, 1000, false], ['mobile', 390, 844, false],
+  ['short', 320, 350, false], ['small-text', 320, 700, true],
+ ];
+ async function verifySlots(name, width, height, enlarged) {
+  await page.setViewportSize({ width, height });
+  await page.evaluate(value => { document.documentElement.style.fontSize = value ? '200%' : '100%'; }, enlarged);
+  const positions = await page.evaluate(() => ['.onboarding-step-title', '.onboarding-step-description', '.onboarding-next'].map(selector => {
+   const rect = document.querySelector(selector).getBoundingClientRect();
+   return { x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height };
+  }));
+  if (!stableSlots.has(name)) stableSlots.set(name, positions);
+  else assert.deepEqual(positions, stableSlots.get(name), name + ': title, description and action must keep their positions across all stages');
+ }
  async function settled(title) {
   await page.getByRole('heading', { name: title, exact: true }).waitFor();
   await page.waitForFunction(() => [...document.querySelectorAll('.onboarding-flow .stagger-reveal-item')].every(el => getComputedStyle(el).opacity === '1'));
@@ -31,6 +53,9 @@ try {
  }
  await settled('Cada huella importa');
  await page.evaluate(() => document.fonts.ready);
+ for (const layout of layouts) await verifySlots(...layout);
+ await page.evaluate(() => { document.documentElement.style.fontSize = '100%'; });
+ await page.setViewportSize({ width: 1440, height: 1000 });
  assert.equal(await page.locator('.onboarding-flow').evaluate(el => getComputedStyle(el).fontFamily.includes('Inter')), true);
  assert.equal(await page.evaluate(() => document.fonts.check('16px "Inter"')), true);
  assert.equal(await heading.evaluate(el => getComputedStyle(el).fontSize), '32px');
@@ -38,6 +63,10 @@ try {
  assert.equal(await page.locator('.onboarding-step-description').evaluate(el => getComputedStyle(el).fontSize), '18px');
  assert.equal(await page.locator('.onboarding-next').evaluate(el => getComputedStyle(el).borderRadius), '18px');
  assert.equal(await page.locator('.onboarding-next').evaluate(el => getComputedStyle(el).height), '48px');
+ assert.deepEqual(await page.locator('.onboarding-next').evaluate(el => {
+  const style = getComputedStyle(el);
+  return { background: style.backgroundImage, shadow: style.boxShadow, textShadow: style.textShadow, color: style.color };
+ }), landingButton, 'Onboarding must share the landing login gradient and light');
  assert.equal(await page.locator('.onboarding-flow').evaluate(el => getComputedStyle(el).maxWidth), '448px');
  assert.equal((await image.boundingBox()).width, 448, 'Illustration fills the desktop column');
  assert.equal(await page.locator('.onboarding-flow .reveal').count(), 0);
@@ -49,6 +78,14 @@ try {
  const entry = await heading.evaluate(el => { const c = getComputedStyle(el); return [c.transitionDuration, c.transitionDelay, c.willChange]; });
  assert.match(entry[0], /0.55s/); assert.equal(entry[1], '0.09s'); assert.equal(entry[2], 'opacity, filter, transform');
  await page.screenshot({ path: fileURLToPath(new URL('desktop-step-1.png', output)), fullPage: true });
+ await page.setViewportSize({ width: 390, height: 844 });
+ const actionBox = await page.locator('.onboarding-next').boundingBox();
+ const titleBox = await heading.boundingBox();
+ assert.equal(Math.round(actionBox.x), 24);
+ assert.equal(Math.round(titleBox.x), 24);
+ assert.equal(Math.round(actionBox.y + actionBox.height), 844 - 60, 'Mobile action anchors the content group above the bottom margin');
+ await page.screenshot({ path: fileURLToPath(new URL('mobile-step-1.png', output)), fullPage: true });
+ await page.setViewportSize({ width: 1440, height: 1000 });
  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
  assert.equal(await page.getByRole('button', { name: 'Continuar', exact: true }).isDisabled(), true);
  await page.waitForFunction(() => getComputedStyle(document.querySelector('.onboarding-illustration')).transitionDelay === '0.27s');
@@ -58,6 +95,9 @@ try {
  await page.getByRole('button', { name: 'Continuar', exact: true }).dispatchEvent('click');
  await page.screenshot({ path: fileURLToPath(new URL('during-exit.png', output)), fullPage: true });
  await settled('Volvamos a casa');
+ for (const layout of layouts) await verifySlots(...layout);
+ await page.evaluate(() => { document.documentElement.style.fontSize = '100%'; });
+ await page.setViewportSize({ width: 1440, height: 1000 });
  assert.match(await image.getAttribute('src'), /dog_with_map.png$/);
  assert.equal(await page.getByRole('status', { name: 'Paso 2 de 3' }).count(), 1);
  assert.equal(await page.getByRole('button', { name: 'Anterior', exact: true }).count(), 0);
@@ -87,6 +127,9 @@ try {
  }
  await page.evaluate(() => { document.documentElement.style.fontSize = '100%'; }); await page.setViewportSize({ width: 1440, height: 1000 });
  await page.getByRole('button', { name: 'Continuar', exact: true }).click(); await settled('Una nueva historia');
+ for (const layout of layouts) await verifySlots(...layout);
+ await page.evaluate(() => { document.documentElement.style.fontSize = '100%'; });
+ await page.setViewportSize({ width: 1440, height: 1000 });
  assert.match(await image.getAttribute('src'), /dog_and_cat.png$/);
  let release; const responseReady = new Promise(resolve => { release = resolve; });
  await page.route('**/api/access/onboarding', async route => { await responseReady; await route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}' }); });

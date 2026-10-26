@@ -8,12 +8,14 @@ class StaggerRevealText extends StatelessWidget {
     required this.text,
     required this.startOrder,
     required this.style,
+    this.textAlign = TextAlign.center,
     super.key,
   });
 
   final String text;
   final int startOrder;
   final TextStyle? style;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +25,15 @@ class StaggerRevealText extends StatelessWidget {
       child: ExcludeSemantics(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment:
+              textAlign == TextAlign.start || textAlign == TextAlign.left
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
             for (var index = 0; index < lines.length; index++)
               StaggerRevealItem(
                 order: startOrder + index,
-                child: Text(
-                  lines[index],
-                  textAlign: TextAlign.center,
-                  style: style,
-                ),
+                child: Text(lines[index], textAlign: textAlign, style: style),
               ),
           ],
         ),

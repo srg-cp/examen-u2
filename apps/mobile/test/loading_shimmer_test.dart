@@ -5,6 +5,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/loading_shimmer.dart';
 
 void main() {
+  for (final iconOnly in [false, true]) {
+    testWidgets('Reject shimmer inside button content; icon=$iconOnly', (
+      tester,
+    ) async {
+      const content = Padding(
+        padding: EdgeInsets.all(4),
+        child: LoadingShimmer(
+          isLoading: false,
+          loadingLabel: 'Guardando',
+          child: Text('Guardar'),
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: iconOnly
+                ? IconButton(onPressed: () {}, icon: content)
+                : FilledButton(onPressed: () {}, child: content),
+          ),
+        ),
+      );
+      expect(
+        tester.takeException(),
+        isA<FlutterError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('LoadingShimmer must wrap the entire button'),
+        ),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
   testWidgets('Each loading sweep starts at the edge after clicking again', (
     tester,
   ) async {

@@ -1,5 +1,33 @@
 # Diseño de la interfaz: implementación y revisión
 
+25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
+onboarding web/móvil tiene texto natural sin saltos prematuros y reserva común
+para títulos/descripciones. Medir coordenadas entre etapas y con texto200%,
+conservando tipografía y acceso al contenido por scroll; sin recortar ni abreviar.
+
+25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): onboarding
+móvil usa stagger de cuatro grupos550ms/90ms como web, sin PageView. Salida
+inversa antes del cambio; entrada desde+56px con blur18 y presión400ms previa.
+Botón móvil68 y marca persistente conservados; verificar fotogramas intermedios,
+reducido y guardado/reintento, sin afirmar migración global.
+
+25/10, precisión posterior ADR-140: onboarding móvil vuelve a botón mínimo68,
+radio26, padding28/18 y texto22/600 con fuente del sistema, conservando celeste
+y luz. Sin deslizamiento lateral, avance mediante botón; scroll vertical y
+transición programática conservados. Sustituye las medidas móviles anteriores;
+web sigue48/radio18/texto16 y padding12/8.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): onboarding
+móvil/web usa composición Sader con acción celeste de landing48/radio18 y texto
+al inicio sobre el botón. Móvil sin puntos visibles, con progreso accesible;
+BottomContentLayout/BrandActionButton reutilizables. Ver ficha onboarding para
+alcance y validación. Sin migración global ni cambios de persistencia.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+shimmer en la superficie completa del botón. Flutter envuelve el control con
+LoadingShimmer; web aplica working al control. Comprobar brillo fuera del área
+del texto, radio/tamaño estables, semántica, dobles envíos y movimiento reducido.
+
 Corrección23/10, ADR-133: Favoritos/Seguir/Bloquear usan el mismo
 PanelActionButton que Descargar/Denunciar: círculos grises56 con iconos26, sin
 etiqueta visible, tooltip/semántica. Todos bajo el separador; Wrap centra y

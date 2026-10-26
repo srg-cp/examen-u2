@@ -350,6 +350,22 @@ Se conserva la numeración original para relacionar implementación, informe aca
 
 ### S1 - Acceso y cuenta
 
+- Precisión25/10: onboarding web/móvil sin saltos forzados en los textos;
+  reservar la mayor altura textual entre etapas para mantener posiciones,
+  también con ampliado. [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md).
+
+- Precisión25/10: onboarding móvil retira también el desplazamiento programático
+  entre etapas y reproduce stagger web/Sader550ms/90ms, cuatro grupos y salida
+  inversa antes de montar el siguiente. Marca fija, botón grande y guardado real
+  conservados. [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md).
+
+- Refinamiento visual autorizado25/10: onboarding web/móvil con composición
+  inferior Sader y degradado/luz de la landing; web botón48/radio18, móvil
+  recupera68/radio26/texto22/600/padding28 horizontal/18 vertical por precisión
+  posterior. Móvil avanza solo con Continuar/Comenzar, sin gesto lateral y sin
+  puntos visibles, con progreso accesible. Tres etapas, persistencia y reintento
+  conservados. [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md).
+
 - Ampliación autorizada el17 de octubre de2026 de **HU-01 / RF-01,34 / issue #1**:
   acceso con Facebook además de correo/Google, conservando sesión y onboarding
   por cuenta. Código local y [guía de activación](LOGIN_FACEBOOK.md); Meta/Auth

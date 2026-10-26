@@ -562,7 +562,7 @@ void main() {
             same(successBrand),
           );
         } else {
-          expect(find.text('Cada huella'), findsOneWidget);
+          expect(find.text('Cada huella importa'), findsOneWidget);
         }
         await tester.pumpWidget(const SizedBox());
         container.dispose();

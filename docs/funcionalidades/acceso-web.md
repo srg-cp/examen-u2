@@ -1,5 +1,13 @@
 # Acceso web
 
+25/10, [ADR-140](../decisiones/140-onboarding-inferior-y-boton-celeste.md):
+/bienvenida mantiene composición Sader y adopta el degradado/luz de Iniciar sesión
+de landing mediante tokens compartidos. Botón48/radio18, etiqueta y flecha juntas;
+marca, tres etapas, PNG originales, persistencia, shimmer y reintento conservados.
+QA Chrome con fixture verifica igualdad del acabado, posición inferior en móvil,
+texto200%, reducido y guardado/fallo/reintento. Revisión del usuario y Android
+físico pendientes; no es evidencia de una nueva activación remota.
+
 ## Aceptación del usuario — 25/10/2026
 
 El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya

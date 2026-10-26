@@ -1,5 +1,9 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+el indicador de botón es presentación compartida y envuelve toda su superficie,
+nunca solo la etiqueta. No modifica operación/estado/permisos de dominio.
+
 25/10, [ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md):
 matching conserva dominio/casos de uso, repositorios/fuentes y ViewModels por
 funcionalidad. CPU en Nuxt existente con pesos locales fijados; sin nuevo worker
