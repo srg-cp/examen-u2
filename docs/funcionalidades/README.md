@@ -1,5 +1,14 @@
 # Funcionalidades de Entre Huellas
 
+26/10: [guía reutilizable de ilustraciones](../GUIA_ILUSTRACIONES.md), enlazada
+desde [Identidad visual](identidad-visual.md): referencias, estilo, escenarios,
+prompts y controles de calidad para nuevas variantes de móvil/web.
+
+26/10: [Inicio móvil](inicio.md) implementa banners/scroll de la referencia
+aprobada, assets imagegen con mascotas estilo Platform y controles nativos.
+ADR-143; validación local y revisión Android pendiente en la ficha, sin nuevos
+casos de uso, migración web ni cierre de historias.
+
 - [Indicadores de carga compartidos](indicadores-de-carga.md): shimmer sobre la
   superficie completa del botón en móvil/web, ADR-139; skeleton/refresh conservados.
 

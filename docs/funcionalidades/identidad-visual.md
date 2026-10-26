@@ -1,5 +1,16 @@
 # Identidad visual y recursos de marca
 
+## Guía reutilizable de ilustraciones —26/10/2026
+
+[GUIA_ILUSTRACIONES](../GUIA_ILUSTRACIONES.md) reúne referencias reales de
+personajes/escenarios/composición, reglas del estilo menos realista solicitado,
+prompts, alfa y exportación. Enlaza los cuatro assets y prompts literales del
+Home y archiva sus bases de edición para futuras variantes móviles/web.
+Documentación y copias verificadas de referencias existentes; sin nuevas
+generaciones, cambios de marca/recursos consumidos, permisos o activación.
+Validación de enlaces/archivos en ESTADO. La revisión física pendiente del Home
+se conserva; la guía no implica migrar su diseño a web.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

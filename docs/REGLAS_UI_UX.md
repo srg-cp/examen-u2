@@ -1,5 +1,19 @@
 # Entre Huellas: regla de oro de UI y UX
 
+26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): por instrucción
+explícita, Inicio móvil usa glass gris perla con luces blanca/celeste suaves,
+ribete único y escenas conservadas. Reutilizar GlassSurface frosted mediante
+HomeBannerSurface; iluminación del arte separada de textos y controles.
+Conservar composición ADR-143, fondo, navegación, ampliado y movimiento.
+
+26/10, [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md):
+Inicio móvil implementa los banners/scroll de la revisión3 aprobada. Mis reportes
+vive dentro de Reportar; hallazgo con perro/puerta y acción inferior; Buscar con
+una foto conserva su operación existente. Mascotas de estilo Platform, escenarios
+conservados y controles/texto nativos. Cabecera fija, navegación, origen real,
+ampliado y reducido conservados. No migra Inicio web; Explorar usa una ilustración
+decorativa en el banner, no un mapa de datos ni otro adaptador.
+
 25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
 onboarding web/móvil ajusta títulos/descripciones al ancho sin saltos forzados;
 reserva la altura máxima entre las tres etapas para estabilizar texto y acción.

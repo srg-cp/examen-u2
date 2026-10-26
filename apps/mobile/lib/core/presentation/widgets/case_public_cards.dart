@@ -188,7 +188,7 @@ const _valueStyle = TextStyle(
   color: Color(0xFF111111),
 );
 
-/// Silver pearl tint over the existing shared blur and polished glass rim.
+/// Shared pearl material, matching Home and the other glass surfaces.
 class CasePublicGlassCard extends StatelessWidget {
   const CasePublicGlassCard({required this.child, super.key});
   final Widget child;

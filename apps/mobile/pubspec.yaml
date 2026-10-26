@@ -61,3 +61,7 @@ flutter:
     - assets/illustrations/community_pets.png
     - assets/illustrations/reunion.png
     - assets/illustrations/dog_with_envelope.png
+    - assets/illustrations/home/report-reunion.webp
+    - assets/illustrations/home/found-home.webp
+    - assets/illustrations/home/photo-search.webp
+    - assets/illustrations/home/explore-map.webp

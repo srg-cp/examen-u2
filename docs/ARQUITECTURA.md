@@ -1,5 +1,18 @@
 # Arquitectura de Entre Huellas
 
+26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): material de Inicio
+Flutter reutiliza GlassSurface frosted mediante HomeBannerSurface; iluminación
+de escenas opacas aislada en HomeBannerScenery. Solo presentación, sin nuevos
+assets/dependencias ni cambios de dominio/data. Coordinador de origen existente
+conservado con color perlado representativo para Buscar con una foto.
+
+26/10, [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md):
+Inicio Flutter compone cuatro banners y cabecera persistente dentro de su
+presentación. HomeBannerSurface/Action reutilizan material local y estilo de
+botón compartido; home_navigation captura el control real para rutas existentes.
+HomeViewModel, dominio/data, bootstrap y permisos conservados. Imágenes como
+assets decorativos, sin datos, paquetes nuevos o imports entre presentaciones.
+
 25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): presentación
 comparte StaggerStageTransition/Item bidireccionales. OnboardingScreen coordina
 presión/salida/entrada sin PageView; OnboardingViewState.completed registra

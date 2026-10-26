@@ -1,5 +1,11 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+26/10: refinamiento visual autorizado de Inicio Flutter según revisión3 aprobada
+y corrección de mascotas conforme a Platform. Banners con scroll para accesos
+existentes de HU-05/06/07 y HU-25/26, sin nueva HU/issue, operaciones, SQL,
+ampliación del MVP ni cierre de historias. [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md)
+y [ficha/validación](funcionalidades/inicio.md).
+
 25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
 Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
 ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,

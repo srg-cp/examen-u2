@@ -4,7 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/glass_surface.dart';
+import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_banner_surface.dart';
+import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_report_banner.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_content.dart';
@@ -12,7 +13,7 @@ import 'package:flutter_application_entrehuellas/features/home/presentation/stat
 
 void main() {
   testWidgets(
-    'Home glass fades and slides together, then keeps its final rim',
+    'Home banner artwork and controls enter together and remain stable',
     (tester) async {
       final boundary = GlobalKey();
       HomeSection? selected;
@@ -28,7 +29,7 @@ void main() {
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: StaggerReveal(
-                      count: 4,
+                      count: HomeContent.revealCount,
                       child: HomeContent(
                         onSelect: (value) => selected = value,
                         onReport: (_) {},
@@ -41,7 +42,7 @@ void main() {
           ),
         ),
       );
-      final card = find.byType(GlassSurface).first;
+      final card = find.byType(HomeBannerSurface).first;
       final rect = tester.getRect(card);
       final sample = Rect.fromLTWH(rect.right - 14, rect.top + 36, 10, 12);
 
@@ -72,7 +73,7 @@ void main() {
       expect(
         entering,
         isNot(orderedEquals(initial)),
-        reason: 'Glass must not appear as an empty shell before its content',
+        reason: 'Banner must not appear as an empty shell before its content',
       );
       await tester.pumpAndSettle();
       final settledRect = tester.getRect(card);
@@ -82,12 +83,12 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
       expect(await borderPixels(), orderedEquals(settled));
       expect(
-        find.image(const AssetImage('assets/illustrations/reunion.png')),
+        find.image(const AssetImage(HomeReportBanner.artwork)),
         findsOneWidget,
       );
-      await tester.ensureVisible(find.text('Mis mascotas'));
-      await tester.tap(find.text('Mis mascotas'));
-      expect(selected, HomeSection.pets);
+      await tester.ensureVisible(find.text('Explorar'));
+      await tester.tap(find.text('Explorar'));
+      expect(selected, HomeSection.explore);
       expect(tester.takeException(), isNull);
     },
   );

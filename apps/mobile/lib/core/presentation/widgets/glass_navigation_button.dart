@@ -8,7 +8,7 @@ class GlassNavigationButton extends StatelessWidget {
     required this.onPressed,
     this.icon = Icons.chevron_left_rounded,
     this.foregroundColor = const Color(0xFF111111),
-    this.finish = GlassSurfaceFinish.polished,
+    this.finish = GlassSurfaceFinish.frosted,
     this.iconSize = 28,
     super.key,
   });

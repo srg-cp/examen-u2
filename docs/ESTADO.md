@@ -1,5 +1,129 @@
 # Estado del proyecto
 
+## Inicio móvil: retirar el borde blanco del glass —26/10/2026
+
+El usuario observa que el ribete blanco destaca más que en la referencia.
+HomeBannerSurface desactiva el trazo con showRim=false; GlassSurface conserva
+el comportamiento anterior por defecto para los demás consumidores. Material
+perlado, luces difusas, radio, sombra, ilustraciones y controles conservados.
+Corrección registrada en ADR-144 y ficha de Inicio.
+
+Validación:13 pruebas de navegación/retorno normal/reducido, estabilidad y captura
+aprobadas; formato y análisis de GlassSurface/Home sin incidencias. Capturas
+regeneradas normales y320px/texto200%; inspección del scroll normal sin ribete.
+Pendiente aceptación visual y revisión Android física; APK no recompilado.
+
+## Guía reutilizable de ilustraciones —26/10/2026
+
+Por petición del usuario se crea [GUIA_ILUSTRACIONES](GUIA_ILUSTRACIONES.md):
+reglas de mascotas estilizadas según Platform, conservación de escenarios,
+referencias por rol y orden exacto de las cuatro llamadas finales, prompts
+reutilizables, transparencia/exportación y adaptación a banners móviles/web.
+Enlaza los prompts literales y assets del Home; distingue estilo de personajes,
+escenario y composición, y la aportación de imagegen/apple-design.
+
+Las dos bases de edición y la referencia de monedas se copian al workspace con
+igualdad SHA-256 comprobada, evitando depender de Temp o de la carpeta personal
+de generación. Las bases con mascotas descartadas se identifican como referencias
+solo de escenario. Guía enlazada desde AGENTS, DISENO_UI, ficha/índice de identidad
+y README de producción. No se generan imágenes nuevas ni se modifica código o
+los WebP consumidos; no procede repetir pruebas Flutter por esta documentación.
+Validación:30 enlaces locales/anclas sin fallos, archivos/metadatos contrastados,
+copias de referencias con SHA-256 iguales y diff comprobado.
+Siguiente paso: usar esta guía al preparar variantes; continúa pendiente la
+revisión Android física ya registrada para el Home implementado.
+
+## Inicio móvil: glass gris perla —26/10/2026
+
+Aplicado el acabado solicitado a las cuatro tarjetas: HomeBannerSurface reutiliza
+GlassSurface frosted con luz perlada blanca/celeste, blur acotado y ribete único.
+Se retira la base celeste opaca. Las escenas opacas de Reportar/Explorar reciben
+iluminación modulada en presentación; archivos WebP, mascotas, escenarios y
+encuadres conservados. Texto/controles y assets con alfa no reciben ese filtro.
+Buscar con una foto comunica el nuevo color representativo al origen existente.
+Composición, fondo, tipografía, cabecera, barra, rutas, fases/duraciones, refresh,
+permisos y datos conservados. Solo Flutter; sin cambios web/SQL ni dependencias.
+[ADR-144](decisiones/144-inicio-mobile-glass-perlado.md), ficha y reglas actualizadas.
+
+Validación:23 pruebas aprobadas de home_redesign, home_glass_stability,
+architecture y capture_home_redesign con fondo ambiental detenido. Cubren
+navegación/retorno normal y reducido, origen, estabilidad de entrada, scroll,
+cabecera/barra y390×844/320×600/320×350 con texto200%. Análisis de Home,
+test actualizado y harness sin incidencias. Capturas regeneradas en
+apps/mobile/build/ui-preview/home-redesign; inspección de inicio, hallazgo,
+búsqueda, final y texto ampliado. Formato y diff comprobados.
+
+Pendiente aceptación visual y revisión de rendimiento/render en Android físico.
+No se recompila ni instala APK en este ajuste: el APK de la nota anterior conserva
+el material anterior. Sin operaciones remotas ni cierre de historias.
+
+## Inicio Flutter implementado desde la referencia aprobada —26/10/2026
+
+Implementada la revisión3 aprobada el25/10. Primero se generan cuatro assets con
+imagegen integrado; la corrección del26/10 cambia solo las mascotas según
+hero-dog/hero-cat/dog-report de Platform y conserva los escenarios. Cabezas/ojos
+grandes, hocicos cortos y formas redondeadas. WebP finales336488bytes; puerta y
+fotos con alfa/esquinas transparentes comprobadas. [Assets y prompts](../apps/mobile/assets/illustrations/home/README.md).
+
+Inicio integra Mis reportes en Reportar, hallazgo con perro/puerta y acción
+inferior, Buscar con una foto y Explorar. Cabecera fija fuera de scroll/stagger,
+navegación conservada y cuerpo continuo con márgenes24 y espacio para gesto/barra.
+Texto200% crece y separa imagen/contenido; widgets nativos para texto/acciones.
+Origen real, color/radio y flecha comprobados en navegación/retorno normal y
+reducido. El mapa del banner es ilustrativo, con SVG oficial nativo y sin datos.
+
+Se conservan rutas, hallazgo independiente/avisos vinculados, refresh/reintento,
+permisos y contratos de movimiento. Sin cambios de dominio/data, SQL, paquetes
+o web. ADR-143, ficha/índice, guía y reglas actualizados; no se cierran historias
+ni se afirma precisión o activación de coincidencias por este cambio visual.
+
+Validación final:51 pruebas aprobadas de Home/refresh/banners/coincidencias,
+arquitectura, origen/stagger y captura.11 regresiones nuevas cubren destinos,
+independent=true, origen/retorno, cabecera/barra y390×844/320×600/320×350 con
+texto200%. Análisis lib/test/harness sin incidencias; formato/diff comprobados.
+Capturas con fuentes/assets reales en apps/mobile/build/ui-preview/home-redesign:
+principio, hallazgo, final y entrada200ms; inspección normal y ampliada.
+
+APK debug compilado con --dart-define-from-file=config/supabase.local.json en
+apps/mobile/build/app/outputs/flutter-apk/app-debug.apk. Primer intento falló por
+loopback; el workaround de CONFIGURACION con directorio temporal de sockets
+en JAVA_TOOL_OPTIONS del proceso permite completarlo sin cambios permanentes.
+Sin dispositivo Android conectado, instalación o nueva demo remota. Siguiente
+paso: revisar el render implementado en Android físico y navegar con cuenta real.
+La aprobación del mockup no sustituye esa comprobación.
+
+## Referencia visual aprobada del Inicio móvil —25/10/2026
+
+El usuario aprueba expresamente la revisión3 completa («esa es perfecto»):
+se registra como referencia visual del Inicio móvil y sus dos posiciones de
+scroll. La aprobación corresponde al diseño mostrado; implementación Flutter
+y validación ejecutable siguen pendientes.
+
+Por petición del usuario se preparan dos propuestas visuales con imagegen
+integrado, usando sus referencias de banners y los criterios consultados de
+apple-design. Representan el mismo Home al inicio y tras deslizar: pérdida y
+hallazgo con imagen/acción integradas y banner de Explorar. El usuario rechaza
+tanto el banner como los accesos de revisión2. La revisión3 integra Mis reportes
+como acción secundaria del banner de Reportar; Buscar con una foto tiene una
+tarjeta visual propia con fotos ilustrativas. Hallazgo usa una escena de perro
+de cuerpo entero junto a una puerta azul, mensaje y botón al pie. Se retiran
+los cuadrados y la barra compartida de los conceptos anteriores. La referencia
+de monedas guía composición/proporciones; paleta y fuentes siguen como referencia.
+Se prioriza espacio y lectura sin comprimir
+todos los accesos en el primer viewport; identidad, colores y tipografía siguen
+como referencia de conservación.
+
+Imágenes y prompts guardados en
+[la revisión3](../output/imagegen/home-scroll-propuesta-v3-2026-10-25/propuesta-y-prompts.md),
+conservando las imágenes de la propuesta anterior.
+Inspección visual de ambas imágenes realizada; el banner de hallazgo conecta
+las dos posiciones. Son mockups generativos: no acreditan scroll, geometría,
+tipografía exacta, accesibilidad ni interacción ejecutable. Sin cambios Flutter,
+web, backend, permisos, alcance o cierre de historias; no se ejecutan pruebas
+de aplicación por tratarse solo de imágenes. Siguiente paso pendiente:
+implementación Flutter siguiendo la referencia aprobada, con validación de
+tamaños, texto ampliado, semántica, scroll y contratos de movimiento existentes.
+
 ## Onboarding: texto natural y posiciones estables —25/10/2026
 
 El usuario detecta que la segunda etapa mueve texto/acción y que los saltos de

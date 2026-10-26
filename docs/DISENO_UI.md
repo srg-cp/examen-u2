@@ -1,5 +1,23 @@
 # Diseño de la interfaz: implementación y revisión
 
+Para generar ilustraciones coherentes con las mascotas de Platform y los
+escenarios del Home, consultar [GUIA_ILUSTRACIONES](GUIA_ILUSTRACIONES.md):
+referencias por rol, prompts de producción, alfa, exportación y revisión
+responsive. La guía documenta recursos visuales, sin migración automática de UI.
+
+26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): tarjetas de
+Inicio Flutter con material gris perla, luz blanca/celeste y ribete único de
+GlassSurface frosted. HomeBannerSurface comparte iluminación; HomeBannerScenery
+integra solo escenas opacas. Conservar arte, texto/controles nativos, contraste,
+scroll y composición de ADR-143; sin extensión implícita a otros recorridos/web.
+
+26/10, [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md):
+Inicio móvil usa la referencia3 aprobada con assets separados, banners/acciones
+nativas y espacio para deslizar. Reutilizar HomeBannerSurface y el estilo de
+acciones de core. Revisar scroll completo, fuentes reales, cabecera/barra fijas,
+texto200%, origen/retorno y últimos controles libres de navegación. Mascotas
+según Platform y escenarios conservados, sin usar recortes de mockups.
+
 25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
 onboarding web/móvil tiene texto natural sin saltos prematuros y reserva común
 para títulos/descripciones. Medir coordenadas entre etapas y con texto200%,

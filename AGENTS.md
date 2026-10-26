@@ -1,5 +1,14 @@
 # Entre Huellas: instrucciones del proyecto
 
+Inicio26/10, ADR-143: referencia móvil aprobada con scroll y banners ilustrados.
+Mis reportes dentro de Reportar; hallazgo con perro/puerta y acción inferior;
+Buscar con una foto conserva coincidencias. Mascotas con estilo de Platform,
+escenarios conservados e imágenes separadas de texto/controles. Mantener título,
+fondo, cabecera fija, navegación, origen real y ampliado; sin migración web.
+Véase docs/decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md.
+Para nuevas ilustraciones/variantes, consultar docs/GUIA_ILUSTRACIONES.md:
+referencias reales, estilo de mascotas, escenarios, prompts y validación.
+
 Shimmer25/10, ADR-139, instrucción explícita: en botones el shimmer siempre
 cubre el control completo, incluida superficie/padding/iconos, nunca solo el
 texto. Flutter: LoadingShimmer por fuera del botón; web: working en el control.

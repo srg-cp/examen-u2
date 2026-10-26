@@ -3,18 +3,33 @@ import 'package:flutter/material.dart';
 
 enum GlassSurfaceFinish { polished, frosted }
 
-/// Neutral glass with a bounded backdrop blur and a directional polished rim.
+/// Shared pearl glass with bounded blur and diffuse white/blue illumination.
 class GlassSurface extends StatelessWidget {
   const GlassSurface({
     required this.child,
     this.radius = 36,
     this.backdropBlendMode = BlendMode.srcOver,
-    this.finish = GlassSurfaceFinish.polished,
+    this.finish = GlassSurfaceFinish.frosted,
+    this.showRim = false,
     super.key,
   });
   final Widget child;
   final double radius;
   final GlassSurfaceFinish finish;
+  final bool showRim;
+
+  static const originColor = Color(0xFFDCE2E6);
+  static const _pearlGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xD9CCD2D6),
+      Color(0xC7F4F6F7),
+      Color(0xB8D2E6F3),
+      Color(0xD9BFC4C9),
+    ],
+    stops: [0, .36, .64, 1],
+  );
 
   /// Use src when an ancestor opacity layer composites the glass entrance.
   final BlendMode backdropBlendMode;
@@ -50,7 +65,7 @@ class GlassSurface extends StatelessWidget {
         blendMode: backdropBlendMode,
         filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: CustomPaint(
-          foregroundPainter: _GlassRim(radius, finish),
+          foregroundPainter: showRim ? _GlassRim(radius, finish) : null,
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -72,7 +87,21 @@ class GlassSurface extends StatelessWidget {
                 stops: const [0, .35, .65, 1],
               ),
             ),
-            child: child,
+            child: finish == GlassSurfaceFinish.frosted
+                ? DecoratedBox(
+                    decoration: const BoxDecoration(gradient: _pearlGradient),
+                    child: DecoratedBox(
+                      decoration: const BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment(-.25, .15),
+                          radius: .85,
+                          colors: [Color(0x70D2EEFF), Color(0x00D2EEFF)],
+                        ),
+                      ),
+                      child: child,
+                    ),
+                  )
+                : child,
           ),
         ),
       ),

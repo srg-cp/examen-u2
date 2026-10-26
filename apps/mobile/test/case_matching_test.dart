@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_application_entrehuellas/app/navigation/entity_editor_page.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_page_transition.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_content.dart';
+import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_photo_search_card.dart';
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter_application_entrehuellas/features/auth/providers/auth_providers.dart';
 import 'package:flutter_application_entrehuellas/features/case_matching/domain/entities/case_match.dart';
@@ -240,15 +241,15 @@ void main() {
             builder: (context, state) => Scaffold(
               body: Center(
                 child: SizedBox(
-                  width: 220,
-                  height: 100,
-                  child: HomeQuickAction(
-                    icon: Icons.manage_search_rounded,
-                    label: 'Coincidencias',
+                  width: 300,
+                  child: HomePhotoSearchCard(
                     onTap: (source) => openHomeAction(
                       source,
                       '/home/coincidencias',
-                      Icons.manage_search_rounded,
+                      Icons.arrow_forward_rounded,
+                      color: const Color(0xFFF0F8FF),
+                      radius: 26,
+                      iconSize: 26,
                     ),
                   ),
                 ),
@@ -284,14 +285,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final source = tester.getRect(find.byType(HomeQuickAction));
-      await tester.tap(find.text('Coincidencias'));
+      final source = tester.getRect(find.byType(HomePhotoSearchCard));
+      await tester.tap(find.text('Buscar con una foto'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 160));
       final transition = tester.widget<OriginPageTransition>(
         find.byType(OriginPageTransition),
       );
       expect(transition.source!.bounds, source);
+      expect(transition.source!.color, const Color(0xFFF0F8FF));
+      expect(transition.source!.radius, 26);
       final positioned = tester.widget<Positioned>(
         find
             .descendant(
@@ -310,7 +313,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 130));
       expect(find.byType(OriginPageTransition), findsOneWidget);
       await tester.pumpAndSettle();
-      expect(find.text('Coincidencias'), findsOneWidget);
+      expect(find.text('Buscar con una foto'), findsOneWidget);
       expect(tester.takeException(), null);
       await tester.pumpWidget(const SizedBox.shrink());
     },
