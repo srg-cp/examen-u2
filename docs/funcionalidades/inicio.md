@@ -1,5 +1,60 @@
 # Inicio y navegación
 
+## Desvanecido bajo cabecera móvil —26/10/2026
+
+Corrección posterior por captura del usuario: el efecto nace dentro del margen
+inferior de la cabecera. Viewport solapado28px, máscara48px y solo20px de salida
+inferior; padding compensado conserva título/composición inicial. Cabecera
+medida a su altura natural y pintada por encima, sin desplazar controles.
+
+Por referencia explícita del usuario, Inicio disuelve el contenido al deslizar
+bajo la cabecera mediante HomeScrollFade. Máscara alfa sobre los widgets reales,
+sin imagen de niebla; deja ver el fondo ambiental existente. Transición hasta48px
+lógicos, limitada al40% del viewport de scroll en ventanas bajas; título intacto
+al estar arriba y retirada continua al volver/pull-to-refresh. No añade animación
+autónoma; movimiento reducido conservado. Cabecera/barra fuera de la máscara.
+Explorar/Mis mascotas/web y materiales ADR-148 conservados. Sin operaciones,
+persistencia/permisos/activación nuevos ni cambios de feedback/reintento.
+[ADR-151](../decisiones/151-desvanecido-bajo-cabecera-inicio-mobile.md).
+39 comprobaciones aprobadas con fondo fijado para las pruebas y capturas reales
+normales/320px/texto200%. Pendiente Android físico y aceptación visual del render;
+APK sin recompilar/instalar. No cierra historias.
+
+26/10, precisión ADR-148: actualizar recupera su glass original; el material
+perlado se solicita solo en las tarjetas mediante GlassSurface.card.
+
+26/10, [ADR-148](../decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+barra de navegación recupera acabado polished y ribete originales por corrección
+del usuario. Las tarjetas mantienen glass perlado sin borde; acciones/scroll intactos.
+
+## Inicio web ilustrado —26/10/2026
+
+Por instrucción explícita, /inicio reutiliza los cuatro WebP finales móviles;
+Reportar a la izquierda, hallazgo/foto a la derecha y Explorar al ancho inferior.
+Hasta850px se apilan y permiten scroll. Texto200% ajusta líneas y separa arte;
+texto/controles nativos, marca, título, fondo, glass web y navegación conservados.
+[ADR-147](../decisiones/147-inicio-web-con-banners-ilustrados.md) sustituye solo
+la composición web histórica siguiente. Sin cambios Flutter/landing.
+
+Mis mascotas, pérdida, coincidencias y Explorar conservan destinos reales.
+Hallazgo abre /reportar?tipo=hallazgo con independent_found como sugerencia
+inicial; restaurar borrador tiene prioridad, sin sobrescribirlo ni marcar como
+editado un formulario recién abierto. Sin nueva persistencia, permisos o SQL.
+Mis reportes no se presenta como lista web implementada. No cambia activación
+del motor ni se prometen resultados reales a partir de las fotos decorativas.
+
+HomeContent comparte GlassSurface/NavigationLink y conserva origen/retorno.
+Validación local: build/typecheck,94 pruebas; Chrome1920/1440/900/390/320 y200%,
+teclado, objetivos48, imágenes decodificadas, roles, destinos y borrador; origen
+normal/retorno de los botones en1440/390 y foto en1440/390/320, reducido y
+alertas/cuenta. Capturas en apps/mobile/build/ui-preview/web-home. Pendiente
+aceptación visual, backend alojado y dispositivos adicionales; sin despliegue.
+
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): por
+precisión expresa del usuario, material/luces sin borde pasan de HomeBannerSurface
+a GlassSurface para todos sus consumidores móviles, incluida ficha pública y
+navegación. Home conserva composición/arte, sin duplicar iluminación de superficie.
+
 ## Material glass perlado —26/10/2026
 
 Corrección posterior: retirado el contorno blanco de las cuatro tarjetas por

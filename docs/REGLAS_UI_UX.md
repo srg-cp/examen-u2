@@ -1,5 +1,40 @@
 # Entre Huellas: regla de oro de UI y UX
 
+## Regla obligatoria: tarjetas y controles glass móviles
+
+Por instrucción explícita del26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+
+Elegir por tamaño y función: las superficies amplias que agrupan información
+(cards) usan perlado; piezas pequeñas, botones y cápsulas usan glass normal
+polished. El tamaño orienta y la función prevalece: la barra de navegación
+mantiene glass normal aunque sea ancha. No establecer un umbral de píxeles ni
+cambiar el acabado por responsive o ampliación de texto.
+
+| Uso | Material obligatorio |
+| --- | --- |
+| Tarjetas de contenido | GlassSurface.card: esmerilado gris perla, luz blanca/celeste difusa y sin trazo blanco. |
+| Volver, Cerrar, Compartir, Actualizar, Mapa de Explorar y barra de navegación | GlassSurface polished original: mayor transparencia, ribete y sombras originales. |
+
+No trasladar el material de tarjetas a controles o navegación, ni cambiar estos
+al refinar una card. Reutilizar componentes y conservar geometría, iconos,
+semántica, interacción y contratos de movimiento. Excepciones solo por instrucción
+explícita y decisión documentada; contacto sólido ADR-146 conservado.
+La diferencia es de material y jerarquía visual: ambos usan blur compartido22.
+
+Las notas anteriores de alcance global de ADR-145 quedan subordinadas a esta regla.
+
+26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+botones superiores y barra móvil recuperan el glass polished/ribete anteriores.
+El perlado sin borde de ADR-145 se conserva en tarjetas, no en esos controles.
+
+26/10, excepción posterior [ADR-146](decisiones/146-contacto-mobile-solido-segun-referencia.md): contacto de ficha pública móvil con fondo lavanda sólido y botones blancos opacos; sin glass. Conserva adaptación accesible y operaciones autorizadas.
+
+26/10, [ADR-145](decisiones/145-glass-perlado-compartido-mobile.md): el usuario
+extiende expresamente el glass perlado del Home a todos los consumidores móviles
+de GlassSurface. Material/iluminación en core, acabado frosted y sin contorno
+blanco por defecto; incluye ficha pública, contacto, navegación y Explorar.
+Sustituye reservas anteriores de acabado/ribete en estos consumidores.
+
 26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): por instrucción
 explícita, Inicio móvil usa glass gris perla con luces blanca/celeste suaves,
 ribete único y escenas conservadas. Reutilizar GlassSurface frosted mediante

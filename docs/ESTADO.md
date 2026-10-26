@@ -1,5 +1,204 @@
 # Estado del proyecto
 
+## Desvanecido suave bajo cabecera de Inicio móvil —26/10/2026
+
+Corrección posterior: el usuario señala que la transición empezaba demasiado
+abajo. Ahora el viewport entra28px dentro del margen inferior de la cabecera;
+la máscara48px nace ahí y sale solo20px por debajo. Padding compensado conserva
+el inicio; cabecera medida por su altura real y pintada encima. Revalidación de
+Home/capturas y análisis indicada a continuación.
+
+Implementada referencia final del usuario con máscara alfa del cuerpo real,
+integrada con el fondo existente; sin assets de humo ni capas celestes añadidas.
+HomeScrollFade crece con scroll hasta48px, limitado al40% del viewport en ventanas
+bajas. Título inicial nítido; cabecera, controles, navegación y otras secciones
+conservados. [ADR-151](decisiones/151-desvanecido-bajo-cabecera-inicio-mobile.md).
+
+Validación:39 comprobaciones de Home, refresh, origen/retorno normal/reducido,
+estabilidad, arquitectura, consistencia y harness aprobadas con fondo ambiental
+fijado. Sin fijarlo pumpAndSettle agotó la espera por su animación continua.
+Capturas reales normales/320px/texto200%, incluida ventana350px, inspeccionadas.
+Análisis de lib/test/tool sin incidencias. Análisis global detectó dos avisos
+avoid_print en build/inspect_case_cache.dart preexistente.
+Siguiente paso: aceptación visual y Android físico. APK sin recompilar/instalar;
+sin despliegue ni cierre de historias.
+
+## Mapa retina y cápsula Ubicación compacta —26/10/2026
+
+La cápsula incorpora icono de mapa16, texto14 y padding14/8, conservando glass
+polished/ribete. MapConfig prepara {r} nativo solo para CARTO y ZoneMapPicker
+lo activa con alta densidad; URLs explícitas y otros proveedores conservados.
+Shimmer por tesela solo mientras hay solicitud iniciada/no cancelada pendiente,
+sin spinner/texto de carga. Fallo con toast y reintento conservados. Compartido
+en mapas móviles, sin cambiar estilo/encuadre/radio/puntos públicos/web/SQL.
+[ADR-150](decisiones/150-teselas-retina-y-ubicacion-compacta.md).
+
+Diagnóstico: antes se solicitaban256px sin retina en pantallas densas; el
+proveedor configurado respondió200 tanto256 como512@2x en prueba puntual.
+No identifica causa concreta de vacío intermitente en dispositivo. Marcador y
+teselas son independientes; capturas de harness usan teselas simuladas.
+
+Validación:44 pruebas de ficha/compartir/carga/zonas/Explorar/retina/arquitectura/
+consistencia aprobadas, más3 con plantilla CARTO y DPR1/3, URL/decodificación/
+shimmer comprobados. Análisis de6 archivos sin incidencias, formato/diff.
+Capturas normales/reducidas y320px texto200% regeneradas e inspeccionadas.
+Siguiente paso: Android físico y comprobar conectividad si persiste el vacío.
+APK sin recompilar/instalar; sin despliegues o cierre de historias.
+
+## Glass: criterio de tamaño y función incorporado a la regla —26/10/2026
+
+Por petición del usuario, AGENTS, REGLAS_UI_UX, ADR-148 e identidad visual precisan
+que superficies amplias de información/cards usan perlado; piezas pequeñas,
+botones y cápsulas usan glass normal. Función prevalece sobre tamaño: barra de
+navegación normal aunque sea ancha. Sin umbrales de píxeles ni cambio de material
+por responsive/texto ampliado. Solo documentación; diff comprobado, sin nuevas
+pruebas Flutter necesarias. Se conservan pendientes de validación física previos.
+
+## Corregir glass de la cápsula Ubicación —26/10/2026
+
+Se retira frosted de la cápsula del mapa y se usa GlassSurface polished con
+ribete original, conforme a ADR-148: perlado reservado a tarjetas de contenido.
+Material compartido sin recreación local; mapa, fecha, geometría y texto
+conservados. Precisión añadida a ADR-149 y ficha de funcionalidad.
+
+Validación:4 pruebas de ficha pública normales/reducidas y320px/texto200%
+aprobadas; capturas regeneradas e inspección del acabado polished. Análisis
+del widget sin incidencias. Pendiente revisión Android físico; APK sin recompilar.
+
+## Regla obligatoria de glass para tarjetas y controles —26/10/2026
+
+Por petición explícita se formaliza en AGENTS, REGLAS_UI_UX, ADR-148 e identidad
+visual: perlado gris sin borde solo para tarjetas; glass original polished para
+Volver/Cerrar/Compartir, Actualizar, Mapa y barra de navegación. No trasladar
+materiales entre ambos usos sin instrucción explícita y decisión documentada.
+Se corrige el resumen histórico de ADR-145 en AGENTS para evitar contradicciones.
+Se documenta diferencia de transparencia, capas de luz, ribete y sombras; blur22
+compartido. Solo documentación, sin cambios de código ni nuevas pruebas Flutter.
+Validación: regla contrastada con GlassSurface/card y diff comprobado. Continúan
+pendientes revisión visual Android y recompilación APK ya registradas.
+
+## Mapa protagonista en ficha pública móvil —26/10/2026
+
+Por referencia explícita del usuario se elimina el aviso completo de ubicación
+pública aproximada y su argumento en CasePublicCards. El mapa ocupa la tarjeta
+con marco6/radio34–28, cápsula glass «Ubicación» dentro y fecha real debajo.
+Sin cabecera exterior. Con texto200% crece para separar cápsula y marcador.
+Skeleton actualizado. Casos perdidos/avisos comparten el cambio; vistas previas
+inmersivas conservadas. Coordenadas siguen públicas/aproximadas, radio1000m,
+adaptador/cartografía/créditos y reintento conservados. Sin cambios web o SQL.
+[ADR-149](decisiones/149-mapa-protagonista-ficha-publica-mobile.md).
+
+Validación:34 pruebas de ficha pública/compartir/carga/arquitectura/consistencia
+aprobadas; análisis de seis archivos sin incidencias. Formato y diff comprobados.
+Capturas390×844 y320×350/texto200%, normales/reducidas, en
+apps/mobile/build/ui-preview/public-cards, inspeccionadas. Teselas simuladas:
+no acreditan proveedor/red real. Fondo ambiental detenido solo en harness.
+Siguiente paso: revisión Android físico y aceptación visual. APK no recompilado
+ni instalado; sin despliegue o cierre de historias.
+
+## Glass perlado reservado a tarjetas —26/10/2026
+
+El usuario precisa que actualizar y Mapa de Explorar también deben conservar su
+glass anterior: el material gris/perla es solo para cards. GlassSurface recupera
+polished/ribete por defecto y ofrece GlassSurface.card para frosted sin borde.
+Home, ficha pública, skeleton y ficha inmersiva solicitan el material de tarjeta;
+actualizar, Mapa y cápsula superior de Explorar recuperan el original por defecto.
+Botones superiores y barra ya restaurados se conservan. Sin cambios de trabajo
+real de refresh, navegación/origen, datos, permisos, web, assets o movimiento.
+Precisión registrada en ADR-148, AGENTS, reglas, arquitectura y fichas.
+
+Validación:19 pruebas aprobadas de refresh Home, navegación normal/reducida,
+ficha inmersiva y captura Home. Primera ejecución de mapa/ficha no compiló por
+un cambio concurrente del contrato locationLabel; tras completarse sus
+consumidores, reejecución de10 pruebas de mapa/ficha aprobada. Análisis de
+widgets compartidos, Home y Explorar sin incidencias; formato/diff comprobados.
+29 pruebas aprobadas en total. Capturas Home regeneradas. Android físico y
+aceptación visual pendientes; APK no recompilado.
+
+## Restaurar botones superiores y barra móvil —26/10/2026
+
+Por corrección explícita del usuario, GlassNavigationButton recupera polished
+y ribete originales por defecto; LiquidNavigation solicita el mismo acabado.
+Se reutiliza el material anterior existente, incluidas sombras/degradados, sin
+cambiar geometría, iconos, acciones o movimiento. Tarjetas mantienen glass
+perlado sin borde; contacto sólido ADR-146 conservado. ADR-148 registra la
+excepción a ADR-145; reglas/AGENTS y fichas actualizadas. Sin cambios web/datos.
+
+Validación:17 pruebas aprobadas de ficha pública, navegación/retorno Home normal
+y reducido, estabilidad y capturas con fondo ambiental detenido. Análisis de
+ambos componentes sin incidencias; formato y diff comprobados. Capturas reales
+regeneradas de Home/ficha, normales y320px/texto200%; inspección de controles
+superiores y barra con acabado anterior y tarjetas perladas conservadas.
+Pendiente revisión Android físico/aceptación visual; APK no recompilado.
+
+## Inicio web con ilustraciones reutilizadas —26/10/2026
+
+Por solicitud explícita se colocan en /inicio los cuatro WebP finales de móvil,
+sin regeneración ni reescalado; copias verificadas idénticas,336488bytes. Dos
+columnas en escritorio y secuencia con scroll hasta850px; texto/controles nativos,
+marca, fondo, título, glass web, navegación y gestión conservados. Hallazgo abre
+el formulario existente con tipo sugerido sin reemplazar borradores guardados.
+Sin nuevos permisos, rutas, SQL, dependencias, cambios Flutter/landing o despliegue.
+[ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md) y ficha actualizadas.
+
+Validación local: build de producción y typecheck aprobados con directorio Nuxt
+aislado,94 pruebas aprobadas. Chrome:1920/1440/900/390/320px, texto200% móvil y
+escritorio, imágenes/fuentes, teclado/objetivos táctiles, acceso/roles, destinos
+y borrador conservado. Origen/retorno normal de pérdida/hallazgo en1440/390 y
+foto en1440/390/320 con fotogramas; reducido, revisión/detalle/reintento de
+coincidencias y regresión de alertas/cuenta. Capturas revisadas en
+apps/mobile/build/ui-preview/web-home y case-matching/web. La fixture deniega
+estadísticas a no administradores para representar el permiso real.
+
+Pendiente aceptación visual del usuario y revisión en backend alojado,
+Safari/Firefox y dispositivos físicos. Fixtures locales no certifican precisión
+del modelo ni activación remota; no se cierran historias.
+
+## Contacto móvil con superficie sólida —26/10/2026
+
+Por nueva referencia explícita del usuario, el bloque de contacto de ficha
+pública deja de usar glass: cápsula lavanda opaca #F5F4FF, círculos blancos48,
+avatar48, teléfono gris sobre nombre oscuro, mensaje de dos burbujas con puntos
+y teléfono con ondas en azul degradado. Sin blur, ribete, reflejos ni sombras.
+Adaptación320px/texto200%, acciones SMS/marcador revalidadas, consentimiento,
+editor y permisos conservados. Excepción local documentada en ADR-146 y fichas;
+no cambia el material compartido de las demás tarjetas ni la web.
+
+Validación:23 pruebas de contacto/ficha pública/arquitectura/consistencia
+aprobadas; análisis del widget sin incidencias y formato comprobado. Capturas
+regeneradas en apps/mobile/build/ui-preview/public-cards; revisión normal y
+texto ampliado, con movimiento normal/reducido. Fondo ambiental repetitivo
+desactivado solo en harness mediante AMBIENT_BACKGROUND_MOTION=false para
+permitir pumpAndSettle; las transiciones de contenido siguen activas.
+
+Pendiente aceptación visual y revisión Android físico. APK no recompilado ni
+instalado; sin cambios remotos, SQL o cierre de historias.
+
+## Glass perlado compartido en móvil —26/10/2026
+
+El usuario precisa que el material del Home debía alcanzar todas las superficies
+del mismo estilo, incluida ficha pública. Se centralizan las capas perladas y
+luz blanca/celeste en GlassSurface; frosted y sin trazo blanco por defecto,
+también en GlassNavigationButton. Home retira sus capas duplicadas y conserva
+iluminación del arte opaco, interacción, geometría y origen. Todos los consumidores
+móviles heredan el acabado: ficha/contacto, navegación/volver/compartir, Explorar,
+ficha inmersiva conservada, skeleton y retorno de refresh. No hay consumidores
+que soliciten polished/showRim=true. Paneles blancos y materiales independientes
+conservados; sin cambios web, dominio/data, SQL, paquetes o contratos de movimiento.
+ADR-145, reglas, guía, arquitectura, AGENTS y fichas actualizadas.
+
+Validación:39 pruebas aprobadas de ficha pública, contacto, ficha inmersiva,
+Home/navegación/retorno, refresh, estabilidad, arquitectura y harness de Home.
+Análisis de core/presentation/widgets, Home, contactos y Explorar sin incidencias.
+Reejecución de9 pruebas de ficha/contacto con CAPTURE_PUBLIC_CARDS=1 para generar
+capturas actuales: normales/reducidas y320px/texto200%, sin errores.
+Inspección de tarjetas, contacto, botones y mapa público con teselas simuladas
+del harness, además del Home. Capturas en build/ui-preview/public-cards y
+home-redesign. Formato y diff comprobados.
+
+Pendiente aceptación visual y revisión de render/rendimiento en Android físico.
+APK no recompilado ni instalado; sin nueva operación remota o cierre de historias.
+
 ## Inicio móvil: retirar el borde blanco del glass —26/10/2026
 
 El usuario observa que el ribete blanco destaca más que en la referencia.

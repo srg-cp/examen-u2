@@ -14,7 +14,7 @@ try {
   await page.goto(server.origin+'/iniciar-sesion');await login('ordinario@example.test');
   await page.waitForFunction(()=>document.querySelector('.account-avatar img')?.complete);
   assert.equal(await page.locator('.account-avatar img').evaluate(img=>img.naturalWidth>0),true);
-  assert.equal(await page.locator('.home-reunion').evaluate(el=>getComputedStyle(el).backdropFilter),'blur(22px)');
+  assert.equal(await page.locator('.home-found').evaluate(el=>getComputedStyle(el).backdropFilter),'blur(22px)');
   assert.equal(await page.getByRole('button',{name:'Alertas',exact:true}).count(),1);
   assert.equal(server.calls.filter(c=>c.kind==='list').length,0,'Inbox only reads after opening');
   async function capture(name) {await page.screenshot({path:fileURLToPath(new URL(name+'.png',output)),fullPage:true});}

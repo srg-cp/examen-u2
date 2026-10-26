@@ -12,7 +12,7 @@ class HomeBannerSurface extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => GlassSurface(
+  Widget build(BuildContext context) => GlassSurface.card(
     radius: radius,
     // The whole banner enters inside StaggerReveal's opacity layer.
     backdropBlendMode: BlendMode.src,

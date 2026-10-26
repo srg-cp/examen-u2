@@ -1,5 +1,9 @@
 # Explorar: lista y mapa de casos
 
+26/10, precisión ADR-148: el botón Mapa y cápsulas de cabecera recuperan glass
+original; el perlado gris se reserva a tarjetas mediante GlassSurface.card.
+Navegación, origen/retorno, datos y gestos del mapa se conservan.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

@@ -117,7 +117,7 @@ class HomeNotice extends StatelessWidget {
   final String title, description;
 
   @override
-  Widget build(BuildContext context) => GlassSurface(
+  Widget build(BuildContext context) => GlassSurface.card(
     radius: 26,
     backdropBlendMode: BlendMode.src,
     child: Padding(

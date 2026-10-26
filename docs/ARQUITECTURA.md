@@ -1,5 +1,20 @@
 # Arquitectura de Entre Huellas
 
+26/10, precisión ADR-148: GlassSurface.card declara material perlado de tarjetas.
+El constructor general recupera polished/ribete originales para controles,
+incluido refresh y botón Mapa. Sin dependencias entre funcionalidades.
+
+26/10, [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md): HomeContent
+web compone GlassSurface/NavigationLink y recursos públicos reutilizados de
+móvil, sin imports entre funcionalidades ni capas nuevas. La página reportar
+traduce tipo=hallazgo a initialKind de RecoveryScreen; el borrador restaurado
+prevalece. Guards, dominio/data, persistencia y coordinador global conservados.
+
+26/10, [ADR-145](decisiones/145-glass-perlado-compartido-mobile.md): GlassSurface
+centraliza el material perlado y luces del Home para todos sus consumidores
+móviles. Frosted/sin ribete por defecto también en GlassNavigationButton.
+HomeBannerSurface deja de duplicar material; solo presentación compartida.
+
 26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): material de Inicio
 Flutter reutiliza GlassSurface frosted mediante HomeBannerSurface; iluminación
 de escenas opacas aislada en HomeBannerScenery. Solo presentación, sin nuevos

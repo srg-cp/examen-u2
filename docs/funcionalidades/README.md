@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+26/10: [Inicio web](inicio.md) adopta expresamente los cuatro banners ilustrados
+existentes, con dos columnas/scroll responsive y hallazgo preseleccionado sin
+reemplazar borradores. ADR-147; validación local, sin despliegue ni cierre de HU.
+
 26/10: [guía reutilizable de ilustraciones](../GUIA_ILUSTRACIONES.md), enlazada
 desde [Identidad visual](identidad-visual.md): referencias, estilo, escenarios,
 prompts y controles de calidad para nuevas variantes de móvil/web.

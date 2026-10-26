@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de UI y UX web
 
+26/10, [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md): Inicio web
+adopta expresamente los cuatro assets móviles existentes. Banners a dos columnas
+en escritorio/apilados hasta850px, scroll y texto ampliado; controles/texto nativos,
+marca/título/fondo y origen existentes. Mantener solo destinos operativos y
+prioridad de borradores al entrar a hallazgo. Sin migración global del glass móvil.
+
 25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
 onboarding sin saltos de línea forzados y con altura común por grupo textual
 entre las tres etapas, recalculada por CSS grid. Textos de medida invisibles y

@@ -9,10 +9,19 @@ class GlassSurface extends StatelessWidget {
     required this.child,
     this.radius = 36,
     this.backdropBlendMode = BlendMode.srcOver,
-    this.finish = GlassSurfaceFinish.frosted,
-    this.showRim = false,
+    this.finish = GlassSurfaceFinish.polished,
+    this.showRim = true,
     super.key,
   });
+
+  /// Pearl material is reserved for content cards, never navigation controls.
+  const GlassSurface.card({
+    required this.child,
+    this.radius = 36,
+    this.backdropBlendMode = BlendMode.srcOver,
+    super.key,
+  }) : finish = GlassSurfaceFinish.frosted,
+       showRim = false;
   final Widget child;
   final double radius;
   final GlassSurfaceFinish finish;

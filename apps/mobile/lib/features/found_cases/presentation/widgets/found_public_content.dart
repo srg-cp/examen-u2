@@ -70,13 +70,8 @@ class FoundPublicContent extends StatelessWidget {
     ],
     description: value.traits,
     occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',
-    locationLabel: value.reportKind == 'possible_loss'
-        ? 'Ubicación de posible desaparición'
-        : 'Ubicación del aviso',
     latitude: value.latitude,
     longitude: value.longitude,
-    privacy:
-        'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
     actions: actions,
     contact: value.status == 'active' ? contact : null,
   );

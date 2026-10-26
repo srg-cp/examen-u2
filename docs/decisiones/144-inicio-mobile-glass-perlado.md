@@ -1,5 +1,9 @@
 # ADR-144: material glass perlado en Inicio móvil
 
+Precisión posterior: [ADR-145](145-glass-perlado-compartido-mobile.md) extiende
+expresamente este material a todos los consumidores móviles de GlassSurface,
+centraliza las capas en core y desactiva su trazo blanco por defecto.
+
 Fecha:26 de octubre de2026. Estado: aceptada por instrucción explícita.
 
 ## Decisión

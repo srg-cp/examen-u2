@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/international_phone_field.dart';
-import '../../../../core/presentation/widgets/case_public_cards.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
-import '../../../../core/presentation/widgets/glass_navigation_button.dart';
-import '../../../../core/presentation/widgets/glass_surface.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../../../core/presentation/widgets/shake_field.dart';
 import '../../domain/entities/case_contact.dart';
@@ -70,7 +67,12 @@ class CaseContactPanel extends ConsumerWidget {
             },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: CasePublicGlassCard(
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F4FF),
+            borderRadius: BorderRadius.circular(v.access.canEdit ? 28 : 56),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -116,7 +118,7 @@ class _ContactRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final avatar = ClipOval(
       child: SizedBox.square(
-        dimension: 44,
+        dimension: 48,
         child: contact.avatarUri == null
             ? _initials()
             : Image.network(
@@ -132,33 +134,31 @@ class _ContactRow extends StatelessWidget {
       children: [
         Text(
           contact.phone,
-          style: const TextStyle(fontSize: 13, color: Color(0xFF626975)),
+          style: const TextStyle(fontSize: 13, color: Color(0xFF85858A)),
         ),
         const SizedBox(height: 3),
         Text(
           contact.name,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF171918),
+          ),
         ),
       ],
     );
     final actions = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GlassNavigationButton(
+        _ContactActionButton(
           tooltip: 'Enviar SMS al reportante',
-          finish: GlassSurfaceFinish.frosted,
-          iconSize: 22,
-          foregroundColor: const Color(0xFF2887EF),
-          icon: Icons.chat_bubble_outline_rounded,
+          icon: Icons.sms_rounded,
           onPressed: busy ? null : onMessage,
         ),
-        const SizedBox(width: 4),
-        GlassNavigationButton(
+        const SizedBox(width: 8),
+        _ContactActionButton(
           tooltip: 'Llamar al reportante',
-          finish: GlassSurfaceFinish.frosted,
-          iconSize: 22,
-          foregroundColor: const Color(0xFF2887EF),
-          icon: Icons.phone_outlined,
+          icon: Icons.phone_in_talk_rounded,
           onPressed: busy ? null : onCall,
         ),
       ],
@@ -192,6 +192,78 @@ class _ContactRow extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Opaque controls matching the public contact reference.
+class _ContactActionButton extends StatelessWidget {
+  const _ContactActionButton({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    tooltip: tooltip,
+    onPressed: onPressed,
+    style: IconButton.styleFrom(
+      backgroundColor: Colors.white,
+      disabledBackgroundColor: Colors.white,
+      foregroundColor: const Color(0xFF459FF6),
+      disabledForegroundColor: const Color(0xFF9CBFDD),
+      fixedSize: const Size.square(48),
+      shape: const CircleBorder(),
+    ),
+    icon: icon == Icons.sms_rounded
+        ? const CustomPaint(
+            size: Size.square(24),
+            painter: _MessageIconPainter(),
+          )
+        : ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [Color(0xFF2887EF), Color(0xFF75C9EF)],
+            ).createShader(bounds),
+            child: Icon(icon, size: 22, color: Colors.white),
+          ),
+  );
+}
+
+class _MessageIconPainter extends CustomPainter {
+  const _MessageIconPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 24, size.height / 24);
+    final blue = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topRight,
+        end: Alignment.bottomLeft,
+        colors: [Color(0xFF2887EF), Color(0xFF75C9EF)],
+      ).createShader(const Rect.fromLTWH(0, 0, 24, 24));
+    canvas.drawCircle(const Offset(16, 8), 6.5, blue);
+    canvas.drawCircle(const Offset(10, 14), 8, Paint()..color = Colors.white);
+    canvas.drawCircle(const Offset(10, 14), 7, blue);
+    canvas.drawPath(
+      Path()
+        ..moveTo(4, 17)
+        ..lineTo(3, 22)
+        ..lineTo(9, 20)
+        ..close(),
+      blue,
+    );
+    for (final x in [7.0, 10.0, 13.0]) {
+      canvas.drawCircle(Offset(x, 14), .8, Paint()..color = Colors.white);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_MessageIconPainter oldDelegate) => false;
 }
 
 class _ContactEditor extends StatefulWidget {

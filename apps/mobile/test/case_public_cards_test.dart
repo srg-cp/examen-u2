@@ -101,11 +101,8 @@ void main() {
                     description:
                         'Pelaje dorado, pecho blanco y collar azul. Tiene una pequeña marca en la oreja izquierda y suele esconderse cerca de los árboles cuando escucha ruidos fuertes.',
                     occurredAt: 'Desaparición: 20/10/2026 09:30',
-                    locationLabel: 'Ubicación de desaparición',
                     latitude: -12.045,
                     longitude: -77.045,
-                    privacy:
-                        'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
                     createMapTileProvider: () => NetworkTileProvider(
                       httpClient: MockClient((request) async {
                         return http.Response.bytes(
@@ -133,12 +130,20 @@ void main() {
               boundary.currentContext!,
             ),
           );
+          // Advance entry frames while allowing asynchronously mounted map
+          // tiles to decode; their shimmer intentionally keeps scheduling frames.
+          for (var frame = 0; frame < 25; frame++) {
+            await tester.pump(const Duration(milliseconds: 100));
+            await tester.runAsync(
+              () => Future<void>.delayed(const Duration(milliseconds: 20)),
+            );
+          }
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
           expect(find.text('Búsqueda activa'), findsNothing);
           expect(find.text('Lucía Torres'), findsOneWidget);
           expect(find.byType(DraggableScrollableSheet), findsNothing);
-          expect(find.byType(GlassNavigationButton), findsNWidgets(4));
+          expect(find.byType(GlassNavigationButton), findsNWidgets(2));
           final header = tester.getRect(find.byTooltip('Compartir ficha'));
           if (!small) {
             final name = tester.getRect(
@@ -191,6 +196,17 @@ void main() {
           expect(map.showRadius, isFalse);
           expect(map.markers.single.point.latitude, -12.045);
           expect(map.fitRadius, isTrue);
+          expect(find.text('Ubicación'), findsOneWidget);
+          expect(find.text('Ubicación de desaparición'), findsNothing);
+          expect(
+            find.textContaining('El punto exacto y la referencia'),
+            findsNothing,
+          );
+          final mapRect = tester.getRect(find.byType(ZoneMapPicker));
+          final labelRect = tester.getRect(find.text('Ubicación'));
+          expect(mapRect.contains(labelRect.topLeft), isTrue);
+          expect(mapRect.contains(labelRect.bottomRight), isTrue);
+          expect(mapRect.width, closeTo((small ? 320 : 390) - 44, 1));
           await _capture(tester, boundary, small, reduced, 'map');
           final action = find.widgetWithText(
             FilledButton,

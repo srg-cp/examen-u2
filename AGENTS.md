@@ -1,5 +1,33 @@
 # Entre Huellas: instrucciones del proyecto
 
+REGLA OBLIGATORIA GLASS MÓVIL26/10, ADR-148:
+
+- Criterio de elección: superficies amplias que agrupan información, como cards,
+  usan perlado; piezas pequeñas, botones y cápsulas usan glass normal polished.
+  El tamaño orienta, pero la función prevalece: la barra de navegación conserva
+  glass normal aunque sea ancha. No definir un umbral de píxeles ni cambiar el
+  material al redimensionar o ampliar texto.
+- Tarjetas de contenido: glass esmerilado gris perla, luces blancas/celestes
+  difusas y sin contorno blanco, mediante GlassSurface.card.
+- Controles y navegación: glass original polished, más transparente, ribete
+  y sombras originales. Incluye Volver/Cerrar/Compartir, Actualizar, botón Mapa
+  de Explorar y barra LiquidNavigation. Nunca aplicarles el material de cards.
+- Cambiar tarjetas no autoriza modificar controles ni navegación. Conservar
+  radios, dimensiones, iconos, estados, semántica y movimiento de cada pieza.
+  Cualquier excepción requiere instrucción explícita y decisión documentada.
+- Contacto sólido ADR-146 y otras excepciones explícitas conservados.
+Véase docs/decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md.
+
+Inicio web26/10, ADR-147: por autorización explícita, /inicio reutiliza los cuatro
+WebP móviles y adapta banners a dos columnas/scroll responsive. Texto/controles
+nativos, rutas operativas y origen existente; hallazgo propone tipo sin borrar
+borradores. Sin migración de otras pantallas ni del material móvil global.
+Véase docs/decisiones/147-inicio-web-con-banners-ilustrados.md.
+
+Glass26/10, ADR-145 es antecedente histórico: su alcance global queda limitado
+por la regla de ADR-148 anterior y el contacto sólido de ADR-146. No usarlo
+para extender el perlado a controles o navegación.
+
 Inicio26/10, ADR-143: referencia móvil aprobada con scroll y banners ilustrados.
 Mis reportes dentro de Reportar; hallazgo con perro/puerta y acción inferior;
 Buscar con una foto conserva coincidencias. Mascotas con estilo de Platform,

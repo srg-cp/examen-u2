@@ -45,7 +45,7 @@ class CasePublicSkeleton extends StatelessWidget {
                   ),
                   Padding(
                     padding: ImmersivePhotoSheetGeometry.cardPadding(context),
-                    child: GlassSurface(
+                    child: GlassSurface.card(
                       radius: ImmersivePhotoSheetGeometry.cardRadius,
                       child: Padding(
                         padding: const EdgeInsets.all(20),

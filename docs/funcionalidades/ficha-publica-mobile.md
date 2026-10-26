@@ -1,5 +1,39 @@
 # Ficha pública móvil por tarjetas glass
 
+26/10, [ADR-150](../decisiones/150-teselas-retina-y-ubicacion-compacta.md):
+cápsula Ubicación compacta con icono16/texto14/padding14–8, glass polished.
+ZoneMapPicker comparte retina nativo CARTO en DPR alto y shimmer por teselas
+pendientes; conserva estilo, coordenadas públicas, créditos, fallo/reintento.
+44 pruebas+3 de retina nativo y análisis correctos; HTTP puntual200 en256/512px.
+Sin confirmación de causa del vacío intermitente ni revisión Android física.
+
+Corrección26/10: la cápsula «Ubicación» usa GlassSurface polished con ribete original, según la regla obligatoria ADR-148; el acabado perlado/frosted queda reservado a tarjetas de contenido. Se conserva posición, radio, texto, mapa y datos.
+
+26/10, [ADR-149](../decisiones/149-mapa-protagonista-ficha-publica-mobile.md):
+mapa a todo el ancho de la tarjeta con marco6/radios34–28 y cápsula glass
+«Ubicación» dentro, centrada abajo. Fecha debajo; se retiran cabecera exterior
+y aviso visible de ubicación aproximada. Mantiene coordenadas públicas/radio1000,
+créditos, cartografía compartida y reintento. Skeleton equivalente y altura
+adaptada al texto200%; vistas previas inmersivas conservadas. Validación:34
+pruebas y análisis sin incidencias; capturas con teselas simuladas, Android pendiente.
+
+26/10, [ADR-148](../decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+Volver/Compartir recuperan glass polished/ribete originales. Tarjetas conservan
+perlado sin borde; contacto sólido ADR-146 y operaciones se mantienen.
+
+26/10, corrección posterior [ADR-146](../decisiones/146-contacto-mobile-solido-segun-referencia.md):
+contacto móvil con cápsula lavanda sólida, acciones blancas e iconos azules rellenos,
+sin glass en superficie ni botones, según la nueva referencia del usuario.
+Sustituye el acabado de ADR-113/145 solo en este bloque. Mantener identidad real,
+consentimiento, SMS/marcador, permisos y adaptación a texto ampliado.
+
+
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): ficha,
+contacto y controles adoptan el mismo material gris perla del Home, luz difusa
+blanca/celeste y ausencia de contorno blanco. Sustituye las reservas históricas
+de ribete/acabado anterior. Datos, galería, scroll, geometría, ampliado, acciones
+y permisos se conservan. Validación y pendientes en ESTADO.
+
 23/10, por instrucción del usuario, [ADR-133](../decisiones/133-acciones-de-ficha-y-navegacion-glass-compartida.md):
 la cabecera conserva únicamente Volver y Compartir. Favoritos, Seguir/Dejar de
 seguir y Bloquear/Desbloquear pasan al panel «Compartir ficha», junto a Descargar/Denunciar: círculos grises56, iconos26, sin texto visible,

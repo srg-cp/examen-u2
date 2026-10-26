@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -21,10 +22,8 @@ class CasePublicCards extends StatelessWidget {
     required this.facts,
     required this.description,
     required this.occurredAt,
-    required this.locationLabel,
     required this.latitude,
     required this.longitude,
-    required this.privacy,
     this.actions,
     this.contact,
     this.createMapTileProvider,
@@ -32,12 +31,7 @@ class CasePublicCards extends StatelessWidget {
     super.key,
   });
 
-  final String name,
-      eventLabel,
-      description,
-      occurredAt,
-      locationLabel,
-      privacy;
+  final String name, eventLabel, description, occurredAt;
   final List<Widget> photos;
   final List<CasePublicFact> facts;
   final double latitude, longitude;
@@ -111,61 +105,132 @@ class CasePublicCards extends StatelessWidget {
       StaggerRevealItem(
         order: 3,
         preserveBackdrop: true,
-        child: CasePublicGlassCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(locationLabel, style: _valueStyle),
-              const SizedBox(height: 6),
-              Text(occurredAt, style: _labelStyle),
-              const SizedBox(height: 12),
-              if (offline)
-                Text(
-                  'Ubicación pública aproximada: ${latitude.toStringAsFixed(3)}, ${longitude.toStringAsFixed(3)}. Mapa disponible al conectar.',
-                )
-              else
-                ZoneMapPicker(
-                  latitude: latitude,
-                  longitude: longitude,
-                  radiusMeters: 1000,
-                  onSelect: null,
-                  readOnly: true,
-                  compactAttribution: true,
-                  fitRadius: true,
-                  showRadius: false,
-                  showCenterMarker: false,
-                  markers: [
-                    Marker(
-                      point: LatLng(latitude, longitude),
-                      width: 72,
-                      height: 72,
-                      child: Semantics(
-                        label: 'Ubicación pública aproximada',
-                        child: Container(
-                          padding: const EdgeInsets.all(23),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0x30459FF6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xB3FFFFFF),
+                borderRadius: BorderRadius.circular(34),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => Stack(
+                    children: [
+                      if (offline)
+                        SizedBox(
+                          height: math.max(
+                            constraints.maxWidth / 1.35,
+                            MediaQuery.textScalerOf(context).scale(140),
                           ),
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFF2887EF),
-                              border: Border.all(color: Colors.white, width: 2),
+                          child: const Center(
+                            child: Icon(
+                              Icons.map_outlined,
+                              size: 48,
+                              semanticLabel: 'Mapa disponible al conectar',
+                            ),
+                          ),
+                        )
+                      else
+                        ZoneMapPicker(
+                          latitude: latitude,
+                          longitude: longitude,
+                          radiusMeters: 1000,
+                          onSelect: null,
+                          readOnly: true,
+                          compactAttribution: true,
+                          fitRadius: true,
+                          showRadius: false,
+                          showCenterMarker: false,
+                          markers: [
+                            Marker(
+                              point: LatLng(latitude, longitude),
+                              width: 72,
+                              height: 72,
+                              child: Semantics(
+                                label: 'Ubicación pública aproximada',
+                                child: Container(
+                                  padding: const EdgeInsets.all(23),
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0x30459FF6),
+                                  ),
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFF2887EF),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          height: math.max(
+                            constraints.maxWidth / 1.35,
+                            MediaQuery.textScalerOf(context).scale(140),
+                          ),
+                          borderRadius: 28,
+                          createTileProvider: createMapTileProvider,
+                        ),
+                      Positioned(
+                        left: 16,
+                        right: 16,
+                        bottom: 32,
+                        child: IgnorePointer(
+                          child: Center(
+                            child: GlassSurface(
+                              radius: 28,
+                              finish: GlassSurfaceFinish.polished,
+                              showRim: true,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.map_outlined,
+                                      size: 16,
+                                      color: Color(0xFF171918),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        'Ubicación',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          height: 1.2,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF171918),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                  height: 180,
-                  borderRadius: 22,
-                  createTileProvider: createMapTileProvider,
+                    ],
+                  ),
                 ),
-              const SizedBox(height: 10),
-              Text(privacy, style: _labelStyle.copyWith(fontSize: 13)),
-            ],
-          ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(occurredAt, style: _labelStyle),
+            ),
+          ],
         ),
       ),
       if (actions != null) ...[
@@ -194,9 +259,8 @@ class CasePublicGlassCard extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => GlassSurface(
+  Widget build(BuildContext context) => GlassSurface.card(
     radius: 28,
-    finish: GlassSurfaceFinish.frosted,
     backdropBlendMode: BlendMode.src,
     child: Padding(padding: const EdgeInsets.all(18), child: child),
   );

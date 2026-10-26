@@ -446,10 +446,8 @@ void main() {
                     ],
                     description: 'Pelaje dorado y collar azul.',
                     occurredAt: '20/10/2026',
-                    locationLabel: 'Ubicación de desaparición',
                     latitude: -12,
                     longitude: -77,
-                    privacy: 'Ubicación aproximada.',
                     createMapTileProvider: () => NetworkTileProvider(
                       httpClient: MockClient(
                         (request) async => http.Response.bytes(

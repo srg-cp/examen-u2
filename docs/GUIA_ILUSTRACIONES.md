@@ -1,5 +1,11 @@
 # Guía de ilustraciones de Entre Huellas con imagegen
 
+Adopción web26/10: los cuatro WebP finales se reutilizan sin cambios en
+[public/images/home](../apps/platform/public/images/home/README.md), con igualdad
+SHA256 respecto a móvil. La composición responsive se resuelve en CSS y mantiene
+texto/controles nativos; no se generaron variantes de mayor tamaño.
+[ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md).
+
 Fecha: 26 de octubre de 2026. Referencia: [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md).
 
 Este documento reúne la dirección visual, los archivos de referencia, los prompts

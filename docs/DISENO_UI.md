@@ -1,5 +1,26 @@
 # Diseño de la interfaz: implementación y revisión
 
+26/10, [ADR-149](decisiones/149-mapa-protagonista-ficha-publica-mobile.md): mapa protagonista en ficha pública móvil, cápsula glass «Ubicación» dentro y fecha debajo; retirar cabecera exterior y aviso de ubicación aproximada. Conservar coordenadas públicas, créditos y cartografía compartida.
+
+26/10, precisión ADR-148: perlado solo para cards (GlassSurface.card); actualizar,
+Mapa y otras superficies de control recuperan el acabado general original.
+
+26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+GlassNavigationButton y LiquidNavigation usan polished/ribete original; tarjetas
+conservan perlado sin borde. Revisar capturas de ficha y Home por separado.
+
+26/10, [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md): Inicio web
+reutiliza los cuatro WebP finales y adapta composición desktop/responsive con
+scroll, texto ampliado y controles nativos. Material web y motores compartidos
+conservados; revisar origen/retorno real de cada nuevo acceso.
+
+26/10, excepción posterior [ADR-146](decisiones/146-contacto-mobile-solido-segun-referencia.md): contacto de ficha pública móvil con fondo lavanda sólido y botones blancos opacos; sin glass. Conserva adaptación accesible y operaciones autorizadas.
+
+26/10, [ADR-145](decisiones/145-glass-perlado-compartido-mobile.md): el glass
+perlado sin trazo blanco es compartido por todos los consumidores móviles de
+GlassSurface. No definir otra iluminación de superficie dentro del Home.
+Verificar ficha pública/contacto, controles y navegación además de los banners.
+
 Para generar ilustraciones coherentes con las mascotas de Platform y los
 escenarios del Home, consultar [GUIA_ILUSTRACIONES](GUIA_ILUSTRACIONES.md):
 referencias por rol, prompts de producción, alfa, exportación y revisión

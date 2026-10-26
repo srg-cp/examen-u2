@@ -79,11 +79,8 @@ class CasePublicContent extends StatelessWidget {
       ],
       description: f.traits ?? '',
       occurredAt: 'Desaparición: ${caseDateLabel(value.occurredAt)}',
-      locationLabel: 'Ubicación de desaparición',
       latitude: value.latitude,
       longitude: value.longitude,
-      privacy:
-          'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
       actions: actions,
       contact: value.status == 'active' ? contact : null,
     );

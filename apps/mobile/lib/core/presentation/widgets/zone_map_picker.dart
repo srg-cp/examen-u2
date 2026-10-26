@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../../config/map_config.dart';
 import 'map_attribution.dart';
 import 'map_style.dart';
+import 'loading_shimmer.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
 class ZoneMapPicker extends StatefulWidget {
@@ -138,11 +139,25 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
   Widget build(BuildContext context) {
     final attempt = _attempt;
     final tiles = TileLayer(
-      urlTemplate: MapConfig.tileUrl,
+      urlTemplate: MapConfig.displayTileUrl,
+      retinaMode:
+          MapConfig.displayTileUrl.contains('{r}') &&
+          RetinaMode.isHighDensity(context),
       tileProvider: _tiles,
       userAgentPackageName: 'com.example.flutter_application_entrehuellas',
       panBuffer: 0,
       errorTileCallback: (_, _, _) => _failure(attempt),
+      tileBuilder: (context, child, tile) => LoadingShimmer(
+        isLoading:
+            tile.loadStarted != null &&
+            tile.imageInfo == null &&
+            !tile.loadError &&
+            !tile.cancelLoading.isCompleted,
+        isAction: false,
+        radius: 0,
+        loadingLabel: 'Consultando mapa',
+        child: child,
+      ),
     );
     final point = widget.latitude == null || widget.longitude == null
         ? null

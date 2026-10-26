@@ -125,6 +125,29 @@ void main() {
       }
       await tester.pumpAndSettle();
       await capture('${config.$1}-top');
+      final scroll = tester.state<ScrollableState>(find.byType(Scrollable));
+      scroll.position.jumpTo(
+        230.clamp(0, scroll.position.maxScrollExtent).toDouble(),
+      );
+      await tester.pumpAndSettle();
+      await capture('${config.$1}-header-fade');
+      if (config.$1 == 'normal') {
+        final button = find.ancestor(
+          of: find.text('Reportar pérdida'),
+          matching: find.byType(FilledButton),
+        );
+        final viewportTop = tester
+            .getTopLeft(find.byType(SingleChildScrollView))
+            .dy;
+        scroll.position.jumpTo(
+          scroll.position.pixels +
+              tester.getTopLeft(button).dy -
+              viewportTop -
+              10,
+        );
+        await tester.pumpAndSettle();
+        await capture('normal-header-fade-report');
+      }
       await Scrollable.ensureVisible(
         tester.element(find.byKey(const ValueKey('home-found-banner'))),
       );

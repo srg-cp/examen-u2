@@ -1,5 +1,25 @@
 # Identidad visual y recursos de marca
 
+## Regla de materiales glass móviles —26/10/2026
+
+Elegir por tamaño y función: superficies amplias de información/cards, perlado;
+piezas pequeñas, botones y cápsulas, glass normal. La función prevalece sobre
+el tamaño: barra de navegación normal aunque sea ancha. No cambiar material
+con responsive o texto ampliado ni introducir umbrales arbitrarios de píxeles.
+
+Tarjetas: gris perla esmerilado sin contorno blanco (GlassSurface.card).
+Controles/navegación: glass original más transparente con ribete y sombras
+polished. Incluye botones superiores, Actualizar, Mapa y barra inferior.
+Comparten blur22; el perlado añade capas de color/luz, no más desenfoque.
+No intercambiar materiales al refinar una pantalla; excepciones requieren
+instrucción explícita y decisión. [Regla obligatoria](../REGLAS_UI_UX.md) y
+[ADR-148](../decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md).
+
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): el estilo
+glass móvil comparte gris perla, luz blanca/celeste y ausencia de trazo blanco en
+GlassSurface. Incluye Home, ficha pública, controles y navegación existentes.
+No cambia ilustraciones, marca, fuentes ni contratos funcionales.
+
 ## Guía reutilizable de ilustraciones —26/10/2026
 
 [GUIA_ILUSTRACIONES](../GUIA_ILUSTRACIONES.md) reúne referencias reales de

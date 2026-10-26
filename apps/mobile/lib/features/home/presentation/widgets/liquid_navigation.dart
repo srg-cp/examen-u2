@@ -33,6 +33,8 @@ class _LiquidNavigationState extends State<LiquidNavigation> {
     children: [
       Expanded(
         child: GlassSurface(
+          finish: GlassSurfaceFinish.polished,
+          showRim: true,
           child: Padding(
             padding: const EdgeInsets.all(6),
             child: LayoutBuilder(

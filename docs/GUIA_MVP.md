@@ -1,5 +1,15 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+26/10: adopción web expresamente autorizada de los banners ilustrados de Inicio.
+Reutilización de assets y rutas existentes, adaptación responsive; hallazgo con
+tipo sugerido y borradores conservados. [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md).
+Sin nuevas HU/issues, operaciones, SQL, ampliación del MVP o cierre de historias.
+
+26/10: alcance visual precisado por el usuario: glass perlado compartido en
+todos los consumidores móviles de GlassSurface, incluida ficha pública.
+[ADR-145](decisiones/145-glass-perlado-compartido-mobile.md). Sin nuevas HU,
+operaciones, SQL, cambios web ni cierre de historias.
+
 26/10: refinamiento visual autorizado de Inicio Flutter según revisión3 aprobada
 y corrección de mascotas conforme a Platform. Banners con scroll para accesos
 existentes de HU-05/06/07 y HU-25/26, sin nueva HU/issue, operaciones, SQL,

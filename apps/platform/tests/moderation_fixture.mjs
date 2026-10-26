@@ -10,6 +10,7 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),o
  const send=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
  async function handle(req,res){
   if(options.handle&&await options.handle(req,res))return true;
+  if(req.url==='/rest/v1/rpc/require_platform_administrator'){for await(const _ of req){}send(res,{code:'42501',message:'statistics_forbidden'},403);return true;}
   const actor=req.headers.authorization==='Bearer '+'m'.repeat(30)?moderator:ordinary;
   if(req.url?.startsWith('/auth/v1/authorize?')){
    const url=new URL(req.url,'http://fixture'),callback=new URL(url.searchParams.get('redirect_to'));
