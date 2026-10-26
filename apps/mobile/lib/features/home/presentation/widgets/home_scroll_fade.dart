@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class HomeScrollLayout extends StatelessWidget {
     super.key,
   });
 
-  static const overlap = 28.0;
+  static const overlap = 32.0;
   final Widget header, child;
   final bool enabled;
 
@@ -64,6 +65,17 @@ class HomeScrollFade extends StatefulWidget {
 
 class _HomeScrollFadeState extends State<HomeScrollFade> {
   double _extent = 0;
+  ui.Image? _maskImage;
+  ui.Shader? _maskShader;
+  Size? _maskSize;
+  double? _maskExtent;
+
+  @override
+  void dispose() {
+    _maskShader?.dispose();
+    _maskImage?.dispose();
+    super.dispose();
+  }
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
@@ -91,7 +103,10 @@ class _HomeScrollFadeState extends State<HomeScrollFade> {
                   colors: [Colors.white, Colors.white],
                 ).createShader(bounds);
               }
-              return const LinearGradient(
+              if (_maskSize == bounds.size && _maskExtent == _extent) {
+                return _maskShader!;
+              }
+              const gradient = LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
@@ -103,7 +118,57 @@ class _HomeScrollFadeState extends State<HomeScrollFade> {
                   Colors.white,
                 ],
                 stops: [0, .18, .4, .65, .86, 1],
-              ).createShader(Rect.fromLTWH(0, 0, bounds.width, height));
+              );
+              final width = bounds.width.ceil();
+              final stripHeight = (height + 8).ceil();
+              final recorder = ui.PictureRecorder();
+              final canvas = Canvas(recorder);
+              // Unequal soft extensions separated by clearer openings, rather
+              // than a filled band with a wavy lower edge. No smoke texture.
+              // The approved32px overlap and maximum48px depth stay intact.
+              for (var x = 0; x < width; x++) {
+                final t = (x + .5) / width;
+                double extension(
+                  double center,
+                  double spread,
+                  double strength,
+                ) {
+                  final distance = (t - center) / spread;
+                  return math.exp(-.5 * distance * distance) * strength;
+                }
+
+                final extensions =
+                    (extension(.10, .065, .75) +
+                            extension(.39, .085, .58) +
+                            extension(.70, .07, 1) +
+                            extension(.96, .075, .72))
+                        .clamp(0.0, 1.0);
+                final localHeight = height * (.50 + .50 * extensions);
+                canvas.drawRect(
+                  Rect.fromLTWH(x.toDouble(), 0, 1, stripHeight.toDouble()),
+                  Paint()
+                    ..shader = gradient.createShader(
+                      Rect.fromLTWH(0, 0, width.toDouble(), localHeight),
+                    ),
+                );
+              }
+              final picture = recorder.endRecording();
+              final image = picture.toImageSync(width, stripHeight);
+              picture.dispose();
+              final shader = ui.ImageShader(
+                image,
+                TileMode.clamp,
+                TileMode.clamp,
+                Matrix4.identity().storage,
+                filterQuality: FilterQuality.low,
+              );
+              _maskShader?.dispose();
+              _maskImage?.dispose();
+              _maskShader = shader;
+              _maskImage = image;
+              _maskSize = bounds.size;
+              _maskExtent = _extent;
+              return shader;
             },
             child: widget.child,
           ),

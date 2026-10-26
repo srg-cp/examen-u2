@@ -2,9 +2,33 @@
 
 ## Desvanecido suave bajo cabecera de Inicio móvil —26/10/2026
 
+Refinamiento más reciente autorizado: forma de neblina con prolongaciones
+difusas y huecos más despejados, sin copiar textura. Perfil de cuatro lóbulos
+desiguales, profundidad24–48px; solape32px y máximo48px conservados. Retira el
+relleno continuo del perfil ondulado anterior, sin mover controles ni añadir
+assets/animación.16 comprobaciones aprobadas de Home/refresh/retorno, harness
+y regresión gráfica de entradas/prolongaciones y contenido inferior opaco.
+Capturas reales normales/320px/texto200% regeneradas e inspeccionadas.
+Android físico y recompilación APK pendientes; sin despliegue.
+
+Último ajuste solicitado: mantener posición restaurada32px/16px y añadir solo
+irregularidad leve de profundidad mediante variaciones amplias4px/1.5px. Sin
+bajar el conjunto ni alterar curva, cabecera, controles o materiales. Máscara
+alfa generada/cacheada, sin imagen de humo ni animación añadida.16 comprobaciones
+aprobadas de Home/refresh/retorno, harness y regresión gráfica de variación
+horizontal/contenido inferior opaco. Capturas reales regeneradas e inspeccionadas;
+análisis sin incidencias. Android físico y recompilación APK pendientes.
+La restauración uniforme siguiente es el antecedente de este ajuste.
+
+Restauración solicitada con capturas del chat: versión uniforme con solape32px
+y salida16px, anterior al desplazamiento4px hacia abajo y a la irregularidad.
+Retirados malla/cache de máscara y prueba exclusiva de irregularidad. Se conserva
+el resto del trabajo. Revalidación:15 pruebas de Home/refresh/retorno y harness;
+capturas regeneradas. Android físico y recompilación APK pendientes.
+
 Corrección posterior: el usuario señala que la transición empezaba demasiado
-abajo. Ahora el viewport entra28px dentro del margen inferior de la cabecera;
-la máscara48px nace ahí y sale solo20px por debajo. Padding compensado conserva
+abajo. Ahora el viewport entra32px dentro del margen inferior de la cabecera;
+la máscara48px nace ahí y sale solo16px por debajo. Padding compensado conserva
 el inicio; cabecera medida por su altura real y pintada encima. Revalidación de
 Home/capturas y análisis indicada a continuación.
 

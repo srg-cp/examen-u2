@@ -2,8 +2,27 @@
 
 ## Desvanecido bajo cabecera móvil —26/10/2026
 
+Refinamiento vigente: forma de neblina sin copiar su textura. Cuatro
+prolongaciones suaves desiguales, con zonas más despejadas entre ellas;
+profundidad24–48px al desplazar, solape32px y alcance máximo conservados.
+Sustituye el perfil de banda ondulada siguiente. No añade assets o animación;
+solo cambia la máscara del contenido real.16 comprobaciones aprobadas,
+incluidas entradas claras/prolongaciones y contenido inferior opaco;
+capturas normales/ampliadas regeneradas e inspeccionadas. Pendiente Android
+físico y recompilación APK.
+
+Instrucción vigente: sobre la posición restaurada32px/16px, añadir solamente
+variación horizontal suave de4px/1.5px en la profundidad del desvanecido. Conserva
+curva y cabecera; máscara alfa generada/cacheada por la interfaz, sin assets ni
+animación nueva.16 comprobaciones aprobadas, incluida regresión de opacidad;
+capturas regeneradas e inspeccionadas, análisis sin incidencias.
+La restauración uniforme siguiente queda como antecedente.
+
+Por petición posterior y capturas del chat, restaurada la máscara uniforme
+anterior al desplazamiento4px y la irregularidad. Sin texturas ni malla alfa.
+
 Corrección posterior por captura del usuario: el efecto nace dentro del margen
-inferior de la cabecera. Viewport solapado28px, máscara48px y solo20px de salida
+inferior de la cabecera. Viewport solapado32px, máscara48px y solo16px de salida
 inferior; padding compensado conserva título/composición inicial. Cabecera
 medida a su altura natural y pintada por encima, sin desplazar controles.
 
