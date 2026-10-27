@@ -1,5 +1,32 @@
 # Diseño de la interfaz: implementación y revisión
 
+26/10, [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md): la
+pantalla Recorrido comparte literalmente el mapa completo, cápsula16/500,
+retorno, panel blanco deslizable, foto/resumen y botones del mapa de Explorar.
+Título «Recorrido», sección «Ubicaciones» y pines rojo/celestes del recorrido.
+Ver ficha/flecha conservan aspecto, pero son adornos sin acción/foco/semántica
+solo aquí, por instrucción explícita. Filas/pines centran la zona; refresco
+descendente conservado. Tarjeta perla de entrada sin cambios.
+
+Precisión posterior26/10 de ADR-154: Ubicaciones usa puntos6/halo14 (origen rojo,
+avisos celestes) y eje vertical punteado gris1 entre filas, según referencia del
+usuario. Dot alineado al centro de la primera línea del título, sin cambiar su
+tipografía ni la selección. Eje adaptable al texto, sin tramo después del último
+punto. Solo en Recorrido; iconos de Explorar y pines cartográficos conservados.
+
+26/10, [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+ficha móvil con acciones circulares/etiquetas externas y utilidades rectangulares
+contiguas; reutilizar CaseActionButton/CaseUtilityButton y acabado de navegación.
+Tarjeta con GlassSurface.card, arte separado y fechas reales. Corrección final:
+sin título externo/pie/chevrón; círculo negro56/flecha diagonal26 arriba a la
+derecha. Padding18/gap16/radio28 compartidos con datos; resumen sin «Origen».
+Origen rojo/avisos celestes con vector oficial en mapa funcional.
+
+26/10, [ADR-152](decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
+el desvanecido aprobado acompaña la cabecera común en Inicio/Explorar/Mis mascotas
+mediante FadingHeaderScroll. Misma forma/posición, título inicial intacto y
+marca/Alertas/avatar nítidos; revisar las tres secciones normales/ampliadas.
+
 26/10, [ADR-149](decisiones/149-mapa-protagonista-ficha-publica-mobile.md): mapa protagonista en ficha pública móvil, cápsula glass «Ubicación» dentro y fecha debajo; retirar cabecera exterior y aviso de ubicación aproximada. Conservar coordenadas públicas, créditos y cartografía compartida.
 
 26/10, precisión ADR-148: perlado solo para cards (GlassSurface.card); actualizar,

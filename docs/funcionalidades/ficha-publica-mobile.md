@@ -1,5 +1,28 @@
 # Ficha pública móvil por tarjetas glass
 
+26/10, [ADR-154](../decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+el destino de la tarjeta Recorrido adopta el mapa/panel real de Explorar, con
+cabecera «Recorrido» y «Ubicaciones». Flecha celeste/Ver ficha permanecen como
+adornos temporales sin acción solo en ese destino; tarjeta perla y demás opciones
+de esta ficha conservadas. [Recorrido/validación](recorrido-de-busqueda.md).
+
+Corrección final26/10 de ADR-153: tarjeta Recorrido sin encabezado «Avisos de esta
+búsqueda» ni pie «Ver mapa y cronología»/separador/chevrón. Círculo negro56 con
+flecha diagonal26 en esquina superior derecha, un único destino. Padding18,
+radio28, gap16 y separación etiqueta/valor3 compartidos con CasePublicGlassCard.
+Contador sin «Origen»: avistamiento(s)/Sin avistamientos, o aviso(s) con custodia.
+
+26/10, [ADR-153](../decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+acciones compactas aprobadas, Reportar con NavigationAccentSurface, Seguimiento
+y Cartel contiguos. Avisos pasan a tarjeta perla de [recorrido](recorrido-de-busqueda.md),
+un acceso a mapa/cronología. Origen rojo/avisos celestes con logo; arte separado.
+Mapa principal, contacto, navegación y permisos conservados.
+
+Corrección26/10: Recorrido y tarjeta perla de datos usan CaseCardTypography
+compartida: familia del tema, etiquetas14/400/1.4, título/valores17/600/1.3 y
+colores de texto de la tarjeta superior. Se elimina la jerarquía local distinta
+del recorrido sin cambiar superficies, geometría, acciones ni mapa.
+
 26/10, [ADR-150](../decisiones/150-teselas-retina-y-ubicacion-compacta.md):
 cápsula Ubicación compacta con icono16/texto14/padding14–8, glass polished.
 ZoneMapPicker comparte retina nativo CARTO en DPR alto y shimmer por teselas

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/presentation/widgets/brand_map_pin.dart';
 
 class ExploreMapPin extends StatelessWidget {
   const ExploreMapPin({required this.selected, required this.onTap, super.key});
@@ -9,7 +10,7 @@ class ExploreMapPin extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PhysicalShape(
     color: selected ? const Color(0xFF171918) : Colors.white,
-    clipper: const _MapPinClipper(),
+    clipper: const BrandMapPinClipper(),
     clipBehavior: Clip.antiAlias,
     elevation: selected ? 4 : 2,
     shadowColor: const Color(0x40000000),
@@ -34,24 +35,4 @@ class ExploreMapPin extends StatelessWidget {
       ),
     ),
   );
-}
-
-class _MapPinClipper extends CustomClipper<Path> {
-  const _MapPinClipper();
-  @override
-  Path getClip(Size size) => Path()
-    ..moveTo(size.width * .5, size.height)
-    ..lineTo(size.width * .34, size.height * .81)
-    ..cubicTo(-size.width * .12, size.height * .65, 0, 0, size.width * .5, 0)
-    ..cubicTo(
-      size.width,
-      0,
-      size.width * 1.12,
-      size.height * .65,
-      size.width * .66,
-      size.height * .81,
-    )
-    ..close();
-  @override
-  bool shouldReclip(_MapPinClipper oldClipper) => false;
 }

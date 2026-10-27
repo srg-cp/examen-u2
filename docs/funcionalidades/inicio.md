@@ -1,5 +1,16 @@
 # Inicio y navegación
 
+## Cabecera y desvanecido comunes —26/10/2026
+
+Por instrucción explícita, el efecto se integra en FadingHeaderScroll compartido
+en core/presentation, no en el contenido de Inicio. Inicio, Explorar y Mis
+mascotas lo reciben de su cabecera/scroll común. Conserva forma, posición,
+padding inicial, fondo, navegación y origen/retorno; reinicia máscara al cambiar
+sección. Refresh/paginación conservan eventos de scroll. Sin cambios de datos,
+permisos, errores o reintentos. [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md)
+sustituye las notas de alcance exclusivo a Inicio siguientes. Validación local
+y revisión Android pendiente en ESTADO; sin cierre de historias ni cambios web.
+
 ## Desvanecido bajo cabecera móvil —26/10/2026
 
 Refinamiento vigente: forma de neblina sin copiar su textura. Cuatro

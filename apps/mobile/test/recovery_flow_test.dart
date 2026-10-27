@@ -1,4 +1,5 @@
 import 'support/fake_local_drafts.dart';
+import 'package:flutter_application_entrehuellas/features/case_journey/presentation/screens/case_journey_screen.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'lost_cases_test.dart' show FakeCases;
@@ -35,7 +36,7 @@ import 'package:flutter_application_entrehuellas/features/found_cases/presentati
 import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
 import 'found_cases_test.dart' show FakeFoundCases;
 import 'sightings_test.dart' show FakeSightings;
-import 'case_timeline_test.dart' show FakeTimeline;
+import 'case_timeline_test.dart' show FakeTimeline, testReview;
 import 'package:flutter_application_entrehuellas/features/case_timeline/providers/case_timeline_providers.dart';
 import 'package:flutter_application_entrehuellas/features/case_timeline/presentation/screens/case_timeline_screen.dart';
 import 'package:flutter_application_entrehuellas/features/sightings/providers/sighting_providers.dart';
@@ -100,11 +101,18 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
         tester.platformDispatcher.textScaleFactorTestValue = small ? 2 : 1;
+        // This test exercises business flows; map motion uses dedicated renders.
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(disableAnimations: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
         addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
         final auth = FakeAuthRepository()
           ..current = const AuthSession(userId: 'one');
         final reports = FakeFoundCases();
         final closures = FlowClosure(reports);
+        final timelineRepo = FakeTimeline();
         final pets = FakePets();
         final scope = ProviderContainer(
           overrides: [
@@ -112,7 +120,7 @@ void main() {
             contentReportRepositoryProvider.overrideWithValue(FakeReports()),
             caseClosureRepositoryProvider.overrideWithValue(closures),
             sightingRepositoryProvider.overrideWithValue(FakeSightings()),
-            caseTimelineRepositoryProvider.overrideWithValue(FakeTimeline()),
+            caseTimelineRepositoryProvider.overrideWithValue(timelineRepo),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
             ),
@@ -139,7 +147,6 @@ void main() {
             child: const EntreHuellasApp(),
           ),
         );
-        await tester.pumpAndSettle();
         final router = scope.read(routerProvider);
         router.go('/home/lost-cases/new');
         await tester.pumpAndSettle();
@@ -192,6 +199,9 @@ void main() {
         await tester.runAsync(model.publish);
         await tester.pumpAndSettle();
         final search = reports.attempts.single;
+        timelineRepo.current = testReview(
+          target: (id: search.id, community: true),
+        );
         expect(search.reportKind, 'possible_loss');
         expect(search.targetId, isNull);
         reports.publicCase = projection(search, owner: true);
@@ -224,6 +234,16 @@ void main() {
         );
         expect(timeline.target.id, search.id);
         expect(timeline.target.community, true);
+        router.pop();
+        await tester.pumpAndSettle();
+        await Scrollable.ensureVisible(
+          tester.element(find.byIcon(Icons.north_east_rounded)),
+          alignment: .35,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.north_east_rounded));
+        await tester.pumpAndSettle();
+        expect(find.byType(CaseJourneyScreen), findsOneWidget);
         router.pop();
         await tester.pumpAndSettle();
         await tester.tap(find.byTooltip('Compartir ficha'));

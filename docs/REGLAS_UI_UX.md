@@ -1,5 +1,19 @@
 # Entre Huellas: regla de oro de UI y UX
 
+26/10, excepción local [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+pantalla Recorrido con los componentes reales del mapa de Explorar: mapa completo,
+cabecera compacta y panel blanco deslizable. Ver ficha/flecha de este panel son
+adornos temporales explícitamente solicitados; sin interacción/foco/semántica,
+con colores originales. Explorar conserva sus acciones. Tarjeta perla de entrada
+conservada; sin cambio global de material ni tipografía.
+
+26/10, excepción local [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+opciones de ficha como círculos compactos/controles neutros contiguos; Reportar
+reutiliza celeste de navegación. Solo tarjeta informativa usa GlassSurface.card
+perla, con un destino. Corrección final: círculo negro56/flecha diagonal26 arriba
+a la derecha; sin encabezado externo ni pie/chevrón inferior. Padding18/gap16 y
+tipografía de la tarjeta de datos compartidos. No cambia otros controles.
+
 ## Regla obligatoria: tarjetas y controles glass móviles
 
 Por instrucción explícita del26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):

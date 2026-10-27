@@ -6,6 +6,7 @@ import 'expandable_description.dart';
 import 'glass_surface.dart';
 import 'stagger_reveal.dart';
 import 'zone_map_picker.dart';
+import '../../theme/case_card_typography.dart';
 
 class CasePublicFact {
   const CasePublicFact(this.label, this.value);
@@ -67,20 +68,24 @@ class CasePublicCards extends StatelessWidget {
                   final single =
                       MediaQuery.textScalerOf(context).scale(16) > 22;
                   return Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
+                    spacing: CasePublicGlassCard.spacing,
+                    runSpacing: CasePublicGlassCard.spacing,
                     children: [
                       for (final fact in facts)
                         SizedBox(
                           width: single
                               ? constraints.maxWidth
-                              : (constraints.maxWidth - 16) / 2,
+                              : (constraints.maxWidth -
+                                        CasePublicGlassCard.spacing) /
+                                    2,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(fact.label, style: _labelStyle),
-                              const SizedBox(height: 3),
-                              Text(fact.value, style: _valueStyle),
+                              Text(fact.label, style: CaseCardTypography.label),
+                              const SizedBox(
+                                height: CasePublicGlassCard.factSpacing,
+                              ),
+                              Text(fact.value, style: CaseCardTypography.value),
                             ],
                           ),
                         ),
@@ -93,7 +98,7 @@ class CasePublicCards extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Divider(height: 1, color: Color(0x1F454746)),
                 ),
-                const Text('Rasgos', style: _labelStyle),
+                const Text('Rasgos', style: CaseCardTypography.label),
                 const SizedBox(height: 4),
                 ExpandableDescription(text: description),
               ],
@@ -228,7 +233,7 @@ class CasePublicCards extends StatelessWidget {
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(occurredAt, style: _labelStyle),
+              child: Text(occurredAt, style: CaseCardTypography.label),
             ),
           ],
         ),
@@ -241,28 +246,20 @@ class CasePublicCards extends StatelessWidget {
   );
 }
 
-const _labelStyle = TextStyle(
-  fontSize: 14,
-  height: 1.4,
-  color: Color(0xFF626975),
-);
-const _valueStyle = TextStyle(
-  fontSize: 17,
-  height: 1.3,
-  fontWeight: FontWeight.w600,
-  color: Color(0xFF111111),
-);
-
 /// Shared pearl material, matching Home and the other glass surfaces.
 class CasePublicGlassCard extends StatelessWidget {
   const CasePublicGlassCard({required this.child, super.key});
+  static const radius = 28.0;
+  static const contentPadding = EdgeInsets.all(18);
+  static const spacing = 16.0;
+  static const factSpacing = 3.0;
   final Widget child;
 
   @override
   Widget build(BuildContext context) => GlassSurface.card(
-    radius: 28,
+    radius: radius,
     backdropBlendMode: BlendMode.src,
-    child: Padding(padding: const EdgeInsets.all(18), child: child),
+    child: Padding(padding: contentPadding, child: child),
   );
 }
 

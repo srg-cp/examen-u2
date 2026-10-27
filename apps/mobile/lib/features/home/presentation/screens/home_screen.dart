@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/fading_header_scroll.dart';
 import '../../../../core/presentation/widgets/origin_page_transition.dart';
 import '../../../../core/presentation/widgets/pull_to_refresh.dart';
 import '../../../../core/presentation/widgets/scroll_safe_area.dart';
@@ -12,7 +13,6 @@ import '../state/home_view_state.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/home_content.dart';
 import '../widgets/home_header.dart';
-import '../widgets/home_scroll_fade.dart';
 import '../widgets/liquid_navigation.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -69,62 +69,43 @@ class HomeScreen extends ConsumerWidget {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: HomeScrollLayout(
-                        enabled: state.section == HomeSection.home,
+                      child: FadingHeaderScroll(
+                        scrollKey: ValueKey(state.section),
                         header: HomeHeader(
                           profileAvatar: profileAvatar,
                           onAlerts: onAlerts,
                         ),
-                        child: HomeScrollFade(
-                          key: ValueKey(state.section),
-                          enabled: state.section == HomeSection.home,
-                          child: SingleChildScrollView(
-                            key: ValueKey(state.section),
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: StaggerReveal(
-                              enabled: animateContent,
-                              key: ValueKey(state.section),
-                              count: state.section == HomeSection.home
-                                  ? HomeContent.revealCount
-                                  : 2,
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  state.section == HomeSection.explore
-                                      ? 12
-                                      : 24,
-                                  6 +
-                                      (state.section == HomeSection.home
-                                          ? HomeScrollLayout.overlap
-                                          : 0),
-                                  state.section == HomeSection.explore
-                                      ? 12
-                                      : 24,
-                                  ScrollSafeArea.bottomPadding(
-                                    context,
-                                    scrollBottom.toDouble(),
-                                  ),
-                                ),
-                                child: state.section == HomeSection.home
-                                    ? HomeContent(
-                                        onSelect: model.select,
-                                        onReport: (source) => openLostReport(
-                                          source,
-                                          radius: 24,
-                                          icon: Icons.arrow_forward_rounded,
-                                        ),
-                                      )
-                                    : state.section == HomeSection.explore &&
-                                          exploreContent != null
-                                    ? exploreContent!
-                                    : state.section == HomeSection.pets &&
-                                          petsContent != null
-                                    ? petsContent!
-                                    : _UnavailableSection(
-                                        section: state.section,
-                                      ),
-                              ),
-                            ),
+                        padding: EdgeInsets.fromLTRB(
+                          state.section == HomeSection.explore ? 12 : 24,
+                          6,
+                          state.section == HomeSection.explore ? 12 : 24,
+                          ScrollSafeArea.bottomPadding(
+                            context,
+                            scrollBottom.toDouble(),
                           ),
+                        ),
+                        child: StaggerReveal(
+                          enabled: animateContent,
+                          key: ValueKey(state.section),
+                          count: state.section == HomeSection.home
+                              ? HomeContent.revealCount
+                              : 2,
+                          child: state.section == HomeSection.home
+                              ? HomeContent(
+                                  onSelect: model.select,
+                                  onReport: (source) => openLostReport(
+                                    source,
+                                    radius: 24,
+                                    icon: Icons.arrow_forward_rounded,
+                                  ),
+                                )
+                              : state.section == HomeSection.explore &&
+                                    exploreContent != null
+                              ? exploreContent!
+                              : state.section == HomeSection.pets &&
+                                    petsContent != null
+                              ? petsContent!
+                              : _UnavailableSection(section: state.section),
                         ),
                       ),
                     ),

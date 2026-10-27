@@ -1,5 +1,6 @@
 import 'confirmation_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../config/map_config.dart';
@@ -25,6 +26,9 @@ class ZoneMapPicker extends StatefulWidget {
     this.attributionTopInset = 0,
     this.readOnlyNavigation = false,
     this.markers = const [],
+    this.polylines = const [],
+    this.circles = const [],
+    this.fitPoints = const [],
     this.markerLayer,
     this.height = viewportHeight,
     this.borderRadius = 22,
@@ -44,6 +48,9 @@ class ZoneMapPicker extends StatefulWidget {
   /// Result maps can be explored without changing the selected search center.
   final bool readOnlyNavigation;
   final List<Marker> markers;
+  final List<Polyline> polylines;
+  final List<CircleMarker> circles;
+  final List<LatLng> fitPoints;
 
   /// Optional visual layer for result maps with camera-dependent placement.
   final Widget? markerLayer;
@@ -71,6 +78,16 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
 
   bool _mapReady = false;
   void _fitSelection() {
+    if (_mapReady && widget.fitPoints.isNotEmpty) {
+      _controller.fitCamera(
+        CameraFit.coordinates(
+          coordinates: widget.fitPoints,
+          padding: widget.cameraPadding,
+          maxZoom: 13,
+        ),
+      );
+      return;
+    }
     if (!_mapReady ||
         !widget.fitRadius ||
         widget.latitude == null ||
@@ -102,6 +119,9 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
     final pointChanged =
         widget.latitude != oldWidget.latitude ||
         widget.longitude != oldWidget.longitude;
+    if (!listEquals(widget.fitPoints, oldWidget.fitPoints)) {
+      _fitSelection();
+    }
     if (widget.fitRadius &&
         (pointChanged ||
             widget.radiusMeters != oldWidget.radiusMeters ||
@@ -232,6 +252,10 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                         ),
                       ],
                     ),
+                  if (widget.circles.isNotEmpty)
+                    CircleLayer(circles: widget.circles),
+                  if (widget.polylines.isNotEmpty)
+                    PolylineLayer(polylines: widget.polylines),
                   if (widget.markerLayer != null)
                     widget.markerLayer!
                   else if (widget.markers.isNotEmpty)

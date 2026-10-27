@@ -1,5 +1,16 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+26/10: Recorrido adopta la pantalla real del mapa de Explorar, con «Ubicaciones»
+y los dos controles de resumen como adornos temporales por instrucción explícita.
+[ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md) precisa
+ADR-153; mismo alcance HU/RF, datos/permisos, sin nuevas operaciones ni cierre
+de historias. Reutilización de presentación en core, sin migración web.
+
+26/10: autorizado el rediseño real de opciones/avisos en ficha móvil y el mapa
+cronológico asociado, [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md).
+Agrega contratos existentes de HU-05/06/10/11 sin nuevas RPC/servicios ni cambios
+de permisos; no migra web ni cierra historias por la aprobación del mockup.
+
 26/10: adopción web expresamente autorizada de los banners ilustrados de Inicio.
 Reutilización de assets y rutas existentes, adaptación responsive; hallazgo con
 tipo sugerido y borradores conservados. [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md).

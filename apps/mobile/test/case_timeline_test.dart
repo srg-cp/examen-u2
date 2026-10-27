@@ -30,13 +30,14 @@ const reviewKey = (target: timelineTarget, id: sightingId);
 final observed = DateTime(2026, 10, 10, 10, 30),
     received = DateTime(2026, 10, 12, 12);
 SightingReview testReview({
+  TimelineTarget target = timelineTarget,
   int version = 0,
   bool open = true,
   List<SightingDecision> history = const [],
   int? next,
 }) => SightingReview(
   id: sightingId,
-  target: timelineTarget,
+  target: target,
   canReview: open,
   observedAt: observed,
   receivedAt: received,

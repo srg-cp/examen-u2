@@ -1,5 +1,10 @@
 # Guía de ilustraciones de Entre Huellas con imagegen
 
+Recorrido de búsqueda26/10, ADR-153: [fuente/prompt archivados](../output/imagegen/case-journey-2026-10-26/README.md).
+Mapa/lupa transparente con dos pines oficiales, origen rojo/recorrido celeste y
+trazo de huellas de marca, por corrección explícita. Asset separado de card,
+fechas y controles nativos. El mapa funcional usa el SVG oficial existente.
+
 Adopción web26/10: los cuatro WebP finales se reutilizan sin cambios en
 [public/images/home](../apps/platform/public/images/home/README.md), con igualdad
 SHA256 respecto a móvil. La composición responsive se resuelve en CSS y mantiene

@@ -1,5 +1,22 @@
 # Arquitectura de Entre Huellas
 
+26/10, [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+MapCaseSheet, MapCasePanel/MapPanelFact y MapSheetHeader se extraen a core para
+Explorar y Recorrido, sin imports entre presentaciones. Mantienen geometría,
+gestos/resortes y ZoneMapPicker. ReadCaseJourney agrega resumen de su proyección
+pública existente; sin lectura privada nueva. Solo Recorrido declara adornos sin
+callbacks/foco/semántica para Ver ficha y flecha, por instrucción explícita.
+
+26/10, [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+case_journey agrega contratos de dominio de casos/avisos/cronología mediante
+providers. Acceso privado existente/cuadrícula aproximada; ZoneMapPicker comparte
+capas/encuadre y BrandMapPinClipper la silueta oficial. Sin SQL nuevo ni cambio web.
+
+26/10, [ADR-152](decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
+FadingHeaderScroll en core/presentation compone cabecera/scroll y máscara alfa
+para Inicio, Explorar y Mis mascotas. Sin condicional por sección ni imports de
+features en core; padding/solape centralizados. Barra/Mapa fuera del efecto.
+
 26/10, precisión ADR-148: GlassSurface.card declara material perlado de tarjetas.
 El constructor general recupera polished/ribete originales para controles,
 incluido refresh y botón Mapa. Sin dependencias entre funcionalidades.

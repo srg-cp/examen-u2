@@ -1,5 +1,176 @@
 # Estado del proyecto
 
+## Ubicaciones de Recorrido con puntos de cronología —26/10/2026
+
+Por referencia explícita del usuario, las filas sustituyen los iconos de pin por
+puntos6 con halo14: Origen rojo, avisos celestes y línea vertical punteada gris
+tenue. Se alinea al título y adapta a la altura real de cada fila/texto ampliado;
+sin tramo tras el último ni línea con origen único. Fechas, revisión, selección,
+mapa y controles conservados. MapPanelFact admite un leading decorativo sin
+alterar los iconos de Explorar. Precisión registrada en ADR-154/diseño/ficha.
+
+Validación:32 pruebas existentes de Recorrido/Explorar/arquitectura/consistencia
+aprobadas, análisis de los3 archivos Dart intervenidos sin incidencias. Capturas
+normal390×844 y320×600/texto200% inspeccionadas, incluido scroll hasta Ubicaciones.
+16 capturas de Explorar siguen idénticas en RGB. Logs locales:
+apps/mobile/build/recorrido-ubicaciones-dots-tests.log y
+recorrido-ubicaciones-dots-analysis.log. Formato/diff correctos; fixtures locales,
+sin nuevo APK/instalación. Siguiente validación: revisión visual en Android real.
+
+## Recorrido con el mapa y panel de Explorar —26/10/2026
+
+Por instrucción explícita, la pantalla abierta desde Recorrido reutiliza los
+componentes reales de Ver mapa de Explorar: mapa completo, retorno/cápsula glass,
+panel blanco deslizable, foto/resumen, flecha celeste y Ver ficha. Cabecera
+«Recorrido» y sección «Ubicaciones», con pines oficiales rojo/celestes, orden por
+suceso, aproximación y agrupación existentes. La foto/nombre/rasgos corresponden
+a la proyección pública del origen ya consultada. Filas y pines centran su zona.
+
+Ver ficha/flecha son adornos temporales solo en esta pantalla, como solicita el
+usuario: sin callbacks, interacción, foco ni semántica de acción, conservando
+colores y medidas. Explorar conserva sus acciones reales. Tarjeta perla de acceso,
+ilustración, opciones restantes, permisos y datos privados conservados. Refresco
+descendente real con el panel al mínimo, contenido retenido, bloqueo simultáneo,
+toast/reintento y retorno tras perder acceso comprobados. Sin SQL ni cambio web.
+
+MapCaseSheet/MapCasePanel/MapPanelFact/MapSheetHeader extraídos a core, sin imports
+entre presentaciones. Contrato de origen/retorno y movimiento del panel intactos.
+[ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md),
+[ficha](funcionalidades/recorrido-de-busqueda.md) y reglas/documentación actualizadas.
+
+Validación:62 pruebas de recorrido, flujo real, Explorar, mapas/retina, cronología,
+fichas, refresco compartido y arquitectura/consistencia aprobadas con CARTO de
+fixture; análisis lib/tests intervenidos sin incidencias.16 capturas de Explorar
+antes/después de la extracción idénticas píxel por píxel en RGB. Capturas de
+Recorrido390×844 y320×600/texto200% inspeccionadas; adornos, selección de ubicación,
+lectura/refresco, retirada de datos al perder autorización y reintento comprobados.
+Logs en apps/mobile/build/recorrido-explorar-final-tests.log y
+recorrido-explorar-analysis.log; capturas en build/ui-preview/case-journey y
+explore-map. Datos/fotos/teselas de fixture, sin afirmar sesión alojada ni demo
+Android física. Bundle Flutter debug compilado con código0 en
+apps/mobile/build/recorrido-explorar-flutter-assets (kernel y assets comprobados).
+El bloqueo previo de APK Java/Gradle no se reintenta en este ajuste; sin instalación.
+
+## Recorrido: refresco por gesto y subtítulo retirado —26/10/2026
+
+Por instrucción explícita, la vista cartográfica retira «Actualizar recorrido»
+y el subtítulo «Origen · ...». Usa PullToRefresh compartido de las secciones:
+indicador descendente, consulta real, bloqueo de refrescos simultáneos y retirada
+al terminar. CaseScreenShell transmite scrollPhysics opcional; solo esta vista
+solicita AlwaysScrollableScrollPhysics para funcionar también con poco contenido.
+Conserva ContentRefresh sobre datos de la misma cuenta, mapa/cronología, permisos,
+toast/reintentos, título, navegación y movimiento reducido. ADR-153/ficha actualizados.
+
+Validación:42 pruebas de recorrido/flujo real/refresco compartido/arquitectura/
+consistencia/cronología aprobadas. El gesto real en390×844 y320×600/texto200%
+provoca una lectura, conserva contenido pendiente, bloquea otro gesto simultáneo,
+incorpora un aviso nuevo y retira el indicador. Análisis de los3 archivos Dart
+intervenidos sin incidencias; formato/diff comprobados. Capturas de la vista sin
+el texto retirado regeneradas e inspeccionadas. Sin nuevo APK/instalación; el
+bloqueo local Java/Gradle previo permanece documentado abajo.
+
+## Recorrido: acceso en esquina y contador simplificado —26/10/2026
+
+Implementación directa por autorización del usuario, sin nuevo boceto: eliminado
+encabezado «Avisos de esta búsqueda», pie «Ver mapa y cronología», su línea y
+chevrón. Círculo negro56 con flecha diagonal blanca26 en esquina superior derecha;
+flecha ligeramente menor que en la referencia30. Toda la tarjeta conserva el
+mismo destino y la expansión/retorno. Padding18, radio28, gap16 y separación
+etiqueta/valor3 compartidos con la tarjeta de datos mediante CasePublicGlassCard.
+Reserva para evitar solapar texto y adaptación a texto200% conservadas.
+
+Resumen sin «Origen»: «1 avistamiento»/«N avistamientos» o «Sin avistamientos».
+Con custodia se usa aviso(s) para conservar su clasificación. Se mantienen
+tipografía compartida, arte aprobado, fechas reales, mapa y permisos existentes.
+ADR-153, reglas UI y fichas de funcionalidad actualizados.
+
+Validación:32 pruebas existentes de recorrido/ficha/flujo real/navegación,
+arquitectura y consistencia aprobadas; análisis de archivos intervenidos sin
+incidencias. Capturas reales normales/320px texto200% regeneradas e inspeccionadas;
+toque en círculo abre mapa y retorno restaura ficha. El harness sitúa ese acceso
+fuera de la cabecera flotante al desplazar. Formato/diff comprobados. Sin nuevo
+APK ni instalación; permanece el bloqueo local Java/Gradle ya registrado debajo.
+
+## Tipografía de Recorrido igualada a la tarjeta perla superior —26/10/2026
+
+Por corrección explícita del usuario, ambas tarjetas consumen CaseCardTypography:
+familia del tema, etiquetas14/400/interlineado1.4 y título/valores17/600/1.3,
+con los colores de texto de la tarjeta de datos superior. Se retiran los estilos
+locales distintos de Recorrido (18/700, etiquetas12, fechas15). Sin cambios de
+superficies, ilustración, geometría, mapa, controles, datos o permisos.
+Precisión en ADR-153 y fichas de funcionalidad; estilos compartidos en core/theme.
+
+Validación:26 pruebas existentes de recorrido, ficha y arquitectura aprobadas;
+análisis de los3 archivos Dart intervenidos sin incidencias. Capturas normales y
+320px/texto200% del recorrido regeneradas e inspeccionadas. Formato/diff comprobados.
+Este ajuste no recompila APK; continúa el bloqueo Java/Gradle descrito debajo.
+
+## Opciones y recorrido de búsqueda móvil aprobados —26/10/2026
+
+Implementación real de la composición autorizada en este chat: tres acciones
+circulares con etiquetas, Reportar reutilizando NavigationAccentSurface, y
+utilidades Seguimiento/Cartel contiguas de igual altura. Permisos anteriores
+conservados; sin contador ficticio de avisos nuevos. Búsquedas propias y
+comunitarias comparten los controles. Contacto, galería, mapa principal y
+navegación conservados; trabajo local previo de cabeceras preservado.
+
+Tarjeta informativa GlassSurface.card perla con ilustración nativa separada de
+texto/fechas, pin rojo de origen/celeste de recorrido y huellas oficiales. Solo
+un chevrón inferior; toda la tarjeta abre mapa/cronología reales. Pines con SVG
+oficial, orden ascendente por suceso, zonas aproximadas y selección de todos los
+avisos coincidentes sin desplazar coordenadas. Cada aviso abre su consulta.
+Evidencia privada solo con autorización existente, destino comprobado y puntos
+aproximados; rechazada queda en historial. Fallos no equivalen a vacío; cambio
+de cuenta oculta datos/selecciones anteriores. Actualizar conserva contenido
+con ContentRefresh; una denegación lo retira. Sin nuevas RPC, SQL o servicios.
+[ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md),
+[ficha](funcionalidades/recorrido-de-busqueda.md).
+
+Validación final:102 pruebas aprobadas de recorrido, datos/permisos/identidad/
+refresh, paginación/orden, agrupación, arquitectura/consistencia, flujo real de
+reporte→ficha→historial→mapa→cierre, mapas/retina/Explorar, fichas/caché/compartir
+y navegación. Análisis lib y tres tests intervenidos sin incidencias; formato
+y diff comprobados. Flutter build bundle --debug termina con código0 y genera
+kernel_blob.bin/asset WebP. Pruebas/capturas usan fixtures y teselas simuladas,
+no una sesión alojada. No se vuelven a abrir historias previamente aceptadas.
+
+Capturas de widgets reales inspeccionadas en apps/mobile/build/ui-preview/
+case-journey: acciones/mapa normales390×844 y pequeños320×600 con texto200%,
+tarjeta desplazada y fotogramas de apertura/retorno normales. Los tests de
+regresión de ficha existentes cubren además320×350. Fuente/prompt imagegen en
+output/imagegen/case-journey-2026-10-26; app consume WebP con transparencia.
+
+APK nuevo pendiente: Flutter/Gradle y el intento directo sin daemon fallan
+antes de compilar con «Unable to establish loopback connection»; stack Java
+PipeImpl/UnixDomainSockets, «Invalid argument: connect». IPv4 y JAVA_HOME17
+temporal no lo resuelven; sin alterar configuración global. Logs en
+apps/mobile/build/case-journey-apk.log y case-journey-gradle-stack.log.
+Siguiente paso: resolver el bloqueo local Java/Gradle y revisar este nuevo
+recorrido en Android físico con cuentas/teselas reales. Sin instalación,
+despliegue, cambios remotos, publicación GitHub ni cierre adicional de HU.
+
+## Cabecera con desvanecido compartido en móvil —26/10/2026
+
+Por instrucción explícita, el efecto pasa del contenido exclusivo de Inicio
+a FadingHeaderScroll en core/presentation. Componente único con cabecera,
+scroll, solape/padding compensado y máscara irregular aprobada para Inicio,
+Explorar y Mis mascotas. Retirados condición por sección y componentes locales.
+Forma/posición intactas; reinicio del efecto al cambiar sección, marca/controles
+fijos y barra/Mapa fuera de la máscara. Sin cambios de rutas, datos, permisos,
+dominio, materiales, feedback, refresh/paginación o motor de origen/retorno.
+[ADR-152](decisiones/152-cabecera-con-desvanecido-compartido-mobile.md).
+
+Validación:64 comprobaciones aprobadas de Home/retorno/refresh, Explorar/mapa,
+mascotas/navegación/refresh, arquitectura, consistencia, máscara y harness.
+Regresión comprueba máscara activa en las tres secciones, reinicio al cambiar,
+cabecera/barra estables con/sin movimiento reducido y forma/opacidad por píxeles.
+Análisis de lib/test/tool sin incidencias; formato/diff comprobados.
+Capturas de las tres secciones en390×844 y320×600/350 con texto200%, iniciales
+y desplazadas, regeneradas e inspeccionadas. Widgets reales, fuentes/assets
+locales y repositorios simulados; sin acceder a cuentas alojadas.
+Siguiente paso: aceptación visual y Android físico. APK sin recompilar/instalar,
+sin despliegue ni cierre de HU.
+
 ## Desvanecido suave bajo cabecera de Inicio móvil —26/10/2026
 
 Refinamiento más reciente autorizado: forma de neblina con prolongaciones

@@ -1,4 +1,8 @@
 import '../features/case_matching/presentation/screens/matching_screen.dart';
+import '../features/case_journey/presentation/screens/case_journey_screen.dart';
+import '../features/case_journey/presentation/widgets/case_journey_card.dart';
+import '../features/case_journey/presentation/view_models/case_journey_view_model.dart';
+import '../core/presentation/widgets/case_action_button.dart';
 import '../features/offline_cases/presentation/widgets/cached_cases_section.dart';
 import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
@@ -152,6 +156,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
+              state.uri.path.startsWith('/home/journey/') ||
               state.uri.path.startsWith('/home/denounce/') ||
               state.uri.path.startsWith('/home/closure/') ||
               state.uri.path.startsWith('/home/cases/'))) {
@@ -493,15 +498,32 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                timelineAction: TimelineAccessButton(
+                journey: CaseJourneyCard(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
-                posterAction: TextButton.icon(
-                  onPressed: () => context.push(
-                    '/home/posters/found/${state.pathParameters['id']}',
+                onActivityChanged: () => ref.invalidate(
+                  caseJourneyViewModelProvider((
+                    id: state.pathParameters['id']!,
+                    community: true,
+                  )),
+                ),
+                utilitiesBuilder: (canPoster) => TimelineAccessButton(
+                  onReturn: () => ref.invalidate(
+                    caseJourneyViewModelProvider((
+                      id: state.pathParameters['id']!,
+                      community: true,
+                    )),
                   ),
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
-                  label: const Text('Crear cartel con QR'),
+                  target: (id: state.pathParameters['id']!, community: true),
+                  companion: canPoster
+                      ? CaseUtilityButton(
+                          title: 'Crear cartel',
+                          subtitle: 'PDF con QR',
+                          icon: Icons.qr_code_2_rounded,
+                          route:
+                              '/home/posters/found/${state.pathParameters['id']}',
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -587,24 +609,40 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                timelineAction: TimelineAccessButton(
-                  target: (id: state.pathParameters['id']!, community: false),
-                ),
-                posterAction: TextButton.icon(
-                  onPressed: () => context.push(
-                    '/home/posters/lost/${state.pathParameters['id']}',
-                  ),
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
-                  label: const Text('Crear cartel con QR'),
-                ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
-                  showSightingAction: false,
+                  showSightingAction: true,
+                  journey: CaseJourneyCard(
+                    target: (id: value.id, community: false),
+                  ),
+                  utilities: TimelineAccessButton(
+                    onReturn: () => ref.invalidate(
+                      caseJourneyViewModelProvider((
+                        id: value.id,
+                        community: false,
+                      )),
+                    ),
+                    target: (id: value.id, community: false),
+                    companion: value.canResolve
+                        ? CaseUtilityButton(
+                            title: 'Crear cartel',
+                            subtitle: 'PDF con QR',
+                            icon: Icons.qr_code_2_rounded,
+                            route: '/home/posters/lost/${value.id}',
+                          )
+                        : null,
+                  ),
                   id: value.id,
                   community: false,
                   canResolve: value.canResolve,
                   open: value.status == 'active',
                   onChanged: () {
                     onChanged();
+                    ref.invalidate(
+                      caseJourneyViewModelProvider((
+                        id: value.id,
+                        community: false,
+                      )),
+                    );
                     ref.invalidate(myCasesViewModelProvider);
                     ref.invalidate(petListViewModelProvider);
                     ref.invalidate(petDetailViewModelProvider);
@@ -672,6 +710,27 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ref.invalidate(petDetailViewModelProvider);
                   ref.read(exploreViewModelProvider.notifier).refresh();
                 },
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'journey/:source/:id',
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: CaseJourneyScreen(
+                target: (
+                  id: state.pathParameters['id']!,
+                  community: state.pathParameters['source'] == 'found',
+                ),
               ),
             ),
           ),

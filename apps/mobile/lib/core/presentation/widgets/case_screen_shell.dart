@@ -19,6 +19,7 @@ class CaseScreenShell extends StatelessWidget {
     this.onNoticeAction,
     this.noticeId,
     this.noticeIsError = true,
+    this.scrollPhysics,
     super.key,
   });
   final String title;
@@ -36,6 +37,7 @@ class CaseScreenShell extends StatelessWidget {
   final VoidCallback? onNoticeAction;
   final Object? noticeId;
   final bool noticeIsError;
+  final ScrollPhysics? scrollPhysics;
   @override
   Widget build(BuildContext context) => ConfirmationToastHost(
     confirmed: notice != null,
@@ -54,6 +56,7 @@ class CaseScreenShell extends StatelessWidget {
       loading: loading,
       immersive: immersive,
       count: count,
+      scrollPhysics: scrollPhysics,
       child: DefaultTextStyle.merge(
         style: const TextStyle(
           fontSize: 16,

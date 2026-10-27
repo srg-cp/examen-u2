@@ -4,6 +4,10 @@ Fecha:26/10/2026. Estado: aceptada por instrucción explícita del usuario.
 
 ## Decisión
 
+Alcance posterior sustituido por [ADR-152](152-cabecera-con-desvanecido-compartido-mobile.md):
+FadingHeaderScroll compartido en core reemplaza los componentes locales y aplica
+el mismo efecto en Inicio, Explorar y Mis mascotas. Forma/posición conservadas.
+
 Refinamiento vigente autorizado después de la referencia de neblina: tomar
 solo la forma, sin textura. Sustituir la banda rellena ondulada por cuatro
 prolongaciones difusas de alturas/anchos desiguales y entradas más despejadas

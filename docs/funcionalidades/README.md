@@ -1,5 +1,15 @@
 # Funcionalidades de Entre Huellas
 
+26/10: [Recorrido de la búsqueda móvil](recorrido-de-busqueda.md), acciones
+compactas y tarjeta perla con mapa cronológico/pines oficiales/origen rojo.
+ADR-153/154; pantalla con el mapa/panel real de Explorar y «Ubicaciones»,
+Ver ficha/flecha decorativos por instrucción explícita. Permisos existentes,
+sin SQL nuevo ni migración web.
+
+26/10: cabecera con desvanecido compartido en [Inicio](inicio.md),
+[Explorar](explorar.md) y [Mis mascotas](mascotas.md), mediante FadingHeaderScroll
+de core. [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md).
+
 26/10: [Inicio web](inicio.md) adopta expresamente los cuatro banners ilustrados
 existentes, con dos columnas/scroll responsive y hallazgo preseleccionado sin
 reemplazar borradores. ADR-147; validación local, sin despliegue ni cierre de HU.

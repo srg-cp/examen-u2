@@ -1,5 +1,11 @@
 # Registro, edición y ciclo de vida de mascotas
 
+26/10, [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
+Mis mascotas recibe el desvanecido irregular desde FadingHeaderScroll/cabecera
+común. Título inicial, filtro, registro, swipe/consulta, refresh y datos/permisos
+conservados; no altera cabeceras de editores o fichas. Capturas reales con
+repositorio de prueba y pruebas de navegación/refresh; Android físico pendiente.
+
 Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
 la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
 comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8
