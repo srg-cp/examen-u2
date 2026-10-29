@@ -350,11 +350,11 @@ void main() {
     await tester.pumpAndSettle();
     await capture('home');
     final reunion = find.image(
-      const AssetImage('assets/illustrations/reunion.png'),
+      const AssetImage('assets/illustrations/home/found-home.webp'),
     );
     await tester.ensureVisible(reunion);
     await tester.pumpAndSettle();
-    await capture('home_reunion');
+    await capture('home_found');
     Scrollable.of(tester.element(reunion)).position.jumpTo(0);
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Explorar'));

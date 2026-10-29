@@ -69,7 +69,7 @@ class MyFoundCasesScreen extends ConsumerWidget {
                                   ? 'Posiblemente perdida'
                                   : item.reportKind == 'sighting'
                                   ? 'Avistamiento'
-                                  : item.reportKind == 'with_reporter'
+                                  : {'with_reporter', 'independent_found'}.contains(item.reportKind)
                                   ? 'Encontrada'
                                   : 'Reporte anterior'} · ${foundSpeciesLabel(item.species)}',
                           status: item.status,
@@ -77,6 +77,10 @@ class MyFoundCasesScreen extends ConsumerWidget {
                               ? (item.status == 'active'
                                     ? 'Búsqueda abierta'
                                     : 'Búsqueda cerrada')
+                              : item.reportKind == 'independent_found'
+                              ? (item.status == 'active'
+                                    ? 'Hallazgo sin familia identificada'
+                                    : 'Hallazgo retirado')
                               : item.reportKind == 'legacy_found'
                               ? 'Reporte anterior'
                               : (item.status == 'active'
@@ -111,7 +115,7 @@ class MyFoundCasesScreen extends ConsumerWidget {
                                             ? 'Posiblemente perdida'
                                             : item.reportKind == 'sighting'
                                             ? 'Avistamiento'
-                                            : item.reportKind == 'with_reporter'
+                                            : {'with_reporter', 'independent_found'}.contains(item.reportKind)
                                             ? 'Encontrada'
                                             : 'Reporte anterior'} · ${foundSpeciesLabel(item.species)}',
                                     subtitle: item.status == 'draft'

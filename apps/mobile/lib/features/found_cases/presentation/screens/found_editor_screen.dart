@@ -147,7 +147,9 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
         if (!popped) _leave();
       },
       child: CaseScreenShell(
-        title: (v?.communitySearch ?? model.communitySearch)
+        title: v?.reportKind == 'independent_found'
+            ? 'Mascota encontrada'
+            : (v?.communitySearch ?? model.communitySearch)
             ? 'Posible pérdida'
             : 'Reportar aviso',
         count: v != null && v.stage == FoundStage.form
@@ -168,6 +170,8 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
             : v?.stage == FoundStage.confirmed
             ? (v?.communitySearch == false
                   ? 'Aviso publicado'
+                  : v?.reportKind == 'independent_found'
+                  ? 'Hallazgo publicado'
                   : 'Búsqueda publicada')
             : null,
         noticeActionLabel: targetClosed ? 'Volver a la ficha' : null,
@@ -306,10 +310,39 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
               children: [
                 const SizedBox(height: 12),
                 Text(
-                  v.communitySearch
+                  v.reportKind == 'independent_found'
+                      ? 'Publica la mascota que encontraste, aunque no conozcas a su familia. Añade fotos para buscar posibles coincidencias.'
+                      : v.communitySearch
                       ? 'Reporta una mascota que sospechas que está perdida. No hace falta registrarla como tuya.'
                       : 'Tu aviso se enviará a esta búsqueda. No confirma la recuperación ni cierra el caso.',
                 ),
+                if (v.reportKind == 'independent_found') ...[
+                  const SizedBox(height: 20),
+                  AppSelectField<String>(
+                    label: '¿Está bajo tu cuidado?',
+                    value: v.custody,
+                    options: const [
+                      AppSelectOption(
+                        value: '',
+                        label: 'No indico',
+                        icon: Icons.help_outline,
+                      ),
+                      AppSelectOption(
+                        value: 'with_me',
+                        label: 'Sí, está conmigo',
+                        icon: Icons.pets_outlined,
+                      ),
+                      AppSelectOption(
+                        value: 'not_with_me',
+                        label: 'No está conmigo',
+                        icon: Icons.visibility_outlined,
+                      ),
+                    ],
+                    onChanged: enabled
+                        ? (value) => m.edit(custody: value)
+                        : null,
+                  ),
+                ],
                 if (!v.communitySearch) ...[
                   const SizedBox(height: 20),
                   Text(

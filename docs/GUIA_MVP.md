@@ -4,6 +4,54 @@
 y firma personal gratuita desde Windows. Infraestructura de entrega de las HU
 existentes, sin cierre de historias ni publicación App Store/TestFlight.
 [Ficha de distribución iOS](funcionalidades/distribucion-ios.md).
+26/10: Recorrido adopta la pantalla real del mapa de Explorar, con «Ubicaciones»
+y los dos controles de resumen como adornos temporales por instrucción explícita.
+[ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md) precisa
+ADR-153; mismo alcance HU/RF, datos/permisos, sin nuevas operaciones ni cierre
+de historias. Reutilización de presentación en core, sin migración web.
+
+26/10: autorizado el rediseño real de opciones/avisos en ficha móvil y el mapa
+cronológico asociado, [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md).
+Agrega contratos existentes de HU-05/06/10/11 sin nuevas RPC/servicios ni cambios
+de permisos; no migra web ni cierra historias por la aprobación del mockup.
+
+26/10: adopción web expresamente autorizada de los banners ilustrados de Inicio.
+Reutilización de assets y rutas existentes, adaptación responsive; hallazgo con
+tipo sugerido y borradores conservados. [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md).
+Sin nuevas HU/issues, operaciones, SQL, ampliación del MVP o cierre de historias.
+
+26/10: alcance visual precisado por el usuario: glass perlado compartido en
+todos los consumidores móviles de GlassSurface, incluida ficha pública.
+[ADR-145](decisiones/145-glass-perlado-compartido-mobile.md). Sin nuevas HU,
+operaciones, SQL, cambios web ni cierre de historias.
+
+26/10: refinamiento visual autorizado de Inicio Flutter según revisión3 aprobada
+y corrección de mascotas conforme a Platform. Banners con scroll para accesos
+existentes de HU-05/06/07 y HU-25/26, sin nueva HU/issue, operaciones, SQL,
+ampliación del MVP ni cierre de historias. [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md)
+y [ficha/validación](funcionalidades/inicio.md).
+
+25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
+Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
+ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,
+índices/revisiones privadas (plan040), ranking exploratorio de hasta cinco casos,
+revisión humana y recorridos Android/web. Sin worker, inferencia externa ni FCM.
+[ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md). Activación040/demo alojada,
+dataset/evaluación, aceptación e integración pendientes; no se cierra el MVP.
+
+25/10: el usuario acepta cuenta/acceso, difusión, seguimiento y recuperación.
+Se cierran #19/#34/#35/#40/#41/#13 y épica #8 en GitHub/Projects. Cuenta HU-01
+conserva baja #24/exportación #25 sin implementar; HU-12 conserva push #42
+pospuesto. Sin nueva prueba independiente del agente.
+
+Cambio explícito de alcance: **coincidencias visuales incluido en MVP**,
+HU-25/#71 (indexación) y HU-26/#72 (sugerencia/revisión), RF-19/RF-20 originales.
+Sustituye V1/S10 del PDF solo para estas capacidades, sin renumerar HU ni
+confundirlas con #25/#26. Backlog/P1, refinamiento/modelo/evaluación pendientes;
+sin implementación, plazo ni servicios nuevos activados.
+[ADR-137](decisiones/137-coincidencias-visuales-en-el-mvp.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md).
 
 24/10: autorizado continuar tras HU-15.3. PR69 ya fusionado; checks de Flutter/web
 del HEAD y validación de main aprobados, #49 y épica #15 cerrados con evidencia.
@@ -254,7 +302,7 @@ El recorrido del MVP es:
 5. El responsable recibe ayuda en su bandeja, revisa evidencia y cierra el caso.
 6. El QR muestra el estado actualizado, con moderación y manejo de conectividad.
 
-Además: preferencias de zonas, datos públicos separados de privados, gestión de cuenta, auditoría y métricas mínimas. Chat completo, salud, cuidadores compartidos, refugios, adopciones, reservas e IA se planifican después del MVP.
+Además: preferencias de zonas, datos públicos separados de privados, gestión de cuenta, auditoría y métricas mínimas. Chat completo, salud, cuidadores compartidos, refugios, adopciones y reservas se planifican después del MVP. Por decisión del25/10, la similitud visual y revisión de coincidencias (HU-25/HU-26; RF-19/RF-20) se adelantan al MVP; otras ampliaciones de IA no quedan incluidas implícitamente.
 
 Los seis sprints son una secuencia de entregas. Si se conserva la duración de dos semanas del plan, representan doce semanas referenciales. La fecha de entrega y la capacidad semanal todavía deben confirmarse; el chat 00 es preparación, no una promesa de plazo adicional fijo.
 
@@ -332,6 +380,22 @@ la existencia de una ficha no implica cierre de la HU ni ampliación del MVP.
 Se conserva la numeración original para relacionar implementación, informe académico y pruebas. El chat 00 prepara la base técnica que el plan original situaba dentro de S1.
 
 ### S1 - Acceso y cuenta
+
+- Precisión25/10: onboarding web/móvil sin saltos forzados en los textos;
+  reservar la mayor altura textual entre etapas para mantener posiciones,
+  también con ampliado. [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md).
+
+- Precisión25/10: onboarding móvil retira también el desplazamiento programático
+  entre etapas y reproduce stagger web/Sader550ms/90ms, cuatro grupos y salida
+  inversa antes de montar el siguiente. Marca fija, botón grande y guardado real
+  conservados. [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md).
+
+- Refinamiento visual autorizado25/10: onboarding web/móvil con composición
+  inferior Sader y degradado/luz de la landing; web botón48/radio18, móvil
+  recupera68/radio26/texto22/600/padding28 horizontal/18 vertical por precisión
+  posterior. Móvil avanza solo con Continuar/Comenzar, sin gesto lateral y sin
+  puntos visibles, con progreso accesible. Tres etapas, persistencia y reintento
+  conservados. [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md).
 
 - Ampliación autorizada el17 de octubre de2026 de **HU-01 / RF-01,34 / issue #1**:
   acceso con Facebook además de correo/Google, conservando sesión y onboarding

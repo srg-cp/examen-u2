@@ -222,7 +222,7 @@ class _ImmersivePhotoSheetState extends State<ImmersivePhotoSheet> {
                           ),
                           child: StaggerRevealItem(
                             order: 1,
-                            child: GlassSurface(
+                            child: GlassSurface.card(
                               radius: ImmersivePhotoSheetGeometry.cardRadius,
                               child: ColoredBox(
                                 color: const Color(0xDDF5F5F7),

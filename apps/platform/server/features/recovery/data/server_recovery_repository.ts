@@ -18,6 +18,12 @@ async function image(bytes: Uint8Array) {
 }
 export class ServerRecoveryRepository implements RecoveryRepository {
   constructor(private readonly source: RecoverySource, private readonly actor: string) {}
+  async publication(source:'lost'|'found',id:string) {
+    if(!isId(id))throw new RecoveryFailure('invalid');
+    const row=rows(await this.source.rpc(source==='lost'?'read_recovery_pet_case':'read_recovery_report',{p_id:id}))[0];
+    if(!row)throw new RecoveryFailure('forbidden');
+    return {...card(row,source),photos:Array.isArray(row.photos)?Math.min(3,row.photos.length):0,size:row.size??null,sex:row.sex??null,custody:row.custody??null};
+  }
   async explore(query: ExploreQuery, cursor: string | null): Promise<CasePage> {
     let after = null; try { after = cursor ? JSON.parse(cursor) : null; } catch { throw new RecoveryFailure('invalid'); }
     const result = await this.source.rpc('explore_cases', { p_kind: query.kind, p_species: query.species, p_status: query.status, p_cursor: after, p_limit: 20 }) as Row;
@@ -51,7 +57,7 @@ export class ServerRecoveryRepository implements RecoveryRepository {
         const row = await this.source.processPhoto(d.id,p.id,p.bytes,true) as Row;
         if (!row || row.id !== p.id || row.case_id !== d.id || row.owner_id !== this.actor || row.status !== 'ready' || !row.processed_at) throw new RecoveryFailure('unavailable');
       }
-      result = await this.source.rpc('publish_recovery_report', { ...base,p_report_kind:d.kind,p_target_id:d.targetId,p_community_target:d.communityTarget,p_species:d.species,p_species_detail:d.kind === 'possible_loss' && d.species === 'other' ? d.speciesDetail : null,p_size:d.size || null,p_sex:d.sex || null,p_traits:d.traits,p_custody:null });
+      result = await this.source.rpc('publish_recovery_report', { ...base,p_report_kind:d.kind,p_target_id:d.targetId,p_community_target:d.communityTarget,p_species:d.species,p_species_detail:['possible_loss','independent_found'].includes(d.kind) && d.species === 'other' ? d.speciesDetail : null,p_size:d.size || null,p_sex:d.sex || null,p_traits:d.traits,p_custody:d.kind === 'independent_found' ? d.custody ?? null : null });
     }
     const row = rows(result)[0]; if (!row || row.id !== d.id || row.owner_id !== this.actor || row.status !== 'active') throw new RecoveryFailure('unavailable');
     return { id:row.id as string,status:row.status as string };

@@ -36,8 +36,11 @@ class SubmissionTransport {
     return FoundCaseDraft(
       id: d.id,
       reportKind: d.reportKind,
-      targetId: d.slot == 'community-search' ? null : parts[2],
-      communityTarget: d.slot == 'community-search'
+      targetId: {'community-search', 'independent-found'}.contains(d.slot)
+          ? null
+          : parts[2],
+      communityTarget:
+          {'community-search', 'independent-found'}.contains(d.slot)
           ? false
           : parts[1] == 'true',
       occurredAt: d.instant!,
@@ -80,8 +83,10 @@ class SubmissionTransport {
       }
       validateLostCasePet(d.pet);
       lost.validate(_lost(d), DateTime.now());
-    } else if (d.slot == 'community-search' || d.slot.startsWith('found:')) {
-      if (d.slot != 'community-search' && d.slot.split(':').length != 3) {
+    } else if ({'community-search', 'independent-found'}.contains(d.slot) ||
+        d.slot.startsWith('found:')) {
+      if (!{'community-search', 'independent-found'}.contains(d.slot) &&
+          d.slot.split(':').length != 3) {
         throw const SubmissionFailure(SubmissionIssue.invalid);
       }
       found.validate(_found(d), DateTime.now());
@@ -98,7 +103,8 @@ class SubmissionTransport {
     if (d.slot == 'lost') {
       return SubmissionReceipt.lost(await lost(d.owner, _lost(d)));
     }
-    if (d.slot == 'community-search' || d.slot.startsWith('found:')) {
+    if ({'community-search', 'independent-found'}.contains(d.slot) ||
+        d.slot.startsWith('found:')) {
       return SubmissionReceipt.found(await found(d.owner, _found(d)));
     }
     return SubmissionReceipt.sighting(await sighting(d.owner, _sighting(d)));

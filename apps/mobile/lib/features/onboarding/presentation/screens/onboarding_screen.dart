@@ -1,11 +1,11 @@
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
+import '../../../../core/presentation/widgets/stagger_stage_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/brand_wordmark.dart';
 import '../view_models/onboarding_view_model.dart';
 import '../widgets/onboarding_page.dart';
-import '../widgets/onboarding_actions.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,44 +13,92 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  final _pages = PageController();
-  int _revealPage = 0;
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
+  final _motion = GlobalKey<StaggerStageTransitionState>();
+  bool _transitioning = false;
+  late final _press = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 400),
+  );
+  late final _pressScale = _press.drive(
+    TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.0,
+          end: .93,
+        ).chain(CurveTween(curve: const Cubic(.22, 1, .36, 1))),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: .93,
+          end: 1.0,
+        ).chain(CurveTween(curve: const Cubic(.22, 1, .36, 1))),
+        weight: 1,
+      ),
+    ]),
+  );
   static const _titles = [
-    'Cada huella\nimporta',
-    'Volvamos\na casa',
-    'Una nueva\nhistoria',
+    'Cada huella importa',
+    'Volvamos a casa',
+    'Una nueva historia',
   ];
   static const _descriptions = [
-    'Encuentra, ayuda y cuida\na las mascotas cerca de ti.',
-    'Con tu ayuda, más mascotas\npueden reencontrarse\ncon su familia.',
-    'Pequeñas acciones generan\ngrandes finales.',
+    'Encuentra, ayuda y cuida a las mascotas cerca de ti.',
+    'Con tu ayuda, más mascotas pueden reencontrarse con su familia.',
+    'Pequeñas acciones generan grandes finales.',
   ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) _press.value = 1;
+  }
+
+  Future<void> _advance() async {
+    if (_transitioning || ref.read(onboardingViewModelProvider).isBusy) return;
+    setState(() => _transitioning = true);
+    try {
+      if (!MediaQuery.disableAnimationsOf(context)) {
+        try {
+          await _press.forward(from: 0).orCancel;
+        } on TickerCanceled {
+          if (!mounted || !MediaQuery.disableAnimationsOf(context)) return;
+        }
+      }
+      if (!mounted) return;
+      final vm = ref.read(onboardingViewModelProvider.notifier);
+      if (ref.read(onboardingViewModelProvider).page == 2) {
+        // Keep the full action and its shimmer visible throughout the real save.
+        await vm.next();
+        if (!mounted || !ref.read(onboardingViewModelProvider).completed) {
+          return;
+        }
+        if (!await _motion.currentState!.hide() || !mounted) return;
+        vm.acknowledgeCompletion();
+        return;
+      }
+      if (!await _motion.currentState!.hide() || !mounted) return;
+      await vm.next();
+      if (!mounted) return;
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+      await _motion.currentState!.reveal();
+    } finally {
+      if (mounted) setState(() => _transitioning = false);
+    }
+  }
+
   @override
   void dispose() {
-    _pages.dispose();
+    _press.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(onboardingViewModelProvider);
-    ref.listen(onboardingViewModelProvider, (previous, next) {
-      if (previous?.page != next.page &&
-          _pages.hasClients &&
-          _pages.page?.round() != next.page) {
-        if (MediaQuery.disableAnimationsOf(context)) {
-          _pages.jumpToPage(next.page);
-          return;
-        }
-        _pages.animateToPage(
-          next.page,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-    final vm = ref.read(onboardingViewModelProvider.notifier);
     return ConfirmationToastHost(
       confirmed: state.hasError,
       message: 'No se pudo guardar. Inténtalo de nuevo.',
@@ -62,7 +110,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           body: SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
+                constraints: const BoxConstraints(maxWidth: 496),
                 child: Column(
                   children: [
                     const Padding(
@@ -73,39 +121,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ),
                     Expanded(
-                      child: NotificationListener<ScrollNotification>(
-                        onNotification: (notification) {
-                          if (notification.depth == 0 && _pages.hasClients) {
-                            final position = _pages.page!;
-                            final page = position.round();
-                            // Start near arrival instead of waiting for ScrollEnd.
-                            if ((position - page).abs() <= .15 &&
-                                _revealPage != page) {
-                              setState(() => _revealPage = page);
-                            }
-                          }
-                          return false;
-                        },
-                        child: PageView.builder(
-                          controller: _pages,
-                          itemCount: 3,
-                          onPageChanged: vm.selectPage,
-                          physics: state.isBusy
-                              ? const NeverScrollableScrollPhysics()
-                              : null,
-                          itemBuilder: (context, page) => OnboardingPage(
-                            page: page,
-                            isActive: state.page == page && _revealPage == page,
-                            title: _titles[page],
-                            description: _descriptions[page],
-                          ),
+                      child: StaggerStageTransition(
+                        key: _motion,
+                        child: OnboardingPage(
+                          key: ValueKey(state.page),
+                          page: state.page,
+                          title: _titles[state.page],
+                          description: _descriptions[state.page],
+                          titleSamples: _titles,
+                          descriptionSamples: _descriptions,
+                          isBusy: state.isBusy,
+                          disabled: _transitioning,
+                          pressScale: _pressScale,
+                          onNext: _advance,
                         ),
                       ),
-                    ),
-                    OnboardingActions(
-                      page: state.page,
-                      isBusy: state.isBusy,
-                      onNext: vm.next,
                     ),
                   ],
                 ),

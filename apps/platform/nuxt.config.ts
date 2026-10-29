@@ -1,4 +1,5 @@
 import { assertRegisteredRoutes } from './shared/routing/route_policy';
+import { packageNativeImages } from './scripts/package-native-images.mjs';
 
 export default defineNuxtConfig({
   hooks: {
@@ -18,11 +19,20 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   ssr: true,
-  css: ['~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css', '~/assets/fields.css'],
+  css: ['~/assets/brand-action.css', '~/assets/main.css', '~/assets/typography.css', '~/assets/maps.css', '~/assets/fields.css'],
   runtimeConfig: { public: { mapTileUrl: '', siteUrl: 'https://entrehuellas.app' } },
   typescript: { strict: true },
   sourcemap: { server: false, client: false },
-  nitro: { preset: 'node-server', compressPublicAssets: true },
+  nitro: {
+    preset: 'node-server', compressPublicAssets: true,
+    hooks: {
+      async compiled(nitro) {
+        // Dev resolves dependencies from the project, not a standalone server output.
+        if (nitro.options.dev) return;
+        await packageNativeImages(nitro.options.rootDir, nitro.options.output.serverDir);
+      },
+    },
+  },
   app: {
     head: {
       htmlAttrs: { lang: 'es' },

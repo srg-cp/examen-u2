@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_stage_transition.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/brand_wordmark.dart';
 import 'package:flutter_application_entrehuellas/app/entre_huellas_app.dart';
 import 'package:flutter_application_entrehuellas/app/router.dart';
 import 'package:flutter_application_entrehuellas/core/config/startup_state.dart';
@@ -40,6 +41,7 @@ class FakeOnboarding implements OnboardingRepository {
   bool failSave = false;
   int saves = 0;
   Completer<bool>? pendingRead;
+  Completer<void>? pendingSave;
   @override
   Future<bool> isCompleted(String userId) async {
     if (pendingRead != null) return pendingRead!.future;
@@ -50,6 +52,7 @@ class FakeOnboarding implements OnboardingRepository {
   @override
   Future<void> complete() async {
     saves++;
+    if (pendingSave != null) await pendingSave!.future;
     if (failSave) throw StateError('private server details');
     completed.add(auth.current!.userId);
   }
@@ -160,15 +163,15 @@ void main() {
       await tester.pumpAndSettle();
       container.read(routerProvider).go('/home/explore-map');
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
       expect(find.text('Omitir'), findsNothing);
       expect(find.byIcon(Icons.arrow_forward_rounded), findsOneWidget);
       await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
-      expect(find.text('Volvamos'), findsOneWidget);
+      expect(find.text('Volvamos a casa'), findsOneWidget);
       await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
-      expect(find.text('Una nueva'), findsOneWidget);
+      expect(find.text('Una nueva historia'), findsOneWidget);
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
       expect(find.byTooltip('Inicio'), findsOneWidget);
@@ -181,7 +184,7 @@ void main() {
       expect(find.byTooltip('Inicio'), findsOneWidget);
       auth.emit(const AuthSession(userId: 'two'));
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
     },
   );
   testWidgets(
@@ -210,55 +213,110 @@ void main() {
     },
   );
   testWidgets(
-    'Each onboarding page reveals only text once, on button or swipe',
+    'Onboarding replaces stages only after reverse stagger, locks repeated taps and never slides horizontally',
     (tester) async {
       auth.current = const AuthSession(userId: 'one');
       await mount(tester);
-      double opacity(String title) => tester
+      double opacity(String text) => tester
           .widget<Opacity>(
-            find.ancestor(of: find.text(title), matching: find.byType(Opacity)),
+            find
+                .ancestor(of: find.text(text), matching: find.byType(Opacity))
+                .last,
           )
           .opacity;
-      expect(opacity('Cada huella'), 1);
-      expect(
-        find.ancestor(
-          of: find.byType(Image),
-          matching: find.byType(StaggerRevealItem),
-        ),
-        findsNothing,
+      final brand = tester.getRect(find.byType(BrandWordmark));
+      final titleX = tester.getTopLeft(find.text('Cada huella importa')).dx;
+      expect(find.byType(PageView), findsNothing);
+      expect(find.byType(StaggerStageItem), findsNWidgets(4));
+      await tester.drag(
+        find.text('Cada huella importa'),
+        const Offset(-360, 0),
       );
-      expect(
-        find.ancestor(
-          of: find.text('Continuar'),
-          matching: find.byType(StaggerRevealItem),
-        ),
-        findsNothing,
-      );
+      await tester.pumpAndSettle();
+      expect(find.text('Volvamos a casa'), findsNothing);
       await tester.tap(find.text('Continuar'));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 120));
-      expect(opacity('Volvamos'), 0);
-      await tester.pump(const Duration(milliseconds: 80));
-      await tester.pump(const Duration(milliseconds: 16));
-      expect(opacity('Volvamos'), greaterThan(0));
-      expect(opacity('Volvamos'), lessThan(1));
-      await tester.pumpAndSettle();
-      expect(opacity('Volvamos'), 1);
-      await tester.drag(find.byType(PageView), const Offset(-360, 0));
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(opacity('Una nueva'), lessThan(1));
-      await tester.pumpAndSettle();
-      expect(opacity('Una nueva'), 1);
-      await tester.drag(find.byType(PageView), const Offset(360, 0));
-      await tester.pumpAndSettle();
-      expect(opacity('Volvamos'), 1);
-      await tester.tap(find.text('Continuar'));
+      await tester.pump(const Duration(milliseconds: 401));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(opacity('Una nueva'), 1);
+      expect(
+        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        isNull,
+      );
+      expect(opacity('Cada huella importa'), 1);
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(opacity('Continuar'), lessThan(1));
+      expect(
+        opacity('Cada huella importa'),
+        1,
+        reason: 'Bottom group exits first',
+      );
+      expect(tester.getTopLeft(find.text('Cada huella importa')).dx, titleX);
+      expect(tester.getRect(find.byType(BrandWordmark)), brand);
+      await tester.tap(find.text('Continuar'), warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 671));
+      await tester.pump();
+      expect(find.text('Cada huella importa'), findsNothing);
+      expect(find.text('Volvamos a casa'), findsOneWidget);
+      expect(opacity('Volvamos a casa'), 0);
+      await tester.pump(const Duration(milliseconds: 180));
+      expect(opacity('Volvamos a casa'), greaterThan(0));
+      expect(opacity('Volvamos a casa'), lessThan(1));
+      expect(opacity('Continuar'), 0, reason: 'Action enters last');
+      expect(tester.getTopLeft(find.text('Volvamos a casa')).dx, titleX);
       await tester.pumpAndSettle();
+      expect(opacity('Volvamos a casa'), 1);
+      await tester.drag(find.text('Volvamos a casa'), const Offset(360, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Volvamos a casa'), findsOneWidget);
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+      expect(find.text('Una nueva historia'), findsOneWidget);
+      expect(opacity('Una nueva historia'), 1);
     },
   );
+  testWidgets(
+    'Confirmed onboarding save remains visible, blocks repeats and exits before routing',
+    (tester) async {
+      auth.current = const AuthSession(userId: 'one');
+      await mount(tester);
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+      onboarding.pendingSave = Completer<void>();
+      await tester.tap(find.text('Comenzar'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 401));
+      await tester.pump();
+      expect(onboarding.saves, 1);
+      expect(
+        find.bySemanticsLabel('Guardando finalización del onboarding'),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<Opacity>(
+              find.ancestor(
+                of: find.text('Una nueva historia'),
+                matching: find.byType(Opacity),
+              ),
+            )
+            .opacity,
+        1,
+      );
+      await tester.tap(find.text('Comenzar'), warnIfMissed: false);
+      expect(onboarding.saves, 1);
+      onboarding.pendingSave!.complete();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Una nueva historia'), findsOneWidget);
+      expect(find.byTooltip('Inicio'), findsNothing);
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Inicio'), findsOneWidget);
+      expect(onboarding.completed, {'one'});
+    },
+  );
+
   testWidgets('Pending account check shows the brand without a spinner', (
     tester,
   ) async {
@@ -269,11 +327,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.bySemanticsLabel('Preparando tu cuenta'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.text('Cada huella'), findsNothing);
+    expect(find.text('Cada huella importa'), findsNothing);
     expect(find.text('Inicio'), findsNothing);
     pending.complete(false);
     await tester.pumpAndSettle();
-    expect(find.text('Cada huella'), findsOneWidget);
+    expect(find.text('Cada huella importa'), findsOneWidget);
     expect(find.bySemanticsLabel('Preparando tu cuenta'), findsNothing);
   });
   testWidgets(
@@ -288,7 +346,7 @@ void main() {
       onboarding.failRead = false;
       await tester.tap(find.text('Reintentar'));
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
     },
   );
   testWidgets('Restored returning session skips login and onboarding', (
@@ -313,14 +371,14 @@ void main() {
       onboarding.pendingRead = null;
       auth.emit(const AuthSession(userId: 'new'));
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
       previousRead.complete(true);
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
       expect(find.text('Inicio'), findsNothing);
       container.read(routerProvider).go('/home');
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
     },
   );
   testWidgets(
@@ -343,8 +401,11 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
+      // Each step now scrolls its content and action together.
+      await tester.ensureVisible(find.text('Continuar'));
       await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Comenzar'));
       await tester.tap(find.text('Comenzar'));
       await tester.pumpAndSettle();
       expect(find.byTooltip('Inicio'), findsOneWidget);

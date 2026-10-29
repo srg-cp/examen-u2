@@ -1,10 +1,9 @@
+import '../../../../core/presentation/widgets/map_sheet_header.dart';
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/presentation/widgets/glass_navigation_button.dart';
-import '../../../../core/presentation/widgets/glass_surface.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -130,79 +129,11 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
                     ],
                   ),
                 ),
-              Positioned(
-                top: MediaQuery.paddingOf(context).top + 8,
-                left: 16,
-                right: 16,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: _sheetExtent,
-                  child: Row(
-                    children: [
-                      GlassNavigationButton(
-                        tooltip: 'Volver a Explorar',
-                        onPressed: () => context.pop(),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: ValueListenableBuilder<double>(
-                            valueListenable: _sheetExtent,
-                            child: const GlassSurface(
-                              radius: 24,
-                              backdropBlendMode: BlendMode.src,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 22,
-                                  vertical: 12,
-                                ),
-                                child: Text(
-                                  'Explorar',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF171918),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            builder: (context, extent, child) {
-                              final media = MediaQuery.of(context);
-                              final remaining =
-                                  media.size.height * (1 - extent) -
-                                  media.padding.top;
-                              final opacity = media.size.height < 500
-                                  ? 0.0
-                                  : ((remaining - 80) / 40).clamp(0.0, 1.0);
-                              return ExcludeSemantics(
-                                excluding: opacity == 0,
-                                child: Opacity(opacity: opacity, child: child),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 52),
-                    ],
-                  ),
-                  builder: (context, extent, child) {
-                    final reduced = MediaQuery.disableAnimationsOf(context);
-                    final progress = reduced || extent >= .8999
-                        ? (extent >= .89 ? 1.0 : 0.0)
-                        : ((extent - .78) / .12).clamp(0.0, 1.0);
-                    return ExcludeSemantics(
-                      excluding: progress >= 1,
-                      child: IgnorePointer(
-                        ignoring: progress >= 1,
-                        child: Opacity(
-                          opacity: 1 - progress,
-                          child: Transform.translate(
-                            offset: Offset(0, reduced ? 0 : -72 * progress),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              MapSheetHeader(
+                title: 'Explorar',
+                backTooltip: 'Volver a Explorar',
+                extent: _sheetExtent,
+                onBack: () => context.pop(),
               ),
             ],
           ),

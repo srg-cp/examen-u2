@@ -1,6 +1,45 @@
 # Funcionalidades de Entre Huellas
 
 - [Pruebas personales iOS](distribucion-ios.md): compilación remota y firma gratuita desde Windows; validación física pendiente.
+26/10: [Recorrido de la búsqueda móvil](recorrido-de-busqueda.md), acciones
+compactas y tarjeta perla con mapa cronológico/pines oficiales/origen rojo.
+ADR-153/154; pantalla con el mapa/panel real de Explorar y «Ubicaciones»,
+Ver ficha/flecha decorativos por instrucción explícita. Permisos existentes,
+sin SQL nuevo ni migración web.
+
+26/10: cabecera con desvanecido compartido en [Inicio](inicio.md),
+[Explorar](explorar.md) y [Mis mascotas](mascotas.md), mediante FadingHeaderScroll
+de core. [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md).
+
+26/10: [Inicio web](inicio.md) adopta expresamente los cuatro banners ilustrados
+existentes, con dos columnas/scroll responsive y hallazgo preseleccionado sin
+reemplazar borradores. ADR-147; validación local, sin despliegue ni cierre de HU.
+
+26/10: [guía reutilizable de ilustraciones](../GUIA_ILUSTRACIONES.md), enlazada
+desde [Identidad visual](identidad-visual.md): referencias, estilo, escenarios,
+prompts y controles de calidad para nuevas variantes de móvil/web.
+
+26/10: [Inicio móvil](inicio.md) implementa banners/scroll de la referencia
+aprobada, assets imagegen con mascotas estilo Platform y controles nativos.
+ADR-143; validación local y revisión Android pendiente en la ficha, sin nuevos
+casos de uso, migración web ni cierre de historias.
+
+- [Indicadores de carga compartidos](indicadores-de-carga.md): shimmer sobre la
+  superficie completa del botón en móvil/web, ADR-139; skeleton/refresh conservados.
+
+25/10: [Coincidencias entre casos](coincidencias-de-casos.md), HU-25/#71 y
+HU-26/#72, implementación local Android/web en `feature/case-matching`.
+Hallazgos independientes aprobados, motor CLIP CPU local, plan040 y revisión
+humana. Activación/evaluación/aceptación pendientes; no implica historias cerradas.
+Las notas inferiores de «sin implementar» son el plan inicial anterior.
+
+25/10: cuenta/acceso, difusión, seguimiento y recuperación aceptados por el usuario;
+#19/#34/#35/#40/#41/#13 y épica #8 cerrados. Estadísticas #50 ya aceptadas.
+Las activaciones/demos históricas inferiores no sustituyen estas aceptaciones.
+
+- [Coincidencias entre casos](coincidencias-de-casos.md): **incluido en MVP**,
+  HU-25/#71 y HU-26/#72; RF-19/RF-20. Backlog/P1, sin implementar; modelo,
+  contratos de candidatos y evaluación por refinar. ADR-137.
 
 - [Estadísticas del piloto](estadisticas-piloto.md): HU-16.1/RF-35/#50; consulta
   web de agregados con permiso administrador independiente. Implementación local;
@@ -267,7 +306,7 @@ de pruebas y despliegue se registra en [ESTADO](../ESTADO.md).
 | [Buscador compartido de ubicaciones/ciudades](ubicaciones-buscador.md) | places | HU-07/RF-13 y Perfil HU-01.7/RF-01; ampliación16/10/2026 |
 | [Casos guardados](casos-guardados.md) | saved_cases | Ampliación16/10 de HU-07/RF-13; online integrado; offline HU-15.3/#49 sin implementar |
 | [Acceso y recuperación](acceso.md) | auth | HU-01; RF-01,34; #17/#18/#20/#22 Done; #19 retorno Google pendiente; épica #1 abierta por Google/baja/exportación |
-| [Onboarding por cuenta](onboarding.md) | onboarding | HU-01.5; RF-01; issue #21; ADR-004; Done |
+| [Onboarding por cuenta](onboarding.md) | onboarding | HU-01.5; RF-01; issue #21; ADR-004/140/141/142; Done; stagger y texto natural con posiciones estables; botón móvil grande |
 | [Inicio y navegación](inicio.md) | home | Composición de recorridos, acceso a Reportar y módulos |
 | [Perfil y foto de cuenta](perfil.md) | profile | HU-01.7; RF-01; issue #23; entrega integrada; Done |
 | [Mascotas](mascotas.md) | pets | HU-03; RF-03; issues #3/#28/#29; Done |

@@ -136,7 +136,7 @@ void main() {
                 target: target,
                 title: 'Bruno',
                 eventLabel: 'Mascota perdida',
-                onReport: () {},
+                onReport: (_) async {},
                 caseActions: [
                   SaveCaseButton(
                     target: SavedCaseRef(
@@ -197,7 +197,7 @@ void main() {
             target: target,
             title: 'Bruno',
             eventLabel: 'Mascota perdida',
-            onReport: () {},
+            onReport: (_) async {},
           ),
           child: const SizedBox(height: 100),
         ),
@@ -410,7 +410,9 @@ void main() {
                     target: target,
                     title: 'Bruno',
                     eventLabel: 'Mascota perdida',
-                    onReport: () => reports++,
+                    onReport: (_) async {
+                      reports++;
+                    },
                     caseActions: [
                       PanelActionButton(
                         onPressed: () => saves++,
@@ -444,10 +446,8 @@ void main() {
                     ],
                     description: 'Pelaje dorado y collar azul.',
                     occurredAt: '20/10/2026',
-                    locationLabel: 'Ubicación de desaparición',
                     latitude: -12,
                     longitude: -77,
-                    privacy: 'Ubicación aproximada.',
                     createMapTileProvider: () => NetworkTileProvider(
                       httpClient: MockClient(
                         (request) async => http.Response.bytes(
@@ -532,9 +532,7 @@ void main() {
           await tester.tap(find.byTooltip('Denunciar contenido'));
           await tester.pumpAndSettle();
           expect(reports, 1);
-          expect(find.byType(CaseShareSheet), findsNothing);
-          await tester.tap(find.byTooltip('Compartir ficha'));
-          await tester.pumpAndSettle();
+          expect(find.byType(CaseShareSheet), findsOneWidget);
           await tester.binding.handlePopRoute();
           await tester.pumpAndSettle();
           expect(find.byType(CaseShareSheet), findsNothing);

@@ -1,3 +1,8 @@
+import '../features/case_matching/presentation/screens/matching_screen.dart';
+import '../features/case_journey/presentation/screens/case_journey_screen.dart';
+import '../features/case_journey/presentation/widgets/case_journey_card.dart';
+import '../features/case_journey/presentation/view_models/case_journey_view_model.dart';
+import '../core/presentation/widgets/case_action_button.dart';
 import '../features/offline_cases/presentation/widgets/cached_cases_section.dart';
 import '../features/offline_drafts/presentation/screens/submission_queue_screen.dart';
 import '../features/offline_drafts/presentation/screens/local_drafts_screen.dart';
@@ -124,6 +129,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
       if (path == '/home' &&
           state.uri.path == '/home/found-cases/new' &&
+          state.uri.queryParameters['independent'] != 'true' &&
           ((state.uri.queryParameters['case'] ?? '').trim().isEmpty ||
               !{
                 'true',
@@ -145,10 +151,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/submissions' ||
               state.uri.path == '/home/blocked-users' ||
               state.uri.path == '/home/appeals' ||
+              state.uri.path == '/home/coincidencias' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
               state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
+              state.uri.path.startsWith('/home/journey/') ||
               state.uri.path.startsWith('/home/denounce/') ||
               state.uri.path.startsWith('/home/closure/') ||
               state.uri.path.startsWith('/home/cases/'))) {
@@ -252,6 +260,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
         routes: [
           GoRoute(
+            path: 'coincidencias',
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: MatchingScreen(
+                onOpen: (reference, origin) async {
+                  await context.push(
+                    '/home/${reference.source == 'lost' ? 'cases' : 'found-cases'}/${reference.id}',
+                    extra: origin,
+                  );
+                },
+              ),
+            ),
+          ),
+          GoRoute(
             path: 'appeals',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -305,7 +329,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 overrides: [
                   foundEditorContextProvider.overrideWithValue(
                     FoundEditorContext(
-                      communitySearch: false,
+                      communitySearch:
+                          state.uri.queryParameters['independent'] == 'true',
+                      independentFound:
+                          state.uri.queryParameters['independent'] == 'true',
                       targetId: state.uri.queryParameters['case'],
                       communityTarget:
                           state.uri.queryParameters['community'] == 'true',
@@ -367,7 +394,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     return;
                   }
                   final p = d.slot.split(':');
-                  final route = d.slot == 'lost'
+                  final route = d.slot == 'independent-found'
+                      ? '/home/found-cases/new?independent=true'
+                      : d.slot == 'lost'
                       ? '/home/lost-cases/new'
                       : d.slot == 'community-search'
                       ? '/home/lost-cases/community/new'
@@ -393,7 +422,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               child: LocalDraftsScreen(
                 onOpen: (draft) async {
                   final parts = draft.slot.split(':');
-                  final path = draft.slot == 'lost'
+                  final path = draft.slot == 'independent-found'
+                      ? '/home/found-cases/new?independent=true'
+                      : draft.slot == 'lost'
                       ? '/home/lost-cases/new'
                       : draft.slot == 'community-search'
                       ? '/home/lost-cases/community/new'
@@ -461,20 +492,38 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ],
                   title: name,
                   eventLabel: event,
-                  onReport: () => context.push(
+                  onReport: (source) => context.push<void>(
                     '/home/denounce/found/${state.pathParameters['id']}',
+                    extra: source,
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                timelineAction: TimelineAccessButton(
+                journey: CaseJourneyCard(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
-                posterAction: TextButton.icon(
-                  onPressed: () => context.push(
-                    '/home/posters/found/${state.pathParameters['id']}',
+                onActivityChanged: () => ref.invalidate(
+                  caseJourneyViewModelProvider((
+                    id: state.pathParameters['id']!,
+                    community: true,
+                  )),
+                ),
+                utilitiesBuilder: (canPoster) => TimelineAccessButton(
+                  onReturn: () => ref.invalidate(
+                    caseJourneyViewModelProvider((
+                      id: state.pathParameters['id']!,
+                      community: true,
+                    )),
                   ),
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
-                  label: const Text('Crear cartel con QR'),
+                  target: (id: state.pathParameters['id']!, community: true),
+                  companion: canPoster
+                      ? CaseUtilityButton(
+                          title: 'Crear cartel',
+                          subtitle: 'PDF con QR',
+                          icon: Icons.qr_code_2_rounded,
+                          route:
+                              '/home/posters/found/${state.pathParameters['id']}',
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -554,29 +603,46 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ],
                   title: name,
                   eventLabel: event,
-                  onReport: () => context.push(
+                  onReport: (source) => context.push<void>(
                     '/home/denounce/lost/${state.pathParameters['id']}',
+                    extra: source,
                   ),
                 ),
                 id: state.pathParameters['id']!,
-                timelineAction: TimelineAccessButton(
-                  target: (id: state.pathParameters['id']!, community: false),
-                ),
-                posterAction: TextButton.icon(
-                  onPressed: () => context.push(
-                    '/home/posters/lost/${state.pathParameters['id']}',
-                  ),
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
-                  label: const Text('Crear cartel con QR'),
-                ),
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
-                  showSightingAction: false,
+                  showSightingAction: true,
+                  journey: CaseJourneyCard(
+                    target: (id: value.id, community: false),
+                  ),
+                  utilities: TimelineAccessButton(
+                    onReturn: () => ref.invalidate(
+                      caseJourneyViewModelProvider((
+                        id: value.id,
+                        community: false,
+                      )),
+                    ),
+                    target: (id: value.id, community: false),
+                    companion: value.canResolve
+                        ? CaseUtilityButton(
+                            title: 'Crear cartel',
+                            subtitle: 'PDF con QR',
+                            icon: Icons.qr_code_2_rounded,
+                            route: '/home/posters/lost/${value.id}',
+                          )
+                        : null,
+                  ),
                   id: value.id,
                   community: false,
                   canResolve: value.canResolve,
                   open: value.status == 'active',
                   onChanged: () {
                     onChanged();
+                    ref.invalidate(
+                      caseJourneyViewModelProvider((
+                        id: value.id,
+                        community: false,
+                      )),
+                    );
                     ref.invalidate(myCasesViewModelProvider);
                     ref.invalidate(petListViewModelProvider);
                     ref.invalidate(petDetailViewModelProvider);
@@ -644,6 +710,27 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ref.invalidate(petDetailViewModelProvider);
                   ref.read(exploreViewModelProvider.notifier).refresh();
                 },
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'journey/:source/:id',
+            redirect: (_, state) =>
+                !['lost', 'found'].contains(state.pathParameters['source']) ||
+                    !RegExp(
+                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    ).hasMatch(state.pathParameters['id'] ?? '')
+                ? '/home'
+                : null,
+            pageBuilder: (context, state) => entityEditorPage(
+              context: context,
+              key: state.pageKey,
+              source: state.extra,
+              child: CaseJourneyScreen(
+                target: (
+                  id: state.pathParameters['id']!,
+                  community: state.pathParameters['source'] == 'found',
+                ),
               ),
             ),
           ),

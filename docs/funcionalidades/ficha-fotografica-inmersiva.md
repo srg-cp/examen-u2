@@ -1,5 +1,10 @@
 # Ficha fotográfica inmersiva
 
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): las
+superficies GlassSurface conservadas en esta vista previa heredan el material
+perlado compartido sin contorno blanco. Geometría, gestos, nombre y reutilización
+se conservan; pruebas de vista inmersiva aprobadas, Android físico pendiente.
+
 Actualización posterior20/10, ADR-113: el patrón sigue conservado íntegro y activo en vistas previas de los formularios. La consulta pública de perdidos/encontrados ya usa CasePublicCards. Esta nota sustituye las menciones inferiores a su uso activo en las fichas de consulta; el contrato y futura reutilización se conservan.
 
 Estado20/10/2026: diseño implementado, conservado y renombrado por petición del

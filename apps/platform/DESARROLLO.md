@@ -1,5 +1,19 @@
 # Tu primera ejecución en Vue/Nuxt
 
+## Inicio ilustrado —26/10/2026
+
+Con build vigente, PLAYWRIGHT_MODULE y CHROME_PATH, ejecutar
+`node scripts/check-home-browser.mjs`: responsive1920/1440/900/390/320, texto200%,
+imágenes, roles, teclado, rutas, sugerencia de hallazgo y borrador conservado.
+Incluye fotogramas de origen/retorno normal de los dos botones1440/390.
+`check-matching-browser.mjs` comprueba origen/fullscreen/retorno del acceso por
+foto1440/390/320, reducido y operaciones existentes. `check-inbox-browser.mjs`
+comprueba cabecera/cuenta/alertas con los nuevos banners. Son fixtures locales.
+Capturas en apps/mobile/build/ui-preview/web-home y case-matching/web.
+Build/typecheck de este incremento usan NUXT_BUILD_DIR=.nuxt-home-artwork para
+conservar el directorio Nuxt de desarrollo; no ejecutar build mientras fixtures
+con .output estén activas en Windows.
+
 HU-16.1: `/administracion/estadisticas` usa permiso administrador independiente
 de moderación y RPC de plan039. Aplicar039 y asignar una cuenta explícita en
 desarrollo antes de comprobar permisos reales; no se autoasigna desde web.

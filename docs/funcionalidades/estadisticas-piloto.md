@@ -1,9 +1,22 @@
 # Estadísticas agregadas del piloto
 
 HU-16.1 / RF-35 / [#50](https://github.com/srg-cp/entrehuellas/issues/50).
-Implementación local en `feature/pilot-statistics`; historia abierta.
+Integrada en main por PR70, commitb8c12e4; #50 cerrada y Projects Done.
+24/10: usuario confirma haber probado el recorrido y solicita no repetirlo.
+Su aceptación queda registrada; CI web/backend de main aprobada. El agente
+verificó cuatro rechazos alojados para cuenta ordinaria/visitante, sin atribuirse
+la prueba de sesión administradora. Las notas cronológicas siguientes son historial.
 24/10: el usuario confirma ejecución completa de039 en desarrollo; asignación
 administrador y validación alojada siguen pendientes. No se reaplica el patch.
+La cuenta autorizada ya fue indicada por el usuario. Operación de asignación
+preparada en archivo local ignorado, sin publicar el correo; ejecución SQL
+administrativa y comprobación remota pendientes.
+Actualización24/10: usuario confirma asignación ejecutada. Primera validación
+alojada de solo lectura: cuatro rechazos correctos de las dos RPC para cuenta
+ordinaria y visitante; sesión QA propia cerrada. Falta sesión de administrador
+para observar autorización/conteos. PR70 fusionado; web aprobado y SQL en curso
+en la última consulta. Las menciones previas a activación/integración pendientes
+conservan el estado histórico anterior.
 [ADR-136](../decisiones/136-estadisticas-agregadas-y-permiso-administrador.md).
 
 ## Qué hace y recorrido
@@ -93,9 +106,9 @@ no inventa animación.
   vacío confirmado y revocación sin datos residuales. Capturas1920/1440/731/390/320
   y320 con texto200%; sin overflow, errores JS, CSP o hidratación detectados.
 - Fotografías/casos reales y permisos alojados no se certifican mediante fixtures.
-  Pendientes: aplicar039 en desarrollo, asignar cuenta autorizada, demostrar
-  administrador/moderador/usuario reales y contrastar conteos reproducibles;
-  integrar/publicar el incremento. Safari/Firefox y aprobación visual pendientes.
+  Aplicación039, asignación y prueba del recorrido confirmadas por el usuario;
+  PR70 integrado y CI de main aprobada. No se atribuye al agente la prueba de
+  administrador/conteos alojados. Safari/Firefox no acreditados.
 
 Ejecución reproducible: `npm test`, `npm run typecheck`, `npm run build`,
 `npm run test:server` en apps/platform; `npm test` en database/tests;
@@ -104,4 +117,4 @@ Logs locales ignorados: statistics-unit-validation.log, statistics-typecheck.log
 statistics-build.log, statistics-server-validation.log, statistics-browser-validation.log;
 SQL en database/tests/pilot-statistics-full-sql.log y pilot-statistics-validation.log.
 Capturas/fotogramas en apps/mobile/build/ui-preview/web-statistics. Son evidencia
-local, no artefactos publicados. No se cierra #50/#16 ni se inicia #51.
+local, no artefactos publicados. #50 cerrada; #16 abierta por #51, sin iniciarla.

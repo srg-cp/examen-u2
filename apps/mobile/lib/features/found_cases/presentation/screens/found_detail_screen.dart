@@ -2,7 +2,6 @@ import '../../../../core/presentation/widgets/cached_case_notice.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/recovery_case_actions.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
-import '../../../../core/presentation/widgets/collection_add_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/case_public_cards_skeleton.dart';
@@ -16,12 +15,18 @@ class FoundDetailScreen extends ConsumerWidget {
     this.contact,
     this.posterAction,
     this.timelineAction,
+    this.utilitiesBuilder,
+    this.journey,
+    this.onActivityChanged,
     this.shareActionBuilder,
     super.key,
   });
   final Widget? contact;
   final Widget? posterAction;
   final Widget? timelineAction;
+  final Widget Function(bool)? utilitiesBuilder;
+  final Widget? journey;
+  final VoidCallback? onActivityChanged;
   final Widget Function(String, String, bool)? shareActionBuilder;
   final String id;
   @override
@@ -40,12 +45,13 @@ class FoundDetailScreen extends ConsumerWidget {
               switch (state.requireValue.value!.reportKind) {
                 'possible_loss' => 'Posiblemente perdida',
                 'sighting' => 'Avistamiento',
-                'with_reporter' => 'Encontrada',
+                'independent_found' || 'with_reporter' => 'Encontrada',
                 _ => 'Reporte',
               },
               [
                 'possible_loss',
                 'legacy_found',
+                'independent_found',
               ].contains(state.requireValue.value!.reportKind),
             )
           : null,
@@ -97,18 +103,6 @@ class FoundDetailScreen extends ConsumerWidget {
                           ? const []
                           : [
                               if (timelineAction != null) timelineAction!,
-                              if (state.requireValue.value!.reportKind ==
-                                      'possible_loss' &&
-                                  state.requireValue.value!.status ==
-                                      'active') ...[
-                                CollectionAddButton(
-                                  label: 'Reportar avistamiento',
-                                  icon: Icons.visibility_outlined,
-                                  accented: true,
-                                  route: '/home/sightings/found/$id',
-                                ),
-                                const SizedBox(height: 20),
-                              ],
                               if ((state
                                           .requireValue
                                           .value!
@@ -119,7 +113,18 @@ class FoundDetailScreen extends ConsumerWidget {
                               state.requireValue.value!.reportKind ==
                                       'possible_loss'
                                   ? RecoveryCaseActions(
-                                      showSightingAction: false,
+                                      showSightingAction: true,
+                                      journey: journey,
+                                      utilities: utilitiesBuilder?.call(
+                                        state
+                                                .requireValue
+                                                .value!
+                                                .canGeneratePoster ||
+                                            state
+                                                .requireValue
+                                                .value!
+                                                .canResolve,
+                                      ),
                                       id: id,
                                       community: true,
                                       canResolve:
@@ -127,7 +132,10 @@ class FoundDetailScreen extends ConsumerWidget {
                                       open:
                                           state.requireValue.value!.status ==
                                           'active',
-                                      onChanged: model.retry,
+                                      onChanged: () {
+                                        model.retry();
+                                        onActivityChanged?.call();
+                                      },
                                     )
                                   : state.requireValue.value!.targetId !=
                                             null &&

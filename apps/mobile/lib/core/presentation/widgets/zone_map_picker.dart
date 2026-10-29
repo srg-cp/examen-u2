@@ -1,10 +1,12 @@
 import 'confirmation_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../config/map_config.dart';
 import 'map_attribution.dart';
 import 'map_style.dart';
+import 'loading_shimmer.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
 class ZoneMapPicker extends StatefulWidget {
@@ -24,6 +26,9 @@ class ZoneMapPicker extends StatefulWidget {
     this.attributionTopInset = 0,
     this.readOnlyNavigation = false,
     this.markers = const [],
+    this.polylines = const [],
+    this.circles = const [],
+    this.fitPoints = const [],
     this.markerLayer,
     this.height = viewportHeight,
     this.borderRadius = 22,
@@ -43,6 +48,9 @@ class ZoneMapPicker extends StatefulWidget {
   /// Result maps can be explored without changing the selected search center.
   final bool readOnlyNavigation;
   final List<Marker> markers;
+  final List<Polyline> polylines;
+  final List<CircleMarker> circles;
+  final List<LatLng> fitPoints;
 
   /// Optional visual layer for result maps with camera-dependent placement.
   final Widget? markerLayer;
@@ -70,6 +78,16 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
 
   bool _mapReady = false;
   void _fitSelection() {
+    if (_mapReady && widget.fitPoints.isNotEmpty) {
+      _controller.fitCamera(
+        CameraFit.coordinates(
+          coordinates: widget.fitPoints,
+          padding: widget.cameraPadding,
+          maxZoom: 13,
+        ),
+      );
+      return;
+    }
     if (!_mapReady ||
         !widget.fitRadius ||
         widget.latitude == null ||
@@ -101,6 +119,9 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
     final pointChanged =
         widget.latitude != oldWidget.latitude ||
         widget.longitude != oldWidget.longitude;
+    if (!listEquals(widget.fitPoints, oldWidget.fitPoints)) {
+      _fitSelection();
+    }
     if (widget.fitRadius &&
         (pointChanged ||
             widget.radiusMeters != oldWidget.radiusMeters ||
@@ -138,11 +159,25 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
   Widget build(BuildContext context) {
     final attempt = _attempt;
     final tiles = TileLayer(
-      urlTemplate: MapConfig.tileUrl,
+      urlTemplate: MapConfig.displayTileUrl,
+      retinaMode:
+          MapConfig.displayTileUrl.contains('{r}') &&
+          RetinaMode.isHighDensity(context),
       tileProvider: _tiles,
       userAgentPackageName: 'com.example.flutter_application_entrehuellas',
       panBuffer: 0,
       errorTileCallback: (_, _, _) => _failure(attempt),
+      tileBuilder: (context, child, tile) => LoadingShimmer(
+        isLoading:
+            tile.loadStarted != null &&
+            tile.imageInfo == null &&
+            !tile.loadError &&
+            !tile.cancelLoading.isCompleted,
+        isAction: false,
+        radius: 0,
+        loadingLabel: 'Consultando mapa',
+        child: child,
+      ),
     );
     final point = widget.latitude == null || widget.longitude == null
         ? null
@@ -217,6 +252,10 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                         ),
                       ],
                     ),
+                  if (widget.circles.isNotEmpty)
+                    CircleLayer(circles: widget.circles),
+                  if (widget.polylines.isNotEmpty)
+                    PolylineLayer(polylines: widget.polylines),
                   if (widget.markerLayer != null)
                     widget.markerLayer!
                   else if (widget.markers.isNotEmpty)

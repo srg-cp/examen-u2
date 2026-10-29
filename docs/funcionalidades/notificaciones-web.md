@@ -1,5 +1,15 @@
 # Bandeja de alertas y cabecera de cuenta web
 
+## Aceptación del usuario — 25/10/2026
+
+El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya
+fueron validados y solicita actualizar el seguimiento. Se registra su aceptación,
+sin atribuir al agente una nueva demo ni un log individual de cada escenario.
+Esta nota sustituye los pendientes de validación correspondientes de las notas
+históricas; no activa FCM ni acredita baja/exportación sin implementar.
+
+Bandeja/seguimiento aceptados por el usuario; #40/#41 Done. No equivale a seguimiento/preferencias web nuevos ni activa push.
+
 21/10, corrección de movimiento [ADR-124](../decisiones/124-paridad-animaciones-mobile-web.md):
 Perfil/Alertas expanden desde el control real320ms y retornan260ms con las curvas
 y fases móviles. GlassDialog conserva contenido durante salida y libera foco/

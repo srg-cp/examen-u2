@@ -1,3 +1,4 @@
+import 'features/case_matching/providers/case_matching_providers.dart';
 import 'features/offline_cases/data/data_sources/open_case_cache_database_stub.dart'
     if (dart.library.io) 'features/offline_cases/data/data_sources/open_case_cache_database.dart';
 import 'features/offline_cases/data/repositories/case_cache_repository_impl.dart';
@@ -47,6 +48,9 @@ Future<void> main() async {
         ),
         localDraftRepositoryProvider.overrideWithValue(
           LocalDraftRepositoryImpl(openLocalDraftDatabase()),
+        ),
+        caseMatchingRepositoryProvider.overrideWithValue(
+          bootstrap.caseMatchingRepository,
         ),
         userBlockRepositoryProvider.overrideWithValue(
           bootstrap.userBlockRepository,

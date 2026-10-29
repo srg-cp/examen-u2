@@ -1,5 +1,10 @@
 # Base de datos de Entre Huellas
 
+25/10, HU-25/#71 y HU-26/#72: plan040/fuentes128–134 generan índices visuales
+y revisiones privadas, RPC solo servidor, invalidación y nuevo tipo explícito
+`independent_found` sin reclasificar datos. Build-CaseMatchingPatch/Build-RunAll;
+patch040 después de039. Sin aplicación remota. [Contrato y activación](../docs/funcionalidades/coincidencias-de-casos.md).
+
 HU-16.1,24/10: fuentes125–127/plan039 generan migración y patch039 con
 Build-PilotStatisticsPatch/Build-RunAll. Permiso administrador independiente
 de revisores y RPC autenticadas de agregados por período de Lima. No asigna

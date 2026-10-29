@@ -1,5 +1,23 @@
 # Explorar: lista y mapa de casos
 
+26/10, [ADR-154](../decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+mapa/panel/cabecera se extraen a MapCaseSheet, MapCasePanel/MapPanelFact y
+MapSheetHeader en core para reutilización exacta en Recorrido. Explorar conserva
+selección, acciones reales, medidas y movimiento. La decoración temporal de
+Ver ficha/flecha solo se aplica en Recorrido. Comparación de capturas y pruebas
+de regresión documentadas en ESTADO; sin cambios de contratos o permisos.
+
+26/10, [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
+Explorar usa FadingHeaderScroll con la cabecera común, incluido desvanecido
+irregular aprobado. Título/padding inicial y marca estables; botón Mapa y barra
+fuera de la máscara. Filtros, paginación, refresh, permisos y origen/retorno
+conservados. Validación local con widgets reales/repositorios de prueba y
+capturas normales/ampliadas; revisión Android físico pendiente en ESTADO.
+
+26/10, precisión ADR-148: el botón Mapa y cápsulas de cabecera recuperan glass
+original; el perlado gris se reserva a tarjetas mediante GlassSurface.card.
+Navegación, origen/retorno, datos y gestos del mapa se conservan.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

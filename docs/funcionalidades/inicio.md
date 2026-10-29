@@ -1,5 +1,175 @@
 # Inicio y navegación
 
+## Cabecera y desvanecido comunes —26/10/2026
+
+Por instrucción explícita, el efecto se integra en FadingHeaderScroll compartido
+en core/presentation, no en el contenido de Inicio. Inicio, Explorar y Mis
+mascotas lo reciben de su cabecera/scroll común. Conserva forma, posición,
+padding inicial, fondo, navegación y origen/retorno; reinicia máscara al cambiar
+sección. Refresh/paginación conservan eventos de scroll. Sin cambios de datos,
+permisos, errores o reintentos. [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md)
+sustituye las notas de alcance exclusivo a Inicio siguientes. Validación local
+y revisión Android pendiente en ESTADO; sin cierre de historias ni cambios web.
+
+## Desvanecido bajo cabecera móvil —26/10/2026
+
+Refinamiento vigente: forma de neblina sin copiar su textura. Cuatro
+prolongaciones suaves desiguales, con zonas más despejadas entre ellas;
+profundidad24–48px al desplazar, solape32px y alcance máximo conservados.
+Sustituye el perfil de banda ondulada siguiente. No añade assets o animación;
+solo cambia la máscara del contenido real.16 comprobaciones aprobadas,
+incluidas entradas claras/prolongaciones y contenido inferior opaco;
+capturas normales/ampliadas regeneradas e inspeccionadas. Pendiente Android
+físico y recompilación APK.
+
+Instrucción vigente: sobre la posición restaurada32px/16px, añadir solamente
+variación horizontal suave de4px/1.5px en la profundidad del desvanecido. Conserva
+curva y cabecera; máscara alfa generada/cacheada por la interfaz, sin assets ni
+animación nueva.16 comprobaciones aprobadas, incluida regresión de opacidad;
+capturas regeneradas e inspeccionadas, análisis sin incidencias.
+La restauración uniforme siguiente queda como antecedente.
+
+Por petición posterior y capturas del chat, restaurada la máscara uniforme
+anterior al desplazamiento4px y la irregularidad. Sin texturas ni malla alfa.
+
+Corrección posterior por captura del usuario: el efecto nace dentro del margen
+inferior de la cabecera. Viewport solapado32px, máscara48px y solo16px de salida
+inferior; padding compensado conserva título/composición inicial. Cabecera
+medida a su altura natural y pintada por encima, sin desplazar controles.
+
+Por referencia explícita del usuario, Inicio disuelve el contenido al deslizar
+bajo la cabecera mediante HomeScrollFade. Máscara alfa sobre los widgets reales,
+sin imagen de niebla; deja ver el fondo ambiental existente. Transición hasta48px
+lógicos, limitada al40% del viewport de scroll en ventanas bajas; título intacto
+al estar arriba y retirada continua al volver/pull-to-refresh. No añade animación
+autónoma; movimiento reducido conservado. Cabecera/barra fuera de la máscara.
+Explorar/Mis mascotas/web y materiales ADR-148 conservados. Sin operaciones,
+persistencia/permisos/activación nuevos ni cambios de feedback/reintento.
+[ADR-151](../decisiones/151-desvanecido-bajo-cabecera-inicio-mobile.md).
+39 comprobaciones aprobadas con fondo fijado para las pruebas y capturas reales
+normales/320px/texto200%. Pendiente Android físico y aceptación visual del render;
+APK sin recompilar/instalar. No cierra historias.
+
+26/10, precisión ADR-148: actualizar recupera su glass original; el material
+perlado se solicita solo en las tarjetas mediante GlassSurface.card.
+
+26/10, [ADR-148](../decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+barra de navegación recupera acabado polished y ribete originales por corrección
+del usuario. Las tarjetas mantienen glass perlado sin borde; acciones/scroll intactos.
+
+## Inicio web ilustrado —26/10/2026
+
+Por instrucción explícita, /inicio reutiliza los cuatro WebP finales móviles;
+Reportar a la izquierda, hallazgo/foto a la derecha y Explorar al ancho inferior.
+Hasta850px se apilan y permiten scroll. Texto200% ajusta líneas y separa arte;
+texto/controles nativos, marca, título, fondo, glass web y navegación conservados.
+[ADR-147](../decisiones/147-inicio-web-con-banners-ilustrados.md) sustituye solo
+la composición web histórica siguiente. Sin cambios Flutter/landing.
+
+Mis mascotas, pérdida, coincidencias y Explorar conservan destinos reales.
+Hallazgo abre /reportar?tipo=hallazgo con independent_found como sugerencia
+inicial; restaurar borrador tiene prioridad, sin sobrescribirlo ni marcar como
+editado un formulario recién abierto. Sin nueva persistencia, permisos o SQL.
+Mis reportes no se presenta como lista web implementada. No cambia activación
+del motor ni se prometen resultados reales a partir de las fotos decorativas.
+
+HomeContent comparte GlassSurface/NavigationLink y conserva origen/retorno.
+Validación local: build/typecheck,94 pruebas; Chrome1920/1440/900/390/320 y200%,
+teclado, objetivos48, imágenes decodificadas, roles, destinos y borrador; origen
+normal/retorno de los botones en1440/390 y foto en1440/390/320, reducido y
+alertas/cuenta. Capturas en apps/mobile/build/ui-preview/web-home. Pendiente
+aceptación visual, backend alojado y dispositivos adicionales; sin despliegue.
+
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): por
+precisión expresa del usuario, material/luces sin borde pasan de HomeBannerSurface
+a GlassSurface para todos sus consumidores móviles, incluida ficha pública y
+navegación. Home conserva composición/arte, sin duplicar iluminación de superficie.
+
+## Material glass perlado —26/10/2026
+
+Corrección posterior: retirado el contorno blanco de las cuatro tarjetas por
+observación del usuario. La luz queda dentro del material; otros consumidores
+de GlassSurface conservan su ribete. Sin cambios de composición ni navegación.
+
+Por solicitud explícita, las cuatro tarjetas sustituyen la base celeste opaca
+por glass gris perla con luz blanca/celeste difusa y ribete único. HomeBannerSurface
+reutiliza GlassSurface frosted; HomeBannerScenery integra la iluminación de las
+escenas opacas sin cambiar assets, mascotas, escenarios ni texto/controles.
+Buscar con una foto conserva la expansión existente con color de origen perlado.
+Composición, rutas, persistencia, permisos y activación no cambian; solo móvil.
+[ADR-144](../decisiones/144-inicio-mobile-glass-perlado.md). Resultados y revisión
+física pendiente en [ESTADO](../ESTADO.md).
+
+Validación local del ajuste:23 pruebas aprobadas de navegación/retorno normal y
+reducido, estabilidad, arquitectura y capturas; análisis sin incidencias.
+Inspección de material en inicio/scroll/final y320px/texto200%. No se recompila
+APK en este incremento; aceptación visual y dispositivo Android pendientes.
+
+## Inicio móvil implementado localmente —26/10/2026
+
+El usuario autoriza implementar la revisión3 y generar primero los assets;
+precisa mascotas menos realistas según Platform y escenarios conservados.
+[ADR-143](../decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md) sustituye
+la composición móvil de las notas históricas siguientes.
+
+Recorrido: título existente → Reportar con Mis reportes integrado → hallazgo
+con perro/puerta y botón inferior → Buscar con una foto → Explorar. Cuatro
+ilustraciones generadas por separado; controles, texto y símbolo oficial
+vectorial son nativos. Cabecera/navegación fijas, cuerpo con scroll continuo,
+márgenes24 y espacio inferior para barra/gesto. Imágenes excluidas de semántica.
+
+Destinos existentes: Mis reportes abre su lista; Reportar abre pérdida; Encontré
+una mascota abre hallazgo independiente conservando independent=true; Buscar con
+una foto abre coincidencias; Explorar selecciona su sección real. Conserva avisos
+vinculados, históricos, permisos, persistencia y requisitos de activación/evaluación.
+Las fotos son ilustrativas, no resultados; el mapa del banner no tiene datos,
+teselas ni ubicación. Sin nuevas operaciones, dominio/data/SQL o cambios web.
+
+HomeBannerSurface/Action se comparten entre banners y reutilizan el estilo de
+botón de core. Texto200% crece y separa arte/contenido; objetivos mínimos48.
+Stagger y expansión/retorno conservan motores/parámetros, con origen, color,
+radio y flecha reales. Refresh/bloqueo/toast/reintento conservados; navegar no
+introduce carga artificial. [Assets y prompts](../../apps/mobile/assets/illustrations/home/README.md):
+cuatro WebP,336488bytes; alfa/esquinas0 en puerta/fotos, dimensiones comprobadas.
+
+Validación final:51 pruebas aprobadas de Home/refresh/banners/coincidencias,
+arquitectura, origen/stagger y harness.11 regresiones nuevas verifican destinos,
+origen/retorno normal y reducido, scroll, cabecera/barra y tamaños390×844,
+320×600 y320×350/texto200%. Análisis lib/test/harness sin incidencias; formato/diff
+limpios. Capturas reales con fuentes/assets en apps/mobile/build/ui-preview/home-redesign,
+incluida entrada200ms; inspección normal y ampliada. APK debug con configuración
+local compilado mediante workaround temporal de Java documentado en CONFIGURACION,
+sin cambios permanentes de Gradle. Sin instalación ni nueva operación Supabase.
+Pendiente revisión Android físico y aceptación del render implementado; no se
+cierran historias ni se afirma auditoría global de animaciones.
+
+## Referencia visual móvil aprobada —25/10/2026
+
+El usuario aprueba expresamente la revisión3 como referencia del Home móvil:
+composición inicial y continuación al deslizar. La implementación Flutter y
+su validación siguen pendientes; esta aceptación visual no cierra historias.
+
+Exploración solicitada por el usuario con imagegen integrado y criterios de
+apple-design: banners con imagen y botón para pérdida/hallazgo y banner de
+Explorar. El usuario rechaza el banner y los accesos de revisión2. Revisión3:
+Mis reportes pasa al banner de Reportar y Buscar con una foto tiene un acceso
+visual propio con fotos ilustrativas, sin afirmar resultados reales. Hallazgo
+presenta un perro de cuerpo entero junto a una puerta azul, mensaje y botón
+inferior. Sustituye solo como propuesta los cuadrados y la barra anteriores;
+paleta y tipografía aprobadas siguen siendo referencia de conservación.
+Dos imágenes muestran el comienzo y la continuación al deslizar;
+el hallazgo compartido permite reconocer el mismo recorrido. Se conserva como
+referencia la identidad, tipografía y paleta aprobadas; no se intenta mostrar
+todo el contenido en una sola pantalla.
+
+[Imágenes y prompts de revisión3](../../output/imagegen/home-scroll-propuesta-v3-2026-10-25/propuesta-y-prompts.md).
+La propuesta anterior se conserva como exploración previa.
+Referencia visual aprobada, sin sustitución todavía del diseño implementado
+ni nuevas operaciones, persistencia, permisos o requisitos de activación. Los
+botones representados corresponden a destinos existentes. Inspección visual
+realizada; implementar y comprobar composición, scroll, fuentes exactas,
+texto ampliado, semántica, áreas táctiles y transiciones queda pendiente.
+
 21/10, corrección posterior del usuario: la cabecera incorpora campana real
 de [alertas web](notificaciones-web.md), avatar privado con iniciales como
 alternativa y panel de consulta de cuenta. Se retira el desplegable inferior

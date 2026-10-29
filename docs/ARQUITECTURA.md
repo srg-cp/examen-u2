@@ -1,5 +1,79 @@
 # Arquitectura de Entre Huellas
 
+26/10, [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+MapCaseSheet, MapCasePanel/MapPanelFact y MapSheetHeader se extraen a core para
+Explorar y Recorrido, sin imports entre presentaciones. Mantienen geometría,
+gestos/resortes y ZoneMapPicker. ReadCaseJourney agrega resumen de su proyección
+pública existente; sin lectura privada nueva. Solo Recorrido declara adornos sin
+callbacks/foco/semántica para Ver ficha y flecha, por instrucción explícita.
+
+26/10, [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+case_journey agrega contratos de dominio de casos/avisos/cronología mediante
+providers. Acceso privado existente/cuadrícula aproximada; ZoneMapPicker comparte
+capas/encuadre y BrandMapPinClipper la silueta oficial. Sin SQL nuevo ni cambio web.
+
+26/10, [ADR-152](decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
+FadingHeaderScroll en core/presentation compone cabecera/scroll y máscara alfa
+para Inicio, Explorar y Mis mascotas. Sin condicional por sección ni imports de
+features en core; padding/solape centralizados. Barra/Mapa fuera del efecto.
+
+26/10, precisión ADR-148: GlassSurface.card declara material perlado de tarjetas.
+El constructor general recupera polished/ribete originales para controles,
+incluido refresh y botón Mapa. Sin dependencias entre funcionalidades.
+
+26/10, [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md): HomeContent
+web compone GlassSurface/NavigationLink y recursos públicos reutilizados de
+móvil, sin imports entre funcionalidades ni capas nuevas. La página reportar
+traduce tipo=hallazgo a initialKind de RecoveryScreen; el borrador restaurado
+prevalece. Guards, dominio/data, persistencia y coordinador global conservados.
+
+26/10, [ADR-145](decisiones/145-glass-perlado-compartido-mobile.md): GlassSurface
+centraliza el material perlado y luces del Home para todos sus consumidores
+móviles. Frosted/sin ribete por defecto también en GlassNavigationButton.
+HomeBannerSurface deja de duplicar material; solo presentación compartida.
+
+26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): material de Inicio
+Flutter reutiliza GlassSurface frosted mediante HomeBannerSurface; iluminación
+de escenas opacas aislada en HomeBannerScenery. Solo presentación, sin nuevos
+assets/dependencias ni cambios de dominio/data. Coordinador de origen existente
+conservado con color perlado representativo para Buscar con una foto.
+
+26/10, [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md):
+Inicio Flutter compone cuatro banners y cabecera persistente dentro de su
+presentación. HomeBannerSurface/Action reutilizan material local y estilo de
+botón compartido; home_navigation captura el control real para rutas existentes.
+HomeViewModel, dominio/data, bootstrap y permisos conservados. Imágenes como
+assets decorativos, sin datos, paquetes nuevos o imports entre presentaciones.
+
+25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): presentación
+comparte StaggerStageTransition/Item bidireccionales. OnboardingScreen coordina
+presión/salida/entrada sin PageView; OnboardingViewState.completed registra
+guardado confirmado antes de acknowledgeCompletion, que reevalúa entrada tras
+la salida. No hay cambios de dominio/data/RPC; otros StaggerReveal se conservan.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): presentación
+compartida Flutter añade BottomContentLayout/BrandActionButton; onboarding compone
+sus propios textos/ilustraciones/acciones. Web comparte tokens --brand-action-*
+entre landing y bienvenida. Sin cambios en dominio, repositorios, datos ni permisos.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+LoadingShimmer compartido envuelve botones completos y valida su colocación en
+debug/test. Web conserva working en el control. Sin cambios de dominio/data.
+
+25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
+Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
+ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,
+índices/revisiones privadas (plan040), ranking exploratorio de hasta cinco casos,
+revisión humana y recorridos Android/web. Sin worker, inferencia externa ni FCM.
+[ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md). Activación040/demo alojada,
+dataset/evaluación, aceptación e integración pendientes; no se cierra el MVP.
+
+25/10, [ADR-137](decisiones/137-coincidencias-visuales-en-el-mvp.md): HU-25/HU-26,
+RF-19/RF-20 se incorporan al MVP por instrucción explícita. Alcance aprobado,
+sin motor implementado. Selección de modelo/ejecución y candidatos elegibles
+pendiente; no introduce workers de IA ni cambia las fronteras existentes.
+
 24/10, ADR-136: `statistics` en Nuxt separa dominio/casos de uso, DTO/repositorios,
 fuentes HTTP/RPC y ViewModel. Inicio compone el acceso por slot; política global
 SSR/cliente `administrator` y RPC con permiso `platform_administrators` independiente

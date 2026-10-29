@@ -23,6 +23,7 @@ class GlassNavigationButton extends StatelessWidget {
   Widget build(BuildContext context) => GlassSurface(
     radius: 26,
     finish: finish,
+    showRim: finish == GlassSurfaceFinish.polished,
     child: IconButton(
       tooltip: tooltip,
       onPressed: onPressed,

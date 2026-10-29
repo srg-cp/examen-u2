@@ -31,7 +31,8 @@ class PdfPosterDocumentSource implements PosterDocumentSource {
     );
     final regular = pw.Font.ttf(await regularFont());
     final bold = pw.Font.ttf(await boldFont());
-    final title = content.reportKind == 'legacy_found'
+    final title =
+        {'legacy_found', 'independent_found'}.contains(content.reportKind)
         ? 'MASCOTA ENCONTRADA'
         : 'MASCOTA PERDIDA';
     final species = switch (content.species) {
@@ -111,7 +112,7 @@ class PdfPosterDocumentSource implements PosterDocumentSource {
             pw.Text(description, style: const pw.TextStyle(fontSize: 15)),
             pw.SizedBox(height: 4),
             pw.Text(
-              '${content.reportKind == 'legacy_found' ? 'Encuentro' : 'Desaparición'}: $dateLabel',
+              '${{'legacy_found', 'independent_found'}.contains(content.reportKind) ? 'Encuentro' : 'Desaparición'}: $dateLabel',
               style: const pw.TextStyle(fontSize: 14),
             ),
             pw.SizedBox(height: 6),

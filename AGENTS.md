@@ -1,5 +1,55 @@
 # Entre Huellas: instrucciones del proyecto
 
+REGLA OBLIGATORIA GLASS MÓVIL26/10, ADR-148:
+
+- Criterio de elección: superficies amplias que agrupan información, como cards,
+  usan perlado; piezas pequeñas, botones y cápsulas usan glass normal polished.
+  El tamaño orienta, pero la función prevalece: la barra de navegación conserva
+  glass normal aunque sea ancha. No definir un umbral de píxeles ni cambiar el
+  material al redimensionar o ampliar texto.
+- Tarjetas de contenido: glass esmerilado gris perla, luces blancas/celestes
+  difusas y sin contorno blanco, mediante GlassSurface.card.
+- Controles y navegación: glass original polished, más transparente, ribete
+  y sombras originales. Incluye Volver/Cerrar/Compartir, Actualizar, botón Mapa
+  de Explorar y barra LiquidNavigation. Nunca aplicarles el material de cards.
+- Cambiar tarjetas no autoriza modificar controles ni navegación. Conservar
+  radios, dimensiones, iconos, estados, semántica y movimiento de cada pieza.
+  Cualquier excepción requiere instrucción explícita y decisión documentada.
+- Contacto sólido ADR-146 y otras excepciones explícitas conservados.
+Véase docs/decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md.
+
+Inicio web26/10, ADR-147: por autorización explícita, /inicio reutiliza los cuatro
+WebP móviles y adapta banners a dos columnas/scroll responsive. Texto/controles
+nativos, rutas operativas y origen existente; hallazgo propone tipo sin borrar
+borradores. Sin migración de otras pantallas ni del material móvil global.
+Véase docs/decisiones/147-inicio-web-con-banners-ilustrados.md.
+
+Glass26/10, ADR-145 es antecedente histórico: su alcance global queda limitado
+por la regla de ADR-148 anterior y el contacto sólido de ADR-146. No usarlo
+para extender el perlado a controles o navegación.
+
+Inicio26/10, ADR-143: referencia móvil aprobada con scroll y banners ilustrados.
+Mis reportes dentro de Reportar; hallazgo con perro/puerta y acción inferior;
+Buscar con una foto conserva coincidencias. Mascotas con estilo de Platform,
+escenarios conservados e imágenes separadas de texto/controles. Mantener título,
+fondo, cabecera fija, navegación, origen real y ampliado; sin migración web.
+Véase docs/decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md.
+Para nuevas ilustraciones/variantes, consultar docs/GUIA_ILUSTRACIONES.md:
+referencias reales, estilo de mascotas, escenarios, prompts y validación.
+
+Shimmer25/10, ADR-139, instrucción explícita: en botones el shimmer siempre
+cubre el control completo, incluida superficie/padding/iconos, nunca solo el
+texto. Flutter: LoadingShimmer por fuera del botón; web: working en el control.
+Conservar radio, etiqueta, semántica, bloqueo de dobles envíos, trabajo real y
+movimiento reducido. Véase docs/decisiones/139-shimmer-en-superficie-completa-del-boton.md.
+
+Coincidencias25/10, ADR-137/138: HU-25/#71 y HU-26/#72 pertenecen al MVP.
+Hallazgos independientes aprobados expresamente; conservar avisos vinculados
+y clasificación histórica. Modelo CPU local en Nuxt existente, sin nuevos
+workers/servicios ni inferencia externa; pesos/versiones fijados y revisión
+humana. No afirmar precisión por un smoke ni cerrar historias sin activación,
+evaluación y aceptación. Véase docs/funcionalidades/coincidencias-de-casos.md.
+
 Patrón UI/UX aprobado21/10: antes de reutilizar la expansión desde origen,
 consultar docs/patrones-ui-ux/expansion-desde-origen.md. Conservar el contrato
 ADR-128 y usar componentes/coordinador existentes; validar cada integración.

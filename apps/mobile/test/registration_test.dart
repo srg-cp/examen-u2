@@ -437,7 +437,7 @@ void main() {
       expect(repo.resends, 1);
       auth.emit(const AuthSession(userId: 'registered'));
       await tester.pumpAndSettle();
-      expect(find.text('Cada huella'), findsOneWidget);
+      expect(find.text('Cada huella importa'), findsOneWidget);
       expect(find.text('Revisa tu correo'), findsNothing);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();

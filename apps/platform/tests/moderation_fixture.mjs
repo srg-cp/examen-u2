@@ -10,6 +10,7 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),o
  const send=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
  async function handle(req,res){
   if(options.handle&&await options.handle(req,res))return true;
+  if(req.url==='/rest/v1/rpc/require_platform_administrator'){for await(const _ of req){}send(res,{code:'42501',message:'statistics_forbidden'},403);return true;}
   const actor=req.headers.authorization==='Bearer '+'m'.repeat(30)?moderator:ordinary;
   if(req.url?.startsWith('/auth/v1/authorize?')){
    const url=new URL(req.url,'http://fixture'),callback=new URL(url.searchParams.get('redirect_to'));
@@ -47,6 +48,6 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),o
   if(ambiguous){ambiguous=false;send(res,{message:'PRIVATE_FAILURE_AFTER_COMMIT'},503);}else send(res,saved);
   return true;
  }
- const server=await productionFixture(jpeg,{handle,env:{SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture_123456',MODERATION_SESSION_SECRET:'fixture-session-secret-only-not-a-production-key'}});
+ const server=await productionFixture(jpeg,{handle,env:{SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture_123456',MODERATION_SESSION_SECRET:'fixture-session-secret-only-not-a-production-key',...(options.env||{})}});
  return {...server,close:async()=>{logoutBarrier?.release();await server.close();},pauseLogout(){let started,release;const wait=new Promise(resolve=>{release=resolve;}),begun=new Promise(resolve=>{started=resolve;});logoutBarrier={wait,started,release};return {started:begun,release(){logoutBarrier=null;release();}};},setOnboarding:(actor,value)=>onboarded.set(actor,value),completions:()=>completions,profileFailure:value=>{profileFailure=value;},oauthDenied:value=>{socialDenied=value;},oauthCancelled:value=>{socialCancelled=value;},revoke:value=>{revoked=value;},ambiguousDecision:()=>{ambiguous=true;},decisions:()=>decisions.size,accesses:()=>accesses,hidden:()=>hidden};
 }

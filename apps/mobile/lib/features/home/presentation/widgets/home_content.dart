@@ -1,11 +1,18 @@
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/presentation/widgets/origin_page_transition.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../../core/presentation/widgets/glass_surface.dart';
-import 'home_reunion_card.dart';
+import '../../../../core/presentation/widgets/stagger_reveal.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../state/home_view_state.dart';
+import 'home_banner_surface.dart';
+import 'home_explore_banner.dart';
+import 'home_found_banner.dart';
+import 'home_navigation.dart';
+import 'home_photo_search_card.dart';
+import 'home_report_banner.dart';
+
+export 'home_navigation.dart' show openHomeAction, openLostReport;
 
 class HomeContent extends StatelessWidget {
   const HomeContent({
@@ -13,8 +20,11 @@ class HomeContent extends StatelessWidget {
     required this.onReport,
     super.key,
   });
+
+  static const revealCount = 5;
   final ValueChanged<HomeSection> onSelect;
   final ValueChanged<BuildContext> onReport;
+
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,131 +58,53 @@ class HomeContent extends StatelessWidget {
       const SizedBox(height: 22),
       StaggerRevealItem(
         order: 1,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final vertical =
-                constraints.maxWidth < 300 ||
-                MediaQuery.textScalerOf(context).scale(14) > 20;
-            final cards = [
-              HomeQuickAction(
-                icon: Icons.search_rounded,
-                label: 'Reportar',
-                onTap: onReport,
-              ),
-              HomeQuickAction(
-                icon: Icons.assignment_outlined,
-                label: 'Mis reportes',
-                onTap: (source) => source.push('/home/my-reports'),
-              ),
-              HomeQuickAction(
-                icon: Icons.pets_outlined,
-                label: 'Mis mascotas',
-                onTap: (_) => onSelect(HomeSection.pets),
-              ),
-            ];
-            return vertical
-                ? Column(
-                    children: [
-                      for (final card in cards)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: card,
-                        ),
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var i = 0; i < cards.length; i++) ...[
-                        if (i > 0) const SizedBox(width: 10),
-                        Expanded(child: cards[i]),
-                      ],
-                    ],
-                  );
-          },
+        child: HomeReportBanner(
+          key: const ValueKey('home-report-banner'),
+          onReport: onReport,
+          onMyReports: () => context.push('/home/my-reports'),
         ),
       ),
-      const SizedBox(height: 28),
-      const HomeReunionCard(),
-      const SizedBox(height: 28),
+      const SizedBox(height: 24),
+      StaggerRevealItem(
+        order: 2,
+        child: HomeFoundBanner(
+          key: const ValueKey('home-found-banner'),
+          onFound: (source) => openHomeAction(
+            source,
+            '/home/found-cases/new?independent=true',
+            Icons.arrow_forward_rounded,
+            radius: 24,
+          ),
+        ),
+      ),
+      const SizedBox(height: 24),
       StaggerRevealItem(
         order: 3,
-        preserveBackdrop: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Cerca de ti',
-              style: TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF111111),
-              ),
-            ),
-            const SizedBox(height: 14),
-            const HomeNotice(
-              icon: Icons.location_on_outlined,
-              title: 'Explora cerca de ti',
-              description:
-                  'Consulta casos cercanos con tu ubicación actual y un radio inicial de 15 km, o elige otra ubicación manualmente.',
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: () => onSelect(HomeSection.explore),
-                child: const Text('Conoce Explorar'),
-              ),
-            ),
-          ],
+        child: HomePhotoSearchCard(
+          key: const ValueKey('home-photo-search'),
+          onTap: (source) => openHomeAction(
+            source,
+            '/home/coincidencias',
+            Icons.arrow_forward_rounded,
+            color: HomeBannerSurface.originColor,
+            radius: HomeBannerSurface.radius,
+            iconSize: 26,
+          ),
+        ),
+      ),
+      const SizedBox(height: 24),
+      StaggerRevealItem(
+        order: 4,
+        child: HomeExploreBanner(
+          key: const ValueKey('home-explore-banner'),
+          onExplore: () => onSelect(HomeSection.explore),
         ),
       ),
     ],
   );
 }
 
-class HomeQuickAction extends StatelessWidget {
-  const HomeQuickAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    super.key,
-  });
-  final IconData icon;
-  final String label;
-  final ValueChanged<BuildContext> onTap;
-  @override
-  Widget build(BuildContext context) => Material(
-    color: const Color(0xFF111111),
-    borderRadius: BorderRadius.circular(22),
-    child: InkWell(
-      borderRadius: BorderRadius.circular(22),
-      onTap: () => onTap(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            children: [
-              Icon(icon, size: 25, color: Colors.white),
-              const SizedBox(height: 10),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
+/// Existing fallback when a section has not been composed by the app router.
 class HomeNotice extends StatelessWidget {
   const HomeNotice({
     required this.icon,
@@ -180,11 +112,12 @@ class HomeNotice extends StatelessWidget {
     required this.description,
     super.key,
   });
+
   final IconData icon;
-  final String title;
-  final String description;
+  final String title, description;
+
   @override
-  Widget build(BuildContext context) => GlassSurface(
+  Widget build(BuildContext context) => GlassSurface.card(
     radius: 26,
     backdropBlendMode: BlendMode.src,
     child: Padding(
@@ -215,74 +148,4 @@ class HomeNotice extends StatelessWidget {
       ),
     ),
   );
-}
-
-void showHomeInfo(
-  BuildContext context, {
-  required String title,
-  required String description,
-}) => showModalBottomSheet<void>(
-  context: context,
-  isScrollControlled: true,
-  sheetAnimationStyle: MediaQuery.disableAnimationsOf(context)
-      ? AnimationStyle.noAnimation
-      : null,
-  useSafeArea: true,
-  showDragHandle: true,
-  backgroundColor: Colors.white,
-  builder: (context) => SingleChildScrollView(
-    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(title, style: AppTypography.primaryTitle),
-        const SizedBox(height: 16),
-        Text(
-          description,
-          style: const TextStyle(
-            fontSize: 16,
-            height: 1.4,
-            color: Color(0xFF6E6E73),
-          ),
-        ),
-        const SizedBox(height: 20),
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Entendido'),
-        ),
-      ],
-    ),
-  ),
-);
-
-void openLostReport(
-  BuildContext context, {
-  VoidCallback? onReturn,
-  Color color = const Color(0xFF111111),
-  double radius = 32,
-}) {
-  final box = context.findRenderObject();
-  final navigator = Navigator.of(context).context.findRenderObject();
-  final origin = box is RenderBox && box.hasSize
-      ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
-      : null;
-  context
-      .push(
-        '/home/lost-cases/new',
-        extra: origin == null
-            ? null
-            : OriginPageSource(
-                bounds: origin,
-                color: color,
-                radius: radius,
-                child: Icon(
-                  Icons.search_rounded,
-                  color: color == const Color(0xFF111111)
-                      ? Colors.white
-                      : const Color(0xFF111111),
-                ),
-              ),
-      )
-      .then((_) => onReturn?.call());
 }

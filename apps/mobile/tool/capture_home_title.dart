@@ -68,7 +68,7 @@ void main() {
                 body: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
                   child: StaggerReveal(
-                    count: 4,
+                    count: HomeContent.revealCount,
                     child: HomeContent(onSelect: (_) {}, onReport: (_) {}),
                   ),
                 ),

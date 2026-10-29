@@ -62,6 +62,8 @@ void main() {
         ),
       );
       Future<void> processTiles() async {
+        // Mount the tiles created by camera fitting/retry before decoding them.
+        await tester.pump();
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 80)),
         );
@@ -72,7 +74,7 @@ void main() {
       expect(find.textContaining('No se pudo mostrar el mapa'), findsOneWidget);
       await tester.tap(find.byType(FlutterMap));
       await tester.pump(const Duration(milliseconds: 350));
-      await tester.pumpAndSettle();
+      await processTiles();
       expect(latitude, isNull);
       failed = false;
       await tester.tap(find.text('Reintentar mapa'));
@@ -81,7 +83,7 @@ void main() {
       expect(find.textContaining('No se pudo mostrar el mapa'), findsNothing);
       await tester.tap(find.byType(FlutterMap));
       await tester.pump(const Duration(milliseconds: 350));
-      await tester.pumpAndSettle();
+      await processTiles();
       expect(latitude, closeTo(-12.0464, .01));
       expect(longitude, closeTo(-77.0428, .01));
       expect(
@@ -94,7 +96,7 @@ void main() {
         latitude = -13;
         longitude = -78;
       });
-      await tester.pumpAndSettle();
+      await processTiles();
       final map = tester.widget<FlutterMap>(find.byType(FlutterMap));
       expect(map.mapController!.camera.center.latitude, -13);
       expect(map.mapController!.camera.center.longitude, -78);

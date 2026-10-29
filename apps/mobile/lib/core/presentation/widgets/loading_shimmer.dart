@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Keeps the action label and size while a subtle sheen announces real work.
+/// For buttons, wrap the entire control, including its surface and padding.
+/// Never put this widget inside a button's child, label or icon.
 /// Reduced motion uses a static sheen; semantics still announce the operation.
 class LoadingShimmer extends StatefulWidget {
   const LoadingShimmer({
@@ -68,6 +70,20 @@ class _LoadingShimmerState extends State<LoadingShimmer>
 
   @override
   Widget build(BuildContext context) {
+    assert(() {
+      context.visitAncestorElements((ancestor) {
+        if (ancestor.widget is ButtonStyleButton ||
+            ancestor.widget is IconButton) {
+          throw FlutterError(
+            'LoadingShimmer must wrap the entire button. '
+            'Place the button inside LoadingShimmer.child, '
+            'not LoadingShimmer inside the button label or icon.',
+          );
+        }
+        return true;
+      });
+      return true;
+    }());
     // Keep the same ancestors in both states: inserting wrappers on refresh
     // remounts cards/photos and restarts their local state twice per operation.
     final painted = ClipRRect(

@@ -1,4 +1,5 @@
 <div align="center">
+
   <img src="apps/mobile/assets/branding/app_icon.png" alt="Icono de Entre Huellas" width="136" />
   <h1>Entre Huellas</h1>
   <p><strong>Cada huella puede ayudar a volver a casa.</strong></p>
@@ -24,6 +25,12 @@
 ## 🐾 Sobre el proyecto
 
 Entre Huellas conecta a quienes buscan una mascota con personas que pueden aportar información para recuperarla. El MVP contempla búsquedas de mascotas perdidas, avisos vinculados, fichas públicas mediante QR y seguimiento de la recuperación.
+
+Las coincidencias visuales también forman parte del MVP (HU-25/#71 y HU-26/#72),
+con hallazgos independientes y revisión humana. La implementación está en
+`feature/case-matching`; el patch040 fue aplicado según confirmación del usuario.
+La evaluación con fotos autorizadas, la prueba entre dos cuentas y la aceptación
+siguen pendientes. Consulta el [recorrido y la configuración](docs/funcionalidades/coincidencias-de-casos.md).
 
 La app cuenta con implementaciones de acceso y onboarding por cuenta, perfil, mascotas y fotos, zonas de interés, preferencias de alertas, búsquedas y avisos vinculados, y consulta de Mis reportes. **Implementado no significa historia cerrada ni despliegue confirmado**: la evidencia y los pendientes se registran en [las fichas funcionales](docs/funcionalidades/README.md) y [el estado del proyecto](docs/ESTADO.md).
 

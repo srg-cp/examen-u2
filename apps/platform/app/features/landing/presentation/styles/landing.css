@@ -141,8 +141,8 @@ html:has(.landing-page) {
   filter: brightness(0.97);
 }
 .landing-page .button-primary {
-  background: linear-gradient(180deg, #75bfff 0%, #459ff6 48%, #2887ef 100%);
-  color: #fff;
+  background: var(--brand-action-background);
+  color: var(--brand-action-foreground);
 }
 .landing-page .button-secondary {
   background: linear-gradient(145deg, #e5f2fa, var(--brand-sky));
@@ -155,11 +155,8 @@ html:has(.landing-page) {
 }
 .landing-page .header .header-cta,
 .landing-page .closing .button-primary {
-  box-shadow:
-    inset 0 1px 2px #ffffff80,
-    0 7px 20px #2887ef40,
-    0 2px 5px #2887ef1a;
-  text-shadow: 0 1px 2px #155ba94d;
+  box-shadow: var(--brand-action-shadow);
+  text-shadow: var(--brand-action-text-shadow);
 }
 .landing-page .actions {
   display: flex;

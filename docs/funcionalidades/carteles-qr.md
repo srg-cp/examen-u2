@@ -1,5 +1,15 @@
 # Carteles PDF y QR
 
+## Aceptación del usuario — 25/10/2026
+
+El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya
+fueron validados y solicita actualizar el seguimiento. Se registra su aceptación,
+sin atribuir al agente una nueva demo ni un log individual de cada escenario.
+Esta nota sustituye los pendientes de validación correspondientes de las notas
+históricas; no activa FCM ni acredita baja/exportación sin implementar.
+
+Difusión aceptada: #34/#35 y épica #8 cerrados/Done. Los pendientes históricos de impresión/escaneo y acciones nativas dejan de ser bloqueos de aceptación.
+
 24/10/2026: dominio público actualizado a `https://entrehuellas.app`. Los
 endpoints de Supabase y la infraestructura se conservan. Código/configuración
 local actualizados; despliegue, retorno OAuth, envío de correo y escaneo de QR

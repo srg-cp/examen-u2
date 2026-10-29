@@ -1,5 +1,17 @@
 # Contacto del reportante por caso
 
+26/10, corrección posterior [ADR-146](../decisiones/146-contacto-mobile-solido-segun-referencia.md):
+contacto móvil con cápsula lavanda sólida, acciones blancas e iconos azules rellenos,
+sin glass en superficie ni botones, según la nueva referencia del usuario.
+Sustituye el acabado de ADR-113/145 solo en este bloque. Mantener identidad real,
+consentimiento, SMS/marcador, permisos y adaptación a texto ampliado.
+
+
+26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): los
+controles glass de contacto heredan el material perlado compartido sin borde
+blanco, como la ficha y el Home. Acciones, consentimiento, privacidad y RPC
+conservados. Validación local y Android pendiente en ESTADO.
+
 23/10, alcance HU-14.2 confirmado por usuario: patch035 después de034 oculta
 nombre/teléfono/foto entre cuentas bloqueadas, en cualquiera de los sentidos.
 RPC y Storage reutilizan `case_contact_visible`; autor y terceros autorizados

@@ -1,5 +1,15 @@
 # Seguimiento y alertas
 
+## Aceptación del usuario — 25/10/2026
+
+El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya
+fueron validados y solicita actualizar el seguimiento. Se registra su aceptación,
+sin atribuir al agente una nueva demo ni un log individual de cada escenario.
+Esta nota sustituye los pendientes de validación correspondientes de las notas
+históricas; no activa FCM ni acredita baja/exportación sin implementar.
+
+Seguimiento #40 y bandeja #41 aceptados y cerrados/Done. HU-12 sigue abierta solo por #42/FCM pospuesto; no activar emisor ni cron.
+
 21/10: [bandeja web](notificaciones-web.md) desde la campana de cuenta, con
 consulta, paginación y lectura persistida sobre las RPC de plan027. Sin nuevo
 SQL, push/seguimiento/preferencias web ni cierre de historias; evidencia local

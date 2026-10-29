@@ -21,7 +21,7 @@ String _title(RecoveryReport value) => value.fromPet
     : '${switch (value.report!.reportKind) {
         'possible_loss' => 'Posiblemente perdida',
         'sighting' => 'Avistamiento',
-        'with_reporter' => 'Encontrada',
+        'independent_found' || 'with_reporter' => 'Encontrada',
         _ => 'Reporte anterior',
       }} · ${foundSpeciesLabel(value.report!.species)}';
 String _subtitle(RecoveryReport value) => value.pending
@@ -30,6 +30,10 @@ String _subtitle(RecoveryReport value) => value.pending
           : 'Limpieza de fotos pendiente')
     : value.fromPet || value.report!.reportKind == 'possible_loss'
     ? (value.status == 'active' ? 'Búsqueda abierta' : 'Búsqueda resuelta')
+    : value.report!.reportKind == 'independent_found'
+    ? (value.status == 'active'
+          ? 'Hallazgo sin familia identificada'
+          : 'Hallazgo retirado')
     : value.report!.reportKind == 'legacy_found'
     ? 'Reporte anterior'
     : (value.status == 'active'

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/presentation/widgets/collection_add_button.dart';
 import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/skeleton_form_fields.dart';
 import '../../../../core/presentation/widgets/entity_card_content.dart';
 import '../../../../core/presentation/widgets/entity_card_surface.dart';
+import '../../../../core/presentation/widgets/case_action_button.dart';
 import '../view_models/recovery_case_view_model.dart';
 
 class RecoveryCaseActions extends ConsumerWidget {
@@ -16,12 +16,15 @@ class RecoveryCaseActions extends ConsumerWidget {
     required this.open,
     required this.onChanged,
     this.showSightingAction = true,
+    this.utilities,
+    this.journey,
     super.key,
   });
   final String id;
   final bool community, canResolve, open;
   final VoidCallback onChanged;
   final bool showSightingAction;
+  final Widget? utilities, journey;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = recoveryCaseViewModelProvider((id, community));
@@ -39,41 +42,53 @@ class RecoveryCaseActions extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (open && showSightingAction)
-            CollectionAddButton(
-              label: 'Reportar avistamiento',
-              accented: true,
-              route: '/home/sightings/${community ? 'found' : 'lost'}/$id',
-              icon: Icons.visibility_outlined,
-            ),
-          if (open && showSightingAction) const SizedBox(height: 12),
-          if (open)
-            CollectionAddButton(
-              label: 'La vi o la encontré',
-              route: '/home/found-cases/new?case=$id&community=$community',
-              icon: Icons.visibility_outlined,
-            ),
-          if (open && canResolve) ...[
-            const SizedBox(height: 12),
-            CollectionAddButton(
-              label: 'Ya fue recuperada',
-              icon: Icons.check_circle_outline,
-              route: '/home/closure/${community ? 'found' : 'lost'}/$id',
-              onReturn: onChanged,
-            ),
-          ],
-          if (!open)
-            CollectionAddButton(
-              label: 'Ver recuperación',
-              icon: Icons.check_circle_outline,
-              route: '/home/closure/${community ? 'found' : 'lost'}/$id',
-            ),
-          const SizedBox(height: 20),
-          const Text(
-            'Avisos de esta búsqueda',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          CaseActionLayout(
+            children: [
+              if (open && showSightingAction)
+                CaseActionButton(
+                  label: 'Reportar avistamiento',
+                  accented: true,
+                  route: '/home/sightings/${community ? 'found' : 'lost'}/$id',
+                  icon: Icons.visibility_outlined,
+                  onReturn: onChanged,
+                ),
+              if (open)
+                CaseActionButton(
+                  label: 'La vi o la encontré',
+                  route: '/home/found-cases/new?case=$id&community=$community',
+                  icon: Icons.visibility_outlined,
+                  onReturn: () {
+                    model.retry();
+                    onChanged();
+                  },
+                ),
+              if (open && canResolve) ...[
+                CaseActionButton(
+                  label: 'Ya fue recuperada',
+                  icon: Icons.check_circle_outline,
+                  route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+                  onReturn: onChanged,
+                ),
+              ],
+              if (!open)
+                CaseActionButton(
+                  label: 'Ver recuperación',
+                  icon: Icons.check_circle_outline,
+                  route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+                ),
+            ],
           ),
-          if (state.isLoading)
+          if (utilities != null) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 90, vertical: 20),
+              child: Divider(height: 1, color: Color(0xFFDDE6EF)),
+            ),
+            utilities!,
+          ],
+          const SizedBox(height: 20),
+          if (journey != null) ...[
+            journey!,
+          ] else if (state.isLoading)
             const SkeletonFormFields(fieldCount: 1)
           else if (state.hasError || value?.error == true)
             TextButton(onPressed: model.retry, child: const Text('Reintentar'))

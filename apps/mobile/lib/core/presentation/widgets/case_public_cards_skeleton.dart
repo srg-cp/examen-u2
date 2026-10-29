@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'case_public_cards.dart';
 import 'loading_shimmer.dart';
@@ -33,18 +34,20 @@ class CasePublicCardsSkeleton extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const CasePublicGlassCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _Shape(height: 24),
-                SizedBox(height: 12),
-                _Shape(key: ValueKey('case-skeleton-map'), height: 180),
-                SizedBox(height: 12),
-                _Shape(height: 32),
-              ],
+          Padding(
+            padding: const EdgeInsets.all(6),
+            child: LayoutBuilder(
+              builder: (context, constraints) => _Shape(
+                key: const ValueKey('case-skeleton-map'),
+                height: math.max(
+                  constraints.maxWidth / 1.35,
+                  MediaQuery.textScalerOf(context).scale(140),
+                ),
+              ),
             ),
           ),
+          const SizedBox(height: 8),
+          const _Shape(height: 20),
         ],
       ),
     ),

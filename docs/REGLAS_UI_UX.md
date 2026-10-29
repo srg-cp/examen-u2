@@ -1,5 +1,96 @@
 # Entre Huellas: regla de oro de UI y UX
 
+26/10, excepción local [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
+pantalla Recorrido con los componentes reales del mapa de Explorar: mapa completo,
+cabecera compacta y panel blanco deslizable. Ver ficha/flecha de este panel son
+adornos temporales explícitamente solicitados; sin interacción/foco/semántica,
+con colores originales. Explorar conserva sus acciones. Tarjeta perla de entrada
+conservada; sin cambio global de material ni tipografía.
+
+26/10, excepción local [ADR-153](decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md):
+opciones de ficha como círculos compactos/controles neutros contiguos; Reportar
+reutiliza celeste de navegación. Solo tarjeta informativa usa GlassSurface.card
+perla, con un destino. Corrección final: círculo negro56/flecha diagonal26 arriba
+a la derecha; sin encabezado externo ni pie/chevrón inferior. Padding18/gap16 y
+tipografía de la tarjeta de datos compartidos. No cambia otros controles.
+
+## Regla obligatoria: tarjetas y controles glass móviles
+
+Por instrucción explícita del26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+
+Elegir por tamaño y función: las superficies amplias que agrupan información
+(cards) usan perlado; piezas pequeñas, botones y cápsulas usan glass normal
+polished. El tamaño orienta y la función prevalece: la barra de navegación
+mantiene glass normal aunque sea ancha. No establecer un umbral de píxeles ni
+cambiar el acabado por responsive o ampliación de texto.
+
+| Uso | Material obligatorio |
+| --- | --- |
+| Tarjetas de contenido | GlassSurface.card: esmerilado gris perla, luz blanca/celeste difusa y sin trazo blanco. |
+| Volver, Cerrar, Compartir, Actualizar, Mapa de Explorar y barra de navegación | GlassSurface polished original: mayor transparencia, ribete y sombras originales. |
+
+No trasladar el material de tarjetas a controles o navegación, ni cambiar estos
+al refinar una card. Reutilizar componentes y conservar geometría, iconos,
+semántica, interacción y contratos de movimiento. Excepciones solo por instrucción
+explícita y decisión documentada; contacto sólido ADR-146 conservado.
+La diferencia es de material y jerarquía visual: ambos usan blur compartido22.
+
+Las notas anteriores de alcance global de ADR-145 quedan subordinadas a esta regla.
+
+26/10, [ADR-148](decisiones/148-restaurar-glass-controles-y-navegacion-mobile.md):
+botones superiores y barra móvil recuperan el glass polished/ribete anteriores.
+El perlado sin borde de ADR-145 se conserva en tarjetas, no en esos controles.
+
+26/10, excepción posterior [ADR-146](decisiones/146-contacto-mobile-solido-segun-referencia.md): contacto de ficha pública móvil con fondo lavanda sólido y botones blancos opacos; sin glass. Conserva adaptación accesible y operaciones autorizadas.
+
+26/10, [ADR-145](decisiones/145-glass-perlado-compartido-mobile.md): el usuario
+extiende expresamente el glass perlado del Home a todos los consumidores móviles
+de GlassSurface. Material/iluminación en core, acabado frosted y sin contorno
+blanco por defecto; incluye ficha pública, contacto, navegación y Explorar.
+Sustituye reservas anteriores de acabado/ribete en estos consumidores.
+
+26/10, [ADR-144](decisiones/144-inicio-mobile-glass-perlado.md): por instrucción
+explícita, Inicio móvil usa glass gris perla con luces blanca/celeste suaves,
+ribete único y escenas conservadas. Reutilizar GlassSurface frosted mediante
+HomeBannerSurface; iluminación del arte separada de textos y controles.
+Conservar composición ADR-143, fondo, navegación, ampliado y movimiento.
+
+26/10, [ADR-143](decisiones/143-inicio-mobile-banners-ilustrados-y-scroll.md):
+Inicio móvil implementa los banners/scroll de la revisión3 aprobada. Mis reportes
+vive dentro de Reportar; hallazgo con perro/puerta y acción inferior; Buscar con
+una foto conserva su operación existente. Mascotas de estilo Platform, escenarios
+conservados y controles/texto nativos. Cabecera fija, navegación, origen real,
+ampliado y reducido conservados. No migra Inicio web; Explorar usa una ilustración
+decorativa en el banner, no un mapa de datos ni otro adaptador.
+
+25/10, [ADR-142](decisiones/142-onboarding-texto-natural-y-posiciones-estables.md):
+onboarding web/móvil ajusta títulos/descripciones al ancho sin saltos forzados;
+reserva la altura máxima entre las tres etapas para estabilizar texto y acción.
+Respetar tipografía, ampliado, semántica del texto activo y scroll sin recortes.
+
+25/10, [ADR-141](decisiones/141-onboarding-mobile-stagger-como-web.md): onboarding
+móvil elimina PageView y comparte el contrato de movimiento web/Sader: cuatro
+grupos550ms/90ms, entrada desde+56/blur18, salida inversa, presión400ms previa.
+Marca fija, reducido/cancelación, bloqueo y guardado real visibles conservados.
+Sustituye la transición lateral restante de ADR-140; botón móvil grande conservado.
+
+25/10, precisión posterior ADR-140: solo móvil recupera botón68/radio26,
+padding28 horizontal/18 vertical y texto22/600 con fuente del sistema; conserva
+celeste/luz. Onboarding móvil avanza exclusivamente por Continuar/Comenzar,
+sin gesto horizontal; scroll vertical accesible conservado. Sustituye las medidas
+Sader móviles siguientes. Web conserva48/radio18 y padding8/12.
+
+25/10, [ADR-140](decisiones/140-onboarding-inferior-y-boton-celeste.md): onboarding
+móvil/web toma composición inferior y botón Sader48/radio18/texto16/500, con
+degradado y luz celestes de la landing. Textos al inicio, sin puntos visibles;
+progreso accesible, scroll/texto ampliado, marca y tres etapas conservados.
+Flutter reutiliza BottomContentLayout/BrandActionButton; alcance solo onboarding.
+
+25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
+por instrucción explícita, el shimmer de botones cubre toda la superficie,
+padding e iconos, nunca solo el texto. LoadingShimmer envuelve el botón completo.
+Mantener radio/tamaño/etiqueta, semántica, trabajo real y movimiento reducido.
+
 Corrección23/10, ADR-133: Favoritos/Seguir/Bloquear usan el mismo
 PanelActionButton que Descargar/Denunciar: círculos grises56 con iconos26, sin
 etiqueta visible, tooltip/semántica. Todos bajo el separador; Wrap centra y

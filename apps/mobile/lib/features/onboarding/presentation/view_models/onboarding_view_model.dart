@@ -12,13 +12,13 @@ class OnboardingViewModel extends Notifier<OnboardingViewState> {
   @override
   OnboardingViewState build() => const OnboardingViewState();
   void selectPage(int page) {
-    if (!state.isBusy && page >= 0 && page < 3) {
+    if (!state.isBusy && !state.completed && page >= 0 && page < 3) {
       state = OnboardingViewState(page: page);
     }
   }
 
   Future<void> next() async {
-    if (state.isBusy) return;
+    if (state.isBusy || state.completed) return;
     if (state.page < 2) {
       selectPage(state.page + 1);
     } else {
@@ -33,11 +33,15 @@ class OnboardingViewModel extends Notifier<OnboardingViewState> {
     try {
       await ref.read(completeOnboardingProvider)();
       if (ref.mounted) {
-        state = OnboardingViewState(page: page);
-        ref.invalidate(entryViewModelProvider);
+        state = OnboardingViewState(page: page, completed: true);
       }
     } catch (_) {
       if (ref.mounted) state = OnboardingViewState(page: page, hasError: true);
     }
+  }
+
+  /// Leave only after the confirmed save and the presentation's exit phase.
+  void acknowledgeCompletion() {
+    if (state.completed) ref.invalidate(entryViewModelProvider);
   }
 }

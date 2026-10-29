@@ -1,5 +1,33 @@
 # Backlog MVP y trazabilidad académica
 
+25/10: HU-25/#71 y HU-26/#72 implementadas localmente en `feature/case-matching`.
+Hallazgos independientes aprobados expresamente, sin retirar avisos vinculados
+ni reclasificar históricos. Encoder visual CLIP CPU local en Nuxt existente,
+índices/revisiones privadas (plan040), ranking exploratorio de hasta cinco casos,
+revisión humana y recorridos Android/web. Sin worker, inferencia externa ni FCM.
+[ADR-138](decisiones/138-motor-visual-local-y-hallazgos-independientes.md) y
+[ficha](funcionalidades/coincidencias-de-casos.md). Activación040/demo alojada,
+dataset/evaluación, aceptación e integración pendientes; no se cierra el MVP.
+
+## Seguimiento actualizado — 25/10/2026
+
+Aceptación expresa del usuario: #19, #34, #35, #40, #41, #13 y épica #8
+cerrados/Done en GitHub y Projects. La aceptación procede del usuario; no se
+ejecutó una nueva demo del agente ni se fabrican logs de escenarios particulares.
+HU-01 sigue abierta por #24/#25 sin implementar; HU-12 por #42/FCM pospuesto.
+Moderación/denuncias/bloqueos/apelaciones conservan sus pendientes #43–#46.
+Estadísticas #50 ya cerradas por la aceptación del24/10.
+
+Match incluido expresamente en MVP: **HU-25 / #71** y **HU-26 / #72**,
+RF-19/RF-20, Backlog/P1 y needs:refinement. No existían issues de estas
+historias al revisar los51 issues abiertos/cerrados. Ahora hay53 issues:
+**39 Done (31 historias y8 épicas),8 In progress (4 historias y4 épicas),
+6 Backlog (6 historias)**. No es porcentaje de avance ni53 entregas distintas.
+
+Pendientes de implementación: baja #24, exportación #25, controles #51 y
+coincidencias #71/#72. Push #42 sigue diferido. Las tablas/notas inferiores
+son instantáneas históricas, sustituidas por esta actualización.
+
 Fecha: 8 de octubre de 2026. Responsable: @srg-cp.
 
 Archivos individuales de los 51 issues y clasificación operativa: [docs/backlog/README.md](backlog/README.md). Los estados están aplicados tanto en etiquetas como en el Status nativo del [tablero EntreHuellas](https://github.com/users/srg-cp/projects/3/views/1), verificados para las 51 tarjetas. Las fichas siguientes conservan planificación y trazabilidad; el índice individual incluye estado y motivo.
@@ -8,7 +36,7 @@ Actualización operativa del 10 de octubre: HU-02.1 / #26 y su épica HU-02 / #2
 
 ## Estructura y numeración
 
-Se conservan las 16 HU originales del plan maestro y los issues #1–#16. Doce describen alcance amplio y son **épicas**; cuatro conservan un resultado cohesivo y siguen como historias ejecutables. Hay **39 historias ejecutables** (35 derivadas y cuatro originales) y **12 épicas**: 51 issues abiertos asignados a srg-cp. No contar épicas e historias dos veces como esfuerzo ni presentar 51 entregas independientes.
+La base de planificación conserva HU-01 a HU-16 y los issues #1–#16; desde25/10 se incorporan además HU-25/HU-26 originales como #71/#72. Las cantidades del desglose inicial siguiente son históricas. Doce describen alcance amplio y son **épicas**; cuatro conservan un resultado cohesivo y siguen como historias ejecutables. Hay **39 historias ejecutables** (35 derivadas y cuatro originales) y **12 épicas**: 51 issues abiertos asignados a srg-cp. No contar épicas e historias dos veces como esfuerzo ni presentar 51 entregas independientes.
 
 HU-XX.n es una convención local para una historia derivada de HU-XX. Conserva trazabilidad con los RF y el informe original; no es una norma universal ni el número del issue. No se eliminan ni renumeran las HU del plan maestro. Una rúbrica docente puede pedir otra presentación; aún no se ha recibido.
 

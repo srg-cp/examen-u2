@@ -3,7 +3,9 @@ import '../../../../core/presentation/state/event_date_time_draft.dart';
 import '../../domain/entities/found_case.dart';
 import 'found_editor_state.dart';
 
-String foundDraftSlot(FoundEditorContext c) => c.communitySearch
+String foundDraftSlot(FoundEditorContext c) => c.independentFound
+    ? 'independent-found'
+    : c.communitySearch
     ? 'community-search'
     : 'found:${c.communityTarget}:${c.targetId}';
 LocalReportDraft foundLocalDraft(FoundEditorState v, String slot) =>

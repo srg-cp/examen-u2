@@ -8,6 +8,9 @@
 !tsconfig.json
 !scripts/
 !scripts/healthcheck.mjs
+!scripts/prepare-match-model.mjs
+!scripts/check-native-images.mjs
+!scripts/package-native-images.mjs
 !app/
 !app/**
 !shared/
