@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -148,7 +149,7 @@ void main() {
               boundary.currentContext!,
             ),
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           Future<void> shot(String name) async {
             if (!capture) return;
             await tester.runAsync(() async {
@@ -191,7 +192,7 @@ void main() {
             Offset(170, small ? 40 : 135),
             const Offset(-320, 0),
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           expect(find.bySemanticsLabel('Foto 2 de 2'), findsOneWidget);
           if (small) {
             final handle = find.byKey(const ValueKey('case-sheet-handle'));
@@ -203,7 +204,7 @@ void main() {
                 matching: find.byType(Scrollable),
               ),
             );
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.dragFrom(
               tester.getCenter(handle),
               const Offset(0, -220),
@@ -211,14 +212,14 @@ void main() {
           } else {
             await tester.tap(find.byKey(const ValueKey('case-sheet-handle')));
           }
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           final date = tester.widget<Text>(
             find.text('Desaparición: 10/10/2026 15:30'),
           );
           expect(date.style?.fontSize, 20);
           expect(date.style?.fontWeight, FontWeight.w700);
           await tester.ensureVisible(find.byType(ZoneMapPicker));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           final map = tester.widget<ZoneMapPicker>(find.byType(ZoneMapPicker));
           expect(map.latitude, -12.045);
           expect(map.longitude, -77.045);
@@ -230,14 +231,14 @@ void main() {
             tester.element(expandable),
             alignment: .4,
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           final before = tester.getSize(expandable).height;
           await tester.tap(find.text('Ver descripción completa'));
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 160));
           final middle = tester.getSize(expandable).height;
           await shot('expanding');
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           final after = tester.getSize(expandable).height;
           expect(after, greaterThan(before));
           if (!reduced) {
@@ -248,23 +249,23 @@ void main() {
           expect(find.bySemanticsLabel('Foto 2 de 2'), findsOneWidget);
           await shot('expanded');
           await tester.ensureVisible(find.text('Publicar caso'));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           await tester.ensureVisible(find.text('Publicar caso'));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           await tester.tap(find.text('Publicar caso'));
           expect(taps, 1);
           await tester.ensureVisible(find.text('Mostrar menos'));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           await tester.tap(find.text('Mostrar menos'));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           expect(tester.getSize(expandable).height, closeTo(before, .01));
           final panelScroll = tester.widget<CustomScrollView>(
             find.byType(CustomScrollView),
           );
           panelScroll.controller!.jumpTo(0);
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           await tester.dragFrom(const Offset(160, 220), const Offset(0, 400));
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           expect(find.byType(ZoneMapPicker, skipOffstage: false), findsNothing);
           expect(tester.takeException(), isNull);
         },

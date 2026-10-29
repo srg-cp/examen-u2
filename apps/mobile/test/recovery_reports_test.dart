@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'support/fake_local_drafts.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:async';
@@ -202,7 +203,7 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         Future<void> shot(String name) async {
           if (Platform.environment['CAPTURE_REPORT_MENU'] != '1') return;
           await tester.runAsync(() async {
@@ -223,23 +224,23 @@ void main() {
         }
 
         await tester.tap(find.byTooltip('Reportar'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.byType(LostReportScreen), findsOneWidget);
         expect(find.byType(BottomSheet), findsNothing);
         expect(find.text('Mascota encontrada'), findsNothing);
         await shot('direct-report');
         await tester.binding.handlePopRoute();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(find.text('Mis reportes'));
         await tester.tap(find.text('Mis reportes'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.byType(RecoveryReportsScreen), findsOneWidget);
         await tester.ensureVisible(find.text('Luna'));
         await shot('reports');
         expect(find.text('Posiblemente perdida · Perro'), findsOneWidget);
         await tester.ensureVisible(find.text('Resueltos'));
         await tester.tap(find.text('Resueltos'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Avistamiento · Gato'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },

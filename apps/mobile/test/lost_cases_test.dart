@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'support/fake_local_drafts.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
@@ -331,41 +332,41 @@ void main() {
           child: const EntreHuellasApp(),
         ),
       );
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.byTooltip('Reportar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.text('Mascota perdida'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.byType(CaseEditorScreen), findsOneWidget);
       container
           .read(caseEditorViewModelProvider.notifier)
           .edit(placeReference: 'Borrador privado');
       await tester.tap(find.byTooltip('Volver'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('¿Salir del reporte?'), findsOneWidget);
       await tester.tap(find.text('Cancelar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(
         container.read(caseEditorViewModelProvider).requireValue.placeReference,
         'Borrador privado',
       );
       await tester.tap(find.byTooltip('Volver'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'Salir'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(
         container.read(routerProvider).routeInformationProvider.value.uri.path,
         '/home',
       );
       auth.emit(null);
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       for (final path in [
         '/home/lost-cases/new',
         '/home/my-cases',
         '/home/cases/case',
       ]) {
         container.read(routerProvider).go(path);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Iniciar sesión'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
@@ -657,14 +658,14 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Latitud'), findsNothing);
       expect(find.text('Longitud'), findsNothing);
       expect(find.text('Usar coordenadas'), findsNothing);
       final gallery = find.byType(PhotoGalleryStrip);
       await tester.pump(const Duration(seconds: 7));
       await Scrollable.ensureVisible(tester.element(gallery), alignment: .5);
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(
         tester
             .widget<PhotoGalleryTile>(find.byType(PhotoGalleryTile).first)
@@ -672,7 +673,7 @@ void main() {
         PhotoGalleryStrip.detailTileSize(size.width - 48),
       );
       await tester.drag(gallery, const Offset(-350, 0));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       final third = find.byKey(const ValueKey('photo_selection_third'));
       await tester.tap(third);
       await tester.pump();
@@ -687,7 +688,7 @@ void main() {
       expect(state.latitude, -12.05);
       expect(state.longitude, -77.04);
       container.read(caseEditorViewModelProvider.notifier).preview();
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Vista previa pública'), findsNothing);
       expect(find.byType(PageView), findsOneWidget);
       expect(
@@ -778,14 +779,14 @@ void main() {
         await shot('loading');
         pets.fail = true;
         pets.pendingList!.complete();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Reintentar'), findsOneWidget);
         await shot('query-error');
         pets.fail = false;
         pets.pendingList = null;
         pets.pets.clear();
         container.read(caseEditorViewModelProvider.notifier).retry();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Registrar mascota'), findsOneWidget);
         expect(
           tester.getTopLeft(find.text('Mascota perdida')).dy,
@@ -799,9 +800,9 @@ void main() {
           version: 1,
         );
         container.read(caseEditorViewModelProvider.notifier).retry();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.runAsync(init);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(tester.takeException(), isNull);
         await tester.pump(const Duration(seconds: 7));
         expect(find.text('Volver a consultar fotos'), findsNothing);
@@ -812,12 +813,12 @@ void main() {
             tester.element(find.byType(PhotoGalleryStrip)),
             alignment: .5,
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           await shot('gallery');
         }
         final model = container.read(caseEditorViewModelProvider.notifier);
         model.preview();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Vista previa pública'), findsNothing);
         expect(find.text('Referencia privada'), findsNothing);
         expect(find.byType(ZoneMapPicker), findsNothing);
@@ -829,11 +830,11 @@ void main() {
           duration: const Duration(milliseconds: 1),
           curve: Curves.linear,
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         final previewMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );
@@ -850,7 +851,7 @@ void main() {
         const photoError = 'Vuelve a guardar las fotos en Editar mascota.';
         cases.failure = CaseFailureKind.photosUnverified;
         await tester.runAsync(model.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text(photoError), findsOneWidget);
         expect(
           find.descendant(
@@ -861,40 +862,40 @@ void main() {
         );
         await shot('photo-error-toast');
         await tester.tap(find.byKey(const ValueKey('feedback-toast')));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text(photoError), findsNothing);
         await tester.runAsync(model.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text(photoError), findsOneWidget);
         await tester.pump(const Duration(seconds: 7));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text(photoError), findsNothing);
         cases.failure = null;
         cases.loseResponse = true;
         await tester.runAsync(model.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('error');
         await tester.tap(find.byKey(const ValueKey('feedback-toast')));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.drag(
           find.byType(SingleChildScrollView).first,
           const Offset(0, -2000),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(tester.takeException(), isNull);
         final publishButton = find.widgetWithText(
           FilledButton,
           'Publicar caso',
         );
         await tester.ensureVisible(publishButton);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(
           tester.getRect(publishButton).bottom,
           lessThanOrEqualTo(size.height),
         );
         await shot('actions');
         await tester.runAsync(model.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Caso publicado'), findsOneWidget);
         await shot('confirmed');
         cases.publicCase = PublicLostCase(
@@ -918,7 +919,7 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Luna'), findsOneWidget);
         expect(tester.takeException(), isNull);
         expect(find.byType(CasePublicCards), findsOneWidget);
@@ -927,7 +928,7 @@ void main() {
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         final publicMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );

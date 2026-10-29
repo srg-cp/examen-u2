@@ -1,3 +1,5 @@
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_action_button.dart';
+import 'support/settle_map_screen.dart';
 import 'support/fake_local_drafts.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/presentation/screens/found_editor_screen.dart';
@@ -152,7 +154,7 @@ void main() {
                 ),
               ),
             );
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             final router = scope.read(routerProvider);
             final listRoute = '/home/my-cases';
             final entryRoute = found
@@ -162,7 +164,7 @@ void main() {
                 : '/home';
             if (found || fromList) {
               router.go(entryRoute);
-              await tester.pumpAndSettle();
+              await settleMapScreen(tester);
             }
             final route = found
                 ? '/home/found-cases/new'
@@ -174,17 +176,46 @@ void main() {
               (w) => w is CollectionAddButton && w.route == targetRoute,
               skipOffstage: false,
             );
-            final target = found || fromList ? add : find.byTooltip('Reportar');
+            final caseAction = find.byWidgetPredicate(
+              (w) => w is CaseActionButton && w.route == targetRoute,
+              skipOffstage: false,
+            );
+            final target = found
+                ? caseAction
+                : fromList
+                ? add
+                : find.byTooltip('Reportar');
             await tester.ensureVisible(target);
-            await tester.pumpAndSettle();
-            final button = found || fromList
+            await settleMapScreen(tester);
+            final button = found
+                ? find
+                      .descendant(
+                        of: caseAction,
+                        matching: find.byType(InkWell),
+                      )
+                      .first
+                : fromList
                 ? find.descendant(
                     of: add,
                     matching: find.byType(FilledButton, skipOffstage: false),
                     skipOffstage: false,
                   )
                 : target;
-            final origin = tester.getRect(button);
+            final origin = found
+                ? tester.getRect(
+                    find
+                        .descendant(
+                          of: caseAction,
+                          matching: find.byWidgetPredicate(
+                            (w) =>
+                                w is SizedBox &&
+                                w.width == 56 &&
+                                w.height == 56,
+                          ),
+                        )
+                        .first,
+                  )
+                : tester.getRect(button);
             Future<void> shot(String name) async {
               if (!capture) return;
               await tester.runAsync(() async {
@@ -215,14 +246,14 @@ void main() {
             expect(
               transition.source?.radius,
               found
-                  ? 24
+                  ? 28
                   : fromList
                   ? 28
                   : 32,
             );
             expect(transition.animation.value, small ? 1 : lessThan(1));
             await shot('opening');
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             expect(
               router.routerDelegate.currentConfiguration.last.route.path,
               route.substring('/home/'.length),
@@ -234,7 +265,7 @@ void main() {
                   )
                 : scope;
             await tester.pump(const Duration(seconds: 8));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             expect(find.byType(CaseLocationFields), findsOneWidget);
             for (final removed in [
               'Latitud',
@@ -257,14 +288,14 @@ void main() {
               matching: find.byType(TextField),
             );
             await tester.ensureVisible(searchInput);
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.enterText(searchInput, 'Miraflores');
             await tester.pump(const Duration(milliseconds: 650));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.ensureVisible(find.text(FakePlaceSearch.place.label));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.tap(find.text(FakePlaceSearch.place.label));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             final searched = tester.widget<ZoneMapPicker>(
               find.byType(ZoneMapPicker),
             );
@@ -279,11 +310,11 @@ void main() {
             );
             if (capture) {
               await tester.ensureVisible(find.byType(PlaceSearchFields));
-              await tester.pumpAndSettle();
+              await settleMapScreen(tester);
               await shot('location-search');
             }
             location.onSelect!(-12.04, -77.03);
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             final selected = found
                 ? editorScope
                       .read(foundEditorViewModelProvider)
@@ -295,7 +326,7 @@ void main() {
             await shot('form');
             if (capture) {
               await tester.ensureVisible(find.byType(EventDateTimeFields));
-              await tester.pumpAndSettle();
+              await settleMapScreen(tester);
               await shot('date-time');
             }
             final reveal = tester.state(find.byType(ContentReveal).last);
@@ -320,30 +351,30 @@ void main() {
                         w.label == 'Referencia privada del lugar',
                   );
             await tester.ensureVisible(input);
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.enterText(
               find.descendant(of: input, matching: find.byType(TextField)),
               'Detalle de prueba',
             );
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             expect(tester.state(find.byType(ContentReveal).last), same(reveal));
             expect(find.byType(CoverReveal), findsNothing);
             FocusManager.instance.primaryFocus?.unfocus();
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.pump(const Duration(seconds: 8));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.tap(find.byTooltip('Volver'));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             expect(find.text('¿Salir del reporte?'), findsOneWidget);
             await tester.ensureVisible(find.text('Salir'));
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             await tester.tap(find.text('Salir'));
             await tester.pump();
             await tester.pump();
             await tester.pump(const Duration(milliseconds: 100));
             if (!small) expect(find.byType(OriginPageTransition), findsWidgets);
             await shot('closing');
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             expect(router.routeInformationProvider.value.uri.path, entryRoute);
             expect(find.text('¿Salir del reporte?'), findsNothing);
             expect(

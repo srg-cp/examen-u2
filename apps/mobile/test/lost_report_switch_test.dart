@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'support/fake_local_drafts.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'dart:io';
@@ -122,14 +123,14 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         final router = scope.read(routerProvider);
         router.go(
           initialOther
               ? '/home/lost-cases/community/new'
               : '/home/lost-cases/new',
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
 
         final editorScope = ProviderScope.containerOf(
           tester.element(find.byType(LostReportScreen)),
@@ -167,13 +168,13 @@ void main() {
           final selector = find.byKey(const ValueKey('report-pet-selection'));
           await tester.ensureVisible(selector);
           await tester.tap(selector);
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           final label = second ? 'No está en mis mascotas' : 'Luna';
           await tester.ensureVisible(find.text(label).last);
           await tester.tapAt(
             tester.getTopLeft(find.text(label).last) + const Offset(8, 8),
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
           expect(
             find.byType(SkeletonFormFields, skipOffstage: false),
             findsNothing,
@@ -190,10 +191,10 @@ void main() {
             find.byType(SkeletonFormFields, skipOffstage: false),
             findsNothing,
           );
-          await tester.pumpAndSettle();
+          await settleMapScreen(tester);
         }
 
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await select(!initialOther);
         await select(initialOther);
         await select(true);
@@ -235,7 +236,7 @@ void main() {
           if (!capture) return;
           if (suffix != 'report-fields') {
             FocusManager.instance.primaryFocus?.unfocus();
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
             final scroll = tester.widget<SingleChildScrollView>(
               find.ancestor(
                 of: find.text('Mascota perdida'),
@@ -243,7 +244,7 @@ void main() {
               ),
             );
             scroll.controller!.jumpTo(0);
-            await tester.pumpAndSettle();
+            await settleMapScreen(tester);
           }
           await tester.runAsync(() async {
             final render =
@@ -265,21 +266,21 @@ void main() {
         await tester.ensureVisible(
           find.byKey(const ValueKey('report-pet-selection')),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(find.text('Mascota perdida'));
         await tester.pump(const Duration(seconds: 6));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('registered');
         await select(true);
         await tester.ensureVisible(find.text('Mascota perdida'));
         await tester.pump(const Duration(seconds: 6));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('unregistered');
         await tester.ensureVisible(find.text('Revisar publicación'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('report-fields');
         await tester.tap(find.text('Revisar publicación'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.byType(CaseReportFields), findsOneWidget);
         expect(
           editorScope

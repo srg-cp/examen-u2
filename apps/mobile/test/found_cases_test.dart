@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'support/fake_local_drafts.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/providers/local_draft_providers.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
@@ -584,9 +585,9 @@ void main() {
           child: const EntreHuellasApp(),
         ),
       );
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       container.read(routerProvider).go('/home');
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       cases.publicCase = PublicFoundCase(
         id: 'case',
         status: 'active',
@@ -600,17 +601,17 @@ void main() {
       container
           .read(routerProvider)
           .go('/home/found-cases/new?case=case&community=true');
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Caso abierto'), findsNothing);
       expect(find.text('¿Qué ocurrió?'), findsOneWidget);
       ProviderScope.containerOf(
         tester.element(find.byType(FoundEditorScreen)),
       ).read(foundEditorViewModelProvider.notifier).edit(traits: 'Borrador');
       await tester.tap(find.byTooltip('Volver'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('¿Salir del reporte?'), findsOneWidget);
       await tester.tap(find.text('Cancelar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(
         ProviderScope.containerOf(
           tester.element(find.byType(FoundEditorScreen)),
@@ -618,12 +619,12 @@ void main() {
         'Borrador',
       );
       await tester.tap(find.byTooltip('Volver'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.text('Salir'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Caso abierto'), findsNothing);
       container.read(routerProvider).go('/home/found-cases/new');
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(
         container.read(routerProvider).routeInformationProvider.value.uri.path,
         '/home',
@@ -631,9 +632,9 @@ void main() {
       expect(find.byType(FoundEditorScreen), findsNothing);
       auth.current = null;
       auth.controller.add(null);
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       container.read(routerProvider).go('/home/found-cases/new');
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Iniciar sesión'), findsWidgets);
       await tester.pumpWidget(const SizedBox());
     },
@@ -653,29 +654,29 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Envío pendiente sin publicar'), findsOneWidget);
       await tester.tap(find.text('Descartar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.text('Cancelar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(cases.discards, isEmpty);
       await tester.tap(find.text('Descartar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'Descartar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(cases.discards, ['pending']);
       expect(find.text('Envío pendiente sin publicar'), findsNothing);
       cases.mine.add(
         const FoundPublication(id: 'late', ownerId: 'one', status: 'discarded'),
       );
       await container.read(myFoundCasesViewModelProvider.notifier).retry();
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(find.text('Limpieza de fotos pendiente'), findsOneWidget);
       await tester.tap(find.text('Descartar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'Descartar'));
-      await tester.pumpAndSettle();
+      await settleMapScreen(tester);
       expect(cases.discards, ['pending', 'late']);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
@@ -768,9 +769,9 @@ void main() {
           ),
         );
         await tester.pumpWidget(host(const FoundEditorScreen()));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.runAsync(init);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(tester.takeException(), isNull);
         await shot('form');
         final m = container.read(foundEditorViewModelProvider.notifier);
@@ -788,7 +789,7 @@ void main() {
           }
         });
         m.preview();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Referencia privada'), findsNothing);
         expect(find.byType(ZoneMapPicker), findsNothing);
         final sheetForpreviewMap = tester.widget<DraggableScrollableSheet>(
@@ -799,11 +800,11 @@ void main() {
           duration: const Duration(milliseconds: 1),
           curve: Curves.linear,
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         final previewMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );
@@ -818,7 +819,7 @@ void main() {
         await shot('preview');
         cases.loseResponse = true;
         await tester.runAsync(m.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('error');
         const message =
             'No pudimos confirmar la operación. Conservamos los datos para reintentar.';
@@ -831,16 +832,16 @@ void main() {
           findsNothing,
         );
         await tester.tap(find.byKey(const ValueKey('feedback-toast')));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text(message), findsNothing);
         final publish = find.widgetWithText(FilledButton, 'Publicar caso');
         await tester.ensureVisible(publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(tester.getRect(publish).bottom, lessThanOrEqualTo(size.height));
         expect(tester.takeException(), isNull);
         await shot('actions');
         await tester.runAsync(m.publish);
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Búsqueda publicada'), findsOneWidget);
         await shot('confirmed');
         cases.publicCase = PublicFoundCase(
@@ -855,7 +856,7 @@ void main() {
           photos: [],
         );
         await tester.pumpWidget(host(const FoundDetailScreen(id: 'case')));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(tester.takeException(), isNull);
         expect(find.byType(CasePublicCards), findsOneWidget);
         expect(find.byType(PageView), findsNothing);
@@ -863,7 +864,7 @@ void main() {
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         final publicMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );
@@ -891,12 +892,12 @@ void main() {
         );
         container.invalidate(myFoundCasesViewModelProvider);
         await tester.pumpWidget(host(const MyFoundCasesScreen()));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Envío pendiente sin publicar'), findsOneWidget);
         expect(tester.takeException(), isNull);
         await shot('pending');
         await tester.ensureVisible(find.text('Descartar'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('pending-actions');
         cases.mine[0] = const FoundPublication(
           id: 'pending',
@@ -906,7 +907,7 @@ void main() {
         await tester.runAsync(
           container.read(myFoundCasesViewModelProvider.notifier).retry,
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await shot('cleanup');
         await tester.pumpWidget(const SizedBox());
       },

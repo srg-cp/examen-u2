@@ -1,3 +1,4 @@
+import 'support/settle_map_screen.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -387,7 +388,7 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         Future<void> capture(String name) async {
           if (!const bool.fromEnvironment('CAPTURE_ZONES')) return;
           await tester.runAsync(() async {
@@ -413,13 +414,13 @@ void main() {
         await capture('empty');
         final vm = container.read(interestZonesViewModelProvider.notifier);
         vm.startEditor();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await capture('editor');
         expect(tester.takeException(), isNull);
         await tester.enterText(find.byType(TextFormField).first, 'Casa');
         await tester.ensureVisible(find.text('Indicar coordenadas'));
         await tester.tap(find.text('Indicar coordenadas'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(find.widgetWithText(TextField, 'Latitud'));
         await tester.enterText(
           find.widgetWithText(TextField, 'Latitud'),
@@ -431,9 +432,9 @@ void main() {
           '-77',
         );
         await tester.ensureVisible(find.text('Usar coordenadas'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.tap(find.text('Usar coordenadas'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(
           container
               .read(interestZonesViewModelProvider)
@@ -444,14 +445,14 @@ void main() {
         );
         repo.failSave = true;
         await vm.save();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.ensureVisible(find.text('Guardar ubicación'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await capture('save-error');
         expect(find.textContaining('Tus cambios se conservan'), findsOneWidget);
         repo.failSave = false;
         await vm.save();
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.pump(const Duration(seconds: 7));
         expect(find.text('Casa'), findsOneWidget);
         await capture('list');
@@ -463,14 +464,14 @@ void main() {
               .zones
               .single,
         );
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         await tester.tap(find.byTooltip('Volver a mis ubicaciones'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('¿Descartar cambios?'), findsOneWidget);
         await capture('discard-confirmation');
         await tester.ensureVisible(find.text('Descartar'));
         await tester.tap(find.text('Descartar'));
-        await tester.pumpAndSettle();
+        await settleMapScreen(tester);
         expect(find.text('Casa'), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox());
