@@ -1,5 +1,7 @@
 # Funcionalidades de Entre Huellas
 
+- [Pruebas personales iOS](distribucion-ios.md): compilación remota y firma gratuita desde Windows; validación física pendiente.
+
 - [Estadísticas del piloto](estadisticas-piloto.md): HU-16.1/RF-35/#50; consulta
   web de agregados con permiso administrador independiente. Implementación local;
   activación039, asignación explícita, demo alojada e integración pendientes.

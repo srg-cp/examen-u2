@@ -1,5 +1,16 @@
 # Estado del proyecto
 
+## Prueba iOS desde Windows —28/10/2026
+
+Autorizado preparar el proceso completo con commits. Rama aislada
+`feature/ios-sideload` desde `android-build-59`; CocoaPods, configuración pública
+compartida y workflow macOS Release sin firma. Artefacto privado verificable para
+firmar localmente con cuenta gratuita; sin credenciales Apple en CI.
+Compilación remota e instalación física pendientes. Siguiente paso: ejecutar CI
+y descargar IPA, después instalar/renovar en iPhone11/iOS18.5 con el usuario.
+[Ficha y límites](funcionalidades/distribucion-ios.md).
+
+
 ## Aplicación de039 confirmada por el usuario —24/10/2026
 
 El usuario confirma ejecución completa del patch039 en Supabase de desarrollo.

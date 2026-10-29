@@ -1,5 +1,10 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+28/10: autorizado probar la app nativa en iPhone con compilación macOS remota
+y firma personal gratuita desde Windows. Infraestructura de entrega de las HU
+existentes, sin cierre de historias ni publicación App Store/TestFlight.
+[Ficha de distribución iOS](funcionalidades/distribucion-ios.md).
+
 24/10: autorizado continuar tras HU-15.3. PR69 ya fusionado; checks de Flutter/web
 del HEAD y validación de main aprobados, #49 y épica #15 cerrados con evidencia.
 Publicación APK pendiente de nueva ejecución tras la configuración definitiva

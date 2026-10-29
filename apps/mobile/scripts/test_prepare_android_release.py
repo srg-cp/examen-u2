@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from prepare_android_release import prepare
+from mobile_release_config import read_mobile_config, write_mobile_config
 
 
 class PrepareAndroidReleaseTest(unittest.TestCase):
@@ -59,6 +60,12 @@ class PrepareAndroidReleaseTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "ANDROID_KEY_PASSWORD"):
             self.run_prepare()
         self.assert_no_files()
+
+    def test_ios_configuration_needs_no_android_or_apple_credentials(self):
+        with patch.dict(os.environ, {"MOBILE_CONFIG_JSON": json.dumps(self.config)}, clear=True):
+            write_mobile_config(read_mobile_config())
+        self.assertEqual(json.loads(Path("config/release.local.json").read_text()), self.config)
+        self.assertFalse(Path("signing.jks").exists())
 
     def test_privileged_or_unsupported_configuration_is_rejected(self):
         for key in ("service_role_private-value", "sb_secret_private-value"):
