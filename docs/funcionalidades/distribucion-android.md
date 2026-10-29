@@ -1,10 +1,12 @@
 # Distribución Android por GitHub Releases
 
-28/10/2026: por petición expresa de un APK actualizado/tag nuevo, el workflow
-permite también una ejecución manual desde `feature/ios-sideload`. Conserva
-validación completa, firma, numeración y prerelease; no publica por cada push
-de esa rama ni requiere fusionar main. APK e IPA usarán el mismo commit fuente.
-
+29/10/2026: por instrucción explícita, publicación conjunta desde `main`.
+`Flutter` valida y compila Android/iOS en jobs separados; el job final espera
+ambos y adjunta APK firmado, IPA sin firma personal, BUILD.txt, ios-Podfile.lock
+y SHA256SUMS.txt en una prerelease `android-build-N` del mismo commit. Se conserva
+numeración y versionCode10000+N; iOS usa el mismo número. Ninguna rama de desarrollo
+publica. Si falla una plataforma no se publica la nueva Release conjunta.
+Al reintentar ejecutar todos los jobs para conservar coherencia de run_attempt.
 
 Para ejecutar la configuración de principio a fin, seguir la
 [guía operativa de la raíz](../../INSTALACION_ANDROID.md): generación de firma,
@@ -18,7 +20,7 @@ funcionalidades remotas. Conserva el identificador Android existente
 ## Qué hace y recorrido
 
 Cada push a `main` ejecuta formato, análisis y pruebas Flutter. Si pasan,
-compila un APK universal firmado y publica una **prerelease** con APK y SHA-256.
+compila un APK universal firmado y un IPA iOS para firma personal; publica una **prerelease** conjunta con sus SHA-256.
 Incluye cambios de cualquier carpeta, según la petición de publicar cada push.
 Las PR ejecutan validación cuando cambian archivos móviles/workflow y nunca
 acceden a la firma. Run workflow permite repetir manualmente desde `main`.

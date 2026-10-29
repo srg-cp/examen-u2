@@ -1,5 +1,19 @@
 # Estado del proyecto
 
+## Publicación conjunta Android/iOS desde main —29/10/2026
+
+Por instrucción explícita, el workflow Flutter valida y coordina ambos builds
+del mismo commit; solo después publica APK+IPA en android-build-N. iOS pasa a
+workflow reutilizable, sin trigger en rama especial. Guía/fichas actualizadas.
+Validación local:642 pruebas Flutter aprobadas,8 pruebas Python aprobadas;
+formato734 archivos sin cambios y actionlint de ambos workflows correcto.
+Pruebas de mapas permiten completar IO de teselas y retirar el toast de fallo
+antes de tocar controles; conservan pumpAndSettle y las aserciones. Origen de
+hallazgo comprueba el CaseActionButton real y su superficie/radio28.
+Análisis e integración remota en curso; no afirmar Release nueva hasta verificar
+ejecución y adjuntos.
+
+
 ## iOS instalado y guía para el equipo —29/10/2026
 
 El run [40820124492](https://github.com/srg-cp/entrehuellas/actions/runs/40820124492)

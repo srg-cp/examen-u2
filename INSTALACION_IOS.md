@@ -70,12 +70,36 @@ Entre Huellas instalada en su iPhone
 
 Pide al responsable del proyecto el **IPA original sin firma personal** de la versión que van a probar. Puedes recibirlo por el canal de archivos que acuerden; no necesitas acceso a GitHub si el equipo te lo entrega directamente.
 
+### Descargar las nuevas versiones desde Releases
+
+Cada push a `main` ejecuta el workflow **Flutter**. Primero valida el proyecto;
+después compila Android e iOS. Si ambos terminan correctamente, publica una
+**prerelease conjunta** con etiqueta `android-build-N`. Se conserva ese nombre
+por continuidad con Android, pero ahora la Release contiene las dos plataformas.
+
 Si tienes acceso al repositorio privado:
 
-1. Abre [la compilación iOS validada](https://github.com/srg-cp/entrehuellas/actions/runs/40820124492).
-2. Busca **Artifacts** y descarga `ios-sideload-3-1`.
-3. Extrae el ZIP en una carpeta del PC.
-4. Localiza `entre-huellas-ios-unsigned.ipa`.
+1. Abre [Releases de Entre Huellas](https://github.com/srg-cp/entrehuellas/releases).
+2. Elige la versión que indique el responsable y abre sus **Assets**.
+3. Descarga **`entre-huellas-ios-unsigned.ipa`** y **`SHA256SUMS.txt`**.
+4. Carga directamente ese IPA en Sideloadly. El APK es para Android; los archivos
+   automáticos **Source code** tampoco se utilizan para instalar en el iPhone.
+
+Una persona puede descargar el IPA y compartirlo con todo el grupo: cada compañero
+firma el mismo original con su propia cuenta. No hace falta generar uno por persona.
+La descarga de Releases sigue requiriendo acceso al repositorio privado.
+
+Si un build falla, la nueva Release conjunta no se publica; no confundir una
+versión anterior disponible con el resultado del último push. La compilación
+puede iniciarse también manualmente desde **Actions → Flutter → Run workflow**,
+seleccionando **main**. Las ramas de desarrollo validan mediante PR; no publican.
+
+### Primera instalación realizada en este chat
+
+Antes de unificar la publicación, descargamos el IPA de
+[Artifacts del run40820124492](https://github.com/srg-cp/entrehuellas/actions/runs/40820124492),
+artefacto `ios-sideload-3-1`, y extrajimos su ZIP. Ese es el IPA probado en el
+iPhone11. Fue una descarga desde Actions, sin Release iOS en aquella ejecución.
 
 Estos archivos acompañan la compilación:
 
@@ -84,9 +108,9 @@ Estos archivos acompañan la compilación:
 | `entre-huellas-ios-unsigned.ipa` | La app que cargarás en Sideloadly |
 | `SHA256SUMS.txt` | Huella para comprobar que el IPA no cambió al descargarlo o compartirlo |
 | `BUILD.txt` | Commit y herramientas usados para compilar |
-| `Podfile.lock` | Registro de dependencias nativas; no tienes que abrirlo para instalar |
+| `ios-Podfile.lock` (o `Podfile.lock` en el artefacto inicial) | Registro de dependencias nativas; no tienes que abrirlo para instalar |
 
-Los artefactos de esta ejecución se conservan en GitHub durante **14 días desde su generación**. Guarda el IPA en el PC: podrás usarlo para renovar sin volver a descargarlo ni compilarlo.
+Los artefactos temporales de Actions se conservan **14 días desde su generación**; los adjuntos de Releases no utilizan esa caducidad automática de Actions. Guarda el IPA en el PC: podrás usarlo para renovar sin volver a descargarlo ni compilarlo.
 
 **Opcional: comprobar la descarga en PowerShell**, desde la carpeta del archivo:
 

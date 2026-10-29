@@ -1,19 +1,13 @@
 name: iOS personal testing
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [feature/ios-sideload]
-    paths:
-      - 'apps/mobile/**'
-      - '.github/workflows/ios-sideload.yml'
+  workflow_call:
+    secrets:
+      MOBILE_CONFIG_JSON:
+        required: true
 
 permissions:
   contents: read
-
-concurrency:
-  group: ios-personal-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -29,12 +23,7 @@ jobs:
           flutter-version: '3.35.3'
           channel: stable
           cache: true
-      - name: Check build inputs and configuration boundaries
-        run: python3 -m unittest discover -s scripts -p 'test_*.py'
       - run: flutter pub get --enforce-lockfile
-      - run: flutter analyze
-      - name: Check architecture and configuration
-        run: flutter test test/architecture_test.dart test/app_config_test.dart
       - name: Prepare public client configuration
         env:
           MOBILE_CONFIG_JSON: ${{ secrets.MOBILE_CONFIG_JSON }}
@@ -43,7 +32,7 @@ jobs:
         run: >-
           flutter build ios --release --no-codesign
           --dart-define-from-file=config/release.local.json
-          --build-number=$((20000 + GITHUB_RUN_NUMBER))
+          --build-number=$((10000 + GITHUB_RUN_NUMBER))
       - name: Package for personal signing on Windows
         shell: bash
         run: |
@@ -62,7 +51,7 @@ jobs:
           (cd build/distribution && shasum -a 256 entre-huellas-ios-unsigned.ipa > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
-          name: ios-sideload-${{ github.run_number }}-${{ github.run_attempt }}
+          name: ios-${{ github.run_number }}-${{ github.run_attempt }}
           path: apps/mobile/build/distribution/
           if-no-files-found: error
           retention-days: 14

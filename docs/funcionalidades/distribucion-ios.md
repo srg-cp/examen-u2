@@ -13,12 +13,20 @@ y empaqueta `Payload/Runner.app` en `entre-huellas-ios-unsigned.ipa`.
 El IPA aún no es instalable directamente: Sideloadly en Windows lo firma con la
 cuenta Apple gratuita del usuario y lo instala por USB. No requiere jailbreak.
 
-El workflow corre por push de archivos móviles/workflow en esta rama o manualmente
-cuando esté registrado en la rama predeterminada. Permisos GitHub de solo lectura;
-artefacto privado con retención de14 días, SHA-256, commit, versiones y Podfile.lock.
-No publica releases, no modifica el tag Android ni activa facturación adicional.
-Repositorio privado: macOS consume la cuota de Actions; agotarla puede bloquear
-la ejecución y no autoriza contratar un plan. No se almacenan credenciales Apple
+Desde la integración solicitada29/10, `Flutter` se ejecuta por push a `main`
+o manualmente desde main. Tras validate, compila Android y llama al workflow
+reutilizable iOS (`workflow_call`), pasando solo MOBILE_CONFIG_JSON. Release
+espera ambos jobs, verifica SHA-256 y commit y publica APK+IPA originales en
+`android-build-N`. Sin publicación parcial si uno falla; número de build10000+N
+compartido. Las PR validan sin firma ni publicación. No hay compilación por
+push a la antigua rama iOS. Reintentos operativos: ejecutar todos los jobs para
+que los nombres de artefacto coincidan con run_attempt.
+
+Artefactos privados con retención14 días como respaldo; adjuntos de Release
+sin ese vencimiento de Actions. Solo el job final tiene contents:write; iOS
+solo lectura. No activa facturación adicional. macOS consume cuota del repositorio
+privado y agotarla puede bloquear el build.
+No se almacenan credenciales Apple
 ni certificados personales en GitHub o en este repositorio.
 
 ## Configuración, persistencia y permisos
