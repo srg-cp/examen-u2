@@ -249,7 +249,15 @@ hallazgo comprueba el CaseActionButton real y su superficie/radio28.
 Análisis local sin incidencias. Run40828442356: validate e iOS aprobados;
 Android generó APK pero falló por saltos vacíos que separaban los argumentos
 del comando. Sin publicación. YAML corregido y comando plegado comprobado
-mediante parser; nueva ejecución remota pendiente de verificación.
+mediante parser; ejecución40830305712 aprobada:642 pruebas Flutter, análisis sin incidencias,
+Android firmado, iOS Release y publicación conjunta correctos. Release
+[android-build-66](https://github.com/srg-cp/entrehuellas/releases/tag/android-build-66)
+del commit d3d501b, con APK+IPA+BUILD.txt+ios-Podfile.lock+SHA256SUMS.txt.
+Ambos paquetes descargados a Descargas/EntreHuellas-build-66; SHA-256 comprobados
+y estructura IPA verificada localmente. No se ha instalado esta build66 en
+Android/iPhone: la aceptación física anterior corresponde al IPA2e31261.
+Siguiente paso: instalar la nueva versión/validar renovación conservando datos.
+Las próximas ejecuciones desde main mantienen este flujo, sin rama iOS especial.
 
 
 ## iOS instalado y guía para el equipo —29/10/2026

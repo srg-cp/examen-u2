@@ -54,6 +54,15 @@ kernel debug y descripciones de permisos. Un IPA válido no acredita ejecución.
 La renovación automática requiere PC encendido y dispositivo detectable por USB
 o Wi-Fi. Si vence, volver a firmar el mismo IPA; no es necesario recompilar.
 
+## Publicación conjunta verificada29/10
+
+Run40830305712 aprobado en main(d3d501b). Release
+[android-build-66](https://github.com/srg-cp/entrehuellas/releases/tag/android-build-66)
+con APK firmado e IPA de dispositivo sin firma personal; hashes de ambos
+verificados tras descargar y estructura del IPA comprobada.642 pruebas Flutter,
+8 Python, formato/análisis y publicación aprobados. La instalación física de
+esta build y la renovación semanal siguen pendientes.
+
 ## Activación y validación
 
 29/10: run40820124492 aprobado, IPA2e31261 descargado y estructura/SHA-256
