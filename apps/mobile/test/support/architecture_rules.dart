@@ -1,3 +1,8 @@
+/// The legacy constructor declaration is allowed, but using it is forbidden.
+bool usesRetiredEntryCurtain(String code) => RegExp(
+  r'\bCoverReveal(?:\s*\.\s*\w+)?\s*\((?!\s*\{)|\bCoverReveal\s*\.\s*new\b|\bstartCovered\b',
+).hasMatch(code);
+
 bool crossesFeatureBoundary(String source, String target) {
   final feature = RegExp(r'/features/([^/]+)/');
   final origin = feature.firstMatch(source)?.group(1);

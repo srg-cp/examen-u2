@@ -32,9 +32,17 @@ import 'package:flutter_application_entrehuellas/core/presentation/widgets/event
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_location_fields.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/two_option_filter.dart';
 import 'alert_preferences_test.dart' show loadFonts;
-import 'lost_cases_test.dart' show fields;
+import 'lost_cases_test.dart' show fields, FakeCases;
+import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/presentation/view_models/case_editor_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
+import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet_photo.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/app_page_background.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/cover_reveal.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/immersive_photo_sheet.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagger_reveal.dart';
 
 class CountingPets extends FakePets {
   int lists = 0;
@@ -106,8 +114,17 @@ void main() {
               FakeOnboarding(auth)..completed.add('one'),
             ),
             petRepositoryProvider.overrideWithValue(pets),
-            petPhotoRepositoryProvider.overrideWithValue(FakePetPhotos()),
+            petPhotoRepositoryProvider.overrideWithValue(
+              FakePetPhotos()
+                ..photos['photo'] = const PetPhoto(
+                  id: 'photo',
+                  petId: 'pet',
+                  ownerId: 'one',
+                  ready: true,
+                ),
+            ),
             foundCaseRepositoryProvider.overrideWithValue(reports),
+            lostCaseRepositoryProvider.overrideWithValue(FakeCases()),
           ],
         );
         addTearDown(() async {
@@ -160,13 +177,16 @@ void main() {
             .requireValue
             .draftId;
         final listCount = pets.lists;
-        final selectorState = tester.element(
+        var selectorState = tester.element(
           find.byKey(const ValueKey('report-pet-selection')),
         );
         final route = router.routeInformationProvider.value.uri;
         Future<void> select(bool second) async {
           final selector = find.byKey(const ValueKey('report-pet-selection'));
-          await tester.ensureVisible(selector);
+          await Scrollable.ensureVisible(
+            tester.element(selector),
+            alignment: .5,
+          );
           await tester.tap(selector);
           await settleMapScreen(tester);
           final label = second ? 'No está en mis mascotas' : 'Luna';
@@ -290,6 +310,98 @@ void main() {
           isNotEmpty,
         );
         expect(tester.takeException(), isNull);
+        // Both paths of the real loss route preview the same current cards.
+        Future<void> checkPreview(
+          String eventLabel,
+          VoidCallback preview,
+        ) async {
+          preview();
+          await tester.pump();
+          expect(find.byType(CasePublicScreenShell), findsOneWidget);
+          expect(find.byType(CasePublicCards), findsOneWidget);
+          expect(find.byType(ImmersivePhotoSheet), findsNothing);
+          expect(find.byType(DraggableScrollableSheet), findsNothing);
+          expect(find.text('Vista previa'), findsOneWidget);
+          expect(find.text(eventLabel), findsOneWidget);
+          expect(find.text('Referencia de mi mascota'), findsNothing);
+          expect(find.text('Parque'), findsNothing);
+          final cards = tester.widget<CasePublicCards>(
+            find.byType(CasePublicCards),
+          );
+          expect(cards.photos, hasLength(1));
+          expect(cards.privacy, casePublicationPrivacyNotice);
+          final reveal = find.descendant(
+            of: find.byType(CasePublicScreenShell),
+            matching: find.byType(ContentReveal),
+          );
+          expect(reveal, findsOneWidget);
+          final timeline = tester.state(reveal);
+          final photoItem = find
+              .descendant(
+                of: find.byType(CasePublicCards),
+                matching: find.byType(StaggerRevealItem),
+              )
+              .first;
+          double opacity() => tester
+              .widget<Opacity>(
+                find
+                    .descendant(of: photoItem, matching: find.byType(Opacity))
+                    .first,
+              )
+              .opacity;
+          expect(opacity(), initialOther ? 1 : 0);
+          var previous = opacity();
+          for (var frame = 0; frame < 120; frame++) {
+            await tester.pump(const Duration(milliseconds: 16));
+            expect(find.byType(CoverReveal), findsNothing);
+            expect(find.byType(AppPageBackground), findsOneWidget);
+            expect(tester.state(reveal), same(timeline));
+            expect(opacity(), greaterThanOrEqualTo(previous));
+            previous = opacity();
+            if (frame == 10 && !initialOther) {
+              expect(previous, inExclusiveRange(0, 1));
+            }
+          }
+          expect(opacity(), 1);
+          await settleMapScreen(tester);
+          final edit = find.widgetWithText(TextButton, 'Editar reporte');
+          await tester.ensureVisible(edit);
+          await settleMapScreen(tester);
+          await tester.tap(edit);
+          await settleMapScreen(tester);
+          expect(find.byType(CaseReportFields), findsOneWidget);
+          expect(find.byType(CasePublicCards), findsNothing);
+          selectorState = tester.element(
+            find.byKey(const ValueKey('report-pet-selection')),
+          );
+          expect(tester.takeException(), isNull);
+        }
+
+        other.chooseTime(9, 30);
+        await tester.runAsync(other.choosePhoto);
+        await settleMapScreen(tester);
+        await checkPreview('Posiblemente perdida', other.preview);
+        expect(
+          editorScope.read(foundEditorViewModelProvider).requireValue.photos,
+          hasLength(1),
+        );
+        await select(false);
+        own.chooseTime(9, 30);
+        own.togglePhoto('photo');
+        final ownPreview = editorScope
+            .read(caseEditorViewModelProvider)
+            .requireValue;
+        expect(ownPreview.photos, hasLength(1));
+        expect(ownPreview.selectedPhotos, {'photo'});
+        expect(ownPreview.occurredAt, isNotNull);
+        await checkPreview('Perdido', own.preview);
+        expect(
+          editorScope
+              .read(caseEditorViewModelProvider)
+              .requireValue
+              .selectedPhotos,
+          {'photo'},
+        );
       },
     );
   }

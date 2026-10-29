@@ -1,5 +1,10 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md):
+AuthStageTransition conserva identidad por etapa sin cortina/fondo/temporizador
+previos al stagger. Loading→resultado preserva su subárbol/ContentReveal;
+solo presentación compartida, sin cambios de datos, autorización o dominio.
+
 25/10, [ADR-139](decisiones/139-shimmer-en-superficie-completa-del-boton.md):
 el indicador de botón es presentación compartida y envuelve toda su superficie,
 nunca solo la etiqueta. No modifica operación/estado/permisos de dominio.

@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_cards.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_photo_viewer.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/case_public_screen_shell.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/collection_add_button.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/glass_navigation_button.dart';
@@ -177,6 +178,38 @@ void main() {
           );
           await tester.pumpAndSettle();
           expect(find.bySemanticsLabel('Foto 2 de 2'), findsOneWidget);
+          final cardSize = tester.getSize(gallery);
+          expect(cardSize.width, small ? 288 : 358);
+          expect(
+            cardSize.height,
+            closeTo(cardSize.width / (small ? .7 : 1.05), .01),
+          );
+          await tester.tapAt(Offset(200, visibleTop + 20));
+          await tester.pumpAndSettle();
+          expect(find.byType(CasePhotoViewer), findsOneWidget);
+          expect(find.text('Foto 2 de 2'), findsOneWidget);
+          expect(
+            tester.widget<PageView>(find.byType(PageView)).controller!.page,
+            1,
+          );
+          await tester.drag(find.byType(PageView), const Offset(280, 0));
+          await tester.pumpAndSettle();
+          expect(find.text('Foto 1 de 2'), findsOneWidget);
+          final expandedImage = tester.widget<Image>(find.byType(Image).first);
+          expect(expandedImage.fit, BoxFit.contain);
+          expect(find.byType(InteractiveViewer), findsWidgets);
+          await _capture(
+            tester,
+            boundary,
+            small,
+            reduced,
+            'viewer',
+            viewer: true,
+          );
+          await tester.tap(find.byTooltip('Cerrar foto'));
+          await tester.pumpAndSettle();
+          expect(find.byType(CasePhotoViewer), findsNothing);
+          expect(find.bySemanticsLabel('Foto 2 de 2'), findsOneWidget);
           await tester.ensureVisible(find.text('Ver descripción completa'));
           await tester.pumpAndSettle();
           await tester.tap(find.text('Ver descripción completa'));
@@ -237,14 +270,33 @@ Future<void> _capture(
   GlobalKey key,
   bool small,
   bool reduced,
-  String stage,
-) async {
+  String stage, {
+  bool viewer = false,
+}) async {
   if (Platform.environment['CAPTURE_PUBLIC_CARDS'] != '1') return;
   await tester.pumpAndSettle();
+  if (viewer) {
+    void repaint(RenderObject object) {
+      object.markNeedsPaint();
+      object.visitChildren(repaint);
+    }
+
+    repaint(tester.renderObject(find.byType(CasePhotoViewer)));
+    await tester.pump();
+    await tester.pump();
+  }
   await tester.runAsync(() async {
-    final image =
-        await (key.currentContext!.findRenderObject() as RenderRepaintBoundary)
-            .toImage(pixelRatio: 1.5);
+    final render = viewer
+        ? tester.renderObject<RenderRepaintBoundary>(
+            find
+                .ancestor(
+                  of: find.byType(CasePhotoViewer),
+                  matching: find.byType(RepaintBoundary),
+                )
+                .first,
+          )
+        : key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    final image = await render.toImage(pixelRatio: 1.5);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
     final folder = Directory('build/ui-preview/public-cards')
       ..createSync(recursive: true);

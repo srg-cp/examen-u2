@@ -1,5 +1,10 @@
 # Envíos pendientes y reintentos
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 Estado24/10: **Done**, [#48 cerrado](https://github.com/srg-cp/entrehuellas/issues/48)
 y [PR67 fusionado](https://github.com/srg-cp/entrehuellas/pull/67) con CI aprobado.
 Conserva los límites de emulador/desarrollo remoto detallados debajo; #49 sigue pendiente.

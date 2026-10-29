@@ -1,5 +1,49 @@
 # Entre Huellas: regla de oro de UI y UX
 
+29/10, [ADR-158](decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10, [ADR-157](decisiones/157-vista-previa-perdida-con-ficha-actual.md): vista
+previa de pérdida propia/comunitaria con los componentes de la ficha actual,
+CasePublicCards/CasePublicScreenShell. Privacidad y publicar/editar conservados;
+una entrada por etapa. Sustituye el uso inmersivo solo en estos previews;
+ImmersivePhotoSheet y otros consumidores conservados.
+
+## Regla obligatoria: una sola entrada de contenido —29/10/2026
+
+Por instrucción explícita, queda prohibido anteponer cortina, fondo local,
+cobertura opaca o espera artificial al stagger, o aplicar dos timelines al
+mismo contenido. No recrear el patrón con otros nombres. Reutilizar los motores
+compartidos y mantener un único fondo de pantalla. Solo una nueva pantalla o
+etapa real inicia otra entrada; carga→resultado, edición, refresh, contadores
+y reenvíos no la reinician. Marca/navegación persistentes fuera del efecto.
+
+Cada integración debe comprobar contenido ya disponible y carga pendiente,
+fotogramas intermedios, normal/pequeño con texto ampliado y movimiento reducido.
+La comprobación de arquitectura rechaza CoverReveal/startCovered en producción
+y fondos/temporizadores en el motor compartido; las regresiones de pantalla
+comprueban el comportamiento. El control estático no detecta toda copia posible:
+la revisión visual y las pruebas de integración siguen siendo obligatorias.
+Excepciones solo por instrucción explícita y decisión documentada. Los contratos
+de origen, arranque, onboarding y clip-path de landing se conservan.
+[ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md) sustituye las
+indicaciones históricas cover→stagger para entradas de contenido.
+
+29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md): por petición
+explícita, todos los consumidores restantes de AuthStageTransition usan una
+sola entrada por etapa, sin cortina ni otro fondo local antes del stagger.
+Skeleton→resultado conserva la entrada, edición/refresh no la reinician.
+Sustituye cover→stagger de ADR-006 en este motor; origen, arranque y onboarding
+conservan sus contratos. Marca/navegación fuera del efecto y reducido intactos.
+
+29/10, [ADR-155](decisiones/155-login-mobile-entrada-sin-cortina.md): entrada
+del login móvil con StaggerReveal directo, sin cortina previa ni fondo adicional
+dentro del formulario. Excepción local al cover→stagger de ADR-006; marca fija,
+arranque, parámetros del stagger y movimiento reducido conservados.
+
 26/10, excepción local [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
 pantalla Recorrido con los componentes reales del mapa de Explorar: mapa completo,
 cabecera compacta y panel blanco deslizable. Ver ficha/flecha de este panel son

@@ -1,5 +1,22 @@
 # Búsquedas y avisos vinculados
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10, [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md):
+ambos orígenes de Mascota perdida revisan la publicación con las tarjetas de
+la ficha actual. Publicar/editar conservan sus ViewModels, fotos, borradores,
+privacidad y reintentos. Un solo stagger por etapa, normal/reducido y accesible;
+no cambia la clasificación ni las vistas previas de otros tipos de aviso.
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 25/10, [ADR-138](../decisiones/138-motor-visual-local-y-hallazgos-independientes.md):
 usuario aprueba «Encontré una mascota y no sé de quién es» sin destino, además
 de los avisos vinculados existentes. `independent_found`, fotos propias obligatorias,

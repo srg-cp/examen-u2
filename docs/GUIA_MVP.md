@@ -1,5 +1,16 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+29/10, [ADR-158](decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10: corrección de la vista previa móvil de pérdida HU-05/RF-05 y búsqueda
+comunitaria existente: reutiliza la ficha actual por tarjetas, conserva revisión,
+privacidad, publicación e idempotencia. [ADR-157](decisiones/157-vista-previa-perdida-con-ficha-actual.md).
+Sin nueva HU/issue, ampliación funcional, cambios web/SQL ni cierre de historias.
+
 28/10: autorizado probar la app nativa en iPhone con compilación macOS remota
 y firma personal gratuita desde Windows. Infraestructura de entrega de las HU
 existentes, sin cierre de historias ni publicación App Store/TestFlight.
@@ -380,6 +391,11 @@ la existencia de una ficha no implica cierre de la HU ni ampliación del MVP.
 Se conserva la numeración original para relacionar implementación, informe académico y pruebas. El chat 00 prepara la base técnica que el plan original situaba dentro de S1.
 
 ### S1 - Acceso y cuenta
+
+- Corrección29/10 autorizada: una entrada móvil por etapa, sin cortina previa
+  al stagger en registro/recuperación y restantes consumidores compartidos.
+  [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md) extiende ADR-155;
+  sin nuevas HU/RF, cambios de operaciones o cierre de historias.
 
 - Precisión25/10: onboarding web/móvil sin saltos forzados en los textos;
   reservar la mayor altura textual entre etapas para mantener posiciones,

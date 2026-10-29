@@ -1,5 +1,26 @@
 # Casos de mascotas perdidas
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+## Vista previa actualizada —29/10/2026
+
+Por solicitud del usuario, CasePreviewContent delega en CasePublicContent y las
+tarjetas vigentes CasePublicCards. CasePublicScreenShell comparte márgenes,
+navegación glass fija y scroll con la consulta publicada, con título Vista previa.
+Fotos seleccionadas, nombre/estado, datos, rasgos y mapa aproximado coinciden
+con la ficha actual. El aviso preventivo permanece antes de Publicar caso y
+Editar reporte; sin contacto ni acciones ficticias de una publicación existente.
+Conserva UUID/borrador, permisos, shimmer completo, bloqueo y reintentos del
+ViewModel. Una entrada por etapa, sin panel arrastrable/cortina ni reinicio
+al publicar. [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md)
+sustituye el uso inmersivo descrito en notas anteriores solo en esta revisión.
+Validación local y límites en ESTADO; revisión física con nueva compilación
+pendiente, sin cambios de backend ni web.
+
 Excepción local20/10/2026, por petición explícita: el nombre de la ficha del
 caso sobre fotografía conserva su diseño anterior a ADR-111: fuente del sistema,
 blanco, tamaño48/peso800, altura1.05 y sombra negra suave, máximo dos líneas con

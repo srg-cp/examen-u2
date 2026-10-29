@@ -17,7 +17,12 @@ class CasePublicCardsSkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AspectRatio(aspectRatio: 1.35, child: _Shape()),
+          AspectRatio(
+            aspectRatio: MediaQuery.textScalerOf(context).scale(16) > 22
+                ? .7
+                : 1.05,
+            child: const _Shape(),
+          ),
           const SizedBox(height: 12),
           const _Shape(height: 68),
           const SizedBox(height: 12),

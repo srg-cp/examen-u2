@@ -9,6 +9,8 @@ class GlassNavigationBar extends StatelessWidget {
     this.onBack,
     this.tooltip = 'Volver',
     this.enabled = true,
+    this.icon = Icons.chevron_left_rounded,
+    this.foregroundColor = const Color(0xFF111111),
     this.trailing,
     super.key,
   });
@@ -16,6 +18,8 @@ class GlassNavigationBar extends StatelessWidget {
   final VoidCallback? onBack;
   final String tooltip;
   final bool enabled;
+  final IconData icon;
+  final Color foregroundColor;
   final Widget? trailing;
 
   static double topOf(BuildContext context) =>
@@ -29,6 +33,8 @@ class GlassNavigationBar extends StatelessWidget {
     child: Row(
       children: [
         GlassNavigationButton(
+          icon: icon,
+          foregroundColor: foregroundColor,
           tooltip: tooltip,
           onPressed: !enabled
               ? null

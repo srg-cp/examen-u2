@@ -44,6 +44,13 @@ watch(() => state.value.progress, async progress => {
   if (progress) { password.value = ''; confirmation.value = ''; code.value = ''; }
   if (progress?.stage === 'reset' && !props.resetPage && !leaving) { leaving = true; await navigateTo('/restablecer-contrasena', { replace: true }); }
 });
+watch(() => state.value.completed, async completed => {
+  if (completed && !leaving) {
+    leaving = true;
+    password.value = ''; confirmation.value = ''; code.value = '';
+    await navigateTo('/iniciar-sesion?reason=password-updated', { replace: true });
+  }
+});
 watch([name, email, password, confirmation, code], () => model.edited());
 async function submit() {
   if (stage.value === 'register') await model.register(name.value, email.value, password.value, confirmation.value);
@@ -75,10 +82,10 @@ onBeforeUnmount(() => { clearInterval(timer); unsubscribe(); model.dispose(); ch
       <TopToast ref="toast" />
       <div v-if="state.checking" class="credential-skeleton" aria-label="Comprobando solicitud" aria-busy="true"><div class="shape title-shape" /><div class="shape line-shape" /><div class="shape credential-field-shape" /><div class="shape credential-field-shape" /></div>
       <div v-else-if="!state.ready"><ActionButton :working="state.checking" @click="initialize">Reintentar conexión</ActionButton><NavigationLink class="credential-link" to="/recuperar-contrasena" v-if="resetPage">Solicitar otro código</NavigationLink></div>
-      <StaggerReveal v-else :key="stage">
+      <StaggerReveal v-else-if="!state.completed" :key="stage">
         <header class="login-heading"><h1>{{ title }}</h1><p>{{ description }}</p></header>
-        <template v-if="stage === 'complete'"><NavigationLink class="primary credential-login" to="/iniciar-sesion">Iniciar sesión</NavigationLink></template>
-        <template v-else-if="state.failure?.kind === 'expired' || state.failure?.kind === 'conflict'"><ActionButton :working="state.action === 'cancel'" @click="changeEmail">Comenzar de nuevo</ActionButton></template>
+
+        <template v-if="state.failure?.kind === 'expired' || state.failure?.kind === 'conflict'"><ActionButton :working="state.action === 'cancel'" @click="changeEmail">Comenzar de nuevo</ActionButton></template>
         <form v-else class="login-form" :aria-busy="state.busy" novalidate @submit.prevent="submit">
           <template v-if="stage === 'register'"><LoginInput v-model="name" label="Nombre" field="name" :disabled="state.busy" :invalid="invalid('name')" :notice="state.notice" /></template>
           <LoginInput v-if="stage === 'register' || stage === 'recover'" v-model="email" label="Correo" :disabled="state.busy" :invalid="invalid('email')" :notice="state.notice" />

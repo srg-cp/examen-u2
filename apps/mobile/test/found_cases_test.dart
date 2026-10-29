@@ -721,6 +721,10 @@ void main() {
               }
               await loader.load();
             }
+            await (FontLoader(
+                  'Poppins',
+                )..addFont(rootBundle.load('assets/fonts/Poppins-Regular.ttf')))
+                .load();
           });
         }
         final boundary = GlobalKey();
@@ -791,15 +795,10 @@ void main() {
         m.preview();
         await settleMapScreen(tester);
         expect(find.text('Referencia privada'), findsNothing);
-        expect(find.byType(ZoneMapPicker), findsNothing);
-        final sheetForpreviewMap = tester.widget<DraggableScrollableSheet>(
-          find.byType(DraggableScrollableSheet),
-        );
-        sheetForpreviewMap.controller!.animateTo(
-          sheetForpreviewMap.maxChildSize,
-          duration: const Duration(milliseconds: 1),
-          curve: Curves.linear,
-        );
+        expect(find.text('Vista previa'), findsOneWidget);
+        expect(find.byType(DraggableScrollableSheet), findsNothing);
+        expect(find.byType(ImmersivePhotoSheet), findsNothing);
+        await shot('preview-top');
         await settleMapScreen(tester);
         await tester.ensureVisible(
           find.byType(ZoneMapPicker, skipOffstage: false),
@@ -808,14 +807,15 @@ void main() {
         final previewMap = tester.widget<ZoneMapPicker>(
           find.byType(ZoneMapPicker),
         );
-        final composition = tester.widget<ImmersivePhotoSheet>(
-          find.byType(ImmersivePhotoSheet),
+        final composition = tester.widget<CasePublicCards>(
+          find.byType(CasePublicCards),
         );
         expect(previewMap.latitude, composition.latitude);
         expect(previewMap.longitude, composition.longitude);
         expect(previewMap.readOnly, isTrue);
         expect(previewMap.showCenterMarker, isFalse);
-        expect(find.byType(ImmersivePhotoSheet), findsOneWidget);
+        expect(previewMap.onSelect, isNull);
+        expect(composition.privacy, casePublicationPrivacyNotice);
         await shot('preview');
         cases.loseResponse = true;
         await tester.runAsync(m.publish);

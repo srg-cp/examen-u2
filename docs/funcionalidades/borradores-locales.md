@@ -1,5 +1,10 @@
 # Borradores locales de reportes
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 Estado24/10: **Done**, [#47 cerrado](https://github.com/srg-cp/entrehuellas/issues/47).
 Integración original PR66 y aceptación final con PR67/CI aprobado. La evidencia
 Android siguiente corresponde a emulador y reinicio de proceso.

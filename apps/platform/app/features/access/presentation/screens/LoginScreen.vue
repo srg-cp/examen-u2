@@ -40,7 +40,8 @@ watch(() => state.value.session, async session => {
 });
 async function showRouteNotice() {
   if (!state.value.session && !state.value.failure) {
-    const reason = await consumeNotice(['forbidden', 'expired', 'oauth-failed', 'oauth-cancelled', 'signed-out']);
+    const reason = await consumeNotice(['forbidden', 'expired', 'oauth-failed', 'oauth-cancelled', 'signed-out', 'password-updated']);
+    if (reason === 'password-updated') toast.value?.show('Contraseña actualizada.', null, false);
     if (reason === 'forbidden') toast.value?.show(messages.forbidden);
     if (reason === 'expired') toast.value?.show('La sesión expiró. Vuelve a iniciar sesión.');
     if (reason === 'oauth-failed') toast.value?.show('No pudimos completar el acceso. Vuelve a intentarlo.');

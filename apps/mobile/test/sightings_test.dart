@@ -301,7 +301,7 @@ void main() {
           c.read(sightingViewModelProvider).requireValue.receipt,
           isNotNull,
         );
-        await tester.ensureVisible(find.text('Volver a la ficha'));
+        expect(find.text('Volver a la ficha'), findsNothing);
         await tester.pumpAndSettle();
         await tester.runAsync(() => capture('receipt'));
         expect(tester.takeException(), isNull);

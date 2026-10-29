@@ -122,7 +122,6 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
                             const SizedBox(height: 20),
                             AuthStageTransition(
                               enabled: !async.isLoading,
-                              startCovered: true,
                               stage: data?.draft?.id ?? 'list',
                               builder: (play) => ContentReveal(
                                 loading: async.isLoading,

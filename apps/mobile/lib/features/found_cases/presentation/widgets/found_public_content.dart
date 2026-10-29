@@ -21,6 +21,7 @@ class FoundPublicContent extends StatelessWidget {
     this.actions,
     this.contact,
     this.offline = false,
+    this.isPreview = false,
     this.localPhotos = const {},
     super.key,
   });
@@ -28,6 +29,7 @@ class FoundPublicContent extends StatelessWidget {
   final Widget? actions;
   final Widget? contact;
   final bool offline;
+  final bool isPreview;
   final Map<String, Uint8List> localPhotos;
   @override
   Widget build(BuildContext context) => CasePublicCards(
@@ -72,6 +74,7 @@ class FoundPublicContent extends StatelessWidget {
     occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',
     latitude: value.latitude,
     longitude: value.longitude,
+    privacy: isPreview ? casePublicationPrivacyNotice : null,
     actions: actions,
     contact: value.status == 'active' ? contact : null,
   );
@@ -90,55 +93,62 @@ class FoundPreviewContent extends StatelessWidget {
   final Widget? actions;
   final bool isPreview;
   @override
-  Widget build(BuildContext context) => ImmersivePhotoSheet(
-    name: value.speciesDetail ?? foundSpeciesLabel(value.species),
-    latitude: value.latitude,
-    longitude: value.longitude,
-    locationLabel: value.reportKind == 'possible_loss'
-        ? 'Ubicación de posible desaparición'
-        : 'Ubicación del aviso',
-    photos: [
-      for (final photo in value.photos)
-        localPhotos[photo.id] != null
-            ? CasePhotoView.memory(localPhotos[photo.id]!)
-            : photo.uri == null
-            ? const CasePhotoFailure()
-            : CasePhotoView.network(photo.uri!),
-    ],
-    facts: [
-      if (!isPreview && value.status == 'active')
-        const PreviewFact(Icons.search, 'Reporte activo'),
-      PreviewFact(Icons.pets_outlined, foundSpeciesLabel(value.species)),
-      if (value.size != null)
-        PreviewFact(Icons.straighten, switch (value.size!) {
-          'small' => 'Pequeño',
-          'medium' => 'Mediano',
-          _ => 'Grande',
-        }),
-      if (value.sex != null)
-        PreviewFact(
-          value.sex == 'male' ? Icons.male : Icons.female,
-          value.sex == 'male' ? 'Macho' : 'Hembra',
-        ),
-      if (value.custody != null)
-        PreviewFact(
-          Icons.home_outlined,
-          value.custody == 'with_me'
-              ? 'Está bajo mi cuidado'
-              : 'No está bajo mi cuidado',
-        ),
-    ],
-    description: value.traits,
-    eventLabel: switch (value.reportKind) {
-      'possible_loss' => 'Posiblemente perdida',
-      'sighting' => 'Avistamiento',
-      'independent_found' || 'with_reporter' => 'Encontrada',
-      _ => 'Reporte anterior',
-    },
-    occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',
-    privacy: isPreview
-        ? 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
-        : 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
-    actions: actions,
-  );
+  Widget build(BuildContext context) => value.reportKind == 'possible_loss'
+      ? FoundPublicContent(
+          value: value,
+          localPhotos: localPhotos,
+          actions: actions,
+          isPreview: isPreview,
+        )
+      : ImmersivePhotoSheet(
+          name: value.speciesDetail ?? foundSpeciesLabel(value.species),
+          latitude: value.latitude,
+          longitude: value.longitude,
+          locationLabel: value.reportKind == 'possible_loss'
+              ? 'Ubicación de posible desaparición'
+              : 'Ubicación del aviso',
+          photos: [
+            for (final photo in value.photos)
+              localPhotos[photo.id] != null
+                  ? CasePhotoView.memory(localPhotos[photo.id]!)
+                  : photo.uri == null
+                  ? const CasePhotoFailure()
+                  : CasePhotoView.network(photo.uri!),
+          ],
+          facts: [
+            if (!isPreview && value.status == 'active')
+              const PreviewFact(Icons.search, 'Reporte activo'),
+            PreviewFact(Icons.pets_outlined, foundSpeciesLabel(value.species)),
+            if (value.size != null)
+              PreviewFact(Icons.straighten, switch (value.size!) {
+                'small' => 'Pequeño',
+                'medium' => 'Mediano',
+                _ => 'Grande',
+              }),
+            if (value.sex != null)
+              PreviewFact(
+                value.sex == 'male' ? Icons.male : Icons.female,
+                value.sex == 'male' ? 'Macho' : 'Hembra',
+              ),
+            if (value.custody != null)
+              PreviewFact(
+                Icons.home_outlined,
+                value.custody == 'with_me'
+                    ? 'Está bajo mi cuidado'
+                    : 'No está bajo mi cuidado',
+              ),
+          ],
+          description: value.traits,
+          eventLabel: switch (value.reportKind) {
+            'possible_loss' => 'Posiblemente perdida',
+            'sighting' => 'Avistamiento',
+            'independent_found' || 'with_reporter' => 'Encontrada',
+            _ => 'Reporte anterior',
+          },
+          occurredAt: 'Observada el ${foundDateLabel(value.occurredAt)}',
+          privacy: isPreview
+              ? 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
+              : 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
+          actions: actions,
+        );
 }

@@ -110,7 +110,6 @@ class _EntityScreenShellState extends State<EntityScreenShell> {
         AuthStageTransition(
           enabled: !widget.loading,
           stage: widget.stage,
-          startCovered: true,
           builder: (play) => ContentReveal(
             loading: widget.loading,
             count: widget.count,

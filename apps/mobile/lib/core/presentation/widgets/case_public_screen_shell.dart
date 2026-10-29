@@ -12,6 +12,8 @@ class CasePublicScreenShell extends StatelessWidget {
   const CasePublicScreenShell({
     required this.child,
     required this.loading,
+    this.title = 'Ficha pública',
+    this.stage = 'public-case',
     this.shareAction,
     this.notice,
     this.noticeId,
@@ -22,6 +24,8 @@ class CasePublicScreenShell extends StatelessWidget {
   final Widget child;
   final Widget? shareAction;
   final bool loading;
+  final String title;
+  final Object stage;
   final String? notice;
   final Object? noticeId;
   final VoidCallback? onBack;
@@ -66,7 +70,7 @@ class CasePublicScreenShell extends StatelessWidget {
                                     horizontal: 64,
                                   ),
                                   child: Text(
-                                    'Ficha pública',
+                                    title,
                                     textAlign: TextAlign.center,
                                     style: AppTypography.primaryTitle.copyWith(
                                       fontSize: 20,
@@ -79,16 +83,12 @@ class CasePublicScreenShell extends StatelessWidget {
                           ],
                           if (largeText) ...[
                             const SizedBox(height: 68),
-                            Text(
-                              'Ficha pública',
-                              style: AppTypography.primaryTitle,
-                            ),
+                            Text(title, style: AppTypography.primaryTitle),
                             const SizedBox(height: 16),
                           ],
                           AuthStageTransition(
                             enabled: !loading,
-                            stage: 'public-case',
-                            startCovered: true,
+                            stage: stage,
                             builder: (play) => ContentReveal(
                               loading: loading,
                               count: 5,

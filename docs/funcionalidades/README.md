@@ -1,5 +1,26 @@
 # Funcionalidades de Entre Huellas
 
+29/10, [ADR-159](../decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
+tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
+Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes
+y entrada única/reducido; validación y pendientes en ESTADO.
+
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10: [vista previa de pérdida](casos-perdidos.md) y
+[búsqueda comunitaria](busquedas-y-avisos.md) reutilizan la ficha móvil actual
+por tarjetas, [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md).
+Privacidad/publicación conservadas; patrón inmersivo disponible para otros usos.
+
+29/10: [entradas móviles compartidas](identidad-visual.md) corregidas por
+[ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md): sin cortina
+de fondo previa al stagger en registro/recuperación, preferencias, ubicaciones,
+mascotas, reportes y fichas. Alcance completo y evidencia en la decisión/ESTADO.
+
 - [Pruebas personales iOS](distribucion-ios.md): compilación remota y firma gratuita desde Windows; validación física pendiente.
 26/10: [Recorrido de la búsqueda móvil](recorrido-de-busqueda.md), acciones
 compactas y tarjeta perla con mapa cronológico/pines oficiales/origen rojo.

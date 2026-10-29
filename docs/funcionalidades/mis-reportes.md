@@ -1,5 +1,10 @@
 # Mis reportes
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 Alineación20/10/2026: CollectionHeader ancla el título al borde superior de
 la fila, conservando mínimo56 y espacio de acciones. Explorar y Mis mascotas
 comparten la posición inicial de «Su regreso»; se elimina el desplazamiento8

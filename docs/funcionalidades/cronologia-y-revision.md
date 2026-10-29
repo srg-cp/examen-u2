@@ -1,5 +1,10 @@
 # Cronología y revisión de avistamientos
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 Título principal20/10/2026: Poppins Regular400, base32 y gris #454746 mediante
 el estilo global; sustituye tipografía anterior de cabeceras principales.
 Reglas y validación en [identidad visual](identidad-visual.md) y

@@ -60,7 +60,7 @@ void main() {
       expect(taps, 1);
       update(() => stage = 'preview');
       await tester.pump();
-      expect(find.byType(CoverReveal), findsOneWidget);
+      expect(find.byType(CoverReveal), findsNothing);
       await tester.pumpAndSettle();
       expect(find.text('editing'), findsNothing);
       expect(find.text('preview'), findsOneWidget);

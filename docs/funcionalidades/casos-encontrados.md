@@ -1,5 +1,18 @@
 # Casos encontrados — HU-06 / RF-06 / issue #6
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10, [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md):
+solo la revisión de `possible_loss`, incluida «No está en mis mascotas» de
+Mascota perdida, reutiliza FoundPublicContent/CasePublicCards y el shell de
+ficha actual. Conserva bytes locales, campos, zona pública aproximada, privacidad
+y acciones de publicar/editar. Avisos y hallazgos mantienen ImmersivePhotoSheet.
+Sin cambios de datos/permisos ni web; validación y límites en ESTADO.
+
 23/10, HU-14.2: con034 activo, publicar un nuevo aviso vinculado respeta los
 [bloqueos entre cuentas](bloqueos-usuarios.md). Un bloqueo en cualquier dirección
 rechaza el envío en SQL con toast específico y borrador conservado. Recibos de

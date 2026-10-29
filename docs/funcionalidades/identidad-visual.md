@@ -1,5 +1,17 @@
 # Identidad visual y recursos de marca
 
+29/10, prevención obligatoria solicitada por el usuario: una entrada de contenido
+sin cortina/fondo/espera previa ni timelines duplicados. AGENTS.md y REGLAS_UI_UX
+contienen la regla vigente; architecture_test rechaza el patrón retirado y las
+regresiones de pantalla verifican fondo único y continuidad del stagger.
+La comprobación estática no sustituye revisar cada integración visual nueva.
+[ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 ## Regla de materiales glass móviles —26/10/2026
 
 Elegir por tamaño y función: superficies amplias de información/cards, perlado;

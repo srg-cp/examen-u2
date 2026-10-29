@@ -4,6 +4,47 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('Entry curtain guard rejects invocations and constructor tear-offs', () {
+    for (final code in [
+      'CoverReveal(animation: controller)',
+      'const CoverReveal(animation: controller)',
+      'CoverReveal.named(animation: controller)',
+      'final builder = CoverReveal.new;',
+      'AuthStageTransition(startCovered: true)',
+    ]) {
+      expect(usesRetiredEntryCurtain(code), isTrue, reason: code);
+    }
+    expect(
+      usesRetiredEntryCurtain('const CoverReveal({required this.animation});'),
+      isFalse,
+    );
+    expect(usesRetiredEntryCurtain('StaggerReveal(child: content)'), isFalse);
+  });
+  test('Content entrances never restore a curtain or an artificial wait', () {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))) {
+      expect(
+        usesRetiredEntryCurtain(file.readAsStringSync()),
+        isFalse,
+        reason: '${file.path}: ADR-156 requires one entry without a curtain.',
+      );
+    }
+    final shared = File(
+      'lib/core/presentation/widgets/cover_reveal.dart',
+    ).readAsStringSync();
+    final stage = shared.substring(shared.indexOf('class AuthStageTransition'));
+    expect(
+      RegExp(
+        r'\b(?:AppPageBackground|AnimationController|Timer)\s*\(|\bFuture\s*\.\s*delayed\b',
+      ).hasMatch(stage),
+      isFalse,
+      reason:
+          'ADR-156: the shared stage must not repaint the background or delay its stagger.',
+    );
+  });
   test('All mobile maps share the global tile style adapter', () {
     for (final file
         in Directory('lib')

@@ -1,5 +1,10 @@
 # Bloquear y desbloquear cuentas
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 Integración23/10 con HU-14.4: se conserva035 de apelaciones y el complemento
 local de contacto cambia a036/fuente122 con el mismo cuerpo SQL. Los nombres035
 anteriores de contacto quedan sustituidos en el repositorio; no ejecutar ambos

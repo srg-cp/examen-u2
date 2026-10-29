@@ -26,114 +26,38 @@ class _CoverClipper extends CustomClipper<Rect> {
       oldClipper.progress != progress;
 }
 
-/// Keeps the header outside the transition. A completed cover starts the next
-/// stagger timeline; edits/countdowns/errors do not change the stage.
+/// Keeps the header outside a single stagger entrance per discrete stage.
+/// The historical name remains for callers; no curtain or background is drawn.
+/// Loading completion, edits, countdowns and errors preserve the current entry.
 class AuthStageTransition extends StatefulWidget {
   const AuthStageTransition({
     required this.stage,
     required this.builder,
-    this.startCovered = false,
     this.enabled = true,
     super.key,
   });
   final Object stage;
   final Widget Function(bool play) builder;
-  final bool startCovered;
   final bool enabled;
   @override
   State<AuthStageTransition> createState() => _AuthStageTransitionState();
 }
 
-class _AuthStageTransitionState extends State<AuthStageTransition>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  Widget? _previous;
-  GlobalKey _stageKey = GlobalKey();
-  GlobalKey? _previousKey;
-  bool _covering = false;
-  @override
-  void initState() {
-    super.initState();
-    _covering = widget.startCovered && widget.enabled;
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 320),
-      value: _covering ? 0 : 1,
-    )..addStatusListener(_completed);
-  }
-
-  void _completed(AnimationStatus status) {
-    if (status == AnimationStatus.completed && mounted && _covering) {
-      setState(() {
-        _covering = false;
-        _previous = null;
-        _previousKey = null;
-      });
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!widget.enabled || MediaQuery.disableAnimationsOf(context)) {
-      _covering = false;
-      _previous = null;
-      _previousKey = null;
-      _controller.value = 1;
-    } else if (_covering && !_controller.isAnimating) {
-      _controller.forward();
-    }
-  }
+class _AuthStageTransitionState extends State<AuthStageTransition> {
+  Key _stageKey = UniqueKey();
 
   @override
   void didUpdateWidget(AuthStageTransition oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.enabled) {
-      _covering = false;
-      _previous = null;
-      _previousKey = null;
-      _controller.value = 1;
-      return;
-    }
-    // Completing loading is the same entrance, including its skeleton history.
-    if (!oldWidget.enabled || oldWidget.stage == widget.stage) return;
-    _previous = oldWidget.builder(true);
-    _previousKey = _stageKey;
-    _stageKey = GlobalKey();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _covering = false;
-      _previous = null;
-      _previousKey = null;
-      _controller.value = 1;
-    } else {
-      _covering = true;
-      _controller.forward(from: 0);
+    // Resolving a resource belongs to its existing skeleton entrance.
+    if (widget.enabled &&
+        oldWidget.enabled &&
+        oldWidget.stage != widget.stage) {
+      _stageKey = UniqueKey();
     }
   }
 
   @override
-  void dispose() {
-    _controller.removeStatusListener(_completed);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => IgnorePointer(
-    ignoring: _covering,
-    child: Stack(
-      clipBehavior: Clip.hardEdge,
-      children: [
-        KeyedSubtree(key: _stageKey, child: widget.builder(!_covering)),
-        if (_previous != null)
-          ExcludeSemantics(
-            child: KeyedSubtree(key: _previousKey, child: _previous!),
-          ),
-        if (_covering)
-          Positioned.fill(
-            child: ExcludeSemantics(child: CoverReveal(animation: _controller)),
-          ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) =>
+      KeyedSubtree(key: _stageKey, child: widget.builder(true));
 }

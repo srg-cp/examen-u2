@@ -29,7 +29,7 @@ watch(() => state.value.noticeId, () => {
   if (failure) toast.value?.show(messages[failure.kind], ['unavailable', 'rate_limited'].includes(failure.kind) ? send : null);
 });
 watch(() => state.value.receipt, receipt => {
-  if (receipt) { photo.value = null; toast.value?.show('Avistamiento guardado. Gracias por ayudar.', null, false); emit('sent'); }
+  if (receipt) { photo.value = null; toast.value?.show('Avistamiento guardado. Gracias por ayudar.', null, false); emit('sent'); emit('close'); }
 });
 async function selectPhoto(event: Event) {
   const input = event.target as HTMLInputElement; const file = input.files?.[0]; if (!file) return;
@@ -47,12 +47,7 @@ onBeforeUnmount(() => { unsubscribe(); model.dispose(); photo.value = null; });
   <section class="sighting-screen" aria-label="Reportar avistamiento">
     <button class="glass sighting-back" type="button" aria-label="Volver a la ficha" title="Volver a la ficha" :disabled="state.working" @click="emit('close')">‹</button>
     <header><p class="eyebrow">Una huella tuya puede ayudar</p><h1 ref="heading" tabindex="-1">{{ state.receipt ? 'Gracias por colaborar' : '¿Dónde le viste?' }}</h1></header>
-    <StaggerReveal as="div" v-if="state.receipt" class="sighting-confirmation">
-      <h2>Avistamiento guardado</h2><p>Tu información quedó vinculada a este caso.</p>
-      <p v-if="state.receipt.late" class="muted">Se registró como avistamiento tardío, con la fecha y hora en que ocurrió.</p>
-      <ActionButton variant="primary" @click="emit('close')">Volver al caso</ActionButton>
-    </StaggerReveal>
-    <StaggerReveal as="form" v-else class="sighting-form" novalidate @submit.prevent="send">
+    <StaggerReveal as="form" v-if="!state.receipt" class="sighting-form" novalidate @submit.prevent="send">
       <p class="muted">Ayuda a encontrar a {{ activeCase.name || 'esta mascota' }}. No necesitas crear una cuenta.</p>
       <fieldset :disabled="blocked"><legend>Cuándo le viste</legend>
         <div class="sighting-date-row">

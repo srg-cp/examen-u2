@@ -1,3 +1,5 @@
+import '../../../../core/presentation/navigation/complete_operation.dart';
+import '../../providers/sighting_providers.dart';
 import '../../../../core/presentation/widgets/report_draft_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' show TileProvider;
@@ -17,7 +19,6 @@ import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../../../../core/presentation/widgets/unicode_length_limiting_formatter.dart';
 import '../../../../core/presentation/widgets/zone_map_picker.dart';
 import '../../../../core/presentation/widgets/validation_surface.dart';
-import '../../../../core/presentation/formatters/case_date_label.dart';
 import '../../domain/entities/sighting.dart';
 import '../state/sighting_state.dart';
 import '../view_models/sighting_view_model.dart';
@@ -72,6 +73,14 @@ class _SightingScreenState extends ConsumerState<SightingScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(sightingViewModelProvider, (previous, next) {
+      if (next.asData?.value.receipt != null &&
+          previous?.asData?.value.receipt == null) {
+        final target = ref.read(sightingTargetProvider);
+        completeOperation(
+          context,
+          '/home/${target.community ? 'found-cases' : 'cases'}/${target.id}',
+        );
+      }
       if (next.isLoading ||
           next.hasError ||
           previous?.asData?.value.owner != next.asData?.value.owner) {
@@ -110,33 +119,7 @@ class _SightingScreenState extends ConsumerState<SightingScreen> {
             : v == null
             ? const SizedBox.shrink()
             : v.receipt != null
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Hora observada: ${caseDateTimeLabel(v.frozen!.observedAt)}',
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Recibido: ${caseDateTimeLabel(v.receipt!.receivedAt)}'),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'La búsqueda sigue abierta. Solo su responsable puede confirmar la recuperación.',
-                  ),
-                  if (v.receipt!.late)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16),
-                      child: Text(
-                        'Observación de hace más de 24 horas. Se conservó la hora real del avistamiento.',
-                      ),
-                    ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    style: primaryActionButtonStyle(context),
-                    onPressed: _leave,
-                    child: const Text('Volver a la ficha'),
-                  ),
-                ],
-              )
+            ? const SizedBox.shrink()
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

@@ -1,5 +1,21 @@
 # Diseño de la interfaz: implementación y revisión
 
+29/10, [ADR-159](decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
+tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
+Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes
+y entrada única/reducido; validación y pendientes en ESTADO.
+
+29/10, [ADR-157](decisiones/157-vista-previa-perdida-con-ficha-actual.md): revisión
+de pérdida propia/comunitaria con foto/tarjetas/mapa de la ficha pública vigente,
+título Vista previa y aviso de privacidad antes de publicar/editar. Reutilizar
+renderers/shell; sin duplicar stagger ni reiniciarlo por envío/reintento.
+
+29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md): entradas
+móviles del motor AuthStageTransition con stagger directo por etapa, sin
+rectángulo de fondo local ni espera320ms. Comprobar datos ya disponibles,
+resolución de skeleton, reconstrucción y cambio real de etapa; un fondo y una
+entrada, marca/navegación estables, normal/ampliado/reducido. Origen intacto.
+
 26/10, [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md): la
 pantalla Recorrido comparte literalmente el mapa completo, cápsula16/500,
 retorno, panel blanco deslizable, foto/resumen y botones del mapa de Explorar.

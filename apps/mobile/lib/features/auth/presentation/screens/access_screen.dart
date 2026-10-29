@@ -3,7 +3,6 @@ import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/presentation/widgets/cover_reveal.dart';
 import '../../../../core/presentation/widgets/stagger_reveal.dart';
 import '../widgets/create_account_button.dart';
 import '../widgets/auth_page_layout.dart';
@@ -28,12 +27,7 @@ class AccessScreen extends ConsumerWidget {
           title: 'Iniciar sesión',
           reveal: true,
           revealBrand: false,
-          contentBuilder: (content) => AuthStageTransition(
-            stage: 'login',
-            startCovered: true,
-            builder: (play) =>
-                StaggerReveal(count: 11, play: play, child: content),
-          ),
+          contentBuilder: (content) => StaggerReveal(count: 11, child: content),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

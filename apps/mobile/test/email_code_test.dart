@@ -41,7 +41,7 @@ import 'supabase_registration_data_source_test.dart' show MemoryPkceStorage;
 void main() {
   for (final reduced in [false, true]) {
     testWidgets(
-      'Flat cover precedes stagger with stable brand; reduced=$reduced',
+      'Code stage starts stagger directly with stable brand; reduced=$reduced',
       (tester) async {
         tester.platformDispatcher.accessibilityFeaturesTestValue =
             FakeAccessibilityFeatures(disableAnimations: reduced);
@@ -92,16 +92,16 @@ void main() {
           expect(find.byType(CoverReveal), findsNothing);
           expect(find.byKey(const ValueKey('recovery-email')), findsNothing);
         } else {
-          expect(find.byType(CoverReveal), findsOneWidget);
+          expect(find.byType(CoverReveal), findsNothing);
           final pendingReveal = find
               .ancestor(
                 of: find.byType(EmailCodeConfirmation),
                 matching: find.byType(StaggerReveal),
               )
               .first;
-          expect(tester.widget<StaggerReveal>(pendingReveal).play, false);
+          expect(tester.widget<StaggerReveal>(pendingReveal).play, true);
           await tester.pump(const Duration(milliseconds: 160));
-          expect(tester.widget<StaggerReveal>(pendingReveal).play, false);
+          expect(tester.widget<StaggerReveal>(pendingReveal).play, true);
           expect(
             tester.getRect(find.byKey(const ValueKey('auth-brand'))),
             brandRect,
@@ -110,14 +110,8 @@ void main() {
             tester.renderObject(find.byKey(const ValueKey('auth-brand'))),
             same(brandRender),
           );
-          expect(find.byKey(const ValueKey('recovery-email')), findsOneWidget);
-          expect(
-            tester
-                .widget<TextField>(find.byKey(const ValueKey('recovery-email')))
-                .controller!
-                .text,
-            'ana@example.com',
-          );
+          expect(find.byKey(const ValueKey('recovery-email')), findsNothing);
+
           expect(
             tester
                 .widget<Opacity>(
@@ -196,14 +190,14 @@ void main() {
             .platformDispatcher
             .accessibilityFeatures
             .disableAnimations) {
-          expect(find.byType(CoverReveal), findsOneWidget);
+          expect(find.byType(CoverReveal), findsNothing);
           final resetTimeline = find
               .ancestor(
                 of: find.byKey(const ValueKey('recovery-password')),
                 matching: find.byType(StaggerReveal),
               )
               .first;
-          expect(tester.widget<StaggerReveal>(resetTimeline).play, false);
+          expect(tester.widget<StaggerReveal>(resetTimeline).play, true);
         }
         await tester.pumpAndSettle();
         expect(find.byKey(const ValueKey('recovery-password')), findsOneWidget);
@@ -534,33 +528,12 @@ void main() {
             find.byKey(const ValueKey('recovery-password')),
             findsOneWidget,
           );
-          final successBrand = tester.renderObject(
-            find.byKey(const ValueKey('auth-brand')),
-          );
           await container
               .read(passwordRecoveryViewModelProvider.notifier)
               .reset('new-password', 'new-password');
-          await tester.pump();
-          await tester.pump();
-          if (!tester
-              .platformDispatcher
-              .accessibilityFeatures
-              .disableAnimations) {
-            expect(find.byType(CoverReveal), findsOneWidget);
-            final successTimeline = find
-                .ancestor(
-                  of: find.text('Contraseña actualizada'),
-                  matching: find.byType(StaggerReveal),
-                )
-                .first;
-            expect(tester.widget<StaggerReveal>(successTimeline).play, false);
-          }
           await tester.pumpAndSettle();
-          expect(find.text('Contraseña actualizada'), findsOneWidget);
-          expect(
-            tester.renderObject(find.byKey(const ValueKey('auth-brand'))),
-            same(successBrand),
-          );
+          expect(find.text('Contraseña actualizada'), findsNothing);
+          expect(find.text('Iniciar sesión'), findsOneWidget);
         } else {
           expect(find.text('Cada huella importa'), findsOneWidget);
         }

@@ -80,7 +80,6 @@ class AlertPreferencesScreen extends ConsumerWidget {
                           const SizedBox(height: 20),
                           AuthStageTransition(
                             enabled: !async.isLoading,
-                            startCovered: true,
                             stage: 'preferences',
                             builder: (play) => ContentReveal(
                               loading: async.isLoading,

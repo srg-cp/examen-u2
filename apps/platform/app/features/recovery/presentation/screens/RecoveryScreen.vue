@@ -30,7 +30,14 @@ const dirty = computed(() => props.section === 'pets' ? !!pendingPetPhoto.value 
 const title = computed(() => props.section === 'explore' ? 'Explorar' : props.section === 'pets' ? editor.value ? version.value ? 'Editar mascota' : 'Registrar mascota' : 'Mis mascotas' : 'Reportar');
 const messages = { blocked:'Un bloqueo entre estas cuentas impide enviar nuevos avisos. Revisa Cuentas bloqueadas desde tu perfil.',invalid:'Revisa los campos señalados. Completa la información y selecciona las fotos necesarias.',photo:'Elige imágenes JPEG, PNG o WebP de hasta 8 MB. Puedes usar hasta tres fotos.',unauthenticated:'Tu sesión terminó. Vuelve a iniciar sesión.',forbidden:'No tienes permiso para realizar esta operación.',conflict:'Los datos cambiaron. Actualiza la información antes de volver a enviarla.',unavailable:'No pudimos confirmar la operación. Conservamos tus datos para reintentar.' };
 watch(() => state.value.notice, () => { if (state.value.failure) { toast.value?.show(messages[state.value.failure.kind]); if (state.value.failure.kind === 'unauthenticated') void navigateTo('/iniciar-sesion?reason=expired'); } });
-watch(() => state.value.receipt, receipt => { if (receipt) { photos.value = []; frozen.value = null; fileNames.value = []; toast.value?.show('Reporte publicado. Gracias por ayudar.',null,false); } });
+watch(() => state.value.receipt, async receipt => {
+  if (!receipt) return;
+  photos.value = []; frozen.value = null; fileNames.value = [];
+  const linked = kind.value === 'sighting' || kind.value === 'with_reporter';
+  const source = linked ? (restoredDraft.value?.communityTarget || snapshot().draft.communityTarget ? 'encontrados' : 'perdidos') : kind.value === 'own_loss' ? 'perdidos' : 'encontrados';
+  const id = linked ? snapshot().draft.targetId : receipt.id;
+  await navigateTo(id ? '/casos/' + source + '/' + id : '/explorar', { replace: true });
+});
 function load(more = false) { return model.load(props.section, { ...query },more); }
 function editPet(p?: Pet) {
   editor.value = true; petId.value = p?.id || crypto.randomUUID(); version.value = p?.version || 0;
@@ -160,7 +167,7 @@ function imageFailed(event: Event) { (event.target as HTMLImageElement).hidden =
         </template>
       </template>
       <template v-else>
-        <div v-if="state.receipt" class="recovery-success"><h2>Reporte publicado</h2><p>Tu información ya está guardada en Entre Huellas.</p><NavigationLink to="/explorar" class="primary">Ir a Explorar</NavigationLink></div>
+        <div v-if="state.receipt" />
         <StaggerReveal v-else as="form" class="recovery-form" novalidate @submit.prevent="send">
           <div class="recovery-fields">
             <FieldSelect class="recovery-full" label="¿Cómo quieres ayudar?" v-model="kind" :disabled="blocked" :options="[{value:'own_loss',label:'Se perdió mi mascota'},{value:'possible_loss',label:'Vi una mascota posiblemente perdida'},{value:'independent_found',label:'Encontré una mascota y no sé de quién es'},{value:'sighting',label:'Vi una mascota que están buscando'},{value:'with_reporter',label:'Tengo a una mascota que están buscando'}]" />

@@ -303,8 +303,8 @@ void main() {
         await tester.tap(find.text('Guardar contraseña'));
         await tester.pumpAndSettle();
         expect(repo.savedPassword, 'new-password');
-        expect(find.text('Contraseña actualizada'), findsOneWidget);
-        await tester.tap(find.text('Volver a iniciar sesión'));
+        expect(find.text('Contraseña actualizada'), findsNothing);
+
         await tester.pumpAndSettle();
         expect(repo.ends, 1);
         expect(find.text('Iniciar sesión'), findsOneWidget);

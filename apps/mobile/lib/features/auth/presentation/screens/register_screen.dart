@@ -43,14 +43,11 @@ class RegisterScreen extends ConsumerWidget {
               reveal: true,
               contentBuilder: (content) => AuthStageTransition(
                 stage: state.confirmationEmail != null,
-                builder: (play) => state.confirmationEmail == null
-                    ? content
-                    : StaggerReveal(
-                        key: const ValueKey('registration-code-reveal'),
-                        count: 9,
-                        play: play,
-                        child: content,
-                      ),
+                builder: (play) => StaggerReveal(
+                  count: state.confirmationEmail == null ? 8 : 9,
+                  play: play,
+                  child: content,
+                ),
               ),
               child: state.confirmationEmail != null
                   ? RegistrationConfirmation(

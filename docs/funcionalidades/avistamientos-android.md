@@ -1,5 +1,16 @@
 # Avistamientos desde Android
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 23/10, HU-14.2: con034 activo, los nuevos envíos autenticados respetan
 [bloqueos entre cuentas](bloqueos-usuarios.md) en ambos sentidos mediante el
 trigger SQL, también tras pasar por Nuxt. Rechazo específico y datos conservados;

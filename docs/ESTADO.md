@@ -1,5 +1,163 @@
 # Estado del proyecto
 
+## Validación conjunta antes del commit —29/10/2026
+
+Por petición del usuario se registra conjuntamente el trabajo acumulado de
+ADR-155–159: entradas sin cortina, vista previa actual, continuación directa
+tras operaciones y foto más alta con visor completo. Suite móvil completa:
+651 pruebas aprobadas con AMBIENT_BACKGROUND_MOTION=false; análisis de lib/test
+sin incidencias y formato de739 archivos sin cambios. Logs en
+apps/mobile/build/precommit-tests.log, precommit-analysis.log y
+precommit-format.log. Web conserva94 pruebas y typecheck aprobados en la
+validación del incremento. Commit local solicitado; sin push ni despliegue.
+Pendiente nueva compilación y revisión física/alojada de los recorridos.
+
+## Foto pública más alta y previsualización completa —29/10/2026
+
+Por petición explícita, CasePublicCards aumenta solo el alto de la fotografía
+(ratio1.35→1.05; texto ampliado0.8→0.7), con el mismo ancho/radios/nombre/estado.
+Skeleton adaptado. Tocar abre la foto activa en CasePhotoViewer sin recorte,
+con zoom1–4, galería y cierre glass X/Atrás; volver conserva foto/scroll. El
+visor reutiliza ImageProvider y bytes autorizados, con carga/fallo existentes;
+sin nuevas consultas privadas, SQL o permisos. Una sola entrada compartida,
+sin reinicio al cambiar foto y movimiento reducido. La vista previa de pérdida
+hereda el cambio por su renderer compartido; web y patrón inmersivo conservados.
+[ADR-159](decisiones/159-foto-publica-mas-alta-y-visor-completo.md).
+
+Validación:42 pruebas móviles de tarjetas/visor, pérdidas, encontrados y
+arquitectura aprobadas. Cuatro combinaciones normal/pequeña, texto200% y
+movimiento normal/reducido comprueban ancho, alto, foto inicial, cambio de foto,
+BoxFit.contain, controles de zoom y retorno sin perder selección. Análisis de
+lib/test sin incidencias. Capturas regeneradas y revisadas en
+apps/mobile/build/ui-preview/public-cards, incluida imagen completa en visor;
+datos/imagen de prueba, sin acreditar descarga real. Logs en
+apps/mobile/build/photo-viewer-tests.log, photo-viewer-analysis.log y
+photo-viewer-final-tests.log. Revisión visual ajusta X y barras del sistema
+claras sobre el fondo negro, sin alterar controles de las demás pantallas.
+
+Siguiente paso: comprobar zoom táctil en dispositivo con nueva compilación.
+Sin APK/IPA, despliegue ni acciones GitHub; trabajo anterior conservado.
+
+## Continuación directa tras completar operaciones —29/10/2026
+
+Por instrucción explícita se retiran pasos de éxito con texto y un botón:
+publicación móvil de pérdida propia/comunitaria, hallazgos y avisos abre su
+ficha reemplazando el editor; avistamientos vuelven a la búsqueda y denuncias
+al contenido anterior. Cambiar contraseña cierra la capacidad temporal antes
+de volver al acceso; si falla el cierre, reintenta sin repetir el guardado.
+En web, reportes abren su ficha/búsqueda vinculada, contraseña vuelve al acceso
+con toast, avistamiento QR cierra el formulario y moderación consulta el estado
+actual sin exigir otro clic. [ADR-158](decisiones/158-continuacion-directa-tras-operaciones.md).
+
+Se conserva la confirmación del servidor como condición para navegar; respuestas
+ambiguas, validación, permisos, borradores, UUID y recibos permanecen en sus
+modelos. Verificación por código, onboarding, vacíos reales y errores con
+acciones de recuperación no son pasos de éxito y se conservan. La auditoría
+se centró en pantallas de resultado de los recorridos móviles y componentes
+web existentes; no afirma una nueva aceptación global de toda la aplicación.
+
+Validación:76 pruebas móviles de publicación, navegación real, contraseña/códigos,
+avistamientos, denuncias y arquitectura aprobadas con movimiento ambiental
+desactivado. Prueba específica verifica reemplazo y ausencia del editor en
+retorno incluso cuando se desmonta su shell al confirmar. El flujo integrado
+comprueba publicación comunitaria, denuncia y recuperación en tamaños normal
+y pequeño.94 pruebas web aprobadas; typecheck web correcto. Análisis de lib/test
+móvil sin incidencias. Logs: apps/mobile/build/direct-completion-tests.log,
+direct-completion-analysis.log y direct-completion-navigation.log;
+apps/platform/completion-tests.log y completion-typecheck.log.
+
+Siguiente paso: revisar en dispositivo/alojado con nueva compilación. Sin builds
+APK/IPA, despliegues, commits ni acciones GitHub; cambios locales anteriores
+conservados. Las fichas funcionales y reglas enlazan la nueva decisión.
+
+## Vista previa de pérdida con la ficha actual —29/10/2026
+
+Corregida por solicitud del usuario: la revisión de pérdida propia y de
+«No está en mis mascotas» reutiliza CasePublicContent/FoundPublicContent,
+CasePublicCards y CasePublicScreenShell. Foto/nombre/estado, tarjetas perladas,
+mapa y fecha coinciden con la consulta vigente; título Vista previa y aviso
+preventivo antes de Publicar caso/Editar reporte. Una entrada compartida por
+etapa, sin panel inmersivo/cortina ni reinicio por envío/reintento. Se conservan
+fotos seleccionadas/bytes locales, borradores, ubicación pública aproximada,
+privacidad, ViewModels, shimmer/bloqueos y operaciones existentes. Patrón
+ImmersivePhotoSheet íntegro para otros consumidores; sin cambios web/SQL.
+[ADR-157](decisiones/157-vista-previa-perdida-con-ficha-actual.md), reglas y
+fichas actualizadas; sin nueva HU/issue ni cierre de historias.
+
+Validación:56 pruebas de pérdidas, comunitarias/avisos, ruta real de creación,
+tarjetas, patrón inmersivo, arquitectura, consistencia y entradas compartidas
+aprobadas con AMBIENT_BACKGROUND_MOTION=false. La ruta real revisa120 fotogramas
+por entrada propia/comunitaria normal/reducida y vuelve a editar conservando
+fotos y borradores. Edición/publicación/fallo/respuesta ambigua/reintento y mapa
+de solo lectura comprobados en390×844 y320×350/texto200%. Análisis de lib/test
+sin incidencias;11 archivos Dart formateados sin cambios pendientes y diff
+comprobado. Logs: apps/mobile/build/case-preview-tests.log y
+case-preview-analysis.log. Las26 pruebas de editores se ejecutaron además para
+regenerar capturas locales con Poppins, revisadas en build/ui-preview/cases y
+build/ui-preview/found-cases; no acreditan descarga real de fotos/teselas.
+
+Siguiente paso: nueva compilación y revisión física Android/iOS. Sin APK/IPA
+nuevo, publicación, despliegue ni acciones GitHub en esta tarea. El trabajo local
+previo de ADR-155/156 se conserva.
+
+## Regla preventiva de entrada única —29/10/2026
+
+Por instrucción explícita, AGENTS.md y REGLAS_UI_UX.md prohíben cortinas/fondos
+locales/esperas antes del stagger y timelines duplicados sobre el mismo contenido,
+también al integrar pantallas nuevas. Se sustituye la instrucción contradictoria
+cover→stagger de AGENTS; ADR-156 e identidad visual registran la prevención.
+architecture_test rechaza CoverReveal/startCovered en producción y fondos o
+temporizadores en AuthStageTransition. Detector probado con invocaciones,
+constructores nombrados/tear-offs y ejemplos permitidos; CI Flutter ya lo incluye.
+No detecta toda copia con nombres distintos: las regresiones de integración y
+la revisión visual siguen siendo obligatorias.
+
+Validación:18 pruebas de arquitectura y entradas compartidas/login aprobadas;
+análisis de los dos archivos de comprobación sin incidencias, formato/diff
+correctos. Logs: apps/mobile/build/entry-rule-tests.log y entry-rule-analysis.log.
+Sin cambios adicionales de UI ni builds/publicación; siguiente paso físico
+continúa siendo revisar APK/IPA actualizado.
+
+## Entradas móviles compartidas sin cortina previa —29/10/2026
+
+Por petición explícita de extender la corrección del login, se revisaron todas
+las referencias de AuthStageTransition/CoverReveal. Seis consumidores restantes:
+registro, recuperación, preferencias, ubicaciones, EntityScreenShell y
+CasePublicScreenShell. Sus recorridos usan stagger directo por etapa; el motor
+ya no pinta otro fondo ni retiene el formulario anterior durante320ms.
+Carga→resultado mantiene identidad/historial de skeleton; edición no reinicia
+la entrada. Recuperación elimina además el timeline exterior redundante.
+Marca/navegación, parámetros del stagger, reducido, origen y datos conservados.
+Sin instanciaciones de CoverReveal en producción. Búsqueda web sin este patrón
+en StaggerReveal/useStaggerReveal; sin cambios web ni auditoría global de movimiento.
+[ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md), reglas y fichas
+de consumidores actualizadas.
+
+Suite móvil completa:648 pruebas aprobadas con AMBIENT_BACKGROUND_MOTION=false
+(misma configuración de CI; stagger y movimiento de recorridos activos).
+Análisis de lib/test sin incidencias; formato/diff y27 documentos con enlaces
+a ADR-156 comprobados. Regresión nueva de120 fotogramas por entrada en entidades
+y ficha pública, con contenido disponible, reconstrucción, cambio de etapa,
+reducido y320×600/texto200%. Logs en apps/mobile/build/single-entry-full-tests.log
+y single-entry-analysis.log. Siguiente paso: APK/IPA actualizado y revisión física;
+no generados ni publicados en esta tarea.
+
+## Login móvil sin rectángulo ni cortina previa —29/10/2026
+
+Corregido AccessScreen: StaggerReveal directo, sin AuthStageTransition inicial
+que repetía el fondo dentro del formulario y retrasaba320ms la entrada. ADR-094
+había corregido únicamente Inicio/Explorar. Marca, arranque, tiempos del stagger,
+reducido y autenticación conservados; alcance local documentado en ADR-155 y
+ficha de acceso. Sin cambios de backend ni web.
+
+Validación:30 pruebas de entrada real, acceso/feedback, startup, stagger,
+arquitectura y consistencia aprobadas. La regresión recorre120 fotogramas en
+modo normal/reducido y verifica fondo único, progreso continuo, marca estable y
+ausencia de reinicio al editar. Análisis de los dos archivos Dart sin incidencias;
+formato y diff comprobados. Logs: apps/mobile/build/login-entry-tests.log y
+login-entry-analysis.log. Siguiente paso: revisar en iPhone con nueva compilación;
+sin APK/IPA nuevo ni publicación en esta tarea.
+
 ## Publicación conjunta Android/iOS desde main —29/10/2026
 
 Por instrucción explícita, el workflow Flutter valida y coordina ambos builds

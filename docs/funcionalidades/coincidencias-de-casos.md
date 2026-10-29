@@ -1,5 +1,10 @@
 # Coincidencias entre casos de mascotas
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 25/10, [ADR-139](../decisiones/139-shimmer-en-superficie-completa-del-boton.md):
 Buscar/Continuar comparación aplica LoadingShimmer al botón completo, incluyendo
 superficie y padding. Se corrige el brillo limitado al texto; operación, ranking,

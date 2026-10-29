@@ -1,5 +1,26 @@
 # Acceso y recuperación de contraseña
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
+## Corrección de entrada móvil —29/10/2026
+
+Login utiliza una sola entrada StaggerReveal, sin la cortina previa que dibujaba
+un rectángulo con otro encuadre del fondo y demoraba320ms el formulario. La
+corrección anterior ADR-094 solo cubría Inicio/Explorar. Marca fija, arranque,
+campos, tiempos del stagger, reducido y autenticación conservados.
+[ADR-155](../decisiones/155-login-mobile-entrada-sin-cortina.md).
+Regresión con pantalla real y120 fotogramas en movimiento normal/reducido;
+validación en iPhone con nueva compilación pendiente.
+
 ## Aceptación del usuario — 25/10/2026
 
 El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya

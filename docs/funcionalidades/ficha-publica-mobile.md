@@ -1,5 +1,21 @@
 # Ficha pública móvil por tarjetas glass
 
+29/10, [ADR-159](../decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
+tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
+Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes
+y entrada única/reducido; validación y pendientes en ESTADO.
+
+29/10, [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md):
+las vistas previas de pérdida propia/comunitaria ahora comparten estos renderers
+y CasePublicScreenShell, con título Vista previa, aviso preventivo y acciones
+reales de publicar/editar. Sustituye la reserva inmersiva solo en esos previews;
+la consulta pública y los otros consumidores del patrón inmersivo se conservan.
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 26/10, [ADR-154](../decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
 el destino de la tarjeta Recorrido adopta el mapa/panel real de Explorar, con
 cabecera «Recorrido» y «Ubicaciones». Flecha celeste/Ver ficha permanecen como

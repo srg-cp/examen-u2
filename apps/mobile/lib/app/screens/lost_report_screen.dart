@@ -234,7 +234,7 @@ class _LostReportScreenState extends ConsumerState<LostReportScreen> {
         title: 'Mascota perdida',
         onBack: _leave,
         loading: loading,
-        immersive: preview,
+        publicCards: preview,
         // Both forms share this completed timeline, including outgoing fields.
         count: form ? 13 : 2,
         stage: form ? 'form' : (_community, preview ? 'preview' : 'confirmed'),

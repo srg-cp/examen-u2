@@ -1,5 +1,11 @@
 # Navegación de usuario y recuperación web
 
+29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
 Contrato vigente21/10, ADR-128: combinar fullscreen/GSAP Sader con identidad
 móvil al abrir y cerrar. La superficie negra y su radio se transforman; icono
 y nueve puntos mantienen tamaño, centrados dentro del contorno, con fase fuente

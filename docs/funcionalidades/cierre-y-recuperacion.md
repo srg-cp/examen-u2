@@ -1,5 +1,10 @@
 # Cierre y recuperación
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 ## Aceptación del usuario — 25/10/2026
 
 El usuario confirma que cuenta/acceso, difusión, seguimiento y recuperación ya

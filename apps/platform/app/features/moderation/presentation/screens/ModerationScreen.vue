@@ -38,6 +38,13 @@ function date(value:string){return new Intl.DateTimeFormat('es-PE',{dateStyle:'m
 function kind(value:string){return value==='lost'?'Caso perdido':value==='found'?'Publicación o aviso':'Avistamiento';}
 function actionLabel(value:string){return value==='hide'?'Ocultar contenido':value==='show'?'Restaurar visibilidad':'Resolver sin cambiar visibilidad';}
 function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||state.value.busy){event.preventDefault();event.returnValue='';}}
+let refreshedReceipt: object | null = null;
+watch(() => [state.value.receipt, state.value.busy] as const, async ([receipt, busy]) => {
+  if (receipt && !busy && receipt !== refreshedReceipt) {
+    refreshedReceipt = receipt;
+    await model.refreshDetail();
+  }
+});
 watch(()=>state.value.notice,()=>{if(state.value.failure)toast.value?.show(messages[state.value.failure.kind]);else if(state.value.receipt)toast.value?.show('Decisión guardada.',null,false);});
 watch(()=>[state.value.stage,state.value.busy] as const,([stage,busy])=>{if(stage==='login'&&!busy&&state.value.failure?.kind!=='unavailable'){answer(false);navigateTo(state.value.failure?.kind==='forbidden'?'/inicio?reason=forbidden':exitReason?'/iniciar-sesion?reason='+exitReason:'/iniciar-sesion',{replace:true});}});
 watch(()=>state.value.stage,async stage=>{emit('detail',stage==='detail');await nextTick();heading.value?.focus();});

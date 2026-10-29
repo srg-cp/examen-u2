@@ -1,6 +1,5 @@
 import '../../../../core/presentation/widgets/case_photo.dart';
 import '../../../../core/presentation/formatters/case_date_label.dart';
-import '../../../../core/presentation/widgets/immersive_photo_sheet.dart';
 import '../../../../core/presentation/widgets/case_public_cards.dart';
 import '../../../../core/presentation/widgets/case_photo_failure.dart';
 import 'package:flutter/material.dart';
@@ -38,12 +37,14 @@ class CasePublicContent extends StatelessWidget {
     this.actions,
     this.contact,
     this.offline = false,
+    this.isPreview = false,
     super.key,
   });
   final PublicLostCase value;
   final Widget? actions;
   final Widget? contact;
   final bool offline;
+  final bool isPreview;
   @override
   Widget build(BuildContext context) {
     final f = value.fields;
@@ -81,6 +82,7 @@ class CasePublicContent extends StatelessWidget {
       occurredAt: 'Desaparición: ${caseDateLabel(value.occurredAt)}',
       latitude: value.latitude,
       longitude: value.longitude,
+      privacy: isPreview ? casePublicationPrivacyNotice : null,
       actions: actions,
       contact: value.status == 'active' ? contact : null,
     );
@@ -98,50 +100,6 @@ class CasePreviewContent extends StatelessWidget {
   final Widget? actions;
   final bool isPreview;
   @override
-  Widget build(BuildContext context) {
-    final f = value.fields;
-    return ImmersivePhotoSheet(
-      name: f.name,
-      latitude: value.latitude,
-      longitude: value.longitude,
-      locationLabel: 'Ubicación de desaparición',
-      photos: [
-        for (final photo in value.photos)
-          photo.uri == null
-              ? const CasePhotoFailure()
-              : CasePhotoView.network(
-                  photo.uri!,
-                  semanticLabel: 'Foto de ${f.name}',
-                ),
-      ],
-      facts: [
-        if (!isPreview && value.status == 'active')
-          const PreviewFact(Icons.search, 'Búsqueda activa'),
-        if (f.ageMonths != null)
-          PreviewFact(Icons.calendar_today_outlined, '${f.ageMonths} meses'),
-        PreviewFact(Icons.pets_outlined, switch (f.species) {
-          PetSpecies.dog => 'Perro',
-          PetSpecies.cat => 'Gato',
-          _ => f.speciesDetail ?? 'Otra especie',
-        }),
-        if (f.sex != null)
-          PreviewFact(
-            f.sex == PetSex.male ? Icons.male : Icons.female,
-            f.sex == PetSex.male ? 'Macho' : 'Hembra',
-          ),
-        if (f.size != null)
-          PreviewFact(Icons.straighten, switch (f.size!) {
-            PetSize.small => 'Pequeño',
-            PetSize.medium => 'Mediano',
-            PetSize.large => 'Grande',
-          }),
-      ],
-      description: f.traits ?? '',
-      occurredAt: 'Desaparición: ${caseDateLabel(value.occurredAt)}',
-      privacy: isPreview
-          ? 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.'
-          : 'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados.',
-      actions: actions,
-    );
-  }
+  Widget build(BuildContext context) =>
+      CasePublicContent(value: value, actions: actions, isPreview: isPreview);
 }

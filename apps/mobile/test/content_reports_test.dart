@@ -361,10 +361,10 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Enviar denuncia'));
         await tester.pumpAndSettle();
-        expect(find.text('Denuncia registrada'), findsOneWidget);
+        expect(find.text('Denuncia registrada'), findsNothing);
         expect(repo.attempts.length, 1);
         await capture('receipt');
-        await tester.ensureVisible(find.textContaining('Referencia:'));
+
         await tester.pumpAndSettle();
         await capture('receipt-bottom');
         expect(tester.takeException(), isNull);

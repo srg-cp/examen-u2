@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/presentation/formatters/case_date_label.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/case_screen_shell.dart';
 import '../../../../core/presentation/widgets/confirm_discard_action.dart';
@@ -66,6 +65,12 @@ class _ContentReportScreenState extends ConsumerState<ContentReportScreen> {
   Widget build(BuildContext context) {
     final provider = contentReportViewModelProvider(widget.target);
     ref.listen(provider, (previous, next) {
+      if (next.asData?.value.receipt != null &&
+          previous?.asData?.value.receipt == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && GoRouter.maybeOf(context) != null) _leave();
+        });
+      }
       if (next.isLoading ||
           next.hasError ||
           previous?.asData?.value.actor != next.asData?.value.actor) {
@@ -118,39 +123,7 @@ class _ContentReportScreenState extends ConsumerState<ContentReportScreen> {
 
   Widget _content(ContentReportState value, ContentReportViewModel model) {
     final receipt = value.receipt;
-    if (receipt != null) {
-      return StaggerRevealItem(
-        order: 0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Denuncia registrada',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Tu denuncia quedó guardada para revisión. El contenido mantiene su estado; este recibo no implica una decisión de moderación.',
-            ),
-            const SizedBox(height: 20),
-            Text('Fecha: ${caseDateTimeLabel(receipt.submittedAt)}'),
-            const SizedBox(height: 12),
-            Text('Motivo: ${receipt.reason}'),
-            if (receipt.evidence != null) ...[
-              const SizedBox(height: 12),
-              Text('Evidencia: ${receipt.evidence}'),
-            ],
-            const SizedBox(height: 12),
-            SelectableText('Referencia: ${receipt.id}'),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: _leave,
-              child: const Text('Volver al contenido'),
-            ),
-          ],
-        ),
-      );
-    }
+    if (receipt != null) return const SizedBox.shrink();
     final invalid = value.issue == ReportIssue.invalid;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

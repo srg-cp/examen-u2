@@ -1,5 +1,16 @@
 # Ficha fotográfica inmersiva
 
+29/10, [ADR-157](../decisiones/157-vista-previa-perdida-con-ficha-actual.md):
+por solicitud explícita, las vistas previas de pérdida propia/comunitaria pasan
+a las tarjetas actuales. Esta precisión sustituye su uso inmersivo descrito
+debajo. ImmersivePhotoSheet se conserva íntegro, con pruebas y consumidores de
+avisos/hallazgos existentes, para reutilización futura.
+
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 26/10, [ADR-145](../decisiones/145-glass-perlado-compartido-mobile.md): las
 superficies GlassSurface conservadas en esta vista previa heredan el material
 perlado compartido sin contorno blanco. Geometría, gestos, nombre y reutilización

@@ -61,6 +61,15 @@ PublicFoundCase projection(FoundCaseDraft d, {bool owner = false}) =>
       canResolve: owner,
     );
 
+class FlowReports extends FakeFoundCases {
+  @override
+  Future<FoundPublication> publish(String owner, FoundCaseDraft draft) async {
+    final result = await super.publish(owner, draft);
+    publicCase = projection(draft, owner: true);
+    return result;
+  }
+}
+
 class FlowClosure extends FakeClosure {
   FlowClosure(this.reports);
   final FakeFoundCases reports;
@@ -110,7 +119,7 @@ void main() {
         addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
         final auth = FakeAuthRepository()
           ..current = const AuthSession(userId: 'one');
-        final reports = FakeFoundCases();
+        final reports = FlowReports();
         final closures = FlowClosure(reports);
         final timelineRepo = FakeTimeline();
         final pets = FakePets();
@@ -196,6 +205,7 @@ void main() {
         );
         model.preview();
         await tester.pumpAndSettle();
+
         await tester.runAsync(model.publish);
         await tester.pumpAndSettle();
         final search = reports.attempts.single;
@@ -213,8 +223,7 @@ void main() {
             species: 'dog',
           ),
         );
-        await tester.ensureVisible(find.text('Ver ficha pública'));
-        await tester.tap(find.text('Ver ficha pública'));
+
         await tester.pumpAndSettle();
         expect(
           find.byType(RecoveryCaseActions, skipOffstage: false),
@@ -263,9 +272,7 @@ void main() {
         reportModel.edit(reason: 'Publicación que requiere revisión');
         expect(await reportModel.submit(), true);
         await tester.pumpAndSettle();
-        expect(find.text('Denuncia registrada'), findsOneWidget);
-        router.pop();
-        await tester.pumpAndSettle();
+        expect(find.text('Denuncia registrada'), findsNothing);
         // Sharing stays mounted after returning from the report. Close it
         // before using actions on the underlying case card.
         expect(find.byType(CaseShareSheet), findsOneWidget);

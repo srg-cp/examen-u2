@@ -1,5 +1,10 @@
 # Registro, edición y ciclo de vida de mascotas
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 26/10, [ADR-152](../decisiones/152-cabecera-con-desvanecido-compartido-mobile.md):
 Mis mascotas recibe el desvanecido irregular desde FadingHeaderScroll/cabecera
 común. Título inicial, filtro, registro, swipe/consulta, refresh y datos/permisos

@@ -8,14 +8,13 @@ import 'package:flutter_application_entrehuellas/core/presentation/widgets/stagg
 
 void main() {
   testWidgets(
-    'Startup moves the icon left, reveals text, then starts cover/stagger',
+    'Startup moves the icon left, reveals text, then starts stagger directly',
     (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: StartupReveal(
             child: AuthStageTransition(
               stage: 'login',
-              startCovered: true,
               builder: (play) => StaggerReveal(
                 play: play,
                 count: 3,
@@ -54,8 +53,9 @@ void main() {
       expect(find.byType(BrandMark), findsNothing);
       expect(
         tester.widget<StaggerReveal>(find.byType(StaggerReveal)).play,
-        false,
+        true,
       );
+      expect(find.byType(CoverReveal), findsNothing);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 321));
       expect(

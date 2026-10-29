@@ -1,3 +1,4 @@
+import '../../../../core/presentation/navigation/complete_operation.dart';
 import '../../../../core/presentation/widgets/report_draft_status.dart';
 import '../../../../core/presentation/widgets/case_report_fields.dart';
 import '../../../../core/presentation/widgets/size_choice_selector.dart';
@@ -95,6 +96,14 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(foundEditorViewModelProvider, (previous, next) {
+      final result = next.asData?.value;
+      if (result?.stage == FoundStage.confirmed &&
+          previous?.asData?.value.stage != FoundStage.confirmed) {
+        completeOperation(
+          context,
+          '/home/found-cases/${result!.published!.id}',
+        );
+      }
       if (next.isLoading ||
           next.hasError ||
           previous?.asData?.value.ownerId != next.asData?.value.ownerId) {
@@ -158,7 +167,10 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
         onBack: _leave,
         stage: v?.stage ?? 'initial',
         loading: async.isLoading,
-        immersive: v?.stage == FoundStage.preview,
+        publicCards:
+            v?.stage == FoundStage.preview && v?.reportKind == 'possible_loss',
+        immersive:
+            v?.stage == FoundStage.preview && v?.reportKind != 'possible_loss',
         notice: async.hasError
             ? (async.error is FoundFailure &&
                       (async.error as FoundFailure).kind ==
@@ -221,24 +233,7 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
           ],
         );
   Widget _editorContent(FoundEditorState v, FoundEditorViewModel m) {
-    if (v.stage == FoundStage.confirmed) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          StaggerRevealItem(
-            order: 0,
-            child: FilledButton(
-              style: primaryActionButtonStyle(context),
-              onPressed: () => context.pushReplacement(
-                '/home/found-cases/${v.published!.id}',
-              ),
-              child: const Text('Ver ficha pública'),
-            ),
-          ),
-        ],
-      );
-    }
+    if (v.stage == FoundStage.confirmed) return const SizedBox.shrink();
     if (v.stage == FoundStage.preview) {
       final preview = v.preview;
       return FoundPreviewContent(

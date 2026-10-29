@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md):
+AuthStageTransition concentra identidad por etapa sin pintar fondo/cortina ni
+retener la etapa anterior. La finalización de carga conserva el subárbol y el
+historial de ContentReveal. Solo presentación compartida; consumidores y capas
+funcionales conservados, sin cambios de consultas/permisos/dominio.
+
 26/10, [ADR-154](decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
 MapCaseSheet, MapCasePanel/MapPanelFact y MapSheetHeader se extraen a core para
 Explorar y Recorrido, sin imports entre presentaciones. Mantienen geometría,

@@ -1,5 +1,10 @@
 # Apelaciones de moderación
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 HU-14.4 / RF-33; issue #46. Implementada localmente el23/10/2026 en Flutter,
 Nuxt y SQL versionado. La revisión administrativa permanece exclusivamente web.
 No cierra HU-14 ni acredita activación remota.

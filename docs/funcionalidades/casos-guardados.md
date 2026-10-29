@@ -1,5 +1,10 @@
 # Casos guardados
 
+29/10: el motor móvil compartido elimina la cortina/fondo local previo al
+stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
+[Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
+Revisión física con nueva compilación pendiente; datos/permisos conservados.
+
 24/10, HU-15.3: Guardados incorpora por composición Consultados en este dispositivo,
 independiente de favoritos remotos. Las fichas abiertas se conservan con datos/fotos
 públicos por cuenta para consulta sin red; marcar favorito por sí solo no descarga

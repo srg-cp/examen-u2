@@ -1,5 +1,40 @@
 # Entre Huellas: instrucciones del proyecto
 
+29/10, [ADR-158](docs/decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
+sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
+la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
+y denuncias vuelven al contenido. Errores/reintentos, revisión previa y recibos
+de dominio conservados. Alcance web/móvil y validación en la decisión/ESTADO.
+
+Vista previa de pérdida29/10, ADR-157: por instrucción explícita, pérdida propia
+y «No está en mis mascotas» reutilizan CasePublicCards/CasePublicScreenShell
+de la ficha actual, con privacidad y acciones reales de revisión/publicación.
+Sustituye la conservación del diseño inmersivo solo en estas vistas previas.
+ImmersivePhotoSheet se conserva íntegro para otros consumidores y uso futuro.
+Véase docs/decisiones/157-vista-previa-perdida-con-ficha-actual.md.
+
+REGLA OBLIGATORIA ENTRADA ÚNICA29/10, ADR-156:
+
+- Cada pantalla o etapa usa una sola entrada. Nunca anteponer una cortina,
+  cobertura opaca, fondo local ni espera artificial al StaggerReveal, ni
+  superponer dos timelines sobre el mismo contenido. No reutilizar CoverReveal
+  ni startCovered para entradas nuevas o existentes.
+- Reutilizar StaggerReveal/ContentReveal/AuthStageTransition existentes; no
+  recrear el efecto con otro nombre. El fondo pertenece a la pantalla y no se
+  repinta dentro de formularios/cards para ocultar contenido durante la entrada.
+- Skeleton→datos/error/vacío pertenece a la misma entrada; editar, refrescar,
+  reenviar o actualizar contadores no reinicia el stagger. Solo un cambio real
+  de pantalla/etapa puede iniciar otra entrada. Marca y navegación persistentes
+  quedan fuera del efecto; respetar movimiento reducido.
+- Validar nuevas integraciones con contenido ya disponible y con carga pendiente,
+  fotogramas intermedios, pantalla pequeña/texto ampliado y movimiento reducido.
+  Mantener la comprobación automática de arquitectura y las regresiones visuales.
+- Esta regla sustituye cover→stagger de ADR-006 en entradas de contenido.
+  Expansiones desde origen, arranque, onboarding y clip-path de landing conservan
+  sus contratos específicos; no autorizan agregar una cortina al stagger.
+  Cualquier excepción requiere instrucción explícita y decisión documentada.
+Véase docs/decisiones/156-entrada-mobile-unica-sin-cortinas.md.
+
 REGLA OBLIGATORIA GLASS MÓVIL26/10, ADR-148:
 
 - Criterio de elección: superficies amplias que agrupan información, como cards,
@@ -240,7 +275,7 @@ Las instrucciones explícitas del usuario prevalecen sobre este documento. El pl
   preservar parámetros de login/onboarding, cabeceras, movimiento reducido y
   QR SSR sin JS. Landing conserva clip-path aprobado. ADR-075 sustituye
   cover→stagger para estas entradas web; la regla siguiente conserva Flutter.
-- Aplicar cover reveal seguido de stagger reveal en entradas de pantalla y cambios discretos de etapa, con cabeceras persistentes fuera del efecto y movimiento reducido respetado. No repetir efectos con edición/teclado/contadores/reenvío ni durante cada frame de un gesto; seguir ADR-006.
+- Aplicar una sola entrada stagger en pantallas y cambios discretos de etapa, sin cortina previa; cabeceras persistentes fuera del efecto y movimiento reducido respetado. No repetir efectos con edición/teclado/contadores/reenvío ni durante cada frame de un gesto; ADR-156 sustituye cover→stagger de ADR-006.
 - Nunca indicar carga de botones mediante etiquetas con puntos suspensivos (`...` o `…`). Mantener la etiqueta y usar `LoadingShimmer` compartido durante trabajo real, con semántica de progreso y bloqueo de dobles envíos; sin spinner en botones ni shimmer por simple deshabilitación/cooldown. Mantener la comprobación automática y seguir ADR-006.
 - Carga de contenido según ADR-011: skeleton en carga inicial, contenido conservado con progreso fino superpuesto durante refresh explícito de la misma cuenta. Sin textos visibles de carga ni indicadores circulares; labels accesibles permitidos. Ocultar datos anteriores al cambiar identidad y distinguir error de vacío confirmado.
 - La configuración de acceso, permisos y reglas críticas se valida en Supabase: grants, RLS, restricciones y funciones autorizadas.

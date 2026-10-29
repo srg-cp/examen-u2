@@ -6,7 +6,11 @@ import 'expandable_description.dart';
 import 'glass_surface.dart';
 import 'stagger_reveal.dart';
 import 'zone_map_picker.dart';
+import 'case_photo_viewer.dart';
 import '../../theme/case_card_typography.dart';
+
+const casePublicationPrivacyNotice =
+    'Ubicación pública aproximada de unos 1 km. El punto exacto y la referencia permanecen privados. Al publicar, estos datos y fotos serán públicos; revisa que no contengan domicilio, documentos ni datos personales.';
 
 class CasePublicFact {
   const CasePublicFact(this.label, this.value);
@@ -27,6 +31,7 @@ class CasePublicCards extends StatelessWidget {
     required this.longitude,
     this.actions,
     this.contact,
+    this.privacy,
     this.createMapTileProvider,
     this.offline = false,
     super.key,
@@ -38,6 +43,7 @@ class CasePublicCards extends StatelessWidget {
   final double latitude, longitude;
   final Widget? actions;
   final Widget? contact;
+  final String? privacy;
   final bool offline;
   final TileProvider Function()? createMapTileProvider;
 
@@ -238,9 +244,21 @@ class CasePublicCards extends StatelessWidget {
           ],
         ),
       ),
-      if (actions != null) ...[
+      if (privacy != null || actions != null) ...[
         const SizedBox(height: 16),
-        StaggerRevealItem(order: 4, child: actions!),
+        StaggerRevealItem(
+          order: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (privacy != null) ...[
+                Text(privacy!, style: CaseCardTypography.label),
+                const SizedBox(height: 16),
+              ],
+              if (actions != null) actions!,
+            ],
+          ),
+        ),
       ],
     ],
   );
@@ -296,7 +314,7 @@ class _CasePhotoCardState extends State<_CasePhotoCard> {
       child: Stack(
         children: [
           AspectRatio(
-            aspectRatio: largeText ? .8 : 1.35,
+            aspectRatio: largeText ? .7 : 1.05,
             child: ColoredBox(
               color: const Color(0xFFDCE1E7),
               child: widget.photos.isEmpty
@@ -308,10 +326,29 @@ class _CasePhotoCardState extends State<_CasePhotoCard> {
                         semanticLabel: 'Sin foto pública',
                       ),
                     )
-                  : PageView(
-                      key: ValueKey((widget.name, widget.photos.length)),
-                      onPageChanged: (index) => setState(() => _photo = index),
-                      children: widget.photos,
+                  : Semantics(
+                      button: true,
+                      label: 'Abrir foto completa de ${widget.name}',
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          PageRouteBuilder<void>(
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    CasePhotoViewer(
+                                      photos: widget.photos,
+                                      initialPhoto: _photo,
+                                    ),
+                          ),
+                        ),
+                        child: PageView(
+                          key: ValueKey((widget.name, widget.photos.length)),
+                          onPageChanged: (index) =>
+                              setState(() => _photo = index),
+                          children: widget.photos,
+                        ),
+                      ),
                     ),
             ),
           ),

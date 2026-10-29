@@ -1,3 +1,4 @@
+import '../../../../core/presentation/navigation/complete_operation.dart';
 import '../../../../core/presentation/widgets/report_draft_status.dart';
 import '../../../../core/presentation/widgets/case_report_fields.dart';
 import '../../../../core/presentation/widgets/collection_add_button.dart';
@@ -80,6 +81,11 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(caseEditorViewModelProvider, (previous, next) {
+      final result = next.asData?.value;
+      if (result?.stage == CaseEditorStage.confirmed &&
+          previous?.asData?.value.stage != CaseEditorStage.confirmed) {
+        completeOperation(context, '/home/cases/${result!.published!.id}');
+      }
       if (next.isLoading ||
           next.hasError ||
           previous?.asData?.value.ownerId != next.asData?.value.ownerId) {
@@ -110,7 +116,7 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
         title: 'Mascota perdida',
         count: value?.stage == CaseEditorStage.form ? 8 : 2,
         loading: async.isLoading,
-        immersive: value?.stage == CaseEditorStage.preview,
+        publicCards: value?.stage == CaseEditorStage.preview,
         notice: async.hasError
             ? 'No pudimos preparar el reporte. Revisa tu sesión y conexión.'
             : value?.issue != null
@@ -169,21 +175,7 @@ class _CaseEditorScreenState extends ConsumerState<CaseEditorScreen> {
         );
   Widget _editorContent(CaseEditorState value, CaseEditorViewModel model) {
     if (value.stage == CaseEditorStage.confirmed) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          StaggerRevealItem(
-            order: 0,
-            child: FilledButton(
-              style: primaryActionButtonStyle(context),
-              onPressed: () =>
-                  context.pushReplacement('/home/cases/${value.published!.id}'),
-              child: const Text('Ver ficha pública'),
-            ),
-          ),
-        ],
-      );
+      return const SizedBox.shrink();
     }
     if (value.stage == CaseEditorStage.preview) {
       final preview = value.preview;
