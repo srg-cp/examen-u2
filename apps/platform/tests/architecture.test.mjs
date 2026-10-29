@@ -16,11 +16,15 @@ test('Mobile and web profile/dialog origin transitions share timing, curves and 
     assert.match(source,new RegExp(`transitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_ENTER_MS}`));
     assert.match(source,new RegExp(`reverseTransitionDuration:[\\s\\S]*?milliseconds: ${ORIGIN_EXIT_MS}`));
   }
-  assert.match(mobile,/Curves\.easeInOutCubic/);assert.match(mobile,/Interval\(\.65, 1, curve: Curves\.easeOutCubic\)/);
-  assert.match(mobile,/Interval\(\s*0,\s*\.45,/);
-  assert.equal(ORIGIN_SOURCE_END,.45);assert.equal(ORIGIN_CONTENT_START,.65);
+  assert.match(mobile,/Curves\.easeInOutCubic/);
+  assert.match(mobile,/const originSourceEnd = \.55;/);
+  assert.match(mobile,/const originContentStart = \.55;/);
+  assert.match(mobile,/Interval\(\s*originContentStart,\s*1,\s*curve: Curves\.easeOutCubic,?\s*\)/);
+  assert.match(mobile,/Interval\(\s*0,\s*originSourceEnd,/);
+  assert.equal(ORIGIN_SOURCE_END,.55);assert.equal(ORIGIN_CONTENT_START,.55);
   assert.deepEqual(originMotionFrame(0),{shape:0,source:1,content:0});
-  assert.equal(originMotionFrame(.45).source,0);assert.equal(originMotionFrame(.65).content,0);
+  assert.equal(originMotionFrame(.55).source,0);assert.equal(originMotionFrame(.55).content,0);
+  assert.ok(originMotionFrame(.5).source>0);assert.ok(originMotionFrame(.6).content>0);
   assert.ok(Math.abs(originMotionFrame(.5).shape-.516875)<.002);
   assert.deepEqual(originMotionFrame(1),{shape:1,source:0,content:1});
 });

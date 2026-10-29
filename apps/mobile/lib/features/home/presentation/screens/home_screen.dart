@@ -12,6 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../state/home_view_state.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/home_content.dart';
+import '../widgets/home_banner_surface.dart';
 import '../widgets/home_header.dart';
 import '../widgets/liquid_navigation.dart';
 
@@ -96,7 +97,10 @@ class HomeScreen extends ConsumerWidget {
                                   onReport: (source) => openLostReport(
                                     source,
                                     radius: 24,
-                                    icon: Icons.arrow_forward_rounded,
+                                    identity: HomeBannerAction.identity(
+                                      source,
+                                      'Reportar pérdida',
+                                    ),
                                   ),
                                 )
                               : state.section == HomeSection.explore &&

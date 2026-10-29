@@ -1,5 +1,83 @@
 # Estado del proyecto
 
+## Marca estable entre arranque y espera de cuenta —29/10/2026
+
+Corregido el salto que muestran las capturas del usuario: StartupReveal usaba
+icono96/texto36 y un ancho268 con espacio sobrante; EntryScreen usaba80/32 y
+centrado en SafeArea. Ambas etapas reutilizan BrandWordmark.startup con80/32,
+separación16 y ancho real calculado desde BrandName. Mismo ajuste scaleDown
+y área segura; conservar1100ms, intervalo18–85%, easeOutBack y sobrepaso
+horizontal. Sin espera artificial ni cambios de sesión, consultas, errores,
+reintentos, permisos, splash nativo o web. La duración de la espera observada
+no se atribuye a una causa de red/CPU sin medición en el dispositivo.
+[ADR-161](decisiones/161-marca-estable-entre-arranque-y-espera.md) y
+[ficha](funcionalidades/identidad-visual.md).
+
+Validación local:40 pruebas de arranque, aplicación/cuenta, arquitectura y
+consistencia aprobadas con AMBIENT_BACKGROUND_MOTION=false. Diez combinaciones:
+iPhone414×896, Android390×844, pequeño320×350/texto200%, ancho160/texto200%
+y horizontal844×390, cada una con movimiento normal/reducido. Rectángulos
+conservados al pasar a EntryScreen con cuenta pendiente, esperar cinco segundos
+y resolver; prueba existente de sobrepaso horizontal y destino disponible
+conservada. Capturas finales y de espera idénticas por SHA256 en las diez
+combinaciones; fotogramas intermedios y finales revisados visualmente en
+apps/mobile/build/ui-preview/startup. Marca real y ViewModel de cuenta de prueba;
+sin acreditar tiempos de red ni ejecución física. Formato de cinco archivos sin
+cambios, análisis de lib/test sin incidencias y diff comprobado. Logs:
+apps/mobile/build/startup-continuity-tests.log y startup-continuity-analysis.log.
+
+Siguiente paso: nueva compilación y arranque frío Android/iOS en dispositivo,
+incluida cuenta con señal débil. Sin APK/IPA, commit, publicación/despliegue ni
+acciones GitHub; cambios locales anteriores conservados.
+
+## Orígenes completos y fases al 55% —29/10/2026
+
+Por instrucción explícita se conserva el morph existente, con fuente hasta55%
+y destino móvil/diálogos desde55%, sin el intervalo45–65 anterior. Inicio
+reutiliza texto/flecha completos en Reportar pérdida y Encontré una mascota;
+Buscar con una foto conserva ilustración/texto/flecha. Recorrido conserva su
+imagen en tamaño real, título, contador, fechas y acción; utilidades conservan
+icono/título/subtítulo. Nueve puntos y + delegado conservan su identidad real.
+Contenido compartido entre control/copia, temas y escala capturados; scroll
+parcial mantiene todo el rectángulo para evitar recentrado. Etiquetas externas
+a círculos, permisos, consultas, borradores y operaciones conservados.
+
+Web captura solo el control completo con estilos resueltos, inerte, temporal
+y sin IDs/eventos/navegación. Fuente hasta55%, diálogos55/55; fullscreen Sader
+conserva700ms/CustomEase y fade/blur500ms. Corregida además la posición del
+cuerpo de una ruta abierta desde Inicio desplazado: coordenadas documentales,
+sin salto al finalizar. Cierre/locales conservan coordenadas actuales.
+[ADR-160](decisiones/160-origen-completo-y-fases-al-55.md), patrón, reglas y
+fichas de Inicio/ficha pública/Recorrido/navegación actualizados. Sin nuevas
+HU/RF, SQL, dependencias, ampliación de MVP o cierre de historias.
+
+Validación local: suite móvil completa679 pruebas aprobadas con
+AMBIENT_BACKGROUND_MOTION=false. Además14 pruebas de Recorrido aprobadas tras
+ampliar su matriz a390×844/320×600 texto200%, normal/reducido. Inicio verifica
+posiciones iniciales de texto/flecha/imagen en ambos tamaños y movimientos;
+18 pruebas de utilidades/botones normal/acentuado/descripción/+/nueve puntos,
+fases55/55 en ambos sentidos y origen parcialmente visible. Análisis lib/test
+sin incidencias; formato de741 archivos sin cambios y diff comprobado.
+
+Web:94 pruebas, typecheck y build aprobados. QA Chrome headless:16 combinaciones
+de nueve puntos/Reportar pérdida/hallazgo/búsqueda con foto en1852/1255/390/320px,
+más los cuatro recorridos a320px/texto200%; fotogramas de apertura/cierre,
+identidad completa, dimensiones/posición reales, scroll, reapertura en tiempo
+real y reducido. Diálogos Perfil/Alertas aprobados en escritorio/móvil/texto200%,
+incluidos foco, marca, resize, cancelación, preferencia reducida en vivo y cierre
+rápido. Backend fixture; no acreditan permisos/operaciones remotas ni render
+de teselas reales. Capturas con fuentes reales revisadas en
+apps/mobile/build/ui-preview/origin-complete, case-journey y web-origin-sader.
+
+Logs: apps/mobile/build/origin-fix-all-tests.log, origin-journey-tests.log,
+origin-home-tests.log, origin-trigger-tests.log, origin-fix-analysis.log,
+origin-fix-format.log, origin-fix-web-tests.log, origin-fix-web-typecheck.log,
+origin-fix-web-build.log, origin-fix-web-browser.log, origin-fix-web-text200.log
+y origin-fix-dialog-browser.log.
+
+Siguiente paso: nueva compilación y revisión física Android/iOS; Safari/Firefox
+pendientes. Sin APK/IPA, publicación/despliegue ni acciones GitHub en esta tarea.
+
 ## Validación conjunta antes del commit —29/10/2026
 
 Por petición del usuario se registra conjuntamente el trabajo acumulado de

@@ -1,5 +1,12 @@
 # Ficha pública móvil por tarjetas glass
 
+29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): utilidades
+y tarjeta Recorrido entregan el contenido completo al morph, incluidos
+textos, ilustración, contador y fechas, en sus posiciones reales. Etiquetas
+externas a círculos siguen fuera de su origen. Fases móviles55/55; scroll
+parcial y texto ampliado conservados. Sin cambios de lectura/permisos/acciones.
+Validación local y revisión física pendiente en ESTADO.
+
 29/10, [ADR-159](../decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
 tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
 Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes

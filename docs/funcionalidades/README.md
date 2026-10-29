@@ -1,5 +1,15 @@
 # Funcionalidades de Entre Huellas
 
+29/10: [Identidad visual](identidad-visual.md) conserva tamaño y posición de la
+marca entre el final del arranque y la espera de cuenta, mediante composición
+compartida. [ADR-161](../decisiones/161-marca-estable-entre-arranque-y-espera.md).
+
+29/10: [Inicio](inicio.md), [ficha pública móvil](ficha-publica-mobile.md),
+[Recorrido](recorrido-de-busqueda.md) y [navegación web](navegacion-web.md)
+conservan la composición completa del origen al expandir. Límites55/55 en
+móvil/diálogos, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md).
+Evidencia local y revisión física pendiente en ESTADO; sin nuevas historias.
+
 29/10, [ADR-159](../decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
 tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
 Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes

@@ -1,5 +1,13 @@
 # Inicio y navegación
 
+29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): Reportar
+pérdida/Encontré una mascota conservan texto y flecha al comenzar expansión;
+Buscar con una foto conserva ilustración/texto/flecha. Navegación conserva los
+nueve puntos reales; + delegado conserva su identidad. Fuente hasta55% y destino
+móvil desde55%, composición y texto ampliado sin saltos. Web conserva todo el
+control y la entrada Sader del destino. Datos/rutas/borradores intactos;
+validación local y revisión física pendiente en ESTADO.
+
 ## Cabecera y desvanecido comunes —26/10/2026
 
 Por instrucción explícita, el efecto se integra en FadingHeaderScroll compartido

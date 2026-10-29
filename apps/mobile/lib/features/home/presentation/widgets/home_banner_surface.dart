@@ -52,6 +52,31 @@ class HomeBannerAction extends StatelessWidget {
   final String label;
   final ValueChanged<BuildContext> onTap;
 
+  static Widget identity(BuildContext context, String label) =>
+      DefaultTextStyle(
+        style: primaryActionButtonStyle(
+          context,
+        ).textStyle!.resolve({})!.copyWith(color: Colors.white),
+        child: IconTheme(
+          data: const IconThemeData(color: Colors.white),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Center(child: _content(label)),
+          ),
+        ),
+      );
+
+  static Widget _content(String label) => Wrap(
+    alignment: WrapAlignment.center,
+    crossAxisAlignment: WrapCrossAlignment.center,
+    spacing: 12,
+    runSpacing: 6,
+    children: [
+      Text(label, textAlign: TextAlign.center),
+      const Icon(Icons.arrow_forward_rounded, size: 24),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) => Builder(
     builder: (source) => FilledButton(
@@ -62,16 +87,7 @@ class HomeBannerAction extends StatelessWidget {
           EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         ),
       ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 12,
-        runSpacing: 6,
-        children: [
-          Text(label, textAlign: TextAlign.center),
-          const Icon(Icons.arrow_forward_rounded, size: 24),
-        ],
-      ),
+      child: _content(label),
     ),
   );
 }

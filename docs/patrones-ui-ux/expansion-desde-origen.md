@@ -1,15 +1,17 @@
 # Expansión desde origen con identidad del control
 
 Patrón de movimiento aprobado visualmente por el usuario el21/10/2026.
-Referencia vigente: [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md).
+Referencia vigente: [ADR-128](../decisiones/128-identidad-mobile-en-origen-web-fullscreen.md),
+precisada por [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md).
 Combina la expansión fullscreen de Sader con la identidad del botón de móvil.
 
 ## Experiencia que debe conservarse
 
 El usuario reconoce que el destino nace del control que acaba de pulsar. La
 superficie del botón, negra en Reportar, se estira desde su posición y radio
-reales hasta ocupar toda la pantalla. El icono conserva su tamaño y permanece
-centrado dentro de esa superficie mientras se transforma en el contenido.
+reales hasta ocupar toda la pantalla. La composición completa del control
+conserva su tamaño y posiciones internas dentro de esa superficie: texto,
+iconos e ilustraciones se desvanecen juntos, sin centrar solo el icono.
 
 La sección anterior sigue visible detrás durante la apertura. El contenido
 nuevo está dentro del contorno creciente, escalado y recortado por él; su entrada
@@ -47,7 +49,7 @@ la funcionalidad. La animación no debe esperar a que acaben todas las consultas
 | Curva de geometría | CustomEase de Sader: `M0,0 C0.305,0.206 0.116,0.567 0.3,0.8 0.394,0.921 0.491,1 1,1`. |
 | Superficie | Visible desde el primer fotograma; el color fuente se transforma al fondo de página con la geometría. Sin fade/blur global. |
 | Radio | Radio real →0; inverso al cerrar. Se calcula en coordenadas visuales compensando ambos ejes de escala para recuperar el círculo sin esquinas. |
-| Identidad fuente | Icono al tamaño original, centrado dentro del contorno, sin estiramiento. Se desvanece hasta45% con easeInOutCubic; fase invertida al cerrar. |
+| Identidad fuente | Composición completa al tamaño original y centrada como conjunto dentro del contorno, sin estiramiento ni saltos internos. Se desvanece hasta55% con easeInOutCubic; fase invertida al cerrar. |
 | Cuerpo al abrir | Opacidad0/blur10px → opacidad1/blur0 en500ms; `cubic-bezier(0.56,0.27,0,1)`. |
 | Cuerpo al cerrar | Blur0→32px en500ms, `cubic-bezier(0.37,0.35,0,1)`; opacidad1→0 en700ms, `cubic-bezier(0.56,0.27,0,1)`. |
 | Composición | Fade/blur solo sobre el cuerpo de destino; superficie e identidad fuente conservan nitidez. Cuerpo e identidad viven dentro del mismo recorte. |
@@ -56,6 +58,12 @@ Las fases se solapan; no hay una pausa inventada a mitad del recorrido ni una
 aparición del formulario al100%. Tampoco se combina con otro fade de ruta,
 cover o stagger de entrada que vuelva a ocultar/revelar el mismo contenido.
 Conservar los parámetros compartidos al reutilizar, sin ajustes por pantalla.
+
+Flutter y los diálogos web conservan320/260ms; fuente hasta55% y destino desde55%
+por ADR-160. El fullscreen web conserva las fases Sader de la tabla. Orígenes
+parcialmente visibles conservan su rectángulo completo, recortado por el viewport.
+Al abrir una ruta desde scroll, el cuerpo de destino usa coordenadas documentales
+para no heredar la posición desplazada de la sección saliente.
 
 ## Cómo integrarlo en Nuxt
 

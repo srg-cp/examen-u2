@@ -111,20 +111,16 @@ Future<T?> pushCaseControl<T>(
   required double radius,
   required Widget identity,
 }) {
-  final box = key.currentContext?.findRenderObject();
-  final navigator = Navigator.of(context).context.findRenderObject();
-  final bounds = box is RenderBox && box.hasSize
-      ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
-      : null;
+  final sourceContext = key.currentContext;
   return context.push<T>(
     route,
-    extra: bounds == null
+    extra: sourceContext == null
         ? null
-        : OriginPageSource(
-            bounds: bounds,
+        : OriginPageSource.capture(
+            sourceContext,
             color: color,
             radius: radius,
-            child: Center(child: identity),
+            child: identity,
           ),
   );
 }
@@ -158,13 +154,43 @@ class _CaseUtilityButtonState extends State<CaseUtilityButton> {
         _surface,
         color: const Color(0xFFF0F1F3),
         radius: 22,
-        identity: Icon(widget.icon, color: const Color(0xFF171918), size: 24),
+        identity: _content(),
       );
       if (mounted) widget.onReturn?.call();
     } finally {
       if (mounted) setState(() => _opening = false);
     }
   }
+
+  Widget _content() => Padding(
+    padding: const EdgeInsets.all(14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(widget.icon, size: 21, color: const Color(0xFF171918)),
+        const SizedBox(height: 7),
+        Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.25,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF171918),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          widget.subtitle,
+          style: const TextStyle(
+            fontSize: 12,
+            height: 1.3,
+            color: Color(0xFF6E6E73),
+          ),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -178,38 +204,7 @@ class _CaseUtilityButtonState extends State<CaseUtilityButton> {
       color: const Color(0xFFF0F1F3),
       borderRadius: BorderRadius.circular(22),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: _opening ? null : _open,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(widget.icon, size: 21, color: const Color(0xFF171918)),
-              const SizedBox(height: 7),
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  height: 1.25,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF171918),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                widget.subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  height: 1.3,
-                  color: Color(0xFF6E6E73),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: InkWell(onTap: _opening ? null : _open, child: _content()),
     ),
   );
 }

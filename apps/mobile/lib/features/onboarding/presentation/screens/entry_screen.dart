@@ -56,7 +56,7 @@ class EntryScreen extends ConsumerWidget {
                     label: 'Preparando tu cuenta',
                     liveRegion: true,
                     child: const ExcludeSemantics(
-                      child: BrandWordmark(iconSize: 80, textSize: 32),
+                      child: BrandWordmark.startup(),
                     ),
                   ),
           ),

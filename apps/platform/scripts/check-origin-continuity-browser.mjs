@@ -8,8 +8,8 @@ let server=await recoveryFixture();
 const output=new URL('../../mobile/build/ui-preview/web-origin-sader/',import.meta.url);
 await mkdir(output,{recursive:true});
 try {
- for(const mode of ['nine','shortcut']) {
-  if(mode==='shortcut'){await server.close();server=await recoveryFixture();}
+ for(const mode of (process.env.ORIGIN_MODES?process.env.ORIGIN_MODES.split(','):['nine','shortcut','found','photo'])) {
+  if(mode!=='nine'){await server.close();server=await recoveryFixture();}
   for(const width of (process.env.ORIGIN_WIDTHS?process.env.ORIGIN_WIDTHS.split(',').map(Number):[1852,1255,390,320])) {
    const origin=process.env.BROWSER_ORIGIN||server.origin;
    const page=await browser.newPage({viewport:{width,height:844},reducedMotion:'no-preference'});
@@ -28,8 +28,11 @@ try {
    const nav=page.getByRole('navigation',{name:'Navegación de usuario'});
    await nav.waitFor();await page.waitForTimeout(500);
    if(process.env.ORIGIN_TEXT_SCALE)await page.evaluate(scale=>{document.documentElement.style.fontSize=scale;},process.env.ORIGIN_TEXT_SCALE);
-   const trigger=mode==='nine'?nav.getByRole('link',{name:'Reportar',exact:true}):page.getByRole('navigation',{name:'Accesos de Inicio'}).getByRole('link',{name:'Reportar',exact:true});
+   const trigger=mode==='nine'?nav.getByRole('link',{name:'Reportar',exact:true}):page.locator(mode==='photo'?'.home-photo-link':mode==='found'?'.home-found .home-banner-action':'.home-report .home-banner-action');
+   const destination=mode==='photo'?'/coincidencias':'/reportar';
+   await trigger.scrollIntoViewIfNeeded();
    const source=await trigger.boundingBox();
+   const sourceText=(await trigger.textContent()).trim();
    const sourceIcon=await trigger.locator('svg,img').first().boundingBox();
    const surface=page.locator('main[data-origin-content]:not([data-origin-underlay] *)');
    // Pause the actual GSAP Flip timeline at creation, not a substitute WAAPI
@@ -41,7 +44,7 @@ try {
     });
     window.originObserver.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['data-origin-animating']});
    });
-   await trigger.click();await page.waitForURL('**/reportar');
+   await trigger.click();await page.waitForURL(url=>url.pathname===destination);
    await page.waitForFunction(()=>document.querySelector('main[data-origin-animating="opening"]')?._flip?.paused());
    const initial=await surface.evaluate(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,duration:node._flip.duration(),fill:getComputedStyle(node).getPropertyValue('--origin-fill').trim()};});
    for(const key of ['x','y','width','height'])assert.ok(Math.abs(initial[key]-source[key])<1,`${mode}/${width}: real component ${key} starts at trigger: ${JSON.stringify({initial,source})}`);
@@ -50,21 +53,27 @@ try {
    assert.equal(openingTiming.duration,500,'Sader opening CSS lasts 500ms');
    assert.equal(openingTiming.easing.replaceAll(' ',''),'cubic-bezier(0.56,0.27,0,1)','Sader opening CSS curve is copied unchanged');
    let nearFinalHeading;
-   for(const progress of [0,.02,.05,.1,.15,.45,.65,.85,.99]) {
+   for(const progress of [0,.02,.05,.1,.15,.45,.5,.55,.65,.85,.99]) {
     await surface.evaluate((node,value)=>{node._flip.progress(value);for(const animation of node.getAnimations({subtree:true})){animation.pause();animation.currentTime=value*700;}},progress);
     const state=await surface.evaluate(node=>({body:getComputedStyle(node.querySelector('.origin-page-body')).visibility,inert:node.inert,fill:getComputedStyle(node).getPropertyValue('--origin-fill').trim(),opacity:Number(getComputedStyle(node.querySelector('.origin-page-body')).opacity),filter:getComputedStyle(node.querySelector('.origin-page-body')).filter}));
     assert.equal(state.body,'visible',`Form must scale within the surface from the start, including ${progress}`);assert.equal(state.inert,true);
     const identity=surface.locator('[data-origin-identity]');
-    const icon=await identity.locator('svg,img').boundingBox();
+    const icon=await identity.locator('svg,img').first().boundingBox();
+    if(progress===0){
+     assert.ok(Math.abs(icon.x-sourceIcon.x)<.6&&Math.abs(icon.y-sourceIcon.y)<.6,'The source icon must start in its real position, alongside the full label');
+     assert.equal((await identity.textContent()).trim(),sourceText,'The complete trigger label stays in the source');
+     if(mode==='photo')assert.equal(await identity.locator('img').count(),1,'The card illustration remains in the source');
+    }
     assert.ok(Math.abs(icon.width-sourceIcon.width)<.6&&Math.abs(icon.height-sourceIcon.height)<.6,'The source icon must retain its original size while the black surface expands');
     const identityOpacity=await identity.evaluate(node=>Number(getComputedStyle(node).opacity));
     if(progress===0){assert.equal(identityOpacity,1);assert.equal(await surface.evaluate(node=>Number(getComputedStyle(node).opacity)),1,'The source shell must be visible immediately');}
-    if(progress>=.45)assert.equal(identityOpacity,0,'Mobile source identity disappears by 45%');
+    if(progress>=.55)assert.equal(identityOpacity,0,'Source identity disappears by 55%');
+    if(progress===.5)assert.ok(identityOpacity>0,'Source identity is still visible at 50%');
     if(progress===0){assert.equal(state.opacity,0,'Sader PrettyModal starts the destination fade at zero');assert.equal(state.filter,'blur(10px)','Sader starts with 10px blur');}
     if(progress>=.85){assert.equal(state.opacity,1,'Sader completes the 500ms fade before the 700ms morph');assert.ok(['none','blur(0px)'].includes(state.filter));}
     if(progress===.99){nearFinalHeading=await surface.locator('h1').boundingBox();const box=await surface.boundingBox();assert.ok(Math.abs(box.x)<3&&Math.abs(box.y)<3&&Math.abs(box.width-width)<3&&Math.abs(box.height-844)<3,'The morph must reach the entire viewport, not the content column');}
-    assert.equal(await page.locator('.home-shortcuts:not([data-origin-underlay] *),.origin-transition-host,.origin-transition-hold,.origin-transition-previous').count(),0,'No Home shortcuts inside the destination or obsolete animation layers');
-    assert.equal(await page.locator('[data-origin-underlay] .home-shortcuts').count(),1,'The real previous section must remain behind the growing destination');
+    assert.equal(await page.locator('.home-report:not([data-origin-underlay] *),.origin-transition-host,.origin-transition-hold,.origin-transition-previous').count(),0,'No Home shortcuts inside the destination or obsolete animation layers');
+    assert.equal(await page.locator('[data-origin-underlay] .home-report').count(),1,'The real previous section must remain behind the growing destination');
     if(progress===.15){const heading=await surface.locator('h1').boundingBox();const layoutHeight=await surface.locator('h1').evaluate(node=>node.offsetHeight);const shell=await surface.boundingBox();assert.ok(heading.width<=shell.width&&heading.height<layoutHeight*.9,'The form heading must scale inside the origin, not appear at its final size');}
     if([0,.02,.05,.1,.15,.45,.99].includes(progress))await page.screenshot({path:fileURLToPath(new URL(`${mode}-${width}-${Math.round(progress*100)}.png`,output))});
    }
@@ -75,17 +84,17 @@ try {
    const finalHeading=await surface.locator('h1').boundingBox();
    for(const axis of ['x','y'])assert.ok(Math.abs(finalHeading[axis]-nearFinalHeading[axis])<3,`No content jump at fullscreen completion: ${JSON.stringify({nearFinalHeading,finalHeading})}`);
    assert.equal(await surface.locator('.origin-page-body').evaluate(node=>getComputedStyle(node).visibility),'visible');
-   assert.equal(await page.locator('.home-shortcuts').count(),0);
+   assert.equal(await page.locator('.home-report').count(),0);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'The completed form must fit the viewport');
    await page.screenshot({path:fileURLToPath(new URL(`${mode}-${width}-100.png`,output))});
    // The outgoing component remains mounted for Flip.to; routing commits only
    // after the real Sader close has completed, rather than animating a clone.
    const back=page.goBack();
    await page.waitForFunction(()=>document.querySelector('main[data-origin-animating="closing"]')?._flip?.paused());
-   assert.ok(await surface.textContent().then(text=>text.includes('Reportar')));
+   assert.ok(await surface.textContent().then(text=>text.includes(mode==='photo'?'Buscar con una foto':'Reportar')));
    for(const progress of [.5,.75,.95,.999]){
     await surface.evaluate((node,value)=>{node._flip.progress(value);for(const animation of node.getAnimations({subtree:true})){animation.pause();animation.currentTime=value*700;}},progress);
-    const icon=await surface.locator('[data-origin-identity] svg,[data-origin-identity] img').boundingBox();
+    const icon=await surface.locator('[data-origin-identity] svg,[data-origin-identity] img').first().boundingBox();
     assert.ok(Math.abs(icon.width-sourceIcon.width)<.6&&Math.abs(icon.height-sourceIcon.height)<.6,'The source icon must return at its original size');
     if(progress===.999&&mode==='nine'){
      const radii=await surface.evaluate(node=>{const r=node.getBoundingClientRect(),parts=getComputedStyle(node).borderTopLeftRadius.split(' ').map(parseFloat);return [parts[0]*r.width/node.offsetWidth,(parts[1]??parts[0])*r.height/node.offsetHeight];});
@@ -125,18 +134,18 @@ try {
      window.addEventListener('resize',()=>window.liveOriginEvents.push('window resize'),{signal:listeners.signal});
      visualViewport?.addEventListener('resize',()=>window.liveOriginEvents.push('visualViewport resize'),{signal:listeners.signal});
     },round===0);
-    await trigger.click();await page.waitForURL('**/reportar');await idle();
+    await trigger.click();await page.waitForURL(url=>url.pathname===destination);await idle();
     const live=await page.evaluate(()=>{window.liveOriginObserver.disconnect();window.liveOriginCleanup();return {frames:window.liveOriginFrames,events:window.liveOriginEvents};});
     assert.ok(live.frames.at(-1)?.time>=600,`Opening must actually run in real time: ${JSON.stringify(live)}`);
     assert.ok(live.frames.filter(frame=>frame.opening&&frame.body==='visible').length>=5,`Opening must paint multiple content frames: ${JSON.stringify(live)}`);
     assert.ok(live.frames.filter(frame=>frame.opening).every(frame=>frame.body==='visible'),'The route content must remain inside the expansion throughout the opening');
     assert.ok(Math.max(...live.frames.map(frame=>frame.width*frame.height))>live.frames[0].width*live.frames[0].height*2,`The real-time opening must visibly grow, including narrow layouts: ${JSON.stringify(live)}`);
     liveDurations.push(Math.round(live.frames.at(-1).time));
-    assert.equal(await page.locator('.home-shortcuts').count(),0);
+    assert.equal(await page.locator('.home-report').count(),0);
     await page.goBack();await page.waitForURL('**/inicio');await idle();
    }
    await page.emulateMedia({reducedMotion:'reduce'});
-   await nav.getByRole('link',{name:'Reportar',exact:true}).click();await page.waitForURL('**/reportar');await idle();
+   await trigger.click();await page.waitForURL(url=>url.pathname===destination);await idle();
    assert.equal(await page.locator('[data-origin-animating]').count(),0);assert.deepEqual(errors,[]);
    console.log(JSON.stringify({mode,width,engine:'Sader GSAP Flip',duration:initial.duration,liveDurations,fullscreen:true,entryMs:500,copies:0}));
    await page.unrouteAll({behavior:'wait'});await page.close();

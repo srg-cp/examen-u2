@@ -1,5 +1,22 @@
 # Identidad visual y recursos de marca
 
+## Continuidad de marca en arranque y espera —29/10/2026
+
+StartupReveal y la preparación de cuenta de EntryScreen comparten
+BrandWordmark.startup: icono80, lettering32, separación16, ancho real del
+conjunto y centrado dentro de SafeArea. El final de la animación tiene el mismo
+tamaño y posición que la espera. Antes se usaban icono96/lettering36, un ancho
+sobrante y un centro sin área segura en el arranque.
+
+Conservar1100ms, intervalo18–85%, easeOutBack y sobrepaso horizontal, con
+destino inmediato en reducido. Sin demora artificial, cambio de sesiones,
+consultas, persistencia/permisos, errores/reintentos o recursos de marca.
+[ADR-161](../decisiones/161-marca-estable-entre-arranque-y-espera.md).
+Regresión geométrica con cuenta pendiente y matriz de tamaños/texto200%/reducido
+aprobada:40 pruebas del incremento y diez pares de capturas final/espera
+idénticas por SHA256. Logs/resultados en ESTADO; revisión física con nueva
+compilación pendiente.
+
 29/10, prevención obligatoria solicitada por el usuario: una entrada de contenido
 sin cortina/fondo/espera previa ni timelines duplicados. AGENTS.md y REGLAS_UI_UX
 contienen la regla vigente; architecture_test rechaza el patrón retirado y las

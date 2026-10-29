@@ -31,101 +31,100 @@ class CollectionAddButton extends StatelessWidget {
   final VoidCallback? onReturn;
 
   @override
-  Widget build(BuildContext context) => Builder(
-    builder: (buttonContext) {
-      final button = Tooltip(
-        message: label,
-        excludeFromSemantics: true,
-        child: FilledButton(
-          key: buttonKey,
-          style: compact
-              ? FilledButton.styleFrom(
-                  backgroundColor: AppColors.ink,
-                  foregroundColor: Colors.white,
-                  fixedSize: const Size.square(56),
-                  minimumSize: const Size.square(56),
-                  padding: EdgeInsets.zero,
-                  shape: const CircleBorder(),
-                )
-              : primaryActionButtonStyle(context).copyWith(
-                  minimumSize: const WidgetStatePropertyAll(Size(0, 56)),
-                  padding: accented
-                      ? const WidgetStatePropertyAll(EdgeInsets.all(8))
-                      : null,
-                  backgroundColor: accented
-                      ? const WidgetStatePropertyAll(Colors.transparent)
-                      : description == null
-                      ? null
-                      : const WidgetStatePropertyAll(Color(0xFFF5F5F7)),
-                  foregroundColor: description == null
-                      ? null
-                      : const WidgetStatePropertyAll(AppColors.ink),
-                ),
-          onPressed: () {
-            if (onAction != null) {
-              onAction!(buttonContext);
-              return;
-            }
-            final box = buttonContext.findRenderObject();
-            final navigator = Navigator.of(
-              buttonContext,
-            ).context.findRenderObject();
-            final origin = box is RenderBox && box.hasSize
-                ? box.localToGlobal(Offset.zero, ancestor: navigator) & box.size
-                : null;
-            beforeNavigate?.call();
-            buttonContext
-                .push(
-                  route!,
-                  extra: origin == null
-                      ? null
-                      : OriginPageSource(
-                          bounds: origin,
-                          color: accented
-                              ? const Color(0xFF2887EF)
-                              : description == null
-                              ? AppColors.ink
-                              : const Color(0xFFF5F5F7),
-                          radius: compact ? origin.shortestSide / 2 : 24,
-                          child: DefaultTextStyle(
-                            style:
-                                (primaryActionButtonStyle(
-                                          context,
-                                        ).textStyle?.resolve({}) ??
-                                        Theme.of(context).textTheme.labelLarge!)
-                                    .copyWith(
-                                      color: description == null
-                                          ? Colors.white
-                                          : AppColors.ink,
-                                    ),
-                            child: IconTheme(
-                              data: IconThemeData(
-                                color: description == null
-                                    ? Colors.white
-                                    : AppColors.ink,
-                              ),
-                              child: Padding(
-                                padding: compact
-                                    ? EdgeInsets.zero
-                                    : const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                        vertical: 18,
-                                      ),
-                                child: Center(child: _content()),
-                              ),
-                            ),
+  Widget build(BuildContext context) => OriginTriggerIdentity(
+    identity: _identity(context),
+    child: Builder(
+      builder: (buttonContext) {
+        final button = Tooltip(
+          message: label,
+          excludeFromSemantics: true,
+          child: FilledButton(
+            key: buttonKey,
+            style: compact
+                ? FilledButton.styleFrom(
+                    backgroundColor: AppColors.ink,
+                    foregroundColor: Colors.white,
+                    fixedSize: const Size.square(56),
+                    minimumSize: const Size.square(56),
+                    padding: EdgeInsets.zero,
+                    shape: const CircleBorder(),
+                  )
+                : primaryActionButtonStyle(context).copyWith(
+                    minimumSize: const WidgetStatePropertyAll(Size(0, 56)),
+                    padding: accented
+                        ? const WidgetStatePropertyAll(EdgeInsets.all(8))
+                        : null,
+                    backgroundColor: accented
+                        ? const WidgetStatePropertyAll(Colors.transparent)
+                        : description == null
+                        ? null
+                        : const WidgetStatePropertyAll(Color(0xFFF5F5F7)),
+                    foregroundColor: description == null
+                        ? null
+                        : const WidgetStatePropertyAll(AppColors.ink),
+                  ),
+            onPressed: () {
+              if (onAction != null) {
+                onAction!(buttonContext);
+                return;
+              }
+              final box = buttonContext.findRenderObject();
+              final navigator = Navigator.of(
+                buttonContext,
+              ).context.findRenderObject();
+              final origin = box is RenderBox && box.hasSize
+                  ? box.localToGlobal(Offset.zero, ancestor: navigator) &
+                        box.size
+                  : null;
+              beforeNavigate?.call();
+              buttonContext
+                  .push(
+                    route!,
+                    extra: origin == null
+                        ? null
+                        : OriginPageSource(
+                            bounds: origin,
+                            color: accented
+                                ? const Color(0xFF2887EF)
+                                : description == null
+                                ? AppColors.ink
+                                : const Color(0xFFF5F5F7),
+                            radius: compact ? origin.shortestSide / 2 : 24,
+                            child: _identity(context),
                           ),
-                        ),
-                )
-                .then((_) => onReturn?.call());
-          },
-          child: _content(),
-        ),
-      );
-      return accented
-          ? NavigationAccentSurface(engaged: false, child: button)
-          : button;
-    },
+                  )
+                  .then((_) => onReturn?.call());
+            },
+            child: _content(),
+          ),
+        );
+        return accented
+            ? NavigationAccentSurface(engaged: false, child: button)
+            : button;
+      },
+    ),
+  );
+
+  Widget _identity(BuildContext context) => DefaultTextStyle(
+    style:
+        (primaryActionButtonStyle(context).textStyle?.resolve({}) ??
+                Theme.of(context).textTheme.labelLarge!)
+            .copyWith(
+              color: description == null ? Colors.white : AppColors.ink,
+            ),
+    child: IconTheme(
+      data: IconThemeData(
+        color: description == null ? Colors.white : AppColors.ink,
+      ),
+      child: Padding(
+        padding: compact
+            ? EdgeInsets.zero
+            : accented
+            ? const EdgeInsets.all(8)
+            : const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        child: Center(child: _content()),
+      ),
+    ),
   );
 
   Widget _content() => compact

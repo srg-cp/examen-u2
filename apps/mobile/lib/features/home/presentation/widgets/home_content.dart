@@ -72,7 +72,7 @@ class HomeContent extends StatelessWidget {
           onFound: (source) => openHomeAction(
             source,
             '/home/found-cases/new?independent=true',
-            Icons.arrow_forward_rounded,
+            HomeBannerAction.identity(source, 'Encontré una mascota'),
             radius: 24,
           ),
         ),
@@ -85,10 +85,9 @@ class HomeContent extends StatelessWidget {
           onTap: (source) => openHomeAction(
             source,
             '/home/coincidencias',
-            Icons.arrow_forward_rounded,
+            const HomePhotoSearchContent(),
             color: HomeBannerSurface.originColor,
             radius: HomeBannerSurface.radius,
-            iconSize: 26,
           ),
         ),
       ),

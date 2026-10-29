@@ -80,7 +80,7 @@ class _OriginDialogTransitionState extends State<OriginDialogTransition> {
                               width: 48,
                               height: 48,
                             )
-                          : origin;
+                          : widget.origin!;
                       final surface = target == null
                           ? start
                           : Rect.lerp(start, target, progress)!;
@@ -156,7 +156,7 @@ class _OriginDialogTransitionState extends State<OriginDialogTransition> {
                                       !_closing &&
                                       widget.source != null &&
                                       widget.origin != null &&
-                                      widget.animation.value < .45)
+                                      widget.animation.value < originSourceEnd)
                                     Positioned.fill(
                                       child: IgnorePointer(
                                         child: ExcludeSemantics(
@@ -167,7 +167,8 @@ class _OriginDialogTransitionState extends State<OriginDialogTransition> {
                                             opacity:
                                                 1 -
                                                 Curves.easeOutCubic.transform(
-                                                  (widget.animation.value / .45)
+                                                  (widget.animation.value /
+                                                          originSourceEnd)
                                                       .clamp(0.0, 1.0),
                                                 ),
                                             child: FittedBox(

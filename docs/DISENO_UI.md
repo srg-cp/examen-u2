@@ -1,5 +1,16 @@
 # Diseño de la interfaz: implementación y revisión
 
+29/10, [ADR-161](decisiones/161-marca-estable-entre-arranque-y-espera.md):
+arranque y espera de cuenta comparten BrandWordmark.startup, icono80/texto32,
+ancho real y centrado en SafeArea. Mismo tamaño/posición al terminar la
+animación; conservar1100ms, resorte horizontal, reducido y destino sin demora.
+
+29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): identidad de
+origen completa y sin salto inicial; textos/ilustraciones/iconos se desvanecen
+juntos hasta55%, destino móvil/diálogos desde55%. Nueve puntos y + conservan
+su identidad real. Layout fijo durante morph y rectángulo completo con scroll
+parcial; web fullscreen mantiene700ms/entrada Sader500ms y fuente hasta55%.
+
 29/10, [ADR-159](decisiones/159-foto-publica-mas-alta-y-visor-completo.md): foto pública móvil más alta sin cambiar ancho;
 tocar abre visor completo sin recorte, con zoom y galería desde la foto activa.
 Cerrar conserva foto/scroll. Skeleton adaptado, proveedores/permisos existentes

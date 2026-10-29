@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +12,8 @@ import 'package:flutter_application_entrehuellas/features/home/presentation/stat
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_header.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/home_banner_surface.dart';
 import 'package:flutter_application_entrehuellas/features/home/presentation/widgets/liquid_navigation.dart';
+import 'case_journey_test.dart' show loadJourneyFonts;
+import 'support/origin_visual_capture.dart';
 
 Future<void> reveal(WidgetTester tester, Finder target) async {
   await Scrollable.ensureVisible(tester.element(target), alignment: .25);
@@ -18,120 +21,166 @@ Future<void> reveal(WidgetTester tester, Finder target) async {
 }
 
 void main() {
-  for (final reduced in [false, true]) {
-    for (final entry in [
-      ('Mis reportes', '/home/my-reports'),
-      ('Reportar pérdida', '/home/lost-cases/new'),
-      ('Encontré una mascota', '/home/found-cases/new?independent=true'),
-      ('Buscar con una foto', '/home/coincidencias'),
-    ]) {
-      testWidgets(
-        'Home ${entry.$1} keeps destination and return; reduced=$reduced',
-        (tester) async {
-          tester.view.physicalSize = const Size(390, 844);
-          tester.view.devicePixelRatio = 1;
-          addTearDown(tester.view.resetPhysicalSize);
-          addTearDown(tester.view.resetDevicePixelRatio);
-          OriginPageSource? captured;
-          Uri? destination;
-          final router = GoRouter(
-            initialLocation: '/home',
-            routes: [
-              GoRoute(
-                path: '/home',
-                builder: (_, _) => const HomeScreen(
-                  profileAvatar: CircleAvatar(child: Text('A')),
+  for (final enlarged in [false, true]) {
+    for (final reduced in [false, true]) {
+      for (final entry in [
+        ('Mis reportes', '/home/my-reports'),
+        ('Reportar pérdida', '/home/lost-cases/new'),
+        ('Encontré una mascota', '/home/found-cases/new?independent=true'),
+        ('Buscar con una foto', '/home/coincidencias'),
+      ]) {
+        testWidgets(
+          'Home ${entry.$1} keeps destination and return; reduced=$reduced enlarged=$enlarged',
+          (tester) async {
+            tester.view.physicalSize = enlarged
+                ? const Size(320, 600)
+                : const Size(390, 844);
+            tester.view.devicePixelRatio = 1;
+            addTearDown(tester.view.resetPhysicalSize);
+            addTearDown(tester.view.resetDevicePixelRatio);
+            final boundary = GlobalKey();
+            final imageName =
+                'home-${entry.$1.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '-')}-${enlarged ? 'text200' : 'normal'}';
+            if (Platform.environment['CAPTURE_ORIGIN'] == '1') {
+              await tester.runAsync(loadJourneyFonts);
+            }
+            OriginPageSource? captured;
+            Uri? destination;
+            final router = GoRouter(
+              initialLocation: '/home',
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (_, _) => const HomeScreen(
+                    profileAvatar: CircleAvatar(child: Text('A')),
+                  ),
+                  routes: [
+                    for (final path in [
+                      'my-reports',
+                      'lost-cases/new',
+                      'found-cases/new',
+                      'coincidencias',
+                    ])
+                      GoRoute(
+                        path: path,
+                        pageBuilder: (context, state) {
+                          destination = state.uri;
+                          captured = state.extra as OriginPageSource?;
+                          return entityEditorPage(
+                            context: context,
+                            key: state.pageKey,
+                            source: state.extra,
+                            child: const Scaffold(
+                              body: Text('Destino existente'),
+                            ),
+                          );
+                        },
+                      ),
+                  ],
                 ),
-                routes: [
-                  for (final path in [
-                    'my-reports',
-                    'lost-cases/new',
-                    'found-cases/new',
-                    'coincidencias',
-                  ])
-                    GoRoute(
-                      path: path,
-                      pageBuilder: (context, state) {
-                        destination = state.uri;
-                        captured = state.extra as OriginPageSource?;
-                        return entityEditorPage(
-                          context: context,
-                          key: state.pageKey,
-                          source: state.extra,
-                          child: const Scaffold(
-                            body: Text('Destino existente'),
-                          ),
-                        );
-                      },
+              ],
+            );
+            addTearDown(router.dispose);
+            await tester.pumpWidget(
+              ProviderScope(
+                child: MaterialApp.router(
+                  theme: AppTheme.light,
+                  routerConfig: router,
+                  builder: (context, child) => MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      disableAnimations: reduced,
+                      textScaler: TextScaler.linear(enlarged ? 2 : 1),
                     ),
-                ],
-              ),
-            ],
-          );
-          addTearDown(router.dispose);
-          await tester.pumpWidget(
-            ProviderScope(
-              child: MaterialApp.router(
-                theme: AppTheme.light,
-                routerConfig: router,
-                builder: (context, child) => MediaQuery(
-                  data: MediaQuery.of(
-                    context,
-                  ).copyWith(disableAnimations: reduced),
-                  child: child!,
+                    child: RepaintBoundary(key: boundary, child: child!),
+                  ),
                 ),
               ),
-            ),
-          );
-          await tester.pumpAndSettle();
-          final label = find.text(entry.$1);
-          await reveal(tester, label);
-          final target = entry.$1 == 'Buscar con una foto'
-              ? find.byKey(const ValueKey('home-photo-search'))
-              : entry.$1 == 'Mis reportes'
-              ? find.ancestor(of: label, matching: find.byType(TextButton))
-              : find.ancestor(of: label, matching: find.byType(FilledButton));
-          final sourceBounds = tester.getRect(target);
-          await tester.tap(label);
-          await tester.pump();
-          expect(destination.toString(), entry.$2);
-          if (entry.$1 != 'Mis reportes') {
-            expect(captured!.bounds, sourceBounds);
-            expect((captured!.child as Icon).icon, Icons.arrow_forward_rounded);
-            expect(
-              (captured!.child as Icon).size,
-              entry.$1 == 'Buscar con una foto' ? 26 : 24,
             );
-            expect(
-              captured!.color,
-              entry.$1 == 'Buscar con una foto'
-                  ? HomeBannerSurface.originColor
-                  : const Color(0xFF111111),
+            await tester.pumpAndSettle();
+            final label = find.text(entry.$1);
+            await reveal(tester, label);
+            final target = entry.$1 == 'Buscar con una foto'
+                ? find.byKey(const ValueKey('home-photo-search'))
+                : entry.$1 == 'Mis reportes'
+                ? find.ancestor(of: label, matching: find.byType(TextButton))
+                : find.ancestor(of: label, matching: find.byType(FilledButton));
+            final sourceBounds = tester.getRect(target);
+            final labelBounds = tester.getRect(label);
+            final arrow = find.descendant(
+              of: target,
+              matching: find.byIcon(Icons.arrow_forward_rounded),
             );
-            if (!reduced) {
-              await tester.pump(const Duration(milliseconds: 160));
+            final arrowBounds = arrow.evaluate().isEmpty
+                ? null
+                : tester.getRect(arrow);
+            if (!reduced) await capture(tester, boundary, '$imageName-before');
+            await tester.tap(label);
+            await tester.pump();
+            await tester.pump();
+            expect(destination.toString(), entry.$2);
+            if (entry.$1 != 'Mis reportes') {
+              expect(captured!.bounds, sourceBounds);
+              if (!reduced) {
+                final copy = find.byKey(const ValueKey('origin-page-source'));
+                final copyLabel = find.descendant(
+                  of: copy,
+                  matching: find.text(entry.$1),
+                );
+                expect(copyLabel, findsOneWidget);
+                expect(
+                  tester.getRect(copyLabel),
+                  rectMoreOrLessEquals(labelBounds, epsilon: .5),
+                );
+                final copyArrow = find.descendant(
+                  of: copy,
+                  matching: find.byIcon(Icons.arrow_forward_rounded),
+                );
+                expect(copyArrow, findsOneWidget);
+                expect(
+                  tester.getRect(copyArrow),
+                  rectMoreOrLessEquals(arrowBounds!, epsilon: .5),
+                );
+                if (entry.$1 == 'Buscar con una foto') {
+                  expect(
+                    find.descendant(of: copy, matching: find.byType(Image)),
+                    findsOneWidget,
+                  );
+                }
+                await capture(tester, boundary, '$imageName-start');
+                await tester.pump(const Duration(milliseconds: 48));
+                await capture(tester, boundary, '$imageName-15');
+              }
+              expect(
+                captured!.color,
+                entry.$1 == 'Buscar con una foto'
+                    ? HomeBannerSurface.originColor
+                    : const Color(0xFF111111),
+              );
+              if (!reduced) {
+                await tester.pump(const Duration(milliseconds: 160));
+                final transition = tester.widget<OriginPageTransition>(
+                  find.byType(OriginPageTransition),
+                );
+                expect(transition.animation.value, inExclusiveRange(0, 1));
+              }
+            }
+            await tester.pumpAndSettle();
+            expect(find.text('Destino existente'), findsOneWidget);
+            router.pop();
+            await tester.pump();
+            if (!reduced && entry.$1 != 'Mis reportes') {
+              await tester.pump(const Duration(milliseconds: 130));
               final transition = tester.widget<OriginPageTransition>(
                 find.byType(OriginPageTransition),
               );
               expect(transition.animation.value, inExclusiveRange(0, 1));
             }
-          }
-          await tester.pumpAndSettle();
-          expect(find.text('Destino existente'), findsOneWidget);
-          router.pop();
-          await tester.pump();
-          if (!reduced && entry.$1 != 'Mis reportes') {
-            await tester.pump(const Duration(milliseconds: 130));
-            final transition = tester.widget<OriginPageTransition>(
-              find.byType(OriginPageTransition),
-            );
-            expect(transition.animation.value, inExclusiveRange(0, 1));
-          }
-          await tester.pumpAndSettle();
-          expect(label, findsOneWidget);
-          expect(tester.takeException(), isNull);
-        },
-      );
+            await tester.pumpAndSettle();
+            expect(label, findsOneWidget);
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
     }
   }
 

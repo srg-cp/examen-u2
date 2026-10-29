@@ -1,5 +1,10 @@
 # Entre Huellas: reglas de UI y UX web
 
+29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): identidad
+completa del control, con estilos y distribución reales, inerte y temporal.
+Fuente hasta55%; destino de diálogos desde55%. Fullscreen Sader conserva
+fade/blur500ms y geometría700ms; no reconstruir flecha/texto en otra composición.
+
 26/10, [ADR-147](decisiones/147-inicio-web-con-banners-ilustrados.md): Inicio web
 adopta expresamente los cuatro assets móviles existentes. Banners a dos columnas
 en escritorio/apilados hasta850px, scroll y texto ampliado; controles/texto nativos,

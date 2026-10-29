@@ -57,7 +57,7 @@ void main() {
           expect(tester.widget<Opacity>(content).opacity, 0);
           animation.value = .5;
           await tester.pump();
-          expect(find.text('Ficha origen'), findsNothing);
+          expect(find.text('Ficha origen'), findsOneWidget);
           final middle = tester.getRect(surface);
           expect(middle.height, greaterThan(origin.height));
           expect(middle.height, lessThan(180));

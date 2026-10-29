@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): expansión
+móvil con fuente completa hasta55% y destino desde55%, conservando curvas y
+retorno. Iconos/textos/ilustraciones mantienen layout inicial; no reemplazar
+una tarjeta por un icono centrado. Scroll parcial conserva rectángulo completo.
+Identidad web completa; diálogos al55%, fullscreen Sader conserva fade/blur500ms.
+
 29/10, [ADR-158](decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
 sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
 la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
@@ -605,7 +611,7 @@ Un componente específico de Auth, como EmailCodeConfirmation o authInputDecorat
 | Duración total de stagger | `850 + (cantidad de intervalos − 1) × 90` ms; usar orden de lectura y bloques reconocibles, no animar cada carácter |
 | Apertura existente de registro/recuperación | OriginPageTransition desde el control real: 320 ms; cierre 260 ms. Conservar solo esta entrada de ruta aprobada |
 | Cambios correo → código → nueva contraseña → éxito | Cover plano y después stagger; conservar cabecera; nunca expansión desde el botón |
-| Arranque Flutter | 1100 ms: icono centrado de 96, logo hacia izquierda y nombre emerge detrás hacia derecha; `easeOutBack`, leve sobrepaso y retorno exclusivamente horizontales |
+| Arranque Flutter | 1100 ms: icono80 y lettering32 compartidos con espera mediante BrandWordmark.startup, centrados en SafeArea; logo hacia izquierda y nombre emerge detrás hacia derecha; `easeOutBack`, leve sobrepaso y retorno exclusivamente horizontales. ADR-161 |
 
 La excepción de resorte horizontal pertenece al logo y nombre del arranque: no agregarles movimiento arriba/abajo. El stagger de los demás componentes conserva su desplazamiento vertical aprobado. La animación del arranque termina antes de montar el destino; el login completa cover y después empieza stagger. No sumar un fundido de ruta que oculte esta secuencia.
 

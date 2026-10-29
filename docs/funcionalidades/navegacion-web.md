@@ -1,5 +1,11 @@
 # Navegación de usuario y recuperación web
 
+29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): el origen
+conserva todo el control y sus estilos/posiciones, en una copia temporal inerte;
+no reconstruir icono/etiqueta. Fuente hasta55% y diálogos desde55%; fullscreen
+Sader mantiene su geometría700ms y fade/blur500ms. Limpieza, foco, guards y
+operaciones existentes; validación local/limitaciones en ESTADO.
+
 29/10, [ADR-158](../decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
 sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
 la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos

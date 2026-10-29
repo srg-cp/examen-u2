@@ -1,5 +1,12 @@
 # Arquitectura de Entre Huellas
 
+29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): motores de
+origen comparten límites55/55 en móvil/diálogos web. OriginTriggerIdentity
+entrega contenido completo a navegación delegada; OriginPageSource.capture
+conserva apariencia heredada y escala. Contenido real/copia reutilizados en
+Inicio, utilidades y Recorrido. Web captura estilos del control completo en
+memoria, inerte y con limpieza existente; Sader conserva fade/blur500ms.
+
 29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md):
 AuthStageTransition concentra identidad por etapa sin pintar fondo/cortina ni
 retener la etapa anterior. La finalización de carga conserva el subárbol y el

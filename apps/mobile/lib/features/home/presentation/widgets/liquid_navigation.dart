@@ -147,11 +147,19 @@ class _LiquidNavigationState extends State<LiquidNavigation> {
             padding: const EdgeInsets.all(20),
             shape: const CircleBorder(),
           ),
-          icon: const CustomPaint(size: Size(24, 24), painter: _NineDots()),
+          icon: const ReportNavigationIdentity(),
         ),
       ),
     ],
   );
+}
+
+class ReportNavigationIdentity extends StatelessWidget {
+  const ReportNavigationIdentity({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const CustomPaint(size: Size(24, 24), painter: _NineDots());
 }
 
 class _NineDots extends CustomPainter {

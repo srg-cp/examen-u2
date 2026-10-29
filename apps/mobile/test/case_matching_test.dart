@@ -254,10 +254,9 @@ void main() {
                     onTap: (source) => openHomeAction(
                       source,
                       '/home/coincidencias',
-                      Icons.arrow_forward_rounded,
+                      const HomePhotoSearchContent(),
                       color: const Color(0xFFF0F8FF),
                       radius: 26,
-                      iconSize: 26,
                     ),
                   ),
                 ),

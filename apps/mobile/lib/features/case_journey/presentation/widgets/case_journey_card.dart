@@ -94,121 +94,11 @@ class JourneySummaryCard extends StatelessWidget {
               _surface,
               color: GlassSurface.originColor,
               radius: CasePublicGlassCard.radius,
-              identity: Image.asset(
-                art,
-                width: 120,
-                excludeFromSemantics: true,
-              ),
+              identity: JourneySummaryContent(value: value),
             );
             if (context.mounted) onReturn?.call();
           },
-          child: Padding(
-            padding: CasePublicGlassCard.contentPadding,
-            child: LayoutBuilder(
-              builder: (context, c) {
-                final large = MediaQuery.textScalerOf(context).scale(16) > 22;
-                final image = Image.asset(
-                  art,
-                  width: large ? 154 : c.maxWidth * .36,
-                  excludeFromSemantics: true,
-                  filterQuality: FilterQuality.high,
-                );
-                final title = Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(right: large ? 0 : 72),
-                      child: const Text(
-                        'Recorrido de la búsqueda',
-                        style: CaseCardTypography.value,
-                      ),
-                    ),
-                    const SizedBox(height: CasePublicGlassCard.factSpacing),
-                    Text(value.countLabel, style: CaseCardTypography.label),
-                  ],
-                );
-                final dates = [
-                  _DateFact(
-                    'Inicio de la búsqueda',
-                    journeyDate(value.origin.time),
-                  ),
-                  _DateFact(
-                    'Último aviso',
-                    value.latest == null
-                        ? 'Sin avisos todavía'
-                        : journeyDate(value.latest!),
-                  ),
-                ];
-                return Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (large) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(right: 72),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: image,
-                            ),
-                          ),
-                          const SizedBox(height: CasePublicGlassCard.spacing),
-                          title,
-                        ] else
-                          Row(
-                            children: [
-                              image,
-                              const SizedBox(
-                                width: CasePublicGlassCard.spacing,
-                              ),
-                              Expanded(child: title),
-                            ],
-                          ),
-                        const SizedBox(height: CasePublicGlassCard.spacing),
-                        if (large) ...[
-                          dates[0],
-                          const SizedBox(height: CasePublicGlassCard.spacing),
-                          dates[1],
-                        ] else
-                          IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(child: dates[0]),
-                                const VerticalDivider(
-                                  width: CasePublicGlassCard.spacing,
-                                ),
-                                Expanded(child: dates[1]),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                    const Positioned(
-                      top: 0,
-                      right: 0,
-                      child: ExcludeSemantics(
-                        child: SizedBox.square(
-                          dimension: 56,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Color(0xFF171918),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.north_east_rounded,
-                              color: Colors.white,
-                              size: 26,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
+          child: JourneySummaryContent(value: value),
         ),
       ),
     ),
@@ -226,5 +116,110 @@ class _DateFact extends StatelessWidget {
       const SizedBox(height: CasePublicGlassCard.factSpacing),
       Text(value, style: CaseCardTypography.value),
     ],
+  );
+}
+
+class JourneySummaryContent extends StatelessWidget {
+  const JourneySummaryContent({required this.value, super.key});
+  final CaseJourney value;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: CasePublicGlassCard.contentPadding,
+    child: LayoutBuilder(
+      builder: (context, c) {
+        final large = MediaQuery.textScalerOf(context).scale(16) > 22;
+        final image = Image.asset(
+          JourneySummaryCard.art,
+          width: large ? 154 : c.maxWidth * .36,
+          excludeFromSemantics: true,
+          filterQuality: FilterQuality.high,
+        );
+        final title = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: large ? 0 : 72),
+              child: const Text(
+                'Recorrido de la búsqueda',
+                style: CaseCardTypography.value,
+              ),
+            ),
+            const SizedBox(height: CasePublicGlassCard.factSpacing),
+            Text(value.countLabel, style: CaseCardTypography.label),
+          ],
+        );
+        final dates = [
+          _DateFact('Inicio de la búsqueda', journeyDate(value.origin.time)),
+          _DateFact(
+            'Último aviso',
+            value.latest == null
+                ? 'Sin avisos todavía'
+                : journeyDate(value.latest!),
+          ),
+        ];
+        return Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (large) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 72),
+                    child: Align(alignment: Alignment.centerLeft, child: image),
+                  ),
+                  const SizedBox(height: CasePublicGlassCard.spacing),
+                  title,
+                ] else
+                  Row(
+                    children: [
+                      image,
+                      const SizedBox(width: CasePublicGlassCard.spacing),
+                      Expanded(child: title),
+                    ],
+                  ),
+                const SizedBox(height: CasePublicGlassCard.spacing),
+                if (large) ...[
+                  dates[0],
+                  const SizedBox(height: CasePublicGlassCard.spacing),
+                  dates[1],
+                ] else
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: dates[0]),
+                        const VerticalDivider(
+                          width: CasePublicGlassCard.spacing,
+                        ),
+                        Expanded(child: dates[1]),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const Positioned(
+              top: 0,
+              right: 0,
+              child: ExcludeSemantics(
+                child: SizedBox.square(
+                  dimension: 56,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF171918),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.north_east_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ),
   );
 }

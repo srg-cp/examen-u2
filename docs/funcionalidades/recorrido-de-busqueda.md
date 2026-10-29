@@ -1,5 +1,12 @@
 # Recorrido de la búsqueda móvil
 
+29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): expansión
+desde la tarjeta completa: ilustración en su tamaño real, título, contador,
+fechas y flecha, con un solo desvanecimiento hasta55%; destino desde55%.
+Sin sustituir la tarjeta por una imagen centrada de120px. Layout compartido
+entre origen/copia, scroll parcial y texto ampliado conservados; consulta,
+permisos/mapa existentes. Validación y revisión física pendiente en ESTADO.
+
 HU-05/06/10/11, RF-05/06/11/12/14; incremento sobre contratos existentes.
 [ADR-153](../decisiones/153-acciones-y-recorrido-de-busqueda-mobile.md) y
 [ADR-154](../decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md).

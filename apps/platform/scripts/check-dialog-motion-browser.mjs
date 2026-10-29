@@ -29,7 +29,7 @@ try{
       await reset();await button.click();await started(320);
       const start=await frame();assert.ok(Math.abs(start.x-source.x)<2&&Math.abs(start.y-source.y)<2&&Math.abs(start.width-source.width)<2,layout+' '+slug+' real origin');assert.equal(start.opacity,0);assert.equal(start.inert,true);assert.equal(start.sourceCount,slug==='inbox'?1:0);
       await seek(160);const middle=await frame();assert.ok(middle.width>source.width+15,layout+' '+slug+' expansion frame');assert.equal(middle.opacity,0);await capture(layout+'-'+slug+'-opening');
-      await seek(208);assert.equal((await frame()).opacity,0,'Content starts after 65%');await seek(280);assert.ok((await frame()).opacity>0);await capture(layout+'-'+slug+'-content');
+      await seek(176);assert.equal((await frame()).opacity,0,'Content starts after 55%');await seek(208);assert.ok((await frame()).opacity>0);await seek(280);assert.ok((await frame()).opacity>0);await capture(layout+'-'+slug+'-content');
       await finish();await settled();const full=await frame();assert.equal(full.inert,false);assert.equal(full.opacity,1);assert.equal(await page.getByRole('dialog',{name:title,exact:true}).evaluate(el=>el.scrollWidth<=el.clientWidth),true);
       const stable=await page.locator('.account-header .site-brand').boundingBox();assert.deepEqual(stable,brand,'Brand stays fixed');
       await reset();await page.keyboard.press('Escape');await started(260);assert.equal(await page.getByRole('dialog',{name:title,exact:true}).count(),1,'Keep dialog mounted throughout closing');

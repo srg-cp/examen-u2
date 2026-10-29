@@ -1,4 +1,5 @@
 import {ORIGIN_ENTER_MS,ORIGIN_EXIT_MS,originMotionFrame} from './origin_motion_contract';
+import {captureOriginIdentity} from './origin_identity';
 export function playOriginDialog(dialog:HTMLDialogElement,content:HTMLElement,identity:HTMLElement,origin:HTMLElement|null|undefined,reverse:boolean,showSource:boolean) {
   const end=dialog.getBoundingClientRect(),start=origin?.isConnected?origin.getBoundingClientRect():null;
   const animations:Animation[]=[];
@@ -7,8 +8,7 @@ export function playOriginDialog(dialog:HTMLDialogElement,content:HTMLElement,id
   const frames=Array.from({length:101},(_,i)=>{const value=reverse?1-i/100:i/100;return{offset:i/100,...originMotionFrame(value)};});
   identity.replaceChildren();
   if(showSource){
-    const original=origin?.querySelector('svg,img');const icon=original?.cloneNode(true) as Element|undefined;
-    if(icon){for(const node of [icon,...icon.querySelectorAll('*')]){node.removeAttribute('id');for(const attr of [...node.attributes])if(/^on/i.test(attr.name))node.removeAttribute(attr.name);}identity.append(icon);}
+    if(origin)identity.append(captureOriginIdentity(origin));
   }
   Object.assign(content.style,{width:`${end.width}px`,transformOrigin:'top left'});
   const options:KeyframeAnimationOptions={duration:reverse?ORIGIN_EXIT_MS:ORIGIN_ENTER_MS,fill:'both',easing:'linear'};

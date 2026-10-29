@@ -41,13 +41,17 @@ function play(source:OriginSource, reverse:boolean) {
   const priorFlipId = target.getAttribute('data-flip-id');
   const bounds = target.getBoundingClientRect();
   const bodyBounds=body.getBoundingClientRect();
+  // Router scrolling can finish after the morph. A newly opened route belongs
+  // at document coordinates, not at the outgoing page's current scroll offset.
+  const routeOpening=!reverse&&!!document.querySelector('[data-origin-underlay]');
+  const bodyLeft=bodyBounds.x+(routeOpening?window.scrollX:0);
+  const bodyTop=bodyBounds.y+(routeOpening?window.scrollY:0);
   const sourceVisibility=source.element.style.visibility;
   source.element.style.visibility='hidden';
   const identity=document.createElement('span');
   identity.dataset.originIdentity='';identity.setAttribute('aria-hidden','true');
-  Object.assign(identity.style,{position:'absolute',left:'50%',top:'50%',width:`${source.bounds.width}px`,height:`${source.bounds.height}px`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'10px',color:source.color,fontFamily:'Arial, sans-serif',fontSize:'.78125rem',fontWeight:'600',pointerEvents:'none',transformOrigin:'center'});
-  if(source.icon){const icon=source.icon.cloneNode(true) as HTMLElement;Object.assign(icon.style,{width:`${source.iconWidth}px`,height:`${source.iconHeight}px`,flexShrink:'0'});identity.append(icon);}
-  if(source.label){const label=document.createElement('span');label.textContent=source.label;identity.append(label);}
+  Object.assign(identity.style,{position:'absolute',left:'50%',top:'50%',width:`${source.bounds.width}px`,height:`${source.bounds.height}px`,pointerEvents:'none',transformOrigin:'center'});
+  identity.append(source.identity.cloneNode(true));
   target.append(identity);
   // Keep the document height/scroll position while the actual surface occupies
   // the viewport, as pretty-modal-fullscreen does in Sader. No cloned content.
@@ -61,7 +65,7 @@ function play(source:OriginSource, reverse:boolean) {
   target.dataset.flipId = flipId;
   target.dataset.originAnimating = reverse ? 'closing' : 'opening';
   target.inert = true;
-  gsap.set(body,{visibility:'visible',opacity:1,position:'absolute',left:bodyBounds.x,top:bodyBounds.y,width:bodyBounds.width});
+  gsap.set(body,{visibility:'visible',opacity:1,position:'absolute',left:bodyLeft,top:bodyTop,width:bodyBounds.width});
   // Opaque page paint inside the morph occludes the outgoing route only within
   // its actual transformed bounds. The content scales with that same surface.
   const shell=target.closest<HTMLElement>('.reader-shell');

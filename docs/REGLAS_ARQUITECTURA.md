@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): fases55/55
+centralizadas en presentación compartida. Controles reutilizan su contenido;
+OriginPageSource captura temas/MediaQuery, sin acceso a dominio/data. Web copia
+solo identidad visual del control, temporal/inerta; sin snapshots de páginas,
+persistencia o cambios en autorización. Sader conserva su contrato específico.
+
 29/10, [ADR-156](decisiones/156-entrada-mobile-unica-sin-cortinas.md):
 AuthStageTransition conserva identidad por etapa sin cortina/fondo/temporizador
 previos al stagger. Loading→resultado preserva su subárbol/ContentReveal;

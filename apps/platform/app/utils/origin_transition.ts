@@ -1,13 +1,11 @@
 import { nextTick, readonly, shallowRef } from 'vue';
-export type OriginSource = Readonly<{bounds:{x:number;y:number;width:number;height:number};element:HTMLElement;backgroundColor:string;borderRadius:string;color:string;icon:Element|null;iconWidth:number;iconHeight:number;label:string}>;
+import { captureOriginIdentity } from './origin_identity';
+export type OriginSource = Readonly<{bounds:{x:number;y:number;width:number;height:number};element:HTMLElement;backgroundColor:string;borderRadius:string;identity:HTMLElement}>;
 export type OriginPlayer = (source:OriginSource,reverse:boolean)=>Promise<void>;
 function capture(element:HTMLElement):OriginSource {
   const {x,y,width,height}=element.getBoundingClientRect();
   const style=getComputedStyle(element);
-  const original=element.querySelector('svg,img'),icon=original?.cloneNode(true) as Element|undefined;
-  if(icon)for(const node of [icon,...icon.querySelectorAll('*')]){node.removeAttribute('id');for(const attr of [...node.attributes])if(/^on/i.test(attr.name))node.removeAttribute(attr.name);}
-  const iconBounds=original?.getBoundingClientRect();
-  return {bounds:{x,y,width,height},element,backgroundColor:style.backgroundColor,borderRadius:style.borderRadius,color:style.color,icon:icon??null,iconWidth:iconBounds?.width??24,iconHeight:iconBounds?.height??24,label:element.textContent?.trim()??''};
+  return {bounds:{x,y,width,height},element,backgroundColor:style.backgroundColor,borderRadius:style.borderRadius,identity:captureOriginIdentity(element)};
 }
 export function createOriginTransition(actor:()=>string|null=()=>null) {
   const pending=shallowRef<string|null>(null),busy=shallowRef(false);

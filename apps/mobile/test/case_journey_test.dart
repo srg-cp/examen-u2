@@ -324,211 +324,255 @@ void main() {
   );
 
   for (final small in [false, true]) {
-    testWidgets(
-      'Approved actions and card: normal/small text200%, source and return; small=$small',
-      (tester) async {
-        await tester.runAsync(loadJourneyFonts);
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = small
-            ? const Size(320, 600)
-            : const Size(390, 844);
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-        final value = await ReadCaseJourney(
-          FakeCases(),
-          found()..observations.add(notice('a', 16)),
-          JourneyTimeline()..deny = true,
-        )('reader', target);
-        final boundary = GlobalKey();
-        final router = GoRouter(
-          routes: [
-            GoRoute(
-              path: '/',
-              builder: (context, state) => Scaffold(
-                backgroundColor: Colors.transparent,
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 12),
-                        const CaseActionLayout(
-                          children: [
-                            CaseActionButton(
-                              label: 'Reportar avistamiento',
-                              icon: Icons.visibility_outlined,
-                              route: '/action',
-                              accented: true,
-                            ),
-                            CaseActionButton(
-                              label: 'La vi o la encontré',
-                              icon: Icons.visibility_outlined,
-                              route: '/action',
-                            ),
-                            CaseActionButton(
-                              label: 'Ya fue recuperada',
-                              icon: Icons.check_circle_outline,
-                              route: '/action',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 22),
-                        const CaseActionLayout(
-                          utilities: true,
-                          children: [
-                            CaseUtilityButton(
-                              title: 'Ver seguimiento',
-                              subtitle: 'Historial y revisiones',
-                              icon: Icons.route_outlined,
-                              route: '/action',
-                            ),
-                            CaseUtilityButton(
-                              title: 'Crear cartel',
-                              subtitle: 'PDF con QR',
-                              icon: Icons.qr_code_2_rounded,
-                              route: '/action',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        JourneySummaryCard(value: value),
-                      ],
+    for (final reduced in [false, true]) {
+      testWidgets(
+        'Approved actions and card: normal/small text200%, source and return; small=$small reduced=$reduced',
+        (tester) async {
+          await tester.runAsync(loadJourneyFonts);
+          tester.view.devicePixelRatio = 1;
+          tester.view.physicalSize = small
+              ? const Size(320, 600)
+              : const Size(390, 844);
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          final value = await ReadCaseJourney(
+            FakeCases(),
+            found()..observations.add(notice('a', 16)),
+            JourneyTimeline()..deny = true,
+          )('reader', target);
+          final boundary = GlobalKey();
+          final router = GoRouter(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 12),
+                          const CaseActionLayout(
+                            children: [
+                              CaseActionButton(
+                                label: 'Reportar avistamiento',
+                                icon: Icons.visibility_outlined,
+                                route: '/action',
+                                accented: true,
+                              ),
+                              CaseActionButton(
+                                label: 'La vi o la encontré',
+                                icon: Icons.visibility_outlined,
+                                route: '/action',
+                              ),
+                              CaseActionButton(
+                                label: 'Ya fue recuperada',
+                                icon: Icons.check_circle_outline,
+                                route: '/action',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 22),
+                          const CaseActionLayout(
+                            utilities: true,
+                            children: [
+                              CaseUtilityButton(
+                                title: 'Ver seguimiento',
+                                subtitle: 'Historial y revisiones',
+                                icon: Icons.route_outlined,
+                                route: '/action',
+                              ),
+                              CaseUtilityButton(
+                                title: 'Crear cartel',
+                                subtitle: 'PDF con QR',
+                                icon: Icons.qr_code_2_rounded,
+                                route: '/action',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          JourneySummaryCard(value: value),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            GoRoute(
-              path: '/action',
-              pageBuilder: (context, state) => entityEditorPage(
-                context: context,
-                key: state.pageKey,
-                source: state.extra,
-                child: const Scaffold(body: Text('Destino')),
+              GoRoute(
+                path: '/action',
+                pageBuilder: (context, state) => entityEditorPage(
+                  context: context,
+                  key: state.pageKey,
+                  source: state.extra,
+                  child: const Scaffold(body: Text('Destino')),
+                ),
               ),
-            ),
-            GoRoute(
-              path: '/home/journey/:source/:id',
-              pageBuilder: (context, state) => entityEditorPage(
-                context: context,
-                key: state.pageKey,
-                source: state.extra,
-                child: const Scaffold(body: Text('Mapa y cronología')),
+              GoRoute(
+                path: '/home/journey/:source/:id',
+                pageBuilder: (context, state) => entityEditorPage(
+                  context: context,
+                  key: state.pageKey,
+                  source: state.extra,
+                  child: const Scaffold(body: Text('Mapa y cronología')),
+                ),
               ),
-            ),
-          ],
-        );
-        addTearDown(router.dispose);
-        await tester.pumpWidget(
-          MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            routerConfig: router,
-            builder: (context, child) => MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(small ? 2 : 1),
-                disableAnimations: small,
-              ),
-              child: RepaintBoundary(
-                key: boundary,
-                child: AppPageBackground(child: child!),
-              ),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-        await tester.runAsync(
-          () => precacheImage(
-            const AssetImage(JourneySummaryCard.art),
-            tester.element(find.byType(JourneySummaryCard)),
-          ),
-        );
-        await tester.pumpAndSettle();
-        expect(tester.takeException(), isNull);
-        if (!small) {
-          final semantics = tester.ensureSemantics();
-          expect(
-            tester
-                .getSemantics(find.bySemanticsLabel('Reportar avistamiento'))
-                .getSemanticsData()
-                .hasAction(ui.SemanticsAction.tap),
-            true,
+            ],
           );
-          expect(
-            tester
-                .getSemantics(
-                  find.bySemanticsLabel(
-                    'Ver seguimiento. Historial y revisiones',
-                  ),
+          addTearDown(router.dispose);
+          await tester.pumpWidget(
+            MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.light,
+              routerConfig: router,
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(small ? 2 : 1),
+                  disableAnimations: reduced,
+                ),
+                child: RepaintBoundary(
+                  key: boundary,
+                  child: AppPageBackground(child: child!),
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.runAsync(
+            () => precacheImage(
+              const AssetImage(JourneySummaryCard.art),
+              tester.element(find.byType(JourneySummaryCard)),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+          if (!small) {
+            final semantics = tester.ensureSemantics();
+            expect(
+              tester
+                  .getSemantics(find.bySemanticsLabel('Reportar avistamiento'))
+                  .getSemanticsData()
+                  .hasAction(ui.SemanticsAction.tap),
+              true,
+            );
+            expect(
+              tester
+                  .getSemantics(
+                    find.bySemanticsLabel(
+                      'Ver seguimiento. Historial y revisiones',
+                    ),
+                  )
+                  .getSemanticsData()
+                  .hasAction(ui.SemanticsAction.tap),
+              true,
+            );
+            final buttons = find.byType(CaseUtilityButton);
+            semantics.dispose();
+            expect(
+              tester.getSize(buttons.at(0)).height,
+              tester.getSize(buttons.at(1)).height,
+            );
+          }
+          final surfaces = tester.widgetList<GlassSurface>(
+            find.byType(GlassSurface),
+          );
+          expect(surfaces.single.finish, GlassSurfaceFinish.frosted);
+          expect(surfaces.single.showRim, false);
+          expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+          expect(find.text('Ver mapa y cronología'), findsNothing);
+          expect(find.text('Avisos de esta búsqueda'), findsNothing);
+          expect(find.text('1 avistamiento'), findsOneWidget);
+          expect(find.byIcon(Icons.north_east_rounded), findsOneWidget);
+          if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
+            await capture(
+              tester,
+              boundary,
+              small ? 'acciones-small' : 'acciones-normal',
+            );
+          }
+          await tester.ensureVisible(find.byIcon(Icons.north_east_rounded));
+          await tester.pumpAndSettle();
+          if (small && Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
+            await capture(tester, boundary, 'acciones-small-tarjeta');
+          }
+          final originalTitle = tester.getRect(
+            find.text('Recorrido de la búsqueda'),
+          );
+          final originalImage = tester.getRect(
+            find.descendant(
+              of: find.byType(JourneySummaryCard),
+              matching: find.byType(Image),
+            ),
+          );
+          await tester.tap(find.byIcon(Icons.north_east_rounded));
+          await tester.pump();
+          await tester.pump();
+          if (!reduced) {
+            final copy = find.byKey(const ValueKey('origin-page-source'));
+            for (final label in [
+              'Recorrido de la búsqueda',
+              '1 avistamiento',
+              'Inicio de la búsqueda',
+              'Último aviso',
+            ]) {
+              expect(
+                find.descendant(of: copy, matching: find.text(label)),
+                findsOneWidget,
+              );
+            }
+            expect(
+              tester.getRect(
+                find.descendant(
+                  of: copy,
+                  matching: find.text('Recorrido de la búsqueda'),
+                ),
+              ),
+              originalTitle,
+            );
+            expect(
+              tester.getRect(
+                find.descendant(of: copy, matching: find.byType(Image)),
+              ),
+              originalImage,
+            );
+            if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
+              await capture(tester, boundary, 'apertura-origen-completo');
+            }
+          }
+          await tester.pump(const Duration(milliseconds: 100));
+          if (!reduced) {
+            final transition = tester
+                .widgetList<OriginPageTransition>(
+                  find.byType(OriginPageTransition),
                 )
-                .getSemanticsData()
-                .hasAction(ui.SemanticsAction.tap),
-            true,
-          );
-          final buttons = find.byType(CaseUtilityButton);
-          semantics.dispose();
-          expect(
-            tester.getSize(buttons.at(0)).height,
-            tester.getSize(buttons.at(1)).height,
-          );
-        }
-        final surfaces = tester.widgetList<GlassSurface>(
-          find.byType(GlassSurface),
-        );
-        expect(surfaces.single.finish, GlassSurfaceFinish.frosted);
-        expect(surfaces.single.showRim, false);
-        expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
-        expect(find.text('Ver mapa y cronología'), findsNothing);
-        expect(find.text('Avisos de esta búsqueda'), findsNothing);
-        expect(find.text('1 avistamiento'), findsOneWidget);
-        expect(find.byIcon(Icons.north_east_rounded), findsOneWidget);
-        if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
-          await capture(
-            tester,
-            boundary,
-            small ? 'acciones-small' : 'acciones-normal',
-          );
-        }
-        await tester.ensureVisible(find.byIcon(Icons.north_east_rounded));
-        await tester.pumpAndSettle();
-        if (small && Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
-          await capture(tester, boundary, 'acciones-small-tarjeta');
-        }
-        await tester.tap(find.byIcon(Icons.north_east_rounded));
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
-        if (!small) {
-          final transition = tester
-              .widgetList<OriginPageTransition>(
-                find.byType(OriginPageTransition),
-              )
-              .last;
-          expect(transition.source, isNotNull);
-          expect(transition.source!.radius, 28);
-          if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
-            await capture(tester, boundary, 'apertura-normal');
+                .last;
+            expect(transition.source, isNotNull);
+            expect(transition.source!.radius, 28);
+            if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
+              await capture(tester, boundary, 'apertura-normal');
+            }
           }
-        }
-        await tester.pumpAndSettle();
-        expect(find.text('Mapa y cronología'), findsOneWidget);
-        router.pop();
-        await tester.pump();
-        if (!small) {
-          await tester.pump(const Duration(milliseconds: 80));
-          if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
-            await capture(tester, boundary, 'retorno-normal');
+          await tester.pumpAndSettle();
+          expect(find.text('Mapa y cronología'), findsOneWidget);
+          router.pop();
+          await tester.pump();
+          if (!reduced) {
+            await tester.pump(const Duration(milliseconds: 80));
+            if (Platform.environment['CAPTURE_CASE_JOURNEY'] == '1') {
+              await capture(tester, boundary, 'retorno-normal');
+            }
           }
-        }
-        await tester.pumpAndSettle();
-        expect(find.byType(JourneySummaryCard), findsOneWidget);
-        await tester.ensureVisible(find.text('Reportar avistamiento'));
-        await tester.tap(find.text('Reportar avistamiento'));
-        await tester.pumpAndSettle();
-        expect(find.text('Destino'), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      },
-    );
+          await tester.pumpAndSettle();
+          expect(find.byType(JourneySummaryCard), findsOneWidget);
+          await tester.ensureVisible(find.text('Reportar avistamiento'));
+          await tester.tap(find.text('Reportar avistamiento'));
+          await tester.pumpAndSettle();
+          expect(find.text('Destino'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   }
   testWidgets(
     'Actual map groups coincident points and opens all entries without moving their coordinates',

@@ -2,8 +2,8 @@
 export const ORIGIN_ENTER_MS=320;
 export const ORIGIN_EXIT_MS=260;
 export const ORIGIN_EASING='cubic-bezier(.645,.045,.355,1)';
-export const ORIGIN_SOURCE_END=.45;
-export const ORIGIN_CONTENT_START=.65;
+export const ORIGIN_SOURCE_END=.55;
+export const ORIGIN_CONTENT_START=.55;
 function cubic(value:number,x1:number,y1:number,x2:number,y2:number) {
   if(value<=0)return 0;if(value>=1)return 1;
   const axis=(t:number,a:number,b:number)=>3*(1-t)*(1-t)*t*a+3*(1-t)*t*t*b+t*t*t;

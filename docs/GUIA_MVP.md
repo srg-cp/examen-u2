@@ -1,5 +1,11 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+29/10: corrección transversal de presentación de las HU existentes:
+composición completa en expansiones de Inicio, utilidades y Recorrido;
+fases móviles/diálogos55/55 y conservación de origen parcialmente visible.
+[ADR-160](decisiones/160-origen-completo-y-fases-al-55.md). Sin nuevas HU/RF,
+operaciones, SQL, ampliación de MVP ni cierre de historias.
+
 29/10, [ADR-158](decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
 sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
 la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
@@ -391,6 +397,10 @@ la existencia de una ficha no implica cierre de la HU ni ampliación del MVP.
 Se conserva la numeración original para relacionar implementación, informe académico y pruebas. El chat 00 prepara la base técnica que el plan original situaba dentro de S1.
 
 ### S1 - Acceso y cuenta
+
+- Corrección29/10 autorizada: marca del arranque del mismo tamaño y posición
+  que la espera de cuenta. [ADR-161](decisiones/161-marca-estable-entre-arranque-y-espera.md).
+  Presentación de HU-01/RF-01 existente, sin ampliar el MVP ni cerrar historias.
 
 - Corrección29/10 autorizada: una entrada móvil por etapa, sin cortina previa
   al stagger en registro/recuperación y restantes consumidores compartidos.

@@ -3,6 +3,99 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_entrehuellas/core/presentation/widgets/origin_page_transition.dart';
 
 void main() {
+  testWidgets('A partially scrolled trigger keeps its full original geometry', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final controller = AnimationController(
+      vsync: tester,
+      duration: const Duration(milliseconds: 320),
+    );
+    addTearDown(controller.dispose);
+    const origin = Rect.fromLTWH(20, 730, 360, 140);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OriginPageTransition(
+          animation: controller,
+          origin: origin,
+          source: const OriginPageSource(
+            bounds: origin,
+            color: Colors.black,
+            radius: 24,
+            child: Center(
+              child: SizedBox(
+                width: 40,
+                height: 20,
+                key: ValueKey('source-marker'),
+              ),
+            ),
+          ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+    );
+    expect(
+      tester.getRect(find.byKey(const ValueKey('origin-surface'))),
+      origin,
+    );
+    expect(
+      tester.getCenter(find.byKey(const ValueKey('source-marker'))),
+      origin.center,
+    );
+  });
+
+  testWidgets('Source and destination meet at 55% in both directions', (
+    tester,
+  ) async {
+    final controller = AnimationController(
+      vsync: tester,
+      duration: const Duration(milliseconds: 320),
+    );
+    addTearDown(controller.dispose);
+    const origin = Rect.fromLTWH(20, 100, 280, 70);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OriginPageTransition(
+          animation: controller,
+          origin: origin,
+          source: const OriginPageSource(
+            bounds: origin,
+            color: Colors.black,
+            radius: 24,
+            child: Text('Complete trigger'),
+          ),
+          child: const Text('Destination'),
+        ),
+      ),
+    );
+    for (final values in [
+      [0.0, .45, .5, .55, .6, .65, 1.0],
+      [1.0, .65, .6, .55, .5, .45, 0.0],
+    ]) {
+      for (final value in values) {
+        controller.value = value;
+        await tester.pump();
+        final source = find.byKey(const ValueKey('origin-page-source'));
+        final destination = find
+            .ancestor(
+              of: find.text('Destination'),
+              matching: find.byType(Opacity),
+            )
+            .first;
+        expect(
+          tester.widget<Opacity>(destination).opacity,
+          value > .55 ? greaterThan(0) : 0,
+        );
+        if (value < .55) {
+          expect(tester.widget<Opacity>(source).opacity, greaterThan(0));
+        } else {
+          expect(source, findsNothing);
+        }
+      }
+    }
+  });
+
   testWidgets(
     'Trigger identity morphs in both directions without early page interaction',
     (tester) async {

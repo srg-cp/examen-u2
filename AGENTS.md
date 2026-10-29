@@ -1,5 +1,12 @@
 # Entre Huellas: instrucciones del proyecto
 
+29/10, [ADR-160](docs/decisiones/160-origen-completo-y-fases-al-55.md): expansión
+móvil conserva la composición completa del control y sus posiciones iniciales,
+sin sustituirla por un icono/imagen centrados. Fuente hasta55%, destino desde55%;
+retorno/reducido conservados. Web comparte identidad completa y límites en
+sus diálogos; fullscreen Sader conserva fade/blur500ms y fuente hasta55%.
+Reutilizar contenido/temas reales y validar apertura/cierre/scroll/texto200%.
+
 29/10, [ADR-158](docs/decisiones/158-continuacion-directa-tras-operaciones.md): continuar directamente tras éxito confirmado,
 sin pantallas de texto y botón que agreguen una pulsación. Publicación abre
 la ficha; contraseña vuelve al acceso tras cerrar recuperación; avistamientos
