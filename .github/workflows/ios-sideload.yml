@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           app=build/ios/iphoneos/Runner.app
           test -f "$app/Runner"
-          lipo -verify_arch arm64 "$app/Runner"
+          lipo "$app/Runner" -verify_arch arm64
           plutil -lint "$app/Info.plist"
           mkdir -p build/sideload/Payload build/distribution
           ditto "$app" build/sideload/Payload/Runner.app
