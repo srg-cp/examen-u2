@@ -23,6 +23,7 @@ import 'package:flutter_application_entrehuellas/core/presentation/widgets/map_s
 import 'package:flutter_application_entrehuellas/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/entities/found_case.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/providers/found_case_providers.dart';
+import 'package:flutter_application_entrehuellas/features/found_cases/presentation/widgets/recovery_case_actions.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/domain/entities/lost_case.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
@@ -354,46 +355,31 @@ void main() {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const SizedBox(height: 12),
-                          const CaseActionLayout(
-                            children: [
-                              CaseActionButton(
-                                label: 'Reportar avistamiento',
-                                icon: Icons.visibility_outlined,
-                                route: '/action',
-                                accented: true,
-                              ),
-                              CaseActionButton(
-                                label: 'La vi o la encontré',
-                                icon: Icons.visibility_outlined,
-                                route: '/action',
-                              ),
-                              CaseActionButton(
-                                label: 'Ya fue recuperada',
-                                icon: Icons.check_circle_outline,
-                                route: '/action',
-                              ),
-                            ],
+                          RecoveryCaseActions(
+                            id: target.id,
+                            community: target.community,
+                            open: true,
+                            canResolve: true,
+                            onChanged: () {},
+                            utilities: const CaseActionLayout(
+                              utilities: true,
+                              children: [
+                                CaseUtilityButton(
+                                  title: 'Ver seguimiento',
+                                  subtitle: 'Historial y revisiones',
+                                  icon: Icons.route_outlined,
+                                  route: '/action',
+                                ),
+                                CaseUtilityButton(
+                                  title: 'Crear cartel',
+                                  subtitle: 'PDF con QR',
+                                  icon: Icons.qr_code_2_rounded,
+                                  route: '/action',
+                                ),
+                              ],
+                            ),
+                            journey: JourneySummaryCard(value: value),
                           ),
-                          const SizedBox(height: 22),
-                          const CaseActionLayout(
-                            utilities: true,
-                            children: [
-                              CaseUtilityButton(
-                                title: 'Ver seguimiento',
-                                subtitle: 'Historial y revisiones',
-                                icon: Icons.route_outlined,
-                                route: '/action',
-                              ),
-                              CaseUtilityButton(
-                                title: 'Crear cartel',
-                                subtitle: 'PDF con QR',
-                                icon: Icons.qr_code_2_rounded,
-                                route: '/action',
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          JourneySummaryCard(value: value),
                         ],
                       ),
                     ),
@@ -409,6 +395,19 @@ void main() {
                   child: const Scaffold(body: Text('Destino')),
                 ),
               ),
+              for (final path in [
+                '/home/sightings/:source/:id',
+                '/home/found-cases/new',
+              ])
+                GoRoute(
+                  path: path,
+                  pageBuilder: (context, state) => entityEditorPage(
+                    context: context,
+                    key: state.pageKey,
+                    source: state.extra,
+                    child: const Scaffold(body: Text('Destino')),
+                  ),
+                ),
               GoRoute(
                 path: '/home/journey/:source/:id',
                 pageBuilder: (context, state) => entityEditorPage(
@@ -422,18 +421,26 @@ void main() {
           );
           addTearDown(router.dispose);
           await tester.pumpWidget(
-            MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.light,
-              routerConfig: router,
-              builder: (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(small ? 2 : 1),
-                  disableAnimations: reduced,
+            ProviderScope(
+              overrides: [
+                foundSessionProvider.overrideWith(
+                  (ref) => Stream.value(const AuthSession(userId: 'reader')),
                 ),
-                child: RepaintBoundary(
-                  key: boundary,
-                  child: AppPageBackground(child: child!),
+                foundCaseRepositoryProvider.overrideWithValue(found()),
+              ],
+              child: MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light,
+                routerConfig: router,
+                builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(small ? 2 : 1),
+                    disableAnimations: reduced,
+                  ),
+                  child: RepaintBoundary(
+                    key: boundary,
+                    child: AppPageBackground(child: child!),
+                  ),
                 ),
               ),
             ),
@@ -569,6 +576,23 @@ void main() {
           await tester.tap(find.text('Reportar avistamiento'));
           await tester.pumpAndSettle();
           expect(find.text('Destino'), findsOneWidget);
+          expect(
+            GoRouterState.of(tester.element(find.text('Destino'))).uri.path,
+            '/home/sightings/found/${target.id}',
+          );
+          router.pop();
+          await tester.pumpAndSettle();
+          await tester.ensureVisible(find.text('La vi o la encontré'));
+          await tester.tap(find.text('La vi o la encontré'));
+          await tester.pumpAndSettle();
+          expect(find.text('Destino'), findsOneWidget);
+          expect(GoRouterState.of(tester.element(find.text('Destino'))).uri.queryParameters, {
+            'case': target.id,
+            'community': 'true',
+          });
+          router.pop();
+          await tester.pumpAndSettle();
+          expect(find.byType(RecoveryCaseActions), findsOneWidget);
           expect(tester.takeException(), isNull);
         },
       );

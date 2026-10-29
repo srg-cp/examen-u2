@@ -1,5 +1,9 @@
 # Recorrido de la búsqueda móvil
 
+29/10: BrandMapPin comparte renderer con selectores y Explorar; origen rojo,
+avisos azules, numeración/agrupación y48×56 conservados. Sin cambio de datos,
+acciones ni movimiento. [Pines de mapa](pines-de-mapa.md), ADR-165.
+
 29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): expansión
 desde la tarjeta completa: ilustración en su tamaño real, título, contador,
 fechas y flecha, con un solo desvanecimiento hasta55%; destino desde55%.

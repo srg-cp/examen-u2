@@ -79,8 +79,8 @@ class JourneyMap extends StatelessWidget {
         for (final entry in groups.entries)
           Marker(
             point: entry.key,
-            width: 48,
-            height: 56,
+            width: BrandMapPin.markerWidth,
+            height: BrandMapPin.markerHeight,
             alignment: Alignment.topCenter,
             child: Tooltip(
               message: entry.value

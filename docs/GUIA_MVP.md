@@ -1,5 +1,19 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+29/10: ajuste visual autorizado de acciones de ficha móvil HU-07/08:
+Reportar avistamiento y La vi o la encontré adoptan tarjetas grises del mockup
+elegido. [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md).
+Sin nuevas operaciones/HU/RF, SQL, migración web ni cierre de historias.
+
+29/10: unificación visual de pines de HU-02/05/06/07/10 y Recorrido: todos con
+logo oficial, excepto punto azul de ficha pública. [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md).
+Sin nuevas HU/RF, datos, SQL, ampliación del MVP ni cierre de historias.
+
+29/10: HU-02.1/RF-02,16/#26 admite guardar una ubicación de interés sin escribir
+nombre; selección explícita y radio inicial conservados, etiqueta automática
+en dominio compatible con SQL010. [ADR-164](decisiones/164-ubicaciones-de-interes-con-nombre-opcional.md).
+Sin nuevas HU/RF, ampliación del MVP, migración ni cierre de historias.
+
 29/10: corrección transversal de presentación de las HU existentes:
 composición completa en expansiones de Inicio, utilidades y Recorrido;
 fases móviles/diálogos55/55 y conservación de origen parcialmente visible.

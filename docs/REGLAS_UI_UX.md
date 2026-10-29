@@ -1,5 +1,19 @@
 # Entre Huellas: regla de oro de UI y UX
 
+29/10, excepción explícita [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
+Reportar avistamiento y La vi o la encontré en ficha pública móvil usan tarjetas
+sólidas gris claro con icono pequeño arriba a la izquierda, etiqueta debajo y
+padding vertical20, según el mockup elegido. Reutilizar CaseUtilityButton y
+CaseActionLayout; origen de tarjeta completa y adaptación a texto ampliado.
+Sustituye los círculos/acento de ADR-153 solo en estas dos acciones; conservar
+permisos, rutas, reducido, recuperación y materiales de los demás componentes.
+
+29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md): pines
+internos con silueta/logo oficial; selector móvil/web negro/blanco48×56 centrado.
+Explorar conserva blanco/negro48×48; Recorrido rojo/azul con numeración48×56.
+Todos reutilizan el renderer compartido, sin location_on estándar. Punto azul
+con borde blanco/halo de ficha pública y marcadores ocultos conservados.
+
 29/10, [ADR-162](decisiones/162-recarga-por-gesto-y-retorno-al-top.md): recarga
 móvil conserva giro ligado al dedo aun con desplazamiento visual máximo;
 cancelar/confirmar el tirón acomoda el scroll al top de la pantalla actual.

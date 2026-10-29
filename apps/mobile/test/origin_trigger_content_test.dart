@@ -16,6 +16,7 @@ void main() {
   for (final mode in ['normal', 'text200', 'reduced']) {
     for (final kind in [
       'utility',
+      'sighting',
       'add',
       'accented',
       'description',
@@ -35,6 +36,12 @@ void main() {
         final boundary = GlobalKey();
         const route = '/home/lost-cases/new';
         Widget trigger() => switch (kind) {
+          'sighting' => const CaseUtilityButton(
+            title: 'Reportar avistamiento',
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+            icon: Icons.visibility_outlined,
+            route: route,
+          ),
           'utility' => const CaseUtilityButton(
             title: 'Crear cartel',
             subtitle: 'PDF con QR',

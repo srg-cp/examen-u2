@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md):
+BrandMapPin compartido en selector/Explorar/Recorrido, con estado visual recibido
+por parámetros. SVG equivalente en LocationMap generado de la marca oficial;
+paridad de geometría y anclaje comprobada. Punto azul de CasePublicCards intacto.
+Sin cambios de consultas/permisos ni nuevas dependencias entre funcionalidades.
+
 29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): motores de
 origen comparten límites55/55 en móvil/diálogos web. OriginTriggerIdentity
 entrega contenido completo a navegación delegada; OriginPageSource.capture

@@ -1,5 +1,12 @@
 # Entre Huellas: instrucciones del proyecto
 
+29/10, [ADR-165](docs/decisiones/165-pines-con-logo-compartidos-mobile-web.md):
+todos los pines internos usan silueta y logo oficiales mediante BrandMapPin
+móvil y SVG equivalente en LocationMap web; no volver al pin Material estándar.
+Conservar estados de Explorar, colores/números de Recorrido y anclaje/precisión.
+Excepción explícita: punto azul con borde blanco/halo de CasePublicCards intacto.
+No añadir marcadores donde están ocultos ni modificar mapas externos/ilustrados.
+
 29/10, [ADR-160](docs/decisiones/160-origen-completo-y-fases-al-55.md): expansión
 móvil conserva la composición completa del control y sus posiciones iniciales,
 sin sustituirla por un icono/imagen centrados. Fuente hasta55%, destino desde55%;

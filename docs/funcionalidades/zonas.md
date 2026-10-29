@@ -1,5 +1,14 @@
 # Ubicaciones de interés privadas
 
+29/10: el selector usa pin con logo oficial mediante BrandMapPin compartido;
+selección/coordenadas/radio intactos. [Pines de mapa](pines-de-mapa.md), ADR-165.
+
+29/10: nombre opcional por petición explícita. Basta seleccionar un punto y
+guardar con el radio inicial; si se omite nombre, dominio asigna una etiqueta
+con sus coordenadas. [ADR-164](../decisiones/164-ubicaciones-de-interes-con-nombre-opcional.md).
+SQL010 y permisos conservados, sin migración nueva. Pruebas locales y revisión
+física pendiente en [ESTADO](../ESTADO.md). [Comparación de pines](../revisiones/pines-mapas-2026-10-29.md).
+
 29/10: el motor móvil compartido elimina la cortina/fondo local previo al
 stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
 [Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).
@@ -57,9 +66,12 @@ Las zonas no se asocian a una mascota concreta ni publican coordenadas de casos.
 
 ## Reglas y persistencia
 
-Nombre obligatorio de1–60 puntos de código; latitud −85..85, longitud −180..180
-y radio100–50000 metros. Se exige seleccionar un punto explícito y rechazan
-valores no finitos. Dominio y SQL comparten estos límites.
+Nombre personalizado opcional de hasta60 puntos de código; vacío/espacios se
+sustituyen al guardar por `Ubicación (latitud, longitud)` con cinco decimales.
+La etiqueta se persiste y es editable, sin geocodificación inversa ni GPS.
+SQL sigue recibiendo un nombre válido de1–60 caracteres. Latitud −85..85,
+longitud −180..180 y radio100–50000 metros, inicialmente1000. Se exige seleccionar
+un punto explícito y se rechazan valores no finitos.
 
 Las RPC obtienen la cuenta de la sesión, usan UUID estable y versión esperada.
 El reintento idéntico reconoce el resultado sin duplicar ni incrementar de nuevo;

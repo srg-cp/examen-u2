@@ -7,6 +7,7 @@ import '../../config/map_config.dart';
 import 'map_attribution.dart';
 import 'map_style.dart';
 import 'loading_shimmer.dart';
+import 'brand_map_pin.dart';
 
 /// Visual map adapter only. The ViewModel owns the selected product coordinates.
 class ZoneMapPicker extends StatefulWidget {
@@ -244,11 +245,10 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                       markers: [
                         Marker(
                           point: point,
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Color(0xFF111111),
-                            size: 36,
-                          ),
+                          width: BrandMapPin.markerWidth,
+                          height: BrandMapPin.markerHeight,
+                          alignment: Alignment.center,
+                          child: const BrandMapPin(color: Color(0xFF111111)),
                         ),
                       ],
                     ),

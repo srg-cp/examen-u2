@@ -1,5 +1,19 @@
 # Diseño de la interfaz: implementación y revisión
 
+29/10, [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
+en ficha móvil, Reportar avistamiento y La vi o la encontré reutilizan las
+tarjetas grises sólidas del mockup elegido: radio22, icono21 y etiqueta14/600
+alineados arriba a la izquierda, padding14 horizontal/20 vertical, gap12.
+Dos columnas de igual altura, apiladas con texto ampliado en ancho pequeño;
+sin subtítulos nuevos. Origen completo, rutas/retorno y recuperación conservados.
+Excepción local a ADR-148/153; sin migración web ni otros controles afectados.
+
+29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md): pin
+con logo compartido en mapas móvil/web, conservando colores/selección/numeración.
+Excepción visual de marcador: punto azul con borde blanco/halo de ficha.
+Reutilizar BrandMapPin/LocationMap; no dibujar otro pin estándar por consumidor.
+SVG web generado desde marca oficial. [Ficha](funcionalidades/pines-de-mapa.md).
+
 29/10, [ADR-162](decisiones/162-recarga-por-gesto-y-retorno-al-top.md):
 PullToRefresh limita el desplazamiento pintado112px sin congelar el controlador
 del giro. Cancelar con rebote inicia retirada durante la primera actualización

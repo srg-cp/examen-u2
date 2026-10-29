@@ -86,6 +86,28 @@ test('All maps use shared adapters and the same mobile/web tile palette', async 
   assert.match(css, /\.leaflet-tile-pane\s*\{\s*filter: url\('\/map-style\.svg#cartography'\)/);
 });
 
+test('Map selectors share the official brand pin and keep the mobile/web anchor', async () => {
+  const mobile = await readFile(new URL('../../mobile/lib/core/presentation/widgets/brand_map_pin.dart', import.meta.url), 'utf8');
+  const adapter = await readFile(new URL('../app/components/LocationMap.vue', import.meta.url), 'utf8');
+  const svg = await readFile(new URL('../public/map-location-pin.svg', import.meta.url), 'utf8');
+  const logo = await readFile(new URL('../../mobile/assets/branding/only-black.svg', import.meta.url), 'utf8');
+  const width = Number(mobile.match(/markerWidth = ([\d.]+)/)[1]);
+  const height = Number(mobile.match(/markerHeight = ([\d.]+)/)[1]);
+  assert.ok(adapter.includes(`iconSize: [${width}, ${height}]`));
+  assert.ok(adapter.includes(`iconAnchor: [${width / 2}, ${height / 2}]`));
+  assert.ok(svg.includes(`width="${width}" height="${height}"`));
+  const paths = source => [...source.matchAll(/<path\b[^>]*\bd="([^"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(paths(svg).slice(1), paths(logo), 'The pin must embed the complete official mark');
+  assert.match(svg, /fill="#111111"/);
+  assert.equal((svg.match(/fill="white"/g) || []).length, paths(logo).length);
+  const picker = await readFile(new URL('../../mobile/lib/core/presentation/widgets/zone_map_picker.dart', import.meta.url), 'utf8');
+  assert.match(picker, /child: const BrandMapPin\(/);
+  assert.doesNotMatch(picker, /Icons\.location_on\b/);
+  const explore = await readFile(new URL('../../mobile/lib/features/explore/presentation/widgets/explore_map_pin.dart', import.meta.url), 'utf8');
+  assert.match(explore, /=> BrandMapPin\(/);
+  assert.doesNotMatch(explore, /SvgPicture|PhysicalShape/);
+});
+
 test('All pages share the global access policy; new pages cannot bypass registration', async () => {
   const pages = await sources(new URL('../app/pages/', import.meta.url));
   const patterns = pages.map(([path, source]) => {

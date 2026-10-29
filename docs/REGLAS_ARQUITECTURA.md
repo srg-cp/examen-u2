@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md):
+BrandMapPin centraliza silueta/logo en core/presentation, reutilizado por
+selector/Explorar/Recorrido. LocationMap usa SVG generado desde la marca oficial,
+con comprobación de paths/dimensiones/anclaje. Excepción azul de ficha conservada;
+solo presentación, sin imports entre funcionalidades ni cambios de dominio/data.
+
 29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): fases55/55
 centralizadas en presentación compartida. Controles reutilizan su contenido;
 OriginPageSource captura temas/MediaQuery, sin acceso a dominio/data. Web copia

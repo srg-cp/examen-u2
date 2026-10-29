@@ -1,5 +1,13 @@
 # Funcionalidades de Entre Huellas
 
+- [Pines de mapa compartidos](pines-de-mapa.md): logo oficial en móvil/web,
+  excepción azul de ficha pública y estados de Explorar/Recorrido conservados,
+  [ADR-165](../decisiones/165-pines-con-logo-compartidos-mobile-web.md).
+
+29/10: [Ubicaciones de interés](zonas.md) permite guardar el pin sin escribir
+nombre, con etiqueta automática de coordenadas. [ADR-164](../decisiones/164-ubicaciones-de-interes-con-nombre-opcional.md).
+[Revisión de los diseños de pin existentes](../revisiones/pines-mapas-2026-10-29.md), sin rediseño de mapas.
+
 29/10: [Recarga de contenido por gesto](recarga-de-contenido.md): seguimiento
 sin congelar el giro y retorno al top de la pantalla actual al soltar un tirón.
 [ADR-162](../decisiones/162-recarga-por-gesto-y-retorno-al-top.md).

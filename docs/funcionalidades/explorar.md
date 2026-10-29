@@ -1,5 +1,9 @@
 # Explorar: lista y mapa de casos
 
+29/10: pines con logo mediante BrandMapPin compartido; conservar resultados48×48,
+estados blanco/negro y acciones. El filtro Ubicación adopta el pin negro/logo
+blanco48×56. [Pines de mapa](pines-de-mapa.md), ADR-165; datos/permisos intactos.
+
 26/10, [ADR-154](../decisiones/154-recorrido-con-panel-del-mapa-de-explorar.md):
 mapa/panel/cabecera se extraen a MapCaseSheet, MapCasePanel/MapPanelFact y
 MapSheetHeader en core para reutilización exacta en Recorrido. Explorar conserva

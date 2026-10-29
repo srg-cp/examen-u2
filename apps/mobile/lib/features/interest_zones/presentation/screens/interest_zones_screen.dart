@@ -341,8 +341,7 @@ class _InterestZonesScreenState extends ConsumerState<InterestZonesScreen> {
 }
 
 String zoneFailureLabel(ZoneFailureKind kind) => switch (kind) {
-  ZoneFailureKind.invalidName =>
-    'Escribe un nombre de ubicación de 1 a 60 caracteres.',
+  ZoneFailureKind.invalidName => 'El nombre puede tener hasta 60 caracteres.',
   ZoneFailureKind.invalidPoint =>
     'Selecciona un punto válido en el mapa o indica sus coordenadas.',
   ZoneFailureKind.invalidRadius => 'El radio debe estar entre 0.1 y 50 km.',

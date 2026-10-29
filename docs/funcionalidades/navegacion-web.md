@@ -1,5 +1,10 @@
 # Navegación de usuario y recuperación web
 
+29/10: LocationMap sustituye el pin estándar por silueta/logo oficial negro/blanco
+48×56 centrado, equivalente al selector móvil. Reportar, avistamientos y ficha de
+recuperación comparten el recurso. [Pines de mapa](pines-de-mapa.md), ADR-165;
+privacidad, radios y teclado intactos. Validación local en ESTADO.
+
 29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): el origen
 conserva todo el control y sus estilos/posiciones, en una copia temporal inerte;
 no reconstruir icono/etiqueta. Fuente hasta55% y diálogos desde55%; fullscreen

@@ -1,5 +1,10 @@
 # Entre Huellas: reglas de UI y UX web
 
+29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md):
+LocationMap usa silueta/logo oficial blanco sobre negro48×56, equivalente al
+BrandMapPin móvil con anclaje central24/28. Sustituye location_on36 de ADR-129;
+radios, cartografía, selección/teclado y privacidad conservados.
+
 29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): identidad
 completa del control, con estilos y distribución reales, inerte y temporal.
 Fuente hasta55%; destino de diálogos desde55%. Fullscreen Sader conserva

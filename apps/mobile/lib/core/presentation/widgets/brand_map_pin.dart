@@ -5,6 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 class BrandMapPin extends StatelessWidget {
   const BrandMapPin({
     required this.color,
+    this.logoColor = Colors.white,
+    this.logoSize = 27,
+    this.elevation = 3,
     this.onTap,
     this.number,
     this.count = 1,
@@ -12,10 +15,14 @@ class BrandMapPin extends StatelessWidget {
     super.key,
   });
   final Color color;
+  final Color logoColor;
+  final double logoSize, elevation;
+  static const markerWidth = 48.0;
+  static const markerHeight = 56.0;
   final VoidCallback? onTap;
   final int? number;
   final int count;
-  final String label;
+  final String? label;
   @override
   Widget build(BuildContext context) => Semantics(
     label: label,
@@ -28,7 +35,7 @@ class BrandMapPin extends StatelessWidget {
             color: color,
             clipper: const BrandMapPinClipper(),
             clipBehavior: Clip.antiAlias,
-            elevation: 3,
+            elevation: elevation,
             shadowColor: const Color(0x40000000),
             child: Material(
               color: color,
@@ -39,13 +46,10 @@ class BrandMapPin extends StatelessWidget {
                   child: Center(
                     child: SvgPicture.asset(
                       'assets/branding/only-black.svg',
-                      width: 27,
-                      height: 27,
+                      width: logoSize,
+                      height: logoSize,
                       excludeFromSemantics: true,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
+                      colorFilter: ColorFilter.mode(logoColor, BlendMode.srcIn),
                     ),
                   ),
                 ),

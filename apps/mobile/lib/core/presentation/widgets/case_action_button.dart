@@ -128,13 +128,16 @@ Future<T?> pushCaseControl<T>(
 class CaseUtilityButton extends StatefulWidget {
   const CaseUtilityButton({
     required this.title,
-    required this.subtitle,
     required this.icon,
     required this.route,
+    this.subtitle,
+    this.padding = const EdgeInsets.all(14),
     this.onReturn,
     super.key,
   });
-  final String title, subtitle, route;
+  final String title, route;
+  final String? subtitle;
+  final EdgeInsetsGeometry padding;
   final IconData icon;
   final VoidCallback? onReturn;
   @override
@@ -163,10 +166,11 @@ class _CaseUtilityButtonState extends State<CaseUtilityButton> {
   }
 
   Widget _content() => Padding(
-    padding: const EdgeInsets.all(14),
+    padding: widget.padding,
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Icon(widget.icon, size: 21, color: const Color(0xFF171918)),
         const SizedBox(height: 7),
@@ -179,15 +183,17 @@ class _CaseUtilityButtonState extends State<CaseUtilityButton> {
             color: Color(0xFF171918),
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          widget.subtitle,
-          style: const TextStyle(
-            fontSize: 12,
-            height: 1.3,
-            color: Color(0xFF6E6E73),
+        if (widget.subtitle case final subtitle?) ...[
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 12,
+              height: 1.3,
+              color: Color(0xFF6E6E73),
+            ),
           ),
-        ),
+        ],
       ],
     ),
   );
@@ -195,7 +201,7 @@ class _CaseUtilityButtonState extends State<CaseUtilityButton> {
   @override
   Widget build(BuildContext context) => Semantics(
     button: true,
-    label: '${widget.title}. ${widget.subtitle}',
+    label: [widget.title, ?widget.subtitle].join('. '),
     excludeSemantics: true,
     enabled: !_opening,
     onTap: _opening ? null : _open,

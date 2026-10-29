@@ -42,19 +42,28 @@ class RecoveryCaseActions extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CaseActionLayout(
-            children: [
-              if (open && showSightingAction)
-                CaseActionButton(
-                  label: 'Reportar avistamiento',
-                  accented: true,
-                  route: '/home/sightings/${community ? 'found' : 'lost'}/$id',
-                  icon: Icons.visibility_outlined,
-                  onReturn: onChanged,
-                ),
-              if (open)
-                CaseActionButton(
-                  label: 'La vi o la encontré',
+          if (open)
+            CaseActionLayout(
+              utilities: true,
+              children: [
+                if (showSightingAction)
+                  CaseUtilityButton(
+                    title: 'Reportar avistamiento',
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 20,
+                    ),
+                    route:
+                        '/home/sightings/${community ? 'found' : 'lost'}/$id',
+                    icon: Icons.visibility_outlined,
+                    onReturn: onChanged,
+                  ),
+                CaseUtilityButton(
+                  title: 'La vi o la encontré',
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 20,
+                  ),
                   route: '/home/found-cases/new?case=$id&community=$community',
                   icon: Icons.visibility_outlined,
                   onReturn: () {
@@ -62,22 +71,28 @@ class RecoveryCaseActions extends ConsumerWidget {
                     onChanged();
                   },
                 ),
-              if (open && canResolve) ...[
-                CaseActionButton(
-                  label: 'Ya fue recuperada',
-                  icon: Icons.check_circle_outline,
-                  route: '/home/closure/${community ? 'found' : 'lost'}/$id',
-                  onReturn: onChanged,
-                ),
               ],
-              if (!open)
-                CaseActionButton(
-                  label: 'Ver recuperación',
-                  icon: Icons.check_circle_outline,
-                  route: '/home/closure/${community ? 'found' : 'lost'}/$id',
-                ),
-            ],
-          ),
+            ),
+          if (open && canResolve) const SizedBox(height: 16),
+          if (canResolve || !open)
+            CaseActionLayout(
+              children: [
+                if (open && canResolve) ...[
+                  CaseActionButton(
+                    label: 'Ya fue recuperada',
+                    icon: Icons.check_circle_outline,
+                    route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+                    onReturn: onChanged,
+                  ),
+                ],
+                if (!open)
+                  CaseActionButton(
+                    label: 'Ver recuperación',
+                    icon: Icons.check_circle_outline,
+                    route: '/home/closure/${community ? 'found' : 'lost'}/$id',
+                  ),
+              ],
+            ),
           if (utilities != null) ...[
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 90, vertical: 20),

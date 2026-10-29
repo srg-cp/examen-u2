@@ -22,7 +22,7 @@ class ZoneEditor extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
-          'Nombra tu ubicación y toca el mapa para elegir su centro. Puedes moverlo y ampliar la vista.',
+          'Toca el mapa para elegir tu ubicación. Puedes moverlo y ampliar la vista. El nombre es opcional.',
           style: TextStyle(fontSize: 16, color: Color(0xFF6E6E73), height: 1.4),
         ),
         const SizedBox(height: 20),
@@ -34,7 +34,10 @@ class ZoneEditor extends ConsumerWidget {
             initialValue: draft.name,
             style: const TextStyle(fontSize: 16, color: Color(0xFF111111)),
             enabled: !state.busy,
-            decoration: _decoration('Nombre de la ubicación', invalidName),
+            decoration: _decoration(
+              'Nombre (opcional)',
+              invalidName,
+            ).copyWith(hintMaxLines: 2),
             onChanged: (name) => vm.edit(name: name),
           ),
         ),

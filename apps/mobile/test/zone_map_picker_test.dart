@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:flutter_application_entrehuellas/core/theme/app_theme.dart';
+import 'package:flutter_application_entrehuellas/core/presentation/widgets/brand_map_pin.dart';
 import 'package:flutter_application_entrehuellas/features/interest_zones/presentation/widgets/zone_map_picker.dart';
 
 void main() {
@@ -86,6 +87,15 @@ void main() {
       await processTiles();
       expect(latitude, closeTo(-12.0464, .01));
       expect(longitude, closeTo(-77.0428, .01));
+      expect(find.byType(BrandMapPin), findsOneWidget);
+      expect(find.byIcon(Icons.location_on), findsNothing);
+      final marker = tester
+          .widget<MarkerLayer>(find.byType(MarkerLayer))
+          .markers
+          .single;
+      expect(marker.width, BrandMapPin.markerWidth);
+      expect(marker.height, BrandMapPin.markerHeight);
+      expect(marker.alignment, Alignment.center);
       expect(
         providers,
         2,

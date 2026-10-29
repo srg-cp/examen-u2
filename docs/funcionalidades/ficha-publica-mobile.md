@@ -1,5 +1,16 @@
 # Ficha pública móvil por tarjetas glass
 
+29/10, [ADR-166](../decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
+«Reportar avistamiento» y «La vi o la encontré» usan dos tarjetas sólidas gris
+claro, radio22, icono21 arriba a la izquierda y etiqueta14/600 debajo;
+padding14 horizontal/20 vertical. Referencia elegida archivada en
+[mockups](../../mockups/acciones-ficha-tarjetas-grises.png). Sin subtítulos
+inventados; dos columnas de igual altura, apiladas en ancho pequeño/texto
+ampliado. CaseUtilityButton y CaseActionLayout compartidos; origen completo,
+rutas, retorno y permisos conservados. Recuperación sigue circular debajo.
+Excepción local a ADR-148/153 solo para estas dos acciones móviles; web y otros
+controles conservados. Validación y revisión física pendiente en ESTADO.
+
 29/10, [ADR-163](../decisiones/163-favorito-mobile-amarillo-y-particulas.md):
 marcador favorito amarillo tras confirmación; pequeño rebote y seis partículas
 amarillas discretas alrededor de la parte inferior al guardar. Se conserva el

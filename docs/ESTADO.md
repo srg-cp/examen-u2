@@ -1,5 +1,60 @@
 # Estado del proyecto
 
+## Pines con logo compartidos en móvil y web —29/10/2026
+
+Todos los pines cartográficos internos usan silueta/logo oficial. ZoneMapPicker
+sustituye location_on por BrandMapPin negro/logo blanco48×56 con anclaje central;
+LocationMap web sirve el SVG equivalente generado desde la marca oficial.
+Explorar delega en el renderer compartido conservando48×48, selección y sombras;
+Recorrido mantiene colores/números/grupos48×56. Punto azul con borde blanco/halo
+de CasePublicCards intacto; no se añaden pines ocultos ni mapas nuevos.
+[ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md) sustituye el
+pin estándar de ADR-129; [ficha](funcionalidades/pines-de-mapa.md) e
+[inventario actualizado](revisiones/pines-mapas-2026-10-29.md).
+
+Validación local:49 pruebas móviles aprobadas de mapas/ubicaciones/Explorar/
+Recorrido/ficha pública/arquitectura/consistencia; análisis lib/test limpio.
+12 comprobaciones web aprobadas, incluidas marca completa/dimensiones/anclaje;
+typecheck y build Nuxt de producción aprobados. Chromium real en1440/390/320,
+texto200% y reducido: toque/teclado, SVG servido, centro correcto y sin overflow,
+CSP ni errores de hidratación. Autenticación y teselas son fixtures locales.
+Script: apps/platform/scripts/check-map-pins-browser.mjs. Capturas del renderer
+móvil real y mapa web revisadas en apps/mobile/build/ui-preview/map-pins.
+Log móvil: apps/mobile/build/brand-map-pins-tests.log.
+
+No se acredita proveedor/Supabase remoto ni versión instalada. Siguiente paso:
+recompilar y revisar Android/iOS en dispositivo. Sin APK/IPA, commit, despliegue
+ni acciones GitHub. Los cambios anteriores de nombre opcional se conservan.
+
+## Ubicaciones de interés sin nombre obligatorio y revisión de pines —29/10/2026
+
+Perfil → Ubicaciones de interés permite seleccionar un pin y guardar sin
+escribir nombre, con el radio inicial de1km. Campo opcional hasta60 caracteres;
+SaveInterestZone asigna al vacío una etiqueta determinista con coordenadas de
+cinco decimales, compatible con SQL010. Borradores, reintentos, versiones,
+privacidad, nombres anteriores y alternativa manual conservados. No requiere
+migración ni activación remota. [ADR-164](decisiones/164-ubicaciones-de-interes-con-nombre-opcional.md)
+y [ficha](funcionalidades/zonas.md).
+
+La [revisión de pines](revisiones/pines-mapas-2026-10-29.md) identifica cuatro
+familias actuales: Material negro en selectores móvil/web, marca blanco/negro
+en resultados de Explorar móvil, marca rojo/azul numerada en Recorrido y punto
+azul con halo en ficha pública móvil. ImmersivePhotoSheet oculta pin y muestra
+radio; Explorar web no tiene mapa de resultados. Inventario por código, sin
+unificación visual ni validación de la versión instalada.
+
+Validación local:26 pruebas aprobadas de zonas, mapa, repositorio Supabase,
+arquitectura y consistencia. Incluyen nombre vacío/espacios, punto obligatorio,
+etiqueta estable en reintento, recuperación tras fallo y edición; pantalla390×844
+y320×350/texto200%, guardado sin nombre, scroll y descarte. Capturas con fuentes
+reales en apps/mobile/build/ui-preview/zones; etiqueta opcional admite dos líneas.
+Teselas bloqueadas por el harness, sin validar proveedor real ni operaciones
+Supabase remotas. Log: apps/mobile/build/interest-zones-validation.log.
+
+Análisis de lib/test sin incidencias. Siguiente paso: recompilar y comprobar
+selección/guardado/lectura tras reiniciar en Android/iOS autenticado. Sin build
+instalable, commit, despliegue ni acciones GitHub en esta tarea.
+
 ## Favorito móvil amarillo y partículas discretas —29/10/2026
 
 Por petición explícita, SaveCaseButton muestra el marcador confirmado amarillo

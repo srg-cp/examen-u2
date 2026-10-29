@@ -177,7 +177,7 @@ void main() {
               skipOffstage: false,
             );
             final caseAction = find.byWidgetPredicate(
-              (w) => w is CaseActionButton && w.route == targetRoute,
+              (w) => w is CaseUtilityButton && w.route == targetRoute,
               skipOffstage: false,
             );
             final target = found
@@ -206,12 +206,7 @@ void main() {
                     find
                         .descendant(
                           of: caseAction,
-                          matching: find.byWidgetPredicate(
-                            (w) =>
-                                w is SizedBox &&
-                                w.width == 56 &&
-                                w.height == 56,
-                          ),
+                          matching: find.byType(Material),
                         )
                         .first,
                   )
@@ -246,7 +241,7 @@ void main() {
             expect(
               transition.source?.radius,
               found
-                  ? 28
+                  ? 22
                   : fromList
                   ? 28
                   : 32,

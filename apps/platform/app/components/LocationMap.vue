@@ -38,8 +38,8 @@ async function start() {
     tiles.on('tileerror', () => { if (!failed && !disposed) { failed = true; emit('failed', retry); } });
     tiles.addTo(map);
     map.on('click', event => choose(event.latlng.lat, event.latlng.lng));
-    // Same centered 36px Material location_on glyph as ZoneMapPicker (not tip-anchored).
-    marker = L.marker([0, 0], { interactive: false, keyboard: false, icon: L.icon({ iconUrl: '/map-location-pin.svg', iconSize: [36, 36], iconAnchor: [18, 18], className: 'location-map-pin' }) });
+    // Same centered brand pin as ZoneMapPicker; coordinates keep their anchor.
+    marker = L.marker([0, 0], { interactive: false, keyboard: false, icon: L.icon({ iconUrl: '/map-location-pin.svg', iconSize: [48, 56], iconAnchor: [24, 28], className: 'location-map-pin' }) });
     radius = L.circle([0, 0], { radius: props.radiusMeters, color: '#111111', weight: 2, opacity: 1, fillColor: '#111111', fillOpacity: 34 / 255, interactive: false });
     sync(); syncInteraction(); ready.value = true;
     resizeObserver = new ResizeObserver(() => map?.invalidateSize({ animate: false, pan: false }));

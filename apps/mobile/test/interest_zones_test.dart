@@ -97,12 +97,11 @@ void main() {
         );
   });
   test(
-    'Required fields, Unicode, finite coordinates and radius bounds block writes; foreign owner cannot delete',
+    'Name length, finite coordinates and radius bounds block writes; foreign owner cannot delete',
     () async {
       final repo = FakeZones();
       final save = SaveInterestZone(repo);
       for (final invalid in [
-        draft.copyWith(name: ' '),
         draft.copyWith(name: '🐾' * 61),
         draft.copyWith(latitude: double.nan),
         draft.copyWith(longitude: double.infinity),
@@ -138,6 +137,43 @@ void main() {
     },
   );
 
+  test(
+    'Point-only saves use a stable coordinate label and still require a point',
+    () async {
+      final repo = FakeZones();
+      final save = SaveInterestZone(repo);
+      final unnamed = draft.copyWith(name: ' \u00a0 ');
+      final first = await save('one', unnamed);
+      final retry = await save('one', unnamed);
+      expect(first.name, 'Ubicación (-12.04000, -77.04000)');
+      expect(retry.name, first.name);
+      expect(repo.rows, hasLength(1));
+      expect(first.radiusMeters, draft.radiusMeters);
+      final renamed = await save('one', unnamed.copyWith(name: ' Casa '));
+      expect(renamed.name, 'Casa');
+      await expectLater(
+        save(
+          'one',
+          const ZoneDraft(
+            id: 'missing',
+            name: '',
+            latitude: null,
+            longitude: null,
+            radiusMeters: 1000,
+          ),
+        ),
+        throwsA(
+          isA<ZoneFailure>().having(
+            (failure) => failure.kind,
+            'kind',
+            ZoneFailureKind.invalidPoint,
+          ),
+        ),
+      );
+      expect(repo.saves, 3);
+    },
+  );
+
   late ProviderContainer container;
   late FakeAuthRepository auth;
   late FakeZones repo;
@@ -168,7 +204,7 @@ void main() {
       await init();
       final vm = container.read(interestZonesViewModelProvider.notifier);
       vm.startEditor();
-      vm.edit(name: 'Casa', latitude: -12, longitude: -77, radiusMeters: 1500);
+      vm.edit(latitude: -12, longitude: -77, radiusMeters: 1500);
       final id = container
           .read(interestZonesViewModelProvider)
           .requireValue
@@ -178,12 +214,14 @@ void main() {
       await vm.save();
       var current = container.read(interestZonesViewModelProvider).requireValue;
       expect(current.draft!.id, id);
+      expect(current.draft!.name, isEmpty);
       expect(current.confirmation, isNull);
       expect(current.busy, false);
       repo.failSave = false;
       await vm.save();
       current = container.read(interestZonesViewModelProvider).requireValue;
       expect(current.zones.single.id, id);
+      expect(current.zones.single.name, 'Ubicación (-12.00000, -77.00000)');
       expect(current.draft, isNull);
       vm.startEditor(current.zones.single);
       vm.edit(name: 'Casa nueva');
@@ -368,6 +406,9 @@ void main() {
               }
               await loader.load();
             }
+            final poppins = FontLoader('Poppins')
+              ..addFont(rootBundle.load('assets/fonts/Poppins-Regular.ttf'));
+            await poppins.load();
           });
         }
         final size = small ? const Size(320, 350) : const Size(390, 844);
@@ -417,7 +458,17 @@ void main() {
         await settleMapScreen(tester);
         await capture('editor');
         expect(tester.takeException(), isNull);
-        await tester.enterText(find.byType(TextFormField).first, 'Casa');
+        expect(find.text('Nombre (opcional)'), findsOneWidget);
+        await Scrollable.ensureVisible(
+          tester.element(find.byType(TextFormField).first),
+          alignment: .2,
+        );
+        await settleMapScreen(tester);
+        await capture('optional-name');
+        if (!small) {
+          await tester.enterText(find.byType(TextFormField).first, 'Casa');
+        }
+        final savedName = small ? 'Ubicación (-12.00000, -77.00000)' : 'Casa';
         await tester.ensureVisible(find.text('Indicar coordenadas'));
         await tester.tap(find.text('Indicar coordenadas'));
         await settleMapScreen(tester);
@@ -454,7 +505,10 @@ void main() {
         await vm.save();
         await settleMapScreen(tester);
         await tester.pump(const Duration(seconds: 7));
-        expect(find.text('Casa'), findsOneWidget);
+        await tester.pumpAndSettle();
+        expect(find.text(savedName), findsOneWidget);
+        await tester.ensureVisible(find.text(savedName));
+        await tester.pumpAndSettle();
         await capture('list');
         expect(tester.takeException(), isNull);
         vm.startEditor(
@@ -472,7 +526,7 @@ void main() {
         await tester.ensureVisible(find.text('Descartar'));
         await tester.tap(find.text('Descartar'));
         await settleMapScreen(tester);
-        expect(find.text('Casa'), findsOneWidget);
+        expect(find.text(savedName), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox());
       },
