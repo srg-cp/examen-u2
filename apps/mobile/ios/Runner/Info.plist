@@ -35,8 +35,6 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Seleccionar tu foto de perfil desde la galería.</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>

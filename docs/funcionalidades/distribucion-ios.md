@@ -1,8 +1,9 @@
 # Pruebas personales de iOS desde Windows
 
 28/10/2026. Infraestructura de prueba autorizada para iPhone 11/iOS 18.5.
-Base: tag `android-build-59`; rama `feature/ios-sideload`. No incorpora los
-cambios posteriores de otras ramas ni cierra historias del MVP.
+Rama `feature/ios-sideload`: integra `feature/case-matching` (afb7cb2) y
+`origin/main` (6db8810), por instrucción posterior de actualizar el APK y crear
+un tag nuevo. No cierra historias del MVP.
 
 ## Recorrido y reglas
 

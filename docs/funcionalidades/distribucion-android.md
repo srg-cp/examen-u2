@@ -1,5 +1,11 @@
 # Distribución Android por GitHub Releases
 
+28/10/2026: por petición expresa de un APK actualizado/tag nuevo, el workflow
+permite también una ejecución manual desde `feature/ios-sideload`. Conserva
+validación completa, firma, numeración y prerelease; no publica por cada push
+de esa rama ni requiere fusionar main. APK e IPA usarán el mismo commit fuente.
+
+
 Para ejecutar la configuración de principio a fin, seguir la
 [guía operativa de la raíz](../../INSTALACION_ANDROID.md): generación de firma,
 origen de los valores, cinco secrets, primera ejecución, instalación y actualizaciones.

@@ -82,24 +82,32 @@ void main() {
     final fonts = file.uri
         .resolve('${flutter['rootUri']}/')
         .resolve('../../bin/cache/artifacts/material_fonts/');
-    for (final entry in {
-      'sans-serif': [
-        'roboto-regular.ttf',
-        'roboto-medium.ttf',
-        'roboto-bold.ttf',
-      ],
-      'MaterialIcons': ['materialicons-regular.otf'],
-    }.entries) {
-      final loader = FontLoader(entry.key);
-      for (final name in entry.value) {
-        loader.addFont(
-          File.fromUri(
-            fonts.resolve(name),
-          ).readAsBytes().then(ByteData.sublistView),
-        );
-      }
-      await loader.load();
-    }
+    // Use versioned app fonts; Flutter's SDK cache differs between OS images.
+    await (FontLoader('sans-serif')
+          ..addFont(
+            File(
+              'assets/fonts/Roboto-Regular.ttf',
+            ).readAsBytes().then(ByteData.sublistView),
+          )
+          ..addFont(
+            File(
+              'assets/fonts/Roboto-Bold.ttf',
+            ).readAsBytes().then(ByteData.sublistView),
+          ))
+        .load();
+    await (FontLoader('MaterialIcons')..addFont(
+          Directory.fromUri(fonts)
+              .listSync()
+              .whereType<File>()
+              .firstWhere(
+                (font) =>
+                    font.uri.pathSegments.last.toLowerCase() ==
+                    'materialicons-regular.otf',
+              )
+              .readAsBytes()
+              .then(ByteData.sublistView),
+        ))
+        .load();
     await (FontLoader('Poppins')..addFont(
           File(
             'assets/fonts/Poppins-Regular.ttf',

@@ -1,6 +1,6 @@
 # Probar Entre Huellas en iPhone desde Windows
 
-Para iPhone 11 con iOS 18.5. Compilación Release basada en `android-build-59`.
+Para iPhone 11 con iOS 18.5. Compilación Release del código actual integrado en `feature/ios-sideload`.
 No convierte el APK: genera una app iOS desde el código Flutter.
 
 ## 1. Obtener la compilación

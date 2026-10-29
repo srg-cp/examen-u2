@@ -57,7 +57,7 @@ jobs:
           (cd build/sideload && /usr/bin/zip -qry ../distribution/entre-huellas-ios-unsigned.ipa Payload)
           cp ios/Podfile.lock build/distribution/Podfile.lock
           python3 scripts/verify_ios_package.py build/distribution/entre-huellas-ios-unsigned.ipa
-          printf 'source_commit=%s\nbase_tag=android-build-59\nflutter=3.35.3\nmode=release\nsigning=unsigned; sign locally with your Apple account\n' "$GITHUB_SHA" > build/distribution/BUILD.txt
+          printf 'source_commit=%s\nflutter=3.35.3\nmode=release\nsigning=unsigned; sign locally with your Apple account\n' "$GITHUB_SHA" > build/distribution/BUILD.txt
           xcodebuild -version >> build/distribution/BUILD.txt
           (cd build/distribution && shasum -a 256 entre-huellas-ios-unsigned.ipa > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4

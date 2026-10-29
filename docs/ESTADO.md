@@ -3,10 +3,15 @@
 ## Prueba iOS desde Windows —28/10/2026
 
 Autorizado preparar el proceso completo con commits. Rama aislada
-`feature/ios-sideload` desde `android-build-59`; CocoaPods, configuración pública
+`feature/ios-sideload`, actualizada con afb7cb2 y main6db8810 por petición
+posterior de generar también un APK/tag nuevo; CocoaPods, configuración pública
 compartida y workflow macOS Release sin firma. Artefacto privado verificable para
 firmar localmente con cuenta gratuita; sin credenciales Apple en CI.
-Compilación remota e instalación física pendientes. Siguiente paso: ejecutar CI
+Primer run iOS40819223075 cancelado tras la petición de actualizar la base.
+Ocho pruebas Python de configuración/paquete aprobadas. Se corrige la prueba
+de coincidencias para usar Roboto versionado e iconos independientes de
+mayúsculas/minúsculas del SDK; no cambia UI. Compilación remota e instalación
+física pendientes. Siguiente paso: ejecutar CI
 y descargar IPA, después instalar/renovar en iPhone11/iOS18.5 con el usuario.
 [Ficha y límites](funcionalidades/distribucion-ios.md).
 

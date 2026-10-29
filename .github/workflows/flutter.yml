@@ -32,7 +32,9 @@ jobs:
       - run: flutter test --dart-define=AMBIENT_BACKGROUND_MOTION=false
 
   release:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/feature/ios-sideload')
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 40
