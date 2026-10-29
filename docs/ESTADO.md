@@ -10,8 +10,10 @@ formato734 archivos sin cambios y actionlint de ambos workflows correcto.
 Pruebas de mapas permiten completar IO de teselas y retirar el toast de fallo
 antes de tocar controles; conservan pumpAndSettle y las aserciones. Origen de
 hallazgo comprueba el CaseActionButton real y su superficie/radio28.
-Análisis e integración remota en curso; no afirmar Release nueva hasta verificar
-ejecución y adjuntos.
+Análisis local sin incidencias. Run40828442356: validate e iOS aprobados;
+Android generó APK pero falló por saltos vacíos que separaban los argumentos
+del comando. Sin publicación. YAML corregido y comando plegado comprobado
+mediante parser; nueva ejecución remota pendiente de verificación.
 
 
 ## iOS instalado y guía para el equipo —29/10/2026
