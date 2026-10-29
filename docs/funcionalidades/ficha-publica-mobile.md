@@ -1,5 +1,11 @@
 # Ficha pública móvil por tarjetas glass
 
+29/10, [ADR-163](../decisiones/163-favorito-mobile-amarillo-y-particulas.md):
+marcador favorito amarillo tras confirmación; pequeño rebote y seis partículas
+amarillas discretas alrededor de la parte inferior al guardar. Se conserva el
+control compartido y su área táctil; sin animación en reducido ni al consultar
+favoritos existentes. [Reglas y validación](casos-guardados.md).
+
 29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): utilidades
 y tarjeta Recorrido entregan el contenido completo al morph, incluidos
 textos, ilustración, contador y fechas, en sus posiciones reales. Etiquetas

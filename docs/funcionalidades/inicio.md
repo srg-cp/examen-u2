@@ -1,5 +1,9 @@
 # Inicio y navegación
 
+29/10: recarga compartida corregida en Inicio y sus secciones: giro ligado al
+dedo sin congelarse; cancelar/confirmar acomoda el scroll al top de la sección
+actual. [Contrato y validación](recarga-de-contenido.md), ADR-162.
+
 29/10, [ADR-160](../decisiones/160-origen-completo-y-fases-al-55.md): Reportar
 pérdida/Encontré una mascota conservan texto y flecha al comenzar expansión;
 Buscar con una foto conserva ilustración/texto/flecha. Navegación conserva los

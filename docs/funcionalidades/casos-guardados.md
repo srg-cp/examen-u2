@@ -1,5 +1,12 @@
 # Casos guardados
 
+29/10, [ADR-163](../decisiones/163-favorito-mobile-amarillo-y-particulas.md):
+en ficha móvil, favorito confirmado amarillo; al guardar, rebote breve del icono
+y seis partículas pequeñas por sus lados inferiores. Sin efecto al consultar,
+quitar o fallar; reducido conserva el color sin animación. Presentación local,
+sin cambios de permisos/persistencia. Cuatro pruebas visuales y26 regresiones
+aprobadas, análisis sin incidencias; revisión física con nueva compilación pendiente.
+
 29/10: el motor móvil compartido elimina la cortina/fondo local previo al
 stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
 [Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).

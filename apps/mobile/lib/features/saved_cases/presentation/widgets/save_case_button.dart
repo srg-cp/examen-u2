@@ -6,6 +6,7 @@ import '../../../../core/presentation/widgets/glass_navigation_button.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../../domain/entities/saved_case_ref.dart';
 import '../view_models/saved_case_view_model.dart';
+import 'favorite_bookmark_icon.dart';
 
 class SaveCaseButton extends ConsumerWidget {
   const SaveCaseButton({required this.target, this.inPanel = false, super.key});
@@ -29,6 +30,12 @@ class SaveCaseButton extends ConsumerWidget {
         ? 'Quitar de favoritos'
         : 'Añadir a favoritos';
     final icon = saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded;
+    final bookmark = FavoriteBookmarkIcon(
+      key: ValueKey((target, value?.owner)),
+      saved: saved,
+      celebrationId: value?.noticeId ?? 0,
+      size: inPanel ? 26 : 28,
+    );
     final VoidCallback? onPressed = busy
         ? null
         : retry
@@ -53,6 +60,7 @@ class SaveCaseButton extends ConsumerWidget {
               ? PanelActionButton(
                   onPressed: onPressed,
                   icon: icon,
+                  iconWidget: bookmark,
                   label: label,
                 )
               : GlassNavigationButton(
@@ -66,6 +74,7 @@ class SaveCaseButton extends ConsumerWidget {
                   icon: saved
                       ? Icons.bookmark_rounded
                       : Icons.bookmark_border_rounded,
+                  iconWidget: bookmark,
                   onPressed: busy
                       ? null
                       : retry

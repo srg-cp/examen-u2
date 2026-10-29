@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+29/10: [Recarga de contenido por gesto](recarga-de-contenido.md): seguimiento
+sin congelar el giro y retorno al top de la pantalla actual al soltar un tirón.
+[ADR-162](../decisiones/162-recarga-por-gesto-y-retorno-al-top.md).
+
 29/10: [Identidad visual](identidad-visual.md) conserva tamaño y posición de la
 marca entre el final del arranque y la espera de cuenta, mediante composición
 compartida. [ADR-161](../decisiones/161-marca-estable-entre-arranque-y-espera.md).

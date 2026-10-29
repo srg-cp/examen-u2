@@ -1,5 +1,49 @@
 # Estado del proyecto
 
+## Favorito móvil amarillo y partículas discretas —29/10/2026
+
+Por petición explícita, SaveCaseButton muestra el marcador confirmado amarillo
+y celebra el guardado con rebote del icono y seis partículas pequeñas alrededor
+de la parte inferior durante620ms. FavoriteBookmarkIcon encapsula presentación
+y lifecycle; los controles compartidos aceptan icono compuesto sin cambiar
+geometría/superficie/semántica. Sin celebración en lectura inicial, retirada,
+errores o reconstrucciones; clave por caso/cuenta y movimiento reducido sin
+animación. Shimmer, toast, ViewModel, datos y permisos conservados. Alcance solo
+móvil, excepción explícita local de paridad registrada en
+[ADR-163](decisiones/163-favorito-mobile-amarillo-y-particulas.md).
+
+Validación local: cuatro pruebas del icono en390×844 y320×600/texto200%, normal
+y reducido;26 pruebas de arquitectura/consistencia/compartir aprobadas. Análisis
+lib/test sin incidencias; formato de archivos intervenidos y diff comprobados.
+Capturas con MaterialIcons real revisadas en apps/mobile/build/ui-preview/favorite.
+Sin comprobar operaciones remotas nuevas ni revisión física. Siguiente paso:
+nueva compilación y revisión táctil Android/iOS. Sin build de distribución,
+commit, publicación/despliegue ni acciones GitHub; cambios previos conservados.
+
+## Recarga por gesto y retorno al top —29/10/2026
+
+Corregido PullToRefresh compartido: el límite visual ya no congela el giro
+durante un tirón largo/lento; el tirón parcial se retira sin consulta, también
+al comenzar el rebote. Cancelar/confirmar acomoda el scroll primario al borde
+superior de la pantalla actual, sin navegación. Scroll ordinario conservado;
+movimiento reducido directo, giro continuo durante trabajo real, duplicados,
+ViewModels, shimmer, feedback y entrada única conservados. Sin SQL/web ni nueva
+HU/RF. [ADR-162](decisiones/162-recarga-por-gesto-y-retorno-al-top.md) y
+[ficha](funcionalidades/recarga-de-contenido.md).
+
+Validación:47 pruebas de gesto, Inicio, mascotas, ContentRefresh, Recorrido,
+arquitectura y consistencia aprobadas con AMBIENT_BACKGROUND_MOTION=false;
+diez nuevas cubren lento/largo, parcial/completo, top durante/después de petición,
+duplicados y scroll ordinario con clamping/bouncing y normal/reducido. Formato
+de los dos archivos y dart analyze lib test sin incidencias. Logs:
+apps/mobile/build/pull-refresh-tests.log y pull-refresh-analysis.log.
+El intento de flutter analyze global incluyó copias antiguas dentro de build y
+reportó63 incidencias de esos artefactos; análisis explícito de lib/test aprobado.
+
+Siguiente paso: recompilar y comprobar gesto táctil en Android/iOS, incluidos
+pantalla pequeña/texto ampliado. Sin build instalable, commit, publicación,
+despliegue ni acciones GitHub en esta tarea.
+
 ## Marca estable entre arranque y espera de cuenta —29/10/2026
 
 Corregido el salto que muestran las capturas del usuario: StartupReveal usaba

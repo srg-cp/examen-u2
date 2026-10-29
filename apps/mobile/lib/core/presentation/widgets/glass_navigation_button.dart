@@ -10,6 +10,7 @@ class GlassNavigationButton extends StatelessWidget {
     this.foregroundColor = const Color(0xFF111111),
     this.finish = GlassSurfaceFinish.polished,
     this.iconSize = 28,
+    this.iconWidget,
     super.key,
   });
   final String tooltip;
@@ -18,6 +19,7 @@ class GlassNavigationButton extends StatelessWidget {
   final Color foregroundColor;
   final GlassSurfaceFinish finish;
   final double iconSize;
+  final Widget? iconWidget;
 
   @override
   Widget build(BuildContext context) => GlassSurface(
@@ -32,7 +34,7 @@ class GlassNavigationButton extends StatelessWidget {
         shape: const CircleBorder(),
         foregroundColor: foregroundColor,
       ),
-      icon: Icon(icon, size: iconSize),
+      icon: iconWidget ?? Icon(icon, size: iconSize),
     ),
   );
 }

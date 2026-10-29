@@ -1,5 +1,13 @@
 # Diseño de la interfaz: implementación y revisión
 
+29/10, [ADR-162](decisiones/162-recarga-por-gesto-y-retorno-al-top.md):
+PullToRefresh limita el desplazamiento pintado112px sin congelar el controlador
+del giro. Cancelar con rebote inicia retirada durante la primera actualización
+balística; cancelar/confirmar acomoda el scroll primario a minScrollExtent en
+220ms/easeOutCubic (directo en reducido). Umbral nativo y scroll ordinario
+conservados; sin navegación ni reinicio de entrada.47 pruebas locales y análisis
+lib/test aprobados; revisión táctil Android/iOS pendiente.
+
 29/10, [ADR-161](decisiones/161-marca-estable-entre-arranque-y-espera.md):
 arranque y espera de cuenta comparten BrandWordmark.startup, icono80/texto32,
 ancho real y centrado en SafeArea. Mismo tamaño/posición al terminar la

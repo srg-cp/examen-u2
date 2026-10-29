@@ -35,6 +35,8 @@ class _PullToRefreshState extends State<PullToRefresh>
   bool _reduced = false;
   double _distance = 0;
   double _travelTarget = 0;
+  ScrollPosition? _pullPosition;
+  bool _settling = false;
 
   @override
   void didChangeDependencies() {
@@ -75,17 +77,48 @@ class _PullToRefreshState extends State<PullToRefresh>
     setState(() => _status = status);
     if (status == RefreshIndicatorStatus.drag) {
       _distance = _travel.value * 2;
+      _settling = false;
+      _pullPosition = null;
       _travel.stop();
       _travelTarget = -1;
     } else if (status == RefreshIndicatorStatus.snap ||
         status == RefreshIndicatorStatus.refresh) {
+      _settleAtTop();
       _moveTo(64);
     } else if (status == RefreshIndicatorStatus.done ||
         status == RefreshIndicatorStatus.canceled ||
         status == null) {
+      if (status == RefreshIndicatorStatus.canceled) _settleAtTop();
       _rotation.stop();
       _moveTo(0);
+      if (status == null) _pullPosition = null;
     }
+  }
+
+  void _settleAtTop() {
+    final position = _pullPosition;
+    if (_settling || _distance <= 0 || position == null) return;
+    _settling = true;
+    // Notifications arrive after layout. Stop the release velocity on the next
+    // frame, without taking ownership of feature scroll controllers. In
+    // particular, a bouncing pull must not carry the list past its initial top.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          !identical(_pullPosition, position) ||
+          !position.hasPixels ||
+          position.context.notificationContext?.mounted != true) {
+        return;
+      }
+      if (_reduced) {
+        position.jumpTo(position.minScrollExtent);
+      } else {
+        position.animateTo(
+          position.minScrollExtent,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
   }
 
   bool _trackPull(ScrollNotification notification) {
@@ -96,6 +129,18 @@ class _PullToRefreshState extends State<PullToRefresh>
             _status != RefreshIndicatorStatus.armed)) {
       return false;
     }
+    _pullPosition = notification.context == null
+        ? null
+        : Scrollable.maybeOf(notification.context!)?.position;
+    if (notification is ScrollUpdateNotification &&
+        notification.dragDetails == null &&
+        _status == RefreshIndicatorStatus.drag &&
+        _distance > 0) {
+      // iOS starts its spring before ScrollEnd. Retract a partial pull now,
+      // rather than leaving a stationary glyph until the spring finishes.
+      _settleAtTop();
+      _moveTo(0);
+    }
     double? delta;
     if (notification is ScrollUpdateNotification &&
         notification.dragDetails != null) {
@@ -105,7 +150,9 @@ class _PullToRefreshState extends State<PullToRefresh>
       delta = notification.overscroll;
     }
     if (delta != null) {
-      _distance = (_distance - delta).clamp(0.0, 224.0);
+      // Limit only the painted displacement. Clamping the controller itself
+      // freezes both the glyph rotation and its rebuilds during a long pull.
+      _distance = (_distance - delta).clamp(0.0, double.infinity);
       _travelTarget = -1;
       _travel.value = _distance * .5;
     }
@@ -206,7 +253,7 @@ class _PullToRefreshState extends State<PullToRefresh>
                                     child: Transform.rotate(
                                       angle: _reduced
                                           ? 0
-                                          : (offset / 64 * .75 +
+                                          : (_travel.value / 64 * .75 +
                                                     _rotation.value) *
                                                 2 *
                                                 pi,

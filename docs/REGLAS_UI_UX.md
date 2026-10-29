@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+29/10, [ADR-162](decisiones/162-recarga-por-gesto-y-retorno-al-top.md): recarga
+móvil conserva giro ligado al dedo aun con desplazamiento visual máximo;
+cancelar/confirmar el tirón acomoda el scroll al top de la pantalla actual.
+Tirón parcial se retira sin consulta, incluido rebote; scroll ordinario intacto.
+Movimiento reducido directo y giro continuo solo durante trabajo real.
+
 29/10, [ADR-160](decisiones/160-origen-completo-y-fases-al-55.md): expansión
 móvil con fuente completa hasta55% y destino desde55%, conservando curvas y
 retorno. Iconos/textos/ilustraciones mantienen layout inicial; no reemplazar

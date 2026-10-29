@@ -7,6 +7,7 @@ class PanelActionButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.iconOnly = true,
+    this.iconWidget,
     super.key,
   });
 
@@ -14,6 +15,7 @@ class PanelActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
   final bool iconOnly;
+  final Widget? iconWidget;
 
   @override
   Widget build(BuildContext context) => iconOnly
@@ -27,11 +29,11 @@ class PanelActionButton extends StatelessWidget {
             shape: const CircleBorder(),
           ),
           onPressed: onPressed,
-          icon: Icon(icon, size: 26),
+          icon: iconWidget ?? Icon(icon, size: 26),
         )
       : TextButton.icon(
           onPressed: onPressed,
-          icon: Icon(icon),
+          icon: iconWidget ?? Icon(icon),
           label: Text(label),
         );
 }
