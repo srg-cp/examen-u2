@@ -1,5 +1,22 @@
 # Estado del proyecto
 
+## iOS instalado y guía para el equipo —29/10/2026
+
+El run [40820124492](https://github.com/srg-cp/entrehuellas/actions/runs/40820124492)
+compiló Release iOS con Flutter3.35.3/Xcode16.4 desde2e31261. Artefacto privado
+`ios-sideload-3-1` descargado; estructura para dispositivo y SHA-256 verificados
+localmente. Instalado con Sideloadly0.71.2 en Windows y cuenta Apple gratuita.
+Tras autorizar el desarrollador, el usuario confirma uso «10 de10» en iPhone11,
+iOS18.5. No acredita todos los recorridos ni otros dispositivos.
+
+[Guía compartible](../INSTALACION_IOS.md) ampliada con requisitos, obtención del
+IPA, instalación, confianza, Modo de desarrollador, renovación, actualización,
+solución de errores y fuentes. Copia junto al IPA en Descargas/EntreHuellas-iOS.
+Comprobados enlaces internos y ausencia de marcadores de conflicto en la guía.
+Pendientes: renovación semanal con conservación de datos, matriz funcional y
+otros iPhone. Android run40819669520:622 pruebas aprobadas/20 fallidas; corrección
+de esperas de mapa y controles de prueba en curso, sin APK/tag nuevo todavía.
+
 ## Prueba iOS desde Windows —28/10/2026
 
 Autorizado preparar el proceso completo con commits. Rama aislada

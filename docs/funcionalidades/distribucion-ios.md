@@ -48,7 +48,10 @@ o Wi-Fi. Si vence, volver a firmar el mismo IPA; no es necesario recompilar.
 
 ## Activación y validación
 
-Preparación local pendiente de compilación remota y prueba física. Comprobar:
+29/10: run40820124492 aprobado, IPA2e31261 descargado y estructura/SHA-256
+verificados. Usuario confirma instalación/uso «10 de10» en iPhone11/iOS18.5
+tras autorizar su desarrollador. Guía ampliada para compañeros con cuenta propia.
+Pendientes de comprobación por recorrido y no acreditados por esa aceptación:
 instalación/apertura sin depurador, cuenta y retorno de autenticación, cámara,
 galería, ubicación manual/GPS, mapa, compartir/PDF, SQLite al reiniciar/offline,
 renovación sin desinstalar y fluidez. Push y capacidades Apple restringidas a
