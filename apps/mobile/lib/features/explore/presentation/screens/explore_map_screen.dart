@@ -94,10 +94,30 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
                     items: data.items,
                     query: data.query,
                     currentLocation: data.currentLocation,
+                    locationUnavailable: data.currentLocation == null,
+                    onManualLocationSelected: data.busy
+                        ? null
+                        : (latitude, longitude) => vm.apply(
+                            kind: data.query.kind,
+                            species: data.query.species,
+                            status: data.query.status,
+                            days:
+                                data.query.since == null ||
+                                    data.query.until == null
+                                ? 0
+                                : data.query.until!
+                                      .difference(data.query.since!)
+                                      .inDays,
+                            latitude: latitude,
+                            longitude: longitude,
+                            radiusMeters: data.query.radiusMeters ?? 15000,
+                            locationLabel: '',
+                            centerName: 'Punto del mapa',
+                          ),
                     emptyMessage: data.failed || data.busy
                         ? 'Puedes volver a Explorar para ajustar la búsqueda.'
                         : data.needsLocation
-                        ? 'Elige una ubicación desde Explorar para ver casos cercanos.'
+                        ? 'Toca el mapa para elegir una ubicación y ver casos cercanos.'
                         : null,
                     onOpen: data.busy || _openingCase ? null : openCase,
                     createTileProvider: widget.createTileProvider,

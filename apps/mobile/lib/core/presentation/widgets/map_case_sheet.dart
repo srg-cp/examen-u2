@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/physics.dart';
-import '../../config/map_config.dart';
 import 'map_attribution.dart';
 
 /// The same viewport, white sheet, handle and physical motion for case maps.
@@ -285,7 +284,7 @@ class MapCaseSheetState extends State<MapCaseSheet>
                 );
               },
             ),
-            if (widget.showAttribution && MapConfig.usesCarto)
+            if (widget.showAttribution)
               AnimatedBuilder(
                 animation: Listenable.merge([_sheet, _pullOffset]),
                 builder: (context, _) {

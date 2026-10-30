@@ -1,5 +1,19 @@
 # Estado del proyecto
 
+## Examen Unidad II tipo 1 punto 3 en copia aislada —30/10/2026
+
+Worktree entreHuellas-examen-punto-3 desde125c04d. Círculo de precisión GPS en
+metros/etiqueta, selección manual en mapa sin lectura y crédito OpenStreetMap
+independiente de CARTO. No cambia GPS/seguimiento del punto 2 ni platform/backend.
+[Ficha y conexión pendiente con el punto 2](funcionalidades/examen-u2-punto-3.md).
+
+43 pruebas focalizadas aprobadas y análisis sin incidencias; cinco escenarios
+propios con toque real, consulta por centro manual y rechazo de ubicación obsoleta.
+Renders revisados normal/pequeño/texto200%/reducido con teselas neutras. APK debug
+compilado en esta copia; sin instalación ni pruebas nativas porque emulator-5554
+está reservado por el otro chat. Pendientes integración con su commit, capturas
+reales de GPS/manual y código, y completar el Word propio. No se cierra punto 3.
+
 ## Examen Unidad II tipo 1 — punto 1 —30/10/2026
 
 Cierre del punto 1: permiso FINE junto a COARSE en Android, precisión media

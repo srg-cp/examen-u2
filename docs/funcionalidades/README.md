@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Examen Unidad II punto 3](examen-u2-punto-3.md): precisión GPS y alternativa
+  manual en el mapa real; trabajo aislado y evidencia nativa pendiente.
+
 - [Examen Unidad II tipo 1](examen-u2.md): punto 1 de ubicación en Explorar móvil;
   evidencia GPS del emulador y puntos 2–5 pendientes.
 

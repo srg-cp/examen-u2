@@ -53,6 +53,24 @@ Archivos móviles afectados (relativos a `apps/mobile`):
 
 Validación y evidencias pendientes: [ficha del examen](docs/funcionalidades/examen-u2.md).
 
+### Punto 3 en worktree aislado
+
+Círculo GPS cuyo radio es `accuracyMeters`, etiqueta «Precisión ± N m», créditos
+OpenStreetMap y selección manual cuando la ubicación no está disponible. La
+selección aplica el punto a la búsqueda real sin inventar precisión. Rama
+`feature/examen-u2-punto-3`, base `125c04d`; sin integración en el proyecto principal.
+43 pruebas locales aprobadas. Integración con punto 2 y capturas nativas pendientes;
+[contrato y validación](docs/funcionalidades/examen-u2-punto-3.md).
+
+Archivos móviles afectados, relativos a `apps/mobile`:
+
+- `lib/features/explore/presentation/widgets/explore_case_map.dart`
+- `lib/features/explore/presentation/screens/explore_map_screen.dart`
+- `lib/core/presentation/widgets/map_attribution.dart`
+- `lib/core/presentation/widgets/map_case_sheet.dart`
+- `lib/core/presentation/widgets/zone_map_picker.dart`
+- `test/examen_location_map_test.dart`
+
 ## 🐾 Sobre el proyecto
 
 Entre Huellas conecta a quienes buscan una mascota con personas que pueden aportar información para recuperarla. El MVP contempla búsquedas de mascotas perdidas, avisos vinculados, fichas públicas mediante QR y seguimiento de la recuperación.
