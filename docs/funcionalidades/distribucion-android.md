@@ -1,5 +1,10 @@
 # Distribución Android por GitHub Releases
 
+30/10: repositorio individual srg-cp/examen-u2/main mediante remoto examen.
+Etiqueta examen-u2-build-N, build20000+N en Android/iOS para distinguir el contador
+nuevo. Secrets propios del repositorio; reutilizar firma/configuración locales.
+Véase paso4 de INSTALACION_ANDROID.md. Compilación remota pendiente de secrets.
+
 30/10/2026: excepción explícita para el examen: `exuii-colque` también publica
 por push o ejecución manual, con etiqueta `exuii-colque-build-N`, título y notas
 que identifican rama/commit. `main` conserva `android-build-N`. Ambas esperan

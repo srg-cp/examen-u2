@@ -156,6 +156,20 @@ sus valores al compilar; excluirlo de Git no los vuelve secretos dentro del APK.
 
 ## 4. Guardar los cinco secrets en GitHub
 
+Para el repositorio individual, abrir
+[Secrets de examen-u2](https://github.com/srg-cp/examen-u2/settings/secrets/actions).
+Los secrets se configuran de nuevo en ese repositorio. En este equipo ya existen
+release.local.json, el JKS, su Base64 y android/key.properties (todos privados e
+ignorados). Reutilizar esos archivos y la misma firma; key.properties contiene
+storePassword, keyAlias y keyPassword para los tres secrets correspondientes.
+No copiar storeFile como secret. Si falta el Base64, ejecutar el script de firma
+con -ExportOnly, como indica el paso2. No hace falta generar otro JKS.
+
+El remoto individual es `examen`; publicar desde la rama local actual con
+`git push examen HEAD:main`. Ese main genera `examen-u2-build-N` con APK+IPA,
+usando build20000+N en ambas plataformas porque el contador del nuevo repositorio
+empieza de nuevo. El repositorio original conserva sus etiquetas y base10000.
+
 Abre [el repositorio](https://github.com/srg-cp/entrehuellas) en el navegador:
 
 1. Entra en **Settings** del repositorio, no en los ajustes de tu cuenta.

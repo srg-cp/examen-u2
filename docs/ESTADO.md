@@ -1,5 +1,20 @@
 # Estado del proyecto
 
+## Repositorio individual examen-u2 —30/10/2026
+
+Destino confirmado: srg-cp/examen-u2, remoto examen, rama remota main.
+Workflow conserva validación completa/publicación conjunta y usa repositorio
+del evento para adjuntos. En el individual, etiqueta examen-u2-build-N y número
+20000+N compartido Android/iOS; el original conserva sus contratos. Se evita
+retroceder al reiniciar el contador de Actions. No cambia identificador ni firma.
+Guía Android ampliada con destino de secrets, archivos locales existentes y push
+explícito a examen HEAD:main. No se leen/imprimen valores privados ni se generan
+firmas nuevas. Inventario remoto inicial: cero secrets; activación requiere los
+cinco de distribución. Nueva compilación/instalación pendientes de configurarlos.
+Validación: actionlint de ambos workflows y git diff --check correctos;8 pruebas
+Python aprobadas;54 escenarios de jobs/repositorio/evento/ref y4 publicaciones
+Bash simuladas aprobadas, con la misma base de número en Android/iOS.
+
 ## Distribución del examen desde exuii-colque —30/10/2026
 
 Por solicitud explícita se crea `exuii-colque`, conservando la documentación

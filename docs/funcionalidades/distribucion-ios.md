@@ -1,5 +1,10 @@
 # Pruebas personales de iOS desde Windows
 
+30/10: en srg-cp/examen-u2/main, release examen-u2-build-N y build20000+N,
+compartido con Android. El workflow reutilizable obtiene el repositorio del
+invocador; conserva firma personal y requiere MOBILE_CONFIG_JSON en el nuevo
+repositorio. Publicación conjunta pendiente de los cinco secrets de distribución.
+
 30/10/2026: por solicitud explícita, `exuii-colque` también compila/publica en
 cada push y permite ejecución manual. Conserva el workflow iOS reutilizable,
 secrets y firma personal existentes. Publicación conjunta APK+IPA en

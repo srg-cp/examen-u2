@@ -41,6 +41,7 @@ jobs:
     env:
       # Avoid the project's 8 GB development heap on hosted runners.
       GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx3g -Dorg.gradle.workers.max=2 -Dorg.gradle.daemon=false
+      MOBILE_BUILD_BASE: ${{ github.repository == 'srg-cp/examen-u2' && '20000' || '10000' }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -67,7 +68,7 @@ jobs:
         run: >-
           flutter build apk --release
           --dart-define-from-file=config/release.local.json
-          --build-number=$((10000 + GITHUB_RUN_NUMBER))
+          --build-number=$((MOBILE_BUILD_BASE + GITHUB_RUN_NUMBER))
       - name: Verify signature and prepare download
         shell: bash
         run: |
@@ -152,6 +153,10 @@ jobs:
               exit 1
               ;;
           esac
+          if [ "$GH_REPO" = "srg-cp/examen-u2" ]; then
+            tag="examen-u2-build-${GITHUB_RUN_NUMBER}"
+            title="Entre Huellas examen U2 build ${GITHUB_RUN_NUMBER} - Android + iOS"
+          fi
           if gh release view "$tag" >/dev/null 2>&1; then
             target="$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha)"
             test "$target" = "$GITHUB_SHA"

@@ -13,6 +13,8 @@ jobs:
   build:
     runs-on: macos-15
     timeout-minutes: 30
+    env:
+      MOBILE_BUILD_BASE: ${{ github.repository == 'srg-cp/examen-u2' && '20000' || '10000' }}
     defaults:
       run:
         working-directory: apps/mobile
@@ -32,7 +34,7 @@ jobs:
         run: >-
           flutter build ios --release --no-codesign
           --dart-define-from-file=config/release.local.json
-          --build-number=$((10000 + GITHUB_RUN_NUMBER))
+          --build-number=$((MOBILE_BUILD_BASE + GITHUB_RUN_NUMBER))
       - name: Package for personal signing on Windows
         shell: bash
         run: |
