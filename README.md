@@ -29,11 +29,17 @@ solo `apps/mobile`. Punto 1 implementado: entidad `CurrentLocation` con latitud,
 longitud y precisión en metros; GPS encapsulado en `DeviceLocationSource`;
 repositorio/caso de uso inyectados al ViewModel y coordenadas visibles en
 Explorar → Mapa. La precisión se conserva aunque falle la consulta de casos.
-Los puntos 2–5 y las capturas del emulador están pendientes.
+Los puntos 2–5 están pendientes.
+Actualización del punto 1: Android declara también `ACCESS_FINE_LOCATION` para
+permitir elegir ubicación precisa manteniendo `LocationAccuracy.medium`.
+APK debug compilado e instalado, permiso preciso activado y lectura nativa
+verificada en Tacna (-18.006598, -70.246300; diferencia aproximada de 0.22 m
+respecto del punto fijado). Las cinco capturas están incorporadas al Word de trabajo.
 
 Archivos móviles afectados (relativos a `apps/mobile`):
 
 - `lib/features/explore/domain/entities/current_location.dart`
+- `android/app/src/main/AndroidManifest.xml`
 - `lib/features/explore/domain/repositories/current_location_repository.dart`
 - `lib/features/explore/domain/use_cases/get_current_explore_location.dart`
 - `lib/features/explore/data/data_sources/device_location_source.dart`

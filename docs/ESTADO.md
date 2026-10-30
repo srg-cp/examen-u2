@@ -2,6 +2,26 @@
 
 ## Examen Unidad II tipo 1 — punto 1 —30/10/2026
 
+Cierre del punto 1: permiso FINE junto a COARSE en Android, precisión media
+conservada. APK debug compilado e instalado en emulator-5554, permiso preciso
+activado y lectura real -18.006598, -70.246300 para punto -18.0066, -70.2463
+(diferencia aproximada 0.22 m). Captura precisa y explicación sustituyen la
+evidencia anterior del Word; nueve páginas revisadas. 22 pruebas focalizadas
+aprobadas; fuente Dart sin cambios desde el análisis limpio anterior.
+Compilación resuelta con directorio corto para sockets UNIX de Java solo en el
+proceso, sin editar configuración global/Gradle. Logs en build/examen-punto1-cierre-*
+de móvil. Captura final verifica coordenadas; no acredita teselas del punto 3.
+Siguiente paso: punto 2 cuando el usuario indique continuar.
+
+Historial anterior al cierre:
+
+Último avance documental: recibida captura de Entre Huellas en Tacna con lectura
+-18.018018, -70.237279 tras Google Maps y reapertura de la app. Incorporada al Word
+de trabajo junto a las otras cuatro capturas: nueve páginas, punto 1 documentado.
+Se explicita diferencia con el punto del emulador por permiso aproximado/precisión
+media; no se acredita coincidencia exacta ni aceptación docente. Sin cambios de
+código adicionales, pruebas nuevas o desarrollo del punto 2.
+
 Corrección de evidencia: usar ubicación actual desde filtros ya actualiza también
 la entidad GPS del estado/panel; regresión con dos posiciones, aplicación, refresh
 y paginación. 22 pruebas focalizadas aprobadas y análisis sin incidencias.

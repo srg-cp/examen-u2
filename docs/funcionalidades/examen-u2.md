@@ -28,7 +28,36 @@ revisa con teselas neutras en tamaño normal y pequeño/texto 200%/movimiento
 reducido. Estas comprobaciones no acreditan GPS ni cartografía nativos.
 Log: `apps/mobile/build/examen-u2-punto-1-tests.log`.
 
-## Evidencia pendiente del estudiante
+## Evidencias y validación
+
+Cierre del punto 1, 30/10: incorporado ACCESS_FINE_LOCATION junto a COARSE en
+AndroidManifest.xml, manteniendo LocationAccuracy.medium. APK debug compilado
+e instalado mediante actualización, sesión conservada y permiso preciso activado
+en emulator-5554. Posición fijada -18.0066, -70.2463; tras solicitar ubicación
+desde Explorar y aplicar, el mapa muestra -18.006598, -70.246300. Diferencia
+aproximada de 0.22 m, dentro de la precisión de la lectura nativa. Coordenadas
+reales verificadas mediante captura y árbol de accesibilidad, sin sustituciones.
+Las cinco figuras y explicación actualizadas en el Word de nueve páginas; figura 5
+sustituida por la captura precisa. 22 pruebas focalizadas aprobadas; la última
+fuente Dart analizada no cambió en este ajuste de permiso. Puntos 2–5 pendientes.
+
+Logs: `apps/mobile/build/examen-punto1-cierre-tests.log` y
+`apps/mobile/build/examen-punto1-cierre-build.log`. El bloqueo Java de loopback
+se resolvió solo en el proceso de compilación con
+`JAVA_TOOL_OPTIONS=-Djdk.net.unixdomain.tmpdir=C:\Temp\eh-java`, sin configuración
+global ni cambio de Gradle del proyecto. La captura precisa acredita coordenadas;
+las teselas de la captura final no aparecen pintadas, por lo que no acredita la
+cartografía del punto 3. No se altera platform ni el backend.
+
+### Historial previo al cierre
+
+Última evidencia recibida 30/10: tras comprobar mi ubicación en Google Maps y
+reabrir Entre Huellas, la app muestra Tacna (-18.018018, -70.237279). Incorporada
+como figura 5 a la copia Word, ahora de nueve páginas. Incluye las cinco capturas
+del punto 1 y explicación técnica. ACCESS_COARSE_LOCATION/precisión media conservados:
+la lectura es aproximada y no coincide numéricamente con el punto configurado
+(-18.0066, -70.2463). Diferencia explicada en el documento; no se afirma precisión
+exacta ni aceptación del docente. Puntos 2–5 todavía no desarrollados.
 
 Avance documental 30/10: copia de trabajo
 `SI988-EXPRAC-U2-ColquePonceSergioAlberto.docx` con las tres capturas de código

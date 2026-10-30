@@ -1,5 +1,12 @@
 # Arquitectura de Entre Huellas
 
+30/10, examen Unidad II tipo 1, solo móvil: permiso preciso opcional de primer
+plano (FINE junto a COARSE) autorizado para verificar coordenadas del emulador;
+DeviceLocationSource conserva LocationAccuracy.medium y es el único acceso al
+SDK GPS. Dominio conserva CurrentLocation y presentación recibe lectura por
+repositorio/caso de uso inyectados. Sin ubicación de fondo ni cambios de backend.
+[Validación y alcance del examen](funcionalidades/examen-u2.md).
+
 30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
 Perfil móvil separa resumen y editor conservando ProfileViewModel/PhotoViewModel
 y formulario existentes. Shell y filas compartidos en profile; router compone
