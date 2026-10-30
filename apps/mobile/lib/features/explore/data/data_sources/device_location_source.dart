@@ -17,7 +17,9 @@ class DeviceLocationSource {
       const Duration(seconds: 5),
     );
     if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+      permission = await Geolocator.requestPermission().timeout(
+        const Duration(seconds: 10),
+      );
     }
     if (permission != LocationPermission.always &&
         permission != LocationPermission.whileInUse) {
@@ -33,7 +35,7 @@ class DeviceLocationSource {
         accuracy: LocationAccuracy.medium,
         timeLimit: Duration(seconds: 10),
       ),
-    );
+    ).timeout(const Duration(seconds: 10));
     return (
       latitude: position.latitude,
       longitude: position.longitude,
