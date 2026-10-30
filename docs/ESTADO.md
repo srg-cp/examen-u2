@@ -1,5 +1,32 @@
 # Estado del proyecto
 
+## Scripts de limpieza global de mascotas y casos —30/10/2026
+
+Petición explícita: SQL para vaciar mascotas y casos de todas las cuentas,
+sin filtrar por estado, incluidos favoritos y datos relacionados. Entregados
+[script transaccional](../database/maintenance/001_clear_pets_and_cases.sql),
+[inventario de fotos](../database/maintenance/002_list_pet_and_case_storage.sql)
+y [ficha de operación](funcionalidades/limpieza-mascotas-y-casos.md).
+Lista explícita de25 tablas actuales/27 anteriores a042, más eliminación selectiva
+de seguimientos/comandos de casos. Conserva cuentas/perfiles/avatares, permisos,
+bloqueos, zonas/seguimientos de zonas, preferencias y dispositivos. TRUNCATE con
+RESTART IDENTITY y RESTRICT; sin deshabilitar triggers/RLS, sin migración ni cambios
+de esquema. Mascotas/casos usan UUID; contadores propios asociados vuelven a1.
+
+Validación local:2/2 pruebas PGlite/PostGIS con run_all vigente y baseline anterior
+a042. Filas en todas las tablas objetivo, dos cuentas y casos activos/resueltos/
+borradores/descartados; limpieza, repetición, siguiente ID1 y conservación exacta
+de cuentas/configuración/Storage. FK ajena fuerza reversión completa incluidos
+seguimientos y secuencias; rol authenticated no puede ejecutar la limpieza.
+Inventario excluye avatares y no modifica datos. Pruebas incluidas en npm test.
+Catálogo de migraciones/numeración:2/2 aprobadas; git diff --check sin errores.
+
+Sin ejecución remota ni borrado físico de fotos: vaciar los cinco buckets mediante
+Storage Dashboard/API si se desea completar esa parte. Cachés/borradores offline,
+carteles descargados y avisos ya entregados no se eliminan desde SQL. Siguiente
+paso: ejecución manual en la base elegida y actualización de clientes; no añade
+HU/RF ni cierra historias.
+
 ## Perfil agrupado y editor con navegación horizontal —30/10/2026
 
 Por aprobación de los mockups imagegen y solicitud explícita de movimiento

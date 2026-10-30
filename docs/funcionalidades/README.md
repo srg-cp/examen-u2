@@ -1,5 +1,9 @@
 # Funcionalidades de Entre Huellas
 
+30/10: [limpieza operativa de mascotas y casos](limpieza-mascotas-y-casos.md):
+SQL manual para todas las cuentas/estados y referencias asociadas, reinicio de
+identidades y conservación de cuentas/configuración; sin ejecución remota.
+
 30/10: [Perfil](perfil.md) móvil con resumen navegable, opciones agrupadas y editor
 separado; navegación horizontal interna y retorno inverso, [ADR-171](../decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md).
 
