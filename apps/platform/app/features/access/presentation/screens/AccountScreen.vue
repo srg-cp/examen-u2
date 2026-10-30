@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const contributionReturn = useContributionReturn();
 import '../styles/account.css';
 import OnboardingFlow from '../widgets/OnboardingFlow.vue';
 import HomeContent from '../widgets/HomeContent.vue';
@@ -54,7 +55,7 @@ watch(() => state.value.session, async (session, previous) => {
       if (await onboardingView.value?.finish() === false) return;
       if (state.value.session?.actor !== session.actor) return;
     }
-    leaving = true; channel?.postMessage({ actor: session.actor }); await navigateTo('/inicio', { replace: true });
+    leaving = true; channel?.postMessage({ actor: session.actor }); await navigateTo(contributionReturn(), { replace: true });
   }
   else if (!props.onboarding && route.path === '/inicio') await model.loadManagementAccess();
 }, { immediate:true });

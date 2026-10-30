@@ -22,7 +22,7 @@ class PrepareUserBlock {
   Future<UserBlock?> call(String actor, BlockTarget target) {
     if (!_id.hasMatch(actor) ||
         !_id.hasMatch(target.id) ||
-        !{'lost', 'found', 'sighting'}.contains(target.kind)) {
+        !{'lost', 'found'}.contains(target.kind)) {
       throw const BlockFailure(BlockIssue.invalid);
     }
     return repository.prepare(actor, target);

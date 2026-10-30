@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/presentation/formatters/case_date_label.dart';
 import '../../../../core/presentation/widgets/case_screen_shell.dart';
 import '../../../../core/presentation/widgets/collection_empty_state.dart';
@@ -86,16 +85,6 @@ class CaseTimelineScreen extends ConsumerWidget {
                               padding: const EdgeInsets.only(bottom: 16),
                               child: EntityCardSurface(
                                 child: InkWell(
-                                  onTap: event.kind != 'sighting'
-                                      ? null
-                                      : () async {
-                                          await context.push(
-                                            '/home/timeline/${target.community ? 'found' : 'lost'}/${target.id}/sightings/${event.id}',
-                                          );
-                                          if (context.mounted) {
-                                            await m.refresh();
-                                          }
-                                        },
                                   child: Padding(
                                     padding: const EdgeInsets.all(20),
                                     child: Column(
@@ -118,42 +107,6 @@ class CaseTimelineScreen extends ConsumerWidget {
                                         Text(
                                           'Suceso: ${caseDateTimeLabel(event.observedAt)}',
                                         ),
-                                        if (event.kind == 'sighting') ...[
-                                          Text(
-                                            'Recibido: ${caseDateTimeLabel(event.receivedAt)}',
-                                          ),
-                                          if (event.late)
-                                            const Text(
-                                              'Reporte tardío · más de 24 horas',
-                                            ),
-                                          const SizedBox(height: 12),
-                                          Text(
-                                            'Revisión: ${timelineStateLabel(event.reviewState)}',
-                                          ),
-                                          Text(
-                                            event.hasPhoto
-                                                ? 'Foto adjunta'
-                                                : 'Sin foto adjunta',
-                                          ),
-                                          if (event.comment.isNotEmpty)
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 8,
-                                              ),
-                                              child: Text(event.comment),
-                                            ),
-                                          const SizedBox(height: 12),
-                                          const Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Ver evidencia y revisiones',
-                                                ),
-                                              ),
-                                              Icon(Icons.chevron_right_rounded),
-                                            ],
-                                          ),
-                                        ],
                                       ],
                                     ),
                                   ),

@@ -12,16 +12,13 @@ class JourneyPoint {
     required this.time,
     required this.latitude,
     required this.longitude,
-    this.private = false,
     this.inCustody = false,
-    this.reviewState,
   });
   final String id;
   final DateTime time;
   final double latitude, longitude;
-  final bool private, inCustody;
-  final String? reviewState;
-  String get key => '${private ? 'private' : 'public'}:$id';
+  final bool inCustody;
+  String get key => 'public:$id';
 }
 
 class CaseJourney {

@@ -1,5 +1,139 @@
 # Estado del proyecto
 
+## Retirada completa del sistema privado —30/10/2026
+
+El usuario aclara que no hay avistamientos privados antiguos y solicita quitar
+el sistema completo. [ADR-168](decisiones/168-retirada-completa-avistamientos-privados.md)
+sustituye la conservación de compatibilidad de ADR-167. Eliminados módulos de
+avistamientos privados móvil/web, endpoints, rutas, inyección, revisión/evidencia
+y envío en cola. Recorrido solo agrega avisos públicos; historial conserva
+publicación/recuperación. SQLite3 elimina los slots retirados sin tocar pérdidas
+ni avisos públicos. No se ha convertido ningún envío privado a publicación.
+
+Plan042/fuente136 y [patch042](../database/patchs/042_patch_remove_private_sightings.sql)
+eliminan public_sightings/sighting_reviews y RPC privadas, sin CASCADE. Adaptados
+historial, notificaciones, moderación, bloqueos, apelaciones y estadísticas;
+esta última cuenta sighting público por published_at. Comprobación transaccional
+rechaza funciones que todavía consulten tablas retiradas. Generador específico,
+migración y run_all actualizados; migraciones antiguas inmutables.
+
+Validación móvil:52 pruebas de flujo/Recorrido/arquitectura/consistencia/borradores/
+cola aprobadas;15 pruebas posteriores de cola/historial aprobadas, incluida
+limpieza de slots retirados y conservación de reportes públicos. Web:88 pruebas
+unitarias/arquitectura y6 de servidor compilado aprobadas; typecheck y build Nuxt
+aprobados. QA navegador QR → login → formulario público con destino fijo pasó.
+Revisión final: apelaciones rechaza el tipo privado retirado;6 pruebas web y8
+móviles aprobadas. Las móviles usan AMBIENT_BACKGROUND_MOTION=false para
+pumpAndSettle (la primera ejecución con fondo animado agotó el tiempo en2).
+Análisis Flutter completo y typecheck web finales sin incidencias. Patch042 y
+migración042 tienen hash idéntico. Sin publicación remota ni evidencia nueva
+de mapas/fotos reales.
+
+SQL: corrida amplia66 pruebas:61 aprobadas inicialmente y5 de coincidencias
+fallidas por repetir040 después de042. Corregido el orden del harness; las5
+de coincidencias y2 de retirada pasan juntas en repetición focalizada7/7
+(apps/mobile/build/retirement-current-sql-final.log). No se repitió toda la
+suite tras esa corrección.
+
+SQL: regresiones de instalación actual y actualización desde041, repetición,
+ausencia de tablas/consultas privadas, alertas al creador, historial, estadísticas,
+bloqueos y moderación públicas. Coincidencias valida operaciones sobre042;
+repetición de040 se comprueba antes de042, nunca después de retirar sus funciones.
+Las suites de contratos privados antiguos usan explícitamente historicalBundle
+(pre042); no se presentan como comportamiento de la aplicación actual.
+
+Activación pendiente: aplicar041 si falta y después042; desplegar servidor/web y
+actualizar móvil juntos. No ejecutar run_all sobre producción para actualizar.
+No se aplicó SQL remoto, no hubo despliegue, commit ni APK/IPA en esta tarea.
+
+## Ayuda pública unificada y cuenta desde QR —29/10/2026
+
+Por petición explícita, la ficha móvil ofrece solo «La vi o la encontré», con
+la tarjeta gris aprobada. Reutiliza publicación de aviso vinculado y sus dos
+tipos; retira Reportar avistamiento privado de la ficha. El formulario explica
+visibilidad pública y alerta según preferencias. Históricos privados y contratos
+para borradores/envíos anteriores conservados, sin convertirlos a públicos.
+[ADR-167](decisiones/167-ayuda-publica-unificada-con-cuenta.md).
+
+Web QR muestra hasta100 avisos públicos recientes, excluye eliminados/ocultos y
+respeta revocación. /ayudar/:slug usa política global account, mantiene destino
+tras acceso/registro/onboarding y fija la búsqueda, con borrador por cuenta/QR.
+La escritura anónima anterior devuelve410. Nuevos avisos usan las operaciones
+existentes de found_cases y el trigger de notificaciones; FCM continúa inactivo.
+
+Validación:40 pruebas Flutter aprobadas (flujo, creación, Recorrido, arquitectura,
+consistencia); análisis completo sin incidencias. Repetidas14 de Recorrido con
+capturas390×844 y320×600/texto200%, revisadas sin desbordamiento.41 pruebas web de dominio,
+lectura, acceso, recuperación y arquitectura; typecheck y build Nuxt aprobados.
+7 pruebas del servidor compilado aprobadas. SQL local:6 comprobaciones de alertas/
+catálogo y1 regresión nueva aprobadas; prueba autor notificado, destino exige
+cuenta, aporte público visible, histórico privado ausente, borrado y revocación.
+Un primer fallo del assert confundía los rasgos públicos del fixture con evidencia
+privada; corregido para comprobar los secretos reales y repetido con éxito.
+Navegador390×844: QR público → acceso → mismo caso con selector bloqueado,
+capturas revisadas en apps/mobile/build/ui-preview/public-contributions.
+Pruebas con fixtures locales; mapas/fotos y entrega remota no acreditados.
+
+Pendiente de activación: aplicar
+[supabase/migrations/20261029004100_public_case_contributions.sql](../supabase/migrations/20261029004100_public_case_contributions.sql)
+y desplegar servidor/web junto con041, además de actualizar móvil. Sin SQL remoto,
+despliegue, APK/IPA ni commit desde esta tarea. Siguiente paso: demo con dos cuentas
+reales para publicación y campana; push al teléfono sigue pospuesto. El error
+original de ejecución del usuario permanece sin mensaje exacto para reproducirlo.
+
+## Diagnóstico de ejecución desde editor/terminal —29/10/2026
+
+Ante el error de código comunicado al ejecutar Flutter, el análisis de lib/test
+no reproduce fallos. El análisis global anterior sí incluía126 incidencias de
+copias antiguas en build/map-sheet-refactor-before. analysis_options.yaml ahora
+excluye build/**, sin borrar respaldos ni modificar fuentes de producto.
+flutter analyze --no-pub y dart analyze . completos aprobados sin incidencias;
+guía de desarrollo actualizada en apps/mobile/README.md.
+
+Compilación Flutter web debug con configuración local aprobada en77,3s.
+Windows debug compiló en151,2s y arrancó con servicio VM; el proceso terminó
+después con Lost connection to device, sin error Dart registrado en ese log.
+La preparación de NuGet tardó, sin fallo de compilación. Evidencia local en
+apps/mobile/build/startup-web.log, startup-windows.log, startup-analysis-full.log
+y startup-dart-analysis.log. No se prueba Android/iOS ni autenticación remota.
+El error exacto del usuario sigue sin reproducirse: queda pendiente que indique
+destino seleccionado y primera línea del error para identificar su causa.
+
+Comprobado también que las dos acciones de ficha tienen contratos distintos:
+Reportar avistamiento guarda evidencia/punto exacto privados para revisión;
+La vi o la encontré crea aviso público vinculado de avistamiento o custodia.
+Sin unificar operaciones ni cambiar etiquetas/reglas de privacidad en esta tarea.
+
+## Acciones de ficha con las tarjetas grises elegidas —29/10/2026
+
+Reportar avistamiento y La vi o la encontré usan dos tarjetas sólidas gris claro,
+icono21 arriba a la izquierda, etiqueta14/600 debajo, radio22 y padding14
+horizontal/20 vertical. CaseUtilityButton compartido admite subtítulo opcional
+y padding; etiquetas originales sin subtítulos inventados. Dos columnas con
+igual altura y alineación superior, apiladas en ancho pequeño/texto ampliado.
+Recuperación conserva círculo/permisos debajo; Seguimiento/Cartel y Recorrido
+conservados. Origen completo de tarjeta, rutas/identificadores/tipo y refresco
+al retornar intactos. Alcance móvil, sin migración web ni cambios de datos/SQL.
+[ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md),
+[ficha](funcionalidades/ficha-publica-mobile.md) y
+[referencia elegida](../mockups/acciones-ficha-tarjetas-grises.png).
+
+Validación local:65 pruebas aprobadas de creación, flujo de recuperación,
+origen completo, ficha pública, Recorrido, arquitectura y consistencia. La
+revisión de acciones usa RecoveryCaseActions real con repositorio sustituido;
+comprueba rutas de ambos formularios y retorno,390×844 y320×600/texto200%,
+movimiento normal/reducido. Creación prueba también320×350/texto200%. Capturas
+normales/pequeñas y de apertura/retorno revisadas en
+apps/mobile/build/ui-preview/case-journey y origin-complete; log final en
+apps/mobile/build/case-actions-regression.log. Análisis lib/test sin incidencias,
+formato y diff comprobados. Análisis sin limitar a fuentes detectó126 incidencias
+en copias antiguas bajo build/map-sheet-refactor-before; se conservan sin editar.
+
+No se acredita operación Supabase ni teselas remotas: fixtures locales y
+respuestas400 de cartografía en el harness. Siguiente paso: recompilar y revisar
+las dos acciones en Android/iOS real. Sin APK/IPA ni despliegue realizado en
+esta tarea; los cambios previos se conservan.
+
 ## Pines con logo compartidos en móvil y web —29/10/2026
 
 Todos los pines cartográficos internos usan silueta/logo oficial. ZoneMapPicker

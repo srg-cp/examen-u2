@@ -15,7 +15,6 @@ class RecoveryCaseActions extends ConsumerWidget {
     required this.canResolve,
     required this.open,
     required this.onChanged,
-    this.showSightingAction = true,
     this.utilities,
     this.journey,
     super.key,
@@ -23,7 +22,6 @@ class RecoveryCaseActions extends ConsumerWidget {
   final String id;
   final bool community, canResolve, open;
   final VoidCallback onChanged;
-  final bool showSightingAction;
   final Widget? utilities, journey;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,18 +44,6 @@ class RecoveryCaseActions extends ConsumerWidget {
             CaseActionLayout(
               utilities: true,
               children: [
-                if (showSightingAction)
-                  CaseUtilityButton(
-                    title: 'Reportar avistamiento',
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 20,
-                    ),
-                    route:
-                        '/home/sightings/${community ? 'found' : 'lost'}/$id',
-                    icon: Icons.visibility_outlined,
-                    onReturn: onChanged,
-                  ),
                 CaseUtilityButton(
                   title: 'La vi o la encontré',
                   padding: const EdgeInsets.symmetric(

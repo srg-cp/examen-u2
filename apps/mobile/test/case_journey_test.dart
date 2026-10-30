@@ -27,7 +27,6 @@ import 'package:flutter_application_entrehuellas/features/found_cases/presentati
 import 'package:flutter_application_entrehuellas/features/lost_cases/providers/lost_case_providers.dart';
 import 'package:flutter_application_entrehuellas/features/lost_cases/domain/entities/lost_case.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
-import 'package:flutter_application_entrehuellas/features/case_timeline/domain/entities/case_timeline.dart';
 import 'package:flutter_application_entrehuellas/features/case_timeline/providers/case_timeline_providers.dart';
 import 'package:flutter_application_entrehuellas/features/case_journey/domain/entities/case_journey.dart';
 import 'package:flutter_application_entrehuellas/features/case_journey/domain/use_cases/read_case_journey.dart';
@@ -37,7 +36,6 @@ import 'package:flutter_application_entrehuellas/features/case_journey/presentat
 import 'package:flutter_application_entrehuellas/features/case_journey/presentation/screens/case_journey_screen.dart';
 import 'found_cases_test.dart' show FakeFoundCases;
 import 'lost_cases_test.dart' show FakeCases;
-import 'case_timeline_test.dart' show FakeTimeline, testReview;
 import 'alert_preferences_test.dart' show loadFonts;
 
 const target = (id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', community: true);
@@ -65,6 +63,7 @@ class JourneyFoundCases extends FakeFoundCases {
   @override
   Future<PublicFoundCase?> readPublic(String id) {
     reads++;
+    if (failRead) throw const FoundFailure(FoundFailureKind.unavailable);
     return super.readPublic(id);
   }
 }
@@ -81,70 +80,6 @@ JourneyFoundCases found() => JourneyFoundCases()
     traits: 'Caso',
     photos: [],
   );
-
-class JourneyTimeline extends FakeTimeline {
-  int reads = 0, details = 0;
-  bool extraPage = false, wrongTarget = false, repeated = false;
-  bool failAccess = false;
-  @override
-  Future<bool> canRead(String owner, TimelineTarget target) async {
-    if (failAccess) throw const TimelineFailure(TimelineIssue.unavailable);
-    return !deny;
-  }
-
-  @override
-  Future<TimelinePage> read(
-    String owner,
-    TimelineTarget target,
-    TimelineCursor? cursor,
-  ) async {
-    reads++;
-    return TimelinePage(
-      'active',
-      [
-        TimelineEvent(
-          key: 'private',
-          id: 'private',
-          kind: 'sighting',
-          observedAt: DateTime(2026, 10, 17),
-          receivedAt: DateTime(2026, 10, 20),
-          late: true,
-          comment: 'Privado',
-          hasPhoto: false,
-          reviewState: 'useful',
-          revision: 0,
-        ),
-      ],
-      extraPage && (cursor == null || repeated)
-          ? TimelineCursor(DateTime(2026, 10, 17), 'private')
-          : null,
-    );
-  }
-
-  @override
-  Future<SightingReview> detail(String owner, String id, int? before) async {
-    details++;
-    final r = testReview();
-    return SightingReview(
-      id: id,
-      target: wrongTarget ? (id: 'other', community: true) : target,
-      canReview: false,
-      observedAt: DateTime(2026, 10, 17),
-      receivedAt: r.receivedAt,
-      late: true,
-      comment: 'Privado',
-      latitude: -12.123456,
-      longitude: -77.012345,
-      locationSource: 'manual',
-      accuracy: null,
-      hasPhoto: false,
-      state: 'useful',
-      revision: 0,
-      history: [],
-      nextRevision: null,
-    );
-  }
-}
 
 void main() {
   test(
@@ -172,10 +107,10 @@ void main() {
         );
       final f = FakeFoundCases()
         ..observations.add(notice('seen', 16, community: false));
-      final value = await ReadCaseJourney(l, f, JourneyTimeline()..deny = true)(
-        'reader',
-        (id: target.id, community: false),
-      );
+      final value = await ReadCaseJourney(l, f)('reader', (
+        id: target.id,
+        community: false,
+      ));
       expect(value.origin.time, DateTime(2026, 10, 15));
       expect(value.summary.name, 'Luna');
       expect(value.summary.traits, 'Blanca y pequeña');
@@ -189,43 +124,13 @@ void main() {
     () async {
       final f = found()
         ..observations.addAll([notice('b', 18), notice('a', 16)]);
-      final t = JourneyTimeline()..deny = true;
-      final result = await ReadCaseJourney(FakeCases(), f, t)('reader', target);
+      final result = await ReadCaseJourney(FakeCases(), f)('reader', target);
       expect(result.points.map((p) => p.id), ['a', 'b']);
       expect(result.latest, DateTime(2026, 10, 18, 18, 40));
       expect(result.countLabel, '2 avistamientos');
       expect(result.summary.name, isEmpty);
       expect(result.summary.traits, f.publicCase!.traits);
       expect(result.summary.photoUri, isNull);
-      expect(t.reads, 0);
-      expect(t.details, 0);
-      expect(result.points.any((p) => p.private), false);
-    },
-  );
-  test(
-    'Authorized private evidence is approximated and paginated without duplicates',
-    () async {
-      final f = found()
-        ..observations.addAll([notice('b', 18), notice('a', 16)]);
-      final t = JourneyTimeline()..extraPage = true;
-      final result = await ReadCaseJourney(FakeCases(), f, t)('owner', target);
-      expect(result.points.map((p) => p.id), ['a', 'private', 'b']);
-      expect(result.points[1].latitude, closeTo(-12.125, 1e-9));
-      expect(result.points[1].longitude, closeTo(-77.015, 1e-9));
-      expect(result.points[1].private, true);
-      expect(t.reads, 2);
-    },
-  );
-  test(
-    'Foreign private targets and repeated page cursors fail closed',
-    () async {
-      final t = JourneyTimeline()..wrongTarget = true;
-      final read = ReadCaseJourney(FakeCases(), found(), t);
-      await expectLater(read('owner', target), throwsA(isA<TimelineFailure>()));
-      t.wrongTarget = false;
-      t.extraPage = true;
-      t.repeated = true;
-      await expectLater(read('owner', target), throwsA(isA<TimelineFailure>()));
     },
   );
   test(
@@ -233,29 +138,26 @@ void main() {
     () async {
       final f = found()..publicCase = null;
       await expectLater(
-        ReadCaseJourney(FakeCases(), f, JourneyTimeline())('owner', target),
+        ReadCaseJourney(FakeCases(), f)('owner', target),
         throwsA(isA<FoundFailure>()),
       );
-      final empty = await ReadCaseJourney(
-        FakeCases(),
-        found(),
-        JourneyTimeline()..deny = true,
-      )('reader', target);
+      final empty = await ReadCaseJourney(FakeCases(), found())(
+        'reader',
+        target,
+      );
       expect(empty.points, isEmpty);
       expect(empty.latest, isNull);
       expect(empty.countLabel, 'Sin avistamientos');
     },
   );
   test(
-    'Account change discards the private journey and rebuilds from authorized projections',
+    'Account change discards the previous journey and rebuilds from authorized projections',
     () async {
       final sessions = StreamController<AuthSession?>();
-      final t = JourneyTimeline();
       final scope = ProviderContainer(
         overrides: [
           foundCaseRepositoryProvider.overrideWithValue(found()),
           lostCaseRepositoryProvider.overrideWithValue(FakeCases()),
-          caseTimelineRepositoryProvider.overrideWithValue(t),
           timelineSessionProvider.overrideWith((ref) => sessions.stream),
         ],
       );
@@ -267,8 +169,7 @@ void main() {
       final first = await scope.read(
         caseJourneyViewModelProvider(target).future,
       );
-      expect(first.journey.points.single.private, true);
-      t.deny = true;
+      expect(first.journey.points, isEmpty);
       sessions.add(const AuthSession(userId: 'reader'));
       await Future<void>.delayed(Duration.zero);
       final second = await scope.read(
@@ -284,12 +185,11 @@ void main() {
   test(
     'Refresh retains content on transient failure and removes it after forbidden origin',
     () async {
-      final f = found(), t = JourneyTimeline();
+      final f = found();
       final scope = ProviderContainer(
         overrides: [
           foundCaseRepositoryProvider.overrideWithValue(f),
           lostCaseRepositoryProvider.overrideWithValue(FakeCases()),
-          caseTimelineRepositoryProvider.overrideWithValue(t),
           timelineSessionProvider.overrideWith(
             (ref) => Stream.value(const AuthSession(userId: 'owner')),
           ),
@@ -300,7 +200,7 @@ void main() {
         caseJourneyViewModelProvider(target).future,
       );
       final model = scope.read(caseJourneyViewModelProvider(target).notifier);
-      t.failAccess = true;
+      f.failRead = true;
       final refresh = model.refresh();
       expect(
         scope
@@ -315,6 +215,7 @@ void main() {
           .requireValue;
       expect(failed.refreshFailed, true);
       expect(failed.journey, same(initial.journey));
+      f.failRead = false;
       f.publicCase = null;
       await model.refresh();
       expect(scope.read(caseJourneyViewModelProvider(target)).hasError, true);
@@ -339,7 +240,6 @@ void main() {
           final value = await ReadCaseJourney(
             FakeCases(),
             found()..observations.add(notice('a', 16)),
-            JourneyTimeline()..deny = true,
           )('reader', target);
           final boundary = GlobalKey();
           final router = GoRouter(
@@ -366,7 +266,7 @@ void main() {
                               children: [
                                 CaseUtilityButton(
                                   title: 'Ver seguimiento',
-                                  subtitle: 'Historial y revisiones',
+                                  subtitle: 'Historial del caso',
                                   icon: Icons.route_outlined,
                                   route: '/action',
                                 ),
@@ -458,7 +358,7 @@ void main() {
             final semantics = tester.ensureSemantics();
             expect(
               tester
-                  .getSemantics(find.bySemanticsLabel('Reportar avistamiento'))
+                  .getSemantics(find.bySemanticsLabel('La vi o la encontré'))
                   .getSemanticsData()
                   .hasAction(ui.SemanticsAction.tap),
               true,
@@ -467,7 +367,7 @@ void main() {
               tester
                   .getSemantics(
                     find.bySemanticsLabel(
-                      'Ver seguimiento. Historial y revisiones',
+                      'Ver seguimiento. Historial del caso',
                     ),
                   )
                   .getSemanticsData()
@@ -477,8 +377,8 @@ void main() {
             final buttons = find.byType(CaseUtilityButton);
             semantics.dispose();
             expect(
-              tester.getSize(buttons.at(0)).height,
               tester.getSize(buttons.at(1)).height,
+              tester.getSize(buttons.at(2)).height,
             );
           }
           final surfaces = tester.widgetList<GlassSurface>(
@@ -572,24 +472,17 @@ void main() {
           }
           await tester.pumpAndSettle();
           expect(find.byType(JourneySummaryCard), findsOneWidget);
-          await tester.ensureVisible(find.text('Reportar avistamiento'));
-          await tester.tap(find.text('Reportar avistamiento'));
-          await tester.pumpAndSettle();
-          expect(find.text('Destino'), findsOneWidget);
-          expect(
-            GoRouterState.of(tester.element(find.text('Destino'))).uri.path,
-            '/home/sightings/found/${target.id}',
-          );
-          router.pop();
-          await tester.pumpAndSettle();
+          expect(find.text('Reportar avistamiento'), findsNothing);
           await tester.ensureVisible(find.text('La vi o la encontré'));
           await tester.tap(find.text('La vi o la encontré'));
           await tester.pumpAndSettle();
           expect(find.text('Destino'), findsOneWidget);
-          expect(GoRouterState.of(tester.element(find.text('Destino'))).uri.queryParameters, {
-            'case': target.id,
-            'community': 'true',
-          });
+          expect(
+            GoRouterState.of(
+              tester.element(find.text('Destino')),
+            ).uri.queryParameters,
+            {'case': target.id, 'community': 'true'},
+          );
           router.pop();
           await tester.pumpAndSettle();
           expect(find.byType(RecoveryCaseActions), findsOneWidget);
@@ -665,9 +558,6 @@ void main() {
             overrides: [
               foundCaseRepositoryProvider.overrideWithValue(repository),
               lostCaseRepositoryProvider.overrideWithValue(FakeCases()),
-              caseTimelineRepositoryProvider.overrideWithValue(
-                JourneyTimeline()..deny = true,
-              ),
               timelineSessionProvider.overrideWith(
                 (ref) => Stream.value(const AuthSession(userId: 'reader')),
               ),

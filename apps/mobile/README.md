@@ -21,6 +21,13 @@ Para conectar Supabase, completar `config/supabase.local.json` con URL y clave p
 
 En VS Code, Run/Debug de `main.dart` utiliza el perfil local mediante `templateFor`. Se puede seguir usando el botón de ejecución de Dart/Flutter y elegir el emulador; para cargar cambios del JSON hay que detener e iniciar la app de nuevo.
 
+El analizador excluye `build/**`: contiene salidas de compilación y puede
+conservar copias antiguas de fuentes para revisión, que no forman parte de la
+app. Ejecutar `flutter analyze --no-pub` desde esta carpeta analiza el proyecto
+sin interpretar esas copias como código vigente. Si falla Run/Debug, conservar
+el destino seleccionado y el primer mensaje de error: un análisis correcto no
+sustituye comprobar la compilación y el arranque del destino concreto.
+
 Por terminal, el arranque configurado es:
 
 ```powershell

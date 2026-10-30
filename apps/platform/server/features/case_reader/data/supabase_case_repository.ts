@@ -26,7 +26,7 @@ export class SupabaseCaseRepository implements CaseRepository, CasePhotoReposito
     if (!Array.isArray(raw.photo_objects) || !raw.photo_objects.every(safePhoto)) throw new ReaderFailure();
     return publicCase({ state: raw.state, kind: raw.kind, name: raw.name, species: raw.species,
       speciesDetail: raw.species_detail, size: raw.size, sex: raw.sex, traits: raw.traits,
-      occurredAt: raw.occurred_at, area: raw.area, photoCount: raw.photo_objects.length,
+      occurredAt: raw.occurred_at, contributions: raw.contributions, area: raw.area, photoCount: raw.photo_objects.length,
       revision: createHash('sha256').update(JSON.stringify(raw)).digest('hex') });
   }
   async photo(slug: string, index: number, signal?: AbortSignal) {

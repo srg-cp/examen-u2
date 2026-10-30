@@ -1,9 +1,10 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {test} from 'node:test';
 import {PGlite} from '@electric-sql/pglite';
 import {postgis} from '@electric-sql/pglite-postgis';
-const bundle=await readFile(new URL('../run_all.sql',import.meta.url),'utf8');
+const bundle=await historicalBundle();
 const owner='11111111-1111-4111-8111-111111111128',other='22222222-2222-4222-8222-222222222228';
 const pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb28',target='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa28';
 const uuid=n=>`cccccccc-cccc-4ccc-8ccc-${String(n).padStart(12,'0')}`;

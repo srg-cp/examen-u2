@@ -1,7 +1,6 @@
 import 'dart:async';
 import '../../../lost_cases/domain/entities/lost_case.dart';
 import '../../../found_cases/domain/entities/found_case.dart';
-import '../../../sightings/domain/entities/sighting.dart';
 import '../entities/local_report_draft.dart';
 import '../entities/queued_report.dart';
 import '../repositories/local_draft_repository.dart';
@@ -34,18 +33,7 @@ SubmissionIssue submissionIssue(Object error) {
       _ => SubmissionIssue.unavailable,
     };
   }
-  if (error is SightingFailure) {
-    return switch (error.issue) {
-      SightingIssue.conflict => SubmissionIssue.conflict,
-      SightingIssue.forbidden => SubmissionIssue.forbidden,
-      SightingIssue.blocked => SubmissionIssue.blocked,
-      SightingIssue.closed => SubmissionIssue.closed,
-      SightingIssue.invalid => SubmissionIssue.invalid,
-      SightingIssue.photo => SubmissionIssue.photo,
-      SightingIssue.rateLimited => SubmissionIssue.rateLimited,
-      _ => SubmissionIssue.unavailable,
-    };
-  }
+
   return SubmissionIssue.unavailable;
 }
 

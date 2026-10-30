@@ -41,8 +41,8 @@ export class ServerRecoveryRepository implements RecoveryRepository {
     const result = await this.source.processPhoto(parent,p.id,await image(p.bytes)) as Row;
     if (!result || result.id !== p.id || result.pet_id !== parent || result.owner_id !== this.actor || result.status !== 'published' || !result.processed_at) throw new RecoveryFailure('unavailable');
   }
-  async targets() {
-    const result = rows(await this.source.rpc('list_open_recovery_searches'));
+  async targets(slug?: string) {
+    const result = rows(await this.source.rpc(slug ? 'read_qr_recovery_target' : 'list_open_recovery_searches', slug ? {p_slug:slug} : {}));
     return result.map(r => card(r, r.community === true || r.community_target === true ? 'found' : 'lost'));
   }
   async publish(d: ReportDraft, photos: readonly ReportPhoto[]) {

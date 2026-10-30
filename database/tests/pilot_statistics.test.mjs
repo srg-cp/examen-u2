@@ -1,9 +1,10 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { postgis } from '@electric-sql/pglite-postgis';
-const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+const bundle = await historicalBundle();
 const patch = await readFile(new URL('../patchs/039_patch_pilot_statistics.sql', import.meta.url), 'utf8');
 const admin = '11111111-1111-4111-8111-111111111150', ordinary = '22222222-2222-4222-8222-222222222250', reviewer = '33333333-3333-4333-8333-333333333350';
 const id = n => `dddddddd-dddd-4ddd-8ddd-${String(n).padStart(12, '0')}`;

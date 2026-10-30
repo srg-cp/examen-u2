@@ -276,18 +276,7 @@ class _LocationRow extends StatelessWidget {
                   : 'Avistamiento $number',
               value: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(caseDateTimeLabel(point.time)),
-                  if (point.private)
-                    Text(
-                      'Evidencia privada · ${switch (point.reviewState) {
-                        'confirmed' => 'Confirmada',
-                        'useful' => 'Útil',
-                        'doubtful' => 'Dudosa',
-                        _ => 'Sin revisar',
-                      }}',
-                    ),
-                ],
+                children: [Text(caseDateTimeLabel(point.time))],
               ),
             ),
           ),

@@ -1,5 +1,9 @@
 # Base de datos de Entre Huellas
 
+30/10: retirada completa de avistamientos privados, [ADR-168](../docs/decisiones/168-retirada-completa-avistamientos-privados.md). Solo avisos públicos con cuenta. Patch042 después de041; actualizar móvil/web y servidor juntos, sin activación remota en esta tarea.
+
+29/10: plan041/fuente135: destino QR autenticado y lista pública de avisos vinculados, sin exponer avistamientos privados históricos. Generar con Build-Migration -Plan migration_plans/041_public_case_contributions.json; run_all incorpora135. Aplicar20261029004100 y servidor/web juntos, sin ejecución remota en esta tarea. [ADR-167](../docs/decisiones/167-ayuda-publica-unificada-con-cuenta.md).
+
 25/10, HU-25/#71 y HU-26/#72: plan040/fuentes128–134 generan índices visuales
 y revisiones privadas, RPC solo servidor, invalidación y nuevo tipo explícito
 `independent_found` sin reclasificar datos. Build-CaseMatchingPatch/Build-RunAll;

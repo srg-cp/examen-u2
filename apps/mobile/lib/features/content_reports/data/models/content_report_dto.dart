@@ -4,7 +4,7 @@ class ContentReportDto {
   static ReportReceipt receipt(Object? raw) {
     final row = Map<String, dynamic>.from(raw as Map);
     final kind = row['resource_kind'] as String;
-    if (!{'lost', 'found', 'sighting'}.contains(kind)) {
+    if (!{'lost', 'found'}.contains(kind)) {
       throw const FormatException();
     }
     return ReportReceipt(

@@ -4,7 +4,7 @@ export class AppealFailure extends Error {
 }
 export type AppealCursor = Readonly<{ time: string; id: string }>;
 export type AppealEntry = Readonly<{
-  decision: string; kind: 'lost' | 'found' | 'sighting'; resource: string;
+  decision: string; kind: 'lost' | 'found'; resource: string;
   action: 'hide' | 'show' | 'dismiss'; reason: string; decidedAt: string;
   appeal: Readonly<{ id: string; reason: string; submittedAt: string;
     answer: Readonly<{ id: string; actor: string; reason: string; answeredAt: string }> | null }> | null;

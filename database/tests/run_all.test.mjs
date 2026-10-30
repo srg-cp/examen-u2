@@ -1,10 +1,11 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { postgis } from '@electric-sql/pglite-postgis';
 
-const bundle = await readFile(new URL('../run_all.sql', import.meta.url), 'utf8');
+const bundle = await historicalBundle();
 
 test('Recovery business conflicts upgrade to PT409 without changing bodies, settings or privileges and repeat safely', async t => {
  const db=await database(t); await db.exec(bundle);

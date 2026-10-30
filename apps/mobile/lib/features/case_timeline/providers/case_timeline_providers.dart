@@ -17,12 +17,3 @@ final readTimelineAccessProvider = Provider(
 final readCaseTimelineProvider = Provider(
   (ref) => ReadCaseTimeline(ref.watch(caseTimelineRepositoryProvider)),
 );
-final readSightingReviewProvider = Provider(
-  (ref) => ReadSightingReview(ref.watch(caseTimelineRepositoryProvider)),
-);
-final readSightingEvidenceProvider = Provider(
-  (ref) => ReadSightingEvidence(ref.watch(caseTimelineRepositoryProvider)),
-);
-final reviewSightingProvider = Provider(
-  (ref) => ReviewSighting(ref.watch(caseTimelineRepositoryProvider)),
-);

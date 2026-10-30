@@ -58,8 +58,6 @@ class SubmissionQueueScreen extends ConsumerWidget {
                             Text(
                               entry.command.slot == 'lost'
                                   ? 'Mascota perdida'
-                                  : entry.command.slot.startsWith('sighting:')
-                                  ? 'Avistamiento'
                                   : 'Búsqueda o aviso',
                             ),
                             Text(

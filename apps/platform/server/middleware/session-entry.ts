@@ -1,6 +1,6 @@
 import { account, accountCookie, clearAccountCookie } from '../utils/account';
 import { AccessFailure } from '../../shared/features/access/domain/access';
-import { routeAccess, sessionRedirect } from '../../shared/routing/route_policy';
+import { routeAccess, sessionRedirect, contributionDestination } from '../../shared/routing/route_policy';
 import { credentials, clearCredentialCookie } from '../utils/credentials';
 import { CredentialFailure } from '../../shared/features/access/domain/credentials';
 import { statistics } from '../utils/statistics';
@@ -9,6 +9,7 @@ export default defineEventHandler(async event => {
   const url = getRequestURL(event);
   if (!['GET', 'HEAD'].includes(event.method)) return;
   const access = routeAccess(url.pathname);
+  if (contributionDestination(url.pathname)) setCookie(event, 'eh_contribution_return', url.pathname, {sameSite:'lax',path:'/',maxAge:3600});
   if (access === 'public') return;
   if (access === 'recovery') {
     try { await credentials(event).read.resetAccess(); }
@@ -32,7 +33,11 @@ export default defineEventHandler(async event => {
     const services = account(event);
     const session = await services.access.session();
     const destination = sessionRedirect(access, session.profile.onboardingCompleted);
-    if (destination) return sendRedirect(event, destination, 302);
+    if (destination) {
+      const pending = session.profile.onboardingCompleted ? contributionDestination(getCookie(event,'eh_contribution_return')) : null;
+      if (pending) deleteCookie(event,'eh_contribution_return',{path:'/'});
+      return sendRedirect(event, pending || destination, 302);
+    }
     if (access === 'reviewer' && !await services.management.execute()) return sendRedirect(event, '/inicio?reason=forbidden', 302);
     if (access === 'administrator' && !await (await statistics(event, false)).access.execute()) return sendRedirect(event, '/inicio?reason=forbidden', 302);
   } catch (error) {

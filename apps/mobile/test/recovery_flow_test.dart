@@ -35,12 +35,9 @@ import 'package:flutter_application_entrehuellas/features/found_cases/presentati
 import 'package:flutter_application_entrehuellas/features/found_cases/presentation/widgets/recovery_case_actions.dart';
 import 'app_test.dart' show FakeAuthRepository, FakeOnboarding;
 import 'found_cases_test.dart' show FakeFoundCases;
-import 'sightings_test.dart' show FakeSightings;
-import 'case_timeline_test.dart' show FakeTimeline, testReview;
+import 'case_timeline_test.dart' show FakeTimeline;
 import 'package:flutter_application_entrehuellas/features/case_timeline/providers/case_timeline_providers.dart';
 import 'package:flutter_application_entrehuellas/features/case_timeline/presentation/screens/case_timeline_screen.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/providers/sighting_providers.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/presentation/screens/sighting_screen.dart';
 import 'support/fake_password_recovery.dart';
 import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
@@ -128,7 +125,6 @@ void main() {
             localDraftRepositoryProvider.overrideWithValue(FakeLocalDrafts()),
             contentReportRepositoryProvider.overrideWithValue(FakeReports()),
             caseClosureRepositoryProvider.overrideWithValue(closures),
-            sightingRepositoryProvider.overrideWithValue(FakeSightings()),
             caseTimelineRepositoryProvider.overrideWithValue(timelineRepo),
             startupStateProvider.overrideWithValue(
               const StartupState(StartupStatus.ready),
@@ -209,21 +205,6 @@ void main() {
         await tester.runAsync(model.publish);
         await tester.pumpAndSettle();
         final search = reports.attempts.single;
-        timelineRepo.current = testReview(
-          target: (id: search.id, community: true),
-        );
-        expect(search.reportKind, 'possible_loss');
-        expect(search.targetId, isNull);
-        reports.publicCase = projection(search, owner: true);
-        reports.searches.add(
-          RecoverySearch(
-            id: search.id,
-            community: true,
-            name: 'Perro con collar azul',
-            species: 'dog',
-          ),
-        );
-
         await tester.pumpAndSettle();
         expect(
           find.byType(RecoveryCaseActions, skipOffstage: false),
@@ -279,22 +260,7 @@ void main() {
         await tester.binding.handlePopRoute();
         await tester.pumpAndSettle();
         expect(find.byType(CaseShareSheet), findsNothing);
-        await tester.ensureVisible(
-          find.text('Reportar avistamiento', skipOffstage: false),
-        );
-        await tester.pumpAndSettle();
-        await tester.tap(
-          find.text('Reportar avistamiento', skipOffstage: false),
-        );
-        await tester.pumpAndSettle();
-        expect(find.byType(SightingScreen), findsOneWidget);
-        final sightingScope = ProviderScope.containerOf(
-          tester.element(find.byType(SightingScreen)),
-        );
-        expect(sightingScope.read(sightingTargetProvider).id, search.id);
-        expect(sightingScope.read(sightingTargetProvider).community, true);
-        router.pop();
-        await tester.pumpAndSettle();
+        expect(find.text('Reportar avistamiento'), findsNothing);
         await tester.ensureVisible(
           find.text('La vi o la encontré', skipOffstage: false),
         );

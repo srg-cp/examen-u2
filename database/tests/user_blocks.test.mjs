@@ -1,9 +1,10 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {test} from 'node:test';
 import {PGlite} from '@electric-sql/pglite';
 import {postgis} from '@electric-sql/pglite-postgis';
-const bundle=await readFile(new URL('../run_all.sql',import.meta.url),'utf8');
+const bundle=await historicalBundle();
 const contactPatch=await readFile(new URL('../../supabase/migrations/20261023003600_block_case_contacts.sql',import.meta.url),'utf8');
 const owner='11111111-1111-4111-8111-111111111142',reporter='22222222-2222-4222-8222-222222222242',other='33333333-3333-4333-8333-333333333342';
 const pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb42',target='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa42';

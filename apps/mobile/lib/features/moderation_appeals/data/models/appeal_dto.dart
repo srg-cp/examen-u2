@@ -26,7 +26,7 @@ class AppealDto {
   static ModeratedDecision decision(Object? raw) {
     final v = _map(raw), a = v['appeal'] == null ? null : _map(v['appeal']);
     final b = a?['answer'] == null ? null : _map(a!['answer']);
-    if (!['lost', 'found', 'sighting'].contains(v['kind']) ||
+    if (!['lost', 'found'].contains(v['kind']) ||
         !['hide', 'show', 'dismiss'].contains(v['action'])) {
       throw const FormatException();
     }

@@ -71,3 +71,8 @@ test('ViewModel deduplicates, retains unchanged content, recovers offline, clear
   finish(active()); await pending; assert.equal(model.state.phase, 'closed'); model.dispose();
   assert.ok(states.some((state) => state.refreshing && state.value === original));
 });
+
+test('Public contributions strip private properties and reject malformed evidence',()=>{
+ const notice={id:'11111111-1111-4111-8111-111111111111',kind:'sighting',text:'La vi en el parque',occurredAt:'2026-10-29T12:00:00Z',latitude:12,private_comment:'SECRET'};
+ const value=publicCase({...active(),contributions:[notice]});assert.equal(value.contributions[0].text,notice.text);assert.ok(!JSON.stringify(value).includes('SECRET'));assert.equal(value.contributions[0].latitude,undefined);assert.throws(()=>publicCase({...active(),contributions:[{...notice,kind:'private'}]}),ReaderFailure);
+});

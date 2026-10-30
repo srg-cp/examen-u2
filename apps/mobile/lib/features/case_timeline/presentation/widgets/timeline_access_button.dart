@@ -44,7 +44,7 @@ class TimelineAccessButton extends ConsumerWidget {
           CaseUtilityButton(
             title: 'Ver seguimiento',
             onReturn: onReturn,
-            subtitle: 'Historial y revisiones',
+            subtitle: 'Historial del caso',
             icon: Icons.route_outlined,
             route:
                 '/home/timeline/${target.community ? 'found' : 'lost'}/${target.id}',

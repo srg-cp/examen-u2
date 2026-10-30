@@ -30,10 +30,6 @@ import 'package:http/http.dart' as http;
 import '../features/case_timeline/domain/repositories/case_timeline_repository.dart';
 import '../features/case_timeline/data/repositories/case_timeline_repository_impl.dart';
 import '../features/case_timeline/data/data_sources/case_timeline_source.dart';
-import '../features/sightings/domain/repositories/sighting_repository.dart';
-import '../features/sightings/data/repositories/unavailable_sighting_repository.dart';
-import '../features/sightings/data/repositories/sighting_repository_impl.dart';
-import '../features/sightings/data/data_sources/sighting_source.dart';
 import 'package:flutter/services.dart'
     show rootBundle, Clipboard, ClipboardData;
 import '../features/case_posters/domain/repositories/case_poster_repository.dart';
@@ -131,7 +127,6 @@ class AppBootstrap {
     this.notificationRepository = const UnavailableNotificationRepository(),
     this.pushRepository = const UnavailablePushRepository(),
     this.caseTimelineRepository = const UnavailableCaseTimelineRepository(),
-    this.sightingRepository = const UnavailableSightingRepository(),
     this.casePosterRepository = const UnavailableCasePosterRepository(),
     required this.state,
     required this.authRepository,
@@ -164,7 +159,6 @@ class AppBootstrap {
   final NotificationRepository notificationRepository;
   final PushRepository pushRepository;
   final CaseTimelineRepository caseTimelineRepository;
-  final SightingRepository sightingRepository;
   final CasePosterRepository casePosterRepository;
   final CaseShareRepository caseShareRepository;
   final AuthRepository authRepository;
@@ -232,17 +226,6 @@ Future<AppBootstrap> bootstrapApp(AppConfig config) async {
           ),
           caseTimelineRepository: CaseTimelineRepositoryImpl(
             SupabaseCaseTimelineSource(supabase.client),
-          ),
-          sightingRepository: SightingRepositoryImpl(
-            NativeSightingSource(
-              supabase.client,
-              http.Client(),
-              ImagePicker(),
-              const String.fromEnvironment(
-                'PUBLIC_CASE_WEB_URL',
-                defaultValue: 'https://entrehuellas.app',
-              ),
-            ),
           ),
           casePosterRepository: CasePosterRepositoryImpl(
             SupabasePosterCaseSource(supabase.client),

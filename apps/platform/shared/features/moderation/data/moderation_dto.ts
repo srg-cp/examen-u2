@@ -6,7 +6,7 @@ function id(raw: unknown): string { if (!uuid(raw)) throw new ModerationFailure(
 function number(raw: unknown): number { if (!Number.isSafeInteger(raw) || (raw as number) < 0) throw new ModerationFailure('unavailable'); return raw as number; }
 function bool(raw: unknown): boolean { if (typeof raw !== 'boolean') throw new ModerationFailure('unavailable'); return raw; }
 function time(raw: unknown): string { const value = text(raw); if (!Number.isFinite(Date.parse(value))) throw new ModerationFailure('unavailable'); return value; }
-function kind(raw: unknown): string { const value = text(raw); if (!['lost','found','sighting'].includes(value)) throw new ModerationFailure('unavailable'); return value; }
+function kind(raw: unknown): string { const value = text(raw); if (!['lost','found'].includes(value)) throw new ModerationFailure('unavailable'); return value; }
 export function sessionDto(raw: unknown): ReviewerSession {
   const r = row(raw), expiresAt = number(r.expiresAt);
   if (expiresAt <= Date.now()) throw new ModerationFailure('unauthenticated');

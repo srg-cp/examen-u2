@@ -21,7 +21,7 @@ export default defineEventHandler(event => {
   const nonce = randomBytes(18).toString('base64'); event.context.cspNonce = nonce;
   if (!import.meta.dev) setHeader(event, 'Content-Security-Policy',
     `default-src 'none'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; img-src 'self' https://basemaps.cartocdn.com; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`);
-  const nativeSubmission = event.method === 'POST' && (/^\/api\/app\/cases\/(lost|found)\/[0-9a-f-]{36}\/sightings$/.test(path) || /^\/api\/app\/matching\/(search|review|searches)$/.test(path));
+  const nativeSubmission = event.method === 'POST' && /^\/api\/app\/matching\/(search|review|searches)$/.test(path);
   const oauthCallback = event.method==='GET' && path==='/api/moderation/oauth/callback';
   // Redirects keep the initiating site's Fetch Metadata. The entry bridge is
   // navigation-only and returns fixed internal redirects, never account data.
@@ -45,7 +45,7 @@ export default defineEventHandler(event => {
   const credentialWrite = event.method === 'POST' && /^\/api\/access\/credentials\/(register|recover|verify|resend|reset|cancel)$/.test(path);
   const moderationWrite = credentialWrite || (event.method === 'POST' && ['/api/access/login','/api/access/logout','/api/access/onboarding','/api/access/oauth/start','/api/moderation/login','/api/moderation/oauth/start','/api/moderation/logout','/api/moderation/queue','/api/moderation/decisions'].includes(path));
   if (moderationPath && !oauthCallback && !accountEntryNavigation && getHeader(event,'sec-fetch-site') === 'cross-site') { setResponseStatus(event,403); return {error:'forbidden'}; }
-  const submission = matchingWrite || statisticsRead || blockWrite || appealWrite || notificationWrite || recoveryWrite || moderationWrite || nativeSubmission || (event.method === 'POST' && /^\/api\/c\/[0-9a-f]{64}\/sightings$/.test(path));
+  const submission = matchingWrite || statisticsRead || blockWrite || appealWrite || notificationWrite || recoveryWrite || moderationWrite || nativeSubmission;
   if (event.method !== 'GET' && event.method !== 'HEAD' && !submission) {
     setHeader(event, 'Allow', 'GET, HEAD'); setResponseStatus(event, 405); return { error: 'method_not_allowed' };
   }

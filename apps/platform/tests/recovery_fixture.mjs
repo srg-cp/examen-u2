@@ -19,10 +19,11 @@ export async function recoveryFixture(){
    else send(res,{id,case_id:found,owner_id:actor,status:'ready',processed_at:'2026-10-20T12:00:00Z'});
    return true;
   }
-  const rpc=req.url?.split('/rest/v1/rpc/')[1];if(!['explore_cases','list_open_recovery_searches','create_pet_v2','update_pet_v2','publish_lost_case','prepare_recovery_report','publish_recovery_report','read_recovery_pet_case','read_recovery_report'].includes(rpc))return false;
+  const rpc=req.url?.split('/rest/v1/rpc/')[1];if(!['explore_cases','list_open_recovery_searches','read_qr_recovery_target','create_pet_v2','update_pet_v2','publish_lost_case','prepare_recovery_report','publish_recovery_report','read_recovery_pet_case','read_recovery_report'].includes(rpc))return false;
   const chunks=[];for await(const b of req)chunks.push(b);const body=JSON.parse(Buffer.concat(chunks).toString()||'{}');calls.push({rpc,body,actor});
   if(failed){send(res,{message:'PRIVATE_BACKEND_FAILURE'},503);return true;}
   if(rpc==='explore_cases'){const items=body.p_cursor?[]:[card];send(res,{items,next_cursor:body.p_cursor?null:{as_of:'2026-10-20T12:00:00Z',id:caseId,query:[]}});return true;}
+  if(rpc==='read_qr_recovery_target'){send(res,[{...card,community:false}]);return true;}
   if(rpc==='list_open_recovery_searches'){send(res,[{...card,community:false},{...card,id:'88888888-8888-4888-8888-888888888888',name:'Gato comunitario',community:true}]);return true;}
   if(rpc.startsWith('read_recovery')){send(res,body.p_id===caseId?[{...card,photos:[{path:card.cover_path}]}]:[]);return true;}
   if(rpc==='create_pet_v2'||rpc==='update_pet_v2'){

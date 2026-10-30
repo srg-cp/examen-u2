@@ -12,7 +12,7 @@ function id(value: unknown): string { if (!isUuid(value)) throw new AppealFailur
 function time(value: unknown): string { const s = string(value, 64); if (!Number.isFinite(Date.parse(s))) throw new AppealFailure('unavailable'); return s; }
 export function appealDto(value: unknown): AppealEntry {
   const v = object(value), a = v.appeal === null ? null : object(v.appeal), b = a?.answer === null || !a ? null : object(a.answer);
-  if (!['lost', 'found', 'sighting'].includes(v.kind as string) || !['hide', 'show', 'dismiss'].includes(v.action as string)) throw new AppealFailure('unavailable');
+  if (!['lost', 'found'].includes(v.kind as string) || !['hide', 'show', 'dismiss'].includes(v.action as string)) throw new AppealFailure('unavailable');
   return Object.freeze({ decision: id(v.decision), kind: v.kind as AppealEntry['kind'], resource: id(v.resource), action: v.action as AppealEntry['action'], reason: string(v.reason, 500), decidedAt: time(v.decidedAt),
     appeal: a ? Object.freeze({ id: id(a.id), reason: string(a.reason), submittedAt: time(a.submittedAt),
       answer: b ? Object.freeze({ id: id(b.id), actor: id(b.actor), reason: string(b.reason), answeredAt: time(b.answeredAt) }) : null }) : null });

@@ -134,9 +134,7 @@ class _ContentReportScreenState extends ConsumerState<ContentReportScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                widget.target.kind == 'sighting'
-                    ? 'Denunciar este avistamiento'
-                    : 'Denunciar esta publicación',
+                'Denunciar esta publicación',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,

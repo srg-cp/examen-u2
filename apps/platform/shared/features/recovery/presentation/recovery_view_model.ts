@@ -4,7 +4,7 @@ type State = Readonly<{ loading: boolean; refreshing: boolean; busy: boolean; pe
 export class RecoveryViewModel {
   state: State = { loading: true, refreshing: false, busy: false, petsLoading: false, targetsLoading: false, petsReady: false, targetsReady: false, petsFailure: null, targetsFailure: null, items: [], pets: [], targets: [], cursor: null, failure: null, notice: 0, receipt: null };
   private listeners = new Set<(state: State) => void>(); private generation = 0; private disposed = false;
-  constructor(private readonly explore: ExploreCases, private readonly readPets: ReadMyPets, private readonly save: SaveMyPet, private readonly addPhoto: AddPetPhoto, private readonly searches: ReadOpenSearches, private readonly publish: PublishRecoveryReport, private readonly readDraft:ReadReportDraft, private readonly saveDraft:SaveReportDraft, private readonly clearDraft:ClearReportDraft) {}
+  constructor(private readonly explore: ExploreCases, private readonly readPets: ReadMyPets, private readonly save: SaveMyPet, private readonly addPhoto: AddPetPhoto, private readonly searches: ReadOpenSearches, private readonly publish: PublishRecoveryReport, private readonly readDraft:ReadReportDraft, private readonly saveDraft:SaveReportDraft, private readonly clearDraft:ClearReportDraft, private readonly qrSlug?:string) {}
   subscribe(listener: (state: State) => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   private update(change: Partial<State>) { if (this.disposed) return; this.state = { ...this.state, ...change }; for (const listener of this.listeners) listener(this.state); }
   private fail(e: unknown) { this.update({ failure: e instanceof RecoveryFailure ? e : new RecoveryFailure('unavailable'), notice: this.state.notice + 1 }); }
@@ -39,7 +39,7 @@ export class RecoveryViewModel {
         if (this.disposed || generation !== this.generation) return;
         this.update({ pets, [ready]: true, [failure]: null });
       } else {
-        const targets = await this.searches.execute();
+        const targets = await this.searches.execute(this.qrSlug);
         if (this.disposed || generation !== this.generation) return;
         this.update({ targets, [ready]: true, [failure]: null });
       }

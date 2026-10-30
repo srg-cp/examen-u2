@@ -113,7 +113,6 @@ class FoundDetailScreen extends ConsumerWidget {
                               state.requireValue.value!.reportKind ==
                                       'possible_loss'
                                   ? RecoveryCaseActions(
-                                      showSightingAction: true,
                                       journey: journey,
                                       utilities: utilitiesBuilder?.call(
                                         state

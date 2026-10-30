@@ -1,11 +1,11 @@
 import 'package:drift/drift.dart';
 
-/// Schema 2: private drafts and durable, claimed submission commands.
+/// Schema 3: private drafts and durable, claimed submission commands.
 /// No file references to the image picker's temporary directory survive here.
 class LocalDraftDatabase extends GeneratedDatabase {
   LocalDraftDatabase(super.executor);
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => const [];
   @override
@@ -21,6 +21,14 @@ class LocalDraftDatabase extends GeneratedDatabase {
     },
     onUpgrade: (_, from, to) async {
       if (from < 2) await _createQueue();
+      if (from < 3) {
+        await customStatement(
+          "DELETE FROM report_drafts WHERE slot LIKE 'sighting:%'",
+        );
+        await customStatement(
+          r"DELETE FROM submission_queue WHERE json_extract(payload, '$.slot') LIKE 'sighting:%'",
+        );
+      }
     },
   );
 

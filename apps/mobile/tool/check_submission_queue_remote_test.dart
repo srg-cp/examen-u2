@@ -34,9 +34,6 @@ import 'package:flutter_application_entrehuellas/features/pets/data/data_sources
 import 'package:flutter_application_entrehuellas/features/pets/data/data_sources/supabase_pet_photo_source.dart';
 import 'package:flutter_application_entrehuellas/features/pets/data/repositories/pet_repository_impl.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/data/data_sources/sighting_source.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/data/repositories/sighting_repository_impl.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/domain/use_cases/sighting_actions.dart';
 
 class FaultClient extends http.BaseClient {
   final inner = http.Client();
@@ -87,7 +84,6 @@ void main() {
   final lostId = newEntityId(),
       searchId = newEntityId(),
       noticeId = newEntityId();
-  final sightingId = newEntityId();
   late Uint8List jpeg;
   late LostCaseRepositoryImpl lost;
   late FoundCaseRepositoryImpl found;
@@ -161,34 +157,16 @@ void main() {
       SupabaseFoundCaseDataSource(b),
       NativePhotoGallerySource(ImagePicker()),
     );
-    final sightingB = SightingRepositoryImpl(
-      NativeSightingSource(
-        b,
-        webFault,
-        ImagePicker(),
-        config['PUBLIC_CASE_WEB_URL'] as String? ?? 'https://entrehuellas.app',
-      ),
-    );
     transportB = SubmissionTransport(
       () => PublishLostCase(
         LostCaseRepositoryImpl(SupabaseLostCaseDataSource(b)),
       ),
       () => PublishFoundCase(foundB),
-      () => SubmitSighting(sightingB),
     );
     pets = PetRepositoryImpl(SupabasePetDataSource(a));
-    final sighting = SightingRepositoryImpl(
-      NativeSightingSource(
-        a,
-        webFault,
-        ImagePicker(),
-        config['PUBLIC_CASE_WEB_URL'] as String? ?? 'https://entrehuellas.app',
-      ),
-    );
     transport = SubmissionTransport(
       () => PublishLostCase(lost),
       () => PublishFoundCase(found),
-      () => SubmitSighting(sighting),
     );
     final decoded = image.decodePng(
       File('assets/onboarding/dog_waving.png').readAsBytesSync(),
@@ -203,7 +181,6 @@ void main() {
         'lost': lostId,
         'search': searchId,
         'notice': noticeId,
-        'sighting': sightingId,
       }),
     );
     pet = await pets.create(
@@ -490,50 +467,6 @@ void main() {
       expect(faultB.requests, requests);
       checkpoint(
         'linked_found_second_author_real_jpeg_ack_loss_one_publication',
-      );
-    },
-    timeout: const Timeout(Duration(minutes: 3)),
-  );
-
-  test(
-    'Hosted sighting: actual Nuxt endpoint, evidence, lost ACK and identical receipt',
-    () async {
-      final repo = local(await databaseFile(), 'sighting');
-      final dispatcher = DispatchQueuedReports(repo, transportB);
-      final command = LocalReportDraft(
-        owner: other,
-        slot: 'sighting:false:$lostId',
-        id: sightingId,
-        frozen: true,
-        instant: DateTime.now().toUtc().subtract(const Duration(minutes: 2)),
-        latitude: -12.0464,
-        longitude: -77.0428,
-        comment: 'QA avistamiento cola',
-        photo: jpeg,
-      );
-      webFault.loseResponsePath = '/api/app/cases/lost/$lostId/sightings';
-      await expectLater(
-        dispatcher.send(command, isCurrent: () => true),
-        throwsA(anything),
-      );
-      expect(webFault.lostResponses, 1);
-      final receipt = await dispatcher.retry(
-        other,
-        sightingId,
-        isCurrent: () => true,
-      );
-      expect(receipt.id, sightingId);
-      final before = webFault.requests;
-      final replay = await dispatcher.send(command, isCurrent: () => true);
-      expect(replay.sighting!.receivedAt, receipt.sighting!.receivedAt);
-      expect(webFault.requests, before);
-      expect((await repo.listQueue(other)).single.command.photo, isNull);
-      expect(
-        (await repo.listQueue(other)).single.status,
-        SubmissionStatus.published,
-      );
-      checkpoint(
-        'nuxt_sighting_real_evidence_ack_loss_same_receipt_no_http_replay',
       );
     },
     timeout: const Timeout(Duration(minutes: 3)),

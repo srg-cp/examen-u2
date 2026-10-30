@@ -32,7 +32,7 @@ export async function moderationFixture(jpeg=new Uint8Array([255,216,255,217]),o
   if(req.url?.startsWith('/rest/v1/profiles?')){if(profileFailure){send(res,{},503);return true;}send(res,[{id:actor,display_name:actor===moderator?'Revisor de prueba':'Usuario de prueba',city:'Lima',onboarding_completed_at:onboarded.get(actor)===false?null:'2026-10-18T17:00:00Z'}]);return true;}
   if(req.url==='/rest/v1/rpc/complete_onboarding'){for await(const b of req){}if(onboarded.get(actor)===false){completions++;onboarded.set(actor,true);}res.writeHead(204);res.end();return true;}
   if(req.url?.startsWith('/auth/v1/logout')){const barrier=logoutBarrier;if(barrier){barrier.started();await barrier.wait;}send(res,{});return true;}
-  if(req.url==='/rest/v1/rpc/read_qr_case'&&hidden){for await(const b of req){}send(res,{state:'unavailable'});return true;}
+  if(['/rest/v1/rpc/read_qr_case','/rest/v1/rpc/read_qr_case_with_contributions'].includes(req.url)&&hidden){for await(const b of req){}send(res,{state:'unavailable'});return true;}
   if(!req.url?.includes('/rest/v1/rpc/')||!/(require_content_reviewer|list_moderation_reports|read_moderation_report|read_moderation_evidence|decide_content_report)$/.test(req.url))return false;
   const chunks=[];for await(const b of req)chunks.push(b);const input=JSON.parse(Buffer.concat(chunks).toString()||'{}');
   if(actor!==moderator||revoked){send(res,{code:'42501',message:'moderation_forbidden'},403);return true;}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const contributionReturn = useContributionReturn();
 import '../styles/login.css';
 import '../styles/credentials.css';
 import LoginInput from '../widgets/LoginInput.vue';
@@ -38,7 +39,7 @@ watch(() => state.value.session, async session => {
   if (!session || leaving) return;
   leaving = true; password.value = ''; confirmation.value = ''; code.value = '';
   channel?.postMessage({ actor: session.actor });
-  await navigateTo(session.profile.onboardingCompleted ? '/inicio' : '/bienvenida', { replace: true });
+  await navigateTo(session.profile.onboardingCompleted ? contributionReturn() : '/bienvenida', { replace: true });
 });
 watch(() => state.value.progress, async progress => {
   if (progress) { password.value = ''; confirmation.value = ''; code.value = ''; }

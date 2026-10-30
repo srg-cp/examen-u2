@@ -1,10 +1,11 @@
-import { routeAccess, sessionRedirect } from '#shared/routing/route_policy';
+import { routeAccess, sessionRedirect, contributionDestination } from '#shared/routing/route_policy';
 import { CredentialFailure } from '#shared/features/access/domain/credentials';
 
 export default defineNuxtRouteMiddleware(async to => {
   // Server middleware uses the same policy before any page HTML is generated.
   if (import.meta.server) return;
   const access = routeAccess(to.path);
+  if (contributionDestination(to.path)) useCookie('eh_contribution_return', {sameSite:'lax',path:'/',maxAge:3600}).value = to.path;
   if (access === 'public') return;
   if (access === 'recovery') {
     const model = useNuxtApp().$credentialModel();

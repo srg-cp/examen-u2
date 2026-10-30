@@ -339,6 +339,11 @@ class _FoundEditorScreenState extends ConsumerState<FoundEditorScreen> {
                   ),
                 ],
                 if (!v.communitySearch) ...[
+                  const Text(
+                    'Tu aviso y sus fotos serán públicos dentro del caso. '
+                    'Se mostrará una zona aproximada y el creador recibirá '
+                    'una alerta según sus preferencias.',
+                  ),
                   const SizedBox(height: 20),
                   Text(
                     v.target?.name.isNotEmpty == true

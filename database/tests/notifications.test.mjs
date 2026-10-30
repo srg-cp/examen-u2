@@ -1,9 +1,10 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { postgis } from '@electric-sql/pglite-postgis';
-const bundle=await readFile(new URL('../run_all.sql',import.meta.url),'utf8');
+const bundle=await historicalBundle();
 const a='11111111-1111-4111-8111-111111111127',b='22222222-2222-4222-8222-222222222227',c='33333333-3333-4333-8333-333333333327';
 const pet='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb27',target='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa27',zone='eeeeeeee-eeee-4eee-8eee-eeeeeeeeee27';
 const uuid=n=>`cccccccc-cccc-4ccc-8ccc-${String(n).padStart(12,'0')}`;
@@ -105,4 +106,19 @@ test('HU12 recipient filters, deleted zones, unsubscribe, lease expiry and succe
  await db.exec('reset role');await emit('second');await db.query('update public.alert_preferences set push=false where owner_id=$1',[b]);await db.exec('set role service_role');assert.deepEqual(await claim(),{skipped:true});
  await db.exec('reset role');await db.query('update public.alert_preferences set push=true where owner_id=$1',[b]);await emit('third');await actor(b);await follow(2,'zone',zone,false,1);await db.exec('reset role;set role service_role');assert.deepEqual(await claim(),{skipped:true});
  await db.exec('reset role');assert.equal(await count(),3);assert.equal((await db.query("select count(*)::int n from public.notification_deliveries where status='sent'")).rows[0].n,1);
+});
+
+test('Public QR contributions retain private history and notify the author',async t=>{
+ const {db,actor}=await setup(t);const slug='d'.repeat(64),notice=uuid(901);
+ await db.query("insert into public.case_public_links(case_source,case_id,owner_id,public_slug) values('lost',$1,$2,$3)",[target,a,slug]);
+ await db.query("insert into public.public_sightings(id,case_source,case_id,request_hash,actor_hash,observed_at,latitude,longitude,location_source,comment,is_late) values($1,'lost',$2,repeat('a',64),repeat('b',64),now(),-12,-77,'manual','HISTORICAL PRIVATE',false)",[uuid(902),target]);
+ await db.query("insert into public.found_cases(id,owner_id,status,occurred_at,latitude,longitude,place_reference,public_latitude,public_longitude,species,traits,photo_ids,published_at,report_kind,target_lost_case_id) values($1,$2,'active',now(),-12,-77,'PRIVATE ADDRESS',-12,-77,'dog','Vi a Luna',array[]::uuid[],now(),'sighting',$3)",[notice,b,target]);
+ await db.query("insert into public.found_case_events(case_id,actor_id,event_type) values($1,$2,'published')",[notice,b]);
+ await db.exec('set role anon');await assert.rejects(db.query('select * from public.read_qr_recovery_target($1)',[slug]),/permission denied/);
+ const read=()=>db.query('select public.read_qr_case_with_contributions($1) v',[slug]).then(r=>r.rows[0].v);
+ let value=await read();assert.equal(value.contributions.length,1);assert.equal(value.contributions[0].text,'Vi a Luna');assert.ok(!JSON.stringify(value).includes('HISTORICAL PRIVATE') && !JSON.stringify(value).includes('PRIVATE ADDRESS'));assert.ok(!JSON.stringify(value.contributions).includes('latitude'));
+ await actor(b);assert.equal((await db.query('select * from public.read_qr_recovery_target($1)',[slug])).rows[0].id,target);
+ await actor(a);const alerts=(await db.query('select public.list_notifications() v')).rows[0].v.items;assert.ok(alerts.some(n=>n.kind==='update'&&n.case_id===target));
+ await db.exec('reset role');await db.query('update public.found_cases set deleted_at=now() where id=$1',[notice]);assert.equal((await read()).contributions.length,0);
+ await db.query('update public.case_public_links set revoked_at=now() where public_slug=$1',[slug]);assert.equal((await read()).state,'unavailable');await actor(b);await assert.rejects(db.query('select * from public.read_qr_recovery_target($1)',[slug]),/case_unavailable/);
 });

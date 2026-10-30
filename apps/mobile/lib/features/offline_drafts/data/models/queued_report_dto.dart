@@ -4,7 +4,6 @@ import '../../domain/entities/local_report_draft.dart';
 import '../../domain/entities/queued_report.dart';
 import '../../../lost_cases/domain/entities/lost_case.dart';
 import '../../../found_cases/domain/entities/found_case.dart';
-import '../../../sightings/domain/entities/sighting.dart';
 import 'local_report_draft_dto.dart';
 
 class QueuedReportDto {
@@ -17,9 +16,6 @@ class QueuedReportDto {
           r.lost!.ownerId == d.owner &&
           r.lost!.petId == d.pet?.id &&
           r.lost!.status == 'active';
-    }
-    if (d.slot.startsWith('sighting:')) {
-      return r.sighting != null;
     }
     final f = r.found, p = d.slot.split(':');
     if (f == null ||
@@ -51,10 +47,6 @@ class QueuedReportDto {
         'version': d.pet?.version,
         'place': d.place.trim(),
         'photos': d.selectedPhotos,
-      } else if (d.slot.startsWith('sighting:')) ...{
-        'accuracy': d.accuracy,
-        'comment': d.comment,
-        'photo': d.photo == null ? null : sha256.convert(d.photo!).toString(),
       } else ...{
         'kind': d.reportKind,
         'place': d.place.trim(),
@@ -82,7 +74,7 @@ class QueuedReportDto {
   }
 
   static String encodeReceipt(SubmissionReceipt receipt) {
-    final l = receipt.lost, f = receipt.found, s = receipt.sighting;
+    final l = receipt.lost, f = receipt.found;
     return jsonEncode(
       l != null
           ? {
@@ -104,12 +96,7 @@ class QueuedReportDto {
               'community': f.communityTarget,
               'species': f.species,
             }
-          : {
-              'kind': 'sighting',
-              'id': s!.id,
-              'received': s.receivedAt.toUtc().toIso8601String(),
-              'late': s.late,
-            },
+          : throw const FormatException('Unknown receipt'),
     );
   }
 
@@ -134,13 +121,6 @@ class QueuedReportDto {
           targetId: r['target'] as String?,
           communityTarget: r['community'] as bool,
           species: r['species'] as String?,
-        ),
-      ),
-      'sighting' => SubmissionReceipt.sighting(
-        SightingReceipt(
-          r['id'] as String,
-          DateTime.parse(r['received'] as String),
-          r['late'] as bool,
         ),
       ),
       _ => throw const FormatException('Unknown receipt'),

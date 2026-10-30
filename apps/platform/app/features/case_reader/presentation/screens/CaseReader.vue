@@ -67,9 +67,10 @@ onBeforeUnmount(() => {
             <a class="secondary area-link" :href="`https://www.google.com/maps/search/?api=1&query=${active.area.latitude},${active.area.longitude}`" target="_blank" rel="noopener noreferrer">Ver área aproximada</a>
           </section>
           <section class="collaborate"><h2>Ayuda a que alguien le reconozca</h2><p class="muted">Compartir esta ficha puede acercar el reencuentro.</p>
-            <ActionButton variant="primary" @click="reporting = true">La vi · Reportar avistamiento</ActionButton>
+            <NavigationLink :to="'/ayudar/' + slug" class="primary">La vi o la encontré</NavigationLink><p class="privacy">Publica tu ayuda en este caso con tu cuenta. La comunidad podrá verla.</p>
             <div class="actions"><ActionButton variant="primary" :working="shareBusy" @click="share">Compartir caso</ActionButton><ActionButton :working="copyBusy" @click="copy">Copiar enlace</ActionButton></div>
           </section>
+          <section v-if="active.contributions" aria-label="Ayuda de la comunidad"><h2>Ayuda de la comunidad</h2><p v-if="!active.contributions.length">Aún no hay avisos públicos.</p><article v-for="notice in active.contributions" :key="notice.id"><h3>{{ notice.kind === 'with_reporter' ? 'La encontró y está con ella' : 'Avistamiento' }}</h3><p>{{ notice.text }}</p><p>{{ dateLabel(notice.occurredAt) }}</p><NavigationLink :to="'/casos/encontrados/' + notice.id">Ver aviso</NavigationLink></article></section>
           <ActionButton variant="text-button" :working="state.refreshing" @click="refresh">Actualizar estado</ActionButton>
         </div>
       </StaggerReveal>

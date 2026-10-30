@@ -23,13 +23,13 @@ export class SupabaseCaseDataSource implements CaseSource {
   }
   async rawCase(slug: string, signal?: AbortSignal): Promise<unknown> {
     try {
-      const response = await this.fetcher(`${this.url}/rest/v1/rpc/read_qr_case`, {
+      const response = await this.fetcher(`${this.url}/rest/v1/rpc/read_qr_case_with_contributions`, {
         method: 'POST', headers: { ...this.headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({ p_slug: slug }), redirect: 'error', cache: 'no-store',
         signal: AbortSignal.any([AbortSignal.timeout(5000), ...(signal ? [signal] : [])]),
       });
       if (!response.ok) throw new ReaderFailure();
-      return JSON.parse(new TextDecoder().decode(await limitedBytes(response, 32768)));
+      return JSON.parse(new TextDecoder().decode(await limitedBytes(response, 131072)));
     } catch { throw new ReaderFailure(); }
   }
   async photo(bucket: string, path: string, signal?: AbortSignal) {

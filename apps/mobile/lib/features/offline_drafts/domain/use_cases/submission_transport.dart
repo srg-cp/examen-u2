@@ -2,24 +2,16 @@ import '../../../lost_cases/domain/entities/lost_case.dart';
 import '../../../lost_cases/domain/use_cases/publish_lost_case.dart';
 import '../../../found_cases/domain/entities/found_case.dart';
 import '../../../found_cases/domain/use_cases/found_case_actions.dart';
-import '../../../sightings/domain/entities/sighting.dart';
-import '../../../sightings/domain/use_cases/sighting_actions.dart';
 import '../entities/local_report_draft.dart';
 import '../entities/queued_report.dart';
 
 /// Uses the same concrete product operations and receipt validation as the editors.
 class SubmissionTransport {
-  const SubmissionTransport(
-    this._lostAction,
-    this._foundAction,
-    this._sightingAction,
-  );
+  const SubmissionTransport(this._lostAction, this._foundAction);
   final PublishLostCase Function() _lostAction;
   final PublishFoundCase Function() _foundAction;
-  final SubmitSighting Function() _sightingAction;
   PublishLostCase get lost => _lostAction();
   PublishFoundCase get found => _foundAction();
-  SubmitSighting get sighting => _sightingAction();
 
   LostCaseDraft _lost(LocalReportDraft d) => LostCaseDraft(
     id: d.id,
@@ -57,18 +49,6 @@ class SubmissionTransport {
     );
   }
 
-  SightingDraft _sighting(LocalReportDraft d) {
-    final parts = d.slot.split(':');
-    return SightingDraft(
-      id: d.id,
-      target: SightingTarget(parts[2], parts[1] == 'true'),
-      observedAt: d.instant!,
-      point: SightingPoint(d.latitude!, d.longitude!, accuracy: d.accuracy),
-      comment: d.comment,
-      photo: d.photo,
-    );
-  }
-
   void validate(LocalReportDraft d) {
     if (d.owner.isEmpty ||
         !d.frozen ||
@@ -90,9 +70,6 @@ class SubmissionTransport {
         throw const SubmissionFailure(SubmissionIssue.invalid);
       }
       found.validate(_found(d), DateTime.now());
-    } else if (d.slot.startsWith('sighting:') &&
-        d.slot.split(':').length == 3) {
-      sighting.validate(d.owner, _sighting(d));
     } else {
       throw const SubmissionFailure(SubmissionIssue.invalid);
     }
@@ -107,6 +84,6 @@ class SubmissionTransport {
         d.slot.startsWith('found:')) {
       return SubmissionReceipt.found(await found(d.owner, _found(d)));
     }
-    return SubmissionReceipt.sighting(await sighting(d.owner, _sighting(d)));
+    throw const SubmissionFailure(SubmissionIssue.invalid);
   }
 }

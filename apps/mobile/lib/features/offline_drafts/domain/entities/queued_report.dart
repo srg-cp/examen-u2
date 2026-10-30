@@ -1,6 +1,5 @@
 import '../../../lost_cases/domain/entities/lost_case.dart';
 import '../../../found_cases/domain/entities/found_case.dart';
-import '../../../sightings/domain/entities/sighting.dart';
 import 'local_report_draft.dart';
 
 enum SubmissionStatus { pending, sending, failed, published }
@@ -18,13 +17,11 @@ enum SubmissionIssue {
 }
 
 class SubmissionReceipt {
-  const SubmissionReceipt.lost(this.lost) : found = null, sighting = null;
-  const SubmissionReceipt.found(this.found) : lost = null, sighting = null;
-  const SubmissionReceipt.sighting(this.sighting) : lost = null, found = null;
+  const SubmissionReceipt.lost(this.lost) : found = null;
+  const SubmissionReceipt.found(this.found) : lost = null;
   final PublishedLostCase? lost;
   final FoundPublication? found;
-  final SightingReceipt? sighting;
-  String get id => lost?.id ?? found?.id ?? sighting!.id;
+  String get id => lost?.id ?? found!.id;
 }
 
 class QueuedReport {

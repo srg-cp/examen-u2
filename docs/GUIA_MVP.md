@@ -1,5 +1,9 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+30/10: retirada completa de avistamientos privados, [ADR-168](decisiones/168-retirada-completa-avistamientos-privados.md). Solo avisos públicos con cuenta. Patch042 después de041; actualizar móvil/web y servidor juntos, sin activación remota en esta tarea.
+
+29/10: ayuda pública unificada HU-06/10/12, con cuenta también desde QR. [ADR-167](decisiones/167-ayuda-publica-unificada-con-cuenta.md). Un acceso, avisos públicos y alertas existentes; históricos privados conservados. Plan041 y despliegue pendientes.
+
 29/10: ajuste visual autorizado de acciones de ficha móvil HU-07/08:
 Reportar avistamiento y La vi o la encontré adoptan tarjetas grises del mockup
 elegido. [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md).

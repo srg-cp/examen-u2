@@ -1,5 +1,9 @@
 export type RouteAccess = 'public' | 'guest' | 'account' | 'onboarding' | 'reviewer' | 'administrator' | 'recovery';
 
+export function contributionDestination(value: unknown): string | null {
+  return typeof value === 'string' && /^\/ayudar\/[0-9a-f]{64}$/.test(value) ? value : null;
+}
+
 // Every page must be registered here; the architecture check compares this
 // inventory with app/pages, including redirects and the public 404 fallback.
 export const routePolicies: Readonly<Record<string, RouteAccess>> = Object.freeze({
@@ -12,6 +16,7 @@ export const routePolicies: Readonly<Record<string, RouteAccess>> = Object.freez
   '/explorar': 'account',
   '/mis-mascotas': 'account',
   '/reportar': 'account',
+  '/ayudar/:slug': 'account',
   '/coincidencias': 'account',
   '/casos/:source/:id': 'account',
   '/cuentas-bloqueadas': 'account',

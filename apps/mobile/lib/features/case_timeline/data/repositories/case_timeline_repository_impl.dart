@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import '../../domain/entities/case_timeline.dart';
 import '../../domain/repositories/case_timeline_repository.dart';
 import '../data_sources/case_timeline_source.dart';
@@ -52,49 +50,6 @@ class CaseTimelineRepositoryImpl implements CaseTimelineRepository {
       }),
     ),
   );
-  @override
-  Future<SightingReview> detail(String owner, String id, int? before) => _run(
-    () async => CaseTimelineDto.detail(
-      await source.call(owner, 'read_sighting_review', {
-        'p_id': id,
-        'p_before_revision': before,
-      }),
-    ),
-  );
-  @override
-  Future<Uint8List?> evidence(String owner, String id) => _run(() async {
-    final value = await source.call(owner, 'read_sighting_evidence', {
-      'p_id': id,
-    });
-    if (value == null) return null;
-    if (value is! String || value.length > 1450000) {
-      throw const TimelineFailure(TimelineIssue.unavailable);
-    }
-    final bytes = base64Decode(
-      value.replaceAll(RegExp(r'\s'), ''),
-    ).asUnmodifiableView();
-    if (bytes.length < 4 ||
-        bytes.length > 1048576 ||
-        bytes[0] != 255 ||
-        bytes[1] != 216 ||
-        bytes[bytes.length - 2] != 255 ||
-        bytes.last != 217) {
-      throw const TimelineFailure(TimelineIssue.unavailable);
-    }
-    return bytes;
-  });
-  @override
-  Future<SightingDecision> review(String owner, ReviewCommand c) => _run(
-    () async => CaseTimelineDto.decision(
-      await source.call(owner, 'review_sighting', {
-        'p_command': c.id,
-        'p_id': c.sightingId,
-        'p_expected_revision': c.expectedRevision,
-        'p_state': c.state,
-        'p_reason': c.reason.trim(),
-      }),
-    ),
-  );
 }
 
 class UnavailableCaseTimelineRepository implements CaseTimelineRepository {
@@ -107,13 +62,4 @@ class UnavailableCaseTimelineRepository implements CaseTimelineRepository {
     TimelineTarget target,
     TimelineCursor? cursor,
   ) async => throw const TimelineFailure(TimelineIssue.unavailable);
-  @override
-  Future<SightingReview> detail(String owner, String id, int? before) async =>
-      throw const TimelineFailure(TimelineIssue.unavailable);
-  @override
-  Future<Uint8List?> evidence(String owner, String id) async =>
-      throw const TimelineFailure(TimelineIssue.unavailable);
-  @override
-  Future<SightingDecision> review(String owner, ReviewCommand command) async =>
-      throw const TimelineFailure(TimelineIssue.unavailable);
 }

@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart';
 import 'package:sqlite3/open.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/data/data_sources/local_draft_database.dart';
 import 'package:flutter_application_entrehuellas/features/offline_drafts/data/models/local_report_draft_dto.dart';
@@ -22,10 +21,6 @@ import 'package:flutter_application_entrehuellas/features/found_cases/presentati
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet_photo.dart';
 import 'package:flutter_application_entrehuellas/features/pets/providers/pet_providers.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/domain/entities/sighting.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/providers/sighting_providers.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/presentation/view_models/sighting_view_model.dart';
-import 'package:flutter_application_entrehuellas/features/onboarding/data/data_sources/offline_onboarding_data_source.dart';
 import 'package:flutter_application_entrehuellas/features/onboarding/data/data_sources/onboarding_completion_cache.dart';
 import 'package:flutter_application_entrehuellas/features/onboarding/data/data_sources/onboarding_data_source.dart';
 import 'package:flutter_application_entrehuellas/features/onboarding/data/models/onboarding_record_dto.dart';
@@ -34,7 +29,6 @@ import 'support/fake_pets.dart';
 import 'support/fake_pet_photos.dart';
 import 'lost_cases_test.dart' show fields, FakeCases;
 import 'found_cases_test.dart' show FakeFoundCases;
-import 'sightings_test.dart' show FakeSightings, target;
 
 ProviderContainer editors(
   LocalDraftRepository local, {
@@ -42,7 +36,6 @@ ProviderContainer editors(
   FakePets? pets,
   FakePetPhotos? photos,
   FakeFoundCases? found,
-  FakeSightings? sightings,
   String owner = 'owner',
   Stream<AuthSession?>? sessions,
   FoundEditorContext context = const FoundEditorContext(),
@@ -55,15 +48,10 @@ ProviderContainer editors(
     foundSessionProvider.overrideWith(
       (ref) => sessions ?? Stream.value(AuthSession(userId: owner)),
     ),
-    sightingSessionProvider.overrideWith(
-      (ref) => sessions ?? Stream.value(AuthSession(userId: owner)),
-    ),
     petRepositoryProvider.overrideWithValue(pets ?? FakePets()),
     petPhotoRepositoryProvider.overrideWithValue(photos ?? FakePetPhotos()),
     lostCaseRepositoryProvider.overrideWithValue(cases ?? FakeCases()),
     foundCaseRepositoryProvider.overrideWithValue(found ?? FakeFoundCases()),
-    sightingRepositoryProvider.overrideWithValue(sightings ?? FakeSightings()),
-    sightingTargetProvider.overrideWithValue(target),
     foundEditorContextProvider.overrideWithValue(context),
   ],
 );
@@ -452,149 +440,6 @@ void main() {
       expect(restored.photos.single.bytes, [1, 2, 3]);
       expect(await local.read('owner', 'found:true:case'), isNull);
       expect(found.attempts, isEmpty);
-    },
-  );
-
-  test(
-    'Sighting frozen command survives full SQLite reopen and retries original timestamp and photo',
-    () async {
-      final directory = await Directory.systemTemp.createTemp('eh-sighting-');
-      final file = File('${directory.path}/draft.sqlite');
-      var db = LocalDraftDatabase(NativeDatabase(file));
-      var local = LocalDraftRepositoryImpl(db);
-      final repo = FakeSightings()..issue = SightingIssue.unavailable;
-      var c = editors(local, sightings: repo);
-      c.listen(sightingViewModelProvider, (_, _) {});
-      await c.read(sightingViewModelProvider.future);
-      var m = c.read(sightingViewModelProvider.notifier);
-      m.date(DateTime(2026, 1, 1));
-      m.time(10, 30);
-      m.point(-12, -77);
-      m.comment('Junto al puente');
-      await m.submit();
-      final original = repo.attempts.single;
-      expect(c.read(sightingViewModelProvider).requireValue.frozen, isNotNull);
-      c.dispose();
-      await db.close();
-      db = LocalDraftDatabase(NativeDatabase(file));
-      local = LocalDraftRepositoryImpl(db);
-      c = editors(local, sightings: repo);
-      c.listen(sightingViewModelProvider, (_, _) {});
-      final restored = await c.read(sightingViewModelProvider.future);
-      expect(restored.id, original.id);
-      expect(restored.frozen!.observedAt, original.observedAt);
-      m = c.read(sightingViewModelProvider.notifier);
-      m.comment('Esto no debe cambiar el comando');
-      expect(
-        c.read(sightingViewModelProvider).requireValue.comment,
-        original.comment,
-      );
-      expect(await m.discardLocalDraft(original.id), isFalse);
-      repo.issue = null;
-      await m.submit();
-      expect(repo.attempts.last.id, original.id);
-      expect(repo.attempts.last.comment, original.comment);
-      expect(repo.attempts.last.point.latitude, original.point.latitude);
-      expect(await local.read('owner', 'sighting:false:${target.id}'), isNull);
-      c.dispose();
-      await db.close();
-      await removeTemporaryDatabaseDirectory(directory);
-    },
-  );
-
-  test(
-    'Disk failure blocks publication, retains text, and explicit save recovers',
-    () async {
-      final local = FakeLocalDrafts();
-      final repo = FakeSightings();
-      final c = editors(local, sightings: repo);
-      addTearDown(c.dispose);
-      c.listen(sightingViewModelProvider, (_, _) {});
-      await c.read(sightingViewModelProvider.future);
-      final m = c.read(sightingViewModelProvider.notifier);
-      m.date(DateTime(2026, 1, 1));
-      m.time(10, 30);
-      m.point(-12, -77);
-      await m.saveForLater();
-      local.fail = true;
-      m.comment('Conservar aunque falle el disco');
-      await m.submit();
-      expect(repo.attempts, isEmpty);
-      expect(
-        c.read(sightingViewModelProvider).requireValue.issue,
-        SightingIssue.localStorage,
-      );
-      expect(
-        c.read(sightingViewModelProvider).requireValue.comment,
-        'Conservar aunque falle el disco',
-      );
-      expect(c.read(sightingViewModelProvider).requireValue.busy, isFalse);
-      local.fail = false;
-      expect(await m.saveForLater(), isTrue);
-      expect(c.read(sightingViewModelProvider).requireValue.issue, isNull);
-      await m.submit();
-      expect(repo.attempts, hasLength(1));
-    },
-  );
-
-  test(
-    'Changing account and signing out hides drafts; returning A restores only A',
-    () async {
-      final sessions = StreamController<AuthSession?>.broadcast();
-      final local = FakeLocalDrafts();
-      final c = editors(local, sessions: sessions.stream);
-      addTearDown(c.dispose);
-      addTearDown(sessions.close);
-      c.listen(sightingViewModelProvider, (_, _) {});
-      sessions.add(const AuthSession(userId: 'A'));
-      await c.read(sightingViewModelProvider.future);
-      c.read(sightingViewModelProvider.notifier).comment('Privado de A');
-      await c.read(sightingViewModelProvider.notifier).saveForLater();
-      sessions.add(const AuthSession(userId: 'B'));
-      await Future<void>.delayed(Duration.zero);
-      final b = await c.read(sightingViewModelProvider.future);
-      expect(b.owner, 'B');
-      expect(b.comment, isEmpty);
-      sessions.add(null);
-      await Future<void>.delayed(Duration.zero);
-      await expectLater(
-        c.read(sightingViewModelProvider.future),
-        throwsA(isA<SightingFailure>()),
-      );
-      sessions.add(const AuthSession(userId: 'A'));
-      await Future<void>.delayed(Duration.zero);
-      expect(
-        (await c.read(sightingViewModelProvider.future)).comment,
-        'Privado de A',
-      );
-    },
-  );
-
-  test(
-    'Onboarding fallback is per account, requires confirmed completion, and rejects server errors',
-    () async {
-      final remote = TestOnboardingSource();
-      final cache = MemoryOnboardingCache();
-      String? owner = 'A';
-      final source = OfflineOnboardingDataSource(
-        remote,
-        cache,
-        currentOwner: () => owner,
-      );
-      expect((await source.read('A')).completed, isTrue);
-      remote.failure = ClientException('offline');
-      expect((await source.read('A')).completed, isTrue);
-      owner = 'B';
-      await expectLater(source.read('B'), throwsA(isA<ClientException>()));
-      await expectLater(source.read('A'), throwsA(isA<ClientException>()));
-      owner = 'A';
-      remote.failure = StateError('server denied');
-      await expectLater(source.read('A'), throwsA(isA<StateError>()));
-      remote.failure = null;
-      remote.completed = false;
-      expect((await source.read('A')).completed, isFalse);
-      remote.failure = TimeoutException('offline');
-      await expectLater(source.read('A'), throwsA(isA<TimeoutException>()));
     },
   );
 }

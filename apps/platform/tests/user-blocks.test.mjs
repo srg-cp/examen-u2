@@ -5,7 +5,6 @@ import {UserBlockViewModel} from '../shared/features/user_blocks/presentation/us
 import {HttpUserBlockRepository} from '../shared/features/user_blocks/data/http_user_block_repository.ts';
 import {ServerUserBlockRepository} from '../server/features/user_blocks/data/server_user_block_repository.ts';
 import {UserBlockSource} from '../server/features/user_blocks/data/user_block_source.ts';
-import {SupabaseSightingDataSource} from '../server/features/sightings/data/supabase_sighting_data_source.ts';
 import {RecoverySource} from '../server/features/recovery/data/recovery_source.ts';
 const entry={id:'cccccccc-cccc-4ccc-8ccc-cccccccccc42',label:'Reportante de Luna',enabled:false,version:0};
 const target={kind:'lost',id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa42'};
@@ -46,6 +45,5 @@ test('HU14.2 HTTP binds account and rejects mismatched receipts; source failures
 });
 test('HU14.2 blocked contribution failures remain distinct from authentication, retry uncertainty and private backend text',async()=>{
  const response=()=>Response.json({code:'42501',message:'interaction_blocked'},{status:403});
- await assert.rejects(new SupabaseSightingDataSource({url:'https://backend.test',key:'private'},response).submit({}),e=>e.kind==='blocked');
  await assert.rejects(new RecoverySource({url:'https://backend.test',key:'publishable'},'token',response).rpc('publish_recovery_report',{}),e=>e.kind==='blocked');
 });

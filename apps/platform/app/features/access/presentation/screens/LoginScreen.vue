@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const contributionReturn = useContributionReturn();
 import '../styles/login.css';
 import '../styles/credentials.css';
 import { useStaggerReveal, vStaggerReveal } from '~/composables/useStaggerReveal';
@@ -36,7 +37,7 @@ async function login() {
 }
 watch(() => state.value.notice, () => { if (state.value.failure) toast.value?.show(messages[state.value.failure.kind]); });
 watch(() => state.value.session, async session => {
-  if (session && !leaving) { leaving = true; await navigateTo(session.profile.onboardingCompleted ? '/inicio' : '/bienvenida', { replace: true }); }
+  if (session && !leaving) { leaving = true; await navigateTo(session.profile.onboardingCompleted ? contributionReturn() : '/bienvenida', { replace: true }); }
 });
 async function showRouteNotice() {
   if (!state.value.session && !state.value.failure) {

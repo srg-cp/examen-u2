@@ -12,7 +12,6 @@ import '../features/case_contacts/presentation/view_models/case_contact_view_mod
 import '../features/case_posters/presentation/widgets/case_share_button.dart';
 import '../features/case_contacts/presentation/widgets/case_contact_panel.dart';
 import '../features/content_reports/presentation/screens/content_report_screen.dart';
-import '../features/content_reports/presentation/widgets/report_content_button.dart';
 import '../features/case_closure/presentation/screens/case_closure_screen.dart';
 import '../features/found_cases/presentation/view_models/found_read_view_model.dart';
 import '../features/explore/presentation/view_models/explore_view_model.dart';
@@ -22,7 +21,6 @@ import '../features/explore/presentation/widgets/explore_section.dart';
 import '../features/explore/presentation/widgets/explore_map_button.dart';
 import '../features/case_timeline/presentation/widgets/timeline_access_button.dart';
 import '../features/case_timeline/presentation/screens/case_timeline_screen.dart';
-import '../features/case_timeline/presentation/screens/sighting_review_screen.dart';
 import '../features/explore/presentation/screens/explore_map_screen.dart';
 import '../features/case_posters/presentation/screens/case_poster_screen.dart';
 import '../features/case_posters/domain/entities/case_poster.dart';
@@ -32,9 +30,6 @@ import '../features/saved_cases/presentation/screens/saved_cases_screen.dart';
 import '../features/saved_cases/domain/entities/saved_case_ref.dart';
 import '../features/saved_cases/presentation/widgets/save_case_button.dart';
 import '../features/found_cases/presentation/widgets/recovery_case_actions.dart';
-import '../features/sightings/domain/entities/sighting.dart';
-import '../features/sightings/providers/sighting_providers.dart';
-import '../features/sightings/presentation/screens/sighting_screen.dart';
 import '../features/lost_cases/presentation/view_models/case_read_view_model.dart';
 import '../features/pets/presentation/view_models/pet_list_view_model.dart';
 import '../features/found_cases/providers/found_case_providers.dart';
@@ -154,7 +149,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path == '/home/coincidencias' ||
               state.uri.path == '/home/explore-map' ||
               state.uri.path.startsWith('/home/posters/') ||
-              state.uri.path.startsWith('/home/sightings/') ||
               state.uri.path.startsWith('/home/timeline/') ||
               state.uri.path.startsWith('/home/journey/') ||
               state.uri.path.startsWith('/home/denounce/') ||
@@ -346,32 +340,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: 'sightings/:source/:id',
-            redirect: (context, state) =>
-                !['lost', 'found'].contains(state.pathParameters['source']) ||
-                    !RegExp(
-                      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
-                    ).hasMatch(state.pathParameters['id'] ?? '')
-                ? '/home'
-                : null,
-            pageBuilder: (context, state) => entityEditorPage(
-              context: context,
-              key: state.pageKey,
-              source: state.extra,
-              child: ProviderScope(
-                overrides: [
-                  sightingTargetProvider.overrideWithValue(
-                    SightingTarget(
-                      state.pathParameters['id']!,
-                      state.pathParameters['source'] == 'found',
-                    ),
-                  ),
-                ],
-                child: const SightingScreen(),
-              ),
-            ),
-          ),
-          GoRoute(
             path: 'my-found-cases',
             pageBuilder: (context, state) => NoTransitionPage<void>(
               key: state.pageKey,
@@ -400,10 +368,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ? '/home/lost-cases/new'
                       : d.slot == 'community-search'
                       ? '/home/lost-cases/community/new'
-                      : p.length == 3 && p[0] == 'sighting'
-                      ? (receipt != null
-                            ? '/home/${p[1] == 'true' ? 'found-cases' : 'cases'}/${Uri.encodeComponent(p[2])}'
-                            : '/home/sightings/${p[1] == 'true' ? 'found' : 'lost'}/${Uri.encodeComponent(p[2])}')
                       : p.length == 3 && p[0] == 'found'
                       ? Uri(
                           path: '/home/found-cases/new',
@@ -428,8 +392,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ? '/home/lost-cases/new'
                       : draft.slot == 'community-search'
                       ? '/home/lost-cases/community/new'
-                      : parts.first == 'sighting' && parts.length == 3
-                      ? '/home/sightings/${parts[1] == 'true' ? 'found' : 'lost'}/${Uri.encodeComponent(parts[2])}'
                       : parts.first == 'found' && parts.length == 3
                       ? Uri(
                           path: '/home/found-cases/new',
@@ -610,7 +572,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
                 id: state.pathParameters['id']!,
                 recoveryActions: (value, onChanged) => RecoveryCaseActions(
-                  showSightingAction: true,
                   journey: CaseJourneyCard(
                     target: (id: value.id, community: false),
                   ),
@@ -661,11 +622,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'denounce/:kind/:id',
             redirect: (_, state) =>
-                ![
-                      'lost',
-                      'found',
-                      'sighting',
-                    ].contains(state.pathParameters['kind']) ||
+                !['lost', 'found'].contains(state.pathParameters['kind']) ||
                     !RegExp(
                       r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
                     ).hasMatch(state.pathParameters['id'] ?? '')
@@ -754,43 +711,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
               ),
             ),
-            routes: [
-              GoRoute(
-                path: 'sightings/:sighting',
-                pageBuilder: (context, state) => entityEditorPage(
-                  context: context,
-                  key: state.pageKey,
-                  source: state.extra,
-                  child: SightingReviewScreen(
-                    reportAction: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ReportContentButton(
-                          target: (
-                            kind: 'sighting',
-                            id: state.pathParameters['sighting']!,
-                          ),
-                        ),
-                        UserBlockPanel(
-                          onSettled: refreshCaseContacts,
-                          target: (
-                            kind: 'sighting',
-                            id: state.pathParameters['sighting']!,
-                          ),
-                        ),
-                      ],
-                    ),
-                    reviewKey: (
-                      target: (
-                        id: state.pathParameters['id']!,
-                        community: state.pathParameters['source'] == 'found',
-                      ),
-                      id: state.pathParameters['sighting']!,
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
           GoRoute(
             path: 'posters/:source/:id',

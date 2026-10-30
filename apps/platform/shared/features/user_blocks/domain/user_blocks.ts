@@ -1,7 +1,7 @@
 export type BlockIssue = 'invalid'|'unauthenticated'|'forbidden'|'conflict'|'unavailable';
 export class BlockFailure extends Error { constructor(readonly kind:BlockIssue) { super(kind); } }
 export type BlockEntry = Readonly<{ id:string;label:string;enabled:boolean;version:number }>;
-export type BlockTarget = Readonly<{ kind:'lost'|'found'|'sighting';id:string }>;
+export type BlockTarget = Readonly<{ kind:'lost'|'found';id:string }>;
 export type BlockPage = Readonly<{ items:readonly BlockEntry[];next:string|null }>;
 export type BlockChange = Readonly<{ entry:BlockEntry;enabled:boolean }>;
 export interface UserBlockRepository {
@@ -16,7 +16,7 @@ export class ReadUserBlocks {
 }
 export class PrepareUserBlock {
   constructor(private readonly repository:UserBlockRepository) {}
-  execute(target:BlockTarget) { if (!target || !['lost','found','sighting'].includes(target.kind) || !blockId(target.id)) throw new BlockFailure('invalid');return this.repository.prepare(target); }
+  execute(target:BlockTarget) { if (!target || !['lost','found'].includes(target.kind) || !blockId(target.id)) throw new BlockFailure('invalid');return this.repository.prepare(target); }
 }
 export class SetUserBlock {
   constructor(private readonly repository:UserBlockRepository) {}

@@ -18,7 +18,7 @@ class SubmitContentReport {
   Future<ReportReceipt> call(String actor, ReportCommand command) {
     if (actor.isEmpty) throw const ReportFailure(ReportIssue.forbidden);
     if (!_uuid.hasMatch(command.id) ||
-        !{'lost', 'found', 'sighting'}.contains(command.target.kind) ||
+        !{'lost', 'found'}.contains(command.target.kind) ||
         !RegExp(
           r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
         ).hasMatch(command.target.id)) {

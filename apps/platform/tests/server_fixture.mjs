@@ -12,7 +12,7 @@ export async function productionFixture(jpeg = new Uint8Array([255, 216, 255, 21
       if (req.headers.authorization !== 'Bearer '+ 'a'.repeat(30)) {res.writeHead(401);res.end();return;}
       res.writeHead(200, {'Content-Type':'application/json'});res.end(JSON.stringify({id:'11111111-1111-4111-8111-111111111125'}));return;
     }
-    if (req.url === '/rest/v1/rpc/read_qr_case') {
+    if (['/rest/v1/rpc/read_qr_case','/rest/v1/rpc/read_qr_case_with_contributions'].includes(req.url)) {
       reads++; for await (const chunk of req) { /* Drain test request; never record token. */ }
       if (fail) { res.writeHead(503); res.end('PRIVATE SDK FAILURE'); return; }
       res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(value)); return;

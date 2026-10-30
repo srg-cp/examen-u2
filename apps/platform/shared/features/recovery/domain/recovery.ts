@@ -27,7 +27,7 @@ export interface RecoveryRepository {
   pets(): Promise<readonly Pet[]>;
   savePet(draft: PetDraft): Promise<Pet>;
   uploadPetPhoto(pet: string, photo: ReportPhoto): Promise<void>;
-  targets(): Promise<readonly CaseCard[]>;
+  targets(slug?: string): Promise<readonly CaseCard[]>;
   publish(draft: ReportDraft, photos: readonly ReportPhoto[]): Promise<ReportReceipt>;
 }
 export class ReadCasePublication {
@@ -63,7 +63,7 @@ export class AddPetPhoto {
   constructor(private readonly repository: RecoveryRepository) {}
   execute(pet: string, photo: ReportPhoto) { if (!isId(pet) || !isId(photo.id) || !photo.bytes.length || photo.bytes.length > 8388608) throw new RecoveryFailure('photo'); return this.repository.uploadPetPhoto(pet, photo); }
 }
-export class ReadOpenSearches { constructor(private readonly repository: RecoveryRepository) {} execute() { return this.repository.targets(); } }
+export class ReadOpenSearches { constructor(private readonly repository: RecoveryRepository) {} execute(slug?: string) { if (slug !== undefined && !/^[0-9a-f]{64}$/.test(slug)) throw new RecoveryFailure('invalid'); return this.repository.targets(slug); } }
 export function validateReport(d: ReportDraft, photos: readonly ReportPhoto[], now = Date.now()): ReportDraft {
   if (!d || typeof d !== 'object' || Array.isArray(d) || !Array.isArray(photos) || ['place','traits','species','speciesDetail','size','sex'].some(key => typeof (d as unknown as Record<string,unknown>)[key] !== 'string')) throw new RecoveryFailure('invalid');
   const fields = [];

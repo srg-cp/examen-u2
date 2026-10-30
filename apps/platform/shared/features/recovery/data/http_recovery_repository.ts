@@ -17,7 +17,7 @@ export class HttpRecoveryRepository implements RecoveryRepository {
     const body = new FormData(); body.set('draft', JSON.stringify({ pet, id: photo.id })); body.append('photo', new Blob([new Uint8Array(photo.bytes)], { type: 'application/octet-stream' }), photo.id);
     await this.call('pet-photo', body, true);
   }
-  async targets() { return await this.call('targets') as readonly CaseCard[]; }
+  async targets(slug?: string) { return await this.call('targets' + (slug ? '?qr=' + encodeURIComponent(slug) : '')) as readonly CaseCard[]; }
   async publish(draft: ReportDraft, photos: readonly ReportPhoto[]) {
     const body = new FormData(); body.set('draft', JSON.stringify(draft));
     for (const photo of photos) body.append('photo', new Blob([new Uint8Array(photo.bytes)], { type: 'application/octet-stream' }), photo.id);

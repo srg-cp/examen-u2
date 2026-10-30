@@ -1,3 +1,4 @@
+import {historicalBundle} from './historical_bundle.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
@@ -5,7 +6,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { postgis } from '@electric-sql/pglite-postgis';
 const id=n=>`a0000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const owner=id(1),reporter=id(2),other=id(3),lost=id(10),found=id(11),linked=id(12),pet=id(20),photo=id(21),foundPhoto=id(22);
-const base=await readFile(new URL('../run_all.sql',import.meta.url),'utf8');
+const base=await historicalBundle();
 const plan=JSON.parse(await readFile(new URL('../migration_plans/040_case_matching.json',import.meta.url),'utf8'));
 const increment=(await Promise.all(plan.sources.map(path=>readFile(new URL('../'+path,import.meta.url),'utf8')))).join('\n');
 async function setup(t){
@@ -18,7 +19,7 @@ async function setup(t){
  create table auth.users(id uuid primary key,aud text,role text,email text,raw_user_meta_data jsonb);
  create function auth.uid() returns uuid language sql stable as $$select(nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid$$;
  grant usage on schema auth to authenticated;`);
- await db.exec(base);await db.exec(increment);
+ await db.exec(base);await db.exec(increment);await db.exec(increment);await db.exec(await readFile(new URL('../patchs/042_patch_remove_private_sightings.sql',import.meta.url),'utf8'));
  await db.query('insert into auth.users(id) values($1),($2),($3)',[owner,reporter,other]);
  await db.exec('update public.profiles set onboarding_completed_at=now()');
  await db.query("insert into public.pets(id,owner_id,name,species,size,age_months,traits) values($1,$2,'Luna','dog','small',12,'white ears')",[pet,owner]);
@@ -42,7 +43,7 @@ test('matching actor ownership, public snapshots, independent candidates, no lin
   await assert.rejects(db.query('select * from public.case_match_embeddings'),/permission denied/);
   await assert.rejects(db.query('select * from public.case_match_reviews'),/permission denied/);
  }
- await db.exec('reset role');await db.exec(increment);await db.exec(increment);await context();
+ await db.exec('reset role');await db.exec(await readFile(new URL('../patchs/042_patch_remove_private_sightings.sql',import.meta.url),'utf8'));await context();
 });
 test('matching normalized index, stale-write rejection, removal and current visibility',async t=>{
  const{db,actor,context}=await setup(t);const c=await context(),candidate=c.candidates[0];

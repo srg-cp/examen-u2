@@ -1,5 +1,7 @@
 # Cronología y revisión de avistamientos
 
+30/10: [ADR-168](../decisiones/168-retirada-completa-avistamientos-privados.md) retira por completo el sistema privado, por aclaración del usuario de que no existen registros antiguos. Sin compatibilidad de envío/revisión privada. Avisos públicos, notificaciones e historial de publicación/recuperación conservados; SQLite3 limpia slots retirados. Plan042 elimina tablas/RPC y actualiza dependencias; activación remota pendiente. Las notas anteriores son históricas.
+
 29/10: el motor móvil compartido elimina la cortina/fondo local previo al
 stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
 [Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).

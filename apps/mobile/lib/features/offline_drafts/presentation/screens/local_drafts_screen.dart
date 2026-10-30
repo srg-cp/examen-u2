@@ -70,8 +70,6 @@ class _LocalDraftsScreenState extends ConsumerState<LocalDraftsScreen> {
                                   ? 'Mascota perdida: ${d.pet?.fields.name ?? 'Mi mascota'}'
                                   : d.slot == 'community-search'
                                   ? 'Búsqueda de mascota'
-                                  : d.slot.startsWith('sighting:')
-                                  ? 'Avistamiento'
                                   : 'Aviso de mascota encontrada',
                             ),
                             if (d.target != null) Text(d.target!.name),

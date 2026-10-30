@@ -1,5 +1,6 @@
 import 'package:flutter_application_entrehuellas/features/offline_drafts/domain/use_cases/local_draft_actions.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
@@ -18,11 +19,9 @@ import 'package:flutter_application_entrehuellas/features/lost_cases/domain/enti
 import 'package:flutter_application_entrehuellas/features/lost_cases/domain/use_cases/publish_lost_case.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/entities/found_case.dart';
 import 'package:flutter_application_entrehuellas/features/found_cases/domain/use_cases/found_case_actions.dart';
-import 'package:flutter_application_entrehuellas/features/sightings/domain/use_cases/sighting_actions.dart';
 import 'package:flutter_application_entrehuellas/features/pets/domain/entities/pet.dart';
 import 'lost_cases_test.dart' show FakeCases, fields;
 import 'found_cases_test.dart' show FakeFoundCases;
-import 'sightings_test.dart' show FakeSightings;
 import 'offline_drafts_test.dart' show removeTemporaryDatabaseDirectory;
 
 LocalReportDraft command({
@@ -83,15 +82,11 @@ class IdempotentCases extends FakeCases {
   }
 }
 
-SubmissionTransport transport(
-  FakeCases cases, {
-  FakeFoundCases? found,
-  FakeSightings? sightings,
-}) => SubmissionTransport(
-  () => PublishLostCase(cases),
-  () => PublishFoundCase(found ?? FakeFoundCases()),
-  () => SubmitSighting(sightings ?? FakeSightings()),
-);
+SubmissionTransport transport(FakeCases cases, {FakeFoundCases? found}) =>
+    SubmissionTransport(
+      () => PublishLostCase(cases),
+      () => PublishFoundCase(found ?? FakeFoundCases()),
+    );
 
 class DelayedRejection extends FakeCases {
   final started = Completer<void>(), release = Completer<void>();
@@ -115,7 +110,7 @@ void main() {
   });
 
   test(
-    'Schema 1 upgrades to 2 without losing existing drafts or account separation',
+    'Schema 1 upgrades to 3 without losing existing drafts or account separation',
     () async {
       final dir = await Directory.systemTemp.createTemp('eh-queue-migration-');
       final file = File('${dir.path}/queue.sqlite');
@@ -131,10 +126,17 @@ void main() {
         d.id,
         LocalReportDraftDto.encode(d),
       ]);
+      raw.execute('INSERT INTO report_drafts VALUES(?,?,?,?)', [
+        'A',
+        'sighting:false:retired',
+        'retired',
+        '{}',
+      ]);
       raw.dispose();
       final db = LocalDraftDatabase(NativeDatabase(file));
       final repo = LocalDraftRepositoryImpl(db);
       expect((await repo.read('A', 'lost'))!.id, 'stable');
+      expect(await repo.read('A', 'sighting:false:retired'), isNull);
       await repo.enqueue(d);
       expect(
         (await repo.listQueue('A')).single.status,
@@ -145,12 +147,34 @@ void main() {
         (await db.customSelect('PRAGMA user_version').getSingle()).read<int>(
           'user_version',
         ),
-        2,
+        3,
       );
       await db.close();
       await removeTemporaryDatabaseDirectory(dir);
     },
   );
+
+  test('Schema 3 removes only retired private queue entries', () async {
+    final db = LocalDraftDatabase(NativeDatabase.memory());
+    final repo = LocalDraftRepositoryImpl(db);
+    await repo.enqueue(command());
+    await db.customStatement(
+      "INSERT INTO submission_queue(owner,id,payload,fingerprint,state,created_at,next_attempt_at) VALUES(?,?,?,?,?,?,?)",
+      [
+        'A',
+        'retired',
+        jsonEncode({'slot': 'sighting:false:old'}),
+        'old',
+        'pending',
+        0,
+        0,
+      ],
+    );
+    await db.migration.onUpgrade(db.createMigrator(), 2, 3);
+    expect(await db.queueRow('A', 'retired'), isNull);
+    expect((await repo.listQueue('A')).single.command.id, 'stable');
+    await db.close();
+  });
 
   for (final loseAfterPersist in [false, true]) {
     test(

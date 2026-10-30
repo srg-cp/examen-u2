@@ -1,5 +1,10 @@
 # Ficha pública móvil por tarjetas glass
 
+30/10: [ADR-168](../decisiones/168-retirada-completa-avistamientos-privados.md) retira por completo el sistema privado, por aclaración del usuario de que no existen registros antiguos. Sin compatibilidad de envío/revisión privada. Avisos públicos, notificaciones e historial de publicación/recuperación conservados; SQLite3 limpia slots retirados. Plan042 elimina tablas/RPC y actualiza dependencias; activación remota pendiente. Las notas anteriores son históricas.
+
+29/10: [ADR-167](../decisiones/167-ayuda-publica-unificada-con-cuenta.md) sustituye la doble entrada de ficha por «La vi o la encontré»: aviso público vinculado y alerta al creador según preferencias. QR requiere cuenta para publicar y conserva consulta pública. Históricos privados intactos; plan041/servidor pendientes de activación. Las notas anteriores sobre doble acceso son históricas.
+
+
 29/10, [ADR-166](../decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
 «Reportar avistamiento» y «La vi o la encontré» usan dos tarjetas sólidas gris
 claro, radio22, icono21 arriba a la izquierda y etiqueta14/600 debajo;
