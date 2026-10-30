@@ -11,6 +11,8 @@ import 'package:flutter_application_entrehuellas/features/explore/domain/entitie
 import 'explore_test.dart' show SearchFake;
 
 class DraftLocation implements CurrentLocationRepository {
+  @override
+  Stream<CurrentLocation> watch() => const Stream.empty();
   int calls = 0;
   bool fail = false;
   CurrentLocation point = const CurrentLocation(

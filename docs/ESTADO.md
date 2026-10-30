@@ -14,6 +14,30 @@ compilado en esta copia; sin instalación ni pruebas nativas porque emulator-555
 está reservado por el otro chat. Pendientes integración con su commit, capturas
 reales de GPS/manual y código, y completar el Word propio. No se cierra punto 3.
 
+## Examen Unidad II tipo 1 punto 2 —30/10/2026
+
+Trabajo exclusivo en `feature/examen-u2-punto-2`, copia aislada del examen.
+Precisión media; solicitud nativa cada30s/con50m y filtro adicional que exige
+AMBAS condiciones respecto de la última lectura aceptada. Stopwatch monotónico;
+timeout solo de primera lectura a10s y mensaje exacto «Tiempo agotado».
+CurrentLocationRepository.watch → WatchCurrentExploreLocation →
+exploreMapLocationProvider (AsyncValue<CurrentLocation?>). Errores reemplazan la
+lectura y el mapa no recurre a coordenadas GPS anteriores. Dispose/cambio de
+pantalla/segundo plano cancelan la escucha y el temporizador; log después de cancel.
+Permiso FINE junto a COARSE coincide con el ajuste de125c04d; precisión media intacta.
+
+Validación:29 pruebas pertinentes aprobadas y flutter analyze sin incidencias.
+APK debug compilado e instalado en emulator-5554 con JAVA_TOOL_OPTIONS de sesión
+`-Djdk.net.unixdomain.tmpdir=C:\Temp\eh-java`, sin cambiar Gradle/configuración global.
+Salida real final: PID9385, GPS detenido21:24:51.950 y confirmación nativa de
+actualizaciones detenidas21:24:51.951 (hora registrada por Android).
+Capturas reales con líneas seleccionadas, log, pruebas/análisis/build y Word
+propio de4 páginas revisadas visualmente. [Evidencias](evidencias/examen-u2-punto-2/README.md).
+Sin cambios en web/backend, publicación/push ni desarrollo de puntos3–5.
+Siguiente paso: integrar este commit en el repositorio individual del examen;
+incorporar el apartado del Word al documento final junto a los otros puntos.
+La validación en tiempo real del docente y el envío al Aula Virtual quedan al estudiante.
+
 ## Examen Unidad II tipo 1 — punto 1 —30/10/2026
 
 Cierre del punto 1: permiso FINE junto a COARSE en Android, precisión media

@@ -1,0 +1,13 @@
+--------- beginning of main
+10-30 21:22:22.997 I/flutter ( 9385): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-30 21:22:23.340 I/flutter ( 9385): The Dart VM service is listening on http://127.0.0.1:32791/8mhywD3fEpc=/
+10-30 21:22:24.903 D/FlutterGeolocator( 9385): Attaching Geolocator to activity
+10-30 21:22:32.370 D/FlutterGeolocator( 9385): Creating service.
+10-30 21:22:32.433 D/FlutterGeolocator( 9385): Binding to location service.
+10-30 21:22:33.928 D/FlutterGeolocator( 9385): Geolocator foreground service connected
+10-30 21:22:33.928 D/FlutterGeolocator( 9385): Initializing Geolocator services
+10-30 21:22:33.928 D/FlutterGeolocator( 9385): Flutter engine connected. Connected engine count 1
+10-30 21:24:00.227 E/FlutterGeolocator( 9385): Geolocator position updates started
+10-30 21:24:51.950 I/flutter ( 9385): GPS detenido
+10-30 21:24:51.951 E/FlutterGeolocator( 9385): Geolocator position updates stopped
+10-30 21:24:51.951 E/FlutterGeolocator( 9385): There is still another flutter engine connected, not stopping location service

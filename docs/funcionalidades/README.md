@@ -6,6 +6,9 @@
 - [Examen Unidad II tipo 1](examen-u2.md): punto 1 de ubicación en Explorar móvil;
   evidencia GPS del emulador y puntos 2–5 pendientes.
 
+- [Examen Unidad II tipo 1](examen-u2.md): ubicación en Explorar móvil;
+  punto 2 con seguimiento limitado, timeout y cancelación verificados; puntos 3–5 aparte.
+
 30/10: distribución [Android](distribucion-android.md) e
 [iOS](distribucion-ios.md) también desde `exuii-colque`, con prerelease
 `exuii-colque-build-N` por push; validación completa y publicación conjunta.

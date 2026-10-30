@@ -1,5 +1,6 @@
 import '../domain/repositories/current_location_repository.dart';
 import '../domain/use_cases/get_current_explore_location.dart';
+import '../domain/use_cases/watch_current_explore_location.dart';
 import '../domain/use_cases/read_explore_case_preview.dart';
 import '../../lost_cases/providers/lost_case_providers.dart';
 import '../../found_cases/providers/found_case_providers.dart';
@@ -28,6 +29,10 @@ final exploreSessionProvider = StreamProvider.autoDispose<AuthSession?>(
 
 final currentLocationRepositoryProvider = Provider<CurrentLocationRepository>(
   (ref) => throw StateError('CurrentLocationRepository must be injected'),
+);
+final watchCurrentExploreLocationProvider = Provider(
+  (ref) =>
+      WatchCurrentExploreLocation(ref.watch(currentLocationRepositoryProvider)),
 );
 final getCurrentExploreLocationProvider = Provider(
   (ref) =>

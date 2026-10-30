@@ -34,6 +34,7 @@ class DisabledLocation implements CurrentLocationRepository {
       throw const ExploreFailure(ExploreFailureKind.locationDisabled);
 
   // The point 2 tracking contract uses the same simulated failure.
+  @override
   Stream<CurrentLocation> watch() => Stream.error(
     const ExploreFailure(ExploreFailureKind.locationDisabled),
   );
