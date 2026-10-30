@@ -138,7 +138,9 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen>
                     key: ValueKey(data.owner),
                     items: data.items,
                     query: data.query,
-                    currentLocation: location.hasError ? null : location.asData?.value,
+                    currentLocation: location.hasError
+                        ? null
+                        : location.asData?.value,
                     locationUnavailable: location.hasError,
                     onManualLocationSelected: data.busy
                         ? null

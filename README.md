@@ -74,7 +74,8 @@ Círculo GPS cuyo radio es `accuracyMeters`, etiqueta «Precisión ± N m», cr�
 OpenStreetMap y selección manual cuando la ubicación no está disponible. La
 selección aplica el punto a la búsqueda real sin inventar precisión. Rama
 `feature/examen-u2-punto-3`, base `125c04d`; sin integración en el proyecto principal.
-43 pruebas locales aprobadas. Integración con punto 2 y capturas nativas pendientes;
+43 pruebas locales previas aprobadas. Punto 2 integrado, 30 pruebas conjuntas
+aprobadas y capturas nativas de GPS/selección manual incorporadas al documento;
 [contrato y validación](docs/funcionalidades/examen-u2-punto-3.md).
 
 Archivos móviles afectados, relativos a `apps/mobile`:

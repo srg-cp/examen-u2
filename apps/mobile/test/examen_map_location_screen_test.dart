@@ -41,6 +41,10 @@ class ScriptedTracking extends ExploreMapLocationViewModel {
     const ExploreFailure(ExploreFailureKind.locationTimeout),
     StackTrace.current,
   );
+  void deny() => state = AsyncError(
+    const ExploreFailure(ExploreFailureKind.locationDenied),
+    StackTrace.current,
+  );
 }
 
 class OfflineTiles extends TileProvider {
@@ -88,6 +92,26 @@ void main() {
       isNull,
     );
     expect(find.textContaining('Latitud:'), findsNothing);
+    expect(
+      tester
+          .widget<ExploreCaseMap>(find.byType(ExploreCaseMap))
+          .locationUnavailable,
+      isTrue,
+    );
+    expect(find.text('Toca el mapa para elegir tu ubicación.'), findsOneWidget);
+    expect(find.textContaining('Precisión ±'), findsNothing);
+    (container.read(exploreMapLocationProvider.notifier) as ScriptedTracking)
+        .deny();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('No tenemos permiso de ubicación.'), findsOneWidget);
+    expect(find.text('Toca el mapa para elegir tu ubicación.'), findsOneWidget);
+    expect(
+      tester
+          .widget<ExploreCaseMap>(find.byType(ExploreCaseMap))
+          .currentLocation,
+      isNull,
+    );
     await tester.pumpWidget(const SizedBox.shrink());
     container.dispose();
     await tester.pump();

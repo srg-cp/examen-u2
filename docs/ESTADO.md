@@ -2,6 +2,16 @@
 
 ## Examen Unidad II tipo 1 punto 3 en copia aislada —30/10/2026
 
+Cierre local: integrado punto 2 mediante cherry-pick de4245c8b, con conexión real
+de errores/lecturas al mapa. 30 pruebas integradas aprobadas y análisis sin
+incidencias; APK conjunto compilado e instalado. Capturas reales con teselas OSM,
+crédito, círculo y precisión64m; segunda captura con GPS global apagado, aviso y
+pin manual. Restaurado GPS al terminar. PDF combinado corregido a15 páginas y una
+sola carátula; incluye puntos1–3. Evidencias en docs/evidencias/examen-u2-punto-3.
+Sin cambios en carpetas originales ni desarrollo de puntos4–5.
+
+Historial previo:
+
 Worktree entreHuellas-examen-punto-3 desde125c04d. Círculo de precisión GPS en
 metros/etiqueta, selección manual en mapa sin lectura y crédito OpenStreetMap
 independiente de CARTO. No cambia GPS/seguimiento del punto 2 ni platform/backend.

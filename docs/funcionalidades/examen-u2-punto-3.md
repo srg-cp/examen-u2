@@ -26,6 +26,11 @@ no se versionan secretos ni se cambia el proveedor del proyecto original.
 
 ## Integración con el punto 2
 
+Integración realizada con el commit 4245c8b del punto 2 (cherry-pick bb1dcba).
+La pantalla conserva su seguimiento y consume la lectura actual; errores dejan
+ubicación nula y habilitan selección manual. Los párrafos siguientes describen
+el contrato acordado durante el desarrollo.
+
 El punto 2 mantiene la propiedad del repositorio GPS, watch(), sus límites,
 timeout y cancelación. Tras integrar ambos commits, en ExploreMapScreen conservar
 su provider/lifecycle/aviso y conectar:
@@ -40,7 +45,22 @@ No usar data.currentLocation como fallback tras error del seguimiento.
 En la rama independiente se usa data.currentLocation y su ausencia para permitir
 probar el flujo puntual del punto 1 sin copiar el seguimiento todavía no confirmado.
 
-## Validación y evidencia pendiente
+## Validación y evidencias
+
+Cierre local: 30 pruebas integradas aprobadas y análisis sin incidencias; APK
+debug conjunto compilado e instalado en emulator-5554. Se obtuvo lectura GPS
+-18.006598, -70.246300 con etiqueta Precisión ± 64 m y círculo visible tras zoom.
+Teselas OSM reales y atribución visibles. Después se apagó la ubicación global,
+se abrió el mapa y se tocó un punto: pin manual -11.988067, -77.042800 sin círculo
+ni precisión GPS, con aviso «Activa la ubicación del dispositivo». ADB confirmó
+is-location-enabled=false. Al terminar se restauró a true y posición de Tacna.
+Capturas reales de dispositivo y VS Code en docs/evidencias/examen-u2-punto-3.
+
+Documento combinado corregido: SI988-EXPRAC-U2-ColquePonceSergioAlberto.pdf,
+15 páginas con una sola carátula y puntos 1, 2 y 3. Copias Word propias preservan
+los documentos del otro chat. No incluye desarrollo de puntos 4–5.
+
+### Validación previa e historial
 
 43 pruebas aprobadas de mapa/precisión/selección manual, recorrido de pantalla,
 arquitectura, consistencia, retina y Recorrido; análisis Flutter sin incidencias.
