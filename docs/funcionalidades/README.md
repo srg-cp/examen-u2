@@ -1,5 +1,8 @@
 # Funcionalidades de Entre Huellas
 
+- [Examen Unidad II tipo 1](examen-u2.md): punto 1 de ubicación en Explorar móvil;
+  evidencia GPS del emulador y puntos 2–5 pendientes.
+
 30/10: distribución [Android](distribucion-android.md) e
 [iOS](distribucion-ios.md) también desde `exuii-colque`, con prerelease
 `exuii-colque-build-N` por push; validación completa y publicación conjunta.

@@ -1,5 +1,5 @@
-import '../../../places/domain/entities/search_place.dart';
+import '../entities/current_location.dart';
 
 abstract class CurrentLocationRepository {
-  Future<SearchPlace> locate();
+  Future<CurrentLocation> locate();
 }

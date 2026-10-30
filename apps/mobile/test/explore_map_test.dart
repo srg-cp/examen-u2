@@ -328,6 +328,10 @@ void main() {
         await tester.tap(find.text('Mapa'));
         await settleMap(tester);
         expect(find.byType(ExploreMapScreen), findsOneWidget);
+        expect(
+          find.text('Ubicación GPS\nLatitud: -12.050000\nLongitud: -77.050000'),
+          findsOneWidget,
+        );
         expect(source!.bounds, bounds);
         expect(
           container.read(exploreViewModelProvider).requireValue.query,

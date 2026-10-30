@@ -22,6 +22,31 @@
 
 ---
 
+## Examen práctico Unidad II — Tipo 1
+
+Repositorio individual: https://github.com/srg-cp/examen-u2. Alcance del examen:
+solo `apps/mobile`. Punto 1 implementado: entidad `CurrentLocation` con latitud,
+longitud y precisión en metros; GPS encapsulado en `DeviceLocationSource`;
+repositorio/caso de uso inyectados al ViewModel y coordenadas visibles en
+Explorar → Mapa. La precisión se conserva aunque falle la consulta de casos.
+Los puntos 2–5 y las capturas del emulador están pendientes.
+
+Archivos móviles afectados (relativos a `apps/mobile`):
+
+- `lib/features/explore/domain/entities/current_location.dart`
+- `lib/features/explore/domain/repositories/current_location_repository.dart`
+- `lib/features/explore/domain/use_cases/get_current_explore_location.dart`
+- `lib/features/explore/data/data_sources/device_location_source.dart`
+- `lib/features/explore/data/repositories/current_location_repository_impl.dart`
+- `lib/features/explore/presentation/state/explore_state.dart`
+- `lib/features/explore/presentation/view_models/explore_view_model.dart`
+- `lib/features/explore/presentation/screens/explore_map_screen.dart`
+- `lib/features/explore/presentation/widgets/explore_case_map.dart`
+- `test/current_location_test.dart`, `test/explore_filter_draft_test.dart`,
+  `test/explore_map_test.dart` y `test/support/fake_current_location.dart`.
+
+Validación y evidencias pendientes: [ficha del examen](docs/funcionalidades/examen-u2.md).
+
 ## 🐾 Sobre el proyecto
 
 Entre Huellas conecta a quienes buscan una mascota con personas que pueden aportar información para recuperarla. El MVP contempla búsquedas de mascotas perdidas, avisos vinculados, fichas públicas mediante QR y seguimiento de la recuperación.

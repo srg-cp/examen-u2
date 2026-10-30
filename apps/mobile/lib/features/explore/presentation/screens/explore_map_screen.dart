@@ -93,6 +93,7 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
                     key: ValueKey(data.owner),
                     items: data.items,
                     query: data.query,
+                    currentLocation: data.currentLocation,
                     emptyMessage: data.failed || data.busy
                         ? 'Puedes volver a Explorar para ajustar la búsqueda.'
                         : data.needsLocation

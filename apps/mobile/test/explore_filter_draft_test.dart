@@ -7,21 +7,21 @@ import 'package:flutter_application_entrehuellas/features/explore/domain/reposit
 import 'package:flutter_application_entrehuellas/features/explore/presentation/state/explore_filter_selection.dart';
 import 'package:flutter_application_entrehuellas/features/explore/presentation/view_models/explore_view_model.dart';
 import 'package:flutter_application_entrehuellas/features/explore/providers/explore_providers.dart';
-import 'package:flutter_application_entrehuellas/features/places/domain/entities/search_place.dart';
+import 'package:flutter_application_entrehuellas/features/explore/domain/entities/current_location.dart';
 import 'explore_test.dart' show SearchFake;
 
 class DraftLocation implements CurrentLocationRepository {
   int calls = 0;
   bool fail = false;
-  Completer<SearchPlace>? pending;
+  Completer<CurrentLocation>? pending;
   @override
-  Future<SearchPlace> locate() async {
+  Future<CurrentLocation> locate() async {
     calls++;
     if (fail) throw const ExploreFailure(ExploreFailureKind.locationDenied);
     return pending?.future ??
         Future.value(
-          const SearchPlace(
-            label: 'Ubicación actual',
+          const CurrentLocation(
+            accuracyMeters: 35,
             latitude: -12.05,
             longitude: -77.05,
           ),
@@ -119,7 +119,7 @@ void main() {
       sessions.add(const AuthSession(userId: 'a'));
       await container.read(exploreViewModelProvider.future);
       final vm = container.read(exploreViewModelProvider.notifier);
-      final pending = location.pending = Completer<SearchPlace>();
+      final pending = location.pending = Completer<CurrentLocation>();
       final old = vm.locateForFilter();
       expect(await vm.locateForFilter(), isNull);
       expect(location.calls, 2);
@@ -128,11 +128,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       await container.read(exploreViewModelProvider.future);
       pending.complete(
-        const SearchPlace(
-          label: 'Private old city',
-          latitude: 20,
-          longitude: 20,
-        ),
+        const CurrentLocation(accuracyMeters: 35, latitude: 20, longitude: 20),
       );
       expect(await old, isNull);
       expect(container.read(exploreViewModelProvider).requireValue.owner, 'b');

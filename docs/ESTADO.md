@@ -1,5 +1,21 @@
 # Estado del proyecto
 
+## Examen Unidad II tipo 1 — punto 1 —30/10/2026
+
+Solo móvil, sobre Explorar: `CurrentLocation` conserva latitud/longitud/precisión;
+DeviceLocationSource mantiene el único import de geolocator; repositorio y caso
+de uso inyectados al ViewModel. El mapa muestra las coordenadas GPS en el panel,
+independientes del centro manual y de los casos. Lectura conservada durante
+refresh/paginación y fallo de consulta. Sin cambios en platform o backend.
+[Ficha y pasos para evidencias](funcionalidades/examen-u2.md).
+
+Validación: 36 pruebas de ubicación/Explorar/filtros/mapa/arquitectura aprobadas,
+análisis Flutter sin incidencias y renders normal/pequeño con texto200%/reducido.
+Log `apps/mobile/build/examen-u2-punto-1-tests.log`. Capturas de pruebas con teselas
+neutras; pendiente GPS en emulador/dispositivo. Siguiente paso: recibir capturas
+reales del estudiante y completar el documento del punto 1. Puntos 2–5 pendientes;
+sin afirmar cierre del examen ni cambiar el Word.
+
 ## Repositorio individual examen-u2 —30/10/2026
 
 Destino confirmado: srg-cp/examen-u2, remoto examen, rama remota main.

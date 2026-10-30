@@ -5,7 +5,8 @@ enum DeviceLocationIssue { denied, disabled }
 class DeviceLocationSource {
   const DeviceLocationSource();
 
-  Future<({double latitude, double longitude})> locate() async {
+  Future<({double latitude, double longitude, double accuracyMeters})>
+  locate() async {
     if (!await Geolocator.isLocationServiceEnabled().timeout(
       const Duration(seconds: 5),
     )) {
@@ -27,6 +28,10 @@ class DeviceLocationSource {
         timeLimit: Duration(seconds: 12),
       ),
     );
-    return (latitude: position.latitude, longitude: position.longitude);
+    return (
+      latitude: position.latitude,
+      longitude: position.longitude,
+      accuracyMeters: position.accuracy,
+    );
   }
 }

@@ -1,3 +1,4 @@
+import '../../domain/entities/current_location.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/state/retained_query.dart';
 import '../../domain/entities/explore_query.dart';
@@ -32,11 +33,13 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       throw const ExploreFailure(ExploreFailureKind.forbidden);
     }
     ExploreQuery query;
+    late CurrentLocation currentLocation;
     try {
       final center = await ref.read(getCurrentExploreLocationProvider)();
       if (!ref.mounted || generation != _generation) {
         throw const ExploreFailure(ExploreFailureKind.forbidden);
       }
+      currentLocation = center;
       query = ExploreQuery(
         latitude: center.latitude,
         longitude: center.longitude,
@@ -56,6 +59,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       if (ref.mounted && generation == _generation) retained.markFresh();
       return ExploreState(
         owner: session.userId,
+        currentLocation: currentLocation,
         query: query,
         items: page.items,
         cursor: page.nextCursor,
@@ -64,6 +68,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     } catch (_) {
       return ExploreState(
         owner: session.userId,
+        currentLocation: currentLocation,
         query: query,
         items: const [],
         failed: true,
@@ -105,6 +110,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: current.owner,
+          currentLocation: current.currentLocation,
           query: current.query,
           items: current.items,
           cursor: current.cursor,
@@ -154,7 +160,11 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           state.asData?.value.owner != old.owner) {
         return null;
       }
-      return place;
+      return SearchPlace(
+        label: 'Ubicación actual',
+        latitude: place.latitude,
+        longitude: place.longitude,
+      );
     } catch (error) {
       if (ref.mounted &&
           generation == _generation &&
@@ -162,6 +172,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         state = AsyncData(
           ExploreState(
             owner: old.owner,
+            currentLocation: old.currentLocation,
             query: old.query,
             items: old.items,
             cursor: old.cursor,
@@ -223,6 +234,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     state = AsyncData(
       ExploreState(
         owner: old.owner,
+        currentLocation: old.currentLocation,
         query: old.query,
         items: old.items,
         cursor: old.cursor,
@@ -251,12 +263,14 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
         replace: true,
         locationLabel: '',
         centerName: 'Ubicación actual',
+        currentLocation: center,
       );
     } catch (error) {
       if (!ref.mounted || generation != _generation || state.isLoading) return;
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          currentLocation: old.currentLocation,
           query: old.query,
           items: old.items,
           cursor: old.cursor,
@@ -286,6 +300,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     String? locationLabel,
     String? centerName,
     bool background = false,
+    CurrentLocation? currentLocation,
   }) async {
     final g = ++_generation;
     _backgroundLoading = background;
@@ -301,6 +316,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          currentLocation: currentLocation ?? old.currentLocation,
           locationLabel: appliedLabel,
           centerName: appliedName,
           query: query,
@@ -333,6 +349,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          currentLocation: currentLocation ?? old.currentLocation,
           locationLabel: appliedLabel,
           centerName: appliedName,
           query: query,
@@ -352,6 +369,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       state = AsyncData(
         ExploreState(
           owner: old.owner,
+          currentLocation: currentLocation ?? old.currentLocation,
           locationLabel: appliedLabel,
           centerName: appliedName,
           query: query,

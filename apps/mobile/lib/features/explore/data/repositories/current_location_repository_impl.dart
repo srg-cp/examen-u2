@@ -1,4 +1,4 @@
-import '../../../places/domain/entities/search_place.dart';
+import '../../domain/entities/current_location.dart';
 import '../../domain/failures/explore_failure.dart';
 import '../../domain/repositories/current_location_repository.dart';
 import '../data_sources/device_location_source.dart';
@@ -8,13 +8,13 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
   final DeviceLocationSource _source;
 
   @override
-  Future<SearchPlace> locate() async {
+  Future<CurrentLocation> locate() async {
     try {
       final point = await _source.locate();
-      return SearchPlace(
-        label: 'Ubicación actual',
+      return CurrentLocation(
         latitude: point.latitude,
         longitude: point.longitude,
+        accuracyMeters: point.accuracyMeters,
       );
     } catch (error) {
       throw ExploreFailure(switch (error) {
@@ -30,6 +30,6 @@ class UnavailableCurrentLocationRepository
     implements CurrentLocationRepository {
   const UnavailableCurrentLocationRepository();
   @override
-  Future<SearchPlace> locate() async =>
+  Future<CurrentLocation> locate() async =>
       throw const ExploreFailure(ExploreFailureKind.unavailable);
 }

@@ -7,6 +7,7 @@ import '../../../../core/presentation/widgets/collection_empty_state.dart';
 import '../../../../core/presentation/widgets/map_case_sheet.dart';
 import '../../domain/entities/explore_page.dart';
 import '../../domain/entities/explore_query.dart';
+import '../../domain/entities/current_location.dart';
 import 'explore_map_pins.dart';
 import 'explore_map_case_preview.dart';
 
@@ -19,10 +20,12 @@ class ExploreCaseMap extends StatefulWidget {
     this.emptyMessage,
     this.createTileProvider,
     this.previewBuilder,
+    this.currentLocation,
     super.key,
   });
   final List<ExploreCase> items;
   final ExploreQuery query;
+  final CurrentLocation? currentLocation;
   final void Function(ExploreCase, BuildContext)? onOpen;
   final List<Widget> trailing;
   final String? emptyMessage;
@@ -129,6 +132,15 @@ class _ExploreCaseMapState extends State<ExploreCaseMap> {
       panelBuilder: (onSummaryHeight) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (widget.currentLocation case final location? when item == null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+              child: Text(
+                'Ubicación GPS\n'
+                'Latitud: ${location.latitude.toStringAsFixed(6)}\n'
+                'Longitud: ${location.longitude.toStringAsFixed(6)}',
+              ),
+            ),
           if (item == null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),

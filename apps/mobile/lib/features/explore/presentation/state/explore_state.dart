@@ -1,5 +1,6 @@
 import '../../domain/entities/explore_page.dart';
 import '../../domain/entities/explore_query.dart';
+import '../../domain/entities/current_location.dart';
 
 class ExploreState {
   ExploreState({
@@ -15,6 +16,7 @@ class ExploreState {
     this.noticeId = 0,
     this.locationLabel = '',
     this.centerName = '',
+    this.currentLocation,
   }) : items = List.unmodifiable(items);
   final String owner;
   final ExploreQuery query;
@@ -23,6 +25,7 @@ class ExploreState {
   final bool refreshing, appending, failed, applying;
   final int noticeId;
   final String locationLabel, centerName;
+  final CurrentLocation? currentLocation;
 
   bool get busy => refreshing || appending;
   bool get needsLocation => query.latitude == null || query.longitude == null;
