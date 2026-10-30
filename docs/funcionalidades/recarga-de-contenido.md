@@ -1,5 +1,13 @@
 # Recarga de contenido por gesto móvil
 
+30/10, [ADR-170](../decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md):
+el gesto debe comenzar arriba y hacia abajo, desde cualquier altura del contenido.
+El tirón controla exclusivamente el círculo hasta soltar/cancelar; retroceder lo
+recoge y desarma bajo el umbral, sin scroll simultáneo ni recarga al cancelar.
+Un nuevo gesto desplaza normalmente. Llegar al top desde más abajo o invertir
+un scroll iniciado hacia arriba no muestra el círculo. Aspecto y operaciones
+conservados; sustituye reconocimiento/ajuste posterior de ADR-162.
+
 PullToRefresh es presentación compartida de los consumidores existentes:
 Inicio/Explorar/Mis mascotas, guardados, ubicaciones, avisos y recorridos que
 declaran recarga. PullToRefreshTarget inscribe la operación de la sección activa.
@@ -24,3 +32,10 @@ clamping/bouncing, normal/reducido, gesto parcial/completo/largo y duplicados.
 Análisis lib/test sin incidencias; sin nueva activación de backend ni cierre de
 historias. Pendiente recompilar y revisar Android/iOS físicamente, incluidos
 texto ampliado y pantallas pequeñas. Logs y límites en ESTADO.
+
+Validación30/10:42 pruebas aprobadas de gesto/consumidores/arquitectura y
+consistencia, incluidas nueve regresiones nuevas. Normal/reducido, clamping/
+bouncing,320×600 y texto200%, cancelación/desmontaje y duplicados comprobados.
+Análisis completo inicial y focalizado final limpios; detalles en ESTADO.
+Pendiente recompilar y revisar el gesto físicamente en Android/iOS; sin nuevas
+capturas visuales ni activación de backend.

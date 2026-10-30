@@ -1,5 +1,14 @@
 # Entre Huellas: instrucciones del proyecto
 
+30/10, [ADR-171](docs/decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+Perfil móvil usa resumen con chevrón, tres grupos y editor separado. Reutilizar
+formulario/estado reales y filas/shell compartidos. Editor y seis destinos entran
+desde derecha y regresan en sentido inverso,320/260ms/easeInOutCubic, mediante
+horizontalPage/HorizontalPageTransition; una entrada inicial, sin stagger añadido.
+Cambios discretos de etapa conservan su reveal. Avatar de Inicio conserva origen;
+glass perla/polished, privacidad, guardado/descarte y reducido conservados. Alcance
+móvil explícito, sin migración web ni cambio global de animaciones.
+
 29/10, [ADR-165](docs/decisiones/165-pines-con-logo-compartidos-mobile-web.md):
 todos los pines internos usan silueta y logo oficiales mediante BrandMapPin
 móvil y SVG equivalente en LocationMap web; no volver al pin Material estándar.

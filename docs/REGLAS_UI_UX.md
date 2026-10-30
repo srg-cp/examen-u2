@@ -1,5 +1,19 @@
 # Entre Huellas: regla de oro de UI y UX
 
+30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+Perfil móvil con resumen navegable, grupos Mi actividad/Alertas y zonas/Privacidad
+y editor aparte. Filas completas, cards perla y controles polished compartidos.
+Destinos internos con entrada horizontal desde derecha/retorno inverso320/260ms,
+easeInOutCubic; sin stagger simultáneo. Etapas nuevas conservan su entrada única.
+Avatar de Inicio mantiene expansión desde origen. Títulos adaptan fila y scroll
+con texto200%; privacidad, operaciones/reintentos y reducido intactos. Solo móvil.
+
+30/10, [ADR-170](decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md): recarga
+solo si el arrastre comienza arriba y hacia abajo. El tirón adquirido controla
+exclusivamente el indicador hasta soltar/cancelar; invertir recoge y desarma bajo
+el umbral sin mover contenido. Otro gesto permite scroll normal, incluso durante
+la consulta. Sustituye reconocimiento y ajuste posterior al top de ADR-162.
+
 30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
 por solicitud de actualización sin recarga visible, la revalidación automática de
 Explorar/listas de mascotas conserva contenido sin shimmer ni skeleton. Refresh

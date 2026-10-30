@@ -6,6 +6,27 @@ import 'package:flutter/material.dart';
 const _elementDurationMs = 850;
 const _gapMs = 90;
 
+/// A route can own the initial entrance instead of layering a content stagger.
+/// Discrete stages inside that page can restore their usual content entrance.
+class PageEntranceScope extends InheritedWidget {
+  const PageEntranceScope({
+    required this.routeOwnsEntrance,
+    required super.child,
+    super.key,
+  });
+  final bool routeOwnsEntrance;
+
+  static bool routeOwnsEntranceOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<PageEntranceScope>()
+          ?.routeOwnsEntrance ??
+      false;
+
+  @override
+  bool updateShouldNotify(PageEntranceScope oldWidget) =>
+      routeOwnsEntrance != oldWidget.routeOwnsEntrance;
+}
+
 /// One entrance timeline shared by staggered elements, without changing layout.
 class StaggerReveal extends StatefulWidget {
   const StaggerReveal({
@@ -50,7 +71,7 @@ class _StaggerRevealState extends State<StaggerReveal>
   }
 
   void _start() {
-    if (!widget.enabled) {
+    if (!widget.enabled || PageEntranceScope.routeOwnsEntranceOf(context)) {
       _controller.value = 1;
       return;
     }

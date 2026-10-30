@@ -1,5 +1,18 @@
 # Diseño de la interfaz: implementación y revisión
 
+30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+Perfil con identidad navegable y chevrón, grupos perla radio22/fila completa/icono22
+y salida danger suave separada. Editor con avatar112/cámara polished40, campos
+compartidos y Guardar cambios habilitado solo con edición. Cabecera glass52 y
+título Poppins32 compartidos; título en fila propia cuando falta ancho. Navegación
+interna derecha→centro y retorno inverso320/260ms/easeInOutCubic, sin doble entrada;
+reducido directo, scroll/confirmación de descarte y privacidad conservados.
+
+30/10, [ADR-170](decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md): el tirón
+adquirido conserva el contenido arriba y controla solo el indicador hasta soltar.
+Inversión recoge/desarma; llegar al top desde el contenido no habilita recarga.
+Aspecto, giro, umbral relativo, tiempos, reducido y callbacks conservados.
+
 29/10, [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
 en ficha móvil, Reportar avistamiento y La vi o la encontré reutilizan las
 tarjetas grises sólidas del mockup elegido: radio22, icono21 y etiqueta14/600

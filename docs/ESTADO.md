@@ -1,5 +1,73 @@
 # Estado del proyecto
 
+## Perfil agrupado y editor con navegación horizontal —30/10/2026
+
+Por aprobación de los mockups imagegen y solicitud explícita de movimiento
+horizontal, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md)
+y [ficha](funcionalidades/perfil.md). Perfil móvil muestra una fila de identidad
+con chevrón y grupos Mi actividad/Alertas y zonas/Privacidad. Editor separado con
+avatar112/cámara polished, nombre, correo seleccionable de solo lectura/candado,
+ciudad y celular opcional privado. Se reutilizan formulario, estados, casos de uso,
+repositorios, campos, buscador, materiales y navegación glass existentes.
+
+Editor y seis destinos comparten horizontalPage/HorizontalPageTransition:
+entrada desde derecha, anterior a izquierda, retorno inverso320/260ms/easeInOutCubic.
+PageEntranceScope impide duplicar la entrada inicial con stagger; etapas discretas
+posteriores conservan AuthStageTransition. Avatar de Inicio conserva su expansión
+desde origen. Título adaptable, filas completas/scroll y etiquetas que ganan ancho
+al ampliar texto; sin reducir fuente ni cambiar material. Guardar conserva bloqueo,
+shimmer completo y toast confirmado; cancelar descarte conserva cambios/fotos
+pendientes, Atrás no sale durante operaciones y reabrir no repite éxito anterior.
+
+Validación:135 pruebas aprobadas de perfil/foto, siete destinos, guardado/descarte,
+acceso, identidad, skeleton/error/reintento, movimiento/etapas, preferencias/zonas,
+bloqueos/apelaciones/borradores/cola y arquitectura/consistencia. Análisis Flutter
+completo sin incidencias. Después del ajuste visual de etiquetas ampliadas:20
+pruebas de navegación/scope/carga/arquitectura aprobadas y tres recorridos finales
+con comprobación de palabra completa,390×844 y320×350/texto200%, normal/reducido y
+teclado abierto. Análisis focalizado final sin incidencias; formato de740 archivos
+sin cambios y git diff --check correctos. Los primeros ensayos nuevos necesitaron
+sincronizar la entrega del cambio de cuenta y el frame previo al Atrás del sistema;
+la inspección de renders detectó/corrigió el corte de una palabra con texto200%.
+
+Logs locales: apps/mobile/build/profile-ui-final-tests.log,
+profile-ui-layout-final.log, profile-ui-navigation-final.log,
+profile-ui-analysis.log y profile-ui-analysis-final.log.
+[Revisión visual y capturas](revisiones/perfil-mobile-2026-10-30.md) con fuentes
+locales y datos de prueba; apertura/cierre intermedios comprobados por posición.
+Las pruebas de zonas emitieron avisos de teselas HTTP400 sin fallar; no se acredita
+cartografía remota ni permisos nuevos por estos ensayos.
+
+Siguiente paso: recompilar y comprobar tacto/teclado/galería en Android físico.
+Sin APK/IPA nuevo, prueba hosted, cambios SQL/web, despliegue, commit ni cierre
+de historias. Trabajo local anterior del gesto de recarga conservado.
+
+## Tirón de recarga: inversión y activación desde el borde —30/10/2026
+
+[ADR-170](decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md) y
+[ficha](funcionalidades/recarga-de-contenido.md). PullToRefresh decide elegibilidad
+al comenzar el arrastre arriba/hacia abajo; llegar al borde desde el contenido o
+invertir un scroll ordinario no muestra el indicador. El tirón adquirido mantiene
+el contenido arriba y controla solo el círculo hasta soltar/cancelar. Retroceder
+bajo el umbral desarma incluso después de alcanzarlo. Otro gesto permite scroll
+normal, también durante la consulta. Aspecto, movimiento reducido, callbacks,
+shimmer y protección de duplicados conservados; sin dominio/data, SQL o web.
+
+Validación:42 pruebas aprobadas del gesto, Inicio, mascotas, ContentRefresh,
+arquitectura y consistencia. Nueve regresiones nuevas cubren inversión, llegada
+al borde, cancelación, inicio hacia arriba,320×600/texto200%/movimiento reducido
+y desmontaje con puntero activo. La primera prueba de desmontaje detectó un
+evento tardío tras dispose; corregido y suite completa repetida con éxito.
+Flutter analyze --no-pub completo sin incidencias antes de esa corrección;
+análisis focalizado final de componente/pruebas y formato sin incidencias.
+Logs: apps/mobile/build/pull-gesture-tests.log, pull-gesture-analysis.log y
+pull-gesture-analysis-final.log. Comprobaciones de posiciones en fotogramas de
+arrastre/retirada; no nuevas capturas visuales ni prueba táctil física.
+
+Siguiente paso: recompilar y verificar tacto en Android/iOS, especialmente tirón
+largo, inversión y scroll posterior. Sin APK/IPA nuevo, despliegue, commit ni
+aceptación física. No se amplía MVP ni se cierran historias.
+
 ## Retención móvil y revalidación sin vaciar listas —30/10/2026
 
 Ante la solicitud de fluidez y menor consumo antes del lanzamiento, primer incremento

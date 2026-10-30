@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_page_background.dart';
+import 'stagger_reveal.dart';
 
 /// A curtain with the shared background covers content without scaling it.
 class CoverReveal extends StatelessWidget {
@@ -45,6 +46,7 @@ class AuthStageTransition extends StatefulWidget {
 
 class _AuthStageTransitionState extends State<AuthStageTransition> {
   Key _stageKey = UniqueKey();
+  bool _changedStage = false;
 
   @override
   void didUpdateWidget(AuthStageTransition oldWidget) {
@@ -54,10 +56,14 @@ class _AuthStageTransitionState extends State<AuthStageTransition> {
         oldWidget.enabled &&
         oldWidget.stage != widget.stage) {
       _stageKey = UniqueKey();
+      _changedStage = true;
     }
   }
 
   @override
-  Widget build(BuildContext context) =>
-      KeyedSubtree(key: _stageKey, child: widget.builder(true));
+  Widget build(BuildContext context) => PageEntranceScope(
+    routeOwnsEntrance:
+        !_changedStage && PageEntranceScope.routeOwnsEntranceOf(context),
+    child: KeyedSubtree(key: _stageKey, child: widget.builder(true)),
+  );
 }

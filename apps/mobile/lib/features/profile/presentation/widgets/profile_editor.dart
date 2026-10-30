@@ -123,22 +123,6 @@ class _ProfileFieldsState extends State<_ProfileFields> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppFieldSurface(
-          label: 'Correo electrónico',
-          icon: Icons.mail_outline_rounded,
-          child: Semantics(
-            label: 'Correo electrónico',
-            child: SelectableText(
-              state.profile.email ?? 'Correo no disponible',
-              style: const TextStyle(
-                fontSize: 16,
-                height: 27 / 16,
-                color: Color(0xFF6E6E73),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
         ShakeField(
           errorId: state.errorId,
           hasError: nameError,
@@ -150,9 +134,28 @@ class _ProfileFieldsState extends State<_ProfileFields> {
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.name],
             hint: 'Tu nombre',
-            icon: Icons.person_outline_rounded,
             invalid: nameError,
             onChanged: (value) => widget.onEdit(displayName: value),
+          ),
+        ),
+        const SizedBox(height: 20),
+        AppFieldSurface(
+          label: 'Correo electrónico',
+          suffix: const Icon(
+            Icons.lock_outline_rounded,
+            size: 22,
+            color: Color(0xFF6E6E73),
+          ),
+          child: Semantics(
+            label: 'Correo electrónico, solo lectura',
+            child: SelectableText(
+              state.profile.email ?? 'Correo no disponible',
+              style: const TextStyle(
+                fontSize: 16,
+                height: 27 / 16,
+                color: Color(0xFF6E6E73),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -200,7 +203,7 @@ class _ProfileFieldsState extends State<_ProfileFields> {
         ),
         const SizedBox(height: 12),
         const Text(
-          'Elige el país y escribe tu número. Se guarda en privado; tú eliges en qué fichas compartirlo. Cambiarlo aquí no modifica contactos ya publicados.',
+          'Se guarda en privado. Tú eliges en qué fichas compartirlo. Cambiarlo aquí no modifica contactos ya publicados.',
           style: TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF626975)),
         ),
         const SizedBox(height: 24),

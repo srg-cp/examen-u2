@@ -1,5 +1,11 @@
 # Funcionalidades de Entre Huellas
 
+30/10: [Perfil](perfil.md) móvil con resumen navegable, opciones agrupadas y editor
+separado; navegación horizontal interna y retorno inverso, [ADR-171](../decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md).
+
+30/10: [Recarga de contenido](recarga-de-contenido.md) corrige inversión del
+tirón y activación desde el borde; [ADR-170](../decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md).
+
 - [Retención de datos y actualización al volver](retencion-de-datos.md): primer
   incremento móvil en Explorar y mascotas, vigencia/retención acotadas y revalidación
   sin vaciar contenido. ADR-169; medición remota y alcance restante pendientes.

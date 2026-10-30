@@ -1,5 +1,17 @@
 # Arquitectura de Entre Huellas
 
+30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+Perfil móvil separa resumen y editor conservando ProfileViewModel/PhotoViewModel
+y formulario existentes. Shell y filas compartidos en profile; router compone
+destinos existentes y buscador por slot. HorizontalPageTransition y PageEntranceScope
+centralizan navegación lateral y exclusión del stagger inicial; etapas discretas
+posteriores conservan AuthStageTransition. Sin dominio/data/SQL ni cambios web.
+
+30/10, [ADR-170](decisiones/170-tiron-de-recarga-con-gesto-exclusivo.md):
+PullToRefresh concentra elegibilidad por arrastre, seguimiento de puntero y hold
+temporal del ScrollPosition observado. Libera al terminar/desmontarse, sin tomar
+controladores de las funcionalidades ni cambiar dominio/data/inyección.
+
 30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
 RetainedQuery en core/presentation conserva estado exitoso de Explorar/listas de
 mascotas, con autoDispose acotado, vigencia y revalidación al volver/foco. Sin caché

@@ -34,6 +34,85 @@ void main() {
   );
 
   for (final bouncing in [false, true]) {
+    testWidgets(
+      'Reversing retracts overlay without scrolling; bounce=$bouncing',
+      (tester) async {
+        final scroll = ScrollController();
+        addTearDown(scroll.dispose);
+        var calls = 0;
+        await tester.pumpWidget(
+          _screen(scroll, bouncing, false, () async => calls++),
+        );
+        final gesture = await tester.startGesture(const Offset(160, 150));
+        await gesture.moveBy(const Offset(0, 30));
+        await tester.pump();
+        await gesture.moveBy(const Offset(0, 250));
+        await tester.pump();
+        final before = tester.getCenter(glyph).dy;
+        await gesture.moveBy(const Offset(0, -200));
+        await tester.pump();
+        expect(tester.getCenter(glyph).dy, lessThan(before));
+        expect(scroll.offset, 0);
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(calls, 0);
+        expect(scroll.offset, 0);
+      },
+    );
+
+    testWidgets(
+      'Drag starting inside content cannot acquire refresh at top; bounce=$bouncing',
+      (tester) async {
+        final scroll = ScrollController(initialScrollOffset: 80);
+        addTearDown(scroll.dispose);
+        var calls = 0;
+        await tester.pumpWidget(
+          _screen(scroll, bouncing, false, () async => calls++),
+        );
+        final gesture = await tester.startGesture(const Offset(160, 150));
+        await gesture.moveBy(const Offset(0, 30));
+        await tester.pump();
+        await gesture.moveBy(const Offset(0, 300));
+        await tester.pump();
+        await gesture.moveBy(const Offset(0, -15));
+        await tester.pump();
+        expect(
+          tester
+              .widget<Opacity>(
+                find.ancestor(of: glyph, matching: find.byType(Opacity)).first,
+              )
+              .opacity,
+          0,
+        );
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(calls, 0);
+      },
+    );
+
+    testWidgets('Canceled armed pointer never refreshes; bounce=$bouncing', (
+      tester,
+    ) async {
+      final scroll = ScrollController();
+      addTearDown(scroll.dispose);
+      var calls = 0;
+      await tester.pumpWidget(
+        _screen(scroll, bouncing, false, () async => calls++),
+      );
+      final gesture = await tester.startGesture(const Offset(160, 150));
+      await gesture.moveBy(const Offset(0, 30));
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, 300));
+      await tester.pump();
+      await gesture.cancel();
+      await tester.pumpAndSettle();
+      expect(calls, 0);
+      expect(scroll.offset, 0);
+      await tester.dragFrom(const Offset(160, 300), const Offset(0, -150));
+      await tester.pumpAndSettle();
+      expect(scroll.offset, greaterThan(0));
+    });
+
     for (final reduced in [false, true]) {
       testWidgets(
         'Partial pull retracts to top; bounce=$bouncing reduced=$reduced',
@@ -101,6 +180,85 @@ void main() {
     }
   }
 
+  testWidgets('Small viewport with large text retracts in reduced motion', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final scroll = ScrollController();
+    addTearDown(scroll.dispose);
+    var calls = 0;
+    await tester.pumpWidget(
+      _screen(scroll, false, true, () async => calls++, textScale: 2),
+    );
+    final gesture = await tester.startGesture(const Offset(160, 200));
+    await gesture.moveBy(const Offset(0, 30));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, 180));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, -230));
+    await tester.pump();
+    expect(scroll.offset, 0);
+    expect(
+      tester
+          .widget<Opacity>(
+            find.ancestor(of: glyph, matching: find.byType(Opacity)).first,
+          )
+          .opacity,
+      0,
+    );
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Upward start cannot turn into refresh within the same drag', (
+    tester,
+  ) async {
+    final scroll = ScrollController();
+    addTearDown(scroll.dispose);
+    var calls = 0;
+    await tester.pumpWidget(_screen(scroll, false, false, () async => calls++));
+    final gesture = await tester.startGesture(const Offset(160, 200));
+    await gesture.moveBy(const Offset(0, -80));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, 300));
+    await tester.pump();
+    await gesture.moveBy(const Offset(0, -10));
+    await tester.pump();
+    expect(
+      tester
+          .widget<Opacity>(
+            find.ancestor(of: glyph, matching: find.byType(Opacity)).first,
+          )
+          .opacity,
+      0,
+    );
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+  });
+
+  testWidgets('Removing an active pull releases its scroll hold', (
+    tester,
+  ) async {
+    final scroll = ScrollController();
+    addTearDown(scroll.dispose);
+    var calls = 0;
+    await tester.pumpWidget(_screen(scroll, false, false, () async => calls++));
+    final gesture = await tester.startGesture(const Offset(160, 200));
+    await gesture.moveBy(const Offset(0, 200));
+    await tester.pump();
+    await tester.pumpWidget(const SizedBox());
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Scrolling inside content does not refresh or jump to top', (
     tester,
   ) async {
@@ -123,10 +281,14 @@ Widget _screen(
   ScrollController scroll,
   bool bouncing,
   bool reduced,
-  Future<void> Function() refresh,
-) => MaterialApp(
+  Future<void> Function() refresh, {
+  double textScale = 1,
+}) => MaterialApp(
   home: MediaQuery(
-    data: MediaQueryData(disableAnimations: reduced),
+    data: MediaQueryData(
+      disableAnimations: reduced,
+      textScaler: TextScaler.linear(textScale),
+    ),
     child: Scaffold(
       body: PullToRefresh(
         onRefresh: refresh,

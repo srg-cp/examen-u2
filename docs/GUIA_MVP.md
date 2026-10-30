@@ -852,6 +852,10 @@ Por aprobación explícita del usuario, Inicio incorpora cápsula liquid glass (
 
 ### Incremento de Perfil — HU-01.7 / RF-01, issue #23
 
+Refinamiento30/10 autorizado: Perfil móvil agrupado y editor separado con
+navegación horizontal de destinos internos, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md).
+Conserva operaciones, permisos y privacidad; no amplía MVP ni modifica web.
+
 Implementación local de consulta/edición de nombre visible y ciudad desde Perfil, con persistencia Supabase, validación de campos opcionales, respuesta confirmada, conservación del formulario ante fallos y recuperación. Usa esquema y permisos 001–009 existentes; no amplía a baja/exportación ni inicia mascotas. Debe demostrarse con dos cuentas autenticadas y Android antes de cerrar los criterios remotos. La prueba anónima remota y pruebas PostgreSQL locales no sustituyen esa demo. Procedimiento actualizado en CONFIGURACION.
 
 ### Cambio de acceso a Perfil

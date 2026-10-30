@@ -1,5 +1,12 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+horizontalPage compone HorizontalPageTransition y PageEntranceScope en presentación.
+El scope evita duplicar la entrada inicial del contenido; AuthStageTransition
+permite stagger ante etapas posteriores reales. Perfil reutiliza editor/avatar/
+ViewModels y comparte shell/filas/grupos, sin imports entre presentaciones de
+funcionalidades ni cambios de dominio/data. Router conserva acceso de cuenta.
+
 30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
 retención de presentación móvil siempre acotada y ligada a identidad/ProviderScope;
 mantener autoDispose y liberar timers/lifecycle/suscripciones. No cachear permisos

@@ -1,5 +1,26 @@
 # Perfil y fotografía de cuenta
 
+30/10, [ADR-171](../decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
+Perfil móvil separa el resumen de la edición. Desde avatar de Inicio se abre
+Perfil con nombre/ciudad/foto reales; tocar su fila/chevrón abre Editar perfil.
+Mi actividad contiene Borradores/Envíos/Mis apelaciones, Alertas y zonas contiene
+Preferencias/Ubicaciones, y Privacidad contiene Cuentas bloqueadas. Cerrar sesión
+permanece separado. Cards perla, filas completas y navegación polished compartidos.
+
+Editor conserva foto real/galería/recuperación, nombre, correo seleccionable de
+solo lectura, buscador de ciudad y celular privado opcional con país/prefijo.
+Guardar solo con cambios; errores conservan formulario/reintento/toast y éxito
+solo tras confirmación. Volver/Atrás bloqueados durante operaciones; cambios y
+fotos pendientes piden descarte, cancelar conserva selección. Guardar actualiza
+el resumen; reabrir no repite el aviso anterior. Sin nuevo SQL/activación remota.
+
+Editor y destinos del menú entran desde derecha, desplazan anterior a izquierda
+y deshacen el movimiento al volver (320/260ms/easeInOutCubic; reducido directo).
+Sin stagger inicial superpuesto; etapas discretas posteriores conservan su reveal.
+Entrada desde avatar sigue por origen. Texto ampliado usa filas/scroll naturales;
+sin formulario ni datos privados de contacto en el resumen. Alcance móvil.
+Validación local, renders y Android pendiente: [ESTADO](../ESTADO.md).
+
 21/10: Perfil web recupera expansión/retorno desde el avatar,320/260ms,
 easeInOutCubic y fases de OriginPageTransition móvil, según regla global
 [ADR-124](../decisiones/124-paridad-animaciones-mobile-web.md). El contenido se

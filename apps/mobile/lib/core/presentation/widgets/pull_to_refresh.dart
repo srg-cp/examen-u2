@@ -35,8 +35,11 @@ class _PullToRefreshState extends State<PullToRefresh>
   bool _reduced = false;
   double _distance = 0;
   double _travelTarget = 0;
-  ScrollPosition? _pullPosition;
-  bool _settling = false;
+  int? _pointer;
+  bool _eligible = false;
+  bool _pulling = false;
+  double _threshold = 0;
+  ScrollHoldController? _hold;
 
   @override
   void didChangeDependencies() {
@@ -53,6 +56,10 @@ class _PullToRefreshState extends State<PullToRefresh>
 
   @override
   void dispose() {
+    _pointer = null;
+    _pulling = false;
+    _eligible = false;
+    _hold?.cancel();
     _travel.dispose();
     _rotation.dispose();
     super.dispose();
@@ -75,72 +82,78 @@ class _PullToRefreshState extends State<PullToRefresh>
   void _statusChanged(RefreshIndicatorStatus? status) {
     if (!mounted) return;
     setState(() => _status = status);
-    if (status == RefreshIndicatorStatus.drag) {
-      _distance = _travel.value * 2;
-      _settling = false;
-      _pullPosition = null;
-      _travel.stop();
-      _travelTarget = -1;
-    } else if (status == RefreshIndicatorStatus.snap ||
-        status == RefreshIndicatorStatus.refresh) {
-      _settleAtTop();
+    if (status == RefreshIndicatorStatus.refresh) {
       _moveTo(64);
     } else if (status == RefreshIndicatorStatus.done ||
-        status == RefreshIndicatorStatus.canceled ||
-        status == null) {
-      if (status == RefreshIndicatorStatus.canceled) _settleAtTop();
+        status == RefreshIndicatorStatus.canceled) {
       _rotation.stop();
       _moveTo(0);
-      if (status == null) _pullPosition = null;
     }
   }
 
-  void _settleAtTop() {
-    final position = _pullPosition;
-    if (_settling || _distance <= 0 || position == null) return;
-    _settling = true;
-    // Notifications arrive after layout. Stop the release velocity on the next
-    // frame, without taking ownership of feature scroll controllers. In
-    // particular, a bouncing pull must not carry the list past its initial top.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted ||
-          !identical(_pullPosition, position) ||
-          !position.hasPixels ||
-          position.context.notificationContext?.mounted != true) {
-        return;
-      }
-      if (_reduced) {
-        position.jumpTo(position.minScrollExtent);
-      } else {
-        position.animateTo(
-          position.minScrollExtent,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
+  void _pointerDown(PointerDownEvent event) {
+    if (_pointer != null) return;
+    _pointer = event.pointer;
+    _eligible = false;
+  }
+
+  void _pointerMove(PointerMoveEvent event) {
+    if (event.pointer != _pointer || !_pulling) return;
+    if (!_enabled) {
+      _finishPull(cancel: true);
+      return;
+    }
+    _updateDistance(event.localDelta.dy);
+  }
+
+  void _pointerEnd(PointerEvent event, {bool cancel = false}) {
+    if (event.pointer != _pointer) return;
+    _finishPull(cancel: cancel);
+    _pointer = null;
+    _eligible = false;
+  }
+
+  void _updateDistance(double delta) {
+    _distance = (_distance + delta).clamp(0.0, double.infinity);
+    _travel.stop();
+    _travelTarget = -1;
+    _travel.value = _distance * .5;
+    final status = _distance >= _threshold
+        ? RefreshIndicatorStatus.armed
+        : RefreshIndicatorStatus.drag;
+    if (_status != status) _statusChanged(status);
+  }
+
+  void _finishPull({required bool cancel}) {
+    if (!_pulling) return;
+    final refresh = !cancel && _enabled && _distance >= _threshold;
+    _pulling = false;
+    _eligible = false;
+    _hold?.cancel();
+    _hold = null;
+    if (refresh) {
+      _refresh();
+    } else {
+      _statusChanged(RefreshIndicatorStatus.canceled);
+    }
   }
 
   bool _trackPull(ScrollNotification notification) {
     if (notification.depth != 0 ||
         notification.metrics.axisDirection != AxisDirection.down ||
-        !_enabled ||
-        (_status != RefreshIndicatorStatus.drag &&
-            _status != RefreshIndicatorStatus.armed)) {
+        _pulling) {
       return false;
     }
-    _pullPosition = notification.context == null
-        ? null
-        : Scrollable.maybeOf(notification.context!)?.position;
-    if (notification is ScrollUpdateNotification &&
-        notification.dragDetails == null &&
-        _status == RefreshIndicatorStatus.drag &&
-        _distance > 0) {
-      // iOS starts its spring before ScrollEnd. Retract a partial pull now,
-      // rather than leaving a stationary glyph until the spring finishes.
-      _settleAtTop();
-      _moveTo(0);
+    if (notification is ScrollStartNotification) {
+      // Decide once per drag, never during a reversal or ballistic bounce.
+      _eligible =
+          _pointer != null &&
+          _enabled &&
+          notification.dragDetails != null &&
+          notification.metrics.pixels <= notification.metrics.minScrollExtent;
+      return false;
     }
+    if (!_eligible || !_enabled) return false;
     double? delta;
     if (notification is ScrollUpdateNotification &&
         notification.dragDetails != null) {
@@ -149,17 +162,28 @@ class _PullToRefreshState extends State<PullToRefresh>
         notification.dragDetails != null) {
       delta = notification.overscroll;
     }
-    if (delta != null) {
-      // Limit only the painted displacement. Clamping the controller itself
-      // freezes both the glyph rotation and its rebuilds during a long pull.
-      _distance = (_distance - delta).clamp(0.0, double.infinity);
-      _travelTarget = -1;
-      _travel.value = _distance * .5;
+    if (delta == null) return false;
+    if (delta >= 0 || notification.metrics.extentBefore > 0) {
+      _eligible = false;
+      return false;
     }
+    final position = notification.context == null
+        ? null
+        : Scrollable.maybeOf(notification.context!)?.position;
+    if (position == null) return false;
+    _pulling = true;
+    // Keep the native viewport-relative release threshold. The acquired pointer
+    // controls only the overlay; a new drag scrolls normally, even during I/O.
+    _threshold = notification.metrics.viewportDimension * .25;
+    _distance = 0;
+    _updateDistance(-delta);
+    position.jumpTo(position.minScrollExtent);
+    _hold = position.hold(() => _hold = null);
     return false;
   }
 
   bool get _enabled =>
+      mounted &&
       widget.enabled &&
       !_busy &&
       (widget.onRefresh != null || _binding.enabled);
@@ -169,7 +193,6 @@ class _PullToRefreshState extends State<PullToRefresh>
     final refresh = widget.onRefresh ?? _binding.refresh;
     if (refresh == null) return;
     _busy = true;
-    // Flutter 3.35 noSpinner does not notify its transition into refresh.
     _statusChanged(RefreshIndicatorStatus.refresh);
     if (!_reduced) _rotation.repeat();
     try {
@@ -209,15 +232,13 @@ class _PullToRefreshState extends State<PullToRefresh>
               behavior: ScrollConfiguration.of(
                 context,
               ).copyWith(overscroll: false),
-              child: NotificationListener<ScrollNotification>(
-                onNotification: _trackPull,
-                child: RefreshIndicator.noSpinner(
-                  onRefresh: _refresh,
-                  notificationPredicate: (notification) =>
-                      notification.depth == 0 &&
-                      notification.metrics.axis == Axis.vertical &&
-                      (_enabled || _busy),
-                  onStatusChange: _statusChanged,
+              child: Listener(
+                onPointerDown: _pointerDown,
+                onPointerMove: _pointerMove,
+                onPointerUp: _pointerEnd,
+                onPointerCancel: (event) => _pointerEnd(event, cancel: true),
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: _trackPull,
                   child: widget.child,
                 ),
               ),

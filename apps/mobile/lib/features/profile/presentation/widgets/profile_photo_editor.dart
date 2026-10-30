@@ -1,4 +1,4 @@
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/presentation/widgets/glass_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
@@ -56,67 +56,61 @@ class _ProfilePhotoEditorState extends ConsumerState<ProfilePhotoEditor> {
                 : 'No se pudo confirmar la foto. Tócala para reintentar.')
           : 'Foto actualizada',
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              LoadingShimmer(
-                isLoading: busy,
-                loadingLabel: 'Actualizando foto',
-                radius: 36,
-                child: Semantics(
-                  label: photo.recovered
-                      ? 'Foto recuperada pendiente de guardar'
-                      : (retry
-                            ? 'Reintentar foto de perfil'
-                            : 'Cambiar foto de perfil'),
-                  button: !photo.recovered,
-                  enabled: available && !busy && !photo.recovered,
-                  child: GestureDetector(
-                    onTap: available && !busy && !photo.recovered
-                        ? (retry ? model.retry : model.choose)
-                        : null,
-                    child: photo.recovered && photo.bytes != null
-                        ? ClipOval(
-                            child: Image.memory(
-                              photo.bytes!,
-                              width: 72,
-                              height: 72,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : const Stack(
-                            children: [
-                              ProfileAvatar(size: 72),
-                              Positioned(
-                                right: 0,
-                                bottom: 0,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF111111),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: Icon(
-                                      Icons.photo_camera_outlined,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+          LoadingShimmer(
+            isLoading: busy || profile.isLoading,
+            loadingLabel: busy ? 'Actualizando foto' : 'Consultando foto',
+            radius: 56,
+            child: Semantics(
+              label: photo.recovered
+                  ? 'Foto recuperada pendiente de guardar'
+                  : (retry
+                        ? 'Reintentar foto de perfil'
+                        : 'Cambiar foto de perfil'),
+              button: !photo.recovered,
+              enabled: available && !busy && !photo.recovered,
+              child: GestureDetector(
+                onTap: available && !busy && !photo.recovered
+                    ? (retry ? model.retry : model.choose)
+                    : null,
+                child: profile.isLoading
+                    ? const CircleAvatar(
+                        radius: 56,
+                        backgroundColor: Color(0xFFE5E5EA),
+                      )
+                    : photo.recovered && photo.bytes != null
+                    ? ClipOval(
+                        child: Image.memory(
+                          photo.bytes!,
+                          width: 112,
+                          height: 112,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : const Stack(
+                        children: [
+                          ProfileAvatar(size: 112),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: GlassSurface(
+                              radius: 20,
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: Icon(
+                                  Icons.photo_camera_outlined,
+                                  size: 22,
+                                  color: Color(0xFF454746),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                  ),
-                ),
+                        ],
+                      ),
               ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Text('Perfil', style: AppTypography.primaryTitle),
-              ),
-            ],
+            ),
           ),
           // Android activity recovery is exceptional and requires explicit confirmation.
           if (photo.recovered) ...[

@@ -36,6 +36,8 @@ import '../features/found_cases/providers/found_case_providers.dart';
 import '../features/found_cases/domain/entities/found_case.dart';
 import 'navigation/entity_editor_page.dart';
 import 'navigation/entity_detail_page.dart';
+import 'navigation/horizontal_page.dart';
+import '../core/presentation/widgets/horizontal_page_transition.dart';
 import '../features/found_cases/presentation/screens/found_editor_screen.dart';
 import '../features/found_cases/presentation/screens/found_detail_screen.dart';
 import '../features/found_cases/presentation/screens/my_found_cases_screen.dart';
@@ -59,6 +61,7 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/widgets/profile_avatar.dart';
 import '../features/profile/presentation/view_models/profile_view_model.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/profile/presentation/screens/profile_edit_screen.dart';
 import '../features/moderation_appeals/presentation/screens/appeals_screen.dart';
 import '../features/interest_zones/presentation/screens/interest_zones_screen.dart';
 import '../features/alert_preferences/presentation/screens/alert_preferences_screen.dart';
@@ -156,7 +159,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               state.uri.path.startsWith('/home/cases/'))) {
         return null;
       }
-      if (path == '/home' && state.uri.path == '/home/profile') return null;
+      if (path == '/home' &&
+          {'/home/profile', '/home/profile/edit'}.contains(state.uri.path)) {
+        return null;
+      }
       if (path == '/home' && state.uri.path == '/home/interest-zones') {
         return null;
       }
@@ -271,7 +277,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'appeals',
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => horizontalPage(
+              context: context,
               key: state.pageKey,
               child: const AppealsScreen(),
             ),
@@ -348,7 +355,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'submissions',
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => horizontalPage(
+              context: context,
               key: state.pageKey,
               child: SubmissionQueueScreen(
                 onOpen: (entry) {
@@ -381,7 +389,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'drafts',
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => horizontalPage(
+              context: context,
               key: state.pageKey,
               child: LocalDraftsScreen(
                 onOpen: (draft) async {
@@ -408,10 +417,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'blocked-users',
-            pageBuilder: (context, state) => entityEditorPage(
+            pageBuilder: (context, state) => horizontalPage(
               context: context,
               key: state.pageKey,
-              source: state.extra,
               child: UserBlocksScreen(onSettled: refreshCaseContacts),
             ),
           ),
@@ -618,7 +626,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'alert-preferences',
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => horizontalPage(
+              context: context,
               key: state.pageKey,
               child: const AlertPreferencesScreen(),
             ),
@@ -780,29 +789,45 @@ final routerProvider = Provider<GoRouter>((ref) {
                   : const Duration(milliseconds: 260),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) =>
-                      OriginPageTransition(
-                        animation: animation,
-                        origin: state.extra is Rect
-                            ? state.extra as Rect
-                            : null,
-                        child: child,
+                      HorizontalPageTransition(
+                        animation: const AlwaysStoppedAnimation(1),
+                        secondaryAnimation: secondaryAnimation,
+                        child: OriginPageTransition(
+                          animation: animation,
+                          origin: state.extra is Rect
+                              ? state.extra as Rect
+                              : null,
+                          child: child,
+                        ),
                       ),
-              child: ProfileScreen(
-                cityFieldBuilder: (city, enabled, invalid, onQuery, onSelect) =>
-                    PlaceSearchFields(
-                      citiesOnly: true,
-                      initialLabel: city,
-                      enabled: enabled,
-                      invalid: invalid,
-                      onQueryChanged: onQuery,
-                      onSelect: (place) => onSelect(place.label),
-                    ),
-              ),
+              child: const ProfileScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: 'edit',
+                pageBuilder: (context, state) => horizontalPage(
+                  context: context,
+                  key: state.pageKey,
+                  child: ProfileEditScreen(
+                    cityFieldBuilder:
+                        (city, enabled, invalid, onQuery, onSelect) =>
+                            PlaceSearchFields(
+                              citiesOnly: true,
+                              initialLabel: city,
+                              enabled: enabled,
+                              invalid: invalid,
+                              onQueryChanged: onQuery,
+                              onSelect: (place) => onSelect(place.label),
+                            ),
+                  ),
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: 'interest-zones',
-            pageBuilder: (context, state) => NoTransitionPage<void>(
+            pageBuilder: (context, state) => horizontalPage(
+              context: context,
               key: state.pageKey,
               child: InterestZonesScreen(
                 followActionBuilder: (id) =>
