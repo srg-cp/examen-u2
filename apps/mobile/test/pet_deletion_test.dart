@@ -12,6 +12,7 @@ import 'app_test.dart' show FakeAuthRepository;
 import 'support/fake_pets.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   for (final switchAccount in [false, true]) {
     test(
       'Deletion retains failed row, blocks duplicates, retries lost ack and guards account; switch=$switchAccount',

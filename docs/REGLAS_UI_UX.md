@@ -1,5 +1,11 @@
 # Entre Huellas: regla de oro de UI y UX
 
+30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
+por solicitud de actualización sin recarga visible, la revalidación automática de
+Explorar/listas de mascotas conserva contenido sin shimmer ni skeleton. Refresh
+explícito conserva shimmer y errores conservan toast/reintento. Sin reiniciar la
+entrada por actualizar datos ni conservar datos de otra identidad. Alcance inicial móvil.
+
 29/10, excepción explícita [ADR-166](decisiones/166-acciones-de-avistamiento-en-tarjetas-grises.md):
 Reportar avistamiento y La vi o la encontré en ficha pública móvil usan tarjetas
 sólidas gris claro con icono pequeño arriba a la izquierda, etiqueta debajo y

@@ -88,7 +88,7 @@ class ExploreSection extends ConsumerWidget {
         extra: origin,
       );
       if (context.mounted) {
-        ref.read(exploreViewModelProvider.notifier).refresh();
+        ref.read(exploreViewModelProvider.notifier).refreshIfStale();
       }
     }
 

@@ -22,6 +22,7 @@ import 'support/fake_pets.dart';
 import 'lost_cases_test.dart' show FakeCases, fields;
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   test('Deleting a case refreshes the observed pet list and detail', () async {
     final pets = FakePets()
       ..pets['pet'] = const Pet(

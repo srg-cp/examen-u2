@@ -14,6 +14,7 @@ import 'app_test.dart' show FakeAuthRepository;
 import 'support/fake_pets.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   test(
     'Pet field rules trim Unicode, require age, size and traits while permitting unknown sex and reject incomplete/overlong data before storage',
     () async {

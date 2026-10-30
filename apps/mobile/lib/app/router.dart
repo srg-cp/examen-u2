@@ -463,12 +463,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                 journey: CaseJourneyCard(
                   target: (id: state.pathParameters['id']!, community: true),
                 ),
-                onActivityChanged: () => ref.invalidate(
-                  caseJourneyViewModelProvider((
-                    id: state.pathParameters['id']!,
-                    community: true,
-                  )),
-                ),
+                onActivityChanged: () {
+                  ref.invalidate(
+                    caseJourneyViewModelProvider((
+                      id: state.pathParameters['id']!,
+                      community: true,
+                    )),
+                  );
+                  ref.read(exploreViewModelProvider.notifier).refresh();
+                },
                 utilitiesBuilder: (canPoster) => TimelineAccessButton(
                   onReturn: () => ref.invalidate(
                     caseJourneyViewModelProvider((
@@ -598,6 +601,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   open: value.status == 'active',
                   onChanged: () {
                     onChanged();
+                    ref.read(exploreViewModelProvider.notifier).refresh();
                     ref.invalidate(
                       caseJourneyViewModelProvider((
                         id: value.id,

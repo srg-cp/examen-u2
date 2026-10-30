@@ -1,5 +1,11 @@
 # Arquitectura de Entre Huellas
 
+30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
+RetainedQuery en core/presentation conserva estado exitoso de Explorar/listas de
+mascotas, con autoDispose acotado, vigencia y revalidación al volver/foco. Sin caché
+de permisos ni cambios de dominio/data. Generación rechaza respuestas tardías;
+identidad reconstruye dependencias. Alcance móvil inicial, sin migración global.
+
 29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md):
 BrandMapPin compartido en selector/Explorar/Recorrido, con estado visual recibido
 por parámetros. SVG equivalente en LocationMap generado de la marca oficial;

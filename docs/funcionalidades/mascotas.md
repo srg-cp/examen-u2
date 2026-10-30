@@ -1,5 +1,10 @@
 # Registro, edición y ciclo de vida de mascotas
 
+30/10: listas activas/archivadas con [retención en memoria](retencion-de-datos.md),
+ADR-169. Vigencia60s, liberación tras tres minutos sin observadores; revalidación al
+volver/foco. Fallo automático de red conserva lista con toast/reintento; cambio de
+cuenta y operaciones reales conservan invalidación. Fichas/editor/web no migrados.
+
 29/10: el motor móvil compartido elimina la cortina/fondo local previo al
 stagger; una entrada por etapa y sin repetición al resolver skeleton o editar.
 [Alcance y validación ADR-156](../decisiones/156-entrada-mobile-unica-sin-cortinas.md).

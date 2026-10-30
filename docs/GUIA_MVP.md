@@ -1,5 +1,10 @@
 # Entre Huellas: guía de proyecto, chats, sprints y GitHub
 
+30/10: optimización de lectura móvil de mascotas/Explorar existentes, sin nuevas
+HU/RF ni cierre de historias. [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md).
+Retención en memoria y revalidación al volver/foco. Preparación para lanzamiento:
+medición real, alcance restante y prueba de carga pendientes; no certifica capacidad.
+
 30/10: retirada completa de avistamientos privados, [ADR-168](decisiones/168-retirada-completa-avistamientos-privados.md). Solo avisos públicos con cuenta. Patch042 después de041; actualizar móvil/web y servidor juntos, sin activación remota en esta tarea.
 
 29/10: ayuda pública unificada HU-06/10/12, con cuenta también desde QR. [ADR-167](decisiones/167-ayuda-publica-unificada-con-cuenta.md). Un acceso, avisos públicos y alertas existentes; históricos privados conservados. Plan041 y despliegue pendientes.

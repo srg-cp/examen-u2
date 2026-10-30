@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/presentation/state/retained_query.dart';
 import '../../domain/entities/explore_query.dart';
 import '../../domain/failures/explore_failure.dart';
 import '../../providers/explore_providers.dart';
@@ -14,10 +15,18 @@ final exploreViewModelProvider =
 
 class ExploreViewModel extends AsyncNotifier<ExploreState> {
   int _generation = 0;
+  late RetainedQuery _retained;
+  bool _backgroundLoading = false;
 
   @override
   Future<ExploreState> build() async {
     final generation = ++_generation;
+    _backgroundLoading = false;
+    final retained = _retained = RetainedQuery(
+      ref,
+      freshFor: const Duration(seconds: 30),
+      revalidate: () => refresh(background: true),
+    );
     final session = await ref.watch(exploreSessionProvider.future);
     if (session == null) {
       throw const ExploreFailure(ExploreFailureKind.forbidden);
@@ -44,6 +53,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     }
     try {
       final page = await ref.read(searchCasesProvider)(session.userId, query);
+      if (ref.mounted && generation == _generation) retained.markFresh();
       return ExploreState(
         owner: session.userId,
         query: query,
@@ -171,18 +181,27 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     }
   }
 
-  Future<void> refresh() async {
+  Future<void> refreshIfStale() => _retained.check();
+
+  Future<void> refresh({bool background = false}) async {
     final current = state.isLoading ? null : state.asData?.value;
     if (current == null) {
+      if (background) return;
       ref.invalidateSelf();
       return;
     }
     if (current.needsLocation) {
+      if (background) return;
       await useCurrentLocation();
       return;
     }
-    if (!current.busy) {
-      await _load(current, query: current.query, replace: true);
+    if (!current.busy && (!background || !_backgroundLoading)) {
+      await _load(
+        current,
+        query: current.query,
+        replace: true,
+        background: background,
+      );
     }
   }
 
@@ -266,8 +285,10 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     required bool replace,
     String? locationLabel,
     String? centerName,
+    bool background = false,
   }) async {
     final g = ++_generation;
+    _backgroundLoading = background;
     // A different query must never display results from the preceding filters.
     final same = identical(query, old.query);
     final samePoint =
@@ -276,20 +297,22 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
     final appliedLabel = locationLabel ?? (samePoint ? old.locationLabel : '');
     final appliedName = centerName ?? (samePoint ? old.centerName : '');
     final retained = same ? old.items : <Never>[];
-    state = AsyncData(
-      ExploreState(
-        owner: old.owner,
-        locationLabel: appliedLabel,
-        centerName: appliedName,
-        query: query,
-        items: retained,
-        cursor: replace ? null : old.cursor,
-        refreshing: replace,
-        applying: replace && !same,
-        appending: !replace,
-        noticeId: old.noticeId,
-      ),
-    );
+    if (!background) {
+      state = AsyncData(
+        ExploreState(
+          owner: old.owner,
+          locationLabel: appliedLabel,
+          centerName: appliedName,
+          query: query,
+          items: retained,
+          cursor: replace ? null : old.cursor,
+          refreshing: replace,
+          applying: replace && !same,
+          appending: !replace,
+          noticeId: old.noticeId,
+        ),
+      );
+    }
     try {
       final page = await ref.read(searchCasesProvider)(
         old.owner,
@@ -306,6 +329,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
       if (!replace && page.nextCursor == old.cursor) {
         throw const ExploreFailure(ExploreFailureKind.unavailable);
       }
+      _retained.markFresh();
       state = AsyncData(
         ExploreState(
           owner: old.owner,
@@ -317,8 +341,14 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           noticeId: old.noticeId,
         ),
       );
-    } catch (_) {
+    } catch (error, stack) {
       if (!ref.mounted || g != _generation || state.isLoading) return;
+      if (error is ExploreFailure &&
+          error.kind == ExploreFailureKind.forbidden) {
+        _retained.forget();
+        state = AsyncError(error, stack);
+        return;
+      }
       state = AsyncData(
         ExploreState(
           owner: old.owner,
@@ -326,7 +356,7 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           centerName: appliedName,
           query: query,
           items: retained,
-          cursor: replace ? null : old.cursor,
+          cursor: same ? old.cursor : null,
           failed: true,
           notice: replace
               ? 'No pudimos consultar los casos. Puedes reintentar.'
@@ -334,6 +364,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           noticeId: old.noticeId + 1,
         ),
       );
+    } finally {
+      if (g == _generation) _backgroundLoading = false;
     }
   }
 }

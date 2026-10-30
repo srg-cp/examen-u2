@@ -1,5 +1,36 @@
 # Estado del proyecto
 
+## Retención móvil y revalidación sin vaciar listas —30/10/2026
+
+Ante la solicitud de fluidez y menor consumo antes del lanzamiento, primer incremento
+en Explorar y listas de mascotas activas/archivadas. [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md)
+y [ficha](funcionalidades/retencion-de-datos.md). RetainedQuery conserva resultados
+exitosos en memoria hasta tres minutos sin observadores, manteniendo autoDispose.
+Vigencia30s/60s respectivamente; comprobar al volver/foco, sin polling periódico.
+Lista/mapa de Explorar dejan de refrescar incondicionalmente al regresar de una ficha.
+Revalidación automática conserva contenido sin shimmer; refresh manual conserva su
+feedback. Errores de red mantienen datos con toast/reintento, pérdida de acceso no.
+Identidad/generación evitan que respuestas antiguas sustituyan datos de otra cuenta.
+Callbacks de cambios reales en fichas también actualizan Explorar.
+
+Validación:64 pruebas aprobadas (seis nuevas de retención/navegación/carreras,
+mascotas, fotos/eliminación, Explorar/mapa, arquitectura y consistencia).
+Diez viajes breves entre secciones producen una lectura de cada lista en el ensayo
+con repositorios simulados. Caducidad sin consultas periódicas, expiración de memoria,
+fallo/reintento por foco y respuesta antigua tras cambio de cuenta comprobados.
+Flutter analyze --no-pub completo sin incidencias; formato y git diff --check correctos.
+Logs locales: apps/mobile/build/retained-query-final.log y retained-query-analysis.log.
+La primera ejecución detectó ajustes de API y bindings de prueba, corregidos antes
+de esta corrida final. Sin SQL remoto, despliegue, commit ni nuevo APK/IPA.
+
+Limitaciones: no es realtime, no migra web ni todas las pantallas, no conserva scroll
+entre secciones desmontadas y Explorar revalida desde primera página. Nuevas
+publicaciones sin callback específico pueden esperar vigencia/refresh manual.
+No se midieron HTTP/SQL reales, coste, capacidad concurrente ni red Android física.
+Siguiente paso de lanzamiento: medir recorridos completos con Supabase y Android,
+revisar latencias/consultas/índices, extender por recurso y comprobar carga. No se
+afirma aceptación visual física ni preparación global para producción por estas pruebas.
+
 ## Retirada completa del sistema privado —30/10/2026
 
 El usuario aclara que no hay avistamientos privados antiguos y solicita quitar

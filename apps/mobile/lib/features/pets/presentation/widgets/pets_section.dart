@@ -32,6 +32,7 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
         ? archivedPetListViewModelProvider
         : petListViewModelProvider;
     final pets = ref.watch(listProvider);
+    final refreshNotice = ref.watch(petListRefreshNoticeProvider(_archived));
     final deletion = ref.watch(petDeletionViewModelProvider);
     final showData =
         pets.hasValue &&
@@ -46,10 +47,15 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
         await ref.read(listProvider.future);
       },
       child: ConfirmationToastHost(
-        confirmed: deletion.confirmed || deletion.issue != null,
-        noticeId: deletion.noticeId,
-        isError: deletion.issue != null,
-        message: deletion.issue == null
+        confirmed:
+            deletion.confirmed ||
+            deletion.issue != null ||
+            (showData && refreshNotice != null),
+        noticeId: (deletion.noticeId, refreshNotice),
+        isError: deletion.issue != null || refreshNotice != null,
+        message: showData && refreshNotice != null
+            ? 'No pudimos actualizar tus mascotas. Puedes reintentar.'
+            : deletion.issue == null
             ? 'Mascota eliminada'
             : deletion.issue == PetFailureKind.conflict
             ? 'La ficha cambió. Actualiza la lista antes de eliminarla.'
@@ -58,10 +64,14 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
             : deletion.issue == PetFailureKind.caseHistory
             ? 'Esta mascota tiene historial de casos. Puedes archivarla desde su ficha.'
             : 'No se pudo eliminar la mascota. Desliza para reintentar.',
-        actionLabel: deletion.issue == PetFailureKind.conflict
+        actionLabel:
+            deletion.issue == PetFailureKind.conflict ||
+                (showData && refreshNotice != null)
             ? 'Actualizar lista'
             : null,
-        onAction: deletion.issue == PetFailureKind.conflict
+        onAction:
+            deletion.issue == PetFailureKind.conflict ||
+                (showData && refreshNotice != null)
             ? () => ref.read(listProvider.notifier).reload()
             : null,
         child: Column(
@@ -95,7 +105,7 @@ class _PetsSectionState extends ConsumerState<PetsSection> {
                 refreshing: showData && pets.isLoading,
                 child: pets.isLoading && !showData
                     ? const PetSkeleton()
-                    : pets.hasError
+                    : pets.hasError && !showData
                     ? PetLoadFeedback(
                         error: pets.error,
                         onRetry: () => ref.read(listProvider.notifier).reload(),

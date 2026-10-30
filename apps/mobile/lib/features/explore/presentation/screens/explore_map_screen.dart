@@ -49,7 +49,7 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
           extra: origin,
         );
         if (context.mounted) {
-          await ref.read(exploreViewModelProvider.notifier).refresh();
+          await ref.read(exploreViewModelProvider.notifier).refreshIfStale();
         }
       } finally {
         if (mounted) setState(() => _openingCase = false);

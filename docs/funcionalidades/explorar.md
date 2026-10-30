@@ -1,5 +1,10 @@
 # Explorar: lista y mapa de casos
 
+30/10: [retención en memoria y revalidación](retencion-de-datos.md), ADR-169.
+Lista/mapa comprueban vigencia al regresar de ficha;30s de frescura y tres minutos
+sin observadores. Revalidación automática sin shimmer/skeleton; manual conservada.
+Filtros retenidos, revalidación desde primera página; no es realtime ni migración web.
+
 29/10: pines con logo mediante BrandMapPin compartido; conservar resultados48×48,
 estados blanco/negro y acciones. El filtro Ubicación adopta el pin negro/logo
 blanco48×56. [Pines de mapa](pines-de-mapa.md), ADR-165; datos/permisos intactos.

@@ -1,5 +1,11 @@
 # Entre Huellas: reglas de oro de arquitectura
 
+30/10, [ADR-169](decisiones/169-retencion-acotada-y-revalidacion-mobile.md):
+retención de presentación móvil siempre acotada y ligada a identidad/ProviderScope;
+mantener autoDispose y liberar timers/lifecycle/suscripciones. No cachear permisos
+ni usar resultados de otra cuenta. Revalidación automática conserva contenido;
+actualización explícita conserva shimmer. Primer alcance Explorar/listas de mascotas.
+
 29/10, [ADR-165](decisiones/165-pines-con-logo-compartidos-mobile-web.md):
 BrandMapPin centraliza silueta/logo en core/presentation, reutilizado por
 selector/Explorar/Recorrido. LocationMap usa SVG generado desde la marca oficial,
