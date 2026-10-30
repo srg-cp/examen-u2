@@ -30,6 +30,25 @@ Log: `apps/mobile/build/examen-u2-punto-1-tests.log`.
 
 ## Evidencia pendiente del estudiante
 
+Avance documental 30/10: copia de trabajo
+`SI988-EXPRAC-U2-ColquePonceSergioAlberto.docx` con las tres capturas de código
+y la confirmación de Extended Controls en -18.0066, -70.2463. Maquetación
+revisada en ocho páginas con Word. La captura recibida de la app todavía muestra
+37.423423, -122.083953; no se usa para acreditar la posición de Tacna.
+Pendiente renovar la lectura y recibir la captura coincidente de la app.
+
+Corrección posterior del punto 1: `locateForFilter` ahora guarda en el estado la
+nueva lectura GPS, además de devolverla al editor. Antes, aplicar otra lectura
+movía el filtro pero conservaba las coordenadas GPS anteriores en el panel.
+Regresión con dos ubicaciones distintas comprueba coordenadas/precisión nuevas
+y su conservación tras aplicar/refrescar/paginar. 22 pruebas focalizadas aprobadas
+y análisis Flutter sin incidencias. Compilación debug local bloqueada por Gradle
+(`Unable to establish loopback connection`); no se instaló un APK nuevo.
+Diagnóstico ADB: Android aún registra California como última ubicación GPS/fused,
+incluso después de enviar `emu geo fix -70.2463 -18.0066` (respuesta OK). Pendiente
+comprobar la lectura nativa activando mi ubicación en Google Maps y renovar la
+lectura de Entre Huellas. No se afirma resuelto el GPS del emulador.
+
 1. En el emulador, abrir Extended controls → Location, fijar latitud/longitud
    y pulsar Set location (el nombre puede variar según la versión del emulador).
 2. Abrir Explorar con permiso de ubicación; si ya estaba abierto, usar

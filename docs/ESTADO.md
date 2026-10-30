@@ -2,6 +2,19 @@
 
 ## Examen Unidad II tipo 1 — punto 1 —30/10/2026
 
+Corrección de evidencia: usar ubicación actual desde filtros ya actualiza también
+la entidad GPS del estado/panel; regresión con dos posiciones, aplicación, refresh
+y paginación. 22 pruebas focalizadas aprobadas y análisis sin incidencias.
+Build debug intentado, bloqueado por Gradle/loopback; sin APK nuevo instalado.
+ADB confirma última posición nativa en California; pendiente comprobar adquisición
+en Google Maps y renovar lectura/captura en Entre Huellas. No se valida aún Tacna.
+
+Avance de evidencias: copia `SI988-EXPRAC-U2-ColquePonceSergioAlberto.docx`
+con explicación y tres capturas de código más configuración del emulador en
+Tacna; ocho páginas revisadas visualmente con render de Word. Original preservado.
+La captura de la app conserva coordenadas de California; pendiente nueva lectura
+y captura coincidente antes de dar por validado el punto 1 en Android.
+
 Solo móvil, sobre Explorar: `CurrentLocation` conserva latitud/longitud/precisión;
 DeviceLocationSource mantiene el único import de geolocator; repositorio y caso
 de uso inyectados al ViewModel. El mapa muestra las coordenadas GPS en el panel,

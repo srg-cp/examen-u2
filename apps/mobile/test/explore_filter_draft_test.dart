@@ -13,19 +13,17 @@ import 'explore_test.dart' show SearchFake;
 class DraftLocation implements CurrentLocationRepository {
   int calls = 0;
   bool fail = false;
+  CurrentLocation point = const CurrentLocation(
+    accuracyMeters: 35,
+    latitude: -12.05,
+    longitude: -77.05,
+  );
   Completer<CurrentLocation>? pending;
   @override
   Future<CurrentLocation> locate() async {
     calls++;
     if (fail) throw const ExploreFailure(ExploreFailureKind.locationDenied);
-    return pending?.future ??
-        Future.value(
-          const CurrentLocation(
-            accuracyMeters: 35,
-            latitude: -12.05,
-            longitude: -77.05,
-          ),
-        );
+    return pending?.future ?? Future.value(point);
   }
 }
 
@@ -54,7 +52,16 @@ void main() {
       addTearDown(subscription.close);
       final initial = await container.read(exploreViewModelProvider.future);
       final vm = container.read(exploreViewModelProvider.notifier);
+      location.point = const CurrentLocation(
+        latitude: -18.0066,
+        longitude: -70.2463,
+        accuracyMeters: 12,
+      );
       expect(await vm.locateForFilter(), isNotNull);
+      final updated = container.read(exploreViewModelProvider).requireValue;
+      expect(updated.currentLocation!.latitude, -18.0066);
+      expect(updated.currentLocation!.longitude, -70.2463);
+      expect(updated.currentLocation!.accuracyMeters, 12);
       expect(repo.calls, hasLength(1));
       expect(
         container.read(exploreViewModelProvider).requireValue.query,
@@ -72,6 +79,7 @@ void main() {
       await vm.refresh();
       await vm.more();
       final applied = container.read(exploreViewModelProvider).requireValue;
+      expect(applied.currentLocation, same(location.point));
       expect(applied.locationLabel, 'Miraflores, Lima');
       expect(applied.centerName, 'Miraflores, Lima');
       expect(applied.query.radiusMeters, 25000);

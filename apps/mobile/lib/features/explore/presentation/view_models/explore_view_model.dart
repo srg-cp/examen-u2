@@ -160,6 +160,23 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
           state.asData?.value.owner != old.owner) {
         return null;
       }
+      state = AsyncData(
+        ExploreState(
+          owner: old.owner,
+          query: old.query,
+          items: old.items,
+          cursor: old.cursor,
+          refreshing: old.refreshing,
+          applying: old.applying,
+          appending: old.appending,
+          failed: old.failed,
+          notice: old.notice,
+          noticeId: old.noticeId,
+          locationLabel: old.locationLabel,
+          centerName: old.centerName,
+          currentLocation: place,
+        ),
+      );
       return SearchPlace(
         label: 'Ubicación actual',
         latitude: place.latitude,
