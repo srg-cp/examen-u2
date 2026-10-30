@@ -72,10 +72,14 @@ Pide al responsable del proyecto el **IPA original sin firma personal** de la ve
 
 ### Descargar las nuevas versiones desde Releases
 
-Cada push a `main` ejecuta el workflow **Flutter**. Primero valida el proyecto;
+Cada push a `main` o `exuii-colque` ejecuta el workflow **Flutter**. Primero valida el proyecto;
 después compila Android e iOS. Si ambos terminan correctamente, publica una
-**prerelease conjunta** con etiqueta `android-build-N`. Se conserva ese nombre
-por continuidad con Android, pero ahora la Release contiene las dos plataformas.
+**prerelease conjunta**. Main conserva la etiqueta `android-build-N` por
+continuidad con Android; la Release contiene las dos plataformas.
+
+Las compilaciones de la rama del examen usan **`exuii-colque-build-N`** y muestran
+`exuii-colque` en el título y las notas. Puedes descargarlas sin integrar el PR
+en main; elige la rama y el número de build que vas a probar.
 
 Si tienes acceso al repositorio privado:
 
@@ -92,7 +96,9 @@ La descarga de Releases sigue requiriendo acceso al repositorio privado.
 Si un build falla, la nueva Release conjunta no se publica; no confundir una
 versión anterior disponible con el resultado del último push. La compilación
 puede iniciarse también manualmente desde **Actions → Flutter → Run workflow**,
-seleccionando **main**. Las ramas de desarrollo validan mediante PR; no publican.
+seleccionando **main** o **exuii-colque**. Las demás ramas validan mediante PR;
+no publican. Si necesitas reintentar, usa **Re-run all jobs** para conservar los
+nombres de artefactos coherentes con el intento.
 
 ### Primera instalación realizada en este chat
 

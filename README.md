@@ -131,12 +131,14 @@ Si falla el acceso o falta una función remota, confirma el entorno y la activac
 
 La [guía paso a paso de instalación y distribución](INSTALACION_ANDROID.md)
 explica cómo generar y respaldar la firma, completar el JSON local, guardar los
-cinco secrets en GitHub, activar la compilación desde `main`, descargar el APK
+cinco secrets en GitHub, activar la compilación desde `main` o `exuii-colque`, descargar el APK
 e instalarlo o actualizarlo en un teléfono. Incluye compilación local y solución
 de errores, con comandos e indicaciones de dónde ejecutar cada paso.
 
-El workflow está preparado para publicar una **prerelease con APK firmado** por
-cada push a `main` que supere las validaciones. El usuario confirmó el24/10 la
+El workflow está preparado para publicar una **prerelease con APK firmado e IPA** por
+cada push a `main` o `exuii-colque` que supere las validaciones y ambas compilaciones.
+Las del examen usan `exuii-colque-build-N`; main conserva `android-build-N`.
+El usuario confirmó el24/10 la
 configuración de firma, los cinco secrets y `key.properties` local; el
 [inventario y estado de preparación](INSTALACION_ANDROID.md#estado-de-la-preparacion)
 indica de dónde sale cada dato y los pendientes de respaldo, integración y

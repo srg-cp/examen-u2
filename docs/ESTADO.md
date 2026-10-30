@@ -1,5 +1,49 @@
 # Estado del proyecto
 
+## Distribución del examen desde exuii-colque —30/10/2026
+
+Por solicitud explícita se crea `exuii-colque`, conservando la documentación
+pendiente de protección de main. El workflow Flutter acepta push/manual en main
+y exuii-colque; valida todo antes de compilar Android+iOS y publicar juntos.
+Examen usa `exuii-colque-build-N`, main conserva `android-build-N`; título/notas
+identifican rama y commit. Las PR y otras ramas no publican ni consumen firma.
+No cambia protección de main, secretos, configuración cliente ni backend.
+Fichas [Android](funcionalidades/distribucion-android.md) e
+[iOS](funcionalidades/distribucion-ios.md), guías de instalación y flujo actualizados.
+
+El último run previo de main41095333818 fallaba en9 pruebas: dos de filtros GPS
+sin binding y siete de widgets de mascotas con contenedores externos vivos al
+comprobar temporizadores. Corrección solo en pruebas: inicializar binding y
+desmontar widgets/disponer contenedores antes de las invariantes del framework;
+conserva teardown de respaldo y todas las aserciones. No se omite ninguna prueba.
+
+Validación local:13 pruebas focalizadas aprobadas,8 pruebas Python de preparación
+de paquetes aprobadas, actionlint1.7.12 sin incidencias en ambos workflows,
+25 escenarios evento/ref para android/ios/release y9 escenarios Bash con gh
+simulado (creación, reintento, commit distinto y rama no permitida) aprobados.
+Formato sin cambios, análisis Flutter completo sin incidencias y710 pruebas
+Flutter aprobadas. git diff --check correcto. Logs locales en apps/mobile/build:
+exuii-colque-analysis.log, exuii-colque-targeted-tests.log y
+exuii-colque-full-tests.log. Los avisos HTTP400 de teselas no fallaron la suite;
+no acreditan mapas remotos. Entrega en exuii-colque; comprobación del primer run
+remoto, nuevo APK/IPA e instalación en dispositivo pendientes. Siguiente paso:
+comprobar Actions y distribuir solo su prerelease completada.
+
+## Protección remota de main mediante pull requests —30/10/2026
+
+Por solicitud explícita, activado en GitHub el ruleset26223286 para
+`refs/heads/main`: cambios mediante PR desde otra rama, sin actores con bypass,
+también para administradores; bloquea borrado y force push. Cero aprobaciones
+externas obligatorias para permitir trabajo individual. No añade checks de CI
+obligatorios. [Configuración y recorrido](funcionalidades/proteccion-main-github.md).
+
+Verificación remota: GET del ruleset confirma active y current_user_can_bypass=never;
+GET de reglas efectivas de main devuelve pull_request/deletion/non_fast_forward;
+la rama feature/proteccion-main-github no recibe estas reglas. Sin push de prueba
+ni cambios de commits remotos. Documentación local en feature/proteccion-main-github,
+sin commit/push/PR. Siguiente incremento: trabajar en otra rama, publicar esa rama,
+abrir PR hacia main e integrar después de revisar diff y resultados.
+
 ## Scripts de limpieza global de mascotas y casos —30/10/2026
 
 Petición explícita: SQL para vaciar mascotas y casos de todas las cuentas,

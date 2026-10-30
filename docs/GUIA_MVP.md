@@ -756,6 +756,18 @@ Cada issue #1–#51 tiene su archivo en [backlog](backlog/README.md), con snapsh
 
 Usar `main` como base integrada y una rama por historia o conjunto coherente de cambios. Inicialmente no hace falta mantener una rama `develop` adicional. El repositorio local ya tiene commits; comprobar las referencias y la autenticación del remoto antes de publicar cambios. Los incrementos siguen ramas y pull requests según la autorización de cada tarea.
 
+Desde el30/10/2026, GitHub exige PR para modificar `main`, también a administradores,
+sin excepciones de bypass. Bloquea force push y borrado; las ramas de trabajo siguen
+admitiendo push. El ruleset no exige aprobación de otra persona ni añade checks
+obligatorios de CI. Usar `feature/` como prefijo predeterminado para ramas nuevas.
+Véase [protección de main](funcionalidades/proteccion-main-github.md).
+
+Excepción de distribución autorizada30/10: la rama de examen `exuii-colque`
+genera prereleases APK+IPA por push, sin integrarse en main. Etiquetas
+`exuii-colque-build-N`; main conserva `android-build-N`. Ambas ejecutan todas
+las validaciones antes de compilar y publican solo si ambas plataformas aprueban.
+Las demás ramas no publican y las PR solo validan. No cambia el alcance MVP.
+
 Crear un issue por HU y milestones S1-S6. La plantilla de historia está en `.github/ISSUE_TEMPLATE/historia.md`. No hace falta un tablero adicional para empezar; se puede añadir si mejora la coordinación.
 
 Actualización del 8 de octubre de 2026: conservar las 16 HU originales y sus issues #1–#16. Doce pasan a historias agrupadoras; 35 derivadas HU-XX.n (#17–#51) y cuatro originales sin dividir forman 39 entregas ejecutables. Todas mantienen formato de historia de usuario y están asignadas a `srg-cp`. El [desglose versionado](BACKLOG_MVP.md) conserva RF, criterios, dependencias y validación. No sumar esfuerzo de agrupadoras y derivadas, ni reutilizar estimaciones originales como estimaciones nuevas. Cerrar una agrupadora solo después de sus derivadas y su validación integrada; los sprints siguen siendo objetivos. La reorganización no añade alcance funcional ni acredita criterios pendientes.

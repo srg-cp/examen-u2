@@ -1,11 +1,25 @@
 # Distribución Android por GitHub Releases
 
+30/10/2026: excepción explícita para el examen: `exuii-colque` también publica
+por push o ejecución manual, con etiqueta `exuii-colque-build-N`, título y notas
+que identifican rama/commit. `main` conserva `android-build-N`. Ambas esperan
+validación y compilación de las dos plataformas. Las PR siguen validando y
+las demás ramas no compilan ni publican paquetes. Este alcance sustituye la
+restricción a main de las notas del29/10 siguientes.
+
+Validación local30/10: actionlint sin incidencias,25 escenarios de evento/ref
+para los tres jobs de distribución y9 escenarios Bash simulados de publicación/
+reintento/commit distinto/rama no permitida aprobados. Análisis Flutter sin
+incidencias y710 pruebas aprobadas, incluidas correcciones de preparación/
+limpieza de9 pruebas que bloqueaban main. Primera compilación remota del examen
+pendiente; no se acredita paquete instalado por estas comprobaciones.
+
 29/10/2026: por instrucción explícita, publicación conjunta desde `main`.
 `Flutter` valida y compila Android/iOS en jobs separados; el job final espera
 ambos y adjunta APK firmado, IPA sin firma personal, BUILD.txt, ios-Podfile.lock
 y SHA256SUMS.txt en una prerelease `android-build-N` del mismo commit. Se conserva
 numeración y versionCode10000+N; iOS usa el mismo número. Ninguna rama de desarrollo
-publica. Si falla una plataforma no se publica la nueva Release conjunta.
+publicaba en ese alcance inicial. Si falla una plataforma no se publica la nueva Release conjunta.
 Al reintentar ejecutar todos los jobs para conservar coherencia de run_attempt.
 
 Para ejecutar la configuración de principio a fin, seguir la
@@ -19,16 +33,17 @@ funcionalidades remotas. Conserva el identificador Android existente
 
 ## Qué hace y recorrido
 
-Cada push a `main` ejecuta formato, análisis y pruebas Flutter. Si pasan,
+Cada push a `main` o `exuii-colque` ejecuta formato, análisis y pruebas Flutter. Si pasan,
 compila un APK universal firmado y un IPA iOS para firma personal; publica una **prerelease** conjunta con sus SHA-256.
 Incluye cambios de cualquier carpeta, según la petición de publicar cada push.
 Las PR ejecutan validación cuando cambian archivos móviles/workflow y nunca
-acceden a la firma. Run workflow permite repetir manualmente desde `main`.
+acceden a la firma. Run workflow permite repetir manualmente desde `main` o `exuii-colque`.
 Flutter está fijado en 3.35.3; el runner Android usa JDK 17.
 CI limita Gradle a3 GB de heap y2 workers mediante GRADLE_OPTS, conservando
 la configuración de desarrollo existente y evitando su heap de8 GB en el runner.
 
-Etiqueta: `android-build-N`, donde N es `github.run_number`; versionCode:
+Etiqueta: `android-build-N` para main y `exuii-colque-build-N` para el examen,
+donde N es `github.run_number`; versionCode:
 `10000 + N`. `versionName` procede de `apps/mobile/pubspec.yaml`.
 No reiniciar el contador del workflow ni reutilizar números inferiores para
 versiones posteriores. Un reintento del mismo run conserva etiqueta/número y

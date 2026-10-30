@@ -1,5 +1,13 @@
 # Funcionalidades de Entre Huellas
 
+30/10: distribución [Android](distribucion-android.md) e
+[iOS](distribucion-ios.md) también desde `exuii-colque`, con prerelease
+`exuii-colque-build-N` por push; validación completa y publicación conjunta.
+
+30/10: [Protección de main en GitHub](proteccion-main-github.md): configuración
+operativa activa, cambios por PR también para administradores, sin bypass;
+force push y borrado bloqueados.
+
 30/10: [limpieza operativa de mascotas y casos](limpieza-mascotas-y-casos.md):
 SQL manual para todas las cuentas/estados y referencias asociadas, reinicio de
 identidades y conservación de cuentas/configuración; sin ejecución remota.

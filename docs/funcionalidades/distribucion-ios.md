@@ -1,5 +1,19 @@
 # Pruebas personales de iOS desde Windows
 
+30/10/2026: por solicitud explícita, `exuii-colque` también compila/publica en
+cada push y permite ejecución manual. Conserva el workflow iOS reutilizable,
+secrets y firma personal existentes. Publicación conjunta APK+IPA en
+`exuii-colque-build-N`, con rama/commit identificados; main conserva
+`android-build-N`. No exige integrar el examen en main para descargar el IPA.
+Las demás ramas y PR no publican. Sustituye solo la restricción de ramas de las
+notas del29/10 siguientes. Ambas plataformas deben aprobar antes de publicar.
+
+Validación local30/10: actionlint de ambos workflows sin incidencias,8 pruebas
+Python de paquetes aprobadas, análisis Flutter sin incidencias y710 pruebas
+aprobadas. Condiciones de ramas/eventos y publicación/reintentos comprobados con
+gh simulado. Primera compilación remota desde el examen e instalación de su IPA
+pendientes; se conserva el contrato de firma personal existente.
+
 28/10/2026. Infraestructura de prueba autorizada para iPhone 11/iOS 18.5.
 Rama `feature/ios-sideload`: integra `feature/case-matching` (afb7cb2) y
 `origin/main` (6db8810), por instrucción posterior de actualizar el APK y crear

@@ -1,7 +1,7 @@
 name: Flutter
 on:
   push:
-    branches: [main]
+    branches: [main, exuii-colque]
   workflow_dispatch:
   pull_request:
     paths:
@@ -29,7 +29,9 @@ jobs:
       - run: flutter analyze
       - run: flutter test --dart-define=AMBIENT_BACKGROUND_MOTION=false
   android:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/exuii-colque')
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -88,12 +90,17 @@ jobs:
         shell: bash
         run: rm -f config/release.local.json "$ANDROID_KEYSTORE_PATH"
   ios:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/exuii-colque')
     needs: validate
     uses: ./.github/workflows/ios-sideload.yml
     secrets:
       MOBILE_CONFIG_JSON: ${{ secrets.MOBILE_CONFIG_JSON }}
   release:
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/exuii-colque')
     needs: [android, ios]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -127,10 +134,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail
-          tag="android-build-${GITHUB_RUN_NUMBER}"
+          case "$RELEASE_BRANCH" in
+            main)
+              tag="android-build-${GITHUB_RUN_NUMBER}"
+              title="Entre Huellas build ${GITHUB_RUN_NUMBER} - Android + iOS"
+              ;;
+            exuii-colque)
+              tag="exuii-colque-build-${GITHUB_RUN_NUMBER}"
+              title="Entre Huellas exuii-colque build ${GITHUB_RUN_NUMBER} - Android + iOS"
+              ;;
+            *)
+              echo "Release branch is not allowed" >&2
+              exit 1
+              ;;
+          esac
           if gh release view "$tag" >/dev/null 2>&1; then
             target="$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha)"
             test "$target" = "$GITHUB_SHA"
@@ -138,6 +159,6 @@ jobs:
           else
             gh release create "$tag" release/* \
               --target "$GITHUB_SHA" --prerelease --latest=false \
-              --title "Entre Huellas build ${GITHUB_RUN_NUMBER} - Android + iOS" \
-              --notes "APK Android firmado e IPA iOS para firmar con Sideloadly. Ambos proceden del commit $GITHUB_SHA. Consulta INSTALACION_IOS.md en ese commit para instalar y renovar."
+              --title "$title" \
+              --notes "APK Android firmado e IPA iOS para firmar con Sideloadly. Rama $RELEASE_BRANCH, commit $GITHUB_SHA. Consulta INSTALACION_IOS.md en ese commit para instalar y renovar."
           fi

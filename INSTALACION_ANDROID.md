@@ -15,9 +15,10 @@ la carpeta donde están `README.md`, `apps` y este archivo, salvo indicación ex
 | Compilar un APK en tu equipo | Sección «Compilar localmente» |
 
 La automatización está en [.github/workflows/flutter.yml](.github/workflows/flutter.yml).
-Cada push a `main`, incluido integrar un PR, valida el código y, si pasa,
-compila un APK universal firmado y publica una **prerelease** con APK y checksum.
-Las PR solo validan. También se puede ejecutar manualmente desde `main`.
+Cada push a `main` o `exuii-colque` valida el código y, si pasa,
+compila Android e iOS y publica una **prerelease** con APK firmado, IPA y checksums.
+Las PR solo validan. También se puede ejecutar manualmente desde cualquiera de
+esas dos ramas. Main usa `android-build-N`; el examen usa `exuii-colque-build-N`.
 
 Esto distribuye Android mediante GitHub Releases. El backend Supabase debe estar
 disponible por separado: generar el APK no crea tablas, RLS, buckets ni servicios.
@@ -185,8 +186,8 @@ los permisos del repositorio. Guía oficial: [secrets de Actions](https://docs.g
 
 ## 5. Integrar la automatización y comprobar la primera ejecución
 
-Estos cambios deben estar integrados en `main` para activar la publicación
-por push. Si todavía están en una rama de trabajo, prepara/revisa el commit y
+El workflow debe estar publicado en `main` o `exuii-colque` para activar la
+publicación por push en esa rama. Para otras ramas, prepara/revisa el commit y
 su PR conforme al [flujo del equipo](README.md#trabajo-en-equipo); no incluyas
 archivos ignorados ni fuerces su subida con `git add -f`.
 
@@ -200,25 +201,25 @@ git status --short
 El primer comando debe listar esas rutas. Los archivos privados no deben aparecer
 como cambios para incluir en el commit. El workflow, scripts y ejemplos sí se versionan.
 
-Después de integrar el PR a `main`:
+Después de integrar el PR a `main` o publicar un push a `exuii-colque`:
 
 1. Abre [Actions](https://github.com/srg-cp/entrehuellas/actions).
 2. Selecciona **Flutter** y la ejecución correspondiente al commit integrado.
 3. El job **validate** debe terminar correctamente: dependencias, pruebas de
    configuración, formato, análisis y pruebas Flutter.
-4. Luego **release** prepara los archivos privados, compila, verifica la firma,
-   guarda el artifact y publica la prerelease.
+4. Los jobs **android** e **ios** compilan y verifican sus paquetes; después
+   **release** publica ambos juntos.
 5. Espera a que **release** termine en verde antes de buscar la descarga.
 
 Si `validate` falla, se bloquea la publicación. Si falta un secret o no es válido,
-`release` se detiene; consulta el primer paso con error, sin compartir sus valores.
+la compilación se detiene; consulta el primer paso con error, sin compartir sus valores.
 
 ## 6. Ejecutarlo manualmente o repetirlo
 
 Si ya tienes el workflow integrado pero añadiste/corregiste secrets después:
 
 1. Entra en **Actions → Flutter → Run workflow**.
-2. Selecciona la rama **main**.
+2. Selecciona la rama **main** o **exuii-colque**.
 3. Pulsa **Run workflow** y espera `validate` y `release` en verde.
 
 Esta es la opción recomendada cuando quieres un APK nuevo sin cambiar código.
@@ -226,10 +227,11 @@ Cambiar un secret por sí solo no lanza un build ni modifica APK ya publicados.
 
 Si no aparece el botón, comprueba permisos de escritura, que el workflow tenga
 `workflow_dispatch` integrado en la rama predeterminada y que Actions esté habilitado.
-La publicación solo ocurre desde `main`, aunque el selector muestre otras ramas.
+La publicación solo ocurre desde `main` o `exuii-colque`, aunque el selector muestre otras ramas.
 Referencia: [ejecución manual de workflows](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow).
 
-Para recuperar una ejecución fallida también puedes usar **Re-run failed jobs**.
+Para recuperar una ejecución fallida usa **Re-run all jobs**, de modo que los
+nombres de artefactos de Android/iOS y release compartan el mismo intento.
 Un reintento del mismo run conserva su número y reemplaza los adjuntos de su
 prerelease. Un Run workflow nuevo crea otro número de build.
 
@@ -237,6 +239,7 @@ prerelease. Un Run workflow nuevo crea otro número de build.
 
 Abre [Releases](https://github.com/srg-cp/entrehuellas/releases) y busca
 **Android build N**, con etiqueta `android-build-N` y marca **Pre-release**.
+Para el examen, busca **exuii-colque build N**, etiqueta `exuii-colque-build-N`.
 Elige el número de build mayor: ejecuciones simultáneas pueden terminar en otro orden.
 Estas prereleases no se marcan como la release estable «Latest».
 
