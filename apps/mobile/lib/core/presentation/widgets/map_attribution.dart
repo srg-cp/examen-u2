@@ -3,8 +3,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'confirmation_toast.dart';
 import '../../theme/app_theme.dart';
+import '../../config/map_config.dart';
 
-/// Visible credits for CARTO's basemap, independent of product markers.
+/// Visible OpenStreetMap credits, plus CARTO when it supplies the basemap.
 class MapAttribution extends StatefulWidget {
   const MapAttribution({this.compact = false, super.key});
   final bool compact;
@@ -63,7 +64,8 @@ class _MapAttributionState extends State<MapAttribution> {
           'https://www.openstreetmap.org/copyright',
         ),
       ),
-      _credit('© CARTO', 'https://carto.com/attribution/'),
+      if (MapConfig.usesCarto)
+        _credit('© CARTO', 'https://carto.com/attribution/'),
     ],
   );
 

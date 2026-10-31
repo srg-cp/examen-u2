@@ -4,6 +4,7 @@ enum ExploreFailureKind {
   unavailable,
   locationDenied,
   locationDisabled,
+  locationTimeout,
 }
 
 class ExploreFailure implements Exception {

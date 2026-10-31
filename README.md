@@ -36,6 +36,12 @@ APK debug compilado e instalado, permiso preciso activado y lectura nativa
 verificada en Tacna (-18.006598, -70.246300; diferencia aproximada de 0.22 m
 respecto del punto fijado). Las cinco capturas están incorporadas al Word de trabajo.
 
+Punto 2 implementado en esta rama aislada: seguimiento con precisión media,
+actualización solo con30s Y50m, timeout inicial de10s y cancelación al salir del
+mapa con log «GPS detenido».29 pruebas aprobadas, análisis sin incidencias y APK
+debug compilado/instalado. [Capturas reales y registros](docs/evidencias/examen-u2-punto-2/README.md).
+Los puntos3–5 se desarrollan aparte. El punto2 no se publica en origin/entrehuellas.
+
 Archivos móviles afectados (relativos a `apps/mobile`):
 
 - `lib/features/explore/domain/entities/current_location.dart`
@@ -51,7 +57,35 @@ Archivos móviles afectados (relativos a `apps/mobile`):
 - `test/current_location_test.dart`, `test/explore_filter_draft_test.dart`,
   `test/explore_map_test.dart` y `test/support/fake_current_location.dart`.
 
-Validación y evidencias pendientes: [ficha del examen](docs/funcionalidades/examen-u2.md).
+Archivos adicionales del punto 2:
+
+- `android/app/src/main/AndroidManifest.xml` (permiso FINE de125c04d junto a COARSE).
+- `lib/features/explore/domain/failures/explore_failure.dart`
+- `lib/features/explore/domain/use_cases/watch_current_explore_location.dart`
+- `lib/features/explore/presentation/view_models/explore_map_location_view_model.dart`
+- `lib/features/explore/providers/explore_providers.dart`
+- `test/examen_location_tracking_test.dart` y `test/examen_map_location_screen_test.dart`
+
+Detalle y alcance: [ficha del examen](docs/funcionalidades/examen-u2.md).
+
+### Punto 3 en worktree aislado
+
+Círculo GPS cuyo radio es `accuracyMeters`, etiqueta «Precisión ± N m», créditos
+OpenStreetMap y selección manual cuando la ubicación no está disponible. La
+selección aplica el punto a la búsqueda real sin inventar precisión. Rama
+`feature/examen-u2-punto-3`, base `125c04d`; sin integración en el proyecto principal.
+43 pruebas locales previas aprobadas. Punto 2 integrado, 30 pruebas conjuntas
+aprobadas y capturas nativas de GPS/selección manual incorporadas al documento;
+[contrato y validación](docs/funcionalidades/examen-u2-punto-3.md).
+
+Archivos móviles afectados, relativos a `apps/mobile`:
+
+- `lib/features/explore/presentation/widgets/explore_case_map.dart`
+- `lib/features/explore/presentation/screens/explore_map_screen.dart`
+- `lib/core/presentation/widgets/map_attribution.dart`
+- `lib/core/presentation/widgets/map_case_sheet.dart`
+- `lib/core/presentation/widgets/zone_map_picker.dart`
+- `test/examen_location_map_test.dart`
 
 ## 🐾 Sobre el proyecto
 

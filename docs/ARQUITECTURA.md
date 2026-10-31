@@ -7,6 +7,12 @@ SDK GPS. Dominio conserva CurrentLocation y presentación recibe lectura por
 repositorio/caso de uso inyectados. Sin ubicación de fondo ni cambios de backend.
 [Validación y alcance del examen](funcionalidades/examen-u2.md).
 
+30/10, examen tipo1 punto2, solo rama individual: CurrentLocationRepository.watch
+expone entidades mediante WatchCurrentExploreLocation y provider declarativo.
+ExploreMapLocationViewModel administra la suscripción del mapa con autoDispose;
+DeviceLocationSource mantiene el único import de geolocator, límites30s/50m y
+temporizador inicial10s. Sin cambios de fronteras, persistencia ni web/backend.
+
 30/10, [ADR-171](decisiones/171-perfil-agrupado-y-navegacion-horizontal-mobile.md):
 Perfil móvil separa resumen y editor conservando ProfileViewModel/PhotoViewModel
 y formulario existentes. Shell y filas compartidos en profile; router compone

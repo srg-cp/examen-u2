@@ -1,0 +1,129 @@
+00:00 +0: loading C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart
+00:00 +0: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: (setUpAll)
+00:00 +0: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: GPS accuracy circle and visible attribution; small=false
+00:00 +1: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: GPS accuracy circle and visible attribution; small=false
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:01 +2: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:01 +2: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: GPS accuracy circle and visible attribution; small=true
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:01 +3: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:01 +4: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +4: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: GPS failure removes old accuracy and actual map tap selects a manual point
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:02 +5: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +6: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +6: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: No initial GPS and no query still render a selectable map
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:02 +7: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +8: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +9: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +9: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_map_location_screen_test.dart: timeout shows Tiempo agotado and removes old GPS coordinates
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:02 +10: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +11: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +11: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_map_test.dart: The real map screen explains GPS failure and searches the tapped location
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+GPS detenido
+00:02 +12: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +13: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +14: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +15: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:02 +16: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:03 +17: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:03 +18: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:03 +19: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:03 +20: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:03 +21: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:07 +21: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/explore_map_test.dart: Map opens from its option, shares results, opens detail and returns; reduced=false
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+GPS detenido
+GPS detenido
+00:07 +22: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:08 +22: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/explore_map_test.dart: Map opens from its option, shares results, opens detail and returns; reduced=true
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+GPS detenido
+GPS detenido
+00:08 +23: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:09 +23: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/explore_map_test.dart: Public map separates coincident pins, opens each case, and permits navigation without editing; small=false
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:09 +24: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:09 +24: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/explore_map_test.dart: Public map separates coincident pins, opens each case, and permits navigation without editing; small=true
+  [1m[flutter_map][0m
+    We want to help keep OpenStreetMap available for everyone. Our examples
+    and demo app use the public tile servers, but they are NOT free to use by
+    everyone! Please review whether the OpenStreetMap tile servers are suitable
+    for your project.
+    See:
+      * https://operations.osmfoundation.org/policies/tiles (OSM Tile Usage Policy)
+      * https://docs.fleaflet.dev/osm-warn for more information about this warning
+00:09 +25: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: no first reading in 10 seconds maps to locationTimeout and stops GPS
+00:10 +26: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: leaving cancels native subscription before logging GPS detenido
+00:10 +27: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: leaving during access check never starts a late GPS listener
+00:10 +28: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: tracking error replaces a previous valid reading with an error
+GPS detenido
+00:10 +29: C:/Users/Administrator/Documents/projects/entreHuellas-examen-punto-3/apps/mobile/test/examen_location_tracking_test.dart: disposing the map provider cancels GPS while waiting for the first reading
+GPS detenido
+00:20 +30: All tests passed!

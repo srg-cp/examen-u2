@@ -264,7 +264,7 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
               ),
             ),
           ),
-          if ((MapConfig.usesCarto && widget.showAttribution) || _failed)
+          if (widget.showAttribution || _failed)
             Positioned(
               top: widget.compactAttribution
                   ? null
@@ -274,12 +274,12 @@ class _ZoneMapPickerState extends State<ZoneMapPicker> {
                         widget.attributionTopInset
                   : 8,
               bottom: widget.compactAttribution ? 4 : null,
-              left: MapConfig.usesCarto && !widget.compactAttribution ? 76 : 8,
+              left: !widget.compactAttribution ? 76 : 8,
               right: 8,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (MapConfig.usesCarto && widget.showAttribution)
+                  if (widget.showAttribution)
                     MapAttribution(compact: widget.compactAttribution),
                   if (_failed)
                     TextButton(

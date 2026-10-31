@@ -1,5 +1,50 @@
 # Examen Unidad II tipo 1
 
+## Punto 2 Seguimiento con consumo controlado
+
+Incremento exclusivo del examen,30/10/2026. Iniciar sesión → Explorar → Mapa.
+El mapa suscribe el GPS al entrar y lo cancela al salir; abrir una ficha y pasar
+a segundo plano también detienen el seguimiento. No se apaga el GPS global del
+dispositivo: se liberan las solicitudes de esta pantalla.
+
+Reglas: LocationAccuracy.medium, intervalo nativo30s y distancia50m. El filtro
+de recepción exige a la vez30s transcurridos y desplazamiento≥50m desde la última
+lectura aceptada. Se usa Stopwatch monotónico. Después de verificar acceso,
+la primera lectura tiene10s; si no llega, cancelación y locationTimeout, que la
+pantalla muestra como «Tiempo agotado» mediante el toast compartido. No se aplica
+un timeout recurrente que falle al permanecer quieto. Los errores del seguimiento
+eliminan el valor GPS visible; no se ofrece una lectura anterior como actual.
+
+Contratos para la integración del punto3, sin implementarlo aquí:
+`CurrentLocationRepository.watch()` devuelve `Stream<CurrentLocation>`;
+`ExploreFailureKind.locationTimeout`; `exploreMapLocationProvider` expone
+`AsyncValue<CurrentLocation?>`. La pantalla usa `location.asData?.value`, sin
+fallback a ExploreState.currentLocation cuando el seguimiento falla.
+
+Datos: única dependencia de geolocator en DeviceLocationSource; fuente/repo/caso
+de uso/ViewModel existentes extendidos sin persistencia nueva ni llamadas a
+Supabase. onCancel libera temporizador y escucha nativa. stop registra
+«GPS detenido» tras cancel; ref.onDispose y dispose del mapa evitan fugas.
+ACCESS_FINE_LOCATION junto a ACCESS_COARSE_LOCATION reproduce125c04d sin cambiar
+la precisión solicitada, sin incorporar los otros cambios de ese commit.
+
+Validación:29 pruebas de configuración, límites simultáneos, timeout, cancelación
+antes de primera lectura y durante permisos, errores sin dato GPS anterior,
+presentación del aviso, regresiones de navegación normal/pequeña y arquitectura;
+análisis sin incidencias. APK debug compilado e instalado con el ajuste Java
+temporal comunicado por el estudiante. Logcat final en emulator-5554 confirma
+PID9385:21:24:51.950 GPS detenido y21:24:51.951 position updates stopped.
+No se modificó la ubicación ni se apagó el GPS para obtener esta evidencia.
+
+[Capturas y registros](../evidencias/examen-u2-punto-2/README.md).
+Word independiente: `SI988-EXPRAC-U2-ColquePonceSergioAlberto-Punto2.docx` en la raíz;
+conserva carátula de la copia recibida y documenta solamente el punto2 en4 páginas.
+Se exportó con Word y se revisaron visualmente las4 páginas. La herramienta
+render_docx.py se intentó, pero falta LibreOffice en Windows; se usó el render
+nativo de Word con PNGs de comprobación. No sobrescribe el Word original.
+Pendientes: integración con los apartados de otros chats y validación del docente.
+Las pruebas de este incremento no presentan como desarrollado el punto4 del examen.
+
 ## Punto 1 Separación de ubicación
 
 Incremento del 30/10/2026 sobre Explorar móvil (HU-07/RF-13), únicamente para

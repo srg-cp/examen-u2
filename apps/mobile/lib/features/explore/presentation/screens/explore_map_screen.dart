@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../../../../core/presentation/widgets/map_sheet_header.dart';
 import '../../../../core/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ import '../../../../core/presentation/widgets/confirmation_toast.dart';
 import '../../../../core/presentation/widgets/content_refresh.dart';
 import '../../../../core/presentation/widgets/loading_shimmer.dart';
 import '../view_models/explore_view_model.dart';
+import '../view_models/explore_map_location_view_model.dart';
+import '../../domain/failures/explore_failure.dart';
 import '../widgets/explore_case_map.dart';
 import '../widgets/explore_map_case_preview.dart';
 import '../../domain/entities/explore_page.dart';
@@ -20,12 +23,36 @@ class ExploreMapScreen extends ConsumerStatefulWidget {
   ConsumerState<ExploreMapScreen> createState() => _ExploreMapScreenState();
 }
 
-class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
+class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen>
+    with WidgetsBindingObserver {
   final _sheetExtent = ValueNotifier<double>(.5);
   bool _openingCase = false;
+  ExploreMapLocationViewModel? _location;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _location = ref.read(exploreMapLocationProvider.notifier);
+      _location!.start();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (ModalRoute.of(context)?.isCurrent == true) _location?.start();
+    } else {
+      unawaited(_location?.stop());
+    }
+  }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_location?.stop());
     _sheetExtent.dispose();
     super.dispose();
   }
@@ -35,6 +62,17 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
     final value = ref.watch(exploreViewModelProvider);
     final data = value.isLoading || value.hasError ? null : value.asData?.value;
     final vm = ref.read(exploreViewModelProvider.notifier);
+    final location = ref.watch(exploreMapLocationProvider);
+    final locationNotice = switch (location.error) {
+      ExploreFailure(kind: ExploreFailureKind.locationTimeout) =>
+        'Tiempo agotado',
+      ExploreFailure(kind: ExploreFailureKind.locationDenied) =>
+        'No tenemos permiso de ubicación.',
+      ExploreFailure(kind: ExploreFailureKind.locationDisabled) =>
+        'Activa la ubicación del dispositivo.',
+      null => null,
+      _ => 'No pudimos obtener tu ubicación actual.',
+    };
     Future<void> openCase(ExploreCase item, BuildContext source) async {
       if (_openingCase) return;
       setState(() => _openingCase = true);
@@ -44,6 +82,7 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
           ? null
           : box.localToGlobal(Offset.zero, ancestor: navigator) & box.size;
       try {
+        unawaited(_location?.stop());
         await context.push(
           '/home/${item.fromPet ? 'cases' : 'found-cases'}/${item.id}',
           extra: origin,
@@ -52,18 +91,24 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
           await ref.read(exploreViewModelProvider.notifier).refreshIfStale();
         }
       } finally {
-        if (mounted) setState(() => _openingCase = false);
+        if (mounted) {
+          _location?.start();
+          setState(() => _openingCase = false);
+        }
       }
     }
 
     return AppScaffold(
       body: ConfirmationToastHost(
-        confirmed: value.hasError || data?.notice != null,
+        confirmed:
+            locationNotice != null || value.hasError || data?.notice != null,
         isError: true,
-        message: value.hasError
-            ? 'No pudimos consultar los casos.'
-            : data?.notice ?? '',
-        noticeId: (value.error, data?.noticeId),
+        message:
+            locationNotice ??
+            (value.hasError
+                ? 'No pudimos consultar los casos.'
+                : data?.notice ?? ''),
+        noticeId: (location.error, value.error, data?.noticeId),
         child: NotificationListener<DraggableScrollableNotification>(
           onNotification: (notification) {
             _sheetExtent.value = notification.extent;
@@ -93,11 +138,33 @@ class _ExploreMapScreenState extends ConsumerState<ExploreMapScreen> {
                     key: ValueKey(data.owner),
                     items: data.items,
                     query: data.query,
-                    currentLocation: data.currentLocation,
+                    currentLocation: location.hasError
+                        ? null
+                        : location.asData?.value,
+                    locationUnavailable: location.hasError,
+                    onManualLocationSelected: data.busy
+                        ? null
+                        : (latitude, longitude) => vm.apply(
+                            kind: data.query.kind,
+                            species: data.query.species,
+                            status: data.query.status,
+                            days:
+                                data.query.since == null ||
+                                    data.query.until == null
+                                ? 0
+                                : data.query.until!
+                                      .difference(data.query.since!)
+                                      .inDays,
+                            latitude: latitude,
+                            longitude: longitude,
+                            radiusMeters: data.query.radiusMeters ?? 15000,
+                            locationLabel: '',
+                            centerName: 'Punto del mapa',
+                          ),
                     emptyMessage: data.failed || data.busy
                         ? 'Puedes volver a Explorar para ajustar la búsqueda.'
                         : data.needsLocation
-                        ? 'Elige una ubicación desde Explorar para ver casos cercanos.'
+                        ? 'Toca el mapa para elegir una ubicación y ver casos cercanos.'
                         : null,
                     onOpen: data.busy || _openingCase ? null : openCase,
                     createTileProvider: widget.createTileProvider,

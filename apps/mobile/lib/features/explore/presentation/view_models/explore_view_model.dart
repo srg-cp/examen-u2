@@ -302,6 +302,8 @@ class ExploreViewModel extends AsyncNotifier<ExploreState> {
   }
 
   String _locationNotice(Object error) => switch (error) {
+    ExploreFailure(kind: ExploreFailureKind.locationTimeout) =>
+      'Tiempo agotado',
     ExploreFailure(kind: ExploreFailureKind.locationDenied) =>
       'No tenemos permiso de ubicación. Puedes habilitarlo en Ajustes o elegir una ubicación manualmente.',
     ExploreFailure(kind: ExploreFailureKind.locationDisabled) =>
